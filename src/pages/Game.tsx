@@ -13,9 +13,7 @@ import {
   Briefcase, 
   Link2, 
   MessageSquare,
-  LogOut,
   ChevronLeft,
-  Info,
   Zap
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -244,37 +242,6 @@ const Game = () => {
           <MessageSquare className="w-6 h-6 mr-2" />
           관용어 & 슬랭 퀴즈 / Thành ngữ & Tiếng lóng
         </Button>
-
-        {/* How to Play */}
-        <div className="glass-card p-4 rounded-xl">
-          <div className="flex items-center gap-2 mb-3">
-            <Info className="w-5 h-5 text-blue-400" />
-            <h3 className="text-white font-bold">게임 방식 / Cách chơi</h3>
-          </div>
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-start gap-2 text-white/80">
-              <span className="text-neon-cyan">🎲</span>
-              <div>
-                <p>AI가 서울의 무작위 장소와 상황을 생성합니다</p>
-                <p className="text-white/50">AI tạo địa điểm và tình huống ngẫu nhiên tại Seoul</p>
-              </div>
-            </li>
-            <li className="flex items-start gap-2 text-white/80">
-              <span className="text-green-400">🎯</span>
-              <div>
-                <p>10턴 동안 생존하면 미션 완료!</p>
-                <p className="text-white/50">Sống sót 10 lượt để hoàn thành nhiệm vụ!</p>
-              </div>
-            </li>
-            <li className="flex items-start gap-2 text-white/80">
-              <span className="text-purple-400">💬</span>
-              <div>
-                <p>AI는 자연스럽게 대화하며 진짜 실수만 교정합니다</p>
-                <p className="text-white/50">AI trò chuyện tự nhiên và chỉ sửa lỗi thật sự</p>
-              </div>
-            </li>
-          </ul>
-        </div>
 
         {/* Footer Stats */}
         <div className="flex items-center justify-center gap-4 text-white/40 text-sm pt-4">
