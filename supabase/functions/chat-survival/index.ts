@@ -1,0 +1,141 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+const SEOUL_LOCATIONS = [
+  "강남역", "홍대입구", "명동", "이태원", "한강공원", 
+  "경복궁", "동대문시장", "신촌", "압구정", "잠실",
+  "광화문", "삼성역", "여의도", "서울역", "건대입구"
+];
+
+const SYSTEM_PROMPT = `당신은 "K-Life: 서울 생존기" 게임의 AI 가이드 LUKATO입니다.
+
+역할:
+- 서울의 실제 장소에서 벌어지는 실생활 시나리오를 생성합니다
+- 사용자와 자연스럽게 한국어로 대화합니다
+- 모든 대화에 베트남어 번역을 함께 제공합니다 (이탤릭체로)
+- 사용자의 한국어 실수는 자연스럽게 교정해주되, 심각한 오류만 지적합니다
+
+게임 규칙:
+- 각 턴마다 상황을 제시하고 사용자의 응답을 기다립니다
+- 적절한 응답이면 긍정적 피드백 + 보상 (돈/HP 증가)
+- 부적절하거나 이상한 응답이면 부정적 피드백 + 페널티 (돈/HP 감소)
+- 10턴을 생존하면 미션 성공!
+
+응답 형식 (JSON):
+{
+  "message_ko": "한국어 메시지",
+  "message_vi": "Tin nhắn tiếng Việt (베트남어 번역)",
+  "hp_change": 0, // -20 ~ +10 사이
+  "money_change": 0, // -5000 ~ +3000 사이
+  "turn_result": "success" | "warning" | "fail",
+  "game_over": false,
+  "mission_complete": false
+}
+
+항상 위 JSON 형식으로만 응답하세요.`;
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { messages, location, currentTurn } = await req.json();
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+
+    if (!LOVABLE_API_KEY) {
+      throw new Error("LOVABLE_API_KEY is not configured");
+    }
+
+    // Generate random location if not provided
+    const gameLocation = location || SEOUL_LOCATIONS[Math.floor(Math.random() * SEOUL_LOCATIONS.length)];
+
+    // Build context message
+    const contextMessage = currentTurn === 1 
+      ? `새로운 게임이 시작됩니다. 장소: ${gameLocation}. 첫 번째 시나리오를 생성해주세요. 현재 턴: ${currentTurn}/10`
+      : `현재 턴: ${currentTurn}/10. 장소: ${gameLocation}`;
+
+    const allMessages = [
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user", content: contextMessage },
+      ...messages
+    ];
+
+    console.log("Sending request to Lovable AI Gateway...");
+    console.log("Messages:", JSON.stringify(allMessages, null, 2));
+
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: allMessages,
+        temperature: 0.8,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("AI Gateway error:", response.status, errorText);
+
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "너무 많은 요청입니다. 잠시 후 다시 시도해주세요." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: "크레딧이 부족합니다." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      throw new Error(`AI Gateway error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const aiMessage = data.choices?.[0]?.message?.content;
+
+    console.log("AI Response:", aiMessage);
+
+    // Parse JSON response
+    let parsedResponse;
+    try {
+      // Extract JSON from response (handle markdown code blocks)
+      const jsonMatch = aiMessage.match(/```json\s*([\s\S]*?)\s*```/) || 
+                        aiMessage.match(/```\s*([\s\S]*?)\s*```/) ||
+                        [null, aiMessage];
+      parsedResponse = JSON.parse(jsonMatch[1] || aiMessage);
+    } catch (parseError) {
+      console.error("Failed to parse AI response as JSON:", parseError);
+      // Fallback response
+      parsedResponse = {
+        message_ko: aiMessage,
+        message_vi: "",
+        hp_change: 0,
+        money_change: 0,
+        turn_result: "success",
+        game_over: false,
+        mission_complete: false
+      };
+    }
+
+    return new Response(JSON.stringify(parsedResponse), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (error: unknown) {
+    console.error("Chat survival error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return new Response(
+      JSON.stringify({ error: errorMessage }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+});
