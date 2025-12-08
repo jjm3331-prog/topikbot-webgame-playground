@@ -1,52 +1,55 @@
 import NeonText from "./NeonText";
-import { Github, Twitter, Instagram, Youtube } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="py-12 border-t border-border/30 relative">
+    <footer className="py-8 border-t border-white/10 relative">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Logo & Copyright */}
-          <div className="text-center md:text-left">
-            <h3 className="text-2xl font-display">
-              <NeonText variant="gradient">K-Life</NeonText>
-            </h3>
-            <p className="text-sm text-muted-foreground mt-2">
-              © 2025 Powered by{" "}
-              <span className="text-accent font-tech">LUKATO AI</span>
-            </p>
+          <div className="flex items-center gap-3">
+            <img 
+              src="/favicon.png" 
+              alt="LUKATO" 
+              className="w-10 h-10 rounded-full shadow-lg shadow-neon-pink/20"
+            />
+            <div>
+              <h3 className="text-xl font-display">
+                <NeonText variant="gradient">Game LUKATO</NeonText>
+              </h3>
+              <p className="text-xs text-white/50">
+                Your Korean Mentor
+              </p>
+            </div>
           </div>
 
-          {/* Social Links */}
+          {/* External Links */}
           <div className="flex items-center gap-4">
-            {[
-              { icon: Github, href: "#" },
-              { icon: Twitter, href: "#" },
-              { icon: Instagram, href: "#" },
-              { icon: Youtube, href: "#" },
-            ].map(({ icon: Icon, href }, index) => (
-              <a
-                key={index}
-                href={href}
-                className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/50 hover:shadow-neon transition-all duration-300"
-              >
-                <Icon className="w-5 h-5" />
-              </a>
-            ))}
+            <a
+              href="https://hanoi.topikbot.kr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-card text-xs text-white/70 hover:text-white transition-colors"
+            >
+              <ExternalLink className="w-3 h-3" />
+              Hanoi Official
+            </a>
+            <a
+              href="https://chat-topikbot.kr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-card text-xs text-white/70 hover:text-white transition-colors"
+            >
+              <ExternalLink className="w-3 h-3" />
+              LUKATO AI
+            </a>
           </div>
 
-          {/* Links */}
-          <div className="flex items-center gap-6 text-sm">
-            {["이용약관", "개인정보처리방침", "문의하기"].map((link) => (
-              <a
-                key={link}
-                href="#"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {link}
-              </a>
-            ))}
-          </div>
+          {/* Copyright */}
+          <p className="text-sm text-white/40">
+            © 2025 Powered by{" "}
+            <span className="text-neon-pink font-medium">LUKATO AI</span>
+          </p>
         </div>
       </div>
     </footer>
