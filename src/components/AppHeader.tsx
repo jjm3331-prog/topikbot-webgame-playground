@@ -56,7 +56,7 @@ const AppHeader = ({
             <img 
               src="/favicon.png" 
               alt="LUKATO" 
-              className="w-7 h-7 rounded-full shadow-lg shadow-neon-pink/20"
+              className="w-7 h-7 min-w-[28px] min-h-[28px] rounded-full shadow-lg shadow-neon-pink/20 object-cover aspect-square"
             />
             <span className="font-display font-bold text-sm text-transparent bg-clip-text bg-gradient-to-r from-neon-pink to-neon-cyan hidden xs:inline">
               LUKATO
