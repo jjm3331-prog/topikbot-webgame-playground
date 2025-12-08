@@ -1,4 +1,7 @@
 project_id = "qiiqoaofarkcqhkmuvis"
 
 [functions.chat-survival]
-verify_jwt = true
+verify_jwt = false
+
+[functions.word-chain]
+verify_jwt = false
