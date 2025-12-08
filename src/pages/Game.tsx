@@ -208,7 +208,7 @@ const Game = () => {
             href="https://hanoi.topikbot.kr" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="block"
+            className="block hover-scale"
           >
             <Button 
               className="w-full h-14 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-sm font-bold flex flex-col items-center justify-center gap-0"
@@ -224,7 +224,7 @@ const Game = () => {
             href="https://chat-topikbot.kr" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="block"
+            className="block hover-scale"
           >
             <Button 
               className="w-full h-14 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-sm font-bold flex flex-col items-center justify-center gap-0"
@@ -241,14 +241,14 @@ const Game = () => {
         {/* Ranking & Dating - 2 columns */}
         <div className="grid grid-cols-2 gap-3">
           <Button 
-            className="h-14 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-sm font-bold"
+            className="h-14 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-sm font-bold hover-scale"
             onClick={() => navigate("/ranking")}
           >
             <Trophy className="w-5 h-5 mr-1" />
             랭킹 보기 / Xếp hạng
           </Button>
           <Button 
-            className="h-14 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-sm font-bold"
+            className="h-14 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-sm font-bold hover-scale"
             onClick={() => navigate("/dating")}
           >
             <Heart className="w-5 h-5 mr-1" />
@@ -259,14 +259,14 @@ const Game = () => {
         {/* Bankruptcy & Part-time - 2 columns */}
         <div className="grid grid-cols-2 gap-3">
           <Button 
-            className="h-14 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-sm"
+            className="h-14 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-sm hover-scale"
             onClick={() => navigate("/bankruptcy")}
           >
             <Zap className="w-5 h-5 mr-1" />
             파산 복구 / Phục hồi
           </Button>
           <Button 
-            className="h-14 bg-gradient-to-r from-fuchsia-500 to-pink-500 hover:from-fuchsia-600 hover:to-pink-600 text-sm"
+            className="h-14 bg-gradient-to-r from-fuchsia-500 to-pink-500 hover:from-fuchsia-600 hover:to-pink-600 text-sm hover-scale"
             onClick={() => navigate("/parttime")}
           >
             <Briefcase className="w-5 h-5 mr-1" />
@@ -277,14 +277,14 @@ const Game = () => {
         {/* Word Chain & Quiz - 2 columns */}
         <div className="grid grid-cols-2 gap-3">
           <Button 
-            className="h-14 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-sm"
+            className="h-14 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-sm hover-scale"
             onClick={() => navigate("/wordchain")}
           >
             <Link2 className="w-5 h-5 mr-1" />
             끝말잇기 / Nối từ
           </Button>
           <Button 
-            className="h-14 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-sm"
+            className="h-14 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-sm hover-scale"
             onClick={() => navigate("/quiz")}
           >
             <MessageSquare className="w-5 h-5 mr-1" />
