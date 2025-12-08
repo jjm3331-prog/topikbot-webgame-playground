@@ -5,24 +5,47 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Input validation helpers
+function validateString(value: unknown, maxLength: number): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim().slice(0, maxLength);
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+// Sanitize user input for AI prompts - remove potentially harmful content
+function sanitizeForPrompt(input: string): string {
+  // Remove any attempt at prompt injection
+  return input
+    .replace(/[\n\r]/g, ' ')
+    .replace(/[{}[\]<>]/g, '')
+    .slice(0, 200);
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { npcName, npcJob, userDescription } = await req.json();
+    const body = await req.json().catch(() => ({}));
     
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    console.log('Generating couple photo for:', { npcName, npcJob, userDescription });
+    // Validate inputs
+    const npcName = validateString(body.npcName, 50) || 'Partner';
+    const npcJob = validateString(body.npcJob, 50) || '직장인';
+    const userDescription = body.userDescription 
+      ? sanitizeForPrompt(validateString(body.userDescription, 200) || '')
+      : 'an attractive young person in casual Korean fashion';
+
+    console.log('Generating couple photo for:', { npcName, npcJob, userDescriptionLength: userDescription.length });
 
     const prompt = `A beautiful romantic couple photo in a Seoul cityscape at sunset. 
 The scene shows a cute Korean couple in their mid-20s on a romantic date.
-One person is described as: ${userDescription || 'an attractive young person in casual Korean fashion'}.
+One person is described as: ${userDescription}.
 The other person (${npcName}) works as a ${npcJob} and has a charming, attractive appearance.
 They are looking at each other lovingly with the Seoul skyline and N Seoul Tower in the background.
 The lighting is warm and romantic with a pink/purple sunset sky.
@@ -49,8 +72,7 @@ Ultra high resolution, dreamy and romantic atmosphere.`;
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('AI Gateway error:', response.status, errorText);
+      console.error('AI Gateway error:', response.status);
       
       if (response.status === 429) {
         return new Response(JSON.stringify({ 
@@ -96,7 +118,7 @@ Ultra high resolution, dreamy and romantic atmosphere.`;
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Couple photo generation error:', errorMessage);
     return new Response(JSON.stringify({ 
-      error: errorMessage,
+      error: "Internal server error",
       errorVi: "Lỗi khi tạo ảnh couple"
     }), {
       status: 500,

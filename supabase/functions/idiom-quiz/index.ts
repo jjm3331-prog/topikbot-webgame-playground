@@ -63,25 +63,49 @@ const SYSTEM_PROMPT = `당신은 한국어 관용어/슬랭 퀴즈 게임의 AI�
 - hint_ko, hint_vi는 반드시 포함해야 합니다! 학습자가 정답을 유추할 수 있는 단서를 제공하세요.
 - 난이도에 따라 슬랭/유행어 비율을 맞춰주세요!`;
 
+// Input validation helpers
+function validateString(value: unknown, maxLength: number): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim().slice(0, maxLength);
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function validateDifficulty(value: unknown): 'easy' | 'medium' | 'hard' {
+  if (value === 'easy' || value === 'hard') return value;
+  return 'medium';
+}
+
+function validateUsedExpressions(expressions: unknown): string[] {
+  if (!Array.isArray(expressions)) return [];
+  return expressions
+    .map(e => validateString(e, 100))
+    .filter((e): e is string => e !== null)
+    .slice(-50); // Limit to last 50 used expressions
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { difficulty, usedExpressions } = await req.json();
+    const body = await req.json().catch(() => ({}));
     const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 
     if (!OPENAI_API_KEY) {
       throw new Error("OPENAI_API_KEY is not configured");
     }
 
-    const usedList = usedExpressions?.join(", ") || "없음";
-    const userMessage = `난이도: ${difficulty || "medium"}
+    // Validate inputs
+    const difficulty = validateDifficulty(body.difficulty);
+    const usedExpressions = validateUsedExpressions(body.usedExpressions);
+
+    const usedList = usedExpressions.join(", ") || "없음";
+    const userMessage = `난이도: ${difficulty}
 이미 출제된 표현들 (중복 금지): [${usedList}]
 새로운 퀴즈 문제를 생성해주세요.`;
 
-    console.log("Quiz request:", { difficulty, usedExpressions: usedExpressions?.length || 0 });
+    console.log("Quiz request:", { difficulty, usedExpressionsCount: usedExpressions.length });
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -101,8 +125,7 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("OpenAI API error:", response.status, errorText);
+      console.error("OpenAI API error:", response.status);
 
       if (response.status === 429) {
         return new Response(
@@ -116,7 +139,7 @@ serve(async (req) => {
     const data = await response.json();
     const aiMessage = data.choices?.[0]?.message?.content;
 
-    console.log("AI Response:", aiMessage?.substring(0, 200));
+    console.log("AI Response received");
 
     interface QuizOption {
       ko: string;
@@ -175,9 +198,8 @@ serve(async (req) => {
     });
   } catch (error: unknown) {
     console.error("Quiz error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

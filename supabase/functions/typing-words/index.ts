@@ -6,14 +6,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-
-interface WordRequest {
-  difficulty: 'easy' | 'medium' | 'hard';
-  count: number;
-  exclude?: string[];
-}
-
 const SYSTEM_PROMPT = `당신은 한국어 학습 게임을 위한 단어 생성기입니다.
 플레이어가 타이핑 연습을 할 수 있도록 한국어 단어를 생성합니다.
 
@@ -62,13 +54,48 @@ const SYSTEM_PROMPT = `당신은 한국어 학습 게임을 위한 단어 생성
 - MZ세대 신조어, 줄임말도 포함 (예: 갓생, 혼밥, 존맛, 꿀잼)
 - 베트남어 번역은 정확하고 자연스럽게`;
 
+// Input validation helpers
+function validateDifficulty(value: unknown): 'easy' | 'medium' | 'hard' {
+  if (value === 'easy' || value === 'hard') return value;
+  return 'medium';
+}
+
+function validateNumber(value: unknown, min: number, max: number): number {
+  const num = typeof value === 'number' ? value : min;
+  return Math.max(min, Math.min(max, Math.floor(num)));
+}
+
+function validateString(value: unknown, maxLength: number): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim().slice(0, maxLength);
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function validateExcludeList(exclude: unknown): string[] {
+  if (!Array.isArray(exclude)) return [];
+  return exclude
+    .map(e => validateString(e, 50))
+    .filter((e): e is string => e !== null)
+    .slice(-100); // Limit to last 100 excluded words
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { difficulty, count = 10, exclude = [] }: WordRequest = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+
+    if (!OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY is not configured');
+    }
+
+    // Validate inputs
+    const difficulty = validateDifficulty(body.difficulty);
+    const count = validateNumber(body.count, 1, 20);
+    const exclude = validateExcludeList(body.exclude);
     
     console.log(`Generating ${count} words for difficulty: ${difficulty}`);
 
@@ -97,6 +124,11 @@ ${excludeText}
         temperature: 1.0, // Maximum creativity
       }),
     });
+
+    if (!response.ok) {
+      console.error('OpenAI API error:', response.status);
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
 
     const data = await response.json();
     console.log('OpenAI response received');
@@ -131,8 +163,7 @@ ${excludeText}
 
   } catch (error) {
     console.error('Error in typing-words function:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

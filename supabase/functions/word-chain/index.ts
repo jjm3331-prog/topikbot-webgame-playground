@@ -35,17 +35,61 @@ const SYSTEM_PROMPT = `당신은 한국어 끝말잇기 게임의 AI이자 한�
 상대방 단어가 규칙에 어긋나면 valid: false, game_over: true, winner: "ai"
 AI가 단어를 못 찾으면 valid: true, game_over: true, winner: "user"`;
 
+// Korean character validation regex (Hangul only)
+const KOREAN_REGEX = /^[\uAC00-\uD7AF]+$/;
+
+// Input validation helpers
+function validateString(value: unknown, maxLength: number): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim().slice(0, maxLength);
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function validateKoreanWord(value: unknown): string | null {
+  const word = validateString(value, 20);
+  if (!word) return null;
+  // Only allow Korean characters
+  if (!KOREAN_REGEX.test(word)) return null;
+  return word;
+}
+
+function validateUsedWords(words: unknown): string[] {
+  if (!Array.isArray(words)) return [];
+  return words
+    .map(w => validateKoreanWord(w))
+    .filter((w): w is string => w !== null)
+    .slice(-100); // Limit to last 100 words
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { userWord, usedWords, lastChar } = await req.json();
+    const body = await req.json().catch(() => ({}));
     const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 
     if (!OPENAI_API_KEY) {
       throw new Error("OPENAI_API_KEY is not configured");
+    }
+
+    // Validate inputs
+    const userWord = validateKoreanWord(body.userWord);
+    const usedWords = validateUsedWords(body.usedWords);
+    const lastChar = validateString(body.lastChar, 1);
+
+    if (!userWord) {
+      return new Response(JSON.stringify({
+        valid: false,
+        reason_ko: "올바른 한국어 단어를 입력해주세요.",
+        reason_vi: "Vui lòng nhập từ tiếng Hàn hợp lệ.",
+        game_over: false,
+        winner: null
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
     }
 
     const usedWordsList = usedWords.join(", ");
@@ -53,7 +97,7 @@ serve(async (req) => {
       ? `이전 단어의 마지막 글자: "${lastChar}". 사용자가 말한 단어: "${userWord}". 이미 사용된 단어들: [${usedWordsList}]. 이 단어가 규칙에 맞는지 확인하고, 맞다면 끝말잇기를 이어가세요.`
       : `게임 시작! 사용자가 첫 단어로 "${userWord}"를 말했습니다. 이 단어가 유효한지 확인하고 끝말잇기를 이어가세요.`;
 
-    console.log("Word chain request:", { userWord, usedWords, lastChar });
+    console.log("Word chain request:", { userWord, usedWordsCount: usedWords.length, lastChar });
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -73,8 +117,7 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("OpenAI API error:", response.status, errorText);
+      console.error("OpenAI API error:", response.status);
 
       if (response.status === 429) {
         return new Response(
@@ -88,7 +131,7 @@ serve(async (req) => {
     const data = await response.json();
     const aiMessage = data.choices?.[0]?.message?.content;
 
-    console.log("AI Response:", aiMessage);
+    console.log("AI Response received");
 
     // Parse JSON response
     let parsedResponse;
@@ -115,9 +158,8 @@ serve(async (req) => {
     });
   } catch (error: unknown) {
     console.error("Word chain error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
