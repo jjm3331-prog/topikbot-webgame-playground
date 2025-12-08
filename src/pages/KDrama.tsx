@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Mic, MicOff, RotateCcw, Play, Pause, ChevronRight, ChevronLeft, Volume2 } from "lucide-react";
+import { ArrowLeft, Mic, MicOff, RotateCcw, ChevronRight, ChevronLeft, Volume2, RefreshCw, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -11,10 +11,30 @@ import actionScene from "@/assets/drama/action-scene.jpg";
 import fantasyScene from "@/assets/drama/fantasy-scene.jpg";
 import thrillerScene from "@/assets/drama/thriller-scene.jpg";
 
-// Drama scenes with famous lines
-const dramaScenes = [
+interface DramaScene {
+  id: string;
+  drama: string;
+  character: string;
+  korean: string;
+  vietnamese: string;
+  context: string;
+  difficulty: string;
+  audioTip: string;
+  genre: string;
+}
+
+// Genre to image mapping
+const genreImages: Record<string, string> = {
+  romantic: romanticScene,
+  action: actionScene,
+  fantasy: fantasyScene,
+  thriller: thrillerScene,
+};
+
+// Initial fallback scenes
+const initialScenes: DramaScene[] = [
   {
-    id: 1,
+    id: "init_1",
     drama: "도깨비 (Goblin)",
     character: "김신",
     korean: "내가 너의 신부다.",
@@ -22,35 +42,10 @@ const dramaScenes = [
     context: "도깨비가 은탁에게 처음 말하는 장면",
     difficulty: "쉬움",
     audioTip: "천천히, 감정을 담아서",
-    image: fantasyScene,
     genre: "fantasy"
   },
   {
-    id: 2,
-    drama: "별에서 온 그대 (My Love from the Star)",
-    character: "도민준",
-    korean: "나는 외계인이야.",
-    vietnamese: "Tôi là người ngoài hành tinh.",
-    context: "도민준이 정체를 밝히는 장면",
-    difficulty: "쉬움",
-    audioTip: "진지하게",
-    image: fantasyScene,
-    genre: "fantasy"
-  },
-  {
-    id: 3,
-    drama: "태양의 후예 (Descendants of the Sun)",
-    character: "유시진",
-    korean: "지금 내 눈에는 당신밖에 안 보여요.",
-    vietnamese: "Bây giờ trong mắt tôi chỉ có bạn.",
-    context: "유시진이 강모연에게 고백하는 장면",
-    difficulty: "보통",
-    audioTip: "로맨틱하게, 눈을 맞추며",
-    image: actionScene,
-    genre: "action"
-  },
-  {
-    id: 4,
+    id: "init_2",
     drama: "사랑의 불시착 (Crash Landing on You)",
     character: "리정혁",
     korean: "당신은 나의 운명입니다.",
@@ -58,47 +53,10 @@ const dramaScenes = [
     context: "리정혁이 세리에게 하는 대사",
     difficulty: "보통",
     audioTip: "깊은 감정을 담아서",
-    image: romanticScene,
     genre: "romantic"
   },
   {
-    id: 5,
-    drama: "이태원 클라쓰 (Itaewon Class)",
-    character: "박새로이",
-    korean: "나는 절대 포기하지 않아.",
-    vietnamese: "Tôi tuyệt đối không bỏ cuộc.",
-    context: "박새로이의 각오를 다지는 대사",
-    difficulty: "쉬움",
-    audioTip: "강하고 단호하게",
-    image: thrillerScene,
-    genre: "thriller"
-  },
-  {
-    id: 6,
-    drama: "응답하라 1988 (Reply 1988)",
-    character: "최택",
-    korean: "덕선아, 나 너 좋아해.",
-    vietnamese: "Deok Sun à, tao thích mày.",
-    context: "택이가 덕선이에게 고백하는 장면",
-    difficulty: "쉬움",
-    audioTip: "수줍게, 떨리는 목소리로",
-    image: romanticScene,
-    genre: "romantic"
-  },
-  {
-    id: 7,
-    drama: "킹덤 (Kingdom)",
-    character: "이창",
-    korean: "백성을 살려야 합니다.",
-    vietnamese: "Phải cứu dân chúng.",
-    context: "세자가 결단을 내리는 장면",
-    difficulty: "보통",
-    audioTip: "비장하게, 왕의 품격으로",
-    image: thrillerScene,
-    genre: "thriller"
-  },
-  {
-    id: 8,
+    id: "init_3",
     drama: "오징어 게임 (Squid Game)",
     character: "성기훈",
     korean: "나는 깐부잖아.",
@@ -106,31 +64,6 @@ const dramaScenes = [
     context: "일남 할아버지와의 게임 중",
     difficulty: "쉬움",
     audioTip: "친근하게, 약간 슬프게",
-    image: thrillerScene,
-    genre: "thriller"
-  },
-  {
-    id: 9,
-    drama: "미스터 션샤인 (Mr. Sunshine)",
-    character: "유진 초이",
-    korean: "조선이 내 나라입니다.",
-    vietnamese: "Joseon là đất nước của tôi.",
-    context: "유진이 정체성을 선언하는 장면",
-    difficulty: "보통",
-    audioTip: "결연하게, 자부심을 담아",
-    image: actionScene,
-    genre: "action"
-  },
-  {
-    id: 10,
-    drama: "스카이 캐슬 (SKY Castle)",
-    character: "한서진",
-    korean: "내 아이는 반드시 성공해야 해.",
-    vietnamese: "Con tôi nhất định phải thành công.",
-    context: "한서진의 집착을 보여주는 대사",
-    difficulty: "어려움",
-    audioTip: "집요하게, 약간 광기를 담아",
-    image: thrillerScene,
     genre: "thriller"
   }
 ];
@@ -138,9 +71,14 @@ const dramaScenes = [
 const KDrama = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [scenes, setScenes] = useState<DramaScene[]>(initialScenes);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isLoadingScenes, setIsLoadingScenes] = useState(false);
+  const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
+  const [usedIds, setUsedIds] = useState<string[]>([]);
   const [result, setResult] = useState<{
     recognizedText: string;
     accuracy: number;
@@ -157,7 +95,65 @@ const KDrama = () => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
-  const currentScene = dramaScenes[currentIndex];
+  const currentScene = scenes[currentIndex];
+
+  // Load new scenes from AI
+  const loadNewScenes = async (genre?: string, difficulty?: string) => {
+    setIsLoadingScenes(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/drama-lines`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            genre: genre || selectedGenre,
+            difficulty: difficulty || selectedDifficulty,
+            excludeIds: usedIds
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to load scenes');
+      }
+
+      const data = await response.json();
+      
+      if (data.scenes && data.scenes.length > 0) {
+        setScenes(data.scenes);
+        setCurrentIndex(0);
+        setUsedIds(prev => [...prev, ...data.scenes.map((s: DramaScene) => s.id)]);
+        setResult(null);
+        
+        toast({
+          title: "🎬 새로운 명대사 로드!",
+          description: `${data.scenes.length}개의 새 대사가 준비되었어요`,
+        });
+      }
+    } catch (error) {
+      console.error('Load scenes error:', error);
+      toast({
+        title: "로드 실패",
+        description: "기본 대사를 사용합니다",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingScenes(false);
+    }
+  };
+
+  // Load scenes on mount
+  useEffect(() => {
+    loadNewScenes();
+  }, []);
+
+  const getSceneImage = (genre: string) => {
+    return genreImages[genre] || romanticScene;
+  };
 
   const startRecording = async () => {
     try {
@@ -228,7 +224,6 @@ const KDrama = () => {
     try {
       const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
       
-      // Convert to base64
       const reader = new FileReader();
       const base64Promise = new Promise<string>((resolve, reject) => {
         reader.onloadend = () => {
@@ -293,12 +288,17 @@ const KDrama = () => {
   };
 
   const nextScene = () => {
-    setCurrentIndex((prev) => (prev + 1) % dramaScenes.length);
-    setResult(null);
+    if (currentIndex >= scenes.length - 1) {
+      // Load more scenes when reaching the end
+      loadNewScenes();
+    } else {
+      setCurrentIndex(prev => prev + 1);
+      setResult(null);
+    }
   };
 
   const prevScene = () => {
-    setCurrentIndex((prev) => (prev - 1 + dramaScenes.length) % dramaScenes.length);
+    setCurrentIndex((prev) => (prev - 1 + scenes.length) % scenes.length);
     setResult(null);
   };
 
@@ -325,6 +325,19 @@ const KDrama = () => {
     }
   };
 
+  const genres = [
+    { id: 'romantic', label: '로맨스', emoji: '💕' },
+    { id: 'action', label: '액션', emoji: '💥' },
+    { id: 'fantasy', label: '판타지', emoji: '✨' },
+    { id: 'thriller', label: '스릴러', emoji: '😱' },
+  ];
+
+  const difficulties = [
+    { id: '쉬움', label: '쉬움 / Dễ', color: 'text-green-400' },
+    { id: '보통', label: '보통 / TB', color: 'text-yellow-400' },
+    { id: '어려움', label: '어려움 / Khó', color: 'text-red-400' },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 text-white">
       {/* Header */}
@@ -341,15 +354,90 @@ const KDrama = () => {
           <h1 className="text-lg font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
             🎬 K-Drama 더빙 / Lồng tiếng
           </h1>
-          <div className="w-10" />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => loadNewScenes()}
+            disabled={isLoadingScenes}
+            className="text-white hover:bg-white/10"
+          >
+            {isLoadingScenes ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <RefreshCw className="w-5 h-5" />
+            )}
+          </Button>
         </div>
       </header>
 
+      {/* Filter Bar */}
+      <div className="bg-black/30 py-3 px-4 border-b border-white/5">
+        <div className="container mx-auto">
+          {/* Genre Filter */}
+          <div className="flex gap-2 mb-2 overflow-x-auto pb-1">
+            <Button
+              size="sm"
+              variant={selectedGenre === null ? "default" : "outline"}
+              onClick={() => {
+                setSelectedGenre(null);
+                loadNewScenes(undefined, selectedDifficulty || undefined);
+              }}
+              className="text-xs shrink-0"
+            >
+              전체
+            </Button>
+            {genres.map(genre => (
+              <Button
+                key={genre.id}
+                size="sm"
+                variant={selectedGenre === genre.id ? "default" : "outline"}
+                onClick={() => {
+                  setSelectedGenre(genre.id);
+                  loadNewScenes(genre.id, selectedDifficulty || undefined);
+                }}
+                className="text-xs shrink-0"
+              >
+                {genre.emoji} {genre.label}
+              </Button>
+            ))}
+          </div>
+          
+          {/* Difficulty Filter */}
+          <div className="flex gap-2 overflow-x-auto">
+            <Button
+              size="sm"
+              variant={selectedDifficulty === null ? "default" : "outline"}
+              onClick={() => {
+                setSelectedDifficulty(null);
+                loadNewScenes(selectedGenre || undefined, undefined);
+              }}
+              className="text-xs shrink-0"
+            >
+              모든 난이도
+            </Button>
+            {difficulties.map(diff => (
+              <Button
+                key={diff.id}
+                size="sm"
+                variant={selectedDifficulty === diff.id ? "default" : "outline"}
+                onClick={() => {
+                  setSelectedDifficulty(diff.id);
+                  loadNewScenes(selectedGenre || undefined, diff.id);
+                }}
+                className={`text-xs shrink-0 ${selectedDifficulty === diff.id ? '' : diff.color}`}
+              >
+                {diff.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Score Bar */}
-      <div className="bg-black/30 py-2 px-4">
+      <div className="bg-black/20 py-2 px-4">
         <div className="container mx-auto flex justify-between items-center text-sm">
           <span className="text-gray-400">
-            씬 / Scene: <span className="text-white font-bold">{currentIndex + 1}/{dramaScenes.length}</span>
+            씬 / Scene: <span className="text-white font-bold">{currentIndex + 1}/{scenes.length}</span>
           </span>
           <span className="text-gray-400">
             평균 / TB: <span className="text-cyan-400 font-bold">
@@ -361,182 +449,203 @@ const KDrama = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6 space-y-6">
-        {/* Drama Info Card */}
-        <motion.div
-          key={currentIndex}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-2xl border border-white/10"
-        >
-          {/* Scene Image Background */}
-          <div className="absolute inset-0">
-            <img 
-              src={currentScene.image} 
-              alt={currentScene.drama}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/40" />
+        {/* Loading State */}
+        {isLoadingScenes && scenes.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2 className="w-12 h-12 animate-spin text-pink-500 mb-4" />
+            <p className="text-gray-400">명대사 로딩중...</p>
           </div>
-
-          {/* Content Overlay */}
-          <div className="relative z-10 p-6">
-            {/* Drama Title */}
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-xl font-bold text-pink-300 drop-shadow-lg">{currentScene.drama}</h2>
-                <p className="text-sm text-gray-300 drop-shadow">캐릭터: {currentScene.character}</p>
+        ) : currentScene ? (
+          <>
+            {/* Drama Info Card */}
+            <motion.div
+              key={currentScene.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="relative overflow-hidden rounded-2xl border border-white/10"
+            >
+              {/* Scene Image Background */}
+              <div className="absolute inset-0">
+                <img 
+                  src={getSceneImage(currentScene.genre)} 
+                  alt={currentScene.drama}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/40" />
               </div>
-              <span className={`text-sm font-medium px-3 py-1 rounded-full bg-black/50 backdrop-blur ${getDifficultyColor(currentScene.difficulty)}`}>
-                {currentScene.difficulty}
-              </span>
-            </div>
 
-            {/* Line to Read */}
-            <div className="bg-black/60 backdrop-blur-sm rounded-xl p-5 mb-4 border border-white/10">
-              <div className="flex items-start gap-3 mb-3">
-                <Volume2 className="w-5 h-5 text-pink-400 mt-1 flex-shrink-0" />
-                <div>
-                  <p className="text-2xl font-bold text-white mb-2 leading-relaxed drop-shadow-lg">
-                    "{currentScene.korean}"
-                  </p>
-                  <p className="text-gray-300 text-sm">
-                    {currentScene.vietnamese}
+              {/* Content Overlay */}
+              <div className="relative z-10 p-6">
+                {/* Drama Title */}
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="text-xl font-bold text-pink-300 drop-shadow-lg">{currentScene.drama}</h2>
+                    <p className="text-sm text-gray-300 drop-shadow">캐릭터: {currentScene.character}</p>
+                  </div>
+                  <span className={`text-sm font-medium px-3 py-1 rounded-full bg-black/50 backdrop-blur ${getDifficultyColor(currentScene.difficulty)}`}>
+                    {currentScene.difficulty}
+                  </span>
+                </div>
+
+                {/* Line to Read */}
+                <div className="bg-black/60 backdrop-blur-sm rounded-xl p-5 mb-4 border border-white/10">
+                  <div className="flex items-start gap-3 mb-3">
+                    <Volume2 className="w-5 h-5 text-pink-400 mt-1 flex-shrink-0" />
+                    <div>
+                      <p className="text-2xl font-bold text-white mb-2 leading-relaxed drop-shadow-lg">
+                        "{currentScene.korean}"
+                      </p>
+                      <p className="text-gray-300 text-sm">
+                        {currentScene.vietnamese}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-3 italic">
+                    💡 {currentScene.audioTip}
                   </p>
                 </div>
+
+                {/* Context */}
+                <p className="text-xs text-gray-400 text-center drop-shadow">
+                  📺 {currentScene.context}
+                </p>
               </div>
-              <p className="text-xs text-gray-400 mt-3 italic">
-                💡 {currentScene.audioTip}
+            </motion.div>
+
+            {/* Recording Button */}
+            <div className="flex flex-col items-center gap-4">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={isRecording ? stopRecording : startRecording}
+                disabled={isProcessing}
+                className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  isRecording 
+                    ? 'bg-red-500 animate-pulse shadow-lg shadow-red-500/50' 
+                    : isProcessing
+                      ? 'bg-gray-600 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-pink-500 to-purple-500 hover:shadow-lg hover:shadow-pink-500/50'
+                }`}
+              >
+                {isProcessing ? (
+                  <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : isRecording ? (
+                  <MicOff className="w-10 h-10 text-white" />
+                ) : (
+                  <Mic className="w-10 h-10 text-white" />
+                )}
+              </motion.button>
+              <p className="text-sm text-gray-400">
+                {isProcessing 
+                  ? "분석 중... / Đang phân tích..." 
+                  : isRecording 
+                    ? "녹음 중... 버튼을 눌러 중지 / Đang ghi... Nhấn để dừng" 
+                    : "버튼을 눌러 녹음 시작 / Nhấn để bắt đầu ghi âm"
+                }
               </p>
             </div>
 
-            {/* Context */}
-            <p className="text-xs text-gray-400 text-center drop-shadow">
-              📺 {currentScene.context}
-            </p>
-          </div>
-        </motion.div>
-
-        {/* Recording Button */}
-        <div className="flex flex-col items-center gap-4">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={isRecording ? stopRecording : startRecording}
-            disabled={isProcessing}
-            className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 ${
-              isRecording 
-                ? 'bg-red-500 animate-pulse shadow-lg shadow-red-500/50' 
-                : isProcessing
-                  ? 'bg-gray-600 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-pink-500 to-purple-500 hover:shadow-lg hover:shadow-pink-500/50'
-            }`}
-          >
-            {isProcessing ? (
-              <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : isRecording ? (
-              <MicOff className="w-10 h-10 text-white" />
-            ) : (
-              <Mic className="w-10 h-10 text-white" />
-            )}
-          </motion.button>
-          <p className="text-sm text-gray-400">
-            {isProcessing 
-              ? "분석 중... / Đang phân tích..." 
-              : isRecording 
-                ? "녹음 중... 버튼을 눌러 중지 / Đang ghi... Nhấn để dừng" 
-                : "버튼을 눌러 녹음 시작 / Nhấn để bắt đầu ghi âm"
-            }
-          </p>
-        </div>
-
-        {/* Result */}
-        <AnimatePresence>
-          {result && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 rounded-2xl p-6 border border-white/10"
-            >
-              {/* Grade Badge */}
-              <div className="flex justify-center mb-4">
-                <div className={`w-20 h-20 rounded-full bg-gradient-to-r ${getGradeColor(result.feedback.grade)} flex items-center justify-center`}>
-                  <span className="text-4xl font-black text-white">{result.feedback.grade}</span>
-                </div>
-              </div>
-
-              {/* Accuracy */}
-              <div className="text-center mb-4">
-                <p className="text-4xl font-bold text-white">{result.accuracy}%</p>
-                <p className="text-gray-400 text-sm">정확도 / Độ chính xác</p>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="h-3 bg-gray-700 rounded-full overflow-hidden mb-4">
+            {/* Result */}
+            <AnimatePresence>
+              {result && (
                 <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${result.accuracy}%` }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  className={`h-full rounded-full bg-gradient-to-r ${getGradeColor(result.feedback.grade)}`}
-                />
-              </div>
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 rounded-2xl p-6 border border-white/10"
+                >
+                  {/* Grade Badge */}
+                  <div className="flex justify-center mb-4">
+                    <div className={`w-20 h-20 rounded-full bg-gradient-to-r ${getGradeColor(result.feedback.grade)} flex items-center justify-center`}>
+                      <span className="text-4xl font-black text-white">{result.feedback.grade}</span>
+                    </div>
+                  </div>
 
-              {/* Recognized Text */}
-              <div className="bg-black/40 rounded-xl p-4 mb-4">
-                <p className="text-xs text-gray-500 mb-1">인식된 음성 / Giọng nói được nhận dạng:</p>
-                <p className="text-white font-medium">
-                  "{result.recognizedText || "(인식 실패 / Không nhận dạng được)"}"
-                </p>
-              </div>
+                  {/* Accuracy */}
+                  <div className="text-center mb-4">
+                    <p className="text-4xl font-bold text-white">{result.accuracy}%</p>
+                    <p className="text-gray-400 text-sm">정확도 / Độ chính xác</p>
+                  </div>
 
-              {/* Feedback */}
-              <div className="text-center">
-                <p className="text-xl mb-1">{result.feedback.emoji}</p>
-                <p className="text-white font-medium">{result.feedback.korean}</p>
-                <p className="text-gray-400 text-sm">{result.feedback.vietnamese}</p>
-              </div>
+                  {/* Progress Bar */}
+                  <div className="h-3 bg-gray-700 rounded-full overflow-hidden mb-4">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${result.accuracy}%` }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
+                      className={`h-full rounded-full bg-gradient-to-r ${getGradeColor(result.feedback.grade)}`}
+                    />
+                  </div>
 
-              {/* Retry Button */}
+                  {/* Recognized Text */}
+                  <div className="bg-black/40 rounded-xl p-4 mb-4">
+                    <p className="text-xs text-gray-500 mb-1">인식된 음성 / Giọng nói được nhận dạng:</p>
+                    <p className="text-white font-medium">
+                      "{result.recognizedText || "(인식 실패 / Không nhận dạng được)"}"
+                    </p>
+                  </div>
+
+                  {/* Feedback */}
+                  <div className="text-center">
+                    <p className="text-xl mb-1">{result.feedback.emoji}</p>
+                    <p className="text-white font-medium">{result.feedback.korean}</p>
+                    <p className="text-gray-400 text-sm">{result.feedback.vietnamese}</p>
+                  </div>
+
+                  {/* Retry Button */}
+                  <Button
+                    onClick={resetResult}
+                    className="w-full mt-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
+                  >
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    다시 도전 / Thử lại
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Navigation */}
+            <div className="flex justify-between items-center">
               <Button
-                onClick={resetResult}
-                className="w-full mt-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
+                variant="outline"
+                onClick={prevScene}
+                disabled={currentIndex === 0}
+                className="border-white/20 text-white hover:bg-white/10"
               >
-                <RotateCcw className="w-4 h-4 mr-2" />
-                다시 도전 / Thử lại
+                <ChevronLeft className="w-4 h-4 mr-1" />
+                이전 / Trước
               </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Navigation */}
-        <div className="flex justify-between items-center">
-          <Button
-            variant="outline"
-            onClick={prevScene}
-            className="border-white/20 text-white hover:bg-white/10"
-          >
-            <ChevronLeft className="w-4 h-4 mr-1" />
-            이전 / Trước
-          </Button>
-          <div className="flex gap-1">
-            {dramaScenes.map((_, idx) => (
-              <div
-                key={idx}
-                className={`w-2 h-2 rounded-full transition-colors ${
-                  idx === currentIndex ? 'bg-pink-500' : 'bg-gray-600'
-                }`}
-              />
-            ))}
-          </div>
-          <Button
-            variant="outline"
-            onClick={nextScene}
-            className="border-white/20 text-white hover:bg-white/10"
-          >
-            다음 / Tiếp
-            <ChevronRight className="w-4 h-4 ml-1" />
-          </Button>
-        </div>
+              <div className="flex gap-1">
+                {scenes.slice(0, Math.min(scenes.length, 10)).map((_, idx) => (
+                  <div
+                    key={idx}
+                    className={`w-2 h-2 rounded-full transition-colors ${
+                      idx === currentIndex ? 'bg-pink-500' : 'bg-gray-600'
+                    }`}
+                  />
+                ))}
+                {scenes.length > 10 && (
+                  <span className="text-gray-500 text-xs ml-1">+{scenes.length - 10}</span>
+                )}
+              </div>
+              <Button
+                variant="outline"
+                onClick={nextScene}
+                className="border-white/20 text-white hover:bg-white/10"
+              >
+                {currentIndex >= scenes.length - 1 ? (
+                  <>
+                    새로고침 <RefreshCw className="w-4 h-4 ml-1" />
+                  </>
+                ) : (
+                  <>
+                    다음 / Tiếp <ChevronRight className="w-4 h-4 ml-1" />
+                  </>
+                )}
+              </Button>
+            </div>
+          </>
+        ) : null}
       </main>
     </div>
   );
