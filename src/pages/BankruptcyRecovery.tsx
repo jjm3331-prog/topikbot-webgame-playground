@@ -132,7 +132,9 @@ const BankruptcyRecovery = () => {
     setUserInput(value);
 
     if (currentWord && value === currentWord.korean) {
-      // Correct answer
+      // Correct answer - immediately clear input
+      setUserInput("");
+      
       const streakBonus = Math.floor(streak * 10);
       const earnedPoints = currentWord.points + streakBonus;
       
