@@ -39,18 +39,48 @@ const SYSTEM_PROMPT = `당신은 "K-Life: 서울 생존기" 게임의 AI 가이�
 
 항상 위 JSON 형식으로만 응답하세요.`;
 
+// Input validation helpers
+function validateString(value: unknown, maxLength: number): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim().slice(0, maxLength);
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function validateNumber(value: unknown, min: number, max: number): number {
+  const num = typeof value === 'number' ? value : 0;
+  return Math.max(min, Math.min(max, num));
+}
+
+function validateMessages(messages: unknown): Array<{role: string; content: string}> {
+  if (!Array.isArray(messages)) return [];
+  return messages
+    .filter((item): item is {role: unknown; content: unknown} => 
+      typeof item === 'object' && item !== null)
+    .map(item => ({
+      role: item.role === 'assistant' ? 'assistant' : 'user',
+      content: validateString(item.content, 1000) || ''
+    }))
+    .filter(item => item.content.length > 0)
+    .slice(-30); // Limit to last 30 messages
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { messages, location, currentTurn } = await req.json();
+    const body = await req.json().catch(() => ({}));
     const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 
     if (!OPENAI_API_KEY) {
       throw new Error("OPENAI_API_KEY is not configured");
     }
+
+    // Validate inputs
+    const messages = validateMessages(body.messages);
+    const location = validateString(body.location, 50);
+    const currentTurn = validateNumber(body.currentTurn, 1, 10);
 
     // Generate random location if not provided
     const gameLocation = location || SEOUL_LOCATIONS[Math.floor(Math.random() * SEOUL_LOCATIONS.length)];
@@ -66,8 +96,7 @@ serve(async (req) => {
       ...messages
     ];
 
-    console.log("Sending request to OpenAI API (gpt-4.1-mini)...");
-    console.log("Current turn:", currentTurn);
+    console.log("Chat survival request - Turn:", currentTurn, "Location:", gameLocation);
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -85,7 +114,7 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("OpenAI API error:", response.status, errorText);
+      console.error("OpenAI API error:", response.status);
 
       if (response.status === 429) {
         return new Response(
@@ -105,7 +134,7 @@ serve(async (req) => {
     const data = await response.json();
     const aiMessage = data.choices?.[0]?.message?.content;
 
-    console.log("AI Response received:", aiMessage?.substring(0, 100) + "...");
+    console.log("AI Response received");
 
     // Parse JSON response
     let parsedResponse;
@@ -129,14 +158,17 @@ serve(async (req) => {
       };
     }
 
+    // Sanitize output values
+    parsedResponse.hp_change = validateNumber(parsedResponse.hp_change, -20, 10);
+    parsedResponse.money_change = validateNumber(parsedResponse.money_change, -5000, 3000);
+
     return new Response(JSON.stringify(parsedResponse), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: unknown) {
     console.error("Chat survival error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

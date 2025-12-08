@@ -1,37 +1,37 @@
 project_id = "qiiqoaofarkcqhkmuvis"
 
 [functions.chat-survival]
-verify_jwt = false
+verify_jwt = true
 
 [functions.word-chain]
-verify_jwt = false
+verify_jwt = true
 
 [functions.idiom-quiz]
-verify_jwt = false
+verify_jwt = true
 
 [functions.parttime-job]
-verify_jwt = false
+verify_jwt = true
 
 [functions.parttime-evaluate]
-verify_jwt = false
+verify_jwt = true
 
 [functions.typing-words]
-verify_jwt = false
+verify_jwt = true
 
 [functions.dating-chat]
-verify_jwt = false
+verify_jwt = true
 
 [functions.generate-couple-photo]
-verify_jwt = false
+verify_jwt = true
 
 [functions.drama-dubbing]
-verify_jwt = false
+verify_jwt = true
 
 [functions.drama-lines]
-verify_jwt = false
+verify_jwt = true
 
 [functions.drama-tts]
-verify_jwt = false
+verify_jwt = true
 
 [functions.kpop-lyrics]
-verify_jwt = false
+verify_jwt = true

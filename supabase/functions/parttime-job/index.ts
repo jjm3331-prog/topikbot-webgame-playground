@@ -6,15 +6,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+const VALID_JOB_TYPES = ['convenience_store', 'cafe', 'restaurant', 'pc_bang', 'bookstore'] as const;
+type JobType = typeof VALID_JOB_TYPES[number];
 
-interface JobRequest {
-  job_type: 'convenience_store' | 'cafe' | 'restaurant' | 'pc_bang' | 'bookstore';
-  difficulty: 'easy' | 'medium' | 'hard';
-  turn: number;
-}
-
-const JOB_CONTEXTS = {
+const JOB_CONTEXTS: Record<JobType, { name_ko: string; name_vi: string; situations: string[] }> = {
   convenience_store: {
     name_ko: '편의점',
     name_vi: 'Cửa hàng tiện lợi',
@@ -73,14 +68,41 @@ const SYSTEM_PROMPT = `당신은 한국어 학습 게임 "K-Life"의 아르바�
 - 문화적 뉘앙스 포함 (존댓말, 반말, 사투리 등)
 - 학습자가 실제로 마주칠 상황 위주로`;
 
+// Input validation helpers
+function validateJobType(value: unknown): JobType {
+  if (typeof value === 'string' && VALID_JOB_TYPES.includes(value as JobType)) {
+    return value as JobType;
+  }
+  return 'convenience_store';
+}
+
+function validateDifficulty(value: unknown): 'easy' | 'medium' | 'hard' {
+  if (value === 'easy' || value === 'hard') return value;
+  return 'medium';
+}
+
+function validateNumber(value: unknown, min: number, max: number): number {
+  const num = typeof value === 'number' ? value : min;
+  return Math.max(min, Math.min(max, Math.floor(num)));
+}
+
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { job_type, difficulty, turn }: JobRequest = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+
+    if (!OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY is not configured');
+    }
+
+    // Validate inputs
+    const job_type = validateJobType(body.job_type);
+    const difficulty = validateDifficulty(body.difficulty);
+    const turn = validateNumber(body.turn, 1, 5);
     
     console.log(`Parttime job request: ${job_type}, difficulty: ${difficulty}, turn: ${turn}`);
 
@@ -109,6 +131,11 @@ serve(async (req) => {
         temperature: 0.8,
       }),
     });
+
+    if (!response.ok) {
+      console.error('OpenAI API error:', response.status);
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
 
     const data = await response.json();
     console.log('OpenAI response received');
@@ -155,8 +182,7 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in parttime-job function:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

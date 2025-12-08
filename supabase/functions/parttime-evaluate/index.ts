@@ -6,16 +6,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-
-interface EvaluateRequest {
-  customer_line: string;
-  player_response: string;
-  job_type: string;
-  difficulty: string;
-  situation_hint: string;
-}
-
 const SYSTEM_PROMPT = `당신은 한국어 학습 게임 "K-Life"의 아르바이트 응대 평가 AI입니다.
 플레이어가 손님에게 한 응대를 평가합니다.
 
@@ -59,17 +49,53 @@ const SYSTEM_PROMPT = `당신은 한국어 학습 게임 "K-Life"의 아르바�
 - 실질적인 학습 도움이 되는 피드백 제공
 - language_tips는 실제 오류가 있을 때만 포함 (없으면 빈 배열)`;
 
+// Input validation helpers
+function validateString(value: unknown, maxLength: number): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim().slice(0, maxLength);
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function validateDifficulty(value: unknown): 'easy' | 'medium' | 'hard' {
+  if (value === 'easy' || value === 'hard') return value;
+  return 'medium';
+}
+
+function validateNumber(value: unknown, min: number, max: number): number {
+  const num = typeof value === 'number' ? value : min;
+  return Math.max(min, Math.min(max, Math.floor(num)));
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { customer_line, player_response, job_type, difficulty, situation_hint }: EvaluateRequest = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+
+    if (!OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY is not configured');
+    }
+
+    // Validate inputs
+    const customer_line = validateString(body.customer_line, 500);
+    const player_response = validateString(body.player_response, 500);
+    const job_type = validateString(body.job_type, 50) || 'convenience_store';
+    const difficulty = validateDifficulty(body.difficulty);
+    const situation_hint = validateString(body.situation_hint, 200) || '';
+
+    if (!customer_line || !player_response) {
+      return new Response(JSON.stringify({ 
+        error: "Customer line and player response are required" 
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
     
     console.log(`Evaluating response for ${job_type}, difficulty: ${difficulty}`);
-    console.log(`Customer: ${customer_line}`);
-    console.log(`Player: ${player_response}`);
 
     const userPrompt = `## 상황
 장소: ${job_type}
@@ -99,6 +125,11 @@ serve(async (req) => {
         temperature: 0.6,
       }),
     });
+
+    if (!response.ok) {
+      console.error('OpenAI API error:', response.status);
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
 
     const data = await response.json();
     console.log('OpenAI evaluation response received');
@@ -133,12 +164,9 @@ serve(async (req) => {
       };
     }
 
-    // Ensure earned_money is within range
-    if (!parsedResponse.earned_money || parsedResponse.earned_money < 100) {
-      parsedResponse.earned_money = 100;
-    } else if (parsedResponse.earned_money > 500) {
-      parsedResponse.earned_money = 500;
-    }
+    // Sanitize output values
+    parsedResponse.score = validateNumber(parsedResponse.score, 0, 100);
+    parsedResponse.earned_money = validateNumber(parsedResponse.earned_money, 100, 500);
 
     return new Response(JSON.stringify(parsedResponse), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -146,8 +174,7 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in parttime-evaluate function:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
