@@ -8,3 +8,15 @@ verify_jwt = false
 
 [functions.idiom-quiz]
 verify_jwt = false
+
+[functions.parttime-job]
+verify_jwt = false
+
+[functions.parttime-evaluate]
+verify_jwt = false
+
+[functions.typing-words]
+verify_jwt = false
+
+[functions.dating-chat]
+verify_jwt = false

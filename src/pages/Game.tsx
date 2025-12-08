@@ -243,6 +243,14 @@ const Game = () => {
           관용어 & 슬랭 퀴즈 / Thành ngữ & Tiếng lóng
         </Button>
 
+        <Button 
+          className="w-full h-14 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-lg"
+          onClick={() => navigate("/dating")}
+        >
+          <Heart className="w-6 h-6 mr-2" />
+          Seoul Love Signal 💕 / Tín hiệu tình yêu Seoul
+        </Button>
+
         {/* Footer Stats */}
         <div className="flex items-center justify-center gap-4 text-white/40 text-sm pt-4">
           <span>❤️ {profile?.hp}</span>
