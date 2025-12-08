@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.drama-tts]
 verify_jwt = false
+
+[functions.kpop-lyrics]
+verify_jwt = false
