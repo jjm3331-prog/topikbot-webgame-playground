@@ -50,8 +50,45 @@ const Quiz = () => {
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">("medium");
   const [hintUsed, setHintUsed] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [savedScore, setSavedScore] = useState(0);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Save score to profile when leaving
+  const saveScoreToProfile = async () => {
+    if (score <= savedScore) return;
+    
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('points, money')
+      .eq('id', session.user.id)
+      .single();
+
+    if (profile) {
+      const pointsEarned = score - savedScore;
+      const moneyEarned = Math.floor(pointsEarned * 10);
+      
+      await supabase
+        .from('profiles')
+        .update({ 
+          points: profile.points + pointsEarned,
+          money: profile.money + moneyEarned
+        })
+        .eq('id', session.user.id);
+      
+      setSavedScore(score);
+    }
+  };
+
+  // Save on unmount or navigation
+  useEffect(() => {
+    return () => {
+      saveScoreToProfile();
+    };
+  }, [score, savedScore]);
 
   const fetchQuestion = async () => {
     setIsLoading(true);
@@ -151,12 +188,19 @@ const Quiz = () => {
     return "text-red-400";
   };
 
-  const resetGame = () => {
+  const resetGame = async () => {
+    await saveScoreToProfile();
     setScore(0);
+    setSavedScore(0);
     setStreak(0);
     setTotalQuestions(0);
     setUsedExpressions([]);
     fetchQuestion();
+  };
+
+  const handleBackToGame = async () => {
+    await saveScoreToProfile();
+    navigate("/game");
   };
 
   return (
@@ -164,7 +208,7 @@ const Quiz = () => {
       {/* Header */}
       <header className="flex items-center justify-between p-4 border-b border-white/10">
         <div className="flex items-center gap-2">
-          <button onClick={() => navigate("/game")} className="text-white/70 hover:text-white">
+          <button onClick={handleBackToGame} className="text-white/70 hover:text-white">
             <ChevronLeft className="w-5 h-5" />
           </button>
           <MessageSquare className="w-5 h-5 text-amber-400" />

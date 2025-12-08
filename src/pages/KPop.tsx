@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Question {
   id: string;
@@ -39,11 +40,48 @@ const KPop = () => {
   const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoKey, setVideoKey] = useState(0);
+  const [scoreSaved, setScoreSaved] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const currentQuestion = questions[currentIndex];
+
+  // Save score to profile when game complete
+  const saveScoreToProfile = async (finalScore: number) => {
+    if (scoreSaved || finalScore <= 0) return;
+    
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('points, money')
+      .eq('id', session.user.id)
+      .single();
+
+    if (profile) {
+      const moneyEarned = Math.floor(finalScore * 8);
+      
+      await supabase
+        .from('profiles')
+        .update({ 
+          points: profile.points + finalScore,
+          money: profile.money + moneyEarned
+        })
+        .eq('id', session.user.id);
+      
+      setScoreSaved(true);
+      toast.success(`💰 +${finalScore}점, ₩${moneyEarned.toLocaleString()} 획득!`);
+    }
+  };
+
+  // Save score when game ends
+  useEffect(() => {
+    if (gameComplete && !scoreSaved) {
+      saveScoreToProfile(score);
+    }
+  }, [gameComplete, scoreSaved, score]);
 
   const loadQuestions = async (selectedDifficulty?: string | null) => {
     setIsLoading(true);
@@ -169,7 +207,7 @@ const KPop = () => {
           </div>
           <div className="flex gap-3">
             <Button onClick={() => navigate('/game')} variant="outline" className="flex-1 border-gray-600"><ArrowLeft className="w-4 h-4 mr-2" />돌아가기</Button>
-            <Button onClick={() => { setScore(0); setStreak(0); loadQuestions(difficulty); }} className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500"><RotateCcw className="w-4 h-4 mr-2" />다시하기</Button>
+            <Button onClick={() => { setScore(0); setStreak(0); setScoreSaved(false); setGameComplete(false); loadQuestions(difficulty); }} className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500"><RotateCcw className="w-4 h-4 mr-2" />다시하기</Button>
           </div>
         </motion.div>
       </div>

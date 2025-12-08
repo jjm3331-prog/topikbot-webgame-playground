@@ -34,11 +34,52 @@ const WordChain = () => {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(15);
   const [gameStarted, setGameStarted] = useState(false);
+  const [scoreSaved, setScoreSaved] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Save score to profile when game over
+  const saveScoreToProfile = async (finalScore: number, won: boolean) => {
+    if (scoreSaved || finalScore <= 0) return;
+    
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('points, money')
+      .eq('id', session.user.id)
+      .single();
+
+    if (profile) {
+      const bonusPoints = won ? 100 : 0;
+      const moneyEarned = Math.floor(finalScore * 5);
+      
+      await supabase
+        .from('profiles')
+        .update({ 
+          points: profile.points + finalScore + bonusPoints,
+          money: profile.money + moneyEarned
+        })
+        .eq('id', session.user.id);
+      
+      setScoreSaved(true);
+      toast({
+        title: `💰 보상 획득!`,
+        description: `+${finalScore + bonusPoints}점, ₩${moneyEarned.toLocaleString()}`,
+      });
+    }
+  };
+
+  // Save score when game ends
+  useEffect(() => {
+    if (gameOver && !scoreSaved) {
+      saveScoreToProfile(score, winner === "user");
+    }
+  }, [gameOver, scoreSaved, score, winner]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -207,6 +248,7 @@ const WordChain = () => {
     setScore(0);
     setTimeLeft(15);
     setGameStarted(false);
+    setScoreSaved(false);
     inputRef.current?.focus();
   };
 

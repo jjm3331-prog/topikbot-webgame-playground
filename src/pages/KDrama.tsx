@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Mic, MicOff, RotateCcw, ChevronRight, ChevronLeft, Volume2, RefreshCw, Loader2, PlayCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -92,6 +93,47 @@ const KDrama = () => {
   const [totalScore, setTotalScore] = useState(0);
   const [attempts, setAttempts] = useState(0);
   const [isPlayingTTS, setIsPlayingTTS] = useState(false);
+  const [scoreSaved, setScoreSaved] = useState(false);
+
+  // Save score to profile
+  const saveScoreToProfile = async () => {
+    if (scoreSaved || totalScore <= 0) return;
+    
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('points, money')
+      .eq('id', session.user.id)
+      .single();
+
+    if (profile) {
+      const avgScore = attempts > 0 ? Math.round(totalScore / attempts) : 0;
+      const pointsEarned = Math.floor(avgScore * attempts);
+      const moneyEarned = Math.floor(pointsEarned * 5);
+      
+      await supabase
+        .from('profiles')
+        .update({ 
+          points: profile.points + pointsEarned,
+          money: profile.money + moneyEarned
+        })
+        .eq('id', session.user.id);
+      
+      setScoreSaved(true);
+      toast({
+        title: `💰 보상 획득!`,
+        description: `+${pointsEarned}점, ₩${moneyEarned.toLocaleString()}`,
+      });
+    }
+  };
+
+  // Save on navigate away
+  const handleBackToGame = async () => {
+    await saveScoreToProfile();
+    navigate("/game");
+  };
   const [selectedVoice, setSelectedVoice] = useState<string>('nova');
   
   const voiceOptions = [
@@ -431,7 +473,7 @@ const KDrama = () => {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/game")}
+            onClick={handleBackToGame}
             className="text-white hover:bg-white/10"
           >
             <ArrowLeft className="w-5 h-5" />
