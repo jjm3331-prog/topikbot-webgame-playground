@@ -48,6 +48,8 @@ const Quiz = () => {
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [usedExpressions, setUsedExpressions] = useState<string[]>([]);
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">("medium");
+  const [hintUsed, setHintUsed] = useState(false);
+  const [showHint, setShowHint] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -55,7 +57,8 @@ const Quiz = () => {
     setIsLoading(true);
     setSelectedAnswer(null);
     setShowResult(false);
-
+    setHintUsed(false);
+    setShowHint(false);
     try {
       const { data, error } = await supabase.functions.invoke("idiom-quiz", {
         body: { difficulty, usedExpressions },
@@ -100,12 +103,17 @@ const Quiz = () => {
     const isCorrect = index === question.correct_index;
     
     if (isCorrect) {
-      const points = difficulty === "easy" ? 10 : difficulty === "medium" ? 20 : 30;
-      setScore(prev => prev + points + streak * 5);
+      let points = difficulty === "easy" ? 10 : difficulty === "medium" ? 20 : 30;
+      // 힌트 사용시 점수 절반
+      if (hintUsed) {
+        points = Math.floor(points / 2);
+      }
+      const totalPoints = points + streak * 5;
+      setScore(prev => prev + totalPoints);
       setStreak(prev => prev + 1);
       toast({
         title: "정답입니다! 🎉 Đúng rồi!",
-        description: `+${points + streak * 5}점`,
+        description: hintUsed ? `+${totalPoints}점 (힌트 사용 / Đã dùng gợi ý)` : `+${totalPoints}점`,
       });
     } else {
       setStreak(0);
@@ -115,6 +123,16 @@ const Quiz = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleUseHint = () => {
+    if (hintUsed || showResult) return;
+    setHintUsed(true);
+    setShowHint(true);
+    toast({
+      title: "힌트 사용! / Đã dùng gợi ý!",
+      description: "점수가 절반으로 줄어듭니다 / Điểm sẽ giảm một nửa",
+    });
   };
 
   const getTypeLabel = (type: string) => {
@@ -242,9 +260,40 @@ const Quiz = () => {
                 <p className="text-white/60 text-center text-sm mb-1">
                   이 표현의 의미는 무엇일까요?
                 </p>
-                <p className="text-white/40 text-center text-xs italic">
+                <p className="text-white/40 text-center text-xs italic mb-4">
                   Ý nghĩa của cụm từ này là gì?
                 </p>
+
+                {/* Hint Button & Display */}
+                {!showResult && (
+                  <div className="mt-4">
+                    {!showHint ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleUseHint}
+                        disabled={hintUsed}
+                        className="border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/20 hover:text-yellow-300"
+                      >
+                        <Lightbulb className="w-4 h-4 mr-2" />
+                        힌트 보기 / Xem gợi ý (점수 ½)
+                      </Button>
+                    ) : (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-yellow-500/20 border border-yellow-500/30 p-3 rounded-lg"
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <Lightbulb className="w-4 h-4 text-yellow-400" />
+                          <span className="text-yellow-400 text-sm font-medium">힌트 / Gợi ý</span>
+                        </div>
+                        <p className="text-white/90 text-sm">{question.hint_ko || "힌트가 없습니다"}</p>
+                        <p className="text-white/60 text-xs italic mt-1">{question.hint_vi || "Không có gợi ý"}</p>
+                      </motion.div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Options */}
