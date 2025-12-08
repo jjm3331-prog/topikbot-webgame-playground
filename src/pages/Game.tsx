@@ -14,7 +14,8 @@ import {
   Link2, 
   MessageSquare,
   ChevronLeft,
-  Zap
+  Zap,
+  ExternalLink
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -199,6 +200,42 @@ const Game = () => {
               목표: 10턴 생존
             </Button>
           </div>
+        </div>
+
+        {/* External Links */}
+        <div className="grid grid-cols-2 gap-3">
+          <a 
+            href="https://hanoi.topikbot.kr" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="block"
+          >
+            <Button 
+              className="w-full h-16 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-sm font-bold flex flex-col items-center justify-center gap-0.5"
+            >
+              <div className="flex items-center gap-1">
+                <ExternalLink className="w-4 h-4" />
+                <span>Hanoi 공식 웹사이트</span>
+              </div>
+              <span className="text-xs opacity-80">Trang web chính thức Hanoi</span>
+            </Button>
+          </a>
+          <a 
+            href="https://chat-topikbot.kr" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="block"
+          >
+            <Button 
+              className="w-full h-16 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-sm font-bold flex flex-col items-center justify-center gap-0.5"
+            >
+              <div className="flex items-center gap-1">
+                <ExternalLink className="w-4 h-4" />
+                <span>LUKATO AI 서비스</span>
+              </div>
+              <span className="text-xs opacity-80">Dịch vụ LUKATO AI</span>
+            </Button>
+          </a>
         </div>
 
         {/* Game Modes */}
