@@ -238,14 +238,23 @@ const Game = () => {
           </a>
         </div>
 
-        {/* Ranking - Full width */}
-        <Button 
-          className="w-full h-14 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-lg font-bold"
-          onClick={() => navigate("/ranking")}
-        >
-          <Trophy className="w-6 h-6 mr-2" />
-          랭킹 보기 / Bảng xếp hạng
-        </Button>
+        {/* Ranking & Dating - 2 columns */}
+        <div className="grid grid-cols-2 gap-3">
+          <Button 
+            className="h-14 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-sm font-bold"
+            onClick={() => navigate("/ranking")}
+          >
+            <Trophy className="w-5 h-5 mr-1" />
+            랭킹 보기 / Xếp hạng
+          </Button>
+          <Button 
+            className="h-14 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-sm font-bold"
+            onClick={() => navigate("/dating")}
+          >
+            <Heart className="w-5 h-5 mr-1" />
+            Seoul Love Signal 💕
+          </Button>
+        </div>
 
         {/* Bankruptcy & Part-time - 2 columns */}
         <div className="grid grid-cols-2 gap-3">
@@ -254,7 +263,7 @@ const Game = () => {
             onClick={() => navigate("/bankruptcy")}
           >
             <Zap className="w-5 h-5 mr-1" />
-            파산 복구 / Phục hồi phá sản
+            파산 복구 / Phục hồi
           </Button>
           <Button 
             className="h-14 bg-gradient-to-r from-fuchsia-500 to-pink-500 hover:from-fuchsia-600 hover:to-pink-600 text-sm"
@@ -272,7 +281,7 @@ const Game = () => {
             onClick={() => navigate("/wordchain")}
           >
             <Link2 className="w-5 h-5 mr-1" />
-            끝말잇기 / Nối từ tiếng Hàn
+            끝말잇기 / Nối từ
           </Button>
           <Button 
             className="h-14 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-sm"
@@ -282,15 +291,6 @@ const Game = () => {
             관용어 퀴즈 / Thành ngữ
           </Button>
         </div>
-
-        {/* Dating - Full width */}
-        <Button 
-          className="w-full h-14 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-lg"
-          onClick={() => navigate("/dating")}
-        >
-          <Heart className="w-6 h-6 mr-2" />
-          Seoul Love Signal 💕 / Tín hiệu tình yêu Seoul
-        </Button>
 
         {/* Footer Stats */}
         <div className="flex items-center justify-center gap-4 text-white/40 text-sm pt-4">
