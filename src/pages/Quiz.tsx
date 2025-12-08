@@ -17,12 +17,21 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 
+interface QuizOption {
+  ko: string;
+  vi: string;
+}
+
 interface QuizQuestion {
   expression: string;
   type: "idiom" | "proverb" | "slang" | "internet";
   difficulty: "easy" | "medium" | "hard";
-  correct_answer: string;
-  options: string[];
+  hint_ko?: string;
+  hint_vi?: string;
+  correct_answer_ko: string;
+  correct_answer_vi: string;
+  correct_index: number;
+  options: QuizOption[];
   explanation_ko: string;
   explanation_vi: string;
   example_sentence: string;
@@ -79,30 +88,30 @@ const Quiz = () => {
 
   useEffect(() => {
     fetchQuestion();
-  }, []);
+  }, [difficulty]);
 
-  const handleAnswer = (answer: string) => {
-    if (showResult) return;
+  const handleAnswer = (index: number) => {
+    if (showResult || !question) return;
     
-    setSelectedAnswer(answer);
+    setSelectedAnswer(index.toString());
     setShowResult(true);
     setTotalQuestions(prev => prev + 1);
 
-    const isCorrect = answer === question?.correct_answer;
+    const isCorrect = index === question.correct_index;
     
     if (isCorrect) {
       const points = difficulty === "easy" ? 10 : difficulty === "medium" ? 20 : 30;
       setScore(prev => prev + points + streak * 5);
       setStreak(prev => prev + 1);
       toast({
-        title: "정답! 🎉",
+        title: "정답입니다! 🎉 Đúng rồi!",
         description: `+${points + streak * 5}점`,
       });
     } else {
       setStreak(0);
       toast({
-        title: "오답! 😢",
-        description: "다음 문제에서 다시 도전하세요!",
+        title: "오답입니다 😢 Sai rồi!",
+        description: "다음 문제에서 다시 도전하세요! Hãy thử lại ở câu tiếp theo!",
         variant: "destructive",
       });
     }
@@ -173,13 +182,19 @@ const Quiz = () => {
               key={diff}
               variant={difficulty === diff ? "default" : "ghost"}
               size="sm"
-              onClick={() => setDifficulty(diff)}
+              onClick={() => {
+                setDifficulty(diff);
+                setUsedExpressions([]);
+              }}
               className={difficulty === diff 
                 ? `flex-1 ${diff === "easy" ? "bg-green-600" : diff === "medium" ? "bg-yellow-600" : "bg-red-600"}` 
                 : "flex-1 text-white/60 hover:text-white hover:bg-white/10"
               }
             >
-              {diff === "easy" ? "쉬움" : diff === "medium" ? "보통" : "어려움"}
+              <div className="flex flex-col">
+                <span>{diff === "easy" ? "쉬움" : diff === "medium" ? "보통" : "어려움"}</span>
+                <span className="text-xs opacity-70">{diff === "easy" ? "Dễ" : diff === "medium" ? "Trung bình" : "Khó"}</span>
+              </div>
             </Button>
           ))}
         </div>
@@ -210,9 +225,12 @@ const Quiz = () => {
               {/* Question Card */}
               <div className="glass-card p-6 rounded-2xl mb-4">
                 <div className="flex items-center justify-between mb-4">
-                  <span className={`px-3 py-1 rounded-full text-xs text-white ${getTypeLabel(question.type).color}`}>
-                    {getTypeLabel(question.type).ko}
-                  </span>
+                  <div className="flex flex-col">
+                    <span className={`px-3 py-1 rounded-full text-xs text-white ${getTypeLabel(question.type).color}`}>
+                      {getTypeLabel(question.type).ko}
+                    </span>
+                    <span className="text-xs text-white/50 mt-1 ml-1">{getTypeLabel(question.type).vi}</span>
+                  </div>
                   <span className={`text-sm ${getDifficultyColor(question.difficulty)}`}>
                     {question.difficulty === "easy" ? "★" : question.difficulty === "medium" ? "★★" : "★★★"}
                   </span>
@@ -221,16 +239,19 @@ const Quiz = () => {
                 <h2 className="text-3xl font-bold text-white text-center mb-2">
                   {question.expression}
                 </h2>
-                <p className="text-white/40 text-center text-sm">
+                <p className="text-white/60 text-center text-sm mb-1">
                   이 표현의 의미는 무엇일까요?
+                </p>
+                <p className="text-white/40 text-center text-xs italic">
+                  Ý nghĩa của cụm từ này là gì?
                 </p>
               </div>
 
               {/* Options */}
               <div className="space-y-3 mb-4">
                 {question.options.map((option, index) => {
-                  const isSelected = selectedAnswer === option;
-                  const isCorrect = option === question.correct_answer;
+                  const isSelected = selectedAnswer === index.toString();
+                  const isCorrect = index === question.correct_index;
                   const showCorrect = showResult && isCorrect;
                   const showWrong = showResult && isSelected && !isCorrect;
 
@@ -239,7 +260,7 @@ const Quiz = () => {
                       key={index}
                       whileHover={!showResult ? { scale: 1.02 } : {}}
                       whileTap={!showResult ? { scale: 0.98 } : {}}
-                      onClick={() => handleAnswer(option)}
+                      onClick={() => handleAnswer(index)}
                       disabled={showResult}
                       className={`w-full p-4 rounded-xl text-left transition-all ${
                         showCorrect
@@ -252,9 +273,12 @@ const Quiz = () => {
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-white">{option}</span>
-                        {showCorrect && <CheckCircle className="w-5 h-5 text-green-400" />}
-                        {showWrong && <XCircle className="w-5 h-5 text-red-400" />}
+                        <div className="flex-1">
+                          <p className="text-white font-medium">{option.ko}</p>
+                          <p className="text-white/60 text-sm italic">{option.vi}</p>
+                        </div>
+                        {showCorrect && <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />}
+                        {showWrong && <XCircle className="w-5 h-5 text-red-400 flex-shrink-0" />}
                       </div>
                     </motion.button>
                   );
@@ -272,15 +296,16 @@ const Quiz = () => {
                   >
                     <div className="flex items-center gap-2 mb-3">
                       <Lightbulb className="w-5 h-5 text-yellow-400" />
-                      <span className="text-white font-bold">설명</span>
+                      <span className="text-white font-bold">설명 / Giải thích</span>
                     </div>
                     
-                    <p className="text-white/90 mb-3">{question.explanation_ko}</p>
+                    <p className="text-white/90 mb-2">{question.explanation_ko}</p>
                     <p className="text-white/60 text-sm mb-4 italic">{question.explanation_vi}</p>
                     
                     <div className="bg-white/5 p-3 rounded-lg">
-                      <p className="text-amber-300 mb-1">예문: {question.example_sentence}</p>
-                      <p className="text-white/60 text-sm">{question.example_translation}</p>
+                      <p className="text-white/50 text-xs mb-1">예문 / Ví dụ:</p>
+                      <p className="text-amber-300 mb-1">{question.example_sentence}</p>
+                      <p className="text-white/60 text-sm italic">{question.example_translation}</p>
                     </div>
                   </motion.div>
                 )}
@@ -292,7 +317,7 @@ const Quiz = () => {
                   onClick={fetchQuestion}
                   className="w-full bg-amber-600 hover:bg-amber-700 h-14 text-lg"
                 >
-                  다음 문제
+                  다음 문제 / Câu tiếp theo
                 </Button>
               )}
             </motion.div>
@@ -303,9 +328,9 @@ const Quiz = () => {
       {/* Stats Footer */}
       <div className="p-4 border-t border-white/10 bg-gray-900/50">
         <div className="flex items-center justify-between text-white/60 text-sm">
-          <span>문제: {totalQuestions}개</span>
-          <span>정답률: {totalQuestions > 0 ? Math.round((score / (totalQuestions * 20)) * 100) : 0}%</span>
-          <span>연속: {streak}개</span>
+          <span>문제 Câu hỏi: {totalQuestions}</span>
+          <span>정답률 Tỷ lệ: {totalQuestions > 0 ? Math.round((score / (totalQuestions * 20)) * 100) : 0}%</span>
+          <span>연속 Liên tiếp: {streak}</span>
         </div>
       </div>
     </div>
