@@ -17,6 +17,14 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+// NPC 프로필 이미지 imports
+import male01 from "@/assets/dating/male-01.webp";
+import male02 from "@/assets/dating/male-02.jpg";
+import male03 from "@/assets/dating/male-03.jpg";
+import male04 from "@/assets/dating/male-04.jpg";
+import female01 from "@/assets/dating/female-01.jpg";
+import female02 from "@/assets/dating/female-02.jpg";
+
 type GamePhase = 'swipe' | 'match' | 'chat' | 'album';
 
 interface DateProfile {
@@ -42,7 +50,7 @@ const NPC_PROFILES: DateProfile[] = [
     job: "패션 디자이너",
     mbti: "ENFP",
     intro: "맛집 탐방 좋아해요! 같이 카페 투어 하실 분~ ☕",
-    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=600&fit=crop&crop=faces"
+    image: female01
   },
   {
     id: 2,
@@ -51,34 +59,43 @@ const NPC_PROFILES: DateProfile[] = [
     job: "마케팅 매니저",
     mbti: "INTJ",
     intro: "음악이랑 영화 좋아해요. 취향 공유할 사람 찾아요 🎵",
-    image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=600&fit=crop&crop=faces"
+    image: female02
   },
   {
     id: 3,
-    name: "수아",
-    age: 23,
-    job: "대학원생",
-    mbti: "INFJ",
-    intro: "한강에서 야경 보면서 이야기 나누고 싶어요 🌃",
-    image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=600&fit=crop&crop=faces"
-  },
-  {
-    id: 4,
     name: "민준",
     age: 27,
     job: "스타트업 개발자",
     mbti: "INTP",
     intro: "코딩하다 지치면 같이 산책해요 🚶‍♂️",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop&crop=faces"
+    image: male01
   },
   {
-    id: 5,
+    id: 4,
     name: "현우",
     age: 25,
     job: "웹툰 작가",
     mbti: "ISFP",
     intro: "예술적인 감성 공유할 사람 있나요? 🎨",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=600&fit=crop&crop=faces"
+    image: male02
+  },
+  {
+    id: 5,
+    name: "재현",
+    age: 26,
+    job: "모델",
+    mbti: "ESTP",
+    intro: "운동 좋아해요! 같이 헬스 가실 분~ 💪",
+    image: male03
+  },
+  {
+    id: 6,
+    name: "준서",
+    age: 24,
+    job: "뮤지션",
+    mbti: "INFP",
+    intro: "밤새 음악 이야기 나눌 사람 구해요 🎸",
+    image: male04
   }
 ];
 
