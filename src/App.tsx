@@ -12,6 +12,7 @@ import WordChain from "./pages/WordChain";
 import Quiz from "./pages/Quiz";
 import PartTime from "./pages/PartTime";
 import BankruptcyRecovery from "./pages/BankruptcyRecovery";
+import Dating from "./pages/Dating";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/quiz" element={<Quiz />} />
           <Route path="/parttime" element={<PartTime />} />
           <Route path="/bankruptcy" element={<BankruptcyRecovery />} />
+          <Route path="/dating" element={<Dating />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
