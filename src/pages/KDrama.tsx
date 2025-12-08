@@ -5,6 +5,12 @@ import { ArrowLeft, Mic, MicOff, RotateCcw, Play, Pause, ChevronRight, ChevronLe
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Import scene images
+import romanticScene from "@/assets/drama/romantic-scene.jpg";
+import actionScene from "@/assets/drama/action-scene.jpg";
+import fantasyScene from "@/assets/drama/fantasy-scene.jpg";
+import thrillerScene from "@/assets/drama/thriller-scene.jpg";
+
 // Drama scenes with famous lines
 const dramaScenes = [
   {
@@ -15,7 +21,9 @@ const dramaScenes = [
     vietnamese: "Anh là chú rể của em.",
     context: "도깨비가 은탁에게 처음 말하는 장면",
     difficulty: "쉬움",
-    audioTip: "천천히, 감정을 담아서"
+    audioTip: "천천히, 감정을 담아서",
+    image: fantasyScene,
+    genre: "fantasy"
   },
   {
     id: 2,
@@ -25,7 +33,9 @@ const dramaScenes = [
     vietnamese: "Tôi là người ngoài hành tinh.",
     context: "도민준이 정체를 밝히는 장면",
     difficulty: "쉬움",
-    audioTip: "진지하게"
+    audioTip: "진지하게",
+    image: fantasyScene,
+    genre: "fantasy"
   },
   {
     id: 3,
@@ -35,7 +45,9 @@ const dramaScenes = [
     vietnamese: "Bây giờ trong mắt tôi chỉ có bạn.",
     context: "유시진이 강모연에게 고백하는 장면",
     difficulty: "보통",
-    audioTip: "로맨틱하게, 눈을 맞추며"
+    audioTip: "로맨틱하게, 눈을 맞추며",
+    image: actionScene,
+    genre: "action"
   },
   {
     id: 4,
@@ -45,7 +57,9 @@ const dramaScenes = [
     vietnamese: "Em là định mệnh của anh.",
     context: "리정혁이 세리에게 하는 대사",
     difficulty: "보통",
-    audioTip: "깊은 감정을 담아서"
+    audioTip: "깊은 감정을 담아서",
+    image: romanticScene,
+    genre: "romantic"
   },
   {
     id: 5,
@@ -55,7 +69,9 @@ const dramaScenes = [
     vietnamese: "Tôi tuyệt đối không bỏ cuộc.",
     context: "박새로이의 각오를 다지는 대사",
     difficulty: "쉬움",
-    audioTip: "강하고 단호하게"
+    audioTip: "강하고 단호하게",
+    image: thrillerScene,
+    genre: "thriller"
   },
   {
     id: 6,
@@ -65,7 +81,9 @@ const dramaScenes = [
     vietnamese: "Deok Sun à, tao thích mày.",
     context: "택이가 덕선이에게 고백하는 장면",
     difficulty: "쉬움",
-    audioTip: "수줍게, 떨리는 목소리로"
+    audioTip: "수줍게, 떨리는 목소리로",
+    image: romanticScene,
+    genre: "romantic"
   },
   {
     id: 7,
@@ -75,7 +93,9 @@ const dramaScenes = [
     vietnamese: "Phải cứu dân chúng.",
     context: "세자가 결단을 내리는 장면",
     difficulty: "보통",
-    audioTip: "비장하게, 왕의 품격으로"
+    audioTip: "비장하게, 왕의 품격으로",
+    image: thrillerScene,
+    genre: "thriller"
   },
   {
     id: 8,
@@ -85,7 +105,9 @@ const dramaScenes = [
     vietnamese: "Tao là Gganbu mà.",
     context: "일남 할아버지와의 게임 중",
     difficulty: "쉬움",
-    audioTip: "친근하게, 약간 슬프게"
+    audioTip: "친근하게, 약간 슬프게",
+    image: thrillerScene,
+    genre: "thriller"
   },
   {
     id: 9,
@@ -95,7 +117,9 @@ const dramaScenes = [
     vietnamese: "Joseon là đất nước của tôi.",
     context: "유진이 정체성을 선언하는 장면",
     difficulty: "보통",
-    audioTip: "결연하게, 자부심을 담아"
+    audioTip: "결연하게, 자부심을 담아",
+    image: actionScene,
+    genre: "action"
   },
   {
     id: 10,
@@ -105,7 +129,9 @@ const dramaScenes = [
     vietnamese: "Con tôi nhất định phải thành công.",
     context: "한서진의 집착을 보여주는 대사",
     difficulty: "어려움",
-    audioTip: "집요하게, 약간 광기를 담아"
+    audioTip: "집요하게, 약간 광기를 담아",
+    image: thrillerScene,
+    genre: "thriller"
   }
 ];
 
@@ -340,41 +366,54 @@ const KDrama = () => {
           key={currentIndex}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 rounded-2xl p-6 border border-white/10"
+          className="relative overflow-hidden rounded-2xl border border-white/10"
         >
-          {/* Drama Title */}
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-xl font-bold text-pink-300">{currentScene.drama}</h2>
-              <p className="text-sm text-gray-400">캐릭터: {currentScene.character}</p>
-            </div>
-            <span className={`text-sm font-medium ${getDifficultyColor(currentScene.difficulty)}`}>
-              {currentScene.difficulty}
-            </span>
+          {/* Scene Image Background */}
+          <div className="absolute inset-0">
+            <img 
+              src={currentScene.image} 
+              alt={currentScene.drama}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/40" />
           </div>
 
-          {/* Line to Read */}
-          <div className="bg-black/40 rounded-xl p-5 mb-4">
-            <div className="flex items-start gap-3 mb-3">
-              <Volume2 className="w-5 h-5 text-pink-400 mt-1 flex-shrink-0" />
+          {/* Content Overlay */}
+          <div className="relative z-10 p-6">
+            {/* Drama Title */}
+            <div className="flex items-center justify-between mb-4">
               <div>
-                <p className="text-2xl font-bold text-white mb-2 leading-relaxed">
-                  "{currentScene.korean}"
-                </p>
-                <p className="text-gray-400 text-sm">
-                  {currentScene.vietnamese}
-                </p>
+                <h2 className="text-xl font-bold text-pink-300 drop-shadow-lg">{currentScene.drama}</h2>
+                <p className="text-sm text-gray-300 drop-shadow">캐릭터: {currentScene.character}</p>
               </div>
+              <span className={`text-sm font-medium px-3 py-1 rounded-full bg-black/50 backdrop-blur ${getDifficultyColor(currentScene.difficulty)}`}>
+                {currentScene.difficulty}
+              </span>
             </div>
-            <p className="text-xs text-gray-500 mt-3 italic">
-              💡 {currentScene.audioTip}
+
+            {/* Line to Read */}
+            <div className="bg-black/60 backdrop-blur-sm rounded-xl p-5 mb-4 border border-white/10">
+              <div className="flex items-start gap-3 mb-3">
+                <Volume2 className="w-5 h-5 text-pink-400 mt-1 flex-shrink-0" />
+                <div>
+                  <p className="text-2xl font-bold text-white mb-2 leading-relaxed drop-shadow-lg">
+                    "{currentScene.korean}"
+                  </p>
+                  <p className="text-gray-300 text-sm">
+                    {currentScene.vietnamese}
+                  </p>
+                </div>
+              </div>
+              <p className="text-xs text-gray-400 mt-3 italic">
+                💡 {currentScene.audioTip}
+              </p>
+            </div>
+
+            {/* Context */}
+            <p className="text-xs text-gray-400 text-center drop-shadow">
+              📺 {currentScene.context}
             </p>
           </div>
-
-          {/* Context */}
-          <p className="text-xs text-gray-500 text-center">
-            📺 {currentScene.context}
-          </p>
         </motion.div>
 
         {/* Recording Button */}
