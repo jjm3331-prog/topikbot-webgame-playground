@@ -308,7 +308,7 @@ const Chat = () => {
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 flex flex-col ${shakeScreen ? "animate-shake" : ""}`}>
+    <div className={`min-h-[100dvh] bg-gradient-to-b from-[#1a1a2e] to-[#0f0f23] flex flex-col ${shakeScreen ? "animate-shake" : ""}`}>
       {/* Feedback Popup */}
       {feedback.show && (
         <div className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-bounce`}>

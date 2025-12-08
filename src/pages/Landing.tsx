@@ -38,7 +38,7 @@ const Landing = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col"
+      className="min-h-[100dvh] flex flex-col"
       style={{
         backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.8)), url(${seoulHero})`,
         backgroundSize: "cover",

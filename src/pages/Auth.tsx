@@ -76,7 +76,7 @@ const Auth = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col"
+      className="min-h-[100dvh] flex flex-col"
       style={{
         backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(26, 26, 46, 0.95)), url(${seoulHero})`,
         backgroundSize: "cover",
