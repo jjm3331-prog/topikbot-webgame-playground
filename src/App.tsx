@@ -10,6 +10,7 @@ import Chat from "./pages/Chat";
 import Ranking from "./pages/Ranking";
 import WordChain from "./pages/WordChain";
 import Quiz from "./pages/Quiz";
+import PartTime from "./pages/PartTime";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/ranking" element={<Ranking />} />
           <Route path="/wordchain" element={<WordChain />} />
           <Route path="/quiz" element={<Quiz />} />
+          <Route path="/parttime" element={<PartTime />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
