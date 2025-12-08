@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.dating-chat]
 verify_jwt = false
+
+[functions.generate-couple-photo]
+verify_jwt = false
