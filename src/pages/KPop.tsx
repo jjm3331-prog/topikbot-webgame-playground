@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Music, Sparkles, Check, X, Lightbulb, RotateCcw, Trophy, Volume2 } from 'lucide-react';
+import { ArrowLeft, Music, Sparkles, Check, X, Lightbulb, RotateCcw, Trophy, Play, Pause, Youtube } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,11 +10,11 @@ interface Question {
   id: string;
   artist: string;
   song: string;
-  lyrics: string;
+  youtubeId: string;
+  timestamp: number;
+  lyricLine: string;
   answer: string;
   hint: string;
-  fullLyrics: string;
-  vietnamese: string;
   difficulty: string;
   points: number;
 }
@@ -33,7 +33,9 @@ const KPop = () => {
   const [usedIds, setUsedIds] = useState<string[]>([]);
   const [difficulty, setDifficulty] = useState<string>('보통');
   const [gameComplete, setGameComplete] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const playerRef = useRef<HTMLIFrameElement>(null);
 
   const currentQuestion = questions[currentIndex];
 
@@ -64,6 +66,7 @@ const KPop = () => {
       setShowHint(false);
       setIsAnswered(false);
       setGameComplete(false);
+      setIsPlaying(false);
     } catch (error) {
       console.error('Load error:', error);
       toast.error('문제 로딩 실패 / Lỗi tải câu hỏi');
@@ -85,8 +88,8 @@ const KPop = () => {
   const handleSubmit = () => {
     if (!userAnswer.trim() || !currentQuestion) return;
 
-    const normalizedAnswer = userAnswer.trim().toLowerCase();
-    const normalizedCorrect = currentQuestion.answer.toLowerCase();
+    const normalizedAnswer = userAnswer.trim().toLowerCase().replace(/\s+/g, ' ');
+    const normalizedCorrect = currentQuestion.answer.toLowerCase().replace(/\s+/g, ' ');
     const correct = normalizedAnswer === normalizedCorrect;
 
     setIsCorrect(correct);
@@ -110,6 +113,7 @@ const KPop = () => {
       setUserAnswer('');
       setShowHint(false);
       setIsAnswered(false);
+      setIsPlaying(false);
     } else {
       setGameComplete(true);
     }
@@ -134,6 +138,13 @@ const KPop = () => {
       handleSubmit();
     } else if (e.key === 'Enter' && isAnswered) {
       handleNext();
+    }
+  };
+
+  const openYouTube = () => {
+    if (currentQuestion?.youtubeId) {
+      const url = `https://www.youtube.com/watch?v=${currentQuestion.youtubeId}${currentQuestion.timestamp ? `&t=${currentQuestion.timestamp}` : ''}`;
+      window.open(url, '_blank');
     }
   };
 
@@ -203,7 +214,7 @@ const KPop = () => {
           
           <div className="flex items-center gap-2">
             <Music className="w-5 h-5 text-pink-400" />
-            <span className="text-white font-bold">K-POP 가사 퀴즈</span>
+            <span className="text-white font-bold">K-POP MV 퀴즈</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -262,132 +273,145 @@ const KPop = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="bg-black/40 backdrop-blur-xl rounded-3xl p-6 border border-pink-500/30"
+              className="bg-black/40 backdrop-blur-xl rounded-3xl overflow-hidden border border-pink-500/30"
             >
-              {/* Artist & Song */}
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-2xl">
-                  🎤
-                </div>
-                <div>
-                  <h3 className="text-white font-bold text-lg">{currentQuestion.artist}</h3>
-                  <p className="text-pink-400">"{currentQuestion.song}"</p>
-                </div>
-                <span className={`ml-auto px-3 py-1 rounded-full text-xs font-medium ${
-                  currentQuestion.difficulty === '쉬움' ? 'bg-green-500/20 text-green-400'
-                    : currentQuestion.difficulty === '보통' ? 'bg-yellow-500/20 text-yellow-400'
-                    : 'bg-red-500/20 text-red-400'
-                }`}>
-                  {currentQuestion.difficulty}
-                </span>
-              </div>
-
-              {/* Lyrics */}
-              <div className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 rounded-2xl p-6 mb-6">
-                <p className="text-2xl text-white text-center font-medium leading-relaxed">
-                  {isAnswered ? currentQuestion.fullLyrics : currentQuestion.lyrics}
-                </p>
-                {isAnswered && (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-gray-400 text-center mt-4 text-sm italic"
-                  >
-                    {currentQuestion.vietnamese}
-                  </motion.p>
-                )}
-              </div>
-
-              {/* Hint */}
-              {showHint && !isAnswered && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mb-4"
+              {/* YouTube Video Embed */}
+              <div className="relative aspect-video bg-black">
+                <iframe
+                  ref={playerRef}
+                  src={`https://www.youtube.com/embed/${currentQuestion.youtubeId}?start=${currentQuestion.timestamp || 0}&rel=0&modestbranding=1`}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+                
+                {/* Open in YouTube button */}
+                <button
+                  onClick={openYouTube}
+                  className="absolute bottom-3 right-3 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all"
                 >
-                  <div className="flex items-center gap-2 text-yellow-400">
-                    <Lightbulb className="w-4 h-4" />
-                    <span className="text-sm">힌트: {currentQuestion.hint}</span>
+                  <Youtube className="w-4 h-4" />
+                  YouTube에서 보기
+                </button>
+              </div>
+
+              <div className="p-6">
+                {/* Artist & Song */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-xl">
+                    🎤
                   </div>
-                </motion.div>
-              )}
+                  <div>
+                    <h3 className="text-white font-bold text-lg">{currentQuestion.artist}</h3>
+                    <p className="text-pink-400 text-sm">"{currentQuestion.song}"</p>
+                  </div>
+                  <span className={`ml-auto px-3 py-1 rounded-full text-xs font-medium ${
+                    currentQuestion.difficulty === '쉬움' ? 'bg-green-500/20 text-green-400'
+                      : currentQuestion.difficulty === '보통' ? 'bg-yellow-500/20 text-yellow-400'
+                      : 'bg-red-500/20 text-red-400'
+                  }`}>
+                    {currentQuestion.difficulty}
+                  </span>
+                </div>
 
-              {/* Answer Result */}
-              {isAnswered && (
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className={`rounded-xl p-4 mb-4 ${
-                    isCorrect 
-                      ? 'bg-green-500/20 border border-green-500/30' 
-                      : 'bg-red-500/20 border border-red-500/30'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    {isCorrect ? (
-                      <Check className="w-6 h-6 text-green-400" />
-                    ) : (
-                      <X className="w-6 h-6 text-red-400" />
-                    )}
-                    <div>
-                      <p className={`font-bold ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
-                        {isCorrect ? '정답! 🎉' : '오답!'}
-                      </p>
-                      {!isCorrect && (
-                        <p className="text-gray-300 text-sm">
-                          정답: <span className="text-pink-400 font-bold">{currentQuestion.answer}</span>
+                {/* Lyric Line */}
+                <div className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 rounded-xl p-4 mb-4">
+                  <p className="text-lg text-white text-center font-medium">
+                    🎵 {currentQuestion.lyricLine}
+                  </p>
+                </div>
+
+                {/* Hint */}
+                {showHint && !isAnswered && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 mb-4"
+                  >
+                    <div className="flex items-center gap-2 text-yellow-400">
+                      <Lightbulb className="w-4 h-4" />
+                      <span className="text-sm">💡 {currentQuestion.hint}</span>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Answer Result */}
+                {isAnswered && (
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className={`rounded-xl p-4 mb-4 ${
+                      isCorrect 
+                        ? 'bg-green-500/20 border border-green-500/30' 
+                        : 'bg-red-500/20 border border-red-500/30'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {isCorrect ? (
+                        <Check className="w-6 h-6 text-green-400" />
+                      ) : (
+                        <X className="w-6 h-6 text-red-400" />
+                      )}
+                      <div>
+                        <p className={`font-bold ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
+                          {isCorrect ? '정답! 🎉' : '오답!'}
                         </p>
+                        {!isCorrect && (
+                          <p className="text-gray-300 text-sm">
+                            정답: <span className="text-pink-400 font-bold">{currentQuestion.answer}</span>
+                          </p>
+                        )}
+                      </div>
+                      {isCorrect && (
+                        <span className="ml-auto text-green-400 font-bold">
+                          +{showHint ? Math.floor(currentQuestion.points / 2) : currentQuestion.points}점
+                        </span>
                       )}
                     </div>
-                    {isCorrect && (
-                      <span className="ml-auto text-green-400 font-bold">
-                        +{showHint ? Math.floor(currentQuestion.points / 2) : currentQuestion.points}점
-                      </span>
-                    )}
-                  </div>
-                </motion.div>
-              )}
+                  </motion.div>
+                )}
 
-              {/* Input */}
-              {!isAnswered ? (
-                <div className="space-y-3">
-                  <Input
-                    ref={inputRef}
-                    value={userAnswer}
-                    onChange={(e) => setUserAnswer(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="빈칸에 들어갈 단어를 입력하세요..."
-                    className="bg-white/10 border-pink-500/30 text-white text-center text-lg py-6"
-                  />
-                  
-                  <div className="flex gap-2">
-                    {!showHint && (
+                {/* Input */}
+                {!isAnswered ? (
+                  <div className="space-y-3">
+                    <Input
+                      ref={inputRef}
+                      value={userAnswer}
+                      onChange={(e) => setUserAnswer(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="빈칸에 들어갈 단어를 입력하세요..."
+                      className="bg-white/10 border-pink-500/30 text-white text-center text-lg py-6"
+                    />
+                    
+                    <div className="flex gap-2">
+                      {!showHint && (
+                        <Button
+                          onClick={() => setShowHint(true)}
+                          variant="outline"
+                          className="flex-1 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10"
+                        >
+                          <Lightbulb className="w-4 h-4 mr-2" />
+                          힌트 (-50%)
+                        </Button>
+                      )}
                       <Button
-                        onClick={() => setShowHint(true)}
-                        variant="outline"
-                        className="flex-1 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10"
+                        onClick={handleSubmit}
+                        disabled={!userAnswer.trim()}
+                        className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
                       >
-                        <Lightbulb className="w-4 h-4 mr-2" />
-                        힌트 (-50%)
+                        제출하기
                       </Button>
-                    )}
-                    <Button
-                      onClick={handleSubmit}
-                      disabled={!userAnswer.trim()}
-                      className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
-                    >
-                      제출하기
-                    </Button>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <Button
-                  onClick={handleNext}
-                  className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
-                >
-                  {currentIndex < questions.length - 1 ? '다음 문제' : '결과 보기'}
-                </Button>
-              )}
+                ) : (
+                  <Button
+                    onClick={handleNext}
+                    className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
+                  >
+                    {currentIndex < questions.length - 1 ? '다음 문제 →' : '결과 보기 🏆'}
+                  </Button>
+                )}
+              </div>
             </motion.div>
           </AnimatePresence>
         </div>
