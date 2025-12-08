@@ -18,6 +18,7 @@ import { motion, AnimatePresence } from "framer-motion";
 interface WordEntry {
   word: string;
   meaning?: string;
+  explanation?: string;
   isUser: boolean;
   isInvalid?: boolean;
 }
@@ -106,24 +107,38 @@ const WordChain = () => {
           description: data.reason_ko,
           variant: "destructive",
         });
-      } else if (data.game_over && data.winner === "user") {
-        // AI couldn't find a word
-        setGameOver(true);
-        setWinner("user");
-        setScore(prev => prev + 100);
-        toast({
-          title: "승리! 🎉",
-          description: "AI가 단어를 찾지 못했습니다!",
-        });
-      } else if (data.ai_word) {
-        // Valid game continues
-        setWords(prev => [...prev, { 
-          word: data.ai_word, 
-          meaning: data.ai_word_meaning,
-          isUser: false 
-        }]);
-        setLastChar(getLastChar(data.ai_word));
-        setScore(prev => prev + 10);
+      } else {
+        // Update user's word with explanation
+        if (data.user_word_explanation) {
+          setWords(prev => 
+            prev.map((w, i) => 
+              i === prev.length - 1 
+                ? { ...w, explanation: data.user_word_explanation } 
+                : w
+            )
+          );
+        }
+        
+        if (data.game_over && data.winner === "user") {
+          // AI couldn't find a word
+          setGameOver(true);
+          setWinner("user");
+          setScore(prev => prev + 100);
+          toast({
+            title: "승리! 🎉",
+            description: "AI가 단어를 찾지 못했습니다!",
+          });
+        } else if (data.ai_word) {
+          // Valid game continues
+          setWords(prev => [...prev, { 
+            word: data.ai_word, 
+            meaning: data.ai_word_meaning,
+            explanation: data.ai_word_explanation,
+            isUser: false 
+          }]);
+          setLastChar(getLastChar(data.ai_word));
+          setScore(prev => prev + 10);
+        }
       }
     } catch (error) {
       console.error("Word chain error:", error);
@@ -227,9 +242,12 @@ const WordChain = () => {
                   {entry.isInvalid && <Skull className="w-5 h-5 text-red-400" />}
                 </div>
                 {entry.meaning && (
-                  <p className="text-white/60 text-sm mt-1 italic">{entry.meaning}</p>
+                  <p className="text-yellow-300/90 text-sm mt-2 font-medium">{entry.meaning}</p>
                 )}
-                <p className="text-white/40 text-xs mt-1">
+                {entry.explanation && (
+                  <p className="text-white/70 text-sm mt-1 leading-relaxed">{entry.explanation}</p>
+                )}
+                <p className="text-white/40 text-xs mt-2">
                   {entry.isUser ? "나" : "AI"}
                 </p>
               </div>
