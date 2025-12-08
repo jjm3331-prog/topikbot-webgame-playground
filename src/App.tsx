@@ -7,8 +7,8 @@ import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Game from "./pages/Game";
 import Chat from "./pages/Chat";
+import Ranking from "./pages/Ranking";
 import NotFound from "./pages/NotFound";
-
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -22,6 +22,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/game" element={<Game />} />
           <Route path="/chat" element={<Chat />} />
+          <Route path="/ranking" element={<Ranking />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
