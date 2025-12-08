@@ -15,7 +15,8 @@ import {
   MessageSquare,
   LogOut,
   ChevronLeft,
-  Info
+  Info,
+  Zap
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -78,8 +79,8 @@ const Game = () => {
 
   const handleStartSurvival = () => {
     toast({
-      title: "서울 생존 시작! (Bắt đầu Seoul Survival!)",
-      description: "AI가 시나리오를 생성중입니다...",
+      title: "서울 생존 시작!",
+      description: "AI가 시나리오를 생성중입니다... / AI đang tạo kịch bản...",
     });
     navigate("/chat");
   };
@@ -88,7 +89,7 @@ const Game = () => {
     if (customLocation.trim()) {
       toast({
         title: `${customLocation}에서 시작합니다!`,
-        description: "Bắt đầu tại " + customLocation,
+        description: `Bắt đầu tại ${customLocation}`,
       });
       navigate("/chat", { state: { location: customLocation } });
     }
@@ -97,7 +98,7 @@ const Game = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-purple-900 to-gray-900 flex items-center justify-center">
-        <div className="animate-pulse text-white text-xl">로딩중...</div>
+        <div className="animate-pulse text-white text-xl">로딩중... / Đang tải...</div>
       </div>
     );
   }
@@ -110,7 +111,7 @@ const Game = () => {
           <button onClick={() => navigate("/")} className="text-white/70 hover:text-white">
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <span className="text-white font-medium">Main Menu</span>
+          <span className="text-white font-medium">메인 메뉴 / Menu chính</span>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-white">{profile?.username}</span>
@@ -120,7 +121,7 @@ const Game = () => {
             onClick={handleLogout}
             className="border-red-500/50 text-red-400 hover:bg-red-500/20"
           >
-            Logout
+            로그아웃
           </Button>
         </div>
       </header>
@@ -131,7 +132,7 @@ const Game = () => {
           <div className="flex items-center gap-2">
             <Heart className="w-5 h-5 text-red-500" />
             <div>
-              <p className="text-xs text-white/60">HP</p>
+              <p className="text-xs text-white/60">체력 / Máu</p>
               <div className="flex items-center gap-2">
                 <span className="text-white font-bold">{profile?.hp}/100</span>
                 <div className="w-16 h-2 bg-gray-700 rounded-full overflow-hidden">
@@ -146,14 +147,14 @@ const Game = () => {
           <div className="flex items-center gap-2">
             <Coins className="w-5 h-5 text-yellow-500" />
             <div>
-              <p className="text-xs text-white/60">돈</p>
+              <p className="text-xs text-white/60">소지금 / Tiền</p>
               <span className="text-white font-bold">₩{profile?.money?.toLocaleString()}</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Target className="w-5 h-5 text-green-500" />
             <div>
-              <p className="text-xs text-white/60">미션</p>
+              <p className="text-xs text-white/60">미션 / Nhiệm vụ</p>
               <span className="text-white font-bold">{profile?.missions_completed}/{profile?.total_missions}</span>
             </div>
           </div>
@@ -167,9 +168,13 @@ const Game = () => {
           <div className="glass-card p-4 rounded-xl">
             <div className="flex items-center gap-2 mb-3">
               <MapPin className="w-5 h-5 text-red-400" />
-              <h3 className="text-white font-bold">장소 선택</h3>
+              <h3 className="text-white font-bold">장소 선택 / Chọn địa điểm</h3>
             </div>
-            <p className="text-white/60 text-sm mb-3">커스텀 장소를 입력하거나 빈칸으로 두면 AI가 랜덤 선택</p>
+            <p className="text-white/60 text-sm mb-3">
+              원하는 장소를 입력하거나 비워두면 AI가 랜덤 선택
+              <br />
+              <span className="text-white/40">Nhập địa điểm hoặc để trống để AI chọn ngẫu nhiên</span>
+            </p>
             <Input
               placeholder="예: 강남역, 한강공원, PC방..."
               value={customLocation}
@@ -181,14 +186,14 @@ const Game = () => {
               className="w-full border-white/20 text-white hover:bg-white/10"
               onClick={handleCustomLocation}
             >
-              이 장소로 시작
+              이 장소로 시작 / Bắt đầu tại đây
             </Button>
           </div>
 
           <div className="glass-card p-4 rounded-xl flex flex-col items-center justify-center text-center">
             <Dice6 className="w-12 h-12 text-neon-cyan mb-2" />
             <h3 className="text-white font-bold text-lg">서울에서 생존하기</h3>
-            <p className="text-white/60 text-sm">Start Random Survival</p>
+            <p className="text-white/60 text-sm">Sinh tồn tại Seoul</p>
             <Button 
               className="mt-3 bg-purple-600 hover:bg-purple-700"
               onClick={handleStartSurvival}
@@ -204,7 +209,7 @@ const Game = () => {
           onClick={() => navigate("/ranking")}
         >
           <Trophy className="w-6 h-6 mr-2" />
-          랭킹 보기 (Bảng xếp hạng)
+          랭킹 보기 / Bảng xếp hạng
         </Button>
 
         <div className="grid grid-cols-2 gap-4">
@@ -212,15 +217,15 @@ const Game = () => {
             className="h-14 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
             onClick={() => navigate("/bankruptcy")}
           >
-            <Coins className="w-5 h-5 mr-2" />
-            파산 복구 (Bankruptcy Recovery)
+            <Zap className="w-5 h-5 mr-2" />
+            파산 복구 / Phục hồi phá sản
           </Button>
           <Button 
             className="h-14 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
             onClick={() => navigate("/parttime")}
           >
             <Briefcase className="w-5 h-5 mr-2" />
-            아르바이트 게임 (Part-time Jobs)
+            아르바이트 / Làm thêm
           </Button>
         </div>
 
@@ -229,7 +234,7 @@ const Game = () => {
           onClick={() => navigate("/wordchain")}
         >
           <Link2 className="w-6 h-6 mr-2" />
-          끝말잇기 게임 (Word Chain Game)
+          끝말잇기 / Nối từ tiếng Hàn
         </Button>
 
         <Button 
@@ -237,27 +242,36 @@ const Game = () => {
           onClick={() => navigate("/quiz")}
         >
           <MessageSquare className="w-6 h-6 mr-2" />
-          관용어/슬랭 퀴즈 (Korean Idioms Quiz)
+          관용어 & 슬랭 퀴즈 / Thành ngữ & Tiếng lóng
         </Button>
 
         {/* How to Play */}
         <div className="glass-card p-4 rounded-xl">
           <div className="flex items-center gap-2 mb-3">
             <Info className="w-5 h-5 text-blue-400" />
-            <h3 className="text-white font-bold">게임 방식 (How to Play)</h3>
+            <h3 className="text-white font-bold">게임 방식 / Cách chơi</h3>
           </div>
           <ul className="space-y-2 text-sm">
             <li className="flex items-start gap-2 text-white/80">
               <span className="text-neon-cyan">🎲</span>
-              AI가 서울의 무작위 장소와 상황을 생성합니다
+              <div>
+                <p>AI가 서울의 무작위 장소와 상황을 생성합니다</p>
+                <p className="text-white/50">AI tạo địa điểm và tình huống ngẫu nhiên tại Seoul</p>
+              </div>
             </li>
             <li className="flex items-start gap-2 text-white/80">
               <span className="text-green-400">🎯</span>
-              10턴 동안 생존하면 미션 완료!
+              <div>
+                <p>10턴 동안 생존하면 미션 완료!</p>
+                <p className="text-white/50">Sống sót 10 lượt để hoàn thành nhiệm vụ!</p>
+              </div>
             </li>
             <li className="flex items-start gap-2 text-white/80">
               <span className="text-purple-400">💬</span>
-              AI는 자연스럽게 대화하며 진짜 실수만 교정합니다
+              <div>
+                <p>AI는 자연스럽게 대화하며 진짜 실수만 교정합니다</p>
+                <p className="text-white/50">AI trò chuyện tự nhiên và chỉ sửa lỗi thật sự</p>
+              </div>
             </li>
           </ul>
         </div>
@@ -265,7 +279,7 @@ const Game = () => {
         {/* Footer Stats */}
         <div className="flex items-center justify-center gap-4 text-white/40 text-sm pt-4">
           <span>❤️ {profile?.hp}</span>
-          <span>0/10</span>
+          <span>턴 0/10 | Lượt 0/10</span>
         </div>
       </div>
     </div>
