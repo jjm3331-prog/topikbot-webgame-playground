@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => ({
       includeAssets: ["favicon.ico", "robots.txt", "pwa-icons/*.png"],
       manifest: {
         name: "Game LUKATO",
-        short_name: "LUKATO",
+        short_name: "Game LUKATO",
         description: "AI 기반 한국어 학습 RPG 게임 - Your Korean Mentor",
         theme_color: "#1a1a2e",
         background_color: "#ffffff",
