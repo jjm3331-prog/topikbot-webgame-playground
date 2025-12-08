@@ -202,7 +202,7 @@ const Game = () => {
           </div>
         </div>
 
-        {/* External Links */}
+        {/* External Links - 2 columns */}
         <div className="grid grid-cols-2 gap-3">
           <a 
             href="https://hanoi.topikbot.kr" 
@@ -211,13 +211,13 @@ const Game = () => {
             className="block"
           >
             <Button 
-              className="w-full h-16 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-sm font-bold flex flex-col items-center justify-center gap-0.5"
+              className="w-full h-14 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-sm font-bold flex flex-col items-center justify-center gap-0"
             >
               <div className="flex items-center gap-1">
                 <ExternalLink className="w-4 h-4" />
                 <span>Hanoi 공식 웹사이트</span>
               </div>
-              <span className="text-xs opacity-80">Trang web chính thức Hanoi</span>
+              <span className="text-[10px] opacity-80">Trang web chính thức Hanoi</span>
             </Button>
           </a>
           <a 
@@ -227,18 +227,18 @@ const Game = () => {
             className="block"
           >
             <Button 
-              className="w-full h-16 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-sm font-bold flex flex-col items-center justify-center gap-0.5"
+              className="w-full h-14 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-sm font-bold flex flex-col items-center justify-center gap-0"
             >
               <div className="flex items-center gap-1">
                 <ExternalLink className="w-4 h-4" />
                 <span>LUKATO AI 서비스</span>
               </div>
-              <span className="text-xs opacity-80">Dịch vụ LUKATO AI</span>
+              <span className="text-[10px] opacity-80">Dịch vụ LUKATO AI</span>
             </Button>
           </a>
         </div>
 
-        {/* Game Modes */}
+        {/* Ranking - Full width */}
         <Button 
           className="w-full h-14 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-lg font-bold"
           onClick={() => navigate("/ranking")}
@@ -247,39 +247,43 @@ const Game = () => {
           랭킹 보기 / Bảng xếp hạng
         </Button>
 
-        <div className="grid grid-cols-2 gap-4">
+        {/* Bankruptcy & Part-time - 2 columns */}
+        <div className="grid grid-cols-2 gap-3">
           <Button 
-            className="h-14 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+            className="h-14 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-sm"
             onClick={() => navigate("/bankruptcy")}
           >
-            <Zap className="w-5 h-5 mr-2" />
+            <Zap className="w-5 h-5 mr-1" />
             파산 복구 / Phục hồi phá sản
           </Button>
           <Button 
-            className="h-14 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
+            className="h-14 bg-gradient-to-r from-fuchsia-500 to-pink-500 hover:from-fuchsia-600 hover:to-pink-600 text-sm"
             onClick={() => navigate("/parttime")}
           >
-            <Briefcase className="w-5 h-5 mr-2" />
+            <Briefcase className="w-5 h-5 mr-1" />
             아르바이트 / Làm thêm
           </Button>
         </div>
 
-        <Button 
-          className="w-full h-14 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-lg"
-          onClick={() => navigate("/wordchain")}
-        >
-          <Link2 className="w-6 h-6 mr-2" />
-          끝말잇기 / Nối từ tiếng Hàn
-        </Button>
+        {/* Word Chain & Quiz - 2 columns */}
+        <div className="grid grid-cols-2 gap-3">
+          <Button 
+            className="h-14 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-sm"
+            onClick={() => navigate("/wordchain")}
+          >
+            <Link2 className="w-5 h-5 mr-1" />
+            끝말잇기 / Nối từ tiếng Hàn
+          </Button>
+          <Button 
+            className="h-14 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-sm"
+            onClick={() => navigate("/quiz")}
+          >
+            <MessageSquare className="w-5 h-5 mr-1" />
+            관용어 퀴즈 / Thành ngữ
+          </Button>
+        </div>
 
-        <Button 
-          className="w-full h-14 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-lg"
-          onClick={() => navigate("/quiz")}
-        >
-          <MessageSquare className="w-6 h-6 mr-2" />
-          관용어 & 슬랭 퀴즈 / Thành ngữ & Tiếng lóng
-        </Button>
-
+        {/* Dating - Full width */}
         <Button 
           className="w-full h-14 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-lg"
           onClick={() => navigate("/dating")}
