@@ -210,7 +210,7 @@ const Game = () => {
         <div className="grid grid-cols-2 gap-4">
           <Button 
             className="h-14 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
-            onClick={() => toast({ title: "준비중입니다!", description: "Đang chuẩn bị..." })}
+            onClick={() => navigate("/bankruptcy")}
           >
             <Coins className="w-5 h-5 mr-2" />
             파산 복구 (Bankruptcy Recovery)
