@@ -135,13 +135,13 @@ const PWAInstallPrompt = () => {
               {/* Content */}
               <div className="text-center mb-6">
                 <h3 className="text-xl font-bold text-white mb-2">
-                  📱 앱으로 설치하기
+                  📱 Game LUKATO 설치하기
                 </h3>
                 <p className="text-white/70 text-sm mb-1">
-                  Cài đặt như ứng dụng
+                  Cài đặt Game LUKATO
                 </p>
                 <p className="text-white/60 text-xs mt-3 leading-relaxed">
-                  홈 화면에 추가하면 더 빠르고 편리하게!<br/>
+                  홈 화면에 추가하면 더 빠르고 편리하게!<br />
                   <span className="text-white/50">Thêm vào màn hình chính để truy cập nhanh hơn!</span>
                 </p>
               </div>
