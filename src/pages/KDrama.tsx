@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Mic, MicOff, RotateCcw, ChevronRight, ChevronLeft, Volume2, RefreshCw, Loader2 } from "lucide-react";
+import { ArrowLeft, Mic, MicOff, RotateCcw, ChevronRight, ChevronLeft, Volume2, RefreshCw, Loader2, PlayCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -91,6 +91,8 @@ const KDrama = () => {
   } | null>(null);
   const [totalScore, setTotalScore] = useState(0);
   const [attempts, setAttempts] = useState(0);
+  const [isPlayingTTS, setIsPlayingTTS] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -153,6 +155,79 @@ const KDrama = () => {
 
   const getSceneImage = (genre: string) => {
     return genreImages[genre] || romanticScene;
+  };
+
+  // Play TTS audio
+  const playTTS = async () => {
+    if (isPlayingTTS) {
+      // Stop current playback
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      setIsPlayingTTS(false);
+      return;
+    }
+
+    setIsPlayingTTS(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/drama-tts`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            text: currentScene.korean,
+            voice: 'nova' // Good for Korean
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('TTS failed');
+      }
+
+      const data = await response.json();
+      
+      if (data.audioContent) {
+        const audioSrc = `data:audio/mp3;base64,${data.audioContent}`;
+        const audio = new Audio(audioSrc);
+        audioRef.current = audio;
+        
+        audio.onended = () => {
+          setIsPlayingTTS(false);
+          audioRef.current = null;
+        };
+        
+        audio.onerror = () => {
+          setIsPlayingTTS(false);
+          audioRef.current = null;
+          toast({
+            title: "재생 오류",
+            description: "오디오 재생에 실패했습니다",
+            variant: "destructive",
+          });
+        };
+        
+        await audio.play();
+        
+        toast({
+          title: "🔊 원어민 발음 예시",
+          description: "잘 듣고 따라해보세요!",
+        });
+      }
+    } catch (error) {
+      console.error('TTS error:', error);
+      setIsPlayingTTS(false);
+      toast({
+        title: "TTS 오류",
+        description: "발음 예시를 불러올 수 없습니다",
+        variant: "destructive",
+      });
+    }
   };
 
   const startRecording = async () => {
@@ -490,8 +565,22 @@ const KDrama = () => {
                 {/* Line to Read */}
                 <div className="bg-black/60 backdrop-blur-sm rounded-xl p-5 mb-4 border border-white/10">
                   <div className="flex items-start gap-3 mb-3">
-                    <Volume2 className="w-5 h-5 text-pink-400 mt-1 flex-shrink-0" />
-                    <div>
+                    <button
+                      onClick={playTTS}
+                      disabled={isPlayingTTS && !audioRef.current}
+                      className={`flex-shrink-0 p-2 rounded-full transition-all ${
+                        isPlayingTTS 
+                          ? 'bg-pink-500 animate-pulse' 
+                          : 'bg-pink-500/20 hover:bg-pink-500/40'
+                      }`}
+                    >
+                      {isPlayingTTS ? (
+                        <Volume2 className="w-5 h-5 text-white animate-pulse" />
+                      ) : (
+                        <PlayCircle className="w-5 h-5 text-pink-400" />
+                      )}
+                    </button>
+                    <div className="flex-1">
                       <p className="text-2xl font-bold text-white mb-2 leading-relaxed drop-shadow-lg">
                         "{currentScene.korean}"
                       </p>
@@ -500,6 +589,31 @@ const KDrama = () => {
                       </p>
                     </div>
                   </div>
+                  
+                  {/* Listen Button */}
+                  <Button
+                    onClick={playTTS}
+                    disabled={isPlayingTTS && !audioRef.current}
+                    size="sm"
+                    className={`w-full mt-2 ${
+                      isPlayingTTS 
+                        ? 'bg-pink-500 hover:bg-pink-600' 
+                        : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600'
+                    }`}
+                  >
+                    {isPlayingTTS ? (
+                      <>
+                        <Volume2 className="w-4 h-4 mr-2 animate-pulse" />
+                        재생 중... / Đang phát...
+                      </>
+                    ) : (
+                      <>
+                        <PlayCircle className="w-4 h-4 mr-2" />
+                        원어민 발음 듣기 / Nghe phát âm
+                      </>
+                    )}
+                  </Button>
+                  
                   <p className="text-xs text-gray-400 mt-3 italic">
                     💡 {currentScene.audioTip}
                   </p>
