@@ -15,7 +15,9 @@ import {
   MessageSquare,
   ChevronLeft,
   Zap,
-  ExternalLink
+  ExternalLink,
+  Film,
+  Music
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -289,6 +291,24 @@ const Game = () => {
           >
             <MessageSquare className="w-5 h-5 mr-1" />
             관용어 퀴즈 / Thành ngữ
+          </Button>
+        </div>
+
+        {/* K-Drama & K-Pop - 2 columns */}
+        <div className="grid grid-cols-2 gap-3">
+          <Button 
+            className="h-14 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-sm hover-scale"
+            onClick={() => navigate("/kdrama")}
+          >
+            <Film className="w-5 h-5 mr-1" />
+            K-Drama 더빙
+          </Button>
+          <Button 
+            className="h-14 bg-gradient-to-r from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600 text-sm hover-scale"
+            onClick={() => navigate("/kpop")}
+          >
+            <Music className="w-5 h-5 mr-1" />
+            K-POP 가사
           </Button>
         </div>
 

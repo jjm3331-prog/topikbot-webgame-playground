@@ -13,6 +13,7 @@ import Quiz from "./pages/Quiz";
 import PartTime from "./pages/PartTime";
 import BankruptcyRecovery from "./pages/BankruptcyRecovery";
 import Dating from "./pages/Dating";
+import KDrama from "./pages/KDrama";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/parttime" element={<PartTime />} />
           <Route path="/bankruptcy" element={<BankruptcyRecovery />} />
           <Route path="/dating" element={<Dating />} />
+          <Route path="/kdrama" element={<KDrama />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
