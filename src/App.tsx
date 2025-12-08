@@ -17,6 +17,7 @@ import BankruptcyRecovery from "./pages/BankruptcyRecovery";
 import Dating from "./pages/Dating";
 import KDrama from "./pages/KDrama";
 import KPop from "./pages/KPop";
+import Tutorial from "./pages/Tutorial";
 import NotFound from "./pages/NotFound";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import SplashScreen from "./components/SplashScreen";
@@ -104,6 +105,7 @@ const App = () => {
             <Route path="/dating" element={<Dating />} />
             <Route path="/kdrama" element={<KDrama />} />
             <Route path="/kpop" element={<KPop />} />
+            <Route path="/tutorial" element={<Tutorial />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

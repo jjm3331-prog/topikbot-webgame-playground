@@ -17,7 +17,8 @@ import {
   ExternalLink,
   Film,
   Music,
-  Star
+  Star,
+  HelpCircle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import AppHeader from "@/components/AppHeader";
@@ -304,6 +305,18 @@ const Game = () => {
             <span className="text-[9px] opacity-70">Lời bài hát</span>
           </Button>
         </div>
+
+        {/* Tutorial Button */}
+        <Button 
+          className="w-full h-12 bg-gradient-to-r from-teal-500 to-cyan-500 hover:opacity-90 text-[12px] font-bold flex items-center justify-center gap-2"
+          onClick={() => navigate("/tutorial")}
+        >
+          <HelpCircle className="w-5 h-5" />
+          <div className="flex flex-col items-start">
+            <span>사용법 안내</span>
+            <span className="text-[9px] opacity-70">Hướng dẫn sử dụng</span>
+          </div>
+        </Button>
       </div>
 
       {/* Footer */}
