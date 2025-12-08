@@ -226,12 +226,12 @@ const WordChain = () => {
             <ChevronLeft className="w-5 h-5" />
           </button>
           <Link2 className="w-5 h-5 text-cyan-400" />
-          <span className="text-white font-medium">끝말잇기</span>
+          <span className="text-white font-medium">끝말잇기 / Nối từ</span>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-yellow-400">
             <Sparkles className="w-4 h-4" />
-            <span className="font-bold">{score}</span>
+            <span className="font-bold">{score}점</span>
           </div>
           <Button
             variant="ghost"
@@ -260,7 +260,7 @@ const WordChain = () => {
 
             {/* Next Character */}
             <div className="text-center flex-1">
-              <p className="text-white/60 text-sm mb-1">다음 글자</p>
+              <p className="text-white/60 text-sm mb-1">다음 글자 / Ký tự tiếp</p>
               {lastChar ? (
                 <motion.span 
                   key={lastChar}
@@ -271,7 +271,7 @@ const WordChain = () => {
                   {lastChar}
                 </motion.span>
               ) : (
-                <span className="text-lg text-white/40">아무 단어나!</span>
+                <span className="text-lg text-white/40">아무 단어나! / Bất kỳ từ nào!</span>
               )}
             </div>
 
@@ -330,7 +330,7 @@ const WordChain = () => {
                   <p className="text-white/70 text-sm mt-1 leading-relaxed">{entry.explanation}</p>
                 )}
                 <p className="text-white/40 text-xs mt-2">
-                  {entry.isUser ? "나" : "AI"}
+                  {entry.isUser ? "나 / Tôi" : "AI"}
                 </p>
               </div>
             </motion.div>
@@ -373,14 +373,14 @@ const WordChain = () => {
                   <Trophy className="w-20 h-20 text-yellow-400 mx-auto mb-4" />
                   <h2 className="text-3xl font-bold text-yellow-400 mb-2">승리!</h2>
                   <p className="text-white/60 mb-1">Chiến thắng!</p>
-                  <p className="text-white text-xl mb-6">점수: {score}</p>
+                  <p className="text-white text-xl mb-6">점수 / Điểm: {score}</p>
                 </>
               ) : (
                 <>
                   <Skull className="w-20 h-20 text-red-400 mx-auto mb-4" />
                   <h2 className="text-3xl font-bold text-red-400 mb-2">패배!</h2>
                   <p className="text-white/60 mb-1">Thất bại!</p>
-                  <p className="text-white text-xl mb-6">점수: {score}</p>
+                  <p className="text-white text-xl mb-6">점수 / Điểm: {score}</p>
                 </>
               )}
               <div className="flex gap-4 justify-center">
@@ -389,14 +389,14 @@ const WordChain = () => {
                   className="bg-cyan-600 hover:bg-cyan-700"
                 >
                   <RotateCcw className="w-4 h-4 mr-2" />
-                  다시하기
+                  다시하기 / Chơi lại
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => navigate("/game")}
                   className="border-white/20 text-white hover:bg-white/10"
                 >
-                  메인으로
+                  메인으로 / Menu
                 </Button>
               </div>
             </motion.div>
@@ -411,7 +411,7 @@ const WordChain = () => {
             ref={inputRef}
             value={inputWord}
             onChange={(e) => setInputWord(e.target.value)}
-            placeholder={lastChar ? `"${lastChar}"로 시작하는 단어...` : "첫 단어를 입력하세요..."}
+            placeholder={lastChar ? `"${lastChar}"로 시작하는 단어... / Từ bắt đầu bằng "${lastChar}"...` : "첫 단어를 입력하세요... / Nhập từ đầu tiên..."}
             disabled={isLoading || gameOver}
             className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/40"
           />
