@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Music, Sparkles, Check, X, Lightbulb, RotateCcw, Trophy, Play, Pause, Youtube } from 'lucide-react';
+import { ArrowLeft, Music, Sparkles, Check, X, Lightbulb, RotateCcw, Trophy, Youtube, Timer, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +19,8 @@ interface Question {
   points: number;
 }
 
+const TIMER_DURATION = 20; // seconds per question
+
 const KPop = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
@@ -31,16 +33,19 @@ const KPop = () => {
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [usedIds, setUsedIds] = useState<string[]>([]);
-  const [difficulty, setDifficulty] = useState<string>('보통');
+  const [difficulty, setDifficulty] = useState<string | null>(null);
   const [gameComplete, setGameComplete] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [timerMode, setTimerMode] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
+  const [videoError, setVideoError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const playerRef = useRef<HTMLIFrameElement>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const currentQuestion = questions[currentIndex];
 
-  const loadQuestions = async (selectedDifficulty?: string) => {
+  const loadQuestions = async (selectedDifficulty?: string | null) => {
     setIsLoading(true);
+    setVideoError(false);
     try {
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kpop-lyrics`,
@@ -51,7 +56,7 @@ const KPop = () => {
             'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
           body: JSON.stringify({
-            difficulty: selectedDifficulty || difficulty,
+            difficulty: selectedDifficulty,
             excludeIds: usedIds,
           }),
         }
@@ -66,7 +71,7 @@ const KPop = () => {
       setShowHint(false);
       setIsAnswered(false);
       setGameComplete(false);
-      setIsPlaying(false);
+      setTimeLeft(TIMER_DURATION);
     } catch (error) {
       console.error('Load error:', error);
       toast.error('문제 로딩 실패 / Lỗi tải câu hỏi');
@@ -79,6 +84,41 @@ const KPop = () => {
     loadQuestions();
   }, []);
 
+  // Timer logic
+  useEffect(() => {
+    if (timerMode && !isAnswered && !isLoading && questions.length > 0) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            // Time's up!
+            handleTimeUp();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [timerMode, isAnswered, isLoading, currentIndex]);
+
+  const handleTimeUp = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    setIsCorrect(false);
+    setIsAnswered(true);
+    setStreak(0);
+    if (currentQuestion) {
+      setUsedIds(prev => [...prev, currentQuestion.id]);
+    }
+    toast.error(`⏰ 시간 초과! 정답: ${currentQuestion?.answer}`);
+  }, [currentQuestion]);
+
   useEffect(() => {
     if (!isLoading && !isAnswered && inputRef.current) {
       inputRef.current.focus();
@@ -87,6 +127,10 @@ const KPop = () => {
 
   const handleSubmit = () => {
     if (!userAnswer.trim() || !currentQuestion) return;
+
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
 
     const normalizedAnswer = userAnswer.trim().toLowerCase().replace(/\s+/g, ' ');
     const normalizedCorrect = currentQuestion.answer.toLowerCase().replace(/\s+/g, ' ');
@@ -97,10 +141,14 @@ const KPop = () => {
     setUsedIds(prev => [...prev, currentQuestion.id]);
 
     if (correct) {
-      const points = showHint ? Math.floor(currentQuestion.points / 2) : currentQuestion.points;
+      // Bonus points for timer mode based on time left
+      const timerBonus = timerMode ? Math.floor(timeLeft / 2) : 0;
+      const hintPenalty = showHint ? 0.5 : 1;
+      const points = Math.floor((currentQuestion.points + timerBonus) * hintPenalty);
+      
       setScore(prev => prev + points);
       setStreak(prev => prev + 1);
-      toast.success(`정답! +${points}점 🎉`);
+      toast.success(`정답! +${points}점 ${timerMode && timeLeft > 10 ? '⚡ 스피드 보너스!' : '🎉'}`);
     } else {
       setStreak(0);
       toast.error(`오답! 정답: ${currentQuestion.answer}`);
@@ -113,7 +161,8 @@ const KPop = () => {
       setUserAnswer('');
       setShowHint(false);
       setIsAnswered(false);
-      setIsPlaying(false);
+      setTimeLeft(TIMER_DURATION);
+      setVideoError(false);
     } else {
       setGameComplete(true);
     }
@@ -122,14 +171,16 @@ const KPop = () => {
   const handleNewGame = () => {
     setScore(0);
     setStreak(0);
-    loadQuestions();
+    setTimeLeft(TIMER_DURATION);
+    loadQuestions(difficulty);
   };
 
-  const handleDifficultyChange = (newDifficulty: string) => {
+  const handleDifficultyChange = (newDifficulty: string | null) => {
     setDifficulty(newDifficulty);
     setScore(0);
     setStreak(0);
     setUsedIds([]);
+    setTimeLeft(TIMER_DURATION);
     loadQuestions(newDifficulty);
   };
 
@@ -146,6 +197,12 @@ const KPop = () => {
       const url = `https://www.youtube.com/watch?v=${currentQuestion.youtubeId}${currentQuestion.timestamp ? `&t=${currentQuestion.timestamp}` : ''}`;
       window.open(url, '_blank');
     }
+  };
+
+  const getTimerColor = () => {
+    if (timeLeft > 10) return 'text-green-400';
+    if (timeLeft > 5) return 'text-yellow-400';
+    return 'text-red-400';
   };
 
   if (isLoading) {
@@ -179,6 +236,7 @@ const KPop = () => {
               {score}점
             </p>
             <p className="text-gray-400 mt-2">최고 연속 정답: {streak}회</p>
+            {timerMode && <p className="text-cyan-400 text-sm mt-1">⚡ 타이머 모드 클리어!</p>}
           </div>
 
           <div className="flex gap-3">
@@ -244,21 +302,60 @@ const KPop = () => {
           />
         </div>
 
+        {/* Timer Mode Toggle */}
+        <div className="flex items-center justify-between mt-4 mb-2">
+          <button
+            onClick={() => setTimerMode(!timerMode)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              timerMode 
+                ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white' 
+                : 'bg-white/10 text-gray-300 hover:bg-white/20'
+            }`}
+          >
+            <Zap className={`w-4 h-4 ${timerMode ? 'animate-pulse' : ''}`} />
+            타이머 모드 {timerMode ? 'ON' : 'OFF'}
+          </button>
+          
+          {timerMode && !isAnswered && (
+            <motion.div 
+              className={`flex items-center gap-2 px-4 py-2 rounded-full bg-black/50 ${getTimerColor()}`}
+              animate={timeLeft <= 5 ? { scale: [1, 1.1, 1] } : {}}
+              transition={{ repeat: Infinity, duration: 0.5 }}
+            >
+              <Timer className="w-4 h-4" />
+              <span className="font-bold text-lg tabular-nums">{timeLeft}s</span>
+            </motion.div>
+          )}
+        </div>
+
+        {/* Timer Progress Bar */}
+        {timerMode && !isAnswered && (
+          <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden mb-4">
+            <motion.div
+              className={`h-full ${timeLeft > 10 ? 'bg-green-500' : timeLeft > 5 ? 'bg-yellow-500' : 'bg-red-500'}`}
+              initial={{ width: '100%' }}
+              animate={{ width: `${(timeLeft / TIMER_DURATION) * 100}%` }}
+              transition={{ duration: 0.3 }}
+            />
+          </div>
+        )}
+
         {/* Difficulty Selector */}
-        <div className="flex gap-2 mt-4">
-          {['쉬움', '보통', '어려움'].map((d) => (
+        <div className="flex gap-2">
+          {[null, '쉬움', '보통', '어려움'].map((d) => (
             <button
-              key={d}
+              key={d || 'all'}
               onClick={() => handleDifficultyChange(d)}
-              className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all ${
+              className={`flex-1 py-2 px-2 rounded-lg text-xs font-medium transition-all ${
                 difficulty === d
-                  ? d === '쉬움' ? 'bg-green-500 text-white'
+                  ? d === null ? 'bg-purple-500 text-white'
+                    : d === '쉬움' ? 'bg-green-500 text-white'
                     : d === '보통' ? 'bg-yellow-500 text-black'
                     : 'bg-red-500 text-white'
                   : 'bg-white/10 text-gray-300 hover:bg-white/20'
               }`}
             >
-              {d}
+              {d || '전체'}
             </button>
           ))}
         </div>
@@ -277,32 +374,39 @@ const KPop = () => {
             >
               {/* YouTube Video Embed */}
               <div className="relative aspect-video bg-black">
-                <iframe
-                  ref={playerRef}
-                  src={`https://www.youtube.com/embed/${currentQuestion.youtubeId}?start=${currentQuestion.timestamp || 0}&rel=0&modestbranding=1`}
-                  className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+                {!videoError ? (
+                  <iframe
+                    src={`https://www.youtube.com/embed/${currentQuestion.youtubeId}?start=${currentQuestion.timestamp || 0}&rel=0&modestbranding=1&autoplay=1&mute=0`}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    onError={() => setVideoError(true)}
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+                    <Youtube className="w-12 h-12 mb-2 opacity-50" />
+                    <p className="text-sm">영상을 불러올 수 없습니다</p>
+                  </div>
+                )}
                 
                 {/* Open in YouTube button */}
                 <button
                   onClick={openYouTube}
-                  className="absolute bottom-3 right-3 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all"
+                  className="absolute bottom-3 right-3 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all shadow-lg"
                 >
                   <Youtube className="w-4 h-4" />
-                  YouTube에서 보기
+                  YouTube
                 </button>
               </div>
 
-              <div className="p-6">
+              <div className="p-5">
                 {/* Artist & Song */}
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-xl">
+                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-xl">
                     🎤
                   </div>
                   <div>
-                    <h3 className="text-white font-bold text-lg">{currentQuestion.artist}</h3>
+                    <h3 className="text-white font-bold">{currentQuestion.artist}</h3>
                     <p className="text-pink-400 text-sm">"{currentQuestion.song}"</p>
                   </div>
                   <span className={`ml-auto px-3 py-1 rounded-full text-xs font-medium ${
@@ -310,7 +414,7 @@ const KPop = () => {
                       : currentQuestion.difficulty === '보통' ? 'bg-yellow-500/20 text-yellow-400'
                       : 'bg-red-500/20 text-red-400'
                   }`}>
-                    {currentQuestion.difficulty}
+                    {currentQuestion.points}점
                   </span>
                 </div>
 
@@ -354,7 +458,7 @@ const KPop = () => {
                       )}
                       <div>
                         <p className={`font-bold ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
-                          {isCorrect ? '정답! 🎉' : '오답!'}
+                          {isCorrect ? '정답! 🎉' : timeLeft === 0 ? '⏰ 시간 초과!' : '오답!'}
                         </p>
                         {!isCorrect && (
                           <p className="text-gray-300 text-sm">
@@ -362,11 +466,6 @@ const KPop = () => {
                           </p>
                         )}
                       </div>
-                      {isCorrect && (
-                        <span className="ml-auto text-green-400 font-bold">
-                          +{showHint ? Math.floor(currentQuestion.points / 2) : currentQuestion.points}점
-                        </span>
-                      )}
                     </div>
                   </motion.div>
                 )}
@@ -379,8 +478,8 @@ const KPop = () => {
                       value={userAnswer}
                       onChange={(e) => setUserAnswer(e.target.value)}
                       onKeyPress={handleKeyPress}
-                      placeholder="빈칸에 들어갈 단어를 입력하세요..."
-                      className="bg-white/10 border-pink-500/30 text-white text-center text-lg py-6"
+                      placeholder="빈칸에 들어갈 단어..."
+                      className="bg-white/10 border-pink-500/30 text-white text-center text-lg py-5"
                     />
                     
                     <div className="flex gap-2">
@@ -388,18 +487,19 @@ const KPop = () => {
                         <Button
                           onClick={() => setShowHint(true)}
                           variant="outline"
+                          size="sm"
                           className="flex-1 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10"
                         >
-                          <Lightbulb className="w-4 h-4 mr-2" />
-                          힌트 (-50%)
+                          <Lightbulb className="w-4 h-4 mr-1" />
+                          힌트
                         </Button>
                       )}
                       <Button
                         onClick={handleSubmit}
                         disabled={!userAnswer.trim()}
-                        className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
+                        className={`flex-1 ${showHint ? '' : ''} bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600`}
                       >
-                        제출하기
+                        제출
                       </Button>
                     </div>
                   </div>
