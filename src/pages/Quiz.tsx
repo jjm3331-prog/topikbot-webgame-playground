@@ -168,7 +168,7 @@ const Quiz = () => {
             <ChevronLeft className="w-5 h-5" />
           </button>
           <MessageSquare className="w-5 h-5 text-amber-400" />
-          <span className="text-white font-medium">관용어 퀴즈</span>
+          <span className="text-white font-medium">관용어 퀴즈 / Đố vui thành ngữ</span>
         </div>
         <div className="flex items-center gap-4">
           {streak > 0 && (
@@ -179,7 +179,7 @@ const Quiz = () => {
           )}
           <div className="flex items-center gap-2 text-yellow-400">
             <Sparkles className="w-4 h-4" />
-            <span className="font-bold">{score}</span>
+            <span className="font-bold">{score}점</span>
           </div>
           <Button
             variant="ghost"
@@ -228,7 +228,7 @@ const Quiz = () => {
                 <div className="w-3 h-3 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }} />
                 <div className="w-3 h-3 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
               </div>
-              <p className="text-white/60">문제 생성중...</p>
+              <p className="text-white/60">문제 생성중... / Đang tạo câu hỏi...</p>
             </div>
           </div>
         ) : question ? (

@@ -89,7 +89,7 @@ const Ranking = () => {
           <button onClick={() => navigate("/game")} className="text-white/70 hover:text-white">
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <span className="text-white font-medium">Back to Game</span>
+          <span className="text-white font-medium">랭킹 / Bảng xếp hạng</span>
         </div>
         <Trophy className="w-6 h-6 text-yellow-500" />
       </header>
@@ -121,7 +121,7 @@ const Ranking = () => {
             }
           >
             <Star className="w-4 h-4 mr-1" />
-            포인트
+            포인트 / Điểm
           </Button>
           <Button
             variant={sortBy === "missions_completed" ? "default" : "ghost"}
@@ -133,7 +133,7 @@ const Ranking = () => {
             }
           >
             <Target className="w-4 h-4 mr-1" />
-            미션
+            미션 / Nhiệm vụ
           </Button>
           <Button
             variant={sortBy === "money" ? "default" : "ghost"}
@@ -145,7 +145,7 @@ const Ranking = () => {
             }
           >
             <Coins className="w-4 h-4 mr-1" />
-            자산
+            자산 / Tài sản
           </Button>
         </div>
       </div>
@@ -187,7 +187,7 @@ const Ranking = () => {
                       </span>
                       {isCurrentUser && (
                         <span className="text-xs bg-purple-500 px-2 py-0.5 rounded-full text-white">
-                          YOU
+                          나 / Tôi
                         </span>
                       )}
                     </div>
@@ -237,7 +237,7 @@ const Ranking = () => {
           onClick={() => navigate("/game")}
           className="w-full bg-purple-600 hover:bg-purple-700"
         >
-          게임으로 돌아가기
+          메인으로 돌아가기 / Quay lại menu
         </Button>
       </div>
     </div>

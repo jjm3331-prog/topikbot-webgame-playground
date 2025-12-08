@@ -219,7 +219,7 @@ const PartTime = () => {
           <button onClick={() => navigate("/game")} className="text-white/70 hover:text-white">
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <span className="text-white font-medium">아르바이트 게임 / Part-time Job Game</span>
+          <span className="text-white font-medium">아르바이트 / Làm thêm</span>
         </div>
         {gameState !== 'select_job' && gameState !== 'select_difficulty' && (
           <div className="flex items-center gap-4">
@@ -228,7 +228,7 @@ const PartTime = () => {
               <span className="font-bold">₩{totalEarned.toLocaleString()}</span>
             </div>
             <div className="text-white/70">
-              턴 {turn}/{MAX_TURNS}
+              턴 / Lượt {turn}/{MAX_TURNS}
             </div>
           </div>
         )}

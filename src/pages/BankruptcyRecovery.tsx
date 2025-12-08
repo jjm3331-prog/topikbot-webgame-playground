@@ -294,11 +294,11 @@ const BankruptcyRecovery = () => {
               <div className="glass-card p-4 rounded-xl">
                 <h3 className="text-white font-bold mb-3">🎮 게임 방법 / Cách chơi</h3>
                 <ul className="space-y-2 text-sm text-white/80">
-                  <li>⌨️ 화면에 나오는 한국어 단어를 타이핑하세요</li>
-                  <li>⚡ 연속으로 맞추면 콤보 보너스!</li>
-                  <li>⏭️ 모르면 스킵 버튼으로 다음 단어로</li>
-                  <li>💰 60초 후 번 돈이 계정에 추가됩니다</li>
-                  <li>🤖 AI가 무한한 다양성의 단어를 생성!</li>
+                  <li>⌨️ 화면에 나오는 한국어 단어를 타이핑하세요 / Gõ từ tiếng Hàn xuất hiện trên màn hình</li>
+                  <li>⚡ 연속으로 맞추면 콤보 보너스! / Combo bonus khi gõ đúng liên tiếp!</li>
+                  <li>⏭️ 모르면 스킵 버튼으로 다음 단어로 / Bấm skip nếu không biết</li>
+                  <li>💰 60초 후 번 돈이 계정에 추가됩니다 / Tiền kiếm được sẽ được cộng sau 60 giây</li>
+                  <li>🤖 AI가 무한한 다양성의 단어를 생성! / AI tạo từ vựng đa dạng vô hạn!</li>
                 </ul>
               </div>
 
@@ -376,7 +376,7 @@ const BankruptcyRecovery = () => {
                   showWrong ? 'bg-red-500/30 border-red-400' : ''
                 }`}
               >
-                <p className="text-white/60 text-sm mb-2">다음 단어를 타이핑하세요:</p>
+                <p className="text-white/60 text-sm mb-2">다음 단어를 타이핑하세요 / Gõ từ sau:</p>
                 <motion.p
                   animate={showCorrect ? { scale: [1, 1.2, 1] } : {}}
                   className="text-4xl md:text-5xl font-bold text-white mb-4"
@@ -384,7 +384,7 @@ const BankruptcyRecovery = () => {
                   {currentWord.korean}
                 </motion.p>
                 <p className="text-white/60">{currentWord.vietnamese}</p>
-                <p className="text-yellow-400 text-sm mt-2">+{currentWord.points}원 {streak > 0 && `(+${streak * 10} 보너스)`}</p>
+                <p className="text-yellow-400 text-sm mt-2">+{currentWord.points}원 {streak > 0 && `(+${streak * 10} bonus)`}</p>
               </motion.div>
 
               {/* Input */}
@@ -393,7 +393,7 @@ const BankruptcyRecovery = () => {
                   ref={inputRef}
                   value={userInput}
                   onChange={handleInputChange}
-                  placeholder="여기에 타이핑..."
+                  placeholder="여기에 타이핑... / Gõ ở đây..."
                   className="h-16 text-2xl text-center bg-white/10 border-white/20 text-white placeholder:text-white/40"
                   autoComplete="off"
                   autoCorrect="off"
@@ -413,15 +413,15 @@ const BankruptcyRecovery = () => {
               {/* Current Stats */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="glass-card p-3 rounded-xl text-center">
-                  <p className="text-white/60 text-xs">현재 수입</p>
+                  <p className="text-white/60 text-xs">수입 / Thu nhập</p>
                   <p className="text-yellow-400 font-bold">₩{score}</p>
                 </div>
                 <div className="glass-card p-3 rounded-xl text-center">
-                  <p className="text-white/60 text-xs">최대 콤보</p>
+                  <p className="text-white/60 text-xs">최대 콤보 / Max combo</p>
                   <p className="text-orange-400 font-bold">{maxStreak}x</p>
                 </div>
                 <div className="glass-card p-3 rounded-xl text-center">
-                  <p className="text-white/60 text-xs">완료 단어</p>
+                  <p className="text-white/60 text-xs">완료 / Hoàn thành</p>
                   <p className="text-green-400 font-bold">{wordsCompleted}</p>
                 </div>
               </div>
@@ -458,11 +458,11 @@ const BankruptcyRecovery = () => {
 
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="glass-card p-4 rounded-xl">
-                    <p className="text-white/60">완료 단어</p>
+                    <p className="text-white/60">완료 단어 / Từ hoàn thành</p>
                     <p className="text-2xl font-bold text-green-400">{wordsCompleted}개</p>
                   </div>
                   <div className="glass-card p-4 rounded-xl">
-                    <p className="text-white/60">최대 콤보</p>
+                    <p className="text-white/60">최대 콤보 / Max combo</p>
                     <p className="text-2xl font-bold text-orange-400">{maxStreak}x</p>
                   </div>
                 </div>
@@ -474,14 +474,14 @@ const BankruptcyRecovery = () => {
                   className="h-14 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
                 >
                   <RefreshCw className="w-5 h-5 mr-2" />
-                  다시 하기
+                  다시하기 / Chơi lại
                 </Button>
                 <Button
                   onClick={handleFinish}
                   className="h-14 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
                 >
                   <Coins className="w-5 h-5 mr-2" />
-                  저장 & 나가기
+                  저장 / Lưu
                 </Button>
               </div>
             </motion.div>
