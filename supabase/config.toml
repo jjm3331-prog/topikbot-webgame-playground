@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.drama-dubbing]
 verify_jwt = false
+
+[functions.drama-lines]
+verify_jwt = false
