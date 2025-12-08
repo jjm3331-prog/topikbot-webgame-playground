@@ -95,12 +95,12 @@ const KDrama = () => {
   const [selectedVoice, setSelectedVoice] = useState<string>('nova');
   
   const voiceOptions = [
-    { id: 'nova', label: '👩 Nova', description: '여성 (부드러운)', gender: 'female' },
-    { id: 'shimmer', label: '👩 Shimmer', description: '여성 (밝은)', gender: 'female' },
-    { id: 'alloy', label: '🧑 Alloy', description: '중성', gender: 'neutral' },
-    { id: 'echo', label: '👨 Echo', description: '남성 (자연스러운)', gender: 'male' },
-    { id: 'fable', label: '👨 Fable', description: '남성 (표현력)', gender: 'male' },
-    { id: 'onyx', label: '👨 Onyx', description: '남성 (깊은)', gender: 'male' },
+    { id: 'nova', label: '👩 민희', description: '여성 (부드러운)', gender: 'female' },
+    { id: 'shimmer', label: '👩 수아', description: '여성 (밝은)', gender: 'female' },
+    { id: 'alloy', label: '🧑 하늘', description: '중성', gender: 'neutral' },
+    { id: 'echo', label: '👨 현준', description: '남성 (자연스러운)', gender: 'male' },
+    { id: 'fable', label: '👨 지훈', description: '남성 (표현력)', gender: 'male' },
+    { id: 'onyx', label: '👨 태호', description: '남성 (깊은)', gender: 'male' },
   ];
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
