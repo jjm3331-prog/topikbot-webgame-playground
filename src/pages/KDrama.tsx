@@ -92,7 +92,16 @@ const KDrama = () => {
   const [totalScore, setTotalScore] = useState(0);
   const [attempts, setAttempts] = useState(0);
   const [isPlayingTTS, setIsPlayingTTS] = useState(false);
-  const [selectedVoice, setSelectedVoice] = useState<'male' | 'female'>('female');
+  const [selectedVoice, setSelectedVoice] = useState<string>('nova');
+  
+  const voiceOptions = [
+    { id: 'nova', label: '👩 Nova', description: '여성 (부드러운)', gender: 'female' },
+    { id: 'shimmer', label: '👩 Shimmer', description: '여성 (밝은)', gender: 'female' },
+    { id: 'alloy', label: '🧑 Alloy', description: '중성', gender: 'neutral' },
+    { id: 'echo', label: '👨 Echo', description: '남성 (자연스러운)', gender: 'male' },
+    { id: 'fable', label: '👨 Fable', description: '남성 (표현력)', gender: 'male' },
+    { id: 'onyx', label: '👨 Onyx', description: '남성 (깊은)', gender: 'male' },
+  ];
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -182,7 +191,7 @@ const KDrama = () => {
           },
           body: JSON.stringify({
             text: currentScene.korean,
-            voice: selectedVoice === 'male' ? 'onyx' : 'nova'
+            voice: selectedVoice
           }),
         }
       );
@@ -592,27 +601,28 @@ const KDrama = () => {
                   </div>
                   
                   {/* Voice Selector */}
-                  <div className="flex gap-2 mb-3">
-                    <button
-                      onClick={() => setSelectedVoice('female')}
-                      className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-                        selectedVoice === 'female'
-                          ? 'bg-pink-500 text-white'
-                          : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                      }`}
-                    >
-                      👩 여성 / Nữ
-                    </button>
-                    <button
-                      onClick={() => setSelectedVoice('male')}
-                      className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-                        selectedVoice === 'male'
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                      }`}
-                    >
-                      👨 남성 / Nam
-                    </button>
+                  <div className="mb-3">
+                    <p className="text-xs text-gray-400 mb-2">🎙️ 목소리 선택 / Chọn giọng nói:</p>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {voiceOptions.map((voice) => (
+                        <button
+                          key={voice.id}
+                          onClick={() => setSelectedVoice(voice.id)}
+                          className={`py-2 px-2 rounded-lg text-xs font-medium transition-all ${
+                            selectedVoice === voice.id
+                              ? voice.gender === 'female' 
+                                ? 'bg-pink-500 text-white'
+                                : voice.gender === 'male'
+                                  ? 'bg-blue-500 text-white'
+                                  : 'bg-purple-500 text-white'
+                              : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                          }`}
+                        >
+                          <span className="block">{voice.label}</span>
+                          <span className="block text-[10px] opacity-70">{voice.description}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
                   {/* Listen Button */}
@@ -623,9 +633,11 @@ const KDrama = () => {
                     className={`w-full ${
                       isPlayingTTS 
                         ? 'bg-pink-500 hover:bg-pink-600' 
-                        : selectedVoice === 'male'
+                        : voiceOptions.find(v => v.id === selectedVoice)?.gender === 'male'
                           ? 'bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600'
-                          : 'bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600'
+                          : voiceOptions.find(v => v.id === selectedVoice)?.gender === 'neutral'
+                            ? 'bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600'
+                            : 'bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600'
                     }`}
                   >
                     {isPlayingTTS ? (
@@ -636,7 +648,7 @@ const KDrama = () => {
                     ) : (
                       <>
                         <PlayCircle className="w-4 h-4 mr-2" />
-                        {selectedVoice === 'male' ? '👨' : '👩'} 발음 듣기 / Nghe phát âm
+                        🎧 발음 듣기 / Nghe phát âm
                       </>
                     )}
                   </Button>
