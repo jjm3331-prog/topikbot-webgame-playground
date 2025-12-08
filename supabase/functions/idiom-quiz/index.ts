@@ -27,38 +27,22 @@ const SYSTEM_PROMPT = `당신은 한국어 관용어/슬랭 퀴즈 게임의 AI�
   "expression": "한국어 표현",
   "type": "idiom" | "proverb" | "slang" | "internet",
   "difficulty": "easy" | "medium" | "hard",
-  "hint_ko": "힌트 (한국어)",
-  "hint_vi": "Gợi ý (베트남어)",
-  "correct_answer_ko": "정답의 한국어 의미 설명",
-  "correct_answer_vi": "Nghĩa đúng (베트남어)",
-  "options": [
-    {
-      "ko": "한국어 의미1",
-      "vi": "Nghĩa tiếng Việt 1"
-    },
-    {
-      "ko": "한국어 의미2 (오답)",
-      "vi": "Nghĩa tiếng Việt 2"
-    },
-    {
-      "ko": "한국어 의미3 (오답)",
-      "vi": "Nghĩa tiếng Việt 3"
-    },
-    {
-      "ko": "한국어 의미4 (오답)",
-      "vi": "Nghĩa tiếng Việt 4"
-    }
+  "correct_option": {
+    "ko": "정답의 한국어 의미",
+    "vi": "Nghĩa đúng bằng tiếng Việt"
+  },
+  "wrong_options": [
+    { "ko": "오답1 한국어", "vi": "Đáp án sai 1" },
+    { "ko": "오답2 한국어", "vi": "Đáp án sai 2" },
+    { "ko": "오답3 한국어", "vi": "Đáp án sai 3" }
   ],
-  "correct_index": 0,
   "explanation_ko": "이 표현의 유래와 사용법 (한국어)",
   "explanation_vi": "Giải thích nguồn gốc và cách sử dụng (베트남어)",
   "example_sentence": "예문 (한국어)",
   "example_translation": "Ví dụ (베트남어 번역)"
 }
 
-주의: 
-- options 배열에서 정답의 위치(correct_index)를 랜덤하게 설정하세요 (0-3 사이)
-- 모든 텍스트는 반드시 한국어와 베트남어 양쪽으로 제공하세요`;
+주의: correct_option은 반드시 정답이어야 합니다. wrong_options는 반드시 3개의 오답을 포함해야 합니다.`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -115,12 +99,53 @@ serve(async (req) => {
 
     console.log("AI Response:", aiMessage?.substring(0, 200));
 
-    let parsedResponse;
+    interface QuizOption {
+      ko: string;
+      vi: string;
+    }
+    
+    interface AIResponse {
+      expression: string;
+      type: string;
+      difficulty: string;
+      correct_option: QuizOption;
+      wrong_options: QuizOption[];
+      explanation_ko: string;
+      explanation_vi: string;
+      example_sentence: string;
+      example_translation: string;
+      options?: QuizOption[];
+      correct_index?: number;
+    }
+    
+    let parsedResponse: AIResponse;
     try {
       const jsonMatch = aiMessage.match(/```json\s*([\s\S]*?)\s*```/) || 
                         aiMessage.match(/```\s*([\s\S]*?)\s*```/) ||
                         [null, aiMessage];
       parsedResponse = JSON.parse(jsonMatch[1] || aiMessage);
+      
+      // Shuffle options on server side to ensure correct_index is accurate
+      const correctOption = parsedResponse.correct_option;
+      const allOptions: QuizOption[] = [
+        correctOption,
+        ...parsedResponse.wrong_options
+      ];
+      
+      // Fisher-Yates shuffle
+      for (let i = allOptions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [allOptions[i], allOptions[j]] = [allOptions[j], allOptions[i]];
+      }
+      
+      // Find correct index after shuffle
+      const correctIndex = allOptions.findIndex(
+        opt => opt.ko === correctOption.ko
+      );
+      
+      parsedResponse.options = allOptions;
+      parsedResponse.correct_index = correctIndex;
+      
     } catch (parseError) {
       console.error("Failed to parse AI response:", parseError);
       throw new Error("Failed to generate quiz");
