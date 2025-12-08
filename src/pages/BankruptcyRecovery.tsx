@@ -215,7 +215,7 @@ const BankruptcyRecovery = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-900 via-emerald-800 to-gray-900">
+    <div className="min-h-[100dvh] bg-gradient-to-b from-green-900 via-emerald-800 to-[#0f0f23] flex flex-col overflow-hidden">
       {/* Header */}
       <header className="flex items-center justify-between p-4 border-b border-white/10">
         <div className="flex items-center gap-2">

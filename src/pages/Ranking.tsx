@@ -9,11 +9,12 @@ import {
   Coins, 
   Target, 
   Star,
-  ChevronLeft,
   Crown,
   Flame
 } from "lucide-react";
 import { motion } from "framer-motion";
+import AppHeader from "@/components/AppHeader";
+import AppFooter from "@/components/AppFooter";
 
 interface RankingProfile {
   id: string;
@@ -56,10 +57,10 @@ const Ranking = () => {
   }, [sortBy]);
 
   const getRankIcon = (rank: number) => {
-    if (rank === 1) return <Crown className="w-6 h-6 text-yellow-400" />;
-    if (rank === 2) return <Medal className="w-6 h-6 text-gray-300" />;
-    if (rank === 3) return <Medal className="w-6 h-6 text-amber-600" />;
-    return <span className="w-6 h-6 flex items-center justify-center text-white/60 font-bold">{rank}</span>;
+    if (rank === 1) return <Crown className="w-5 h-5 text-yellow-400" />;
+    if (rank === 2) return <Medal className="w-5 h-5 text-gray-300" />;
+    if (rank === 3) return <Medal className="w-5 h-5 text-amber-600" />;
+    return <span className="w-5 h-5 flex items-center justify-center text-white/60 font-bold text-sm">{rank}</span>;
   };
 
   const getRankBg = (rank: number, isCurrentUser: boolean) => {
@@ -72,91 +73,90 @@ const Ranking = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-900 to-gray-900 flex items-center justify-center">
-        <div className="animate-pulse text-white text-xl flex items-center gap-3">
-          <Flame className="w-6 h-6 animate-bounce text-orange-500" />
-          랭킹 로딩중...
+      <div className="min-h-[100dvh] bg-gradient-to-b from-[#1a1a2e] to-[#0f0f23] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <Flame className="w-8 h-8 animate-bounce text-orange-500" />
+          <p className="text-white/60 text-sm">랭킹 로딩중... / Đang tải xếp hạng...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-gray-900">
-      {/* Header */}
-      <header className="flex items-center justify-between p-4 border-b border-white/10">
-        <div className="flex items-center gap-2">
-          <button onClick={() => navigate("/game")} className="text-white/70 hover:text-white">
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <span className="text-white font-medium">랭킹 / Bảng xếp hạng</span>
-        </div>
-        <Trophy className="w-6 h-6 text-yellow-500" />
-      </header>
+    <div className="min-h-[100dvh] bg-gradient-to-b from-[#1a1a2e] via-[#16213e] to-[#0f0f23] flex flex-col">
+      <AppHeader title="랭킹" titleVi="Xếp hạng" />
 
       {/* Title */}
-      <div className="p-6 text-center">
+      <div className="px-4 py-3 text-center shrink-0">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500">
-            🏆 리더보드
+          <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500">
+            🏆 리더보드 / Bảng xếp hạng
           </h1>
-          <p className="text-white/60 mt-1">Bảng xếp hạng người chơi</p>
         </motion.div>
       </div>
 
       {/* Sort Tabs */}
-      <div className="px-4 mb-4">
-        <div className="flex gap-2 p-1 bg-white/5 rounded-xl">
+      <div className="px-3 mb-3 shrink-0">
+        <div className="flex gap-1 p-1 bg-white/5 rounded-xl">
           <Button
             variant={sortBy === "points" ? "default" : "ghost"}
             size="sm"
             onClick={() => setSortBy("points")}
-            className={sortBy === "points" 
-              ? "flex-1 bg-purple-600 hover:bg-purple-700" 
-              : "flex-1 text-white/60 hover:text-white hover:bg-white/10"
-            }
+            className={`flex-1 h-9 text-[10px] ${sortBy === "points" 
+              ? "bg-purple-600 hover:bg-purple-700" 
+              : "text-white/60 hover:text-white hover:bg-white/10"
+            }`}
           >
-            <Star className="w-4 h-4 mr-1" />
-            포인트 / Điểm
+            <Star className="w-3 h-3 mr-1" />
+            <div className="flex flex-col leading-tight">
+              <span>포인트</span>
+              <span className="opacity-70">Điểm</span>
+            </div>
           </Button>
           <Button
             variant={sortBy === "missions_completed" ? "default" : "ghost"}
             size="sm"
             onClick={() => setSortBy("missions_completed")}
-            className={sortBy === "missions_completed" 
-              ? "flex-1 bg-green-600 hover:bg-green-700" 
-              : "flex-1 text-white/60 hover:text-white hover:bg-white/10"
-            }
+            className={`flex-1 h-9 text-[10px] ${sortBy === "missions_completed" 
+              ? "bg-green-600 hover:bg-green-700" 
+              : "text-white/60 hover:text-white hover:bg-white/10"
+            }`}
           >
-            <Target className="w-4 h-4 mr-1" />
-            미션 / Nhiệm vụ
+            <Target className="w-3 h-3 mr-1" />
+            <div className="flex flex-col leading-tight">
+              <span>미션</span>
+              <span className="opacity-70">Nhiệm vụ</span>
+            </div>
           </Button>
           <Button
             variant={sortBy === "money" ? "default" : "ghost"}
             size="sm"
             onClick={() => setSortBy("money")}
-            className={sortBy === "money" 
-              ? "flex-1 bg-yellow-600 hover:bg-yellow-700" 
-              : "flex-1 text-white/60 hover:text-white hover:bg-white/10"
-            }
+            className={`flex-1 h-9 text-[10px] ${sortBy === "money" 
+              ? "bg-yellow-600 hover:bg-yellow-700" 
+              : "text-white/60 hover:text-white hover:bg-white/10"
+            }`}
           >
-            <Coins className="w-4 h-4 mr-1" />
-            자산 / Tài sản
+            <Coins className="w-3 h-3 mr-1" />
+            <div className="flex flex-col leading-tight">
+              <span>자산</span>
+              <span className="opacity-70">Tài sản</span>
+            </div>
           </Button>
         </div>
       </div>
 
       {/* Rankings List */}
-      <div className="px-4 pb-8 space-y-3">
+      <div className="flex-1 px-3 pb-16 space-y-2 overflow-y-auto">
         {rankings.length === 0 ? (
           <div className="text-center text-white/60 py-12">
-            <Trophy className="w-16 h-16 mx-auto mb-4 opacity-30" />
-            <p>아직 플레이어가 없습니다</p>
-            <p className="text-sm">Chưa có người chơi nào</p>
+            <Trophy className="w-12 h-12 mx-auto mb-4 opacity-30" />
+            <p className="text-sm">아직 플레이어가 없습니다</p>
+            <p className="text-xs">Chưa có người chơi nào</p>
           </div>
         ) : (
           rankings.map((player, index) => {
@@ -168,35 +168,35 @@ const Ranking = () => {
                 key={player.id}
                 initial={{ x: -50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-                className={`p-4 rounded-xl border ${getRankBg(rank, isCurrentUser)} ${
+                transition={{ duration: 0.3, delay: index * 0.03 }}
+                className={`p-3 rounded-xl border ${getRankBg(rank, isCurrentUser)} ${
                   isCurrentUser ? "ring-2 ring-purple-400" : ""
                 }`}
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                   {/* Rank */}
-                  <div className="w-10 h-10 flex items-center justify-center">
+                  <div className="w-8 h-8 flex items-center justify-center shrink-0">
                     {getRankIcon(rank)}
                   </div>
 
                   {/* Player Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className={`font-bold truncate ${isCurrentUser ? "text-purple-300" : "text-white"}`}>
+                      <span className={`font-bold text-sm truncate ${isCurrentUser ? "text-purple-300" : "text-white"}`}>
                         {player.username}
                       </span>
                       {isCurrentUser && (
-                        <span className="text-xs bg-purple-500 px-2 py-0.5 rounded-full text-white">
+                        <span className="text-[9px] bg-purple-500 px-1.5 py-0.5 rounded-full text-white shrink-0">
                           나 / Tôi
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-3 mt-1 text-sm text-white/60">
-                      <span className="flex items-center gap-1">
+                    <div className="flex items-center gap-2 mt-0.5 text-[10px] text-white/60">
+                      <span className="flex items-center gap-0.5">
                         <Heart className="w-3 h-3 text-red-400" />
                         {player.hp}
                       </span>
-                      <span className="flex items-center gap-1">
+                      <span className="flex items-center gap-0.5">
                         <Target className="w-3 h-3 text-green-400" />
                         {player.missions_completed}
                       </span>
@@ -204,22 +204,22 @@ const Ranking = () => {
                   </div>
 
                   {/* Score */}
-                  <div className="text-right">
+                  <div className="text-right shrink-0">
                     {sortBy === "points" && (
-                      <div className="flex items-center gap-1 text-yellow-400 font-bold">
-                        <Star className="w-4 h-4" />
+                      <div className="flex items-center gap-1 text-yellow-400 font-bold text-sm">
+                        <Star className="w-3 h-3" />
                         {player.points.toLocaleString()}
                       </div>
                     )}
                     {sortBy === "missions_completed" && (
-                      <div className="flex items-center gap-1 text-green-400 font-bold">
-                        <Target className="w-4 h-4" />
+                      <div className="flex items-center gap-1 text-green-400 font-bold text-sm">
+                        <Target className="w-3 h-3" />
                         {player.missions_completed}
                       </div>
                     )}
                     {sortBy === "money" && (
-                      <div className="flex items-center gap-1 text-yellow-400 font-bold">
-                        <Coins className="w-4 h-4" />
+                      <div className="flex items-center gap-1 text-yellow-400 font-bold text-sm">
+                        <Coins className="w-3 h-3" />
                         ₩{player.money.toLocaleString()}
                       </div>
                     )}
@@ -231,11 +231,11 @@ const Ranking = () => {
         )}
       </div>
 
-      {/* Footer */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-gray-900 to-transparent">
+      {/* Footer Button */}
+      <div className="fixed bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-[#0f0f23] to-transparent">
         <Button
           onClick={() => navigate("/game")}
-          className="w-full bg-purple-600 hover:bg-purple-700"
+          className="w-full bg-purple-600 hover:bg-purple-700 h-10 text-sm"
         >
           메인으로 돌아가기 / Quay lại menu
         </Button>

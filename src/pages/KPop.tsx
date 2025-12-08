@@ -190,7 +190,7 @@ const KPop = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-900 to-black flex items-center justify-center">
+      <div className="min-h-[100dvh] bg-gradient-to-b from-purple-900 via-pink-900 to-[#0f0f23] flex items-center justify-center">
         <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} className="text-6xl">🎵</motion.div>
       </div>
     );
@@ -198,7 +198,7 @@ const KPop = () => {
 
   if (gameComplete) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-900 to-black flex items-center justify-center p-4">
+      <div className="min-h-[100dvh] bg-gradient-to-b from-purple-900 via-pink-900 to-[#0f0f23] flex items-center justify-center p-4">
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="bg-black/60 backdrop-blur-xl rounded-3xl p-8 text-center max-w-md w-full border border-pink-500/30">
           <Trophy className="w-20 h-20 text-yellow-400 mx-auto mb-4" />
           <h2 className="text-3xl font-bold text-white mb-2">게임 완료! 🎉</h2>
@@ -215,7 +215,7 @@ const KPop = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-900 to-black">
+    <div className="min-h-[100dvh] bg-gradient-to-b from-purple-900 via-pink-900 to-[#0f0f23]">
       <div className="sticky top-0 z-50 bg-black/40 backdrop-blur-xl border-b border-pink-500/20">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
           <button onClick={() => navigate('/game')} className="text-white p-2"><ArrowLeft className="w-6 h-6" /></button>

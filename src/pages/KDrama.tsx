@@ -466,7 +466,7 @@ const KDrama = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 text-white">
+    <div className="min-h-[100dvh] bg-gradient-to-b from-slate-900 via-purple-900 to-[#0f0f23] text-white flex flex-col overflow-hidden">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-black/50 backdrop-blur-lg border-b border-white/10">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">

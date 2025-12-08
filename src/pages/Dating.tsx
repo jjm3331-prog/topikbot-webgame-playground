@@ -224,7 +224,7 @@ const Dating = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-900 via-purple-900 to-gray-900 max-w-md mx-auto relative overflow-hidden">
+    <div className="min-h-[100dvh] bg-gradient-to-b from-pink-900 via-purple-900 to-[#0f0f23] max-w-md mx-auto relative overflow-hidden">
       {/* Modals */}
       <AnimatePresence>
         {showSpin && <LuckySpin onReward={handleSpinReward} canSpin={canSpin} onClose={() => setShowSpin(false)} />}
