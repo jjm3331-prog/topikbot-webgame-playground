@@ -10,7 +10,8 @@ import {
   Trophy,
   Skull,
   Sparkles,
-  RotateCcw
+  RotateCcw,
+  Clock
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
@@ -31,8 +32,11 @@ const WordChain = () => {
   const [winner, setWinner] = useState<"user" | "ai" | null>(null);
   const [lastChar, setLastChar] = useState<string | null>(null);
   const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(15);
+  const [gameStarted, setGameStarted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -45,6 +49,40 @@ const WordChain = () => {
   useEffect(() => {
     inputRef.current?.focus();
   }, [gameOver]);
+
+  // Timer effect
+  useEffect(() => {
+    if (gameStarted && !gameOver && !isLoading) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            // Time's up!
+            clearInterval(timerRef.current!);
+            setGameOver(true);
+            setWinner("ai");
+            toast({
+              title: "시간 초과! ⏰",
+              description: "15초 안에 단어를 입력하지 못했습니다!",
+              variant: "destructive",
+            });
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => {
+        if (timerRef.current) clearInterval(timerRef.current);
+      };
+    }
+  }, [gameStarted, gameOver, isLoading, words]);
+
+  // Reset timer when it's user's turn (after AI responds)
+  useEffect(() => {
+    if (gameStarted && !gameOver && !isLoading && words.length > 0) {
+      setTimeLeft(15);
+    }
+  }, [words.length, isLoading]);
 
   const getLastChar = (word: string): string => {
     const last = word.charAt(word.length - 1);
@@ -60,6 +98,11 @@ const WordChain = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputWord.trim() || isLoading || gameOver) return;
+
+    // Start game on first word
+    if (!gameStarted) {
+      setGameStarted(true);
+    }
 
     const word = inputWord.trim();
     setInputWord("");
@@ -155,13 +198,23 @@ const WordChain = () => {
   };
 
   const resetGame = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
     setWords([]);
     setInputWord("");
     setGameOver(false);
     setWinner(null);
     setLastChar(null);
     setScore(0);
+    setTimeLeft(15);
+    setGameStarted(false);
     inputRef.current?.focus();
+  };
+
+  const handleFirstWord = () => {
+    if (!gameStarted) {
+      setGameStarted(true);
+      setTimeLeft(15);
+    }
   };
 
   return (
@@ -191,22 +244,51 @@ const WordChain = () => {
         </div>
       </header>
 
-      {/* Game Info */}
+      {/* Game Info with Timer */}
       <div className="p-4">
-        <div className="glass-card p-4 rounded-xl text-center">
-          <p className="text-white/60 text-sm mb-1">다음 글자</p>
-          {lastChar ? (
-            <motion.span 
-              key={lastChar}
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="text-4xl font-bold text-cyan-400"
-            >
-              {lastChar}
-            </motion.span>
-          ) : (
-            <span className="text-2xl text-white/40">아무 단어나 시작하세요!</span>
-          )}
+        <div className="glass-card p-4 rounded-xl">
+          <div className="flex items-center justify-between">
+            {/* Timer */}
+            <div className="flex items-center gap-2">
+              <Clock className={`w-5 h-5 ${timeLeft <= 5 ? "text-red-400 animate-pulse" : "text-white/60"}`} />
+              <span className={`text-2xl font-bold ${
+                timeLeft <= 5 ? "text-red-400" : timeLeft <= 10 ? "text-yellow-400" : "text-green-400"
+              }`}>
+                {timeLeft}초
+              </span>
+            </div>
+
+            {/* Next Character */}
+            <div className="text-center flex-1">
+              <p className="text-white/60 text-sm mb-1">다음 글자</p>
+              {lastChar ? (
+                <motion.span 
+                  key={lastChar}
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="text-4xl font-bold text-cyan-400"
+                >
+                  {lastChar}
+                </motion.span>
+              ) : (
+                <span className="text-lg text-white/40">아무 단어나!</span>
+              )}
+            </div>
+
+            {/* Timer Bar */}
+            <div className="w-20">
+              <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+                <motion.div 
+                  className={`h-full ${
+                    timeLeft <= 5 ? "bg-red-500" : timeLeft <= 10 ? "bg-yellow-500" : "bg-green-500"
+                  }`}
+                  initial={{ width: "100%" }}
+                  animate={{ width: `${(timeLeft / 15) * 100}%` }}
+                  transition={{ duration: 0.3 }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
