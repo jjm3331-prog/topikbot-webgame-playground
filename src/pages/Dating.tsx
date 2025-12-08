@@ -17,13 +17,18 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-// NPC 프로필 이미지 imports
+// NPC 프로필 이미지 imports - 남자 5명
 import male01 from "@/assets/dating/male-01.webp";
 import male02 from "@/assets/dating/male-02.jpg";
 import male03 from "@/assets/dating/male-03.jpg";
 import male04 from "@/assets/dating/male-04.jpg";
+import male05 from "@/assets/dating/male-05.jfif";
+// 여자 5명
 import female01 from "@/assets/dating/female-01.jpg";
 import female02 from "@/assets/dating/female-02.jpg";
+import female03 from "@/assets/dating/female-03.jfif";
+import female04 from "@/assets/dating/female-04.jfif";
+import female05 from "@/assets/dating/female-05.jfif";
 
 type GamePhase = 'swipe' | 'match' | 'chat' | 'album';
 
@@ -43,6 +48,7 @@ interface ChatMessage {
 }
 
 const NPC_PROFILES: DateProfile[] = [
+  // 여자 5명
   {
     id: 1,
     name: "서연",
@@ -63,6 +69,34 @@ const NPC_PROFILES: DateProfile[] = [
   },
   {
     id: 3,
+    name: "수아",
+    age: 23,
+    job: "대학원생",
+    mbti: "INFJ",
+    intro: "한강에서 야경 보면서 이야기 나누고 싶어요 🌃",
+    image: female03
+  },
+  {
+    id: 4,
+    name: "유나",
+    age: 25,
+    job: "피아니스트",
+    mbti: "ISFJ",
+    intro: "클래식 음악 좋아하시는 분 있나요? 🎹",
+    image: female04
+  },
+  {
+    id: 5,
+    name: "하은",
+    age: 24,
+    job: "유튜버",
+    mbti: "ESFP",
+    intro: "맛집 브이로그 찍으러 같이 가실 분~ 📹",
+    image: female05
+  },
+  // 남자 5명
+  {
+    id: 6,
     name: "민준",
     age: 27,
     job: "스타트업 개발자",
@@ -71,7 +105,7 @@ const NPC_PROFILES: DateProfile[] = [
     image: male01
   },
   {
-    id: 4,
+    id: 7,
     name: "현우",
     age: 25,
     job: "웹툰 작가",
@@ -80,7 +114,7 @@ const NPC_PROFILES: DateProfile[] = [
     image: male02
   },
   {
-    id: 5,
+    id: 8,
     name: "재현",
     age: 26,
     job: "모델",
@@ -89,13 +123,22 @@ const NPC_PROFILES: DateProfile[] = [
     image: male03
   },
   {
-    id: 6,
+    id: 9,
     name: "준서",
     age: 24,
     job: "뮤지션",
     mbti: "INFP",
     intro: "밤새 음악 이야기 나눌 사람 구해요 🎸",
     image: male04
+  },
+  {
+    id: 10,
+    name: "도윤",
+    age: 28,
+    job: "영화감독",
+    mbti: "ENFJ",
+    intro: "좋은 영화 추천해드릴게요! 영화 얘기해요 🎬",
+    image: male05
   }
 ];
 
