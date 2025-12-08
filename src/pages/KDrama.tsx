@@ -92,6 +92,7 @@ const KDrama = () => {
   const [totalScore, setTotalScore] = useState(0);
   const [attempts, setAttempts] = useState(0);
   const [isPlayingTTS, setIsPlayingTTS] = useState(false);
+  const [selectedVoice, setSelectedVoice] = useState<'male' | 'female'>('female');
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -181,7 +182,7 @@ const KDrama = () => {
           },
           body: JSON.stringify({
             text: currentScene.korean,
-            voice: 'nova' // Good for Korean
+            voice: selectedVoice === 'male' ? 'onyx' : 'nova'
           }),
         }
       );
@@ -590,15 +591,41 @@ const KDrama = () => {
                     </div>
                   </div>
                   
+                  {/* Voice Selector */}
+                  <div className="flex gap-2 mb-3">
+                    <button
+                      onClick={() => setSelectedVoice('female')}
+                      className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                        selectedVoice === 'female'
+                          ? 'bg-pink-500 text-white'
+                          : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                      }`}
+                    >
+                      👩 여성 / Nữ
+                    </button>
+                    <button
+                      onClick={() => setSelectedVoice('male')}
+                      className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                        selectedVoice === 'male'
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                      }`}
+                    >
+                      👨 남성 / Nam
+                    </button>
+                  </div>
+
                   {/* Listen Button */}
                   <Button
                     onClick={playTTS}
                     disabled={isPlayingTTS && !audioRef.current}
                     size="sm"
-                    className={`w-full mt-2 ${
+                    className={`w-full ${
                       isPlayingTTS 
                         ? 'bg-pink-500 hover:bg-pink-600' 
-                        : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600'
+                        : selectedVoice === 'male'
+                          ? 'bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600'
+                          : 'bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600'
                     }`}
                   >
                     {isPlayingTTS ? (
@@ -609,7 +636,7 @@ const KDrama = () => {
                     ) : (
                       <>
                         <PlayCircle className="w-4 h-4 mr-2" />
-                        원어민 발음 듣기 / Nghe phát âm
+                        {selectedVoice === 'male' ? '👨' : '👩'} 발음 듣기 / Nghe phát âm
                       </>
                     )}
                   </Button>
