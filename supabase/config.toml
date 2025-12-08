@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.generate-couple-photo]
 verify_jwt = false
+
+[functions.drama-dubbing]
+verify_jwt = false
