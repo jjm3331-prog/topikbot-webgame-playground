@@ -13,13 +13,15 @@ import {
   Briefcase, 
   Link2, 
   MessageSquare,
-  ChevronLeft,
   Zap,
   ExternalLink,
   Film,
-  Music
+  Music,
+  Star
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import AppHeader from "@/components/AppHeader";
+import AppFooter from "@/components/AppFooter";
 
 interface Profile {
   id: string;
@@ -73,11 +75,6 @@ const Game = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
-  };
-
   const handleStartSurvival = () => {
     toast({
       title: "서울 생존 시작!",
@@ -98,226 +95,188 @@ const Game = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-900 to-gray-900 flex items-center justify-center">
-        <div className="animate-pulse text-white text-xl">로딩중... / Đang tải...</div>
+      <div className="min-h-screen bg-gradient-to-b from-[#1a1a2e] to-[#0f0f23] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <img src="/favicon.png" alt="LUKATO" className="w-16 h-16 rounded-full animate-pulse" />
+          <div className="text-white/60 text-sm">로딩중... / Đang tải...</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-[#1a1a2e] via-[#16213e] to-[#0f0f23] flex flex-col">
       {/* Header */}
-      <header className="flex items-center justify-between p-4 border-b border-white/10">
-        <div className="flex items-center gap-2">
-          <button onClick={() => navigate("/")} className="text-white/70 hover:text-white">
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <span className="text-white font-medium">메인 메뉴 / Menu chính</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-white">{profile?.username}</span>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleLogout}
-            className="border-red-500/50 text-red-400 hover:bg-red-500/20"
-          >
-            로그아웃
-          </Button>
-        </div>
-      </header>
+      <AppHeader 
+        username={profile?.username}
+        title="메인 메뉴"
+        titleVi="Menu chính"
+      />
 
       {/* Stats Bar */}
       <div className="p-4">
-        <div className="glass-card p-4 rounded-xl grid grid-cols-3 gap-4">
-          <div className="flex items-center gap-2">
+        <div className="glass-card p-4 rounded-xl grid grid-cols-4 gap-3">
+          <div className="flex flex-col items-center gap-1">
             <Heart className="w-5 h-5 text-red-500" />
-            <div>
-              <p className="text-xs text-white/60">체력 / Máu</p>
-              <div className="flex items-center gap-2">
-                <span className="text-white font-bold">{profile?.hp}/100</span>
-                <div className="w-16 h-2 bg-gray-700 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-red-500 transition-all"
-                    style={{ width: `${profile?.hp}%` }}
-                  />
-                </div>
+            <div className="flex items-center gap-1">
+              <span className="text-white font-bold text-sm">{profile?.hp}</span>
+              <div className="w-10 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-red-500 to-red-400 transition-all"
+                  style={{ width: `${profile?.hp}%` }}
+                />
               </div>
             </div>
+            <p className="text-[10px] text-white/40">HP</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col items-center gap-1">
             <Coins className="w-5 h-5 text-yellow-500" />
-            <div>
-              <p className="text-xs text-white/60">소지금 / Tiền</p>
-              <span className="text-white font-bold">₩{profile?.money?.toLocaleString()}</span>
-            </div>
+            <span className="text-white font-bold text-sm">₩{profile?.money?.toLocaleString()}</span>
+            <p className="text-[10px] text-white/40">소지금</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col items-center gap-1">
             <Target className="w-5 h-5 text-green-500" />
-            <div>
-              <p className="text-xs text-white/60">미션 / Nhiệm vụ</p>
-              <span className="text-white font-bold">{profile?.missions_completed}/{profile?.total_missions}</span>
-            </div>
+            <span className="text-white font-bold text-sm">{profile?.missions_completed}</span>
+            <p className="text-[10px] text-white/40">미션</p>
+          </div>
+          <div className="flex flex-col items-center gap-1">
+            <Star className="w-5 h-5 text-neon-cyan" />
+            <span className="text-white font-bold text-sm">{profile?.points?.toLocaleString()}</span>
+            <p className="text-[10px] text-white/40">포인트</p>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="p-4 space-y-4">
+      <div className="flex-1 p-4 space-y-4 overflow-auto">
         {/* Location Selection */}
         <div className="grid grid-cols-2 gap-4">
           <div className="glass-card p-4 rounded-xl">
             <div className="flex items-center gap-2 mb-3">
               <MapPin className="w-5 h-5 text-red-400" />
-              <h3 className="text-white font-bold">장소 선택 / Chọn địa điểm</h3>
+              <h3 className="text-white font-bold text-sm">장소 선택</h3>
             </div>
-            <p className="text-white/60 text-sm mb-3">
-              원하는 장소를 입력하거나 비워두면 AI가 랜덤 선택
-              <br />
-              <span className="text-white/40">Nhập địa điểm hoặc để trống để AI chọn ngẫu nhiên</span>
+            <p className="text-white/50 text-xs mb-3">
+              원하는 장소 입력 또는 AI 랜덤 선택
             </p>
             <Input
-              placeholder="예: 강남역, 한강공원, PC방..."
+              placeholder="예: 강남역..."
               value={customLocation}
               onChange={(e) => setCustomLocation(e.target.value)}
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/40 mb-2"
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/40 mb-2 h-9 text-sm"
             />
             <Button 
               variant="outline" 
-              className="w-full border-white/20 text-white hover:bg-white/10"
+              size="sm"
+              className="w-full border-white/20 text-white hover:bg-white/10 text-xs"
               onClick={handleCustomLocation}
             >
-              이 장소로 시작 / Bắt đầu tại đây
+              이 장소로 시작
             </Button>
           </div>
 
           <div className="glass-card p-4 rounded-xl flex flex-col items-center justify-center text-center">
-            <Dice6 className="w-12 h-12 text-neon-cyan mb-2" />
-            <h3 className="text-white font-bold text-lg">서울에서 생존하기</h3>
-            <p className="text-white/60 text-sm">Sinh tồn tại Seoul</p>
+            <Dice6 className="w-10 h-10 text-neon-cyan mb-2" />
+            <h3 className="text-white font-bold text-sm">서울에서 생존</h3>
+            <p className="text-white/50 text-xs">Sinh tồn tại Seoul</p>
             <Button 
-              className="mt-3 bg-purple-600 hover:bg-purple-700"
+              size="sm"
+              className="mt-3 bg-gradient-to-r from-neon-pink to-neon-purple hover:opacity-90 text-xs"
               onClick={handleStartSurvival}
             >
-              목표: 10턴 생존
+              10턴 생존 도전!
             </Button>
           </div>
         </div>
 
-        {/* External Links - 2 columns */}
+        {/* External Links */}
         <div className="grid grid-cols-2 gap-3">
-          <a 
-            href="https://hanoi.topikbot.kr" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="block hover-scale"
-          >
-            <Button 
-              className="w-full h-14 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-sm font-bold flex flex-col items-center justify-center gap-0"
-            >
-              <div className="flex items-center gap-1">
-                <ExternalLink className="w-4 h-4" />
-                <span>Hanoi 공식 웹사이트</span>
-              </div>
-              <span className="text-[10px] opacity-80">Trang web chính thức Hanoi</span>
+          <a href="https://hanoi.topikbot.kr" target="_blank" rel="noopener noreferrer" className="block">
+            <Button className="w-full h-12 bg-gradient-to-r from-blue-500 to-cyan-500 hover:opacity-90 text-xs font-bold">
+              <ExternalLink className="w-4 h-4 mr-1" />
+              Hanoi 공식사이트
             </Button>
           </a>
-          <a 
-            href="https://chat-topikbot.kr" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="block hover-scale"
-          >
-            <Button 
-              className="w-full h-14 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-sm font-bold flex flex-col items-center justify-center gap-0"
-            >
-              <div className="flex items-center gap-1">
-                <ExternalLink className="w-4 h-4" />
-                <span>LUKATO AI 서비스</span>
-              </div>
-              <span className="text-[10px] opacity-80">Dịch vụ LUKATO AI</span>
+          <a href="https://chat-topikbot.kr" target="_blank" rel="noopener noreferrer" className="block">
+            <Button className="w-full h-12 bg-gradient-to-r from-violet-500 to-purple-500 hover:opacity-90 text-xs font-bold">
+              <ExternalLink className="w-4 h-4 mr-1" />
+              LUKATO AI
             </Button>
           </a>
         </div>
 
-        {/* Ranking & Dating - 2 columns */}
+        {/* Game Buttons Grid */}
         <div className="grid grid-cols-2 gap-3">
           <Button 
-            className="h-14 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-sm font-bold hover-scale"
+            className="h-12 bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-xs font-bold"
             onClick={() => navigate("/ranking")}
           >
-            <Trophy className="w-5 h-5 mr-1" />
-            랭킹 보기 / Xếp hạng
+            <Trophy className="w-4 h-4 mr-1" />
+            랭킹 / Xếp hạng
           </Button>
           <Button 
-            className="h-14 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-sm font-bold hover-scale"
+            className="h-12 bg-gradient-to-r from-pink-500 to-rose-500 hover:opacity-90 text-xs font-bold"
             onClick={() => navigate("/dating")}
           >
-            <Heart className="w-5 h-5 mr-1" />
-            Seoul Love Signal 💕
+            <Heart className="w-4 h-4 mr-1" />
+            Seoul Love Signal
           </Button>
         </div>
 
-        {/* Bankruptcy & Part-time - 2 columns */}
         <div className="grid grid-cols-2 gap-3">
           <Button 
-            className="h-14 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-sm hover-scale"
+            className="h-12 bg-gradient-to-r from-green-500 to-emerald-500 hover:opacity-90 text-xs font-bold"
             onClick={() => navigate("/bankruptcy")}
           >
-            <Zap className="w-5 h-5 mr-1" />
-            파산 복구 / Phục hồi
+            <Zap className="w-4 h-4 mr-1" />
+            파산 복구
           </Button>
           <Button 
-            className="h-14 bg-gradient-to-r from-fuchsia-500 to-pink-500 hover:from-fuchsia-600 hover:to-pink-600 text-sm hover-scale"
+            className="h-12 bg-gradient-to-r from-fuchsia-500 to-pink-500 hover:opacity-90 text-xs font-bold"
             onClick={() => navigate("/parttime")}
           >
-            <Briefcase className="w-5 h-5 mr-1" />
-            아르바이트 / Làm thêm
+            <Briefcase className="w-4 h-4 mr-1" />
+            아르바이트
           </Button>
         </div>
 
-        {/* Word Chain & Quiz - 2 columns */}
         <div className="grid grid-cols-2 gap-3">
           <Button 
-            className="h-14 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-sm hover-scale"
+            className="h-12 bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90 text-xs font-bold"
             onClick={() => navigate("/wordchain")}
           >
-            <Link2 className="w-5 h-5 mr-1" />
-            끝말잇기 / Nối từ
+            <Link2 className="w-4 h-4 mr-1" />
+            끝말잇기
           </Button>
           <Button 
-            className="h-14 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-sm hover-scale"
+            className="h-12 bg-gradient-to-r from-amber-500 to-yellow-500 hover:opacity-90 text-xs font-bold"
             onClick={() => navigate("/quiz")}
           >
-            <MessageSquare className="w-5 h-5 mr-1" />
-            관용어 퀴즈 / Thành ngữ
+            <MessageSquare className="w-4 h-4 mr-1" />
+            관용어 퀴즈
           </Button>
         </div>
 
-        {/* K-Drama & K-Pop - 2 columns */}
         <div className="grid grid-cols-2 gap-3">
           <Button 
-            className="h-14 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-sm hover-scale"
+            className="h-12 bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-xs font-bold"
             onClick={() => navigate("/kdrama")}
           >
-            <Film className="w-5 h-5 mr-1" />
+            <Film className="w-4 h-4 mr-1" />
             K-Drama 더빙
           </Button>
           <Button 
-            className="h-14 bg-gradient-to-r from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600 text-sm hover-scale"
+            className="h-12 bg-gradient-to-r from-rose-500 to-red-500 hover:opacity-90 text-xs font-bold"
             onClick={() => navigate("/kpop")}
           >
-            <Music className="w-5 h-5 mr-1" />
+            <Music className="w-4 h-4 mr-1" />
             K-POP 가사
           </Button>
         </div>
-
-        {/* Footer Stats */}
-        <div className="flex items-center justify-center gap-4 text-white/40 text-sm pt-4">
-          <span>❤️ {profile?.hp}</span>
-          <span>턴 0/10 | Lượt 0/10</span>
-        </div>
       </div>
+
+      {/* Footer */}
+      <AppFooter compact />
     </div>
   );
 };

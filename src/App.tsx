@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -25,21 +25,66 @@ const queryClient = new QueryClient();
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [progress, setProgress] = useState(0);
+
+  const simulateProgress = useCallback(() => {
+    // Fast initial progress (0-70%)
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 70) {
+          clearInterval(interval);
+          return prev;
+        }
+        return prev + Math.random() * 15;
+      });
+    }, 100);
+
+    return interval;
+  }, []);
 
   useEffect(() => {
-    // Show splash screen for minimum 2 seconds
-    const timer = setTimeout(() => {
-      setIsLoading(false);
+    const progressInterval = simulateProgress();
+
+    // Check if all resources are loaded
+    const handleLoad = () => {
+      // Complete progress to 100%
+      setProgress(100);
+      
+      // Small delay to show 100% before hiding
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 300);
+    };
+
+    // If document is already loaded
+    if (document.readyState === "complete") {
+      // Minimum display time of 1.2 seconds
+      setTimeout(() => {
+        setProgress(100);
+        setTimeout(() => setIsLoading(false), 300);
+      }, 800);
+    } else {
+      window.addEventListener("load", handleLoad);
+    }
+
+    // Fallback: max 2 seconds loading time
+    const fallbackTimer = setTimeout(() => {
+      setProgress(100);
+      setTimeout(() => setIsLoading(false), 300);
     }, 2000);
 
-    return () => clearTimeout(timer);
-  }, []);
+    return () => {
+      clearInterval(progressInterval);
+      clearTimeout(fallbackTimer);
+      window.removeEventListener("load", handleLoad);
+    };
+  }, [simulateProgress]);
 
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AnimatePresence mode="wait">
-          {isLoading && <SplashScreen key="splash" />}
+          {isLoading && <SplashScreen key="splash" progress={progress} />}
         </AnimatePresence>
         
         <Toaster />
