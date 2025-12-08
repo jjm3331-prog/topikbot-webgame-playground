@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.word-chain]
 verify_jwt = false
+
+[functions.idiom-quiz]
+verify_jwt = false
