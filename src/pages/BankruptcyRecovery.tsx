@@ -12,11 +12,12 @@ import {
   Trophy,
   Target,
   RefreshCw,
-  Flame
+  Flame,
+  Loader2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-type GameState = 'ready' | 'playing' | 'finished';
+type GameState = 'ready' | 'loading' | 'playing' | 'finished';
 type Difficulty = 'easy' | 'medium' | 'hard';
 
 interface Word {
@@ -25,66 +26,14 @@ interface Word {
   points: number;
 }
 
-const WORDS: Record<Difficulty, Word[]> = {
-  easy: [
-    { korean: "안녕", vietnamese: "Xin chào", points: 50 },
-    { korean: "감사", vietnamese: "Cảm ơn", points: 50 },
-    { korean: "사랑", vietnamese: "Tình yêu", points: 50 },
-    { korean: "친구", vietnamese: "Bạn bè", points: 50 },
-    { korean: "학교", vietnamese: "Trường học", points: 50 },
-    { korean: "음식", vietnamese: "Đồ ăn", points: 50 },
-    { korean: "물", vietnamese: "Nước", points: 40 },
-    { korean: "집", vietnamese: "Nhà", points: 40 },
-    { korean: "책", vietnamese: "Sách", points: 40 },
-    { korean: "돈", vietnamese: "Tiền", points: 40 },
-    { korean: "밥", vietnamese: "Cơm", points: 40 },
-    { korean: "차", vietnamese: "Xe/Trà", points: 40 },
-    { korean: "문", vietnamese: "Cửa", points: 40 },
-    { korean: "손", vietnamese: "Tay", points: 40 },
-    { korean: "눈", vietnamese: "Mắt/Tuyết", points: 40 },
-  ],
-  medium: [
-    { korean: "컴퓨터", vietnamese: "Máy tính", points: 80 },
-    { korean: "핸드폰", vietnamese: "Điện thoại", points: 80 },
-    { korean: "아르바이트", vietnamese: "Làm thêm", points: 100 },
-    { korean: "편의점", vietnamese: "Cửa hàng tiện lợi", points: 90 },
-    { korean: "지하철", vietnamese: "Tàu điện ngầm", points: 80 },
-    { korean: "도서관", vietnamese: "Thư viện", points: 80 },
-    { korean: "병원", vietnamese: "Bệnh viện", points: 70 },
-    { korean: "공항", vietnamese: "Sân bay", points: 70 },
-    { korean: "식당", vietnamese: "Nhà hàng", points: 70 },
-    { korean: "화장실", vietnamese: "Nhà vệ sinh", points: 80 },
-    { korean: "대학교", vietnamese: "Đại học", points: 80 },
-    { korean: "운동화", vietnamese: "Giày thể thao", points: 80 },
-    { korean: "냉장고", vietnamese: "Tủ lạnh", points: 80 },
-    { korean: "세탁기", vietnamese: "Máy giặt", points: 80 },
-    { korean: "에어컨", vietnamese: "Điều hòa", points: 80 },
-  ],
-  hard: [
-    { korean: "무궁화꽃이피었습니다", vietnamese: "Hoa Mugungwha đã nở", points: 200 },
-    { korean: "국민건강보험", vietnamese: "Bảo hiểm y tế quốc gia", points: 180 },
-    { korean: "청계천", vietnamese: "Suối Cheonggyecheon", points: 120 },
-    { korean: "경복궁", vietnamese: "Cung điện Gyeongbokgung", points: 120 },
-    { korean: "인스타그램", vietnamese: "Instagram", points: 130 },
-    { korean: "유튜브채널", vietnamese: "Kênh YouTube", points: 140 },
-    { korean: "스마트폰충전기", vietnamese: "Sạc điện thoại", points: 160 },
-    { korean: "신용카드결제", vietnamese: "Thanh toán thẻ tín dụng", points: 180 },
-    { korean: "외국인등록증", vietnamese: "Thẻ đăng ký người nước ngoài", points: 200 },
-    { korean: "한국어능력시험", vietnamese: "Kỳ thi năng lực tiếng Hàn", points: 200 },
-    { korean: "편의점삼각김밥", vietnamese: "Cơm nắm tam giác tiệm tiện lợi", points: 180 },
-    { korean: "지하철환승역", vietnamese: "Ga chuyển tàu", points: 160 },
-    { korean: "배달음식주문", vietnamese: "Đặt đồ ăn giao hàng", points: 160 },
-    { korean: "카카오톡메시지", vietnamese: "Tin nhắn KakaoTalk", points: 170 },
-    { korean: "네이버검색", vietnamese: "Tìm kiếm Naver", points: 140 },
-  ]
-};
-
-const GAME_DURATION = 60; // 60 seconds
+const GAME_DURATION = 60;
 
 const BankruptcyRecovery = () => {
   const [gameState, setGameState] = useState<GameState>('ready');
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
-  const [currentWord, setCurrentWord] = useState<Word | null>(null);
+  const [words, setWords] = useState<Word[]>([]);
+  const [usedWords, setUsedWords] = useState<string[]>([]);
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [userInput, setUserInput] = useState("");
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
@@ -93,27 +42,90 @@ const BankruptcyRecovery = () => {
   const [wordsCompleted, setWordsCompleted] = useState(0);
   const [showCorrect, setShowCorrect] = useState(false);
   const [showWrong, setShowWrong] = useState(false);
+  const [loadingWords, setLoadingWords] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const getRandomWord = useCallback(() => {
-    const words = WORDS[difficulty];
-    const randomIndex = Math.floor(Math.random() * words.length);
-    return words[randomIndex];
-  }, [difficulty]);
+  const currentWord = words[currentWordIndex];
 
-  const startGame = () => {
-    setGameState('playing');
+  const fetchWords = useCallback(async (excludeWords: string[] = []) => {
+    setLoadingWords(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('typing-words', {
+        body: { difficulty, count: 15, exclude: excludeWords }
+      });
+
+      if (error) throw error;
+      
+      if (data.words && data.words.length > 0) {
+        setWords(prev => [...prev, ...data.words]);
+      }
+    } catch (error) {
+      console.error('Error fetching words:', error);
+      toast({
+        title: "단어 로딩 오류",
+        description: "단어를 불러오는데 실패했습니다.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoadingWords(false);
+    }
+  }, [difficulty, toast]);
+
+  const startGame = async () => {
+    setGameState('loading');
     setScore(0);
     setStreak(0);
     setMaxStreak(0);
     setWordsCompleted(0);
     setTimeLeft(GAME_DURATION);
-    setCurrentWord(getRandomWord());
+    setWords([]);
+    setUsedWords([]);
+    setCurrentWordIndex(0);
     setUserInput("");
-    setTimeout(() => inputRef.current?.focus(), 100);
+
+    // Fetch initial words
+    try {
+      const { data, error } = await supabase.functions.invoke('typing-words', {
+        body: { difficulty, count: 15, exclude: [] }
+      });
+
+      if (error) throw error;
+      
+      if (data.words && data.words.length > 0) {
+        setWords(data.words);
+        setGameState('playing');
+        setTimeout(() => inputRef.current?.focus(), 100);
+      }
+    } catch (error) {
+      console.error('Error starting game:', error);
+      toast({
+        title: "게임 시작 오류",
+        description: "게임을 시작하는데 실패했습니다.",
+        variant: "destructive"
+      });
+      setGameState('ready');
+    }
   };
+
+  const moveToNextWord = useCallback(() => {
+    const nextIndex = currentWordIndex + 1;
+    
+    // If we're running low on words, fetch more
+    if (nextIndex >= words.length - 3 && !loadingWords) {
+      fetchWords(usedWords);
+    }
+
+    if (nextIndex < words.length) {
+      setCurrentWordIndex(nextIndex);
+    } else if (words.length > 0) {
+      // Wrap around if needed (shouldn't happen often with prefetching)
+      setCurrentWordIndex(0);
+    }
+    
+    setUserInput("");
+  }, [currentWordIndex, words.length, loadingWords, usedWords, fetchWords]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -128,24 +140,26 @@ const BankruptcyRecovery = () => {
       setStreak(prev => prev + 1);
       setMaxStreak(prev => Math.max(prev, streak + 1));
       setWordsCompleted(prev => prev + 1);
+      setUsedWords(prev => [...prev, currentWord.korean]);
       setShowCorrect(true);
       
       setTimeout(() => {
         setShowCorrect(false);
-        setCurrentWord(getRandomWord());
-        setUserInput("");
-      }, 200);
+        moveToNextWord();
+      }, 150);
     }
   };
 
   const handleSkip = () => {
+    if (currentWord) {
+      setUsedWords(prev => [...prev, currentWord.korean]);
+    }
     setStreak(0);
     setShowWrong(true);
     setTimeout(() => {
       setShowWrong(false);
-      setCurrentWord(getRandomWord());
-      setUserInput("");
-    }, 200);
+      moveToNextWord();
+    }, 150);
   };
 
   useEffect(() => {
@@ -244,6 +258,7 @@ const BankruptcyRecovery = () => {
                 <p className="text-white/60">Phục hồi phá sản</p>
                 <p className="text-white/80 mt-4">60초 안에 한국어 단어를 빠르게 타이핑하세요!</p>
                 <p className="text-white/60">Gõ nhanh các từ tiếng Hàn trong 60 giây!</p>
+                <p className="text-neon-cyan text-sm mt-2">🤖 AI가 매번 새로운 단어를 생성합니다!</p>
               </div>
 
               {/* Difficulty Selection */}
@@ -266,9 +281,9 @@ const BankruptcyRecovery = () => {
                         {diff === 'hard' && '어려움'}
                       </p>
                       <p className="text-xs opacity-70">
-                        {diff === 'easy' && '40-50원'}
-                        {diff === 'medium' && '70-100원'}
-                        {diff === 'hard' && '120-200원'}
+                        {diff === 'easy' && '1-3글자'}
+                        {diff === 'medium' && '3-5글자'}
+                        {diff === 'hard' && '5글자+'}
                       </p>
                     </button>
                   ))}
@@ -283,6 +298,7 @@ const BankruptcyRecovery = () => {
                   <li>⚡ 연속으로 맞추면 콤보 보너스!</li>
                   <li>⏭️ 모르면 스킵 버튼으로 다음 단어로</li>
                   <li>💰 60초 후 번 돈이 계정에 추가됩니다</li>
+                  <li>🤖 AI가 무한한 다양성의 단어를 생성!</li>
                 </ul>
               </div>
 
@@ -293,6 +309,21 @@ const BankruptcyRecovery = () => {
                 <Zap className="w-6 h-6 mr-2" />
                 게임 시작! / Bắt đầu!
               </Button>
+            </motion.div>
+          )}
+
+          {/* Loading State */}
+          {gameState === 'loading' && (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-center justify-center py-20"
+            >
+              <Loader2 className="w-16 h-16 text-neon-cyan animate-spin mb-4" />
+              <p className="text-white text-lg">AI가 단어를 생성하고 있습니다...</p>
+              <p className="text-white/60">AI đang tạo từ vựng...</p>
             </motion.div>
           )}
 
@@ -313,9 +344,14 @@ const BankruptcyRecovery = () => {
                     {streak}x 콤보
                   </span>
                 </div>
-                <div className="flex items-center gap-2 text-white/70">
-                  <Target className="w-5 h-5" />
-                  <span>{wordsCompleted} 단어</span>
+                <div className="flex items-center gap-4">
+                  {loadingWords && (
+                    <Loader2 className="w-4 h-4 text-neon-cyan animate-spin" />
+                  )}
+                  <div className="flex items-center gap-2 text-white/70">
+                    <Target className="w-5 h-5" />
+                    <span>{wordsCompleted} 단어</span>
+                  </div>
                 </div>
               </div>
 

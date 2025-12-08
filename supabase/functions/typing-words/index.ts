@@ -1,0 +1,140 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+
+interface WordRequest {
+  difficulty: 'easy' | 'medium' | 'hard';
+  count: number;
+  exclude?: string[];
+}
+
+const SYSTEM_PROMPT = `당신은 한국어 학습 게임을 위한 단어 생성기입니다.
+플레이어가 타이핑 연습을 할 수 있도록 한국어 단어를 생성합니다.
+
+## 단어 생성 규칙
+
+### 난이도별 기준
+- easy (쉬움): 1-3글자 단어, 일상적이고 기초적인 단어
+  - 예: 밥, 물, 집, 책, 친구, 학교, 사랑, 음식
+  - 포인트: 40-60
+
+- medium (보통): 3-5글자 단어, 일상생활에서 자주 쓰는 단어
+  - 예: 편의점, 지하철, 도서관, 컴퓨터, 핸드폰, 아이스크림
+  - 포인트: 70-100
+
+- hard (어려움): 5글자 이상, 복합어/긴 표현/전문용어
+  - 예: 무궁화꽃이피었습니다, 한국어능력시험, 외국인등록증, 신용카드결제
+  - 포인트: 120-200
+
+## 주제 다양성 (모든 난이도에서 골고루)
+- 음식/요리
+- 장소/건물
+- 기술/IT
+- 교통/이동
+- 쇼핑/경제
+- 문화/엔터테인먼트
+- 일상생활
+- 학교/직장
+- 감정/표현
+- 한국 문화 특유 표현 (MZ세대 용어, 인터넷 신조어 포함)
+
+## 응답 형식 (반드시 JSON 배열로만 응답)
+[
+  {
+    "korean": "한국어 단어",
+    "vietnamese": "Nghĩa tiếng Việt",
+    "points": 숫자 (난이도에 맞게)
+  },
+  ...
+]
+
+## 중요
+- 매번 완전히 다른 단어를 생성하세요
+- 다양한 주제에서 골고루 선택
+- 실제 한국에서 사용하는 자연스러운 단어
+- 학습에 도움이 되는 실용적인 단어
+- MZ세대 신조어, 줄임말도 포함 (예: 갓생, 혼밥, 존맛, 꿀잼)
+- 베트남어 번역은 정확하고 자연스럽게`;
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { difficulty, count = 10, exclude = [] }: WordRequest = await req.json();
+    
+    console.log(`Generating ${count} words for difficulty: ${difficulty}`);
+
+    const excludeText = exclude.length > 0 
+      ? `\n\n제외할 단어 (이미 나온 단어들): ${exclude.join(', ')}` 
+      : '';
+
+    const userPrompt = `난이도: ${difficulty}
+생성할 단어 수: ${count}개
+${excludeText}
+
+위 조건에 맞는 한국어 단어를 생성해주세요. 다양한 주제에서 골고루 선택하고, 매번 새로운 단어를 사용하세요.`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4.1-mini',
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 1.0, // Maximum creativity
+      }),
+    });
+
+    const data = await response.json();
+    console.log('OpenAI response received');
+
+    if (!data.choices || !data.choices[0]) {
+      throw new Error('Invalid response from OpenAI');
+    }
+
+    const content = data.choices[0].message.content;
+    
+    let parsedResponse;
+    try {
+      const jsonMatch = content.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        parsedResponse = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('No JSON array found in response');
+      }
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
+      // Fallback words
+      parsedResponse = [
+        { korean: "한국어", vietnamese: "Tiếng Hàn", points: 70 },
+        { korean: "공부", vietnamese: "Học tập", points: 50 },
+        { korean: "게임", vietnamese: "Trò chơi", points: 50 },
+      ];
+    }
+
+    return new Response(JSON.stringify({ words: parsedResponse }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+
+  } catch (error) {
+    console.error('Error in typing-words function:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return new Response(JSON.stringify({ error: errorMessage }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+});
