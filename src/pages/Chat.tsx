@@ -343,27 +343,27 @@ const Chat = () => {
 
       {/* Exit Dialog */}
       <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
-        <AlertDialogContent className="bg-white">
+        <AlertDialogContent className="bg-white border-0 shadow-xl">
           <AlertDialogHeader>
             <div className="flex justify-center mb-4">
-              <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                <span className="text-2xl">⚠️</span>
+              <div className="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center">
+                <span className="text-3xl">⚠️</span>
               </div>
             </div>
-            <AlertDialogTitle className="text-center text-xl">
+            <AlertDialogTitle className="text-center text-xl text-gray-900 font-bold">
               정말 나가시겠습니까? (Bạn có chắc muốn thoát?)
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-center">
+            <AlertDialogDescription className="text-center text-gray-600">
               현재 진행 상황이 저장되지 않습니다. (Tiến trình hiện tại sẽ không được lưu.)
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex gap-3 sm:justify-center">
-            <AlertDialogCancel className="flex-1">
+          <AlertDialogFooter className="flex gap-3 sm:justify-center mt-4">
+            <AlertDialogCancel className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100">
               계속 하기 (Tiếp tục)
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmExit}
-              className="flex-1 bg-red-500 hover:bg-red-600"
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white"
             >
               나가기 (Thoát)
             </AlertDialogAction>
