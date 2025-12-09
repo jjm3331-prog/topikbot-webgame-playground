@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { MessageCircle, Map, Award } from "lucide-react";
 import AppFooter from "@/components/AppFooter";
+import MobileMenu from "@/components/MobileMenu";
 import seoulHero from "@/assets/seoul-hero.jpg";
 
 const Landing = () => {
@@ -57,14 +58,17 @@ const Landing = () => {
             LUKATO
           </span>
         </div>
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={() => navigate("/auth")}
-          className="text-white/70 hover:text-white hover:bg-white/10"
-        >
-          로그인
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => navigate("/auth")}
+            className="text-white/70 hover:text-white hover:bg-white/10"
+          >
+            로그인
+          </Button>
+          <MobileMenu isLoggedIn={false} />
+        </div>
       </header>
 
       {/* Main Content */}
