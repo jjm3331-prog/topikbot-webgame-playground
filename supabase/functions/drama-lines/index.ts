@@ -342,8 +342,11 @@ const verifiedDramaClips = [
     { character: "홍두식", korean: "공진에서는 서로 돕고 살아.", vietnamese: "Ở Gongjin mọi người giúp đỡ nhau sống.", context: "마을 정", difficulty: "쉬움", audioTip: "따뜻하게", genre: "romantic" },
   ]},
 
-  { drama: "그해 우리는", dramaEn: "Our Beloved Summer", youtubeId: "nTefY_d0GkE", timestamp: 0, scenes: [
-    { character: "최웅", korean: "우리 다시 시작하자.", vietnamese: "Chúng ta bắt đầu lại đi.", context: "재회", difficulty: "쉬움", audioTip: "진심으로", genre: "romantic" },
+  { drama: "그해 우리는", dramaEn: "Our Beloved Summer", youtubeId: "4iGty-nAdSk", timestamp: 0, scenes: [
+    { character: "최웅", korean: "함께해서 더러웠고 다신 보지 말자.", vietnamese: "Ở bên nhau thật bẩn thỉu, đừng gặp lại nữa.", context: "SBS 공식 티저", difficulty: "보통", audioTip: "진심으로", genre: "romantic" },
+  ]},
+  { drama: "그해 우리는", dramaEn: "Our Beloved Summer", youtubeId: "p_dDoDQ8u94", timestamp: 0, scenes: [
+    { character: "최웅/국연수", korean: "10년 만의 재회.", vietnamese: "Tái ngộ sau 10 năm.", context: "Netflix 공식 트레일러", difficulty: "쉬움", audioTip: "설레게", genre: "romantic" },
   ]},
 
   { drama: "스카이캐슬", dramaEn: "SKY Castle", youtubeId: "BQQJ4Y3KVbk", timestamp: 0, scenes: [
