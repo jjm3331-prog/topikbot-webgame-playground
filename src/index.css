@@ -152,6 +152,10 @@
     animation: shimmer 2s infinite;
   }
 
+  .animate-shimmer {
+    animation: shimmerGradient 3s linear infinite;
+  }
+
   .float {
     animation: float 6s ease-in-out infinite;
   }
@@ -200,6 +204,12 @@
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
+}
+
+@keyframes shimmerGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 @keyframes float {
