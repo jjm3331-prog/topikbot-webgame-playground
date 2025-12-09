@@ -289,36 +289,36 @@ const verifiedDramaClips = [
   ]},
 
   // ==================== 더킹: 영원의 군주 (The King: Eternal Monarch) 2020 - SBS ====================
-  { drama: "더킹: 영원의 군주", dramaEn: "The King: Eternal Monarch", youtubeId: "KEQasLtCUQQ", timestamp: 40, scenes: [
+  { drama: "더킹: 영원의 군주", dramaEn: "The King: Eternal Monarch", youtubeId: "dDkM_rqfqPo", timestamp: 0, scenes: [
     { character: "이곤", korean: "내가 데리러 왔다. 너의 왕이.", vietnamese: "Ta đến đón ngươi. Vương của ngươi đây.", context: "명대사", difficulty: "보통", audioTip: "위엄 있게", genre: "fantasy" },
   ]},
 
   // ==================== 킬러들의 쇼핑몰 (A Shop for Killers) 2024 ====================
-  { drama: "킬러들의 쇼핑몰", dramaEn: "A Shop for Killers", youtubeId: "QH7kTjNRxNo", timestamp: 35, scenes: [
+  { drama: "킬러들의 쇼핑몰", dramaEn: "A Shop for Killers", youtubeId: "uoaQOVqSF-U", timestamp: 0, scenes: [
     { character: "정지안", korean: "살아남는 게 복수야.", vietnamese: "Sống sót chính là trả thù.", context: "생존 의지", difficulty: "쉬움", audioTip: "강하게", genre: "action" },
   ]},
 
   // ==================== 지리산 (Jirisan) 2021 - tvN ====================
-  { drama: "지리산", dramaEn: "Jirisan", youtubeId: "7ZYE6YKNRTM", timestamp: 40, scenes: [
+  { drama: "지리산", dramaEn: "Jirisan", youtubeId: "RYjpSBfcqqc", timestamp: 0, scenes: [
     { character: "서이강", korean: "산은 사람을 구하기도 하고, 삼키기도 해.", vietnamese: "Núi vừa cứu người, vừa nuốt người.", context: "산의 양면성", difficulty: "어려움", audioTip: "깊이 있게", genre: "thriller" },
   ]},
 
   // ==================== 악의 꽃 (Flower of Evil) 2020 - tvN ====================
-  { drama: "악의 꽃", dramaEn: "Flower of Evil", youtubeId: "P9qKE2tVQ6k", timestamp: 35, scenes: [
+  { drama: "악의 꽃", dramaEn: "Flower of Evil", youtubeId: "r8BFyYT0gJI", timestamp: 0, scenes: [
     { character: "차지원", korean: "당신이 누구든, 난 당신을 사랑해.", vietnamese: "Dù anh là ai, em vẫn yêu anh.", context: "무조건적 사랑", difficulty: "보통", audioTip: "단호하게", genre: "romantic" },
   ]},
 
   // ==================== 사내맞선 (Business Proposal) 2022 - SBS ====================
-  { drama: "사내맞선", dramaEn: "Business Proposal", youtubeId: "3VYE2UKNRTM", timestamp: 35, scenes: [
+  { drama: "사내맞선", dramaEn: "Business Proposal", youtubeId: "NYCxjljq6HI", timestamp: 0, scenes: [
     { character: "강태무", korean: "신하리씨, 저랑 사귀어 주세요.", vietnamese: "Shin Ha Ri, hãy hẹn hò với tôi.", context: "고백 장면", difficulty: "쉬움", audioTip: "진지하게", genre: "romantic" },
   ]},
 
   // ==================== 추가 드라마 클립 - 다양한 장르 ====================
-  { drama: "별에서 온 그대", dramaEn: "My Love from the Star", youtubeId: "FECMNXAf5_g", timestamp: 0, scenes: [
+  { drama: "별에서 온 그대", dramaEn: "My Love from the Star", youtubeId: "V70Roe1zn6c", timestamp: 0, scenes: [
     { character: "도민준", korean: "외계인도 사랑할 수 있다.", vietnamese: "Người ngoài hành tinh cũng có thể yêu.", context: "명대사", difficulty: "보통", audioTip: "신비롭게", genre: "romantic" },
   ]},
 
-  { drama: "킹덤", dramaEn: "Kingdom", youtubeId: "9HWEqI0i7CQ", timestamp: 0, scenes: [
+  { drama: "킹덤", dramaEn: "Kingdom", youtubeId: "Bv0nJyqLmVs", timestamp: 0, scenes: [
     { character: "이창", korean: "백성을 지키는 것이 왕의 도리.", vietnamese: "Bảo vệ bách tính là đạo lý của vương.", context: "왕의 책임", difficulty: "어려움", audioTip: "위엄 있게", genre: "action" },
   ]},
 
