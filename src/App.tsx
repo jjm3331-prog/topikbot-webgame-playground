@@ -18,8 +18,10 @@ import Dating from "./pages/Dating";
 import KDrama from "./pages/KDrama";
 import KPop from "./pages/KPop";
 import Tutorial from "./pages/Tutorial";
+import PWAGuide from "./pages/PWAGuide";
 import NotFound from "./pages/NotFound";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import PWAWelcome from "./components/PWAWelcome";
 import SplashScreen from "./components/SplashScreen";
 
 const queryClient = new QueryClient();
@@ -91,6 +93,7 @@ const App = () => {
         <Toaster />
         <Sonner />
         <PWAInstallPrompt />
+        <PWAWelcome />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Landing />} />
@@ -106,6 +109,7 @@ const App = () => {
             <Route path="/kdrama" element={<KDrama />} />
             <Route path="/kpop" element={<KPop />} />
             <Route path="/tutorial" element={<Tutorial />} />
+            <Route path="/pwa-guide" element={<PWAGuide />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

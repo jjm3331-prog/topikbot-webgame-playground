@@ -2,11 +2,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronLeft, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import MobileMenu from "@/components/MobileMenu";
 
 interface AppHeaderProps {
   username?: string;
   showBack?: boolean;
   showLogout?: boolean;
+  showMenu?: boolean;
   title?: string;
   titleVi?: string;
 }
@@ -15,6 +17,7 @@ const AppHeader = ({
   username, 
   showBack = true, 
   showLogout = true,
+  showMenu = true,
   title,
   titleVi 
 }: AppHeaderProps) => {
@@ -83,7 +86,7 @@ const AppHeader = ({
             </div>
           )}
           
-          {showLogout && username && (
+          {showLogout && username && !showMenu && (
             <Button 
               variant="ghost" 
               size="sm" 
@@ -92,6 +95,11 @@ const AppHeader = ({
             >
               <LogOut className="w-3.5 h-3.5" />
             </Button>
+          )}
+
+          {/* Mobile Hamburger Menu */}
+          {showMenu && (
+            <MobileMenu username={username} isLoggedIn={!!username} />
           )}
         </div>
       </div>
