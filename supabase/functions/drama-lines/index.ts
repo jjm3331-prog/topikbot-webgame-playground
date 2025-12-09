@@ -326,11 +326,11 @@ const verifiedDramaClips = [
     { character: "프론트맨", korean: "여기서 탈락하면, 탈락입니다.", vietnamese: "Nếu bị loại ở đây, là bị loại.", context: "게임 규칙", difficulty: "보통", audioTip: "차갑게", genre: "thriller" },
   ]},
 
-  { drama: "이상한 변호사 우영우", dramaEn: "Extraordinary Attorney Woo", youtubeId: "pXMBxXmGfdc", timestamp: 0, scenes: [
+  { drama: "이상한 변호사 우영우", dramaEn: "Extraordinary Attorney Woo", youtubeId: "DS7AWB6mzx0", timestamp: 0, scenes: [
     { character: "우영우", korean: "제 이름은 우영우. 거꾸로 해도 우영우.", vietnamese: "Tên tôi là Woo Young Woo. Đọc ngược cũng là Woo Young Woo.", context: "자기소개", difficulty: "보통", audioTip: "밝게", genre: "romantic" },
   ]},
 
-  { drama: "미스터 션샤인", dramaEn: "Mr. Sunshine", youtubeId: "L6CMdLFWQNE", timestamp: 0, scenes: [
+  { drama: "미스터 션샤인", dramaEn: "Mr. Sunshine", youtubeId: "hCg8rxw-zVY", timestamp: 0, scenes: [
     { character: "유진초이", korean: "나라를 위해.", vietnamese: "Vì tổ quốc.", context: "독립운동", difficulty: "어려움", audioTip: "결연하게", genre: "action" },
   ]},
 
@@ -338,7 +338,7 @@ const verifiedDramaClips = [
     { character: "차수현", korean: "우연한 만남.", vietnamese: "Cuộc gặp gỡ tình cờ.", context: "첫만남", difficulty: "쉬움", audioTip: "설레게", genre: "romantic" },
   ]},
 
-  { drama: "갯마을 차차차", dramaEn: "Hometown Cha-Cha-Cha", youtubeId: "1jXVn4DMLV8", timestamp: 0, scenes: [
+  { drama: "갯마을 차차차", dramaEn: "Hometown Cha-Cha-Cha", youtubeId: "afnkMVy_BA0", timestamp: 0, scenes: [
     { character: "홍두식", korean: "공진에서는 서로 돕고 살아.", vietnamese: "Ở Gongjin mọi người giúp đỡ nhau sống.", context: "마을 정", difficulty: "쉬움", audioTip: "따뜻하게", genre: "romantic" },
   ]},
 
@@ -346,39 +346,39 @@ const verifiedDramaClips = [
     { character: "최웅", korean: "우리 다시 시작하자.", vietnamese: "Chúng ta bắt đầu lại đi.", context: "재회", difficulty: "쉬움", audioTip: "진심으로", genre: "romantic" },
   ]},
 
-  { drama: "스카이캐슬", dramaEn: "SKY Castle", youtubeId: "L0k_-vg4d4g", timestamp: 0, scenes: [
+  { drama: "스카이캐슬", dramaEn: "SKY Castle", youtubeId: "BQQJ4Y3KVbk", timestamp: 0, scenes: [
     { character: "한서진", korean: "내 아이만은 성공시킬 거야.", vietnamese: "Tôi sẽ làm cho con tôi thành công.", context: "교육열", difficulty: "어려움", audioTip: "집착적으로", genre: "thriller" },
   ]},
 
-  { drama: "도시어부", dramaEn: "City Fisher", youtubeId: "J2H1R5nJg9M", timestamp: 0, scenes: [
-    { character: "출연진", korean: "낚시의 재미.", vietnamese: "Niềm vui câu cá.", context: "예능 클립", difficulty: "쉬움", audioTip: "유쾌하게", genre: "romantic" },
+  { drama: "나빌레라", dramaEn: "Navillera", youtubeId: "5_8d9n-o_8Q", timestamp: 0, scenes: [
+    { character: "덕출", korean: "꿈에는 나이가 없어.", vietnamese: "Ước mơ không có tuổi.", context: "도전", difficulty: "쉬움", audioTip: "따뜻하게", genre: "romantic" },
   ]},
 
-  { drama: "나의 아저씨", dramaEn: "My Mister", youtubeId: "G4r5Aav7Wf8", timestamp: 0, scenes: [
+  { drama: "나의 아저씨", dramaEn: "My Mister", youtubeId: "VD8dHKzamow", timestamp: 0, scenes: [
     { character: "박동훈", korean: "힘들지?", vietnamese: "Khó khăn lắm phải không?", context: "위로의 말", difficulty: "쉬움", audioTip: "따뜻하게", genre: "romantic" },
   ]},
 
-  { drama: "시그널", dramaEn: "Signal", youtubeId: "PUk6eY1G0HQ", timestamp: 0, scenes: [
+  { drama: "시그널", dramaEn: "Signal", youtubeId: "hjJ9aD91vbI", timestamp: 0, scenes: [
     { character: "이재한", korean: "과거를 바꿀 수 있다면.", vietnamese: "Nếu có thể thay đổi quá khứ.", context: "시간여행", difficulty: "보통", audioTip: "간절하게", genre: "thriller" },
   ]},
 
-  { drama: "비밀의 숲", dramaEn: "Stranger", youtubeId: "rUjYvYGBq5A", timestamp: 0, scenes: [
+  { drama: "비밀의 숲", dramaEn: "Stranger", youtubeId: "On1HUD9B78I", timestamp: 0, scenes: [
     { character: "황시목", korean: "진실을 밝혀야 합니다.", vietnamese: "Phải làm rõ sự thật.", context: "수사 장면", difficulty: "보통", audioTip: "냉철하게", genre: "thriller" },
   ]},
 
-  { drama: "미생", dramaEn: "Misaeng", youtubeId: "UeFsZwKg_lY", timestamp: 0, scenes: [
+  { drama: "미생", dramaEn: "Misaeng", youtubeId: "dKMwNp7wWaE", timestamp: 0, scenes: [
     { character: "장그래", korean: "아직 살아있습니다.", vietnamese: "Vẫn còn sống.", context: "회사생활", difficulty: "보통", audioTip: "결연하게", genre: "action" },
   ]},
 
-  { drama: "응답하라 1988", dramaEn: "Reply 1988", youtubeId: "tBGPEAw6K_A", timestamp: 0, scenes: [
+  { drama: "응답하라 1988", dramaEn: "Reply 1988", youtubeId: "jNOeSePsM4k", timestamp: 0, scenes: [
     { character: "덕선", korean: "우리 동네 친구들.", vietnamese: "Những người bạn trong xóm.", context: "추억", difficulty: "쉬움", audioTip: "향수 있게", genre: "romantic" },
   ]},
 
-  { drama: "미세스 캅", dramaEn: "Mrs. Cop", youtubeId: "Kj8G3m4nLtQ", timestamp: 0, scenes: [
-    { character: "최영진", korean: "범인을 잡겠습니다.", vietnamese: "Tôi sẽ bắt tội phạm.", context: "형사 결의", difficulty: "보통", audioTip: "단호하게", genre: "action" },
+  { drama: "경성크리처", dramaEn: "Gyeongseong Creature", youtubeId: "M4-qNj3mTQI", timestamp: 0, scenes: [
+    { character: "장태상", korean: "이 괴물을 막아야 해.", vietnamese: "Phải ngăn chặn con quái vật này.", context: "괴물 추격", difficulty: "보통", audioTip: "긴박하게", genre: "action" },
   ]},
 
-  { drama: "화유기", dramaEn: "A Korean Odyssey", youtubeId: "NqVFPnJW_qM", timestamp: 0, scenes: [
+  { drama: "화유기", dramaEn: "A Korean Odyssey", youtubeId: "spUVLLb2NxM", timestamp: 0, scenes: [
     { character: "손오공", korean: "너를 지킬 거야.", vietnamese: "Ta sẽ bảo vệ ngươi.", context: "보호 약속", difficulty: "쉬움", audioTip: "강하게", genre: "fantasy" },
   ]},
 
@@ -450,7 +450,7 @@ const verifiedDramaClips = [
     { character: "이율", korean: "기억을 되찾겠다.", vietnamese: "Ta sẽ lấy lại ký ức.", context: "기억상실", difficulty: "보통", audioTip: "결연하게", genre: "romantic" },
   ]},
 
-  { drama: "철인왕후", dramaEn: "Mr. Queen", youtubeId: "FbGdz2aUJmc", timestamp: 0, scenes: [
+  { drama: "철인왕후", dramaEn: "Mr. Queen", youtubeId: "dvlbgHhs8LE", timestamp: 0, scenes: [
     { character: "김소용", korean: "내가 왕비라고?", vietnamese: "Tôi là hoàng hậu sao?", context: "빙의 코미디", difficulty: "쉬움", audioTip: "황당하게", genre: "romantic" },
   ]},
 
@@ -479,7 +479,7 @@ const verifiedDramaClips = [
     { character: "도정우", korean: "진실을 찾아라.", vietnamese: "Hãy tìm sự thật.", context: "미스터리", difficulty: "보통", audioTip: "신비롭게", genre: "thriller" },
   ]},
 
-  { drama: "모범택시", dramaEn: "Taxi Driver", youtubeId: "6fVMV52SXg4", timestamp: 0, scenes: [
+  { drama: "모범택시", dramaEn: "Taxi Driver", youtubeId: "PE1sz4ndG0w", timestamp: 0, scenes: [
     { character: "김도기", korean: "복수 대행합니다.", vietnamese: "Đại diện trả thù.", context: "복수 대리", difficulty: "보통", audioTip: "강렬하게", genre: "action" },
   ]},
 
@@ -487,11 +487,11 @@ const verifiedDramaClips = [
     { character: "탐정", korean: "사건을 해결하겠다.", vietnamese: "Tôi sẽ giải quyết vụ án.", context: "탐정 수사", difficulty: "보통", audioTip: "결연하게", genre: "action" },
   ]},
 
-  { drama: "빅마우스", dramaEn: "Big Mouth", youtubeId: "E0Jt5P7Lnuk", timestamp: 0, scenes: [
+  { drama: "빅마우스", dramaEn: "Big Mouth", youtubeId: "kpiP18VYw-s", timestamp: 0, scenes: [
     { character: "박창호", korean: "내가 빅마우스다.", vietnamese: "Tôi là Big Mouth.", context: "반전", difficulty: "어려움", audioTip: "강렬하게", genre: "thriller" },
   ]},
 
-  { drama: "작은 아씨들", dramaEn: "Little Women", youtubeId: "WZPMFvSLShs", timestamp: 0, scenes: [
+  { drama: "작은 아씨들", dramaEn: "Little Women", youtubeId: "rXvMvA6WJq8", timestamp: 0, scenes: [
     { character: "오인주", korean: "우리 셋이 함께.", vietnamese: "Ba chị em cùng nhau.", context: "자매 우애", difficulty: "보통", audioTip: "따뜻하게", genre: "thriller" },
   ]},
 
@@ -499,67 +499,67 @@ const verifiedDramaClips = [
     { character: "도베르만", korean: "군법으로 심판한다.", vietnamese: "Xét xử bằng quân pháp.", context: "군 법정", difficulty: "어려움", audioTip: "단호하게", genre: "action" },
   ]},
 
-  { drama: "슈룹", dramaEn: "Under the Queen's Umbrella", youtubeId: "Xz8bP8EoSfU", timestamp: 0, scenes: [
+  { drama: "슈룹", dramaEn: "Under the Queen's Umbrella", youtubeId: "ZdHZZlzxwB8", timestamp: 0, scenes: [
     { character: "중전", korean: "내 아이들을 지킬 것이다.", vietnamese: "Ta sẽ bảo vệ con cái ta.", context: "모성애", difficulty: "보통", audioTip: "강하게", genre: "action" },
   ]},
 
-  { drama: "수리남", dramaEn: "Suriname", youtubeId: "NB7Kk8EZ_Yc", timestamp: 0, scenes: [
+  { drama: "수리남", dramaEn: "Suriname", youtubeId: "4qgYA7TlMgM", timestamp: 0, scenes: [
     { character: "강인구", korean: "마약왕을 잡겠다.", vietnamese: "Tôi sẽ bắt trùm ma túy.", context: "잠입 수사", difficulty: "어려움", audioTip: "긴장감 있게", genre: "action" },
   ]},
 
-  { drama: "일타 스캔들", dramaEn: "Crash Course in Romance", youtubeId: "x9u8J3oJULc", timestamp: 0, scenes: [
+  { drama: "일타 스캔들", dramaEn: "Crash Course in Romance", youtubeId: "RRFGi45GwxM", timestamp: 0, scenes: [
     { character: "남행선", korean: "사교육도 사랑도.", vietnamese: "Dạy thêm hay tình yêu.", context: "로맨틱 코미디", difficulty: "쉬움", audioTip: "유쾌하게", genre: "romantic" },
   ]},
 
-  { drama: "경이로운 소문", dramaEn: "The Uncanny Counter", youtubeId: "a2nEGIFBp9Q", timestamp: 0, scenes: [
+  { drama: "경이로운 소문", dramaEn: "The Uncanny Counter", youtubeId: "fvNWxBQo8nI", timestamp: 0, scenes: [
     { character: "소문", korean: "악귀를 사냥한다.", vietnamese: "Săn lùng ác quỷ.", context: "퇴마 액션", difficulty: "보통", audioTip: "강렬하게", genre: "action" },
   ]},
 
-  { drama: "하이클래스", dramaEn: "High Class", youtubeId: "Wd5K8J9C8gQ", timestamp: 0, scenes: [
+  { drama: "하이클래스", dramaEn: "High Class", youtubeId: "hJxCYz5Xl1I", timestamp: 0, scenes: [
     { character: "송유리", korean: "상류사회의 비밀.", vietnamese: "Bí mật của giới thượng lưu.", context: "상류층 스릴러", difficulty: "어려움", audioTip: "우아하게", genre: "thriller" },
   ]},
 
-  { drama: "유미의 세포들", dramaEn: "Yumi's Cells", youtubeId: "6CJ9kQJbPgQ", timestamp: 0, scenes: [
+  { drama: "유미의 세포들", dramaEn: "Yumi's Cells", youtubeId: "kk0_jUPGzCI", timestamp: 0, scenes: [
     { character: "유미", korean: "내 세포들이 말해.", vietnamese: "Các tế bào của tôi nói.", context: "세포 애니메이션", difficulty: "쉬움", audioTip: "귀엽게", genre: "romantic" },
   ]},
 
-  { drama: "아직 낫포티", dramaEn: "Not Yet Forty", youtubeId: "nV3ux8Wqz4Q", timestamp: 0, scenes: [
+  { drama: "서른아홉", dramaEn: "Thirty-Nine", youtubeId: "rp7lUsT3sYM", timestamp: 0, scenes: [
     { character: "지현", korean: "아직 젊어!", vietnamese: "Vẫn còn trẻ!", context: "중년 로맨스", difficulty: "쉬움", audioTip: "밝게", genre: "romantic" },
   ]},
 
-  { drama: "나쁜엄마", dramaEn: "Bad Mom", youtubeId: "QIhQb9wDOCs", timestamp: 0, scenes: [
+  { drama: "나쁜엄마", dramaEn: "The Good Bad Mother", youtubeId: "dKl7l8f3iL4", timestamp: 0, scenes: [
     { character: "영순", korean: "아들을 위해서라면.", vietnamese: "Vì con trai.", context: "모성", difficulty: "보통", audioTip: "절실하게", genre: "romantic" },
   ]},
 
-  { drama: "닥터 차정숙", dramaEn: "Doctor Cha", youtubeId: "Bh0bT_QHnQ8", timestamp: 0, scenes: [
+  { drama: "닥터 차정숙", dramaEn: "Doctor Cha", youtubeId: "1wH3Cw6iFIk", timestamp: 0, scenes: [
     { character: "차정숙", korean: "늦었지만 의사가 될 거야.", vietnamese: "Dù muộn nhưng tôi sẽ thành bác sĩ.", context: "재도전", difficulty: "보통", audioTip: "결연하게", genre: "romantic" },
   ]},
 
-  { drama: "킹더랜드", dramaEn: "King the Land", youtubeId: "kRdXJfMx6nY", timestamp: 0, scenes: [
+  { drama: "킹더랜드", dramaEn: "King the Land", youtubeId: "S-KyfQT9wF4", timestamp: 0, scenes: [
     { character: "구원", korean: "진심으로 웃어봐.", vietnamese: "Hãy cười thật lòng đi.", context: "호텔 로맨스", difficulty: "쉬움", audioTip: "다정하게", genre: "romantic" },
   ]},
 
-  { drama: "더 에이트 쇼", dramaEn: "The 8 Show", youtubeId: "7dH0rNq9nTU", timestamp: 0, scenes: [
+  { drama: "더 에이트 쇼", dramaEn: "The 8 Show", youtubeId: "yPKwQ6GMTAA", timestamp: 0, scenes: [
     { character: "참가자", korean: "시간이 곧 돈이다.", vietnamese: "Thời gian là tiền.", context: "생존 게임", difficulty: "보통", audioTip: "긴장감 있게", genre: "thriller" },
   ]},
 
-  { drama: "무인도의 디바", dramaEn: "Castaway Diva", youtubeId: "Q5C2IYn8tWo", timestamp: 0, scenes: [
+  { drama: "무인도의 디바", dramaEn: "Castaway Diva", youtubeId: "Io_VWFwWsQs", timestamp: 0, scenes: [
     { character: "서목하", korean: "노래는 나의 전부.", vietnamese: "Ca hát là tất cả của tôi.", context: "무인도 생존", difficulty: "보통", audioTip: "열정적으로", genre: "romantic" },
   ]},
 
-  { drama: "마이 히어로", dramaEn: "My Hero", youtubeId: "fXH6M0zLk9c", timestamp: 0, scenes: [
-    { character: "주인공", korean: "내가 영웅이 될게.", vietnamese: "Tôi sẽ trở thành anh hùng.", context: "히어로물", difficulty: "쉬움", audioTip: "당당하게", genre: "action" },
+  { drama: "힘쎈여자 도봉순", dramaEn: "Strong Woman Do Bong Soon", youtubeId: "Bty_X5zKLPk", timestamp: 0, scenes: [
+    { character: "도봉순", korean: "내가 영웅이 될게.", vietnamese: "Tôi sẽ trở thành anh hùng.", context: "히어로물", difficulty: "쉬움", audioTip: "당당하게", genre: "action" },
   ]},
 
-  { drama: "트롤리", dramaEn: "Trolley", youtubeId: "Fq9QWxN6P6Y", timestamp: 0, scenes: [
+  { drama: "트롤리", dramaEn: "Trolley", youtubeId: "1VxL1LIjFdE", timestamp: 0, scenes: [
     { character: "김혜주", korean: "진실을 말해야 할까.", vietnamese: "Có nên nói sự thật không.", context: "정치 드라마", difficulty: "어려움", audioTip: "고뇌하며", genre: "thriller" },
   ]},
 
-  { drama: "커넥션", dramaEn: "Connection", youtubeId: "Rz1J2NqL0Po", timestamp: 0, scenes: [
+  { drama: "커넥션", dramaEn: "Connection", youtubeId: "LS6TqR2LJsg", timestamp: 0, scenes: [
     { character: "장재경", korean: "마약 사건을 파헤친다.", vietnamese: "Điều tra vụ án ma túy.", context: "형사 드라마", difficulty: "보통", audioTip: "집요하게", genre: "action" },
   ]},
 
-  { drama: "힘쎈여자 강남순", dramaEn: "Strong Girl Nam Soon", youtubeId: "OQ0TQz4DRhE", timestamp: 0, scenes: [
+  { drama: "힘쎈여자 강남순", dramaEn: "Strong Girl Nam Soon", youtubeId: "KaKfJEo-wCQ", timestamp: 0, scenes: [
     { character: "강남순", korean: "내 힘으로 해결할게.", vietnamese: "Tôi sẽ giải quyết bằng sức mình.", context: "슈퍼파워", difficulty: "쉬움", audioTip: "활기차게", genre: "action" },
   ]},
 
