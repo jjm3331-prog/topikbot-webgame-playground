@@ -466,41 +466,23 @@ const verifiedDramaClips = [
   ]},
 
   // 추가 클립들로 300개 채우기
-  { drama: "알함브라 궁전의 추억", dramaEn: "Memories of the Alhambra", youtubeId: "fkB3xGzLJds", timestamp: 0, scenes: [
+  { drama: "알함브라 궁전의 추억", dramaEn: "Memories of the Alhambra", youtubeId: "Os5NXCkYTQo", timestamp: 0, scenes: [
     { character: "유진우", korean: "게임과 현실의 경계.", vietnamese: "Ranh giới giữa game và thực tế.", context: "AR 게임", difficulty: "보통", audioTip: "긴장감 있게", genre: "fantasy" },
   ]},
 
-  { drama: "악마판사", dramaEn: "The Devil Judge", youtubeId: "qFuIB3T5vLY", timestamp: 0, scenes: [
+  { drama: "악마판사", dramaEn: "The Devil Judge", youtubeId: "jkGnZW5IddI", timestamp: 0, scenes: [
     { character: "강요한", korean: "법 위에 선 자.", vietnamese: "Kẻ đứng trên luật pháp.", context: "법정 스릴러", difficulty: "어려움", audioTip: "위엄 있게", genre: "thriller" },
-  ]},
-
-  { drama: "마인", dramaEn: "Mine", youtubeId: "EaXJFcL0K8Y", timestamp: 0, scenes: [
-    { character: "서희수", korean: "내 것은 내 것이다.", vietnamese: "Của tôi là của tôi.", context: "상류사회", difficulty: "어려움", audioTip: "강렬하게", genre: "thriller" },
-  ]},
-
-  { drama: "낮과 밤", dramaEn: "Awaken", youtubeId: "XTKK4NUYV_Y", timestamp: 0, scenes: [
-    { character: "도정우", korean: "진실을 찾아라.", vietnamese: "Hãy tìm sự thật.", context: "미스터리", difficulty: "보통", audioTip: "신비롭게", genre: "thriller" },
   ]},
 
   { drama: "모범택시", dramaEn: "Taxi Driver", youtubeId: "PE1sz4ndG0w", timestamp: 0, scenes: [
     { character: "김도기", korean: "복수 대행합니다.", vietnamese: "Đại diện trả thù.", context: "복수 대리", difficulty: "보통", audioTip: "강렬하게", genre: "action" },
   ]},
 
-  { drama: "오늘의 탐정", dramaEn: "Today's Detective", youtubeId: "L5pYB1mZmvw", timestamp: 0, scenes: [
-    { character: "탐정", korean: "사건을 해결하겠다.", vietnamese: "Tôi sẽ giải quyết vụ án.", context: "탐정 수사", difficulty: "보통", audioTip: "결연하게", genre: "action" },
-  ]},
 
   { drama: "빅마우스", dramaEn: "Big Mouth", youtubeId: "kpiP18VYw-s", timestamp: 0, scenes: [
     { character: "박창호", korean: "내가 빅마우스다.", vietnamese: "Tôi là Big Mouth.", context: "반전", difficulty: "어려움", audioTip: "강렬하게", genre: "thriller" },
   ]},
 
-  { drama: "작은 아씨들", dramaEn: "Little Women", youtubeId: "rXvMvA6WJq8", timestamp: 0, scenes: [
-    { character: "오인주", korean: "우리 셋이 함께.", vietnamese: "Ba chị em cùng nhau.", context: "자매 우애", difficulty: "보통", audioTip: "따뜻하게", genre: "thriller" },
-  ]},
-
-  { drama: "군검사 도베르만", dramaEn: "Military Prosecutor Doberman", youtubeId: "KRzJHLnSSjM", timestamp: 0, scenes: [
-    { character: "도베르만", korean: "군법으로 심판한다.", vietnamese: "Xét xử bằng quân pháp.", context: "군 법정", difficulty: "어려움", audioTip: "단호하게", genre: "action" },
-  ]},
 
   { drama: "슈룹", dramaEn: "Under the Queen's Umbrella", youtubeId: "ZdHZZlzxwB8", timestamp: 0, scenes: [
     { character: "중전", korean: "내 아이들을 지킬 것이다.", vietnamese: "Ta sẽ bảo vệ con cái ta.", context: "모성애", difficulty: "보통", audioTip: "강하게", genre: "action" },
