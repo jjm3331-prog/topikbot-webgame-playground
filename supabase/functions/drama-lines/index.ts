@@ -66,7 +66,7 @@ ${excludeIds?.length ? `이미 나온 대사 ID (제외): ${excludeIds.join(', '
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'google/gemini-2.5-flash-lite',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }

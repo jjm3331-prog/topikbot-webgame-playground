@@ -1,4 +1,3 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -86,10 +85,10 @@ serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
-    if (!OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY is not configured');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY is not configured');
     }
 
     // Validate inputs
@@ -109,32 +108,31 @@ ${excludeText}
 
 위 조건에 맞는 한국어 단어를 생성해주세요. 다양한 주제에서 골고루 선택하고, 매번 새로운 단어를 사용하세요.`;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-mini',
+        model: 'google/gemini-2.5-flash-lite',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: userPrompt }
         ],
-        temperature: 1.0, // Maximum creativity
       }),
     });
 
     if (!response.ok) {
-      console.error('OpenAI API error:', response.status);
-      throw new Error(`OpenAI API error: ${response.status}`);
+      console.error('AI API error:', response.status);
+      throw new Error(`AI API error: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log('OpenAI response received');
+    console.log('AI response received');
 
     if (!data.choices || !data.choices[0]) {
-      throw new Error('Invalid response from OpenAI');
+      throw new Error('Invalid response from AI');
     }
 
     const content = data.choices[0].message.content;

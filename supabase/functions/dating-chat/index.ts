@@ -1,7 +1,4 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -30,7 +27,7 @@ function validateConversationHistory(history: unknown): Array<{role: string; con
       content: validateString(item.content, 1000) || ''
     }))
     .filter(item => item.content.length > 0)
-    .slice(-20); // Limit history to last 20 messages
+    .slice(-20);
 }
 
 serve(async (req) => {
@@ -40,7 +37,12 @@ serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY is not configured');
+    }
+
     // Validate and sanitize inputs
     const message = validateString(body.message, 500);
     const npcName = validateString(body.npcName, 50) || 'Unknown';
@@ -98,29 +100,44 @@ serve(async (req) => {
       { role: 'user', content: message }
     ];
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-mini',
+        model: 'google/gemini-2.5-flash-lite',
         messages,
-        temperature: 0.8,
-        max_tokens: 500,
       }),
     });
 
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('AI API error:', response.status, errorText);
+      
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ 
+          error: 'Rate limit',
+          response: "잠시 후 다시 시도해주세요 😅",
+          affinityChange: 0,
+          reason: "요청 제한 / Giới hạn yêu cầu"
+        }), {
+          status: 429,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      throw new Error(`AI API error: ${response.status}`);
+    }
+
     const data = await response.json();
-    console.log('OpenAI response received');
+    console.log('AI response received');
 
     const content = data.choices[0].message.content;
     
     // Parse JSON response
     let parsedResponse;
     try {
-      // Try to extract JSON from the response
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         parsedResponse = JSON.parse(jsonMatch[0]);
@@ -129,7 +146,6 @@ serve(async (req) => {
       }
     } catch (parseError) {
       console.error('JSON parse error:', parseError);
-      // Fallback response
       parsedResponse = {
         response: content,
         affinityChange: 5,
@@ -137,7 +153,7 @@ serve(async (req) => {
       };
     }
 
-    // Sanitize output - ensure affinityChange is within bounds
+    // Sanitize output
     parsedResponse.affinityChange = validateNumber(parsedResponse.affinityChange, -15, 15);
 
     return new Response(JSON.stringify(parsedResponse), {
