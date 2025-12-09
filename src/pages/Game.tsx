@@ -18,11 +18,14 @@ import {
   Film,
   Music,
   Star,
-  HelpCircle
+  HelpCircle,
+  Play,
+  ChevronRight
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
+import { motion } from "framer-motion";
 
 interface Profile {
   id: string;
@@ -32,6 +35,15 @@ interface Profile {
   missions_completed: number;
   total_missions: number;
   points: number;
+}
+
+interface GameItem {
+  icon: React.ReactNode;
+  title: string;
+  titleVi: string;
+  tag?: string;
+  tagColor?: string;
+  route: string;
 }
 
 const Game = () => {
@@ -49,7 +61,6 @@ const Game = () => {
         return;
       }
 
-      // Fetch profile
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -66,7 +77,6 @@ const Game = () => {
 
     checkAuth();
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!session) {
         navigate("/auth");
@@ -94,19 +104,66 @@ const Game = () => {
     }
   };
 
+  const survivalGames: GameItem[] = [
+    { icon: <Dice6 className="w-5 h-5" />, title: "서울 생존", titleVi: "Sinh tồn Seoul", tag: "AI", route: "/chat" },
+    { icon: <Zap className="w-5 h-5" />, title: "파산 복구", titleVi: "Phục hồi phá sản", tag: "도전", tagColor: "bg-neon-green/20 text-neon-green", route: "/bankruptcy" },
+    { icon: <Briefcase className="w-5 h-5" />, title: "아르바이트", titleVi: "Làm thêm", tag: "돈벌기", tagColor: "bg-accent/20 text-accent", route: "/parttime" },
+  ];
+
+  const studyGames: GameItem[] = [
+    { icon: <Link2 className="w-5 h-5" />, title: "끝말잇기", titleVi: "Nối từ", tag: "어휘", route: "/wordchain" },
+    { icon: <MessageSquare className="w-5 h-5" />, title: "관용어 퀴즈", titleVi: "Quiz thành ngữ", tag: "문법", route: "/quiz" },
+  ];
+
+  const mediaGames: GameItem[] = [
+    { icon: <Film className="w-5 h-5" />, title: "K-Drama 더빙", titleVi: "Lồng tiếng K-Drama", tag: "YouTube", tagColor: "bg-destructive/20 text-destructive", route: "/kdrama" },
+    { icon: <Music className="w-5 h-5" />, title: "K-POP 가사", titleVi: "Lời K-POP", tag: "YouTube", tagColor: "bg-destructive/20 text-destructive", route: "/kpop" },
+  ];
+
+  const socialGames: GameItem[] = [
+    { icon: <Heart className="w-5 h-5" />, title: "Love Signal", titleVi: "Tín hiệu tình yêu", tag: "연애", tagColor: "bg-neon-pink/20 text-neon-pink", route: "/dating" },
+    { icon: <Trophy className="w-5 h-5" />, title: "랭킹", titleVi: "Xếp hạng", tag: "경쟁", tagColor: "bg-accent/20 text-accent", route: "/ranking" },
+  ];
+
+  const GameCard = ({ game, index }: { game: GameItem; index: number }) => (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1 * index }}
+      className="glass-card p-3 flex items-center gap-3 cursor-pointer hover:border-primary/40 transition-all active:scale-[0.98]"
+      onClick={() => navigate(game.route)}
+    >
+      <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-primary shrink-0">
+        {game.icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-0.5">
+          <h3 className="font-bold text-foreground text-sm">{game.title}</h3>
+          {game.tag && (
+            <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${game.tagColor || "bg-primary/20 text-primary"}`}>
+              {game.tag}
+            </span>
+          )}
+        </div>
+        <p className="text-[11px] text-muted-foreground">{game.titleVi}</p>
+      </div>
+      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+    </motion.div>
+  );
+
   if (loading) {
     return (
-      <div className="min-h-[100dvh] bg-gradient-to-b from-[#1a1a2e] to-[#0f0f23] flex items-center justify-center">
+      <div className="min-h-[100dvh] bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <img src="/favicon.png" alt="LUKATO" className="w-16 h-16 rounded-full animate-pulse" />
-          <div className="text-white/60 text-sm">로딩중... / Đang tải...</div>
+          <div className="text-muted-foreground text-sm">로딩중... / Đang tải...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-b from-[#1a1a2e] via-[#16213e] to-[#0f0f23] flex flex-col overflow-hidden">
+    <div className="min-h-[100dvh] bg-background flex flex-col overflow-hidden">
       {/* Header */}
       <AppHeader 
         username={profile?.username}
@@ -115,208 +172,200 @@ const Game = () => {
       />
 
       {/* Stats Bar */}
-      <div className="px-3 py-2 shrink-0">
-        <div className="glass-card p-3 rounded-xl grid grid-cols-4 gap-2">
-          <div className="flex flex-col items-center gap-0.5">
-            <Heart className="w-4 h-4 text-red-500" />
-            <div className="flex items-center gap-1">
-              <span className="text-white font-bold text-xs">{profile?.hp}</span>
-              <div className="w-8 h-1 bg-white/10 rounded-full overflow-hidden">
+      <div className="px-4 py-2 shrink-0">
+        <div className="glass-card p-3 rounded-xl">
+          <div className="grid grid-cols-4 gap-2">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <Heart className="w-3.5 h-3.5 text-destructive" />
+                <span className="text-sm font-bold text-foreground">{profile?.hp}</span>
+              </div>
+              <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-gradient-to-r from-red-500 to-red-400 transition-all"
+                  className="h-full bg-gradient-to-r from-destructive to-destructive/70 transition-all"
                   style={{ width: `${profile?.hp}%` }}
                 />
               </div>
+              <p className="text-[9px] text-muted-foreground mt-1">HP</p>
             </div>
-            <p className="text-[9px] text-white/40">HP / Máu</p>
-          </div>
-          <div className="flex flex-col items-center gap-0.5">
-            <Coins className="w-4 h-4 text-yellow-500" />
-            <span className="text-white font-bold text-xs">₩{profile?.money?.toLocaleString()}</span>
-            <p className="text-[9px] text-white/40">소지금 / Tiền</p>
-          </div>
-          <div className="flex flex-col items-center gap-0.5">
-            <Target className="w-4 h-4 text-green-500" />
-            <span className="text-white font-bold text-xs">{profile?.missions_completed}</span>
-            <p className="text-[9px] text-white/40">미션 / NV</p>
-          </div>
-          <div className="flex flex-col items-center gap-0.5">
-            <Star className="w-4 h-4 text-neon-cyan" />
-            <span className="text-white font-bold text-xs">{profile?.points?.toLocaleString()}</span>
-            <p className="text-[9px] text-white/40">포인트 / Điểm</p>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-1">
+                <Coins className="w-3.5 h-3.5 text-accent" />
+                <span className="text-sm font-bold text-foreground">₩{profile?.money?.toLocaleString()}</span>
+              </div>
+              <p className="text-[9px] text-muted-foreground mt-1">소지금</p>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-1">
+                <Target className="w-3.5 h-3.5 text-neon-green" />
+                <span className="text-sm font-bold text-foreground">{profile?.missions_completed}</span>
+              </div>
+              <p className="text-[9px] text-muted-foreground mt-1">미션</p>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-1">
+                <Star className="w-3.5 h-3.5 text-secondary" />
+                <span className="text-sm font-bold text-foreground">{profile?.points?.toLocaleString()}</span>
+              </div>
+              <p className="text-[9px] text-muted-foreground mt-1">포인트</p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content - Scrollable */}
-      <div className="flex-1 px-3 pb-2 space-y-3 overflow-y-auto">
-        {/* Location Selection */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="glass-card p-3 rounded-xl">
-            <div className="flex items-center gap-1.5 mb-2">
-              <MapPin className="w-4 h-4 text-red-400" />
-              <h3 className="text-white font-bold text-xs">장소 선택</h3>
-            </div>
-            <p className="text-white/50 text-[10px] mb-2 leading-tight">
-              원하는 장소 입력<br/>
-              <span className="text-white/30">Nhập địa điểm</span>
-            </p>
-            <Input
-              placeholder="예: 강남역..."
-              value={customLocation}
-              onChange={(e) => setCustomLocation(e.target.value)}
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/40 mb-2 h-8 text-xs"
-            />
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="w-full h-8 border-white/20 text-white hover:bg-white/10 text-[10px]"
-              onClick={handleCustomLocation}
-            >
-              시작 / Bắt đầu
-            </Button>
+      {/* Main Content */}
+      <div className="flex-1 px-4 pb-4 space-y-4 overflow-y-auto">
+        {/* Quick Start Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass-card p-4 rounded-xl"
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <Play className="w-4 h-4 text-primary" />
+            <h2 className="font-bold text-foreground text-sm">빠른 시작</h2>
+            <span className="text-[10px] text-muted-foreground">Quick Start</span>
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <div className="flex items-center gap-1.5 mb-2">
+                <MapPin className="w-3.5 h-3.5 text-destructive" />
+                <span className="text-xs text-muted-foreground">장소 선택</span>
+              </div>
+              <Input
+                placeholder="예: 강남역..."
+                value={customLocation}
+                onChange={(e) => setCustomLocation(e.target.value)}
+                className="bg-muted border-border text-foreground placeholder:text-muted-foreground mb-2 h-9 text-xs"
+              />
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="w-full h-8 border-border text-foreground hover:bg-muted text-xs"
+                onClick={handleCustomLocation}
+              >
+                시작
+              </Button>
+            </div>
+            <div className="flex flex-col items-center justify-center glass-card p-3 rounded-lg">
+              <Dice6 className="w-8 h-8 text-primary mb-2" />
+              <span className="text-xs font-bold text-foreground mb-1">랜덤 서울</span>
+              <Button 
+                size="sm"
+                className="h-8 bg-primary hover:bg-primary/90 text-primary-foreground text-xs px-4"
+                onClick={handleStartSurvival}
+              >
+                10턴 도전!
+              </Button>
+            </div>
+          </div>
+        </motion.div>
 
-          <div className="glass-card p-3 rounded-xl flex flex-col items-center justify-center text-center">
-            <Dice6 className="w-8 h-8 text-neon-cyan mb-1" />
-            <h3 className="text-white font-bold text-xs">서울에서 생존</h3>
-            <p className="text-white/50 text-[10px]">Sinh tồn tại Seoul</p>
-            <Button 
-              size="sm"
-              className="mt-2 h-8 bg-gradient-to-r from-neon-pink to-neon-purple hover:opacity-90 text-[10px] px-3"
-              onClick={handleStartSurvival}
-            >
-              10턴 도전! / Thử thách!
-            </Button>
+        {/* Survival Games */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h2 className="font-bold text-foreground text-sm flex items-center gap-2">
+              🎮 서바이벌 게임
+              <span className="text-[10px] text-muted-foreground font-normal">Survival Games</span>
+            </h2>
+          </div>
+          <div className="space-y-2">
+            {survivalGames.map((game, index) => (
+              <GameCard key={game.title} game={game} index={index} />
+            ))}
+          </div>
+        </div>
+
+        {/* Study Games */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h2 className="font-bold text-foreground text-sm flex items-center gap-2">
+              📚 학습 게임
+              <span className="text-[10px] text-muted-foreground font-normal">Study Games</span>
+            </h2>
+          </div>
+          <div className="space-y-2">
+            {studyGames.map((game, index) => (
+              <GameCard key={game.title} game={game} index={index} />
+            ))}
+          </div>
+        </div>
+
+        {/* Media Games */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h2 className="font-bold text-foreground text-sm flex items-center gap-2">
+              🎬 미디어 게임
+              <span className="text-[10px] text-muted-foreground font-normal">Media Games</span>
+            </h2>
+          </div>
+          <div className="space-y-2">
+            {mediaGames.map((game, index) => (
+              <GameCard key={game.title} game={game} index={index} />
+            ))}
+          </div>
+        </div>
+
+        {/* Social Games */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h2 className="font-bold text-foreground text-sm flex items-center gap-2">
+              💬 소셜 게임
+              <span className="text-[10px] text-muted-foreground font-normal">Social Games</span>
+            </h2>
+          </div>
+          <div className="space-y-2">
+            {socialGames.map((game, index) => (
+              <GameCard key={game.title} game={game} index={index} />
+            ))}
           </div>
         </div>
 
         {/* External Links */}
-        <div className="grid grid-cols-2 gap-2">
-          <a href="https://hanoi.topikbot.kr" target="_blank" rel="noopener noreferrer" className="block">
-            <Button className="w-full h-10 bg-gradient-to-r from-blue-500 to-cyan-500 hover:opacity-90 text-[10px] font-bold flex flex-col gap-0 py-1">
-              <div className="flex items-center gap-1">
-                <ExternalLink className="w-3 h-3" />
-                <span>Hanoi 공식</span>
+        <div className="space-y-2">
+          <h2 className="font-bold text-foreground text-sm flex items-center gap-2">
+            🔗 외부 링크
+            <span className="text-[10px] text-muted-foreground font-normal">External Links</span>
+          </h2>
+          <div className="grid grid-cols-2 gap-2">
+            <a href="https://hanoi.topikbot.kr" target="_blank" rel="noopener noreferrer" className="block">
+              <div className="glass-card p-3 flex items-center gap-2 hover:border-primary/40 transition-all">
+                <ExternalLink className="w-4 h-4 text-secondary" />
+                <div>
+                  <p className="text-xs font-bold text-foreground">Hanoi 공식</p>
+                  <p className="text-[9px] text-muted-foreground">Trang chính thức</p>
+                </div>
               </div>
-              <span className="text-[8px] opacity-70">Trang chính thức</span>
-            </Button>
-          </a>
-          <a href="https://chat-topikbot.kr" target="_blank" rel="noopener noreferrer" className="block">
-            <Button className="w-full h-10 bg-gradient-to-r from-violet-500 to-purple-500 hover:opacity-90 text-[10px] font-bold flex flex-col gap-0 py-1">
-              <div className="flex items-center gap-1">
-                <ExternalLink className="w-3 h-3" />
-                <span>LUKATO AI</span>
+            </a>
+            <a href="https://chat-topikbot.kr" target="_blank" rel="noopener noreferrer" className="block">
+              <div className="glass-card p-3 flex items-center gap-2 hover:border-primary/40 transition-all">
+                <ExternalLink className="w-4 h-4 text-neon-purple" />
+                <div>
+                  <p className="text-xs font-bold text-foreground">LUKATO AI</p>
+                  <p className="text-[9px] text-muted-foreground">Dịch vụ AI</p>
+                </div>
               </div>
-              <span className="text-[8px] opacity-70">Dịch vụ AI</span>
-            </Button>
-          </a>
-        </div>
-
-        {/* Game Buttons Grid */}
-        <div className="grid grid-cols-2 gap-2">
-          <Button 
-            className="h-11 bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-[11px] font-bold flex flex-col gap-0 py-1"
-            onClick={() => navigate("/ranking")}
-          >
-            <div className="flex items-center gap-1">
-              <Trophy className="w-4 h-4" />
-              <span>랭킹</span>
-            </div>
-            <span className="text-[9px] opacity-70">Xếp hạng</span>
-          </Button>
-          <Button 
-            className="h-11 bg-gradient-to-r from-pink-500 to-rose-500 hover:opacity-90 text-[11px] font-bold flex flex-col gap-0 py-1"
-            onClick={() => navigate("/dating")}
-          >
-            <div className="flex items-center gap-1">
-              <Heart className="w-4 h-4" />
-              <span>Love Signal</span>
-            </div>
-            <span className="text-[9px] opacity-70">Tín hiệu tình yêu</span>
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <Button 
-            className="h-11 bg-gradient-to-r from-green-500 to-emerald-500 hover:opacity-90 text-[11px] font-bold flex flex-col gap-0 py-1"
-            onClick={() => navigate("/bankruptcy")}
-          >
-            <div className="flex items-center gap-1">
-              <Zap className="w-4 h-4" />
-              <span>파산 복구</span>
-            </div>
-            <span className="text-[9px] opacity-70">Phục hồi phá sản</span>
-          </Button>
-          <Button 
-            className="h-11 bg-gradient-to-r from-fuchsia-500 to-pink-500 hover:opacity-90 text-[11px] font-bold flex flex-col gap-0 py-1"
-            onClick={() => navigate("/parttime")}
-          >
-            <div className="flex items-center gap-1">
-              <Briefcase className="w-4 h-4" />
-              <span>아르바이트</span>
-            </div>
-            <span className="text-[9px] opacity-70">Làm thêm</span>
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <Button 
-            className="h-11 bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90 text-[11px] font-bold flex flex-col gap-0 py-1"
-            onClick={() => navigate("/wordchain")}
-          >
-            <div className="flex items-center gap-1">
-              <Link2 className="w-4 h-4" />
-              <span>끝말잇기</span>
-            </div>
-            <span className="text-[9px] opacity-70">Nối từ</span>
-          </Button>
-          <Button 
-            className="h-11 bg-gradient-to-r from-amber-500 to-yellow-500 hover:opacity-90 text-[11px] font-bold flex flex-col gap-0 py-1"
-            onClick={() => navigate("/quiz")}
-          >
-            <div className="flex items-center gap-1">
-              <MessageSquare className="w-4 h-4" />
-              <span>관용어 퀴즈</span>
-            </div>
-            <span className="text-[9px] opacity-70">Quiz thành ngữ</span>
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <Button 
-            className="h-11 bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-[11px] font-bold flex flex-col gap-0 py-1"
-            onClick={() => navigate("/kdrama")}
-          >
-            <div className="flex items-center gap-1">
-              <Film className="w-4 h-4" />
-              <span>K-Drama 더빙</span>
-            </div>
-            <span className="text-[9px] opacity-70">Lồng tiếng</span>
-          </Button>
-          <Button 
-            className="h-11 bg-gradient-to-r from-rose-500 to-red-500 hover:opacity-90 text-[11px] font-bold flex flex-col gap-0 py-1"
-            onClick={() => navigate("/kpop")}
-          >
-            <div className="flex items-center gap-1">
-              <Music className="w-4 h-4" />
-              <span>K-POP 가사</span>
-            </div>
-            <span className="text-[9px] opacity-70">Lời bài hát</span>
-          </Button>
+            </a>
+          </div>
         </div>
 
         {/* Tutorial Button */}
-        <Button 
-          className="w-full h-12 bg-gradient-to-r from-teal-500 to-cyan-500 hover:opacity-90 text-[12px] font-bold flex items-center justify-center gap-2"
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="glass-card p-4 flex items-center gap-3 cursor-pointer hover:border-primary/40 transition-all"
           onClick={() => navigate("/tutorial")}
         >
-          <HelpCircle className="w-5 h-5" />
-          <div className="flex flex-col items-start">
-            <span>사용법 안내</span>
-            <span className="text-[9px] opacity-70">Hướng dẫn sử dụng</span>
+          <div className="w-10 h-10 rounded-xl bg-secondary/20 flex items-center justify-center">
+            <HelpCircle className="w-5 h-5 text-secondary" />
           </div>
-        </Button>
+          <div className="flex-1">
+            <h3 className="font-bold text-foreground text-sm">사용법 안내</h3>
+            <p className="text-[11px] text-muted-foreground">Hướng dẫn sử dụng chi tiết</p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        </motion.div>
       </div>
 
       {/* Footer */}
