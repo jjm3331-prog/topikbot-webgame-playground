@@ -171,47 +171,70 @@ const Game = () => {
         titleVi="Menu chính"
       />
 
-      {/* Stats Bar */}
-      <div className="px-4 py-2 shrink-0">
-        <div className="glass-card p-3 rounded-xl">
-          <div className="grid grid-cols-4 gap-2">
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-1 mb-1">
-                <Heart className="w-3.5 h-3.5 text-destructive" />
-                <span className="text-sm font-bold text-foreground">{profile?.hp}</span>
+      {/* Stats Bar - Premium Design */}
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="px-4 py-3 shrink-0"
+      >
+        <div className="glass-card p-4 rounded-2xl border border-border/50 shadow-lg">
+          <div className="grid grid-cols-4 gap-3">
+            {/* HP */}
+            <div className="relative">
+              <div className="flex items-center gap-1.5 mb-2">
+                <div className="w-6 h-6 rounded-lg bg-destructive/20 flex items-center justify-center">
+                  <Heart className="w-3.5 h-3.5 text-destructive" />
+                </div>
+                <span className="text-base font-bold text-foreground">{profile?.hp}</span>
               </div>
-              <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-destructive to-destructive/70 transition-all"
-                  style={{ width: `${profile?.hp}%` }}
+              <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${profile?.hp}%` }}
+                  transition={{ duration: 1, delay: 0.2 }}
+                  className="h-full bg-gradient-to-r from-destructive via-destructive/80 to-red-400 rounded-full"
+                  style={{ boxShadow: '0 0 10px hsl(var(--destructive) / 0.5)' }}
                 />
               </div>
-              <p className="text-[9px] text-muted-foreground mt-1">HP</p>
+              <p className="text-[10px] text-muted-foreground mt-1.5 font-medium">HP</p>
             </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-1">
-                <Coins className="w-3.5 h-3.5 text-accent" />
-                <span className="text-sm font-bold text-foreground">₩{profile?.money?.toLocaleString()}</span>
+            
+            {/* Money */}
+            <div className="relative">
+              <div className="flex items-center gap-1.5 mb-2">
+                <div className="w-6 h-6 rounded-lg bg-accent/20 flex items-center justify-center">
+                  <Coins className="w-3.5 h-3.5 text-accent" />
+                </div>
               </div>
-              <p className="text-[9px] text-muted-foreground mt-1">소지금</p>
+              <p className="text-sm font-bold text-foreground">₩{profile?.money?.toLocaleString()}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">소지금</p>
             </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-1">
-                <Target className="w-3.5 h-3.5 text-neon-green" />
-                <span className="text-sm font-bold text-foreground">{profile?.missions_completed}</span>
+            
+            {/* Missions */}
+            <div className="relative">
+              <div className="flex items-center gap-1.5 mb-2">
+                <div className="w-6 h-6 rounded-lg bg-neon-green/20 flex items-center justify-center">
+                  <Target className="w-3.5 h-3.5 text-neon-green" />
+                </div>
               </div>
-              <p className="text-[9px] text-muted-foreground mt-1">미션</p>
+              <p className="text-sm font-bold text-foreground">{profile?.missions_completed}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">미션</p>
             </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-1">
-                <Star className="w-3.5 h-3.5 text-secondary" />
-                <span className="text-sm font-bold text-foreground">{profile?.points?.toLocaleString()}</span>
+            
+            {/* Points */}
+            <div className="relative">
+              <div className="flex items-center gap-1.5 mb-2">
+                <div className="w-6 h-6 rounded-lg bg-secondary/20 flex items-center justify-center">
+                  <Star className="w-3.5 h-3.5 text-secondary" />
+                </div>
               </div>
-              <p className="text-[9px] text-muted-foreground mt-1">포인트</p>
+              <p className="text-sm font-bold text-foreground">{profile?.points?.toLocaleString()}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">포인트</p>
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Main Content */}
       <div className="flex-1 px-4 pb-4 space-y-4 overflow-y-auto">
