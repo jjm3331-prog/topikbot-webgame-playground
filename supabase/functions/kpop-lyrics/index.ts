@@ -379,7 +379,7 @@ serve(async (req) => {
       song: string;
       youtubeId: string;
       timestamp: number;
-      line: string;
+      lyricLine: string;
       answer: string;
       hint: string;
       difficulty: string;
@@ -411,7 +411,7 @@ serve(async (req) => {
         song: song.song,
         youtubeId: song.youtubeId,
         timestamp: song.timestamp,
-        line: lyric.line,
+        lyricLine: lyric.line,
         answer: lyric.answer,
         hint: lyric.hint,
         difficulty: lyric.difficulty,
@@ -428,7 +428,7 @@ serve(async (req) => {
         song: fallbackSong.song,
         youtubeId: fallbackSong.youtubeId,
         timestamp: fallbackSong.timestamp,
-        line: fallbackLyric.line,
+        lyricLine: fallbackLyric.line,
         answer: fallbackLyric.answer,
         hint: fallbackLyric.hint,
         difficulty: fallbackLyric.difficulty,
@@ -450,7 +450,7 @@ serve(async (req) => {
       song: "봄날",
       youtubeId: "xEeFrLSkMm8",
       timestamp: 70,
-      line: "보고 싶다 이렇게 말하니까 더 ___ 싶다",
+      lyricLine: "보고 싶다 이렇게 말하니까 더 ___ 싶다",
       answer: "보고",
       hint: "nhìn, gặp",
       difficulty: "쉬움",
