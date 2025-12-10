@@ -4,6 +4,13 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import MobileMenu from "@/components/MobileMenu";
 
+interface UserStats {
+  hp: number;
+  money: number;
+  points: number;
+  missions_completed: number;
+}
+
 interface AppHeaderProps {
   username?: string;
   showBack?: boolean;
@@ -11,6 +18,7 @@ interface AppHeaderProps {
   showMenu?: boolean;
   title?: string;
   titleVi?: string;
+  userStats?: UserStats | null;
 }
 
 const AppHeader = ({ 
@@ -19,7 +27,8 @@ const AppHeader = ({
   showLogout = true,
   showMenu = true,
   title,
-  titleVi 
+  titleVi,
+  userStats 
 }: AppHeaderProps) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -99,7 +108,7 @@ const AppHeader = ({
 
           {/* Mobile Hamburger Menu */}
           {showMenu && (
-            <MobileMenu username={username} isLoggedIn={!!username} />
+            <MobileMenu username={username} isLoggedIn={!!username} userStats={userStats} />
           )}
         </div>
       </div>

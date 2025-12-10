@@ -2,8 +2,10 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, MessageCircle, Heart, Gamepad2, Music, Film, Briefcase, Brain, Trophy, ChevronDown } from "lucide-react";
+import { ArrowRight, Sparkles, MessageCircle, Heart, Gamepad2, Music, Film, Briefcase, Brain, Trophy, ChevronDown, Star, Quote, ExternalLink, Send } from "lucide-react";
 import { motion, useInView } from "framer-motion";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 const games = [
   {
@@ -120,11 +122,29 @@ const GameCard = ({ game, index }: { game: typeof games[0]; index: number }) => 
   );
 };
 
+interface Review {
+  id: string;
+  content: string;
+  rating: number;
+  created_at: string;
+  user_id: string;
+  profiles?: {
+    username: string;
+    points: number;
+  };
+}
+
 const Landing = () => {
   const navigate = useNavigate();
   const [isLoaded, setIsLoaded] = useState(false);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [newReview, setNewReview] = useState("");
+  const [newRating, setNewRating] = useState(5);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ id: string; username: string; points: number } | null>(null);
   const gamesRef = useRef<HTMLDivElement>(null);
-  const isGamesInView = useInView(gamesRef, { once: true, margin: "-100px" });
+  const reviewsRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -133,7 +153,51 @@ const Landing = () => {
       }
     });
     setTimeout(() => setIsLoaded(true), 100);
+    fetchReviews();
   }, [navigate]);
+
+  const fetchReviews = async () => {
+    const { data, error } = await supabase
+      .from("reviews")
+      .select(`
+        id,
+        content,
+        rating,
+        created_at,
+        user_id,
+        profiles:user_id (
+          username,
+          points
+        )
+      `)
+      .order("created_at", { ascending: false })
+      .limit(6);
+    
+    if (!error && data) {
+      setReviews(data as unknown as Review[]);
+    }
+  };
+
+  const handleSubmitReview = async () => {
+    if (!currentUser || !newReview.trim()) return;
+    
+    setIsSubmitting(true);
+    const { error } = await supabase.from("reviews").insert({
+      user_id: currentUser.id,
+      content: newReview.trim(),
+      rating: newRating
+    });
+
+    if (error) {
+      toast({ title: "리뷰 등록 실패", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "리뷰가 등록되었습니다!", description: "감사합니다 / Cảm ơn bạn!" });
+      setNewReview("");
+      setNewRating(5);
+      fetchReviews();
+    }
+    setIsSubmitting(false);
+  };
 
   const scrollToGames = () => {
     gamesRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -420,16 +484,196 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 bg-slate-50 border-t border-slate-100">
-        <div className="max-w-6xl mx-auto text-center">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <img src="/favicon.png" alt="LUKATO" className="w-8 h-8 rounded-lg" />
-            <span className="font-bold text-slate-700">LUKATO</span>
+      {/* Reviews Section */}
+      <section ref={reviewsRef} className="px-6 py-24 bg-gradient-to-b from-white via-slate-50/50 to-white relative">
+        <div className="max-w-6xl mx-auto relative z-10">
+          {/* Section Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <motion.span
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="inline-block px-5 py-2 bg-gradient-to-r from-amber-100 to-orange-100 text-amber-700 font-semibold text-sm rounded-full mb-6"
+            >
+              💬 사용자 후기 • Đánh giá người dùng
+            </motion.span>
+            
+            <h2 className="text-4xl sm:text-5xl font-black text-slate-800 mb-6">
+              <span className="block">학습자들의</span>
+              <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
+                생생한 후기
+              </span>
+            </h2>
+            
+            <p className="text-slate-500 text-lg max-w-2xl mx-auto leading-relaxed">
+              Đánh giá thực tế từ người học tiếng Hàn
+            </p>
+          </motion.div>
+
+          {/* Reviews Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {reviews.length > 0 ? reviews.map((review, index) => (
+              <motion.div
+                key={review.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="relative p-6 rounded-3xl bg-white border border-slate-200/80 shadow-lg shadow-slate-200/50 overflow-hidden group"
+              >
+                {/* Quote icon */}
+                <Quote className="absolute top-4 right-4 w-8 h-8 text-slate-100" />
+                
+                {/* Rating stars */}
+                <div className="flex items-center gap-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star 
+                      key={i} 
+                      className={`w-4 h-4 ${i < review.rating ? 'text-amber-400 fill-amber-400' : 'text-slate-200'}`} 
+                    />
+                  ))}
+                </div>
+                
+                {/* Review content */}
+                <p className="text-slate-600 leading-relaxed mb-4 line-clamp-3">
+                  "{review.content}"
+                </p>
+                
+                {/* User info */}
+                <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                      {review.profiles?.username?.charAt(0).toUpperCase() || '?'}
+                    </div>
+                    <span className="font-medium text-slate-700 text-sm">
+                      {review.profiles?.username || '익명'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1 px-2 py-1 bg-amber-50 rounded-full">
+                    <Trophy className="w-3 h-3 text-amber-500" />
+                    <span className="text-xs font-semibold text-amber-600">
+                      {review.profiles?.points?.toLocaleString() || 0}점
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            )) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-slate-400">아직 후기가 없습니다. 첫 번째 후기를 남겨주세요!</p>
+                <p className="text-slate-300 text-sm mt-1">Chưa có đánh giá. Hãy là người đầu tiên!</p>
+              </div>
+            )}
           </div>
-          <p className="text-slate-400 text-sm">
-            © 2025 LUKATO. Your Korean Mentor.
-          </p>
+
+          {/* CTA to login for review */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <p className="text-slate-400 text-sm mb-4">
+              로그인하고 후기를 남겨주세요! • Đăng nhập để viết đánh giá!
+            </p>
+            <Button
+              onClick={() => navigate("/auth")}
+              variant="outline"
+              className="border-amber-300 text-amber-600 hover:bg-amber-50"
+            >
+              <Star className="w-4 h-4 mr-2" />
+              후기 작성하기 • Viết đánh giá
+            </Button>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Premium Footer */}
+      <footer className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+        </div>
+
+        <div className="relative z-10 max-w-6xl mx-auto px-6 py-16">
+          {/* Top Section */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+            {/* Brand */}
+            <div className="md:col-span-1">
+              <div className="flex items-center gap-3 mb-4">
+                <img src="/favicon.png" alt="LUKATO" className="w-12 h-12 rounded-xl shadow-lg shadow-violet-500/30" />
+                <div>
+                  <h3 className="font-bold text-xl bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">LUKATO</h3>
+                  <p className="text-slate-400 text-xs">Your Korean Mentor</p>
+                </div>
+              </div>
+              <p className="text-slate-400 text-sm leading-relaxed">
+                AI와 함께하는 즐거운 한국어 학습 게임
+                <br />
+                <span className="text-slate-500">Học tiếng Hàn vui vẻ cùng AI</span>
+              </p>
+            </div>
+
+            {/* Quick Links */}
+            <div className="md:col-span-1">
+              <h4 className="font-semibold text-white mb-4">바로가기 • Liên kết</h4>
+              <div className="space-y-2">
+                <a href="https://hanoi.topikbot.kr" target="_blank" rel="noopener noreferrer" 
+                   className="flex items-center gap-2 text-slate-400 hover:text-violet-400 transition-colors text-sm group">
+                  <ExternalLink className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                  Hanoi Official Site
+                </a>
+                <a href="https://chat-topikbot.kr" target="_blank" rel="noopener noreferrer"
+                   className="flex items-center gap-2 text-slate-400 hover:text-violet-400 transition-colors text-sm group">
+                  <ExternalLink className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                  LUKATO AI Chat
+                </a>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="md:col-span-1">
+              <h4 className="font-semibold text-white mb-4">게임 정보 • Thông tin</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-3 rounded-xl bg-white/5 border border-white/10">
+                  <div className="text-2xl font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">8</div>
+                  <div className="text-xs text-slate-400">게임 모드</div>
+                </div>
+                <div className="text-center p-3 rounded-xl bg-white/5 border border-white/10">
+                  <div className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">AI</div>
+                  <div className="text-xs text-slate-400">멘토링</div>
+                </div>
+                <div className="text-center p-3 rounded-xl bg-white/5 border border-white/10">
+                  <div className="text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">100%</div>
+                  <div className="text-xs text-slate-400">무료</div>
+                </div>
+                <div className="text-center p-3 rounded-xl bg-white/5 border border-white/10">
+                  <div className="text-2xl font-bold bg-gradient-to-r from-pink-400 to-rose-400 bg-clip-text text-transparent">🇻🇳</div>
+                  <div className="text-xs text-slate-400">베트남</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="h-px bg-gradient-to-r from-transparent via-slate-600 to-transparent mb-8" />
+
+          {/* Bottom Section */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-slate-500 text-sm">
+              © 2025 LUKATO. Powered by{" "}
+              <span className="text-violet-400 font-medium">LUKATO AI</span>
+            </p>
+            <div className="flex items-center gap-4">
+              <span className="text-slate-500 text-xs">Made with ❤️ for Vietnamese learners</span>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
