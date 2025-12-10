@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   Heart, 
   Coins, 
@@ -20,7 +21,8 @@ import {
   Star,
   HelpCircle,
   Play,
-  ChevronRight
+  ChevronRight,
+  Send
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import AppHeader from "@/components/AppHeader";
@@ -50,8 +52,34 @@ const Game = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [customLocation, setCustomLocation] = useState("");
+  const [newReview, setNewReview] = useState("");
+  const [newRating, setNewRating] = useState(5);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const handleSubmitReview = async () => {
+    if (!profile || !newReview.trim()) {
+      toast({ title: "후기 내용을 입력해주세요", description: "Vui lòng nhập nội dung đánh giá", variant: "destructive" });
+      return;
+    }
+    
+    setIsSubmitting(true);
+    const { error } = await supabase.from("reviews").insert({
+      user_id: profile.id,
+      content: newReview.trim(),
+      rating: newRating
+    });
+
+    if (error) {
+      toast({ title: "후기 등록 실패", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "후기가 등록되었습니다!", description: "감사합니다 / Cảm ơn bạn!" });
+      setNewReview("");
+      setNewRating(5);
+    }
+    setIsSubmitting(false);
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -395,6 +423,57 @@ const Game = () => {
           </div>
           <ChevronRight className="w-4 h-4 text-muted-foreground" />
         </motion.div>
+
+        {/* Review Section */}
+        <div className="space-y-2">
+          <h2 className="font-bold text-foreground text-sm flex items-center gap-2">
+            ⭐ 후기 작성
+            <span className="text-[10px] text-muted-foreground font-normal">Viết đánh giá</span>
+          </h2>
+          <div className="glass-card p-4 rounded-xl space-y-3">
+            {/* Rating Stars */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">평점:</span>
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    onClick={() => setNewRating(star)}
+                    className="transition-transform hover:scale-110"
+                  >
+                    <Star
+                      className={`w-5 h-5 ${star <= newRating ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground'}`}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            {/* Review Input */}
+            <Textarea
+              placeholder="게임 후기를 남겨주세요... / Viết đánh giá về game..."
+              value={newReview}
+              onChange={(e) => setNewReview(e.target.value)}
+              className="bg-muted border-border text-foreground placeholder:text-muted-foreground min-h-[80px] text-sm resize-none"
+            />
+            
+            {/* Submit Button */}
+            <Button
+              onClick={handleSubmitReview}
+              disabled={isSubmitting || !newReview.trim()}
+              className="w-full h-9 bg-primary hover:bg-primary/90 text-primary-foreground text-xs"
+            >
+              {isSubmitting ? (
+                "등록중... / Đang đăng..."
+              ) : (
+                <>
+                  <Send className="w-3.5 h-3.5 mr-1.5" />
+                  후기 등록 / Đăng đánh giá
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Footer */}

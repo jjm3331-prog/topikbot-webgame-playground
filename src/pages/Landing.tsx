@@ -2,10 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, MessageCircle, Heart, Gamepad2, Music, Film, Briefcase, Brain, Trophy, ChevronDown, Star, Quote, ExternalLink, Send } from "lucide-react";
+import { ArrowRight, Sparkles, MessageCircle, Heart, Gamepad2, Music, Film, Briefcase, Brain, Trophy, ChevronDown, Star, Quote, ExternalLink } from "lucide-react";
 import { motion, useInView } from "framer-motion";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
 
 const games = [
   {
@@ -138,13 +136,8 @@ const Landing = () => {
   const navigate = useNavigate();
   const [isLoaded, setIsLoaded] = useState(false);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [newReview, setNewReview] = useState("");
-  const [newRating, setNewRating] = useState(5);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [currentUser, setCurrentUser] = useState<{ id: string; username: string; points: number } | null>(null);
   const gamesRef = useRef<HTMLDivElement>(null);
   const reviewsRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -178,26 +171,6 @@ const Landing = () => {
     }
   };
 
-  const handleSubmitReview = async () => {
-    if (!currentUser || !newReview.trim()) return;
-    
-    setIsSubmitting(true);
-    const { error } = await supabase.from("reviews").insert({
-      user_id: currentUser.id,
-      content: newReview.trim(),
-      rating: newRating
-    });
-
-    if (error) {
-      toast({ title: "리뷰 등록 실패", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "리뷰가 등록되었습니다!", description: "감사합니다 / Cảm ơn bạn!" });
-      setNewReview("");
-      setNewRating(5);
-      fetchReviews();
-    }
-    setIsSubmitting(false);
-  };
 
   const scrollToGames = () => {
     gamesRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -571,25 +544,6 @@ const Landing = () => {
             )}
           </div>
 
-          {/* CTA to login for review */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center"
-          >
-            <p className="text-slate-400 text-sm mb-4">
-              로그인하고 후기를 남겨주세요! • Đăng nhập để viết đánh giá!
-            </p>
-            <Button
-              onClick={() => navigate("/auth")}
-              variant="outline"
-              className="border-amber-300 text-amber-600 hover:bg-amber-50"
-            >
-              <Star className="w-4 h-4 mr-2" />
-              후기 작성하기 • Viết đánh giá
-            </Button>
-          </motion.div>
         </div>
       </section>
 
