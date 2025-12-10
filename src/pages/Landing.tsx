@@ -241,20 +241,22 @@ const Landing = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
             transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-            className="text-slate-600 text-lg sm:text-xl leading-[1.8] mb-14 max-w-md mx-auto font-medium"
+            className="text-slate-600 text-lg sm:text-xl leading-[2] mb-14 max-w-md mx-auto font-medium"
           >
-            Nhanh hơn, thông minh hơn.
+            Biến việc học nhàm chán
             <br />
-            AI siêu cá nhân hóa phân tích chính xác điểm yếu
-            <br />
-            và xây dựng{" "}
+            thành{" "}
             <motion.span 
               className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-violet-600 font-bold"
               whileHover={{ scale: 1.05 }}
             >
-              lộ trình chiến thắng
-            </motion.span>{" "}
-            dành riêng cho bạn.
+              trò chơi thú vị
+            </motion.span>
+            <br />
+            <br />
+            Chỉ 10 phút mỗi ngày, xây dựng thói quen
+            <br />
+            và sự kiên trì trong học tiếng Hàn.
           </motion.p>
 
           {/* CTA Button */}
@@ -296,7 +298,7 @@ const Landing = () => {
             transition={{ duration: 0.6, delay: 0.8 }}
             className="text-slate-500 text-sm mt-8 font-medium tracking-wide"
           >
-            Không cần thẻ tín dụng • Bắt đầu ngay trong 30 giây
+            8 game đa dạng • Hỗ trợ AI thông minh • Miễn phí 100%
           </motion.p>
 
           {/* Logo */}
