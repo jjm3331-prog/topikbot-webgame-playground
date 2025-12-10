@@ -71,10 +71,10 @@ const games = [
   },
   {
     icon: Trophy,
-    title: "글로벌 랭킹",
-    titleVi: "Bảng Xếp Hạng",
-    desc: "전 세계 학습자와 경쟁하세요",
-    descVi: "Cạnh tranh với người học toàn cầu",
+    title: "베트남 랭킹",
+    titleVi: "Bảng Xếp Hạng VN",
+    desc: "베트남 학습자들과 경쟁하세요",
+    descVi: "Cạnh tranh với người học tại Việt Nam",
     gradient: "from-yellow-500 to-amber-600",
     bgGradient: "from-yellow-50 to-amber-50"
   }
@@ -241,22 +241,26 @@ const Landing = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
             transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-            className="text-slate-600 text-lg sm:text-xl leading-[2] mb-14 max-w-md mx-auto font-medium"
+            className="text-slate-600 text-lg sm:text-xl leading-[1.9] mb-12 max-w-sm mx-auto font-medium"
           >
-            Biến việc học nhàm chán
-            <br />
-            thành{" "}
+            Biến việc học nhàm chán thành{" "}
             <motion.span 
               className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-violet-600 font-bold"
               whileHover={{ scale: 1.05 }}
             >
               trò chơi thú vị
             </motion.span>
+          </motion.p>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
+            transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
+            className="text-slate-500 text-base sm:text-lg leading-[1.8] mb-12 max-w-sm mx-auto"
+          >
+            Chỉ 10 phút mỗi ngày để xây dựng
             <br />
-            <br />
-            Chỉ 10 phút mỗi ngày, xây dựng thói quen
-            <br />
-            và sự kiên trì trong học tiếng Hàn.
+            thói quen học tiếng Hàn bền vững
           </motion.p>
 
           {/* CTA Button */}
@@ -264,27 +268,29 @@ const Landing = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
             transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
+            className="w-full flex justify-center"
           >
             <motion.div
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
+              className="w-full max-w-xs"
             >
               <Button
                 onClick={() => navigate("/auth")}
-                className="group relative w-full max-w-sm h-16 bg-gradient-to-r from-blue-600 via-blue-500 to-violet-600 hover:from-blue-700 hover:via-blue-600 hover:to-violet-700 text-white text-xl font-bold rounded-2xl shadow-2xl shadow-blue-500/40 hover:shadow-blue-600/50 transition-all duration-300 overflow-hidden"
+                className="group relative w-full h-14 bg-gradient-to-r from-blue-600 via-blue-500 to-violet-600 hover:from-blue-700 hover:via-blue-600 hover:to-violet-700 text-white text-lg font-bold rounded-2xl shadow-2xl shadow-blue-500/40 hover:shadow-blue-600/50 transition-all duration-300 overflow-hidden"
               >
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0"
                   animate={{ x: ["-100%", "100%"] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", repeatDelay: 1 }}
                 />
-                <span className="relative flex items-center gap-3">
-                  Bắt đầu miễn phí
+                <span className="relative flex items-center justify-center gap-2">
+                  Bắt đầu ngay
                   <motion.div
-                    animate={{ x: [0, 5, 0] }}
+                    animate={{ x: [0, 4, 0] }}
                     transition={{ duration: 1.5, repeat: Infinity }}
                   >
-                    <ArrowRight className="w-6 h-6" />
+                    <ArrowRight className="w-5 h-5" />
                   </motion.div>
                 </span>
               </Button>
@@ -296,9 +302,9 @@ const Landing = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: isLoaded ? 1 : 0 }}
             transition={{ duration: 0.6, delay: 0.8 }}
-            className="text-slate-500 text-sm mt-8 font-medium tracking-wide"
+            className="text-slate-400 text-xs mt-6 font-medium"
           >
-            8 game đa dạng • Hỗ trợ AI thông minh • Miễn phí 100%
+            Miễn phí 100% • AI hỗ trợ • 8 game đa dạng
           </motion.p>
 
           {/* Logo */}
