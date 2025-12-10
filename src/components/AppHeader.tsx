@@ -34,8 +34,12 @@ const AppHeader = ({
   const location = useLocation();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+    window.location.href = "/";
   };
 
   const handleBack = () => {

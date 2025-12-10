@@ -147,6 +147,26 @@ const Landing = () => {
     });
     setTimeout(() => setIsLoaded(true), 100);
     fetchReviews();
+
+    // Realtime subscription for reviews
+    const channel = supabase
+      .channel('reviews-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'reviews'
+        },
+        () => {
+          fetchReviews();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [navigate]);
 
   const fetchReviews = async () => {

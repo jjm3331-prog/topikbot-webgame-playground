@@ -58,9 +58,14 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
   }, [isOpen]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
     setIsOpen(false);
-    navigate("/");
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+    // Force navigation regardless of signOut result
+    window.location.href = "/";
   };
 
   const handleNavigate = (path: string) => {
