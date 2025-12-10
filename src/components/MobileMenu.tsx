@@ -17,7 +17,10 @@ import {
   LogOut,
   Zap,
   Dice6,
-  User
+  User,
+  Smartphone,
+  Apple,
+  ChevronDown
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -43,6 +46,9 @@ const MobileMenu = ({ username, isLoggedIn }: MobileMenuProps) => {
     navigate(path);
   };
 
+  const [showAndroidGuide, setShowAndroidGuide] = useState(false);
+  const [showIOSGuide, setShowIOSGuide] = useState(false);
+
   const menuItems = [
     { path: "/game", icon: Home, labelKo: "메인 메뉴", labelVi: "Menu chính" },
     { path: "/chat", icon: Dice6, labelKo: "서울 생존", labelVi: "Sinh tồn Seoul" },
@@ -55,7 +61,6 @@ const MobileMenu = ({ username, isLoggedIn }: MobileMenuProps) => {
     { path: "/kdrama", icon: Film, labelKo: "K-Drama 더빙", labelVi: "Lồng tiếng" },
     { path: "/kpop", icon: Music, labelKo: "K-POP 가사", labelVi: "Lời bài hát" },
     { path: "/tutorial", icon: HelpCircle, labelKo: "사용법 안내", labelVi: "Hướng dẫn" },
-    { path: "/pwa-guide", icon: Download, labelKo: "앱 설치 안내", labelVi: "Cài đặt ứng dụng" },
   ];
 
   return (
@@ -82,13 +87,14 @@ const MobileMenu = ({ username, isLoggedIn }: MobileMenuProps) => {
               onClick={() => setIsOpen(false)}
             />
 
-            {/* Menu Panel */}
+            {/* Menu Panel - 완전 불투명 배경 */}
             <motion.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="fixed top-0 right-0 bottom-0 w-[85%] max-w-[320px] bg-gradient-to-b from-[#1a1a2e] to-[#0f0f23] z-[101] flex flex-col safe-area-inset"
+              className="fixed top-0 right-0 bottom-0 w-[85%] max-w-[320px] bg-[#0f0f1a] z-[101] flex flex-col safe-area-inset shadow-2xl"
+              style={{ backgroundColor: '#0f0f1a' }}
             >
               {/* Menu Header */}
               <div className="flex items-center justify-between p-4 border-b border-white/10">
@@ -119,7 +125,7 @@ const MobileMenu = ({ username, isLoggedIn }: MobileMenuProps) => {
               </div>
 
               {/* Menu Items */}
-              <div className="flex-1 overflow-y-auto py-4 px-3">
+              <div className="flex-1 overflow-y-auto py-4 px-3 bg-[#0f0f1a]">
                 <div className="space-y-1">
                   {menuItems.map((item, index) => {
                     const isActive = location.pathname === item.path;
@@ -147,11 +153,99 @@ const MobileMenu = ({ username, isLoggedIn }: MobileMenuProps) => {
                     );
                   })}
                 </div>
+
+                {/* PWA 설치 안내 섹션 */}
+                <div className="mt-4 pt-4 border-t border-white/10">
+                  <div className="px-2 mb-2">
+                    <span className="text-xs font-semibold text-neon-cyan uppercase tracking-wider">
+                      앱 설치 안내 / Cài đặt ứng dụng
+                    </span>
+                  </div>
+
+                  {/* Android 설치 안내 */}
+                  <div className="mb-2">
+                    <button
+                      onClick={() => setShowAndroidGuide(!showAndroidGuide)}
+                      className="w-full flex items-center justify-between gap-3 p-3 rounded-xl hover:bg-white/5 transition-all"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Smartphone className="w-5 h-5 text-green-400" />
+                        <div className="flex flex-col items-start">
+                          <span className="text-sm font-medium text-white/80">Android 설치</span>
+                          <span className="text-[10px] text-white/40">Cài đặt trên Android</span>
+                        </div>
+                      </div>
+                      <ChevronDown className={`w-4 h-4 text-white/40 transition-transform ${showAndroidGuide ? 'rotate-180' : ''}`} />
+                    </button>
+                    <AnimatePresence>
+                      {showAndroidGuide && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-4 py-3 mx-2 rounded-lg bg-white/5 text-xs space-y-2">
+                            <p className="text-white/70 font-medium">📱 Android 설치 방법:</p>
+                            <ol className="text-white/60 space-y-1 pl-4 list-decimal">
+                              <li>Chrome 브라우저 메뉴 (⋮) 클릭</li>
+                              <li>"홈 화면에 추가" 또는 "앱 설치" 선택</li>
+                              <li>"설치" 버튼 클릭</li>
+                            </ol>
+                            <p className="text-white/50 pt-1 border-t border-white/10">
+                              🇻🇳 Nhấn menu (⋮) → "Thêm vào màn hình chính" → "Cài đặt"
+                            </p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* iOS 설치 안내 */}
+                  <div>
+                    <button
+                      onClick={() => setShowIOSGuide(!showIOSGuide)}
+                      className="w-full flex items-center justify-between gap-3 p-3 rounded-xl hover:bg-white/5 transition-all"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Apple className="w-5 h-5 text-white/80" />
+                        <div className="flex flex-col items-start">
+                          <span className="text-sm font-medium text-white/80">iOS (iPhone) 설치</span>
+                          <span className="text-[10px] text-white/40">Cài đặt trên iPhone</span>
+                        </div>
+                      </div>
+                      <ChevronDown className={`w-4 h-4 text-white/40 transition-transform ${showIOSGuide ? 'rotate-180' : ''}`} />
+                    </button>
+                    <AnimatePresence>
+                      {showIOSGuide && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-4 py-3 mx-2 rounded-lg bg-white/5 text-xs space-y-2">
+                            <p className="text-white/70 font-medium">🍎 iOS 설치 방법:</p>
+                            <ol className="text-white/60 space-y-1 pl-4 list-decimal">
+                              <li>Safari 브라우저에서 열기</li>
+                              <li>하단 공유 버튼 (⎙) 클릭</li>
+                              <li>"홈 화면에 추가" 선택</li>
+                              <li>"추가" 버튼 클릭</li>
+                            </ol>
+                            <p className="text-white/50 pt-1 border-t border-white/10">
+                              🇻🇳 Mở Safari → Nhấn nút chia sẻ (⎙) → "Thêm vào MH chính" → "Thêm"
+                            </p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
               </div>
 
               {/* Menu Footer */}
               {isLoggedIn && (
-                <div className="p-4 border-t border-white/10">
+                <div className="p-4 border-t border-white/10 bg-[#0f0f1a]">
                   <Button
                     variant="outline"
                     onClick={handleLogout}
