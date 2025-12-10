@@ -101,11 +101,11 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="fixed top-0 right-0 bottom-0 w-[85%] max-w-[320px] bg-[#0f0f1a] z-[101] flex flex-col safe-area-inset shadow-2xl"
-              style={{ backgroundColor: '#0f0f1a' }}
+              className="fixed top-0 right-0 bottom-0 w-[85%] max-w-[320px] bg-[#0f0f1a] z-[101] flex flex-col overflow-hidden shadow-2xl"
+              style={{ backgroundColor: '#0f0f1a', height: '100dvh' }}
             >
-              {/* Menu Header */}
-              <div className="p-4 border-b border-white/10 bg-[#0f0f1a]">
+              {/* Menu Header - shrink-0 to prevent collapse */}
+              <div className="shrink-0 p-4 border-b border-white/10 bg-[#0f0f1a]">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <img 
@@ -156,8 +156,8 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
                 )}
               </div>
 
-              {/* Menu Items */}
-              <div className="flex-1 overflow-y-auto py-4 px-3 bg-[#0f0f1a]">
+              {/* Menu Items - scrollable area */}
+              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain py-4 px-3 bg-[#0f0f1a]">
                 <div className="space-y-1">
                   {menuItems.map((item, index) => {
                     const isActive = location.pathname === item.path;
@@ -275,9 +275,9 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
                 </div>
               </div>
 
-              {/* Menu Footer */}
+              {/* Menu Footer - shrink-0 to prevent collapse */}
               {isLoggedIn && (
-                <div className="p-4 border-t border-white/10 bg-[#0f0f1a]">
+                <div className="shrink-0 p-4 border-t border-white/10 bg-[#0f0f1a]">
                   <Button
                     variant="outline"
                     onClick={handleLogout}
