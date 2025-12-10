@@ -54,19 +54,24 @@ const Game = () => {
   const [customLocation, setCustomLocation] = useState("");
   const [newReview, setNewReview] = useState("");
   const [newRating, setNewRating] = useState(5);
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmitReview = async () => {
-    if (!profile || !newReview.trim()) {
+    if (!newReview.trim()) {
       toast({ title: "후기 내용을 입력해주세요", description: "Vui lòng nhập nội dung đánh giá", variant: "destructive" });
+      return;
+    }
+    if (newReview.trim().length > 200) {
+      toast({ title: "200자 이내로 작성해주세요", description: "Tối đa 200 ký tự", variant: "destructive" });
       return;
     }
     
     setIsSubmitting(true);
     const { error } = await supabase.from("reviews").insert({
-      user_id: profile.id,
+      user_id: isAnonymous ? null : profile?.id,
       content: newReview.trim(),
       rating: newRating
     });
@@ -77,6 +82,7 @@ const Game = () => {
       toast({ title: "후기가 등록되었습니다!", description: "감사합니다 / Cảm ơn bạn!" });
       setNewReview("");
       setNewRating(5);
+      setIsAnonymous(false);
     }
     setIsSubmitting(false);
   };
@@ -449,13 +455,26 @@ const Game = () => {
               </div>
             </div>
             
+            {/* Anonymous Option */}
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isAnonymous}
+                onChange={(e) => setIsAnonymous(e.target.checked)}
+                className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+              />
+              <span className="text-xs text-muted-foreground">익명으로 등록 / Đăng ẩn danh</span>
+            </label>
+            
             {/* Review Input */}
             <Textarea
-              placeholder="게임 후기를 남겨주세요... / Viết đánh giá về game..."
+              placeholder="게임 후기를 남겨주세요 (최대 200자) / Viết đánh giá (tối đa 200 ký tự)"
               value={newReview}
               onChange={(e) => setNewReview(e.target.value)}
               className="bg-muted border-border text-foreground placeholder:text-muted-foreground min-h-[80px] text-sm resize-none"
+              maxLength={200}
             />
+            <p className="text-[10px] text-muted-foreground text-right">{newReview.length}/200</p>
             
             {/* Submit Button */}
             <Button
