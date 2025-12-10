@@ -263,11 +263,11 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
                 </button>
                 {showAndroidGuide && (
                   <div style={{ padding: '12px', margin: '0 8px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.05)', fontSize: '12px' }}>
-                    <p style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 500, marginBottom: '8px' }}>📱 Android 설치 방법:</p>
+                    <p style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 500, marginBottom: '8px' }}>📱 Cách cài đặt trên Android:</p>
                     <ol style={{ color: 'rgba(255,255,255,0.6)', paddingLeft: '16px', margin: 0 }}>
-                      <li>Chrome 메뉴 (⋮) 클릭</li>
-                      <li>"홈 화면에 추가" 선택</li>
-                      <li>"설치" 버튼 클릭</li>
+                      <li>Nhấn menu Chrome (⋮) ở góc phải</li>
+                      <li>Chọn "Thêm vào màn hình chính"</li>
+                      <li>Nhấn nút "Cài đặt"</li>
                     </ol>
                   </div>
                 )}
@@ -299,11 +299,12 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
                 </button>
                 {showIOSGuide && (
                   <div style={{ padding: '12px', margin: '0 8px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.05)', fontSize: '12px' }}>
-                    <p style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 500, marginBottom: '8px' }}>🍎 iOS 설치 방법:</p>
+                    <p style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 500, marginBottom: '8px' }}>🍎 Cách cài đặt trên iPhone:</p>
                     <ol style={{ color: 'rgba(255,255,255,0.6)', paddingLeft: '16px', margin: 0 }}>
-                      <li>Safari에서 열기</li>
-                      <li>공유 버튼 (⎙) 클릭</li>
-                      <li>"홈 화면에 추가" 선택</li>
+                      <li>Mở bằng trình duyệt Safari</li>
+                      <li>Nhấn nút chia sẻ (⎙) ở dưới</li>
+                      <li>Chọn "Thêm vào MH chính"</li>
+                      <li>Nhấn "Thêm" ở góc phải</li>
                     </ol>
                   </div>
                 )}
