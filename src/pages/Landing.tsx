@@ -307,42 +307,22 @@ const Landing = () => {
             Miễn phí 100% • AI hỗ trợ • 8 game đa dạng
           </motion.p>
 
-          {/* Logo */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: isLoaded ? 1 : 0, scale: isLoaded ? 1 : 0.8 }}
-            transition={{ duration: 0.6, delay: 1 }}
-            whileHover={{ scale: 1.05 }}
-            className="mt-16 flex items-center justify-center gap-4 cursor-pointer"
-          >
-            <motion.div 
-              className="w-12 h-12 rounded-2xl overflow-hidden border-2 border-slate-200/80 shadow-lg"
-              whileHover={{ rotate: [0, -5, 5, 0] }}
-              transition={{ duration: 0.5 }}
-            >
-              <img src="/favicon.png" alt="LUKATO" className="w-full h-full object-cover" />
-            </motion.div>
-            <div className="flex flex-col items-start">
-              <span className="font-extrabold text-slate-800 text-xl tracking-wide">LUKATO</span>
-              <span className="text-xs text-blue-600 tracking-[0.2em] uppercase font-semibold">Your Korean Mentor</span>
-            </div>
-          </motion.div>
         </div>
 
-        {/* Scroll indicator */}
+        {/* Scroll indicator - moved outside content div, positioned at bottom */}
         <motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: isLoaded ? 1 : 0 }}
           transition={{ delay: 1.5 }}
           onClick={scrollToGames}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-slate-400 hover:text-blue-600 transition-colors cursor-pointer"
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-slate-400 hover:text-blue-600 transition-colors cursor-pointer z-10"
         >
-          <span className="text-sm font-medium">Xem thêm</span>
+          <span className="text-xs font-medium">Xem thêm</span>
           <motion.div
-            animate={{ y: [0, 8, 0] }}
+            animate={{ y: [0, 6, 0] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
-            <ChevronDown className="w-6 h-6" />
+            <ChevronDown className="w-5 h-5" />
           </motion.div>
         </motion.button>
 
@@ -430,10 +410,10 @@ const Landing = () => {
             >
               <Button
                 onClick={() => navigate("/auth")}
-                className="h-14 px-10 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white text-lg font-bold rounded-xl shadow-xl shadow-violet-500/30"
+                className="h-14 px-12 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white text-base font-bold rounded-xl shadow-xl shadow-violet-500/30"
               >
-                지금 시작하기 • Bắt đầu ngay
-                <ArrowRight className="w-5 h-5 ml-3" />
+                <span>지금 시작하기 • Bắt đầu ngay</span>
+                <ArrowRight className="w-5 h-5 ml-2 shrink-0" />
               </Button>
             </motion.div>
           </motion.div>
