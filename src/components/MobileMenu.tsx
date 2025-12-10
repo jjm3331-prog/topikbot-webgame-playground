@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Menu, 
@@ -13,7 +14,6 @@ import {
   Film, 
   Music, 
   HelpCircle,
-  Download,
   LogOut,
   Zap,
   Dice6,
@@ -40,8 +40,22 @@ interface MobileMenuProps {
 
 const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showAndroidGuide, setShowAndroidGuide] = useState(false);
+  const [showIOSGuide, setShowIOSGuide] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -53,9 +67,6 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
     setIsOpen(false);
     navigate(path);
   };
-
-  const [showAndroidGuide, setShowAndroidGuide] = useState(false);
-  const [showIOSGuide, setShowIOSGuide] = useState(false);
 
   const menuItems = [
     { path: "/game", icon: Home, labelKo: "메인 메뉴", labelVi: "Menu chính" },
@@ -71,6 +82,258 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
     { path: "/tutorial", icon: HelpCircle, labelKo: "사용법 안내", labelVi: "Hướng dẫn" },
   ];
 
+  const menuContent = (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Full screen overlay with solid black background */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.95)',
+              zIndex: 99998,
+            }}
+            onClick={() => setIsOpen(false)}
+          />
+
+          {/* Menu Panel - absolutely positioned with solid background */}
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              right: 0,
+              bottom: 0,
+              width: '85%',
+              maxWidth: '320px',
+              backgroundColor: '#0a0a14',
+              zIndex: 99999,
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '-10px 0 30px rgba(0, 0, 0, 0.5)',
+            }}
+          >
+            {/* Header */}
+            <div style={{ 
+              padding: '16px', 
+              borderBottom: '1px solid rgba(255,255,255,0.1)',
+              backgroundColor: '#0a0a14',
+              flexShrink: 0,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <img 
+                    src="/favicon.png" 
+                    alt="LUKATO" 
+                    style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+                  />
+                  <div>
+                    <div style={{ fontWeight: 'bold', fontSize: '18px', background: 'linear-gradient(to right, #ff6b9d, #00d4ff)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                      LUKATO
+                    </div>
+                    {username && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                        <User style={{ width: '12px', height: '12px', color: '#00d4ff' }} />
+                        <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>{username}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  style={{ padding: '8px', borderRadius: '50%', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                >
+                  <X style={{ width: '24px', height: '24px', color: 'white' }} />
+                </button>
+              </div>
+
+              {/* User Stats */}
+              {isLoggedIn && userStats && (
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(4, 1fr)', 
+                  gap: '8px', 
+                  marginTop: '12px',
+                  padding: '12px',
+                  borderRadius: '12px',
+                  backgroundColor: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ color: '#ff6b9d', fontSize: '16px', fontWeight: 'bold' }}>{userStats.hp}</div>
+                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>HP</div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ color: '#00d4ff', fontSize: '14px', fontWeight: 'bold' }}>₩{userStats.money.toLocaleString()}</div>
+                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>소지금</div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ color: '#4ade80', fontSize: '16px', fontWeight: 'bold' }}>{userStats.missions_completed}</div>
+                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>미션</div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ color: '#facc15', fontSize: '16px', fontWeight: 'bold' }}>{userStats.points.toLocaleString()}</div>
+                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>포인트</div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Scrollable Menu Items */}
+            <div style={{ 
+              flex: 1, 
+              overflowY: 'auto', 
+              padding: '16px 12px',
+              backgroundColor: '#0a0a14',
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                {menuItems.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  const IconComponent = item.icon;
+                  return (
+                    <button
+                      key={item.path}
+                      onClick={() => handleNavigate(item.path)}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '12px',
+                        borderRadius: '12px',
+                        border: isActive ? '1px solid rgba(255,107,157,0.3)' : 'none',
+                        background: isActive ? 'linear-gradient(to right, rgba(255,107,157,0.2), rgba(168,85,247,0.2))' : 'transparent',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                      }}
+                    >
+                      <IconComponent style={{ width: '20px', height: '20px', color: isActive ? '#00d4ff' : 'rgba(255,255,255,0.6)' }} />
+                      <div>
+                        <div style={{ fontSize: '14px', fontWeight: 500, color: isActive ? 'white' : 'rgba(255,255,255,0.8)' }}>
+                          {item.labelKo}
+                        </div>
+                        <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>{item.labelVi}</div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* PWA Section */}
+              <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                <div style={{ padding: '0 8px', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#00d4ff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    앱 설치 안내
+                  </span>
+                </div>
+
+                {/* Android */}
+                <button
+                  onClick={() => setShowAndroidGuide(!showAndroidGuide)}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '12px',
+                    borderRadius: '12px',
+                    border: 'none',
+                    background: 'transparent',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <Smartphone style={{ width: '20px', height: '20px', color: '#4ade80' }} />
+                    <div style={{ textAlign: 'left' }}>
+                      <div style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255,255,255,0.8)' }}>Android 설치</div>
+                      <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>Cài đặt trên Android</div>
+                    </div>
+                  </div>
+                  <ChevronDown style={{ width: '16px', height: '16px', color: 'rgba(255,255,255,0.4)', transform: showAndroidGuide ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                </button>
+                {showAndroidGuide && (
+                  <div style={{ padding: '12px', margin: '0 8px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.05)', fontSize: '12px' }}>
+                    <p style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 500, marginBottom: '8px' }}>📱 Android 설치 방법:</p>
+                    <ol style={{ color: 'rgba(255,255,255,0.6)', paddingLeft: '16px', margin: 0 }}>
+                      <li>Chrome 메뉴 (⋮) 클릭</li>
+                      <li>"홈 화면에 추가" 선택</li>
+                      <li>"설치" 버튼 클릭</li>
+                    </ol>
+                  </div>
+                )}
+
+                {/* iOS */}
+                <button
+                  onClick={() => setShowIOSGuide(!showIOSGuide)}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '12px',
+                    borderRadius: '12px',
+                    border: 'none',
+                    background: 'transparent',
+                    cursor: 'pointer',
+                    marginTop: '4px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <Apple style={{ width: '20px', height: '20px', color: 'rgba(255,255,255,0.8)' }} />
+                    <div style={{ textAlign: 'left' }}>
+                      <div style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255,255,255,0.8)' }}>iOS 설치</div>
+                      <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>Cài đặt trên iPhone</div>
+                    </div>
+                  </div>
+                  <ChevronDown style={{ width: '16px', height: '16px', color: 'rgba(255,255,255,0.4)', transform: showIOSGuide ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                </button>
+                {showIOSGuide && (
+                  <div style={{ padding: '12px', margin: '0 8px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.05)', fontSize: '12px' }}>
+                    <p style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 500, marginBottom: '8px' }}>🍎 iOS 설치 방법:</p>
+                    <ol style={{ color: 'rgba(255,255,255,0.6)', paddingLeft: '16px', margin: 0 }}>
+                      <li>Safari에서 열기</li>
+                      <li>공유 버튼 (⎙) 클릭</li>
+                      <li>"홈 화면에 추가" 선택</li>
+                    </ol>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            {isLoggedIn && (
+              <div style={{ 
+                padding: '16px', 
+                borderTop: '1px solid rgba(255,255,255,0.1)',
+                backgroundColor: '#0a0a14',
+                flexShrink: 0,
+              }}>
+                <Button
+                  variant="outline"
+                  onClick={handleLogout}
+                  className="w-full border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  로그아웃 / Đăng xuất
+                </Button>
+              </div>
+            )}
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+
   return (
     <>
       {/* Hamburger Button */}
@@ -82,215 +345,8 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
         <Menu className="w-6 h-6 text-white" />
       </button>
 
-      {/* Full Screen Menu Overlay */}
-      <AnimatePresence>
-        {isOpen && (
-          <div className="fixed inset-0 z-[9999]">
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/90"
-              onClick={() => setIsOpen(false)}
-            />
-
-            {/* Menu Panel */}
-            <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="absolute top-0 right-0 w-[85%] max-w-[320px] h-full bg-[#0f0f1a] flex flex-col shadow-2xl"
-            >
-              {/* Menu Header */}
-              <div className="shrink-0 p-4 border-b border-white/10">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <img 
-                      src="/favicon.png" 
-                      alt="LUKATO" 
-                      className="w-10 h-10 rounded-full shadow-lg shadow-neon-pink/30"
-                    />
-                    <div>
-                      <span className="font-display font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-neon-pink to-neon-cyan">
-                        LUKATO
-                      </span>
-                      {username && (
-                        <div className="flex items-center gap-1 mt-0.5">
-                          <User className="w-3 h-3 text-neon-cyan" />
-                          <span className="text-white/60 text-xs">{username}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setIsOpen(false)}
-                    className="p-2 rounded-full hover:bg-white/10 transition-colors"
-                  >
-                    <X className="w-6 h-6 text-white" />
-                  </button>
-                </div>
-
-                {/* User Stats Display */}
-                {isLoggedIn && userStats && (
-                  <div className="grid grid-cols-4 gap-2 mt-3 p-3 rounded-xl bg-white/5 border border-white/10">
-                    <div className="text-center">
-                      <div className="text-neon-pink text-lg font-bold">{userStats.hp}</div>
-                      <div className="text-[10px] text-white/40">HP</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-neon-cyan text-lg font-bold">₩{userStats.money.toLocaleString()}</div>
-                      <div className="text-[10px] text-white/40">소지금</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-green-400 text-lg font-bold">{userStats.missions_completed}</div>
-                      <div className="text-[10px] text-white/40">미션</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-yellow-400 text-lg font-bold">{userStats.points.toLocaleString()}</div>
-                      <div className="text-[10px] text-white/40">포인트</div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Menu Items - scrollable area */}
-              <div className="flex-1 overflow-y-auto py-4 px-3">
-                <div className="space-y-1">
-                  {menuItems.map((item, index) => {
-                    const isActive = location.pathname === item.path;
-                    return (
-                      <motion.button
-                        key={item.path}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.03 }}
-                        onClick={() => handleNavigate(item.path)}
-                        className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${
-                          isActive 
-                            ? "bg-gradient-to-r from-neon-pink/20 to-neon-purple/20 border border-neon-pink/30" 
-                            : "hover:bg-white/5"
-                        }`}
-                      >
-                        <item.icon className={`w-5 h-5 ${isActive ? "text-neon-cyan" : "text-white/60"}`} />
-                        <div className="flex flex-col items-start">
-                          <span className={`text-sm font-medium ${isActive ? "text-white" : "text-white/80"}`}>
-                            {item.labelKo}
-                          </span>
-                          <span className="text-[10px] text-white/40">{item.labelVi}</span>
-                        </div>
-                      </motion.button>
-                    );
-                  })}
-                </div>
-
-                {/* PWA 설치 안내 섹션 */}
-                <div className="mt-4 pt-4 border-t border-white/10">
-                  <div className="px-2 mb-2">
-                    <span className="text-xs font-semibold text-neon-cyan uppercase tracking-wider">
-                      앱 설치 안내 / Cài đặt ứng dụng
-                    </span>
-                  </div>
-
-                  {/* Android 설치 안내 */}
-                  <div className="mb-2">
-                    <button
-                      onClick={() => setShowAndroidGuide(!showAndroidGuide)}
-                      className="w-full flex items-center justify-between gap-3 p-3 rounded-xl hover:bg-white/5 transition-all"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Smartphone className="w-5 h-5 text-green-400" />
-                        <div className="flex flex-col items-start">
-                          <span className="text-sm font-medium text-white/80">Android 설치</span>
-                          <span className="text-[10px] text-white/40">Cài đặt trên Android</span>
-                        </div>
-                      </div>
-                      <ChevronDown className={`w-4 h-4 text-white/40 transition-transform ${showAndroidGuide ? 'rotate-180' : ''}`} />
-                    </button>
-                    <AnimatePresence>
-                      {showAndroidGuide && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="px-4 py-3 mx-2 rounded-lg bg-white/5 text-xs space-y-2">
-                            <p className="text-white/70 font-medium">📱 Android 설치 방법:</p>
-                            <ol className="text-white/60 space-y-1 pl-4 list-decimal">
-                              <li>Chrome 브라우저 메뉴 (⋮) 클릭</li>
-                              <li>"홈 화면에 추가" 또는 "앱 설치" 선택</li>
-                              <li>"설치" 버튼 클릭</li>
-                            </ol>
-                            <p className="text-white/50 pt-1 border-t border-white/10">
-                              🇻🇳 Nhấn menu (⋮) → "Thêm vào màn hình chính" → "Cài đặt"
-                            </p>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-
-                  {/* iOS 설치 안내 */}
-                  <div>
-                    <button
-                      onClick={() => setShowIOSGuide(!showIOSGuide)}
-                      className="w-full flex items-center justify-between gap-3 p-3 rounded-xl hover:bg-white/5 transition-all"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Apple className="w-5 h-5 text-white/80" />
-                        <div className="flex flex-col items-start">
-                          <span className="text-sm font-medium text-white/80">iOS (iPhone) 설치</span>
-                          <span className="text-[10px] text-white/40">Cài đặt trên iPhone</span>
-                        </div>
-                      </div>
-                      <ChevronDown className={`w-4 h-4 text-white/40 transition-transform ${showIOSGuide ? 'rotate-180' : ''}`} />
-                    </button>
-                    <AnimatePresence>
-                      {showIOSGuide && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="px-4 py-3 mx-2 rounded-lg bg-white/5 text-xs space-y-2">
-                            <p className="text-white/70 font-medium">🍎 iOS 설치 방법:</p>
-                            <ol className="text-white/60 space-y-1 pl-4 list-decimal">
-                              <li>Safari 브라우저에서 열기</li>
-                              <li>하단 공유 버튼 (⎙) 클릭</li>
-                              <li>"홈 화면에 추가" 선택</li>
-                              <li>"추가" 버튼 클릭</li>
-                            </ol>
-                            <p className="text-white/50 pt-1 border-t border-white/10">
-                              🇻🇳 Mở Safari → Nhấn nút chia sẻ (⎙) → "Thêm vào MH chính" → "Thêm"
-                            </p>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div>
-              </div>
-
-              {/* Menu Footer */}
-              {isLoggedIn && (
-                <div className="shrink-0 p-4 border-t border-white/10">
-                  <Button
-                    variant="outline"
-                    onClick={handleLogout}
-                    className="w-full border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300"
-                  >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    로그아웃 / Đăng xuất
-                  </Button>
-                </div>
-              )}
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      {/* Render menu in portal to avoid z-index issues */}
+      {typeof document !== 'undefined' && createPortal(menuContent, document.body)}
     </>
   );
 };
