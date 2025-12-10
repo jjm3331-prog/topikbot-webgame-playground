@@ -2,63 +2,78 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Orbitron:wght@400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Orbitron:wght@400;500;700;900&family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
 
 @layer base {
   :root {
-    --background: 230 25% 5%;
-    --foreground: 210 40% 98%;
+    /* Core - Ultra Dark with depth */
+    --background: 240 25% 3%;
+    --foreground: 0 0% 98%;
 
-    --card: 230 30% 8%;
-    --card-foreground: 210 40% 98%;
+    /* Cards - Glassmorphism ready */
+    --card: 240 20% 6%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 230 30% 8%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 240 20% 6%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 330 100% 60%;
+    /* Primary - Vivid Neon Pink */
+    --primary: 330 100% 65%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 190 100% 50%;
-    --secondary-foreground: 230 25% 5%;
+    /* Secondary - Electric Cyan */
+    --secondary: 185 100% 55%;
+    --secondary-foreground: 240 25% 3%;
 
-    --muted: 230 20% 15%;
-    --muted-foreground: 215 20% 65%;
+    /* Muted - Deep space tones */
+    --muted: 240 15% 12%;
+    --muted-foreground: 240 10% 55%;
 
-    --accent: 45 100% 55%;
-    --accent-foreground: 230 25% 5%;
+    /* Accent - Hot Neon Orange */
+    --accent: 25 100% 60%;
+    --accent-foreground: 240 25% 3%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    /* Semantic */
+    --destructive: 0 90% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 230 30% 20%;
-    --input: 230 30% 15%;
-    --ring: 330 100% 60%;
+    /* UI Elements */
+    --border: 240 15% 18%;
+    --input: 240 15% 10%;
+    --ring: 330 100% 65%;
 
     --radius: 0.75rem;
 
-    /* Custom Neon Colors */
-    --neon-pink: 330 100% 60%;
-    --neon-cyan: 190 100% 50%;
-    --neon-purple: 270 100% 65%;
-    --neon-gold: 45 100% 55%;
-    --neon-green: 150 100% 45%;
+    /* Extended Neon Palette */
+    --neon-pink: 330 100% 65%;
+    --neon-cyan: 185 100% 55%;
+    --neon-purple: 270 100% 70%;
+    --neon-gold: 45 100% 60%;
+    --neon-green: 150 100% 50%;
+    --neon-blue: 220 100% 60%;
+    --neon-red: 0 100% 60%;
 
-    /* Gradients */
+    /* Premium Gradients */
     --gradient-neon: linear-gradient(135deg, hsl(var(--neon-pink)), hsl(var(--neon-purple)), hsl(var(--neon-cyan)));
     --gradient-gold: linear-gradient(135deg, hsl(var(--neon-gold)), hsl(40 100% 70%));
-    --gradient-cyber: linear-gradient(180deg, hsl(230 30% 12%), hsl(230 25% 5%));
-    --gradient-glass: linear-gradient(135deg, hsl(230 30% 15% / 0.6), hsl(230 30% 10% / 0.3));
+    --gradient-cyber: linear-gradient(180deg, hsl(240 20% 8%), hsl(240 25% 3%));
+    --gradient-glass: linear-gradient(135deg, hsl(240 20% 12% / 0.8), hsl(240 20% 6% / 0.4));
+    --gradient-premium: linear-gradient(135deg, hsl(var(--neon-pink)), hsl(var(--neon-purple)) 50%, hsl(var(--neon-cyan)));
+    --gradient-fire: linear-gradient(135deg, hsl(var(--neon-gold)), hsl(var(--neon-pink)));
 
-    /* Shadows */
-    --shadow-neon-pink: 0 0 20px hsl(var(--neon-pink) / 0.5), 0 0 40px hsl(var(--neon-pink) / 0.3), 0 0 60px hsl(var(--neon-pink) / 0.1);
-    --shadow-neon-cyan: 0 0 20px hsl(var(--neon-cyan) / 0.5), 0 0 40px hsl(var(--neon-cyan) / 0.3);
+    /* Enhanced Shadows */
+    --shadow-neon-pink: 0 0 20px hsl(var(--neon-pink) / 0.5), 0 0 40px hsl(var(--neon-pink) / 0.3), 0 0 80px hsl(var(--neon-pink) / 0.15);
+    --shadow-neon-cyan: 0 0 20px hsl(var(--neon-cyan) / 0.5), 0 0 40px hsl(var(--neon-cyan) / 0.3), 0 0 80px hsl(var(--neon-cyan) / 0.15);
     --shadow-neon-gold: 0 0 20px hsl(var(--neon-gold) / 0.5), 0 0 40px hsl(var(--neon-gold) / 0.3);
-    --shadow-glass: 0 8px 32px hsl(0 0% 0% / 0.3);
+    --shadow-glass: 0 8px 32px hsl(0 0% 0% / 0.4), 0 0 0 1px hsl(0 0% 100% / 0.05);
+    --shadow-glow: 0 0 60px hsl(var(--primary) / 0.4), 0 0 120px hsl(var(--primary) / 0.2);
 
-    /* Font families */
+    /* Typography */
     --font-display: 'Black Han Sans', sans-serif;
     --font-tech: 'Orbitron', sans-serif;
     --font-body: 'Noto Sans KR', sans-serif;
+    --font-heading: 'Bebas Neue', sans-serif;
+    --font-modern: 'Montserrat', sans-serif;
   }
 }
 
