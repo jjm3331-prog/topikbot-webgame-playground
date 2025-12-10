@@ -654,8 +654,10 @@ const Landing = () => {
                   <div className="text-xs text-slate-400">무료</div>
                 </div>
                 <div className="text-center p-3 rounded-xl bg-white/5 border border-white/10">
-                  <div className="text-2xl font-bold bg-gradient-to-r from-pink-400 to-rose-400 bg-clip-text text-transparent">🇻🇳</div>
-                  <div className="text-xs text-slate-400">베트남</div>
+                  <div className="text-2xl font-bold">
+                    <span role="img" aria-label="Vietnam flag">🇻🇳</span>
+                  </div>
+                  <div className="text-xs text-slate-400">Việt Nam</div>
                 </div>
               </div>
             </div>
