@@ -85,27 +85,26 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
       {/* Full Screen Menu Overlay */}
       <AnimatePresence>
         {isOpen && (
-          <>
+          <div className="fixed inset-0 z-[9999]">
             {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100]"
+              className="absolute inset-0 bg-black/90"
               onClick={() => setIsOpen(false)}
             />
 
-            {/* Menu Panel - 완전 불투명 배경 */}
+            {/* Menu Panel */}
             <motion.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="fixed top-0 right-0 bottom-0 w-[85%] max-w-[320px] bg-[#0f0f1a] z-[101] flex flex-col overflow-hidden shadow-2xl"
-              style={{ backgroundColor: '#0f0f1a', height: '100dvh' }}
+              className="absolute top-0 right-0 w-[85%] max-w-[320px] h-full bg-[#0f0f1a] flex flex-col shadow-2xl"
             >
-              {/* Menu Header - shrink-0 to prevent collapse */}
-              <div className="shrink-0 p-4 border-b border-white/10 bg-[#0f0f1a]">
+              {/* Menu Header */}
+              <div className="shrink-0 p-4 border-b border-white/10">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <img 
@@ -157,7 +156,7 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
               </div>
 
               {/* Menu Items - scrollable area */}
-              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain py-4 px-3 bg-[#0f0f1a]">
+              <div className="flex-1 overflow-y-auto py-4 px-3">
                 <div className="space-y-1">
                   {menuItems.map((item, index) => {
                     const isActive = location.pathname === item.path;
@@ -275,9 +274,9 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
                 </div>
               </div>
 
-              {/* Menu Footer - shrink-0 to prevent collapse */}
+              {/* Menu Footer */}
               {isLoggedIn && (
-                <div className="shrink-0 p-4 border-t border-white/10 bg-[#0f0f1a]">
+                <div className="shrink-0 p-4 border-t border-white/10">
                   <Button
                     variant="outline"
                     onClick={handleLogout}
@@ -289,7 +288,7 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
                 </div>
               )}
             </motion.div>
-          </>
+          </div>
         )}
       </AnimatePresence>
     </>
