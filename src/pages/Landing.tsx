@@ -1,14 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Map, Award } from "lucide-react";
-import AppFooter from "@/components/AppFooter";
-import MobileMenu from "@/components/MobileMenu";
-import seoulHero from "@/assets/seoul-hero.jpg";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
 
 const Landing = () => {
   const navigate = useNavigate();
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     // Check if already logged in
@@ -17,123 +16,114 @@ const Landing = () => {
         navigate("/game");
       }
     });
+    setTimeout(() => setIsLoaded(true), 100);
   }, [navigate]);
 
-  const features = [
-    {
-      icon: MessageCircle,
-      titleKo: "AI 기반 대화",
-      titleVi: "Hội thoại AI",
-    },
-    {
-      icon: Map,
-      titleKo: "실생활 시나리오",
-      titleVi: "Tình huống thực tế",
-    },
-    {
-      icon: Award,
-      titleKo: "TOPIK 준비",
-      titleVi: "Chuẩn bị TOPIK",
-    },
-  ];
-
   return (
-    <div 
-      className="min-h-[100dvh] flex flex-col"
-      style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.8)), url(${seoulHero})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
-      {/* Header with Logo */}
-      <header className="flex items-center justify-between p-4">
-        <div className="flex items-center gap-3">
-          <img 
-            src="/favicon.png" 
-            alt="LUKATO" 
-            className="w-10 h-10 rounded-full shadow-lg shadow-neon-pink/30"
-          />
-          <span className="font-display font-bold text-xl text-transparent bg-clip-text bg-gradient-to-r from-neon-pink to-neon-cyan">
-            LUKATO
+    <div className="min-h-[100dvh] bg-gradient-to-b from-slate-50 via-white to-blue-50/30 flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
+      {/* Subtle gradient orbs */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-to-br from-blue-100/40 via-purple-100/30 to-pink-100/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-gradient-to-tl from-cyan-100/30 via-blue-100/20 to-transparent rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 left-0 w-[300px] h-[300px] bg-gradient-to-r from-violet-100/30 to-transparent rounded-full blur-3xl pointer-events-none" />
+      
+      {/* Content */}
+      <div className="relative z-10 max-w-lg mx-auto text-center">
+        {/* Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : -20 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="inline-flex items-center gap-3 px-5 py-2.5 bg-white/80 backdrop-blur-sm rounded-full shadow-lg shadow-slate-200/50 border border-slate-100 mb-10"
+        >
+          <Sparkles className="w-5 h-5 text-blue-600" />
+          <span className="text-slate-700 font-medium text-sm tracking-wide">
+            Game học tiếng Hàn đầu tiên tại Việt Nam
           </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="sm"
+          <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse" />
+        </motion.div>
+
+        {/* Main Title */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 30 }}
+          transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
+          className="mb-8"
+        >
+          <h1 className="font-black text-5xl sm:text-6xl md:text-7xl leading-[0.95] tracking-tight">
+            <span className="text-slate-900 block">CHINH PHỤC</span>
+            <span className="bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 bg-clip-text text-transparent block">
+              TIẾNG HÀN
+            </span>
+            <span className="text-slate-900 block">&</span>
+            <span className="bg-gradient-to-r from-purple-600 via-pink-500 to-rose-500 bg-clip-text text-transparent block">
+              VĂN HÓA
+            </span>
+          </h1>
+        </motion.div>
+
+        {/* Description */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
+          transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
+          className="text-slate-600 text-lg sm:text-xl leading-relaxed mb-12 max-w-md mx-auto"
+        >
+          Nhanh hơn, thông minh hơn. AI siêu cá nhân hóa phân tích chính xác điểm yếu và xây dựng{" "}
+          <span className="text-blue-600 font-semibold italic">lộ trình chiến thắng</span>{" "}
+          dành riêng cho bạn.
+        </motion.p>
+
+        {/* CTA Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
+          transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
+        >
+          <Button
             onClick={() => navigate("/auth")}
-            className="text-white/70 hover:text-white hover:bg-white/10"
+            className="group relative w-full max-w-sm h-16 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 hover:from-blue-700 hover:via-blue-600 hover:to-blue-700 text-white text-xl font-bold rounded-2xl shadow-xl shadow-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/40 transition-all duration-300 hover:scale-[1.02]"
           >
-            로그인
+            <span className="flex items-center gap-3">
+              Bắt đầu miễn phí
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" />
+            </span>
           </Button>
-          <MobileMenu isLoggedIn={false} />
-        </div>
-      </header>
+        </motion.div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6">
-        <div className="text-center max-w-lg w-full space-y-8">
-          {/* Title */}
-          <div className="animate-fade-in">
-            <h1 className="font-display text-4xl md:text-5xl text-white mb-2">
-              Game{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-pink via-purple-400 to-neon-cyan">
-                LUKATO
-              </span>
-            </h1>
-            <p className="text-lg text-white/80 font-medium">
-              Your Korean Mentor
-            </p>
-            <p className="text-sm text-purple-300 mt-1">
-              AI 기반 한국어 학습 RPG
-            </p>
+        {/* Sub text */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isLoaded ? 1 : 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="text-slate-400 text-sm mt-6"
+        >
+          Không cần thẻ tín dụng • Bắt đầu ngay trong 30 giây
+        </motion.p>
+
+        {/* Logo */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: isLoaded ? 1 : 0, scale: isLoaded ? 1 : 0.8 }}
+          transition={{ duration: 0.6, delay: 1 }}
+          className="mt-12 flex items-center justify-center gap-3"
+        >
+          <div className="w-10 h-10 rounded-xl overflow-hidden border border-slate-200 shadow-md">
+            <img src="/favicon.png" alt="LUKATO" className="w-full h-full object-cover" />
           </div>
-
-          {/* Start Button */}
-          <div className="animate-scale-in" style={{ animationDelay: "0.2s" }}>
-            <Button
-              onClick={() => navigate("/auth")}
-              className="px-12 py-6 text-xl font-bold bg-gradient-to-r from-neon-pink to-neon-purple hover:from-pink-600 hover:to-purple-600 text-white rounded-full shadow-lg shadow-neon-pink/30 transition-all hover:scale-105"
-            >
-              시작하기 / Bắt đầu
-            </Button>
+          <div className="flex flex-col items-start">
+            <span className="font-bold text-slate-800 text-lg tracking-wide">LUKATO</span>
+            <span className="text-[10px] text-blue-600/80 tracking-widest uppercase">Your Korean Mentor</span>
           </div>
-
-          {/* Description Card */}
-          <div 
-            className="glass-card p-6 rounded-2xl text-left animate-slide-up"
-            style={{ animationDelay: "0.4s" }}
-          >
-            <p className="text-white/90 leading-relaxed mb-4">
-              몰입형 한국어 학습 여정을 시작하세요. AI 기반 대화를 통해 실생활 
-              시나리오를 연습하고, 어휘를 쌓고, 서울 일상생활을 경험하면서 
-              TOPIK 자격증을 준비하세요.
-            </p>
-            <p className="text-purple-300 italic text-sm leading-relaxed">
-              Bắt đầu hành trình học tiếng Hàn đầy đam mê. Luyện tập các tình huống thực tế thông qua 
-              hội thoại AI, xây dựng từ vựng và chuẩn bị chứng chỉ TOPIK.
-            </p>
-
-            {/* Feature List */}
-            <div className="mt-6 space-y-3">
-              {features.map((feature, index) => (
-                <div 
-                  key={index}
-                  className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10"
-                >
-                  <feature.icon className="w-5 h-5 text-neon-cyan" />
-                  <span className="text-white">{feature.titleKo}</span>
-                  <span className="text-purple-300 text-sm">({feature.titleVi})</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        </motion.div>
       </div>
 
-      {/* Footer */}
-      <AppFooter compact />
+      {/* Bottom decorative line */}
+      <motion.div
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: isLoaded ? 1 : 0 }}
+        transition={{ duration: 1, delay: 1.2, ease: "easeOut" }}
+        className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"
+      />
     </div>
   );
 };
