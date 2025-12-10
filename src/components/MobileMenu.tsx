@@ -25,12 +25,20 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 
+interface UserStats {
+  hp: number;
+  money: number;
+  points: number;
+  missions_completed: number;
+}
+
 interface MobileMenuProps {
   username?: string;
   isLoggedIn?: boolean;
+  userStats?: UserStats | null;
 }
 
-const MobileMenu = ({ username, isLoggedIn }: MobileMenuProps) => {
+const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -97,31 +105,55 @@ const MobileMenu = ({ username, isLoggedIn }: MobileMenuProps) => {
               style={{ backgroundColor: '#0f0f1a' }}
             >
               {/* Menu Header */}
-              <div className="flex items-center justify-between p-4 border-b border-white/10">
-                <div className="flex items-center gap-3">
-                  <img 
-                    src="/favicon.png" 
-                    alt="LUKATO" 
-                    className="w-10 h-10 rounded-full shadow-lg shadow-neon-pink/30"
-                  />
-                  <div>
-                    <span className="font-display font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-neon-pink to-neon-cyan">
-                      LUKATO
-                    </span>
-                    {username && (
-                      <div className="flex items-center gap-1 mt-0.5">
-                        <User className="w-3 h-3 text-neon-cyan" />
-                        <span className="text-white/60 text-xs">{username}</span>
-                      </div>
-                    )}
+              <div className="p-4 border-b border-white/10 bg-[#0f0f1a]">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src="/favicon.png" 
+                      alt="LUKATO" 
+                      className="w-10 h-10 rounded-full shadow-lg shadow-neon-pink/30"
+                    />
+                    <div>
+                      <span className="font-display font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-neon-pink to-neon-cyan">
+                        LUKATO
+                      </span>
+                      {username && (
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <User className="w-3 h-3 text-neon-cyan" />
+                          <span className="text-white/60 text-xs">{username}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                  >
+                    <X className="w-6 h-6 text-white" />
+                  </button>
                 </div>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="p-2 rounded-full hover:bg-white/10 transition-colors"
-                >
-                  <X className="w-6 h-6 text-white" />
-                </button>
+
+                {/* User Stats Display */}
+                {isLoggedIn && userStats && (
+                  <div className="grid grid-cols-4 gap-2 mt-3 p-3 rounded-xl bg-white/5 border border-white/10">
+                    <div className="text-center">
+                      <div className="text-neon-pink text-lg font-bold">{userStats.hp}</div>
+                      <div className="text-[10px] text-white/40">HP</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-neon-cyan text-lg font-bold">₩{userStats.money.toLocaleString()}</div>
+                      <div className="text-[10px] text-white/40">소지금</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-green-400 text-lg font-bold">{userStats.missions_completed}</div>
+                      <div className="text-[10px] text-white/40">미션</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-yellow-400 text-lg font-bold">{userStats.points.toLocaleString()}</div>
+                      <div className="text-[10px] text-white/40">포인트</div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Menu Items */}

@@ -169,6 +169,12 @@ const Game = () => {
         username={profile?.username}
         title="메인 메뉴"
         titleVi="Menu chính"
+        userStats={profile ? {
+          hp: profile.hp,
+          money: profile.money,
+          points: profile.points,
+          missions_completed: profile.missions_completed
+        } : null}
       />
 
       {/* Stats Bar - Premium Design */}
