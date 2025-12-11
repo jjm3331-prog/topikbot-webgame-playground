@@ -79,7 +79,7 @@ function validateUsedExpressions(expressions: unknown): string[] {
   return expressions
     .map(e => validateString(e, 100))
     .filter((e): e is string => e !== null)
-    .slice(-50); // Limit to last 50 used expressions
+    .slice(-50);
 }
 
 serve(async (req) => {
@@ -89,10 +89,10 @@ serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    if (!GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is not configured");
     }
 
     // Validate inputs
@@ -106,23 +106,27 @@ serve(async (req) => {
 
     console.log("Quiz request:", { difficulty, usedExpressionsCount: usedExpressions.length });
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: userMessage }
+        contents: [
+          { role: "user", parts: [{ text: userMessage }] }
         ],
+        systemInstruction: {
+          parts: [{ text: SYSTEM_PROMPT }]
+        },
+        generationConfig: {
+          temperature: 0.9,
+          maxOutputTokens: 1024,
+        }
       }),
     });
 
     if (!response.ok) {
-      console.error("AI API error:", response.status);
+      console.error("Gemini API error:", response.status);
 
       if (response.status === 429) {
         return new Response(
@@ -130,11 +134,11 @@ serve(async (req) => {
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      throw new Error(`AI API error: ${response.status}`);
+      throw new Error(`Gemini API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const aiMessage = data.choices?.[0]?.message?.content;
+    const aiMessage = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     console.log("AI Response received");
 
@@ -161,8 +165,9 @@ serve(async (req) => {
     try {
       const jsonMatch = aiMessage.match(/```json\s*([\s\S]*?)\s*```/) || 
                         aiMessage.match(/```\s*([\s\S]*?)\s*```/) ||
-                        [null, aiMessage];
-      parsedResponse = JSON.parse(jsonMatch[1] || aiMessage);
+                        aiMessage.match(/\{[\s\S]*\}/);
+      const jsonStr = jsonMatch?.[1] || jsonMatch?.[0] || aiMessage;
+      parsedResponse = JSON.parse(jsonStr);
       
       // Shuffle options on server side to ensure correct_index is accurate
       const correctOption = parsedResponse.correct_option;

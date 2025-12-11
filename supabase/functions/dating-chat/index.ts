@@ -23,7 +23,7 @@ function validateConversationHistory(history: unknown): Array<{role: string; con
     .filter((item): item is {role: unknown; content: unknown} => 
       typeof item === 'object' && item !== null)
     .map(item => ({
-      role: item.role === 'assistant' ? 'assistant' : 'user',
+      role: item.role === 'assistant' ? 'model' : 'user',
       content: validateString(item.content, 1000) || ''
     }))
     .filter(item => item.content.length > 0)
@@ -37,10 +37,10 @@ serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
     
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY is not configured');
+    if (!GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY is not configured');
     }
 
     // Validate and sanitize inputs
@@ -94,27 +94,35 @@ serve(async (req) => {
 호감도가 높아질수록 더 친밀한 말투를 사용해.
 100%가 되면 "사귀자" 같은 고백 멘트도 가능해.`;
 
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      ...conversationHistory,
-      { role: 'user', content: message }
+    // Convert to Gemini format
+    const contents = [
+      ...conversationHistory.map(m => ({
+        role: m.role,
+        parts: [{ text: m.content }]
+      })),
+      { role: 'user', parts: [{ text: message }] }
     ];
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash-lite',
-        messages,
+        contents,
+        systemInstruction: {
+          parts: [{ text: systemPrompt }]
+        },
+        generationConfig: {
+          temperature: 0.9,
+          maxOutputTokens: 1024,
+        }
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('AI API error:', response.status, errorText);
+      console.error('Gemini API error:', response.status, errorText);
       
       if (response.status === 429) {
         return new Response(JSON.stringify({ 
@@ -127,13 +135,13 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-      throw new Error(`AI API error: ${response.status}`);
+      throw new Error(`Gemini API error: ${response.status}`);
     }
 
     const data = await response.json();
     console.log('AI response received');
 
-    const content = data.choices[0].message.content;
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
     
     // Parse JSON response
     let parsedResponse;
