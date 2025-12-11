@@ -108,7 +108,7 @@ ${excludeText}
 
 위 조건에 맞는 한국어 단어를 생성해주세요. 다양한 주제에서 골고루 선택하고, 매번 새로운 단어를 사용하세요.`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite-preview-06-17:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
