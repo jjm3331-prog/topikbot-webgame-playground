@@ -86,10 +86,12 @@ const Auth = () => {
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
+      // Production 도메인으로 고정 (lovable.app 스테이징 URL 문제 방지)
+      const productionUrl = 'https://game.topikbot.kr';
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/game`
+          redirectTo: `${productionUrl}/game`
         }
       });
       if (error) throw error;
