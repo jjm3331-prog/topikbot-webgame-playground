@@ -198,30 +198,6 @@ const Auth = () => {
               </Button>
             </form>
 
-            {/* Divider */}
-            <div className="flex items-center gap-4 my-6">
-              <div className="flex-1 h-px bg-white/20"></div>
-              <span className="text-white/50 text-sm">또는 / Hoặc</span>
-              <div className="flex-1 h-px bg-white/20"></div>
-            </div>
-
-            {/* Google Login */}
-            <Button
-              type="button"
-              onClick={handleGoogleLogin}
-              disabled={loading}
-              className="w-full h-12 bg-white hover:bg-gray-100 text-gray-800 font-medium flex items-center justify-center gap-3"
-            >
-              {loading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <>
-                  <GoogleIcon />
-                  <span>Google로 시작하기 / Đăng nhập với Google</span>
-                </>
-              )}
-            </Button>
-
             <div className="mt-6 text-center">
               <button
                 type="button"
