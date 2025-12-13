@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -63,6 +64,60 @@ function validateMessages(messages: unknown): Array<{role: string; content: stri
     .slice(-30);
 }
 
+// Simple hash function for cache key
+function hashString(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash).toString(16);
+}
+
+// Cache functions
+async function getCachedResponse(supabase: any, cacheKey: string, functionName: string) {
+  try {
+    const { data, error } = await supabase
+      .from('ai_response_cache')
+      .select('id, response')
+      .eq('function_name', functionName)
+      .eq('cache_key', cacheKey)
+      .gt('expires_at', new Date().toISOString())
+      .maybeSingle();
+
+    if (error || !data) return null;
+
+    supabase.rpc('increment_cache_hit', { p_id: data.id });
+    
+    console.log(`Cache HIT for ${functionName}:${cacheKey}`);
+    return data.response;
+  } catch {
+    return null;
+  }
+}
+
+async function setCachedResponse(supabase: any, cacheKey: string, functionName: string, requestParams: any, response: any) {
+  try {
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 12); // 12시간 캐시
+
+    await supabase
+      .from('ai_response_cache')
+      .upsert({
+        function_name: functionName,
+        cache_key: cacheKey,
+        request_params: requestParams,
+        response: response,
+        expires_at: expiresAt.toISOString()
+      }, { onConflict: 'function_name,cache_key' });
+
+    console.log(`Cache SET for ${functionName}:${cacheKey}`);
+  } catch (error) {
+    console.error('Cache set error:', error);
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -71,6 +126,8 @@ serve(async (req) => {
   try {
     const body = await req.json().catch(() => ({}));
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
     if (!GEMINI_API_KEY) {
       throw new Error("GEMINI_API_KEY is not configured");
@@ -83,6 +140,26 @@ serve(async (req) => {
 
     // Generate random location if not provided
     const gameLocation = location || SEOUL_LOCATIONS[Math.floor(Math.random() * SEOUL_LOCATIONS.length)];
+
+    console.log("Chat survival request - Turn:", currentTurn, "Location:", gameLocation);
+
+    // 첫 턴인 경우 캐시 확인 (시나리오 생성)
+    const isFirstTurn = currentTurn === 1 && messages.length === 0;
+    const cacheKey = isFirstTurn ? hashString(`first-turn:${gameLocation}`) : null;
+    
+    let supabase = null;
+    if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+      supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+      
+      if (cacheKey) {
+        const cachedResponse = await getCachedResponse(supabase, cacheKey, 'chat-survival');
+        if (cachedResponse) {
+          return new Response(JSON.stringify(cachedResponse), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+      }
+    }
 
     // Build context message
     const contextMessage = currentTurn === 1 
@@ -97,8 +174,6 @@ serve(async (req) => {
         parts: [{ text: m.content }]
       }))
     ];
-
-    console.log("Chat survival request - Turn:", currentTurn, "Location:", gameLocation);
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
@@ -159,6 +234,11 @@ serve(async (req) => {
     // Sanitize output values
     parsedResponse.hp_change = validateNumber(parsedResponse.hp_change, -20, 10);
     parsedResponse.money_change = validateNumber(parsedResponse.money_change, -5000, 3000);
+
+    // 첫 턴 시나리오 캐시 저장
+    if (supabase && cacheKey && isFirstTurn) {
+      await setCachedResponse(supabase, cacheKey, 'chat-survival', { location: gameLocation }, parsedResponse);
+    }
 
     return new Response(JSON.stringify(parsedResponse), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

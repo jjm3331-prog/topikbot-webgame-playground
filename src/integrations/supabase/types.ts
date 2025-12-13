@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_response_cache: {
+        Row: {
+          cache_key: string
+          created_at: string
+          expires_at: string
+          function_name: string
+          hit_count: number | null
+          id: string
+          request_params: Json | null
+          response: Json
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string
+          expires_at?: string
+          function_name: string
+          hit_count?: number | null
+          id?: string
+          request_params?: Json | null
+          response: Json
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string
+          expires_at?: string
+          function_name?: string
+          hit_count?: number | null
+          id?: string
+          request_params?: Json | null
+          response?: Json
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -85,7 +118,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_expired_cache: { Args: never; Returns: undefined }
+      increment_cache_hit: { Args: { p_id: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
