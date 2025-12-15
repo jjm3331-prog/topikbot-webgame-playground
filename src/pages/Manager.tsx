@@ -7,6 +7,13 @@ import { toast } from 'sonner';
 import { ChevronRight, Sparkles, Flame, Music, Star, AlertTriangle, Users, Loader2 } from 'lucide-react';
 import AppHeader from '@/components/AppHeader';
 
+// NPC 캐릭터 이미지 임포트
+import ceoDoyoon from '@/assets/manager/ceo-kangdoyoon.jpg';
+import traineeMinseo from '@/assets/manager/trainee-minseo.jpg';
+import trainerJiyeon from '@/assets/manager/trainer-jiyeon.jpg';
+import traineeSumin from '@/assets/manager/trainee-sumin.jpg';
+import pdMinho from '@/assets/manager/pd-minho.jpg';
+
 type GroupConcept = 'fresh' | 'crush' | 'hiphop' | 'retro' | 'dark' | 'band';
 type GroupGender = 'male' | 'female' | 'mixed';
 type GamePhase = 'setup' | 'loading' | 'prologue' | 'dialogue' | 'mission' | 'scoring' | 'result';
@@ -41,6 +48,36 @@ interface GameStats {
   stat_chemistry: number;
   stat_media_tone: number;
   gauge_rumor: number;
+}
+
+// NPC 초상화 매핑
+const NPC_PORTRAITS: Record<string, string> = {
+  '강도윤': ceoDoyoon,
+  '강도윤 대표': ceoDoyoon,
+  '민서': traineeMinseo,
+  '탈락 연습생 민서': traineeMinseo,
+  '박지연': trainerJiyeon,
+  '박지연 트레이너': trainerJiyeon,
+  '트레이너 박지연': trainerJiyeon,
+  '수민': traineeSumin,
+  '연습생 수민': traineeSumin,
+  '최민호': pdMinho,
+  '예능 PD 최민호': pdMinho,
+  'PD 최민호': pdMinho,
+};
+
+// NPC 이름으로 초상화 찾기
+function getNpcPortrait(speaker: string): string | null {
+  // 정확히 일치하는 경우
+  if (NPC_PORTRAITS[speaker]) return NPC_PORTRAITS[speaker];
+  
+  // 부분 일치하는 경우
+  for (const [key, value] of Object.entries(NPC_PORTRAITS)) {
+    if (speaker.includes(key) || key.includes(speaker)) {
+      return value;
+    }
+  }
+  return null;
 }
 
 const CONCEPT_OPTIONS = [
@@ -558,11 +595,30 @@ function DialoguePhase({ storyData, dialogueIndex, stats, onNext }: {
           animate={{ scale: 1, opacity: 1 }}
           className="text-center"
         >
-          <div className="w-28 h-28 mx-auto rounded-full bg-gradient-to-br from-purple-500/30 to-pink-500/30 border-2 border-purple-400/50 flex items-center justify-center shadow-[0_0_50px_rgba(168,85,247,0.3)] mb-4">
-            <span className="text-5xl">
-              {currentLine?.emotion ? EMOTION_EMOJIS[currentLine.emotion] || '😐' : '🎭'}
-            </span>
-          </div>
+          {/* NPC 초상화 또는 이모지 폴백 */}
+          {getNpcPortrait(currentLine?.speaker || '') ? (
+            <div className="relative mx-auto mb-4">
+              <div className="w-32 h-32 rounded-full overflow-hidden border-3 border-purple-400/50 shadow-[0_0_50px_rgba(168,85,247,0.4)]">
+                <img 
+                  src={getNpcPortrait(currentLine?.speaker || '')!}
+                  alt={currentLine?.speaker}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {/* 감정 이모지 배지 */}
+              <div className="absolute -bottom-1 -right-1 w-10 h-10 bg-zinc-800 rounded-full border-2 border-purple-400 flex items-center justify-center">
+                <span className="text-xl">
+                  {currentLine?.emotion ? EMOTION_EMOJIS[currentLine.emotion] || '😐' : '🎭'}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="w-28 h-28 mx-auto rounded-full bg-gradient-to-br from-purple-500/30 to-pink-500/30 border-2 border-purple-400/50 flex items-center justify-center shadow-[0_0_50px_rgba(168,85,247,0.3)] mb-4">
+              <span className="text-5xl">
+                {currentLine?.emotion ? EMOTION_EMOJIS[currentLine.emotion] || '😐' : '🎭'}
+              </span>
+            </div>
+          )}
           <div className="px-4 py-1.5 bg-zinc-800/80 rounded-full border border-zinc-600 inline-block">
             <span className="text-sm font-medium">{currentLine?.speaker}</span>
           </div>
