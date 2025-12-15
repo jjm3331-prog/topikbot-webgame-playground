@@ -148,7 +148,7 @@ const WordChain = () => {
     setWords(prev => [...prev, { word, isUser: true }]);
 
     try {
-      const usedWords = words.map(w => w.word);
+      const usedWords = [...words.map(w => w.word), word];
       
       const { data, error } = await supabase.functions.invoke("word-chain", {
         body: { userWord: word, usedWords, lastChar },

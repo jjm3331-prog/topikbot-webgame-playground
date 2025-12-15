@@ -76,7 +76,7 @@ const Quiz = () => {
     setHintUsed(false);
     setShowHint(false);
     try {
-      const { data, error } = await supabase.functions.invoke("idiom-quiz", { body: { difficulty, usedExpressions } });
+      const { data, error } = await supabase.functions.invoke("idiom-quiz", { body: { difficulty, exclude: usedExpressions, usedExpressions } });
       if (error) throw error;
       if (data.error) { toast({ title: "오류 / Lỗi", description: data.error, variant: "destructive" }); return; }
       setQuestion(data);
