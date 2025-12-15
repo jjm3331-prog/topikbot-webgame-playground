@@ -423,100 +423,131 @@ export default function Manager() {
             </motion.div>
           )}
 
-          {/* 게임 플레이 화면 */}
+          {/* 게임 플레이 화면 - 비주얼노벨 스타일 */}
           {phase === 'playing' && (
             <motion.div
               key="playing"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="h-full flex flex-col max-w-2xl mx-auto"
+              className="h-full flex flex-col relative"
             >
-              {/* 지표 바 */}
-              <div className="grid grid-cols-4 gap-2 mb-4 p-3 bg-zinc-800/50 rounded-lg">
-                <StatBar label="멘탈" value={stats.stat_mental} color="text-blue-400" />
-                <StatBar label="케미" value={stats.stat_chemistry} color="text-green-400" />
-                <StatBar label="미디어" value={stats.stat_media_tone} color="text-yellow-400" />
-                <StatBar label="루머" value={stats.gauge_rumor} color="text-red-400" isRisk />
+              {/* 배경 씬 - 사무실 분위기 그라데이션 */}
+              <div className="absolute inset-0 -z-10">
+                <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-purple-950/30 to-zinc-900" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(168,85,247,0.15)_0%,transparent_50%)]" />
+                {/* 파티클 효과 */}
+                <div className="absolute top-20 left-10 w-2 h-2 bg-pink-500/50 rounded-full animate-pulse" />
+                <div className="absolute top-40 right-16 w-1 h-1 bg-purple-400/60 rounded-full animate-pulse delay-300" />
+                <div className="absolute bottom-60 left-20 w-1.5 h-1.5 bg-blue-400/40 rounded-full animate-pulse delay-700" />
               </div>
 
-              {/* 대화창 */}
-              <div className="flex-1 overflow-y-auto space-y-3 mb-4 bg-zinc-800/30 rounded-lg p-4">
-                {dialogueHistory.map((line, idx) => (
-                  <DialogueBubble key={idx} line={line} />
-                ))}
-                <div ref={dialogueEndRef} />
-              </div>
+              {/* 상단 HUD - 게임스러운 스탯 바 */}
+              <motion.div 
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="mb-4 p-3 bg-black/60 backdrop-blur-sm rounded-xl border border-zinc-700/50"
+              >
+                <div className="grid grid-cols-4 gap-3">
+                  <GameStatBar icon="💙" label="멘탈" value={stats.stat_mental} color="blue" />
+                  <GameStatBar icon="💚" label="케미" value={stats.stat_chemistry} color="green" />
+                  <GameStatBar icon="💛" label="미디어" value={stats.stat_media_tone} color="yellow" />
+                  <GameStatBar icon="💔" label="루머" value={stats.gauge_rumor} color="red" isRisk />
+                </div>
+              </motion.div>
 
-              {/* 입력 영역 */}
-              {isMissionActive ? (
-                <div className="space-y-3">
-                  {/* 미션 프롬프트 */}
-                  <div className="p-3 bg-pink-500/10 border border-pink-500/30 rounded-lg">
-                    <p className="text-sm text-pink-300">{currentLine.missionPrompt?.ko}</p>
-                    <p className="text-xs text-pink-400/70 mt-1">{currentLine.missionPrompt?.vi}</p>
-                  </div>
-
-                  {/* 텍스트 입력 */}
-                  <textarea
-                    value={userInput}
-                    onChange={(e) => setUserInput(e.target.value)}
-                    placeholder="한국어로 응답하세요... / Trả lời bằng tiếng Hàn..."
-                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 resize-none h-24 focus:border-pink-500 focus:outline-none"
-                  />
-
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={submitResponse}
-                      disabled={isEvaluating || !userInput.trim()}
-                      className="flex-1 bg-pink-500 hover:bg-pink-600"
-                    >
-                      {isEvaluating ? '채점중...' : '제출 / Gửi'}
-                    </Button>
-                  </div>
-
-                  {/* 피드백 표시 */}
-                  {feedback && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`p-3 rounded-lg ${
-                        lastScore && lastScore >= 70 
-                          ? 'bg-green-500/10 border border-green-500/30' 
-                          : lastScore && lastScore >= 40
-                          ? 'bg-yellow-500/10 border border-yellow-500/30'
-                          : 'bg-red-500/10 border border-red-500/30'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="font-bold">{lastScore}점</span>
-                        <span className={
-                          lastScore && lastScore >= 70 ? 'text-green-400' :
-                          lastScore && lastScore >= 40 ? 'text-yellow-400' : 'text-red-400'
-                        }>
-                          {lastScore && lastScore >= 70 ? '✓ 성공' : lastScore && lastScore >= 40 ? '⚠ 경고' : '✗ 실패'}
-                        </span>
-                      </div>
-                      <p className="text-sm">{feedback.ko}</p>
-                      <p className="text-xs text-zinc-400 mt-1">{feedback.vi}</p>
-                      
-                      <Button
-                        onClick={advanceDialogue}
-                        className="mt-3 w-full"
-                        variant="outline"
+              {/* 메인 게임 영역 */}
+              <div className="flex-1 flex flex-col relative">
+                {/* NPC 캐릭터 영역 */}
+                <div className="flex-1 flex items-center justify-center relative">
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="relative"
+                  >
+                    {/* 캐릭터 실루엣/아바타 */}
+                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-purple-500/30 to-pink-500/30 border-2 border-purple-400/50 flex items-center justify-center shadow-[0_0_40px_rgba(168,85,247,0.3)]">
+                      <span className="text-5xl">
+                        {dialogueHistory.length > 0 && dialogueHistory[dialogueHistory.length - 1].speaker === '대표 강도윤' ? '👔' :
+                         dialogueHistory.length > 0 && dialogueHistory[dialogueHistory.length - 1].speaker.includes('민서') ? '😢' :
+                         dialogueHistory.length > 0 && dialogueHistory[dialogueHistory.length - 1].isUser ? '🎤' : '🎭'}
+                      </span>
+                    </div>
+                    {/* 이름 태그 */}
+                    {dialogueHistory.length > 0 && !dialogueHistory[dialogueHistory.length - 1].isMission && (
+                      <motion.div
+                        initial={{ y: 10, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-zinc-800 rounded-full border border-zinc-600 text-xs whitespace-nowrap"
                       >
-                        다음 / Tiếp theo <ChevronRight className="w-4 h-4 ml-1" />
-                      </Button>
+                        {dialogueHistory[dialogueHistory.length - 1].speaker}
+                      </motion.div>
+                    )}
+                  </motion.div>
+                </div>
+
+                {/* 대화/미션 박스 - 비주얼노벨 스타일 */}
+                <div className="relative">
+                  {/* 현재 대사 표시 */}
+                  {dialogueHistory.length > 0 && (
+                    <GameDialogueBox 
+                      line={dialogueHistory[dialogueHistory.length - 1]} 
+                      onNext={!isMissionActive && !feedback ? advanceDialogue : undefined}
+                    />
+                  )}
+
+                  {/* 미션 입력 영역 */}
+                  {isMissionActive && (
+                    <motion.div
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      className="mt-3 space-y-3"
+                    >
+                      {/* 미션 알림 */}
+                      <div className="p-3 bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-pink-500/20 border border-pink-400/40 rounded-xl relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-purple-500/10 animate-pulse" />
+                        <div className="relative flex items-start gap-3">
+                          <span className="text-2xl animate-bounce">🎯</span>
+                          <div>
+                            <p className="text-pink-300 font-medium text-sm">{currentLine.missionPrompt?.ko}</p>
+                            <p className="text-pink-400/60 text-xs mt-1">{currentLine.missionPrompt?.vi}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 입력 필드 */}
+                      <div className="relative">
+                        <textarea
+                          value={userInput}
+                          onChange={(e) => setUserInput(e.target.value)}
+                          placeholder="한국어로 응답하세요... / Trả lời bằng tiếng Hàn..."
+                          className="w-full bg-zinc-900/80 border-2 border-purple-500/30 rounded-xl px-4 py-3 resize-none h-20 focus:border-pink-500 focus:outline-none focus:shadow-[0_0_20px_rgba(236,72,153,0.3)] transition-all text-white placeholder:text-zinc-500"
+                        />
+                        <Button
+                          onClick={submitResponse}
+                          disabled={isEvaluating || !userInput.trim()}
+                          className="absolute bottom-2 right-2 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 px-6"
+                        >
+                          {isEvaluating ? (
+                            <span className="flex items-center gap-2">
+                              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                              채점중
+                            </span>
+                          ) : '제출 ✓'}
+                        </Button>
+                      </div>
+
+                      {/* 점수 피드백 */}
+                      {feedback && (
+                        <ScoreFeedback 
+                          score={lastScore || 0} 
+                          feedback={feedback} 
+                          onNext={advanceDialogue}
+                        />
+                      )}
                     </motion.div>
                   )}
                 </div>
-              ) : (
-                <Button
-                  onClick={advanceDialogue}
-                  className="w-full py-4 bg-zinc-700 hover:bg-zinc-600"
-                >
-                  다음 / Tiếp theo <ChevronRight className="w-4 h-4 ml-2" />
-                </Button>
-              )}
+              </div>
             </motion.div>
           )}
 
@@ -567,7 +598,166 @@ export default function Manager() {
   );
 }
 
-// 지표 바 컴포넌트
+// 게임 스탯 바 컴포넌트 (시각적 강화)
+function GameStatBar({ icon, label, value, color, isRisk }: { 
+  icon: string; label: string; value: number; color: string; isRisk?: boolean 
+}) {
+  const colorClasses = {
+    blue: { bar: 'from-blue-500 to-cyan-400', glow: 'shadow-blue-500/50', text: 'text-blue-400' },
+    green: { bar: 'from-green-500 to-emerald-400', glow: 'shadow-green-500/50', text: 'text-green-400' },
+    yellow: { bar: 'from-yellow-500 to-amber-400', glow: 'shadow-yellow-500/50', text: 'text-yellow-400' },
+    red: { bar: 'from-red-500 to-rose-400', glow: 'shadow-red-500/50', text: 'text-red-400' }
+  }[color];
+
+  return (
+    <div className="text-center">
+      <div className="flex items-center justify-center gap-1 mb-1">
+        <span className="text-sm">{icon}</span>
+        <span className={`text-xs font-medium ${colorClasses?.text}`}>{label}</span>
+      </div>
+      <div className="relative h-2 bg-zinc-800 rounded-full overflow-hidden">
+        <motion.div 
+          initial={{ width: 0 }}
+          animate={{ width: `${value}%` }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className={`h-full bg-gradient-to-r ${colorClasses?.bar} rounded-full shadow-lg ${colorClasses?.glow}`}
+        />
+        {value > 80 && !isRisk && (
+          <div className="absolute inset-0 bg-white/20 animate-pulse rounded-full" />
+        )}
+        {isRisk && value > 50 && (
+          <div className="absolute inset-0 bg-red-500/30 animate-pulse rounded-full" />
+        )}
+      </div>
+      <span className={`text-xs font-bold ${colorClasses?.text}`}>{value}</span>
+    </div>
+  );
+}
+
+// 게임 대화 박스 컴포넌트 (비주얼노벨 스타일)
+function GameDialogueBox({ line, onNext }: { line: DialogueLine; onNext?: () => void }) {
+  const isMission = line.isMission;
+  const isUser = line.isUser;
+
+  if (isMission) {
+    return (
+      <motion.div
+        initial={{ y: 30, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="p-4 bg-gradient-to-r from-pink-900/50 via-purple-900/50 to-pink-900/50 border-2 border-pink-500/50 rounded-2xl relative overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(236,72,153,0.1)_50%,transparent_75%)] animate-[shimmer_3s_infinite]" />
+        <div className="relative">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="px-2 py-0.5 bg-pink-500 text-white text-xs rounded-full font-bold animate-pulse">MISSION</span>
+          </div>
+          <p className="text-pink-200 font-medium">{line.text_ko}</p>
+          <p className="text-pink-300/60 text-sm mt-1">{line.text_vi}</p>
+        </div>
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div
+      initial={{ y: 30, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      onClick={onNext}
+      className={`p-4 rounded-2xl relative overflow-hidden cursor-pointer transition-all hover:brightness-110 ${
+        isUser 
+          ? 'bg-gradient-to-r from-pink-600/80 to-purple-600/80 border border-pink-400/50' 
+          : 'bg-zinc-800/90 border border-zinc-600/50'
+      }`}
+    >
+      {/* 대화 내용 */}
+      <div className="relative">
+        <p className="text-white text-lg leading-relaxed">{line.text_ko}</p>
+        {line.text_vi && (
+          <p className="text-white/60 text-sm mt-2">{line.text_vi}</p>
+        )}
+      </div>
+      
+      {/* 다음 표시 */}
+      {onNext && (
+        <motion.div
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ repeat: Infinity, duration: 1.5 }}
+          className="absolute bottom-2 right-3 text-white/50 text-xs flex items-center gap-1"
+        >
+          탭하여 계속 <ChevronRight className="w-3 h-3" />
+        </motion.div>
+      )}
+    </motion.div>
+  );
+}
+
+// 점수 피드백 컴포넌트
+function ScoreFeedback({ score, feedback, onNext }: { 
+  score: number; 
+  feedback: { ko: string; vi: string }; 
+  onNext: () => void 
+}) {
+  const isSuccess = score >= 70;
+  const isWarning = score >= 40 && score < 70;
+
+  return (
+    <motion.div
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      className={`p-4 rounded-2xl relative overflow-hidden ${
+        isSuccess ? 'bg-gradient-to-r from-green-900/60 to-emerald-900/60 border-2 border-green-500/50' :
+        isWarning ? 'bg-gradient-to-r from-yellow-900/60 to-amber-900/60 border-2 border-yellow-500/50' :
+        'bg-gradient-to-r from-red-900/60 to-rose-900/60 border-2 border-red-500/50'
+      }`}
+    >
+      {/* 점수 표시 */}
+      <div className="flex items-center gap-3 mb-3">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', bounce: 0.5 }}
+          className={`w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold ${
+            isSuccess ? 'bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.5)]' :
+            isWarning ? 'bg-yellow-500 shadow-[0_0_30px_rgba(234,179,8,0.5)]' :
+            'bg-red-500 shadow-[0_0_30px_rgba(239,68,68,0.5)]'
+          }`}
+        >
+          {score}
+        </motion.div>
+        <div>
+          <div className={`text-lg font-bold ${
+            isSuccess ? 'text-green-400' : isWarning ? 'text-yellow-400' : 'text-red-400'
+          }`}>
+            {isSuccess ? '✓ 훌륭해요!' : isWarning ? '⚠ 아쉬워요' : '✗ 다시 시도!'}
+          </div>
+          <div className="text-xs text-zinc-400">
+            {isSuccess ? 'Tuyệt vời!' : isWarning ? 'Hơi tiếc!' : 'Thử lại!'}
+          </div>
+        </div>
+      </div>
+
+      {/* 피드백 */}
+      <div className="space-y-1 mb-4">
+        <p className="text-white/90 text-sm">{feedback.ko}</p>
+        <p className="text-white/50 text-xs">{feedback.vi}</p>
+      </div>
+
+      {/* 다음 버튼 */}
+      <Button
+        onClick={onNext}
+        className={`w-full ${
+          isSuccess ? 'bg-green-500 hover:bg-green-600' :
+          isWarning ? 'bg-yellow-500 hover:bg-yellow-600 text-black' :
+          'bg-red-500 hover:bg-red-600'
+        }`}
+      >
+        다음으로 / Tiếp theo <ChevronRight className="w-4 h-4 ml-1" />
+      </Button>
+    </motion.div>
+  );
+}
+
+// 기존 컴포넌트 (사용 안함 - 제거 가능)
 function StatBar({ label, value, color, isRisk }: { label: string; value: number; color: string; isRisk?: boolean }) {
   return (
     <div className="text-center">
@@ -581,7 +771,6 @@ function StatBar({ label, value, color, isRisk }: { label: string; value: number
   );
 }
 
-// 대화 버블 컴포넌트
 function DialogueBubble({ line }: { line: DialogueLine }) {
   const isMission = line.isMission;
   const isUser = line.isUser;
