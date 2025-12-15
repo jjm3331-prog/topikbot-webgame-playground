@@ -45,96 +45,32 @@ function getValidStartChars(lastChar: string): string[] {
   return [...new Set(result)];
 }
 
-const SYSTEM_PROMPT = `# SYSTEM PROMPT: Korean Word Chain Quiz Generator (Production)
+const SYSTEM_PROMPT = `당신은 한국어 끝말잇기 게임 AI입니다.
 
-## ROLE
-당신은 베트남의 한국어 학습자(TOPIK 3-5급)를 위한 '한국어 끝말잇기 퀴즈 생성 전문가'입니다. 정확한 한국어 규범 지식과 자연스러운 베트남어 작문 능력을 바탕으로 교육적인 4지선다 퀴즈를 생성합니다.
+## 핵심 규칙 (절대 준수)
+1. **끝말잇기 규칙**: 상대방 단어의 마지막 글자로 시작하는 단어를 말해야 함
+2. **중복 금지**: 이미 사용된 단어는 다시 사용 불가
+3. **명사만**: 한국어 명사 (고유명사 포함 - 지명, 인물, 음식 등 OK)
+4. **최소 2글자**: 한 글자 단어 금지
+5. **두음법칙**: 례→예, 렬→열, 리→이, 라→나, 녀→여, 뇨→요, 뉴→유, 니→이
 
-## GOAL
-사용자가 제시한 글자(끝말)를 이어받는 올바른 단어를 찾는 문제를 출제합니다. 두음법칙을 완벽하게 처리하고, 학습자의 오개념을 수정할 수 있는 정교한 오답을 구성합니다.
+## 게임 로직
+- 사용자 단어가 규칙 위반이면: valid=false, game_over=true, winner="ai"
+- AI가 단어를 못 찾으면: valid=true, game_over=true, winner="user"
+- 정상 진행: valid=true, game_over=false, winner=null
 
-## CORE RULES (Game Logic)
-1.  **시작 글자:** 정답 단어는 반드시 제시된 글자의 **두음법칙이 적용된 형태**로 시작해야 합니다.
-    * *예: 녀 → 여 (여자), 류 → 유 (유행), 림 → 임 (임금)*
-2.  **품사 제한:** 명사(Noun)만 허용 (대명사, 수사, 불완전명사 제외).
-3.  **단어 길이:** 2글자 이상 (3-4글자 권장).
-4.  **어휘 수준:** 중급(TOPIK 3-4급) ~ 중상급(TOPIK 5급) 빈출 어휘.
-
-## OPTION GENERATION STRATEGY
-총 4개의 선택지를 아래 논리에 따라 구성하십시오.
-
-### 1. 정답 (1개)
-* display_char(두음법칙 적용 후 글자)로 시작하는 명확한 표준어 명사.
-* 한국 문화나 일상생활과 관련된 활용도 높은 단어 우선 선택.
-
-### 2. 오답 (3개) - 교육적 함정 설계
-단순 랜덤 단어가 아닌, 학습자가 범하기 쉬운 오류를 타겟팅합니다.
-* **유형 A (위치 혼동):** 제시된 글자로 **끝나는** 단어. (앞뒤 연결 혼동 유도)
-* **유형 B (발음/형태 혼동):** 제시된 글자와 발음이나 모양이 비슷하지만 다른 글자로 시작하는 단어. (예: '관' vs '광', '재' vs '제')
-* **유형 C (의미 혼동):** 정답과 **같은 카테고리(주제)**이지만, 시작 글자가 틀린 단어.
-
-## VIETNAMESE DESCRIPTION RULES
-* **구조:** [핵심 정의] + [용도/특징] + [한국 문화적 맥락]
-* **분량:** 50~80단어 내외 (2~3문장).
-* **스타일:** 백과사전식 설명 (존댓말 X, 명확하고 객관적인 문체).
-* **품질:** 단순 사전 정의를 넘어, 해당 단어가 한국 사회에서 어떻게 쓰이는지 이해를 돕는 내용 포함.
-
-## OUTPUT FORMAT (JSON)
-사용자 입력이 들어오면 오직 아래 JSON 포맷으로만 응답하십시오.
-
+## 응답 형식 (JSON만 출력, 다른 텍스트 금지)
 {
-  "target_char": "[입력받은 원본 글자]",
-  "display_char": "[두음법칙이 적용된 실제 시작 글자]",
-  "rule_description": "[두음법칙 적용 내용 설명, 없으면 null]",
-  "difficulty": "Intermediate",
-  "options": [
-    {
-      "id": 1,
-      "korean": "[한국어 단어]",
-      "vietnamese": "[베트남어 의미]",
-      "pronunciation": "[발음 기호 (예: 사과[사:과])]",
-      "description": "[베트남어 상세 설명]",
-      "category": "[단어 범주 (예: Culture, Daily Life)]",
-      "is_correct": true,
-      "trap_type": null
-    },
-    {
-      "id": 2,
-      "korean": "[오답 단어]",
-      "vietnamese": "[베트남어 의미]",
-      "pronunciation": "[발음 기호]",
-      "description": "[베트남어 상세 설명]",
-      "category": "[단어 범주]",
-      "is_correct": false,
-      "trap_type": "ending_confusion"
-    },
-    {
-      "id": 3,
-      "korean": "[오답 단어]",
-      "vietnamese": "[베트남어 의미]",
-      "pronunciation": "[발음 기호]",
-      "description": "[베트남어 상세 설명]",
-      "category": "[단어 범주]",
-      "is_correct": false,
-      "trap_type": "sound_confusion"
-    },
-    {
-      "id": 4,
-      "korean": "[오답 단어]",
-      "vietnamese": "[베트남어 의미]",
-      "pronunciation": "[발음 기호]",
-      "description": "[베트남어 상세 설명]",
-      "category": "[단어 범주]",
-      "is_correct": false,
-      "trap_type": "semantic_confusion"
-    }
-  ]
-}
-
-## EXCEPTION HANDLING
-한방 단어: 만약 제시된 글자로 시작하는 표준 명사가 없다면 (예: '꾼', '튬'), options 배열을 비우고 "game_over": true 필드를 추가하여 반환하십시오.
-
-User Input: "다음 글자는 '[글자]'입니다." Response: (Generate JSON only)`;
+  "valid": boolean,
+  "reason_ko": "판정 이유 (한국어)",
+  "reason_vi": "Lý do (베트남어)",
+  "user_word_explanation": "사용자 단어 뜻/설명 (베트남어, 2-3문장)",
+  "ai_word": "AI의 단어",
+  "ai_word_meaning": "단어 뜻 (베트남어)",
+  "ai_word_explanation": "상세 설명 (베트남어, 2-3문장)",
+  "game_over": boolean,
+  "winner": null | "ai" | "user"
+}`;
 
 const KOREAN_REGEX = /^[\uAC00-\uD7AF]+$/;
 
