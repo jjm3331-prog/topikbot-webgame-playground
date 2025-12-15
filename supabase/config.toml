@@ -41,3 +41,6 @@ verify_jwt = true
 
 [functions.manager-story]
 verify_jwt = true
+
+[functions.manager-stt]
+verify_jwt = true

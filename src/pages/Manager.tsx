@@ -867,12 +867,13 @@ function MissionPhase({ storyData, stats, userInput, setUserInput, onSubmit, stt
         reader.onloadend = async () => {
           try {
             const base64 = (reader.result as string).split(',')[1];
-            const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/drama-dubbing`, {
+            const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/manager-stt`, {
               method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
-              body: JSON.stringify({ audio: base64, mode: 'transcribe' }),
+              body: JSON.stringify({ audio: base64 }),
             });
             const data = await res.json();
             if (data.transcribedText) { setUserInput(data.transcribedText); toast.success('✓ 음성 인식 완료!'); }
+            else if (data.error) { toast.error(`음성 인식 실패: ${data.error}`); }
           } catch (e) { toast.error('음성 인식 실패'); }
           setIsTranscribing(false);
         };
