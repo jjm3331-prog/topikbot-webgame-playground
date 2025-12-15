@@ -11,7 +11,7 @@ const SEASON_1_CHAPTERS = {
     title_ko: "잔인한 통보",
     title_vi: "Thông báo tàn nhẫn",
     day: "DAY 1 - 월요일 오전 10시",
-    location: "연습실 A",
+    location: "연습실",
     summary: "회사가 갑작스럽게 데뷔조 3명을 확정하고 나머지를 탈락시킴. 당신은 탈락 통보를 대신 전해야 함.",
     npcs: ["강도윤 대표", "탈락 연습생 민서"],
     mood: "긴장, 슬픔, 불안",
@@ -31,11 +31,101 @@ const SEASON_1_CHAPTERS = {
     title_ko: "첫 번째 거래",
     title_vi: "Giao dịch đầu tiên",
     day: "DAY 5 - 금요일 오후 3시",
-    location: "방송국 회의실",
+    location: "방송국",
     summary: "예능 PD와의 첫 미팅. 조건 협상이 필요함. 굴욕적인 캐릭터 강요 vs 노출 기회.",
     npcs: ["예능 PD 최민호"],
     mood: "긴장, 계산적",
     mission_focus: "협상 + 조건절"
+  },
+  4: {
+    title_ko: "숨겨진 균열",
+    title_vi: "Vết nứt ẩn giấu",
+    day: "DAY 7 - 일요일 새벽 2시",
+    location: "숙소",
+    summary: "멤버들 사이의 갈등이 터짐. 리더와 서브보컬 사이에 심한 말다툼. 당신이 중재해야 함.",
+    npcs: ["연습생 수민", "연습생 하늘", "트레이너 박지연"],
+    mood: "분노, 긴장, 피로",
+    mission_focus: "갈등 중재 + 공감"
+  },
+  5: {
+    title_ko: "악플의 바다",
+    title_vi: "Biển bình luận ác ý",
+    day: "DAY 10 - 수요일 오전 9시",
+    location: "대표실",
+    summary: "연습생 한 명의 과거 영상이 유출됨. 악플이 쏟아지고 대표는 해당 멤버 교체를 요구. 당신의 선택은?",
+    npcs: ["강도윤 대표", "연습생 수민"],
+    mood: "위기, 압박, 불안",
+    mission_focus: "위기 대응 + 설득"
+  },
+  6: {
+    title_ko: "생방송 30분 전",
+    title_vi: "30 phút trước lên sóng",
+    day: "DAY 14 - 일요일 오후 5시 30분",
+    location: "백스테이지",
+    summary: "첫 음악방송 데뷔 무대. 메인 댄서가 발목 부상. 무대를 강행할지, 포기할지 결정해야 함.",
+    npcs: ["연습생 하늘", "트레이너 박지연", "방송국 스태프"],
+    mood: "긴급, 긴장, 결단",
+    mission_focus: "위기 판단 + 공식 커뮤니케이션"
+  },
+  7: {
+    title_ko: "기자의 덫",
+    title_vi: "Cái bẫy của ký giả",
+    day: "DAY 16 - 화요일 오후 2시",
+    location: "방송국",
+    summary: "연예부 기자가 독점 인터뷰를 제안. 하지만 그 대가로 내부 정보를 요구함. 거래를 할 것인가?",
+    npcs: ["기자 한소희", "강도윤 대표"],
+    mood: "의심, 긴장, 계산",
+    mission_focus: "정보 통제 + 외교적 대화"
+  },
+  8: {
+    title_ko: "질투의 불꽃",
+    title_vi: "Ngọn lửa ghen tị",
+    day: "DAY 20 - 토요일 밤 10시",
+    location: "녹음실",
+    summary: "멤버 중 한 명이 솔로 활동 제안을 받음. 다른 멤버들이 동요하기 시작. 팀워크가 흔들림.",
+    npcs: ["연습생 수민", "연습생 하늘", "강도윤 대표"],
+    mood: "질투, 불안, 갈등",
+    mission_focus: "팀 결속 + 개인 면담"
+  },
+  9: {
+    title_ko: "팬의 그림자",
+    title_vi: "Bóng tối của fan cuồng",
+    day: "DAY 23 - 화요일 밤 11시",
+    location: "숙소",
+    summary: "사생팬 문제 발생. 숙소 위치가 유출되고 멤버들이 공포에 떨고 있음. 보안 대책이 필요함.",
+    npcs: ["연습생 수민", "보안팀장", "강도윤 대표"],
+    mood: "공포, 긴장, 보호",
+    mission_focus: "안전 조치 + 멤버 안심"
+  },
+  10: {
+    title_ko: "배신의 증거",
+    title_vi: "Bằng chứng phản bội",
+    day: "DAY 25 - 목요일 오후 4시",
+    location: "대표실",
+    summary: "회사 내부에서 정보가 새어나가고 있음. 의심받는 사람 중에 가까운 동료가 있음. 진실을 밝혀야 함.",
+    npcs: ["강도윤 대표", "매니저 선배", "트레이너 박지연"],
+    mood: "의심, 배신감, 긴장",
+    mission_focus: "조사 + 신뢰 확인"
+  },
+  11: {
+    title_ko: "마지막 선택",
+    title_vi: "Lựa chọn cuối cùng",
+    day: "DAY 27 - 토요일 오전 11시",
+    location: "연습실",
+    summary: "데뷔 쇼케이스 D-1. 대표가 그룹 이름 변경을 요구. 멤버들은 반대. 당신의 결정이 그룹의 미래를 결정함.",
+    npcs: ["강도윤 대표", "연습생 수민", "연습생 하늘", "트레이너 박지연"],
+    mood: "결단, 압박, 희망",
+    mission_focus: "최종 협상 + 리더십"
+  },
+  12: {
+    title_ko: "데뷔의 순간",
+    title_vi: "Khoảnh khắc debut",
+    day: "DAY 28 - 일요일 오후 7시",
+    location: "백스테이지",
+    summary: "드디어 데뷔 쇼케이스 당일. 무대 직전, 모든 갈등과 위기를 딛고 이 순간에 도달함. 마지막 격려가 필요함.",
+    npcs: ["연습생 수민", "연습생 하늘", "트레이너 박지연", "강도윤 대표"],
+    mood: "긴장, 감동, 희망",
+    mission_focus: "격려 + 팀 결속"
   }
 };
 
