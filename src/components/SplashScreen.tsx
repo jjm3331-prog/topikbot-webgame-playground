@@ -89,7 +89,7 @@ const SplashScreen = ({ progress = 0 }: SplashScreenProps) => {
           transition={{ delay: 0.5, duration: 0.5 }}
           className="mt-2 text-white/60 text-sm md:text-base font-body"
         >
-          Your Korean Mentor
+          당신의 한국어 멘토 / Người hướng dẫn tiếng Hàn của bạn
         </motion.p>
       </motion.div>
 
@@ -127,7 +127,7 @@ const SplashScreen = ({ progress = 0 }: SplashScreenProps) => {
         className="absolute bottom-6 text-center"
       >
         <p className="text-white/20 text-xs">
-          AI 기반 한국어 학습 RPG
+          AI 기반 한국어 학습 RPG / RPG học tiếng Hàn AI
         </p>
       </motion.div>
     </motion.div>

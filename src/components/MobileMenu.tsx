@@ -180,15 +180,15 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
                   </div>
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ color: '#00d4ff', fontSize: '14px', fontWeight: 'bold' }}>₩{userStats.money.toLocaleString()}</div>
-                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>소지금</div>
+                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>Tiền</div>
                   </div>
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ color: '#4ade80', fontSize: '16px', fontWeight: 'bold' }}>{userStats.missions_completed}</div>
-                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>미션</div>
+                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>NV</div>
                   </div>
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ color: '#facc15', fontSize: '16px', fontWeight: 'bold' }}>{userStats.points.toLocaleString()}</div>
-                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>포인트</div>
+                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>Điểm</div>
                   </div>
                 </div>
               )}
@@ -238,7 +238,7 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
               <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                 <div style={{ padding: '0 8px', marginBottom: '8px' }}>
                   <span style={{ fontSize: '12px', fontWeight: 600, color: '#00d4ff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    앱 설치 안내
+                    앱 설치 / Cài đặt app
                   </span>
                 </div>
 

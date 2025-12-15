@@ -18,7 +18,7 @@ const Footer = () => {
                 <NeonText variant="gradient">Game LUKATO</NeonText>
               </h3>
               <p className="text-xs text-white/50">
-                Your Korean Mentor
+                당신의 한국어 멘토 / Người hướng dẫn tiếng Hàn của bạn
               </p>
             </div>
           </div>
@@ -32,7 +32,7 @@ const Footer = () => {
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-card text-xs text-white/70 hover:text-white transition-colors"
             >
               <ExternalLink className="w-3 h-3" />
-              Hanoi Official
+              하노이 공식 / Hanoi Official
             </a>
             <a
               href="https://chat-topikbot.kr"

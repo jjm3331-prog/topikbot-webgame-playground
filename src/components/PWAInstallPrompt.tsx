@@ -150,15 +150,15 @@ const PWAInstallPrompt = () => {
               <div className="grid grid-cols-3 gap-2 mb-6">
                 <div className="bg-white/5 rounded-xl p-3 text-center">
                   <span className="text-2xl">⚡</span>
-                  <p className="text-white/80 text-xs mt-1">빠른 실행</p>
+                  <p className="text-white/80 text-xs mt-1">빠른 실행 / Nhanh</p>
                 </div>
                 <div className="bg-white/5 rounded-xl p-3 text-center">
                   <span className="text-2xl">📴</span>
-                  <p className="text-white/80 text-xs mt-1">오프라인</p>
+                  <p className="text-white/80 text-xs mt-1">오프라인 / Offline</p>
                 </div>
                 <div className="bg-white/5 rounded-xl p-3 text-center">
                   <span className="text-2xl">🔔</span>
-                  <p className="text-white/80 text-xs mt-1">알림</p>
+                  <p className="text-white/80 text-xs mt-1">알림 / Thông báo</p>
                 </div>
               </div>
 
@@ -176,7 +176,7 @@ const PWAInstallPrompt = () => {
                   className="flex-1 bg-gradient-to-r from-neon-cyan to-neon-pink hover:from-neon-cyan/90 hover:to-neon-pink/90 text-white font-bold"
                 >
                   <Download className="w-4 h-4 mr-2" />
-                  설치하기
+                  설치 / Cài đặt
                 </Button>
               </div>
             </div>
