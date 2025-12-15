@@ -294,9 +294,66 @@ export default function Manager() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="max-w-md mx-auto space-y-6"
+              className="max-w-md mx-auto space-y-6 pb-8"
             >
-              <div className="text-center mb-8">
+              {/* 게임 소개 섹션 */}
+              <div className="bg-gradient-to-br from-pink-500/10 to-purple-600/10 border border-pink-500/20 rounded-xl p-5 space-y-4">
+                <div className="text-center">
+                  <h1 className="text-xl font-bold text-pink-400 mb-1">🎤 LUKATO 매니저</h1>
+                  <p className="text-sm text-purple-300">Quản lý LUKATO - Game quản lý nhóm nhạc K-POP</p>
+                </div>
+
+                <div className="space-y-3 text-sm">
+                  <div className="bg-zinc-800/50 rounded-lg p-3">
+                    <p className="font-medium text-zinc-200">📖 게임 소개 / Giới thiệu game</p>
+                    <p className="text-zinc-400 mt-1">
+                      당신은 K-POP 그룹의 매니저입니다. 연습생 선발부터 데뷔까지, 
+                      대화와 결정으로 그룹의 운명을 좌우하세요.
+                    </p>
+                    <p className="text-zinc-500 mt-1 text-xs">
+                      Bạn là quản lý của nhóm nhạc K-POP. Từ tuyển chọn thực tập sinh đến debut, 
+                      hãy quyết định vận mệnh của nhóm thông qua đối thoại và lựa chọn.
+                    </p>
+                  </div>
+
+                  <div className="bg-zinc-800/50 rounded-lg p-3">
+                    <p className="font-medium text-zinc-200">🎮 플레이 방식 / Cách chơi</p>
+                    <p className="text-zinc-400 mt-1">
+                      미션마다 <span className="text-pink-400">한국어</span>로 응답하세요. 
+                      AI가 정확성, 어조, 의도를 평가하여 점수를 매깁니다.
+                    </p>
+                    <p className="text-zinc-500 mt-1 text-xs">
+                      Mỗi nhiệm vụ, hãy trả lời bằng <span className="text-pink-400">tiếng Hàn</span>. 
+                      AI sẽ chấm điểm dựa trên độ chính xác, giọng điệu và ý định.
+                    </p>
+                  </div>
+
+                  <div className="bg-zinc-800/50 rounded-lg p-3">
+                    <p className="font-medium text-zinc-200">🏆 시즌제 / Hệ thống mùa</p>
+                    <p className="text-zinc-400 mt-1">
+                      <span className="text-yellow-400">시즌 1</span>: 데뷔 전쟁 (4주간 데뷔 준비)
+                    </p>
+                    <p className="text-zinc-500 mt-1 text-xs">
+                      <span className="text-yellow-400">Mùa 1</span>: Cuộc chiến Debut (4 tuần chuẩn bị debut)
+                    </p>
+                  </div>
+
+                  <div className="bg-zinc-800/50 rounded-lg p-3">
+                    <p className="font-medium text-zinc-200">💡 팁 / Mẹo</p>
+                    <p className="text-zinc-400 mt-1">
+                      존댓말을 사용하고, 상황에 맞는 어조로 대화하세요. 
+                      멘탈, 케미, 미디어 지표가 게임에 영향을 줍니다.
+                    </p>
+                    <p className="text-zinc-500 mt-1 text-xs">
+                      Sử dụng kính ngữ và nói chuyện với giọng điệu phù hợp. 
+                      Các chỉ số tinh thần, hòa hợp, truyền thông ảnh hưởng đến game.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 설정 영역 */}
+              <div className="text-center">
                 <h2 className="text-2xl font-bold mb-2">시즌 1: 데뷔 전쟁</h2>
                 <p className="text-zinc-400 text-sm">Mùa 1: Cuộc chiến Debut</p>
               </div>
