@@ -8,35 +8,69 @@ const corsHeaders = {
 
 const MODEL = "grok-4-1-fast-non-reasoning";
 
-const SYSTEM_PROMPT = `당신은 한국어 끝말잇기 게임의 AI이자 한국어 교사입니다.
+// 두음법칙 매핑 (역방향 포함)
+const DUEUM_MAP: Record<string, string[]> = {
+  '녀': ['여'],
+  '뇨': ['요'],
+  '뉴': ['유'],
+  '니': ['이'],
+  '랴': ['야'],
+  '려': ['여'],
+  '례': ['예'],
+  '료': ['요'],
+  '류': ['유'],
+  '리': ['이'],
+  '라': ['나'],
+  '렬': ['열'],
+  '률': ['율'],
+  '륭': ['융'],
+};
 
-규칙:
-1. 상대방이 말한 단어의 마지막 글자로 시작하는 한국어 단어를 말해야 합니다
-2. 이미 사용된 단어는 다시 사용할 수 없습니다
-3. 명사 사용 가능 (고유명사도 허용! 지명, 인물, 음식명 등 모두 OK)
-4. 한 글자 단어는 사용할 수 없습니다
-5. 두음법칙을 적용합니다 (례→예, 렬→열, 리→이, 라→나, 녀→여, 뇨→요, 뉴→유, 니→이)
-
-중요: 이 게임의 목적은 한국어 학습입니다!
-- 각 단어에 대해 상세한 설명을 제공해주세요
-- 베트남 학습자를 위해 베트남어로 뜻과 설명을 함께 제공합니다
-- 다양한 주제의 단어를 사용하세요 (음식, 동물, 장소, 물건, 추상명사, 한국 문화 등)
-
-응답 형식 (JSON만, 마크다운/설명 텍스트 금지):
-{
-  "valid": true/false,
-  "reason_ko": "판정 이유 (한국어)",
-  "reason_vi": "Lý do (베트남어)",
-  "user_word_explanation": "사용자 단어의 뜻과 설명 (베트남어, 2-3문장)",
-  "ai_word": "AI의 단어 (valid가 true일 때만)",
-  "ai_word_meaning": "단어 뜻 (베트남어, 간단히)",
-  "ai_word_explanation": "단어의 상세 설명, 예문, 문화적 맥락 등 (베트남어, 2-3문장)",
-  "game_over": false,
-  "winner": null
+// 두음법칙 적용 가능한 글자 목록 (시작글자로 가능한 모든 변환)
+function getValidStartChars(lastChar: string): string[] {
+  const result = [lastChar];
+  
+  // 두음법칙 정방향: 원래 글자 → 변환된 글자
+  if (DUEUM_MAP[lastChar]) {
+    result.push(...DUEUM_MAP[lastChar]);
+  }
+  
+  // 두음법칙 역방향: 변환된 글자 → 원래 글자
+  for (const [original, converted] of Object.entries(DUEUM_MAP)) {
+    if (converted.includes(lastChar)) {
+      result.push(original);
+    }
+  }
+  
+  return [...new Set(result)];
 }
 
-상대방 단어가 규칙에 어긋나면 valid: false, game_over: true, winner: "ai"
-AI가 단어를 못 찾으면 valid: true, game_over: true, winner: "user"`;
+const SYSTEM_PROMPT = `당신은 한국어 끝말잇기 게임 AI입니다.
+
+## 핵심 규칙 (절대 준수)
+1. **끝말잇기 규칙**: 상대방 단어의 마지막 글자로 시작하는 단어를 말해야 함
+2. **중복 금지**: 이미 사용된 단어는 다시 사용 불가
+3. **명사만**: 한국어 명사 (고유명사 포함 - 지명, 인물, 음식 등 OK)
+4. **최소 2글자**: 한 글자 단어 금지
+5. **두음법칙**: 례→예, 렬→열, 리→이, 라→나, 녀→여, 뇨→요, 뉴→유, 니→이
+
+## 게임 로직
+- 사용자 단어가 규칙 위반이면: valid=false, game_over=true, winner="ai"
+- AI가 단어를 못 찾으면: valid=true, game_over=true, winner="user"
+- 정상 진행: valid=true, game_over=false, winner=null
+
+## 응답 형식 (JSON만 출력, 다른 텍스트 금지)
+{
+  "valid": boolean,
+  "reason_ko": "판정 이유 (한국어)",
+  "reason_vi": "Lý do (베트남어)",
+  "user_word_explanation": "사용자 단어 뜻/설명 (베트남어, 2-3문장)",
+  "ai_word": "AI의 단어",
+  "ai_word_meaning": "단어 뜻 (베트남어)",
+  "ai_word_explanation": "상세 설명 (베트남어, 2-3문장)",
+  "game_over": boolean,
+  "winner": null | "ai" | "user"
+}`;
 
 const KOREAN_REGEX = /^[\uAC00-\uD7AF]+$/;
 
@@ -79,18 +113,62 @@ function isNonEmptyString(v: unknown, maxLen = 2000): v is string {
   return typeof v === "string" && v.trim().length > 0 && v.length <= maxLen;
 }
 
-function isValidAiWordCandidate(params: {
-  aiWord: unknown;
+// 사용자 단어가 규칙에 맞는지 서버에서 직접 검증
+function validateUserWordChain(params: {
+  userWord: string;
   lastChar: string | null;
   usedWords: string[];
+}): { valid: boolean; reason_ko: string; reason_vi: string } {
+  const { userWord, lastChar, usedWords } = params;
+  
+  // 중복 체크
+  if (usedWords.includes(userWord)) {
+    return {
+      valid: false,
+      reason_ko: `"${userWord}"는 이미 사용된 단어입니다.`,
+      reason_vi: `"${userWord}" đã được sử dụng rồi.`,
+    };
+  }
+  
+  // 첫 번째 단어는 끝말잇기 규칙 적용 안 함
+  if (!lastChar) {
+    return { valid: true, reason_ko: "", reason_vi: "" };
+  }
+  
+  // 끝말잇기 규칙 체크 (두음법칙 적용)
+  const validStarts = getValidStartChars(lastChar);
+  const firstChar = userWord[0];
+  
+  if (!validStarts.includes(firstChar)) {
+    return {
+      valid: false,
+      reason_ko: `"${userWord}"는 "${lastChar}"(으)로 시작해야 합니다. (두음법칙: ${validStarts.join(', ')})`,
+      reason_vi: `"${userWord}" phải bắt đầu bằng "${lastChar}". (Quy tắc đầu âm: ${validStarts.join(', ')})`,
+    };
+  }
+  
+  return { valid: true, reason_ko: "", reason_vi: "" };
+}
+
+// AI 단어가 규칙에 맞는지 검증
+function validateAiWord(params: {
+  aiWord: unknown;
+  requiredStartChar: string;
+  usedWords: string[];
 }): boolean {
-  const { aiWord, lastChar, usedWords } = params;
+  const { aiWord, requiredStartChar, usedWords } = params;
+  
   if (!isNonEmptyString(aiWord, 40)) return false;
+  
   const w = aiWord.trim();
   if (!KOREAN_REGEX.test(w)) return false;
   if (w.length < 2) return false;
   if (usedWords.includes(w)) return false;
-  if (lastChar && w[0] !== lastChar) return false;
+  
+  // AI 단어는 사용자 단어의 마지막 글자로 시작해야 함
+  const validStarts = getValidStartChars(requiredStartChar);
+  if (!validStarts.includes(w[0])) return false;
+  
   return true;
 }
 
@@ -152,8 +230,6 @@ serve(async (req) => {
 
     const userWord = validateKoreanWord(body.userWord);
     const lastChar = validateString(body.lastChar, 1);
-
-    // usedWords는 클라이언트에서 전달되지만, 안정성을 위해 서버에서도 보정
     const usedWords = validateUsedWords(body.usedWords);
 
     if (!userWord) {
@@ -172,15 +248,48 @@ serve(async (req) => {
       );
     }
 
-    const usedWordsSafe = Array.from(new Set([...usedWords, userWord])).slice(-150);
+    // 서버에서 직접 사용자 단어 규칙 검증
+    const userValidation = validateUserWordChain({
+      userWord,
+      lastChar,
+      usedWords,
+    });
 
-    const usedWordsList = usedWordsSafe.join(", ");
-    const basePrompt = lastChar
-      ? `이전 단어의 마지막 글자: "${lastChar}". 사용자가 말한 단어: "${userWord}". 이미 사용된 단어들: [${usedWordsList}].\n\n이 단어가 규칙에 맞는지 확인하고, 맞다면 끝말잇기를 이어가세요.`
-      : `게임 시작! 사용자가 첫 단어로 "${userWord}"를 말했습니다.\n\n이 단어가 유효한지 확인하고 끝말잇기를 이어가세요.`;
+    if (!userValidation.valid) {
+      return new Response(
+        JSON.stringify({
+          valid: false,
+          reason_ko: userValidation.reason_ko,
+          reason_vi: userValidation.reason_vi,
+          user_word_explanation: "",
+          ai_word: "",
+          ai_word_meaning: "",
+          ai_word_explanation: "",
+          game_over: true,
+          winner: "ai",
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    const usedWordsSafe = Array.from(new Set([...usedWords, userWord])).slice(-150);
+    const userWordLastChar = userWord[userWord.length - 1];
+    const validNextStarts = getValidStartChars(userWordLastChar);
+
+    const basePrompt = `사용자 단어: "${userWord}" (마지막 글자: "${userWordLastChar}")
+이미 사용된 단어: [${usedWordsSafe.join(", ")}]
+
+★★★ 중요 ★★★
+1. AI 단어(ai_word)는 반드시 "${validNextStarts.join('" 또는 "')}"(으)로 시작해야 합니다!
+2. 이미 사용된 단어 목록에 있는 단어는 절대 사용하지 마세요!
+3. JSON 형식으로만 응답하세요!
+
+사용자 단어 "${userWord}"의 뜻을 베트남어로 설명하고, 끝말잇기를 이어가세요.`;
 
     // 1차 시도
-    let aiText = await callXAI({ apiKey: X_AI_API_KEY, prompt: basePrompt, temperature: 0.8 });
+    let aiText = await callXAI({ apiKey: X_AI_API_KEY, prompt: basePrompt, temperature: 0.7 });
 
     const tryParse = (text: string): Record<string, unknown> | null => {
       const jsonStr = extractFirstJsonObject(text);
@@ -195,35 +304,77 @@ serve(async (req) => {
 
     let parsed = tryParse(aiText);
 
-    const needsRepair = (obj: Record<string, unknown> | null): boolean => {
-      if (!obj) return true;
-      if (typeof obj.valid !== "boolean") return true;
-      if (obj.valid === true && obj.game_over !== true) {
-        return !isValidAiWordCandidate({
-          aiWord: obj.ai_word,
-          lastChar: lastChar ?? null,
-          usedWords: usedWordsSafe,
-        });
-      }
-      return false;
+    // AI 응답 검증
+    const isAiWordValid = (obj: Record<string, unknown> | null): boolean => {
+      if (!obj) return false;
+      if (obj.valid !== true) return true; // valid가 false면 게임오버이므로 OK
+      if (obj.game_over === true) return true; // 게임오버면 OK
+      
+      // valid=true이고 game_over가 아니면 ai_word 검증
+      return validateAiWord({
+        aiWord: obj.ai_word,
+        requiredStartChar: userWordLastChar,
+        usedWords: usedWordsSafe,
+      });
     };
 
-    // 2차(수정) 시도: JSON 강제 + 시작글자/중복 강제
-    if (needsRepair(parsed)) {
-      const repairPrompt = `${basePrompt}\n\n[출력 규칙] 오직 JSON 객체 1개만 출력. 마크다운/설명/텍스트 절대 금지.\n$${
-        lastChar ? `ai_word는 반드시 "${lastChar}"로 시작해야 함.` : ""
-      }\nai_word는 usedWords 목록에 없는 단어여야 함.`;
-      aiText = await callXAI({ apiKey: X_AI_API_KEY, prompt: repairPrompt, temperature: 0.2 });
+    // 2차 시도: AI 응답이 규칙 위반이면 재시도
+    if (!isAiWordValid(parsed)) {
+      console.log("1차 시도 실패, 재시도:", parsed?.ai_word);
+      
+      const repairPrompt = `${basePrompt}
+
+[경고] 이전 응답의 ai_word가 규칙 위반입니다!
+- ai_word는 반드시 "${validNextStarts[0]}"(으)로 시작해야 합니다
+- 예시: "${validNextStarts[0]}자" "${validNextStarts[0]}리" "${validNextStarts[0]}음" 등
+- 오직 JSON만 출력하세요!`;
+
+      aiText = await callXAI({ apiKey: X_AI_API_KEY, prompt: repairPrompt, temperature: 0.3 });
       parsed = tryParse(aiText);
     }
 
-    if (!parsed) {
+    // 3차 시도: 여전히 실패하면 한 번 더
+    if (!isAiWordValid(parsed)) {
+      console.log("2차 시도 실패, 최종 시도:", parsed?.ai_word);
+      
+      const finalPrompt = `"${userWord}"의 마지막 글자는 "${userWordLastChar}"입니다.
+"${validNextStarts[0]}"(으)로 시작하는 한국어 명사를 하나 말하세요.
+
+사용 불가 단어: ${usedWordsSafe.join(", ")}
+
+JSON 형식:
+{
+  "valid": true,
+  "reason_ko": "정상",
+  "reason_vi": "Hợp lệ",
+  "user_word_explanation": "${userWord}의 베트남어 설명",
+  "ai_word": "${validNextStarts[0]}???",
+  "ai_word_meaning": "뜻",
+  "ai_word_explanation": "설명",
+  "game_over": false,
+  "winner": null
+}`;
+
+      aiText = await callXAI({ apiKey: X_AI_API_KEY, prompt: finalPrompt, temperature: 0.1 });
+      parsed = tryParse(aiText);
+    }
+
+    // 최종 검증 실패 시 AI 패배 처리
+    if (!parsed || !isAiWordValid(parsed)) {
+      console.log("모든 시도 실패, AI 패배 처리");
       return new Response(
         JSON.stringify({
-          error: "AI 응답 처리에 실패했습니다. 잠시 후 다시 시도해주세요.",
+          valid: true,
+          reason_ko: `"${userWord}" 정상! AI가 "${userWordLastChar}"(으)로 시작하는 단어를 찾지 못했습니다.`,
+          reason_vi: `"${userWord}" hợp lệ! AI không tìm được từ bắt đầu bằng "${userWordLastChar}".`,
+          user_word_explanation: "",
+          ai_word: "",
+          ai_word_meaning: "",
+          ai_word_explanation: "",
+          game_over: true,
+          winner: "user",
         }),
         {
-          status: 502,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         },
       );
