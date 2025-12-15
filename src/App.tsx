@@ -19,6 +19,7 @@ import KDrama from "./pages/KDrama";
 import KPop from "./pages/KPop";
 import Tutorial from "./pages/Tutorial";
 import PWAGuide from "./pages/PWAGuide";
+import Manager from "./pages/Manager";
 import NotFound from "./pages/NotFound";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWAWelcome from "./components/PWAWelcome";
@@ -110,6 +111,7 @@ const App = () => {
             <Route path="/kpop" element={<KPop />} />
             <Route path="/tutorial" element={<Tutorial />} />
             <Route path="/pwa-guide" element={<PWAGuide />} />
+            <Route path="/manager" element={<Manager />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

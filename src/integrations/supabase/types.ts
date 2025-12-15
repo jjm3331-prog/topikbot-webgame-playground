@@ -47,6 +47,146 @@ export type Database = {
         }
         Relationships: []
       }
+      manager_chapter_logs: {
+        Row: {
+          chapter_number: number
+          choices_made: Json
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          dialogue_history: Json
+          game_save_id: string
+          id: string
+          score_grammar: number | null
+          score_intent: number | null
+          score_tone: number | null
+          stat_changes: Json
+          stt_responses: Json
+          total_score: number | null
+        }
+        Insert: {
+          chapter_number: number
+          choices_made?: Json
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          dialogue_history?: Json
+          game_save_id: string
+          id?: string
+          score_grammar?: number | null
+          score_intent?: number | null
+          score_tone?: number | null
+          stat_changes?: Json
+          stt_responses?: Json
+          total_score?: number | null
+        }
+        Update: {
+          chapter_number?: number
+          choices_made?: Json
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          dialogue_history?: Json
+          game_save_id?: string
+          id?: string
+          score_grammar?: number | null
+          score_intent?: number | null
+          score_tone?: number | null
+          stat_changes?: Json
+          stt_responses?: Json
+          total_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manager_chapter_logs_game_save_id_fkey"
+            columns: ["game_save_id"]
+            isOneToOne: false
+            referencedRelation: "manager_game_saves"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      manager_game_saves: {
+        Row: {
+          created_at: string
+          current_chapter: number
+          current_day: number
+          ending_type: string | null
+          gauge_obsession: number
+          gauge_rumor: number
+          group_concept: Database["public"]["Enums"]["group_concept"]
+          group_gender: Database["public"]["Enums"]["group_gender"]
+          group_name: string
+          id: string
+          money: number
+          relationships: Json
+          season: number
+          stat_chemistry: number
+          stat_condition: number
+          stat_dance: number
+          stat_fandom_power: number
+          stat_media_tone: number
+          stat_mental: number
+          stat_variety: number
+          stat_vocal: number
+          story_flags: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_chapter?: number
+          current_day?: number
+          ending_type?: string | null
+          gauge_obsession?: number
+          gauge_rumor?: number
+          group_concept?: Database["public"]["Enums"]["group_concept"]
+          group_gender?: Database["public"]["Enums"]["group_gender"]
+          group_name?: string
+          id?: string
+          money?: number
+          relationships?: Json
+          season?: number
+          stat_chemistry?: number
+          stat_condition?: number
+          stat_dance?: number
+          stat_fandom_power?: number
+          stat_media_tone?: number
+          stat_mental?: number
+          stat_variety?: number
+          stat_vocal?: number
+          story_flags?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_chapter?: number
+          current_day?: number
+          ending_type?: string | null
+          gauge_obsession?: number
+          gauge_rumor?: number
+          group_concept?: Database["public"]["Enums"]["group_concept"]
+          group_gender?: Database["public"]["Enums"]["group_gender"]
+          group_name?: string
+          id?: string
+          money?: number
+          relationships?: Json
+          season?: number
+          stat_chemistry?: number
+          stat_condition?: number
+          stat_dance?: number
+          stat_fandom_power?: number
+          stat_media_tone?: number
+          stat_mental?: number
+          stat_variety?: number
+          stat_vocal?: number
+          story_flags?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -150,7 +290,8 @@ export type Database = {
       increment_cache_hit: { Args: { p_id: string }; Returns: undefined }
     }
     Enums: {
-      [_ in never]: never
+      group_concept: "fresh" | "crush" | "hiphop" | "retro" | "dark" | "band"
+      group_gender: "male" | "female" | "mixed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -277,6 +418,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      group_concept: ["fresh", "crush", "hiphop", "retro", "dark", "band"],
+      group_gender: ["male", "female", "mixed"],
+    },
   },
 } as const
