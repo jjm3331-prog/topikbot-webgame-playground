@@ -148,7 +148,9 @@ const WordChain = () => {
     setWords(prev => [...prev, { word, isUser: true }]);
 
     try {
-      const usedWords = [...words.map(w => w.word), word];
+      // IMPORTANT: usedWords는 "이미 사용된 단어(이전 턴까지)"만 전달해야 합니다.
+      // 현재 입력한 word를 포함시키면 서버에서 즉시 '이미 사용됨'으로 판정됩니다.
+      const usedWords = words.map(w => w.word);
       
       const { data, error } = await supabase.functions.invoke("word-chain", {
         body: { userWord: word, usedWords, lastChar },
