@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { ChevronRight, Sparkles, Flame, Music, Star, AlertTriangle, Users, Loader2 } from 'lucide-react';
+import { ChevronRight, Sparkles, Flame, Music, Star, AlertTriangle, Users, Loader2, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import AppHeader from '@/components/AppHeader';
 
 // NPC 캐릭터 이미지 임포트
@@ -147,6 +147,10 @@ export default function Manager() {
   const [groupConcept, setGroupConcept] = useState<GroupConcept>('fresh');
   const [groupGender, setGroupGender] = useState<GroupGender>('mixed');
   
+  // STT/TTS 설정
+  const [sttEnabled, setSttEnabled] = useState(false);
+  const [ttsEnabled, setTtsEnabled] = useState(false);
+  
   // 게임 상태
   const [currentChapter, setCurrentChapter] = useState(1);
   const [storyData, setStoryData] = useState<StoryData | null>(null);
@@ -162,6 +166,12 @@ export default function Manager() {
   const [userInput, setUserInput] = useState('');
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [scoreResult, setScoreResult] = useState<any>(null);
+  
+  // 오디오 상태
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTtsPlaying, setIsTtsPlaying] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   // 스토리 로드
   const loadStory = async (chapter: number) => {
@@ -302,6 +312,10 @@ export default function Manager() {
               setGroupGender={setGroupGender}
               groupConcept={groupConcept}
               setGroupConcept={setGroupConcept}
+              sttEnabled={sttEnabled}
+              setSttEnabled={setSttEnabled}
+              ttsEnabled={ttsEnabled}
+              setTtsEnabled={setTtsEnabled}
               isLoading={isLoading}
               onStart={startGame}
             />
@@ -316,7 +330,8 @@ export default function Manager() {
           {phase === 'prologue' && storyData && (
             <ProloguePhase 
               storyData={storyData} 
-              onContinue={startDialogue} 
+              onContinue={startDialogue}
+              ttsEnabled={ttsEnabled}
             />
           )}
 
@@ -327,6 +342,9 @@ export default function Manager() {
               dialogueIndex={dialogueIndex}
               stats={stats}
               onNext={nextDialogue}
+              ttsEnabled={ttsEnabled}
+              isTtsPlaying={isTtsPlaying}
+              setIsTtsPlaying={setIsTtsPlaying}
             />
           )}
 
@@ -338,6 +356,11 @@ export default function Manager() {
               userInput={userInput}
               setUserInput={setUserInput}
               onSubmit={submitMission}
+              sttEnabled={sttEnabled}
+              isRecording={isRecording}
+              setIsRecording={setIsRecording}
+              mediaRecorderRef={mediaRecorderRef}
+              audioChunksRef={audioChunksRef}
             />
           )}
 
@@ -363,7 +386,8 @@ export default function Manager() {
 // ================== 설정 화면 ==================
 function SetupPhase({ 
   groupName, setGroupName, groupGender, setGroupGender, 
-  groupConcept, setGroupConcept, isLoading, onStart 
+  groupConcept, setGroupConcept, sttEnabled, setSttEnabled,
+  ttsEnabled, setTtsEnabled, isLoading, onStart 
 }: any) {
   return (
     <motion.div
@@ -480,6 +504,53 @@ function SetupPhase({
           </div>
         </div>
 
+        {/* STT/TTS 설정 */}
+        <div className="space-y-3 bg-zinc-800/50 border border-zinc-700 rounded-xl p-4">
+          <p className="text-sm font-medium text-zinc-300">🔊 음성 설정 / Cài đặt giọng nói</p>
+          
+          {/* TTS 토글 */}
+          <button
+            onClick={() => setTtsEnabled(!ttsEnabled)}
+            className={`w-full flex items-center justify-between p-3 rounded-lg border transition-all ${
+              ttsEnabled 
+                ? 'bg-purple-500/20 border-purple-500' 
+                : 'bg-zinc-700/50 border-zinc-600'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              {ttsEnabled ? <Volume2 className="w-5 h-5 text-purple-400" /> : <VolumeX className="w-5 h-5 text-zinc-500" />}
+              <div className="text-left">
+                <p className="text-sm font-medium">TTS (음성 출력)</p>
+                <p className="text-xs text-zinc-500">NPC 대사를 음성으로 듣기 / Nghe lời thoại NPC</p>
+              </div>
+            </div>
+            <div className={`w-12 h-6 rounded-full transition-colors ${ttsEnabled ? 'bg-purple-500' : 'bg-zinc-600'}`}>
+              <div className={`w-5 h-5 bg-white rounded-full mt-0.5 transition-transform ${ttsEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
+            </div>
+          </button>
+
+          {/* STT 토글 */}
+          <button
+            onClick={() => setSttEnabled(!sttEnabled)}
+            className={`w-full flex items-center justify-between p-3 rounded-lg border transition-all ${
+              sttEnabled 
+                ? 'bg-pink-500/20 border-pink-500' 
+                : 'bg-zinc-700/50 border-zinc-600'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              {sttEnabled ? <Mic className="w-5 h-5 text-pink-400" /> : <MicOff className="w-5 h-5 text-zinc-500" />}
+              <div className="text-left">
+                <p className="text-sm font-medium">STT (음성 입력)</p>
+                <p className="text-xs text-zinc-500">마이크로 한국어 말하기 / Nói tiếng Hàn bằng mic</p>
+              </div>
+            </div>
+            <div className={`w-12 h-6 rounded-full transition-colors ${sttEnabled ? 'bg-pink-500' : 'bg-zinc-600'}`}>
+              <div className={`w-5 h-5 bg-white rounded-full mt-0.5 transition-transform ${sttEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
+            </div>
+          </button>
+        </div>
+
         <Button
           onClick={onStart}
           disabled={isLoading}
@@ -515,7 +586,46 @@ function LoadingPhase({ chapter }: { chapter: number }) {
 }
 
 // ================== 프롤로그 화면 ==================
-function ProloguePhase({ storyData, onContinue }: { storyData: StoryData; onContinue: () => void }) {
+function ProloguePhase({ storyData, onContinue, ttsEnabled }: { 
+  storyData: StoryData; onContinue: () => void; ttsEnabled: boolean 
+}) {
+  const [isTtsPlaying, setIsTtsPlaying] = useState(false);
+
+  const playTts = async (text: string) => {
+    if (!ttsEnabled || !text) return;
+    setIsTtsPlaying(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/drama-tts`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ text, voice: 'nova' }),
+        }
+      );
+      const data = await response.json();
+      if (data.audioContent) {
+        const audio = new Audio(`data:audio/mpeg;base64,${data.audioContent}`);
+        audio.onended = () => setIsTtsPlaying(false);
+        await audio.play();
+      }
+    } catch (error) {
+      console.error('TTS error:', error);
+    } finally {
+      setIsTtsPlaying(false);
+    }
+  };
+
+  useEffect(() => {
+    if (ttsEnabled && storyData.scene.prologue_ko) {
+      const timer = setTimeout(() => playTts(storyData.scene.prologue_ko), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [ttsEnabled, storyData.scene.prologue_ko]);
+
   return (
     <motion.div
       key="prologue"
@@ -524,7 +634,6 @@ function ProloguePhase({ storyData, onContinue }: { storyData: StoryData; onCont
       exit={{ opacity: 0 }}
       className="h-full flex flex-col"
     >
-      {/* 배경 이미지 */}
       <div className="absolute inset-0 -z-10">
         <img 
           src={getLocationBackground(storyData.chapter.location)} 
@@ -535,7 +644,6 @@ function ProloguePhase({ storyData, onContinue }: { storyData: StoryData; onCont
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(168,85,247,0.15)_0%,transparent_60%)]" />
       </div>
 
-      {/* 챕터 정보 */}
       <motion.div 
         initial={{ y: -30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -545,15 +653,12 @@ function ProloguePhase({ storyData, onContinue }: { storyData: StoryData; onCont
         <div className="inline-block px-4 py-1 bg-pink-500/20 border border-pink-500/50 rounded-full text-pink-400 text-sm mb-3">
           {storyData.chapter.day}
         </div>
-        <h1 className="text-3xl font-bold text-white mb-1">
-          Chapter {storyData.chapter.number}
-        </h1>
+        <h1 className="text-3xl font-bold text-white mb-1">Chapter {storyData.chapter.number}</h1>
         <h2 className="text-xl text-pink-400">{storyData.chapter.title_ko}</h2>
         <p className="text-zinc-400 text-sm">{storyData.chapter.title_vi}</p>
         <p className="text-zinc-500 text-xs mt-2">📍 {storyData.chapter.location}</p>
       </motion.div>
 
-      {/* 프롤로그 텍스트 */}
       <div className="flex-1 flex items-center justify-center p-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -561,31 +666,31 @@ function ProloguePhase({ storyData, onContinue }: { storyData: StoryData; onCont
           transition={{ delay: 0.6 }}
           className="max-w-md text-center space-y-6 bg-black/40 backdrop-blur-sm p-6 rounded-2xl"
         >
-          <p className="text-xl text-zinc-200 leading-relaxed font-medium">
-            {storyData.scene.prologue_ko}
-          </p>
-          <p className="text-sm text-zinc-400">
-            {storyData.scene.prologue_vi}
-          </p>
-          
-          <div className="pt-4 text-zinc-500 text-sm">
-            {storyData.scene.setting_ko}
+          <div className="relative">
+            <p className="text-xl text-zinc-200 leading-relaxed font-medium">{storyData.scene.prologue_ko}</p>
+            {isTtsPlaying && (
+              <motion.div
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ repeat: Infinity, duration: 1 }}
+                className="absolute -right-2 -top-2 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center"
+              >
+                <Volume2 className="w-3 h-3 text-white" />
+              </motion.div>
+            )}
           </div>
+          <p className="text-sm text-zinc-400">{storyData.scene.prologue_vi}</p>
+          <div className="pt-4 text-zinc-500 text-sm">{storyData.scene.setting_ko}</div>
         </motion.div>
       </div>
 
-      {/* 계속 버튼 */}
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
         className="p-6"
       >
-        <Button
-          onClick={onContinue}
-          className="w-full py-5 bg-gradient-to-r from-pink-600 to-purple-600 text-lg font-bold"
-        >
-          시작하기 <ChevronRight className="w-5 h-5 ml-2" />
+        <Button onClick={onContinue} className="w-full py-5 bg-gradient-to-r from-pink-600 to-purple-600 text-lg font-bold">
+          시작하기 / Bắt đầu <ChevronRight className="w-5 h-5 ml-2" />
         </Button>
       </motion.div>
     </motion.div>
@@ -593,11 +698,46 @@ function ProloguePhase({ storyData, onContinue }: { storyData: StoryData; onCont
 }
 
 // ================== 대화 화면 ==================
-function DialoguePhase({ storyData, dialogueIndex, stats, onNext }: { 
-  storyData: StoryData; dialogueIndex: number; stats: GameStats; onNext: () => void 
+function DialoguePhase({ storyData, dialogueIndex, stats, onNext, ttsEnabled, isTtsPlaying, setIsTtsPlaying }: { 
+  storyData: StoryData; dialogueIndex: number; stats: GameStats; onNext: () => void;
+  ttsEnabled: boolean; isTtsPlaying: boolean; setIsTtsPlaying: (v: boolean) => void;
 }) {
   const currentLine = storyData.dialogue[dialogueIndex];
   const progress = ((dialogueIndex + 1) / storyData.dialogue.length) * 100;
+
+  const playTts = async (text: string) => {
+    if (!ttsEnabled || !text) return;
+    setIsTtsPlaying(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/drama-tts`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ text, voice: 'nova' }),
+        }
+      );
+      const data = await response.json();
+      if (data.audioContent) {
+        const audio = new Audio(`data:audio/mpeg;base64,${data.audioContent}`);
+        audio.onended = () => setIsTtsPlaying(false);
+        await audio.play();
+      }
+    } catch (error) {
+      console.error('TTS error:', error);
+    } finally {
+      setIsTtsPlaying(false);
+    }
+  };
+
+  useEffect(() => {
+    if (ttsEnabled && currentLine?.text_ko) {
+      playTts(currentLine.text_ko);
+    }
+  }, [dialogueIndex, ttsEnabled]);
 
   return (
     <motion.div
@@ -607,7 +747,6 @@ function DialoguePhase({ storyData, dialogueIndex, stats, onNext }: {
       exit={{ opacity: 0 }}
       className="h-full flex flex-col"
     >
-      {/* 배경 이미지 */}
       <div className="absolute inset-0 -z-10">
         <img 
           src={getLocationBackground(storyData.chapter.location)} 
@@ -617,11 +756,22 @@ function DialoguePhase({ storyData, dialogueIndex, stats, onNext }: {
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-purple-950/40 to-black/80" />
       </div>
 
-      {/* 상단 HUD */}
       <div className="p-3 bg-black/60 backdrop-blur-sm border-b border-zinc-700/50">
         <div className="flex justify-between items-center text-xs mb-2">
           <span className="text-zinc-400">📍 {storyData.chapter.location}</span>
-          <span className="text-pink-400">{dialogueIndex + 1} / {storyData.dialogue.length}</span>
+          <div className="flex items-center gap-2">
+            {isTtsPlaying && (
+              <motion.div
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ repeat: Infinity, duration: 1 }}
+                className="flex items-center gap-1 text-purple-400"
+              >
+                <Volume2 className="w-3 h-3" />
+                <span>재생중</span>
+              </motion.div>
+            )}
+            <span className="text-pink-400">{dialogueIndex + 1} / {storyData.dialogue.length}</span>
+          </div>
         </div>
         <div className="h-1 bg-zinc-800 rounded-full overflow-hidden">
           <motion.div 
@@ -632,7 +782,6 @@ function DialoguePhase({ storyData, dialogueIndex, stats, onNext }: {
         </div>
       </div>
 
-      {/* 캐릭터 영역 */}
       <div className="flex-1 flex items-center justify-center p-4">
         <motion.div
           key={dialogueIndex}
@@ -640,17 +789,15 @@ function DialoguePhase({ storyData, dialogueIndex, stats, onNext }: {
           animate={{ scale: 1, opacity: 1 }}
           className="text-center"
         >
-          {/* NPC 초상화 또는 이모지 폴백 */}
           {getNpcPortrait(currentLine?.speaker || '') ? (
             <div className="relative mx-auto mb-4">
-              <div className="w-32 h-32 rounded-full overflow-hidden border-3 border-purple-400/50 shadow-[0_0_50px_rgba(168,85,247,0.4)]">
+              <div className={`w-32 h-32 rounded-full overflow-hidden border-3 border-purple-400/50 shadow-[0_0_50px_rgba(168,85,247,0.4)] ${isTtsPlaying ? 'animate-pulse' : ''}`}>
                 <img 
                   src={getNpcPortrait(currentLine?.speaker || '')!}
                   alt={currentLine?.speaker}
                   className="w-full h-full object-cover"
                 />
               </div>
-              {/* 감정 이모지 배지 */}
               <div className="absolute -bottom-1 -right-1 w-10 h-10 bg-zinc-800 rounded-full border-2 border-purple-400 flex items-center justify-center">
                 <span className="text-xl">
                   {currentLine?.emotion ? EMOTION_EMOJIS[currentLine.emotion] || '😐' : '🎭'}
@@ -658,7 +805,7 @@ function DialoguePhase({ storyData, dialogueIndex, stats, onNext }: {
               </div>
             </div>
           ) : (
-            <div className="w-28 h-28 mx-auto rounded-full bg-gradient-to-br from-purple-500/30 to-pink-500/30 border-2 border-purple-400/50 flex items-center justify-center shadow-[0_0_50px_rgba(168,85,247,0.3)] mb-4">
+            <div className={`w-28 h-28 mx-auto rounded-full bg-gradient-to-br from-purple-500/30 to-pink-500/30 border-2 border-purple-400/50 flex items-center justify-center shadow-[0_0_50px_rgba(168,85,247,0.3)] mb-4 ${isTtsPlaying ? 'animate-pulse' : ''}`}>
               <span className="text-5xl">
                 {currentLine?.emotion ? EMOTION_EMOJIS[currentLine.emotion] || '😐' : '🎭'}
               </span>
@@ -673,7 +820,6 @@ function DialoguePhase({ storyData, dialogueIndex, stats, onNext }: {
         </motion.div>
       </div>
 
-      {/* 대사 박스 */}
       <motion.div 
         key={`dialogue-${dialogueIndex}`}
         initial={{ y: 30, opacity: 0 }}
@@ -681,18 +827,14 @@ function DialoguePhase({ storyData, dialogueIndex, stats, onNext }: {
         onClick={onNext}
         className="mx-4 mb-4 p-5 bg-zinc-900/90 border border-zinc-700/50 rounded-2xl cursor-pointer hover:bg-zinc-800/90 transition-colors"
       >
-        <p className="text-lg text-white leading-relaxed mb-3">
-          {currentLine?.text_ko}
-        </p>
-        <p className="text-sm text-zinc-400">
-          {currentLine?.text_vi}
-        </p>
+        <p className="text-lg text-white leading-relaxed mb-3">{currentLine?.text_ko}</p>
+        <p className="text-sm text-zinc-400">{currentLine?.text_vi}</p>
         <motion.div
           animate={{ opacity: [0.4, 1, 0.4] }}
           transition={{ repeat: Infinity, duration: 1.5 }}
           className="flex items-center justify-end gap-1 mt-3 text-pink-400 text-xs"
         >
-          탭하여 계속 <ChevronRight className="w-3 h-3" />
+          탭하여 계속 / Chạm để tiếp tục <ChevronRight className="w-3 h-3" />
         </motion.div>
       </motion.div>
     </motion.div>
@@ -700,87 +842,93 @@ function DialoguePhase({ storyData, dialogueIndex, stats, onNext }: {
 }
 
 // ================== 미션 화면 ==================
-function MissionPhase({ storyData, stats, userInput, setUserInput, onSubmit }: {
+function MissionPhase({ storyData, stats, userInput, setUserInput, onSubmit, sttEnabled, isRecording, setIsRecording, mediaRecorderRef, audioChunksRef }: {
   storyData: StoryData; stats: GameStats; userInput: string; setUserInput: (v: string) => void; onSubmit: () => void;
+  sttEnabled: boolean; isRecording: boolean; setIsRecording: (v: boolean) => void;
+  mediaRecorderRef: React.MutableRefObject<MediaRecorder | null>;
+  audioChunksRef: React.MutableRefObject<Blob[]>;
 }) {
   const mission = storyData.mission;
+  const [isTranscribing, setIsTranscribing] = useState(false);
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+      mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunksRef.current.push(e.data); };
+      mediaRecorder.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        setIsTranscribing(true);
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = async () => {
+          try {
+            const base64 = (reader.result as string).split(',')[1];
+            const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/drama-dubbing`, {
+              method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
+              body: JSON.stringify({ audio: base64, mode: 'transcribe' }),
+            });
+            const data = await res.json();
+            if (data.transcribedText) { setUserInput(data.transcribedText); toast.success('✓ 음성 인식 완료!'); }
+          } catch (e) { toast.error('음성 인식 실패'); }
+          setIsTranscribing(false);
+        };
+      };
+      mediaRecorder.start();
+      setIsRecording(true);
+      toast.info('🎤 녹음 중... / Đang ghi âm...');
+    } catch { toast.error('마이크 접근 실패'); }
+  };
+
+  const stopRecording = () => { if (mediaRecorderRef.current && isRecording) { mediaRecorderRef.current.stop(); setIsRecording(false); } };
 
   return (
-    <motion.div
-      key="mission"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="h-full flex flex-col overflow-y-auto"
-    >
-      {/* 배경 이미지 */}
+    <motion.div key="mission" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full flex flex-col overflow-y-auto">
       <div className="absolute inset-0 -z-10">
-        <img 
-          src={getLocationBackground(storyData.chapter.location)} 
-          alt={storyData.chapter.location}
-          className="w-full h-full object-cover"
-        />
+        <img src={getLocationBackground(storyData.chapter.location)} alt="" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-purple-950/40 to-black/90" />
       </div>
-
-      {/* 미션 헤더 */}
       <div className="p-4 text-center border-b border-pink-500/30">
-        <motion.div
-          animate={{ scale: [1, 1.05, 1] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 bg-pink-500/20 border border-pink-500/50 rounded-full mb-3"
-        >
-          <span className="text-xl">🎯</span>
-          <span className="text-pink-400 font-bold">MISSION</span>
+        <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="inline-flex items-center gap-2 px-4 py-1.5 bg-pink-500/20 border border-pink-500/50 rounded-full mb-3">
+          <span className="text-xl">🎯</span><span className="text-pink-400 font-bold">MISSION</span>
         </motion.div>
         <h2 className="text-lg font-bold text-white">{storyData.chapter.title_ko}</h2>
       </div>
-
-      {/* 미션 내용 */}
       <div className="flex-1 p-4 space-y-4">
-        {/* 상황 설명 */}
         <div className="bg-zinc-900/80 border border-zinc-700/50 rounded-xl p-4">
           <h3 className="text-sm font-medium text-zinc-300 mb-2">📝 상황 / Tình huống</h3>
           <p className="text-white">{mission.intro_ko}</p>
           <p className="text-zinc-400 text-sm mt-2">{mission.intro_vi}</p>
         </div>
-
-        {/* 미션 지시 */}
         <div className="bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/30 rounded-xl p-4">
           <h3 className="text-sm font-medium text-pink-300 mb-2">🎤 당신이 할 말 / Bạn cần nói</h3>
           <p className="text-pink-100 font-medium">{mission.prompt_ko}</p>
           <p className="text-pink-300/70 text-sm mt-2">{mission.prompt_vi}</p>
         </div>
-
-        {/* 팁 & 금지 */}
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
             <h4 className="text-xs font-medium text-green-400 mb-2">✓ 팁</h4>
-            <ul className="text-xs text-green-300/80 space-y-1">
-              {mission.tips?.map((tip, i) => <li key={i}>• {tip}</li>)}
-            </ul>
+            <ul className="text-xs text-green-300/80 space-y-1">{mission.tips?.map((t, i) => <li key={i}>• {t}</li>)}</ul>
           </div>
           <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
             <h4 className="text-xs font-medium text-red-400 mb-2">✗ 금지</h4>
-            <ul className="text-xs text-red-300/80 space-y-1">
-              {mission.forbidden?.map((f, i) => <li key={i}>• {f}</li>)}
-            </ul>
+            <ul className="text-xs text-red-300/80 space-y-1">{mission.forbidden?.map((f, i) => <li key={i}>• {f}</li>)}</ul>
           </div>
         </div>
-
-        {/* 입력 */}
         <div className="space-y-3">
-          <textarea
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-            placeholder="한국어로 응답하세요... / Trả lời bằng tiếng Hàn..."
-            className="w-full bg-zinc-900/80 border-2 border-pink-500/30 rounded-xl px-4 py-3 resize-none h-28 focus:border-pink-500 focus:outline-none focus:shadow-[0_0_20px_rgba(236,72,153,0.2)] transition-all text-white placeholder:text-zinc-500"
-          />
-          <Button
-            onClick={onSubmit}
-            disabled={!userInput.trim()}
-            className="w-full py-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-lg font-bold disabled:opacity-50"
-          >
+          <div className="relative">
+            <textarea value={userInput} onChange={(e) => setUserInput(e.target.value)} placeholder="한국어로 응답하세요... / Trả lời bằng tiếng Hàn..." className="w-full bg-zinc-900/80 border-2 border-pink-500/30 rounded-xl px-4 py-3 resize-none h-28 focus:border-pink-500 focus:outline-none text-white placeholder:text-zinc-500" />
+            {sttEnabled && (
+              <button onClick={isRecording ? stopRecording : startRecording} disabled={isTranscribing} className={`absolute right-3 bottom-3 w-12 h-12 rounded-full flex items-center justify-center ${isRecording ? 'bg-red-500 animate-pulse' : isTranscribing ? 'bg-yellow-500' : 'bg-pink-500 hover:bg-pink-600'}`}>
+                {isTranscribing ? <Loader2 className="w-5 h-5 text-white animate-spin" /> : isRecording ? <MicOff className="w-5 h-5 text-white" /> : <Mic className="w-5 h-5 text-white" />}
+              </button>
+            )}
+          </div>
+          {sttEnabled && <p className="text-xs text-zinc-500 text-center">{isRecording ? '🔴 녹음 중...' : '🎤 마이크 버튼으로 음성 입력'}</p>}
+          <Button onClick={onSubmit} disabled={!userInput.trim() || isRecording || isTranscribing} className="w-full py-4 bg-gradient-to-r from-pink-500 to-purple-600 text-lg font-bold disabled:opacity-50">
             제출하기 / Gửi ✓
           </Button>
         </div>
