@@ -14,6 +14,14 @@ import trainerJiyeon from '@/assets/manager/trainer-jiyeon.jpg';
 import traineeSumin from '@/assets/manager/trainee-sumin.jpg';
 import pdMinho from '@/assets/manager/pd-minho.jpg';
 
+// 배경 이미지 임포트
+import bgPracticeRoom from '@/assets/manager/bg-practice-room.jpg';
+import bgRecordingStudio from '@/assets/manager/bg-recording-studio.jpg';
+import bgBroadcastStation from '@/assets/manager/bg-broadcast-station.jpg';
+import bgCeoOffice from '@/assets/manager/bg-ceo-office.jpg';
+import bgDormitory from '@/assets/manager/bg-dormitory.jpg';
+import bgBackstage from '@/assets/manager/bg-backstage.jpg';
+
 type GroupConcept = 'fresh' | 'crush' | 'hiphop' | 'retro' | 'dark' | 'band';
 type GroupGender = 'male' | 'female' | 'mixed';
 type GamePhase = 'setup' | 'loading' | 'prologue' | 'dialogue' | 'mission' | 'scoring' | 'result';
@@ -61,17 +69,43 @@ const NPC_PORTRAITS: Record<string, string> = {
   '트레이너 박지연': trainerJiyeon,
   '수민': traineeSumin,
   '연습생 수민': traineeSumin,
+  '하늘': traineeSumin,
+  '연습생 하늘': traineeSumin,
   '최민호': pdMinho,
   '예능 PD 최민호': pdMinho,
   'PD 최민호': pdMinho,
 };
 
+// 배경 이미지 매핑
+const LOCATION_BACKGROUNDS: Record<string, string> = {
+  '연습실': bgPracticeRoom,
+  '연습실 A': bgPracticeRoom,
+  '연습실 B': bgPracticeRoom,
+  '녹음실': bgRecordingStudio,
+  '방송국': bgBroadcastStation,
+  '방송국 회의실': bgBroadcastStation,
+  '대표실': bgCeoOffice,
+  '숙소': bgDormitory,
+  '기숙사': bgDormitory,
+  '백스테이지': bgBackstage,
+};
+
+// 위치로 배경 이미지 찾기
+function getLocationBackground(location: string): string {
+  if (LOCATION_BACKGROUNDS[location]) return LOCATION_BACKGROUNDS[location];
+  
+  for (const [key, value] of Object.entries(LOCATION_BACKGROUNDS)) {
+    if (location.includes(key) || key.includes(location)) {
+      return value;
+    }
+  }
+  return bgPracticeRoom; // 기본값
+}
+
 // NPC 이름으로 초상화 찾기
 function getNpcPortrait(speaker: string): string | null {
-  // 정확히 일치하는 경우
   if (NPC_PORTRAITS[speaker]) return NPC_PORTRAITS[speaker];
   
-  // 부분 일치하는 경우
   for (const [key, value] of Object.entries(NPC_PORTRAITS)) {
     if (speaker.includes(key) || key.includes(speaker)) {
       return value;
@@ -489,10 +523,15 @@ function ProloguePhase({ storyData, onContinue }: { storyData: StoryData; onCont
       exit={{ opacity: 0 }}
       className="h-full flex flex-col"
     >
-      {/* 배경 */}
+      {/* 배경 이미지 */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-purple-950/50 to-black" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(168,85,247,0.2)_0%,transparent_60%)]" />
+        <img 
+          src={getLocationBackground(storyData.chapter.location)} 
+          alt={storyData.chapter.location}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-purple-950/50 to-black/90" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(168,85,247,0.15)_0%,transparent_60%)]" />
       </div>
 
       {/* 챕터 정보 */}
@@ -519,7 +558,7 @@ function ProloguePhase({ storyData, onContinue }: { storyData: StoryData; onCont
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="max-w-md text-center space-y-6"
+          className="max-w-md text-center space-y-6 bg-black/40 backdrop-blur-sm p-6 rounded-2xl"
         >
           <p className="text-xl text-zinc-200 leading-relaxed font-medium">
             {storyData.scene.prologue_ko}
@@ -567,9 +606,14 @@ function DialoguePhase({ storyData, dialogueIndex, stats, onNext }: {
       exit={{ opacity: 0 }}
       className="h-full flex flex-col"
     >
-      {/* 배경 */}
+      {/* 배경 이미지 */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-purple-950/30 to-black" />
+        <img 
+          src={getLocationBackground(storyData.chapter.location)} 
+          alt={storyData.chapter.location}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-purple-950/40 to-black/80" />
       </div>
 
       {/* 상단 HUD */}
@@ -668,9 +712,14 @@ function MissionPhase({ storyData, stats, userInput, setUserInput, onSubmit }: {
       exit={{ opacity: 0 }}
       className="h-full flex flex-col overflow-y-auto"
     >
-      {/* 배경 */}
+      {/* 배경 이미지 */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-pink-950/30 via-purple-950/30 to-black" />
+        <img 
+          src={getLocationBackground(storyData.chapter.location)} 
+          alt={storyData.chapter.location}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-purple-950/40 to-black/90" />
       </div>
 
       {/* 미션 헤더 */}
