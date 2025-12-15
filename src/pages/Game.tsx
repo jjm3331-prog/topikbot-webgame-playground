@@ -256,6 +256,20 @@ const Game = () => {
           </h2>
           
           <div className="glass-card p-4 rounded-xl space-y-3">
+            {/* Season 2 공지 */}
+            <div className="flex items-start gap-3 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-lg p-3 border border-yellow-500/20">
+              <div className="w-8 h-8 rounded-lg bg-yellow-500/20 flex items-center justify-center shrink-0">
+                <span className="text-lg">🔥</span>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-yellow-400">SEASON 2 COMING SOON!</p>
+                <p className="text-xs text-yellow-300/70 mt-1">시즌 2: 첫 번째 히트곡 - 더 치열한 경쟁이 시작됩니다</p>
+                <p className="text-xs text-yellow-300/50">Mùa 2: Bản hit đầu tiên - Cuộc cạnh tranh khốc liệt hơn sắp bắt đầu</p>
+              </div>
+            </div>
+            
+            <div className="h-px bg-border" />
+            
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
                 <Sparkles className="w-4 h-4 text-primary" />

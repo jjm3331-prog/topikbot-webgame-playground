@@ -418,25 +418,6 @@ function SetupPhase({
           </div>
         </div>
 
-        {/* 시즌 2 공지 */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-xl p-4"
-        >
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">🔥</span>
-            <div className="flex-1">
-              <p className="font-bold text-yellow-400 text-sm">SEASON 2 COMING SOON!</p>
-              <p className="text-xs text-yellow-300/70 mt-0.5">
-                시즌 2: 첫 번째 히트곡 - 더 치열한 경쟁이 시작됩니다
-              </p>
-              <p className="text-xs text-yellow-300/50">
-                Mùa 2: Bản hit đầu tiên - Cuộc cạnh tranh khốc liệt hơn sắp bắt đầu
-              </p>
-            </div>
-          </div>
-        </motion.div>
 
         {/* 설정 */}
         <div className="text-center">
