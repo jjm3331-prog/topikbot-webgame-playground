@@ -22,7 +22,8 @@ import {
   HelpCircle,
   Play,
   ChevronRight,
-  Send
+  Send,
+  Crown
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import AppHeader from "@/components/AppHeader";
@@ -157,6 +158,10 @@ const Game = () => {
   const socialGames: GameItem[] = [
     { icon: <Heart className="w-5 h-5" />, title: "Love Signal", titleVi: "Tín hiệu tình yêu", tag: "연애", tagColor: "bg-neon-pink/20 text-neon-pink", route: "/dating" },
     { icon: <Trophy className="w-5 h-5" />, title: "랭킹", titleVi: "Xếp hạng", tag: "경쟁", tagColor: "bg-accent/20 text-accent", route: "/ranking" },
+  ];
+
+  const rpgGames: GameItem[] = [
+    { icon: <Crown className="w-5 h-5" />, title: "LUKATO 매니저", titleVi: "LUKATO Manager", tag: "NEW", tagColor: "bg-gradient-to-r from-pink-500/30 to-purple-500/30 text-pink-400", route: "/manager" },
   ];
 
   const GameCard = ({ game, index }: { game: GameItem; index: number }) => (
@@ -379,6 +384,22 @@ const Game = () => {
           </div>
           <div className="space-y-2">
             {socialGames.map((game, index) => (
+              <GameCard key={game.title} game={game} index={index} />
+            ))}
+          </div>
+        </div>
+
+        {/* RPG Games - NEW */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h2 className="font-bold text-foreground text-sm flex items-center gap-2">
+              👑 RPG 시뮬레이션
+              <span className="text-[10px] text-muted-foreground font-normal">RPG Simulation</span>
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gradient-to-r from-pink-500/30 to-purple-500/30 text-pink-400 animate-pulse">NEW</span>
+            </h2>
+          </div>
+          <div className="space-y-2">
+            {rpgGames.map((game, index) => (
               <GameCard key={game.title} game={game} index={index} />
             ))}
           </div>
