@@ -10,24 +10,17 @@ import {
   Target, 
   MapPin, 
   Dice6, 
-  Trophy, 
-  Briefcase, 
-  Link2, 
-  MessageSquare,
-  Zap,
-  ExternalLink,
-  Film,
-  Music,
   Star,
-  HelpCircle,
   Play,
-  ChevronRight,
   Send,
-  Crown
+  Crown,
+  Sparkles,
+  MessageCircle,
+  ExternalLink
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import AppHeader from "@/components/AppHeader";
-import AppFooter from "@/components/AppFooter";
+import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
 
 interface Profile {
@@ -38,15 +31,6 @@ interface Profile {
   missions_completed: number;
   total_missions: number;
   points: number;
-}
-
-interface GameItem {
-  icon: React.ReactNode;
-  title: string;
-  titleVi: string;
-  tag?: string;
-  tagColor?: string;
-  route: string;
 }
 
 const Game = () => {
@@ -138,57 +122,6 @@ const Game = () => {
       navigate("/chat", { state: { location: customLocation } });
     }
   };
-
-  const survivalGames: GameItem[] = [
-    { icon: <Dice6 className="w-5 h-5" />, title: "서울 생존", titleVi: "Sinh tồn Seoul", tag: "AI", route: "/chat" },
-    { icon: <Zap className="w-5 h-5" />, title: "파산 복구", titleVi: "Phục hồi phá sản", tag: "도전", tagColor: "bg-neon-green/20 text-neon-green", route: "/bankruptcy" },
-    { icon: <Briefcase className="w-5 h-5" />, title: "아르바이트", titleVi: "Làm thêm", tag: "돈벌기", tagColor: "bg-accent/20 text-accent", route: "/parttime" },
-  ];
-
-  const studyGames: GameItem[] = [
-    { icon: <Link2 className="w-5 h-5" />, title: "끝말잇기", titleVi: "Nối từ", tag: "어휘", route: "/wordchain" },
-    { icon: <MessageSquare className="w-5 h-5" />, title: "관용어 퀴즈", titleVi: "Quiz thành ngữ", tag: "문법", route: "/quiz" },
-  ];
-
-  const mediaGames: GameItem[] = [
-    { icon: <Film className="w-5 h-5" />, title: "K-Drama 더빙", titleVi: "Lồng tiếng K-Drama", tag: "YouTube", tagColor: "bg-destructive/20 text-destructive", route: "/kdrama" },
-    { icon: <Music className="w-5 h-5" />, title: "K-POP 가사", titleVi: "Lời K-POP", tag: "YouTube", tagColor: "bg-destructive/20 text-destructive", route: "/kpop" },
-  ];
-
-  const socialGames: GameItem[] = [
-    { icon: <Heart className="w-5 h-5" />, title: "Love Signal", titleVi: "Tín hiệu tình yêu", tag: "연애", tagColor: "bg-neon-pink/20 text-neon-pink", route: "/dating" },
-    { icon: <Trophy className="w-5 h-5" />, title: "랭킹", titleVi: "Xếp hạng", tag: "경쟁", tagColor: "bg-accent/20 text-accent", route: "/ranking" },
-  ];
-
-  const rpgGames: GameItem[] = [
-    { icon: <Crown className="w-5 h-5" />, title: "LUKATO 매니저", titleVi: "LUKATO Manager", tag: "NEW", tagColor: "bg-gradient-to-r from-pink-500/30 to-purple-500/30 text-pink-400", route: "/manager" },
-  ];
-
-  const GameCard = ({ game, index }: { game: GameItem; index: number }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1 * index }}
-      className="glass-card p-3 flex items-center gap-3 cursor-pointer hover:border-primary/40 transition-all active:scale-[0.98]"
-      onClick={() => navigate(game.route)}
-    >
-      <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-primary shrink-0">
-        {game.icon}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-0.5">
-          <h3 className="font-bold text-foreground text-sm">{game.title}</h3>
-          {game.tag && (
-            <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${game.tagColor || "bg-primary/20 text-primary"}`}>
-              {game.tag}
-            </span>
-          )}
-        </div>
-        <p className="text-[11px] text-muted-foreground">{game.titleVi}</p>
-      </div>
-      <ChevronRight className="w-4 h-4 text-muted-foreground" />
-    </motion.div>
-  );
 
   if (loading) {
     return (
@@ -329,195 +262,186 @@ const Game = () => {
           </div>
         </motion.div>
 
-        {/* Survival Games */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h2 className="font-bold text-foreground text-sm flex items-center gap-2">
-              🎮 서바이벌 게임
-              <span className="text-[10px] text-muted-foreground font-normal">Survival Games</span>
-            </h2>
-          </div>
-          <div className="space-y-2">
-            {survivalGames.map((game, index) => (
-              <GameCard key={game.title} game={game} index={index} />
-            ))}
-          </div>
-        </div>
-
-        {/* Study Games */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h2 className="font-bold text-foreground text-sm flex items-center gap-2">
-              📚 학습 게임
-              <span className="text-[10px] text-muted-foreground font-normal">Study Games</span>
-            </h2>
-          </div>
-          <div className="space-y-2">
-            {studyGames.map((game, index) => (
-              <GameCard key={game.title} game={game} index={index} />
-            ))}
-          </div>
-        </div>
-
-        {/* Media Games */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h2 className="font-bold text-foreground text-sm flex items-center gap-2">
-              🎬 미디어 게임
-              <span className="text-[10px] text-muted-foreground font-normal">Media Games</span>
-            </h2>
-          </div>
-          <div className="space-y-2">
-            {mediaGames.map((game, index) => (
-              <GameCard key={game.title} game={game} index={index} />
-            ))}
-          </div>
-        </div>
-
-        {/* Social Games */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h2 className="font-bold text-foreground text-sm flex items-center gap-2">
-              💬 소셜 게임
-              <span className="text-[10px] text-muted-foreground font-normal">Social Games</span>
-            </h2>
-          </div>
-          <div className="space-y-2">
-            {socialGames.map((game, index) => (
-              <GameCard key={game.title} game={game} index={index} />
-            ))}
-          </div>
-        </div>
-
-        {/* RPG Games - NEW */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h2 className="font-bold text-foreground text-sm flex items-center gap-2">
-              👑 RPG 시뮬레이션
-              <span className="text-[10px] text-muted-foreground font-normal">RPG Simulation</span>
-              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gradient-to-r from-pink-500/30 to-purple-500/30 text-pink-400 animate-pulse">NEW</span>
-            </h2>
-          </div>
-          <div className="space-y-2">
-            {rpgGames.map((game, index) => (
-              <GameCard key={game.title} game={game} index={index} />
-            ))}
-          </div>
-        </div>
-
-        {/* External Links */}
-        <div className="space-y-2">
-          <h2 className="font-bold text-foreground text-sm flex items-center gap-2">
-            🔗 외부 링크
-            <span className="text-[10px] text-muted-foreground font-normal">External Links</span>
-          </h2>
-          <div className="grid grid-cols-2 gap-2">
-            <a href="https://hanoi.topikbot.kr" target="_blank" rel="noopener noreferrer" className="block">
-              <div className="glass-card p-3 flex items-center gap-2 hover:border-primary/40 transition-all">
-                <ExternalLink className="w-4 h-4 text-secondary" />
-                <div>
-                  <p className="text-xs font-bold text-foreground">Hanoi 공식</p>
-                  <p className="text-[9px] text-muted-foreground">Trang chính thức</p>
-                </div>
-              </div>
-            </a>
-            <a href="https://chat-topikbot.kr" target="_blank" rel="noopener noreferrer" className="block">
-              <div className="glass-card p-3 flex items-center gap-2 hover:border-primary/40 transition-all">
-                <ExternalLink className="w-4 h-4 text-neon-purple" />
-                <div>
-                  <p className="text-xs font-bold text-foreground">LUKATO AI</p>
-                  <p className="text-[9px] text-muted-foreground">Dịch vụ AI</p>
-                </div>
-              </div>
-            </a>
-          </div>
-        </div>
-
-        {/* Tutorial Button */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="glass-card p-4 flex items-center gap-3 cursor-pointer hover:border-primary/40 transition-all"
-          onClick={() => navigate("/tutorial")}
+        {/* NEW Game Featured Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-pink-500/20 via-purple-500/20 to-indigo-500/20 border border-primary/30 p-5"
         >
-          <div className="w-10 h-10 rounded-xl bg-secondary/20 flex items-center justify-center">
-            <HelpCircle className="w-5 h-5 text-secondary" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-pink-500/30 to-purple-500/30 blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-indigo-500/30 to-pink-500/30 blur-2xl" />
+          
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-gradient-to-r from-pink-500 to-purple-500 text-white animate-pulse">
+                🔥 NEW RELEASE
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-500/30 to-purple-500/30 flex items-center justify-center border border-primary/30">
+                <Crown className="w-7 h-7 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-foreground">LUKATO 매니저</h3>
+                <p className="text-xs text-muted-foreground">LUKATO Manager Simulation</p>
+              </div>
+            </div>
+            
+            <p className="text-sm text-foreground/80 mb-4 leading-relaxed">
+              🎤 K-POP 아이돌 그룹의 매니저가 되어 스타로 키워보세요!
+              <br />
+              <span className="text-muted-foreground text-xs">Trở thành quản lý và đào tạo nhóm nhạc K-POP!</span>
+            </p>
+            
+            <div className="flex flex-wrap gap-2 mb-4">
+              <span className="px-2 py-1 rounded-full text-[10px] bg-muted/50 text-foreground">🎭 스토리 RPG</span>
+              <span className="px-2 py-1 rounded-full text-[10px] bg-muted/50 text-foreground">🎙️ 음성 대화</span>
+              <span className="px-2 py-1 rounded-full text-[10px] bg-muted/50 text-foreground">📈 성장 시뮬</span>
+            </div>
+            
+            <Button 
+              onClick={() => navigate("/manager")}
+              className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              지금 시작하기
+            </Button>
           </div>
-          <div className="flex-1">
-            <h3 className="font-bold text-foreground text-sm">사용법 안내</h3>
-            <p className="text-[11px] text-muted-foreground">Hướng dẫn sử dụng chi tiết</p>
+        </motion.div>
+
+        {/* Info Cards */}
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="space-y-3"
+        >
+          <h2 className="font-bold text-foreground text-sm flex items-center gap-2">
+            📢 공지사항
+            <span className="text-[10px] text-muted-foreground font-normal">Thông báo</span>
+          </h2>
+          
+          <div className="glass-card p-4 rounded-xl space-y-3">
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
+                <Sparkles className="w-4 h-4 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">시즌 1 업데이트 완료!</p>
+                <p className="text-xs text-muted-foreground mt-1">LUKATO 매니저 챕터 1이 추가되었습니다. 지금 바로 체험해보세요!</p>
+              </div>
+            </div>
+            
+            <div className="h-px bg-border" />
+            
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center shrink-0">
+                <Star className="w-4 h-4 text-accent" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">신규 유저 환영 보너스</p>
+                <p className="text-xs text-muted-foreground mt-1">매일 첫 접속시 보너스 포인트를 받으세요! / Nhận điểm thưởng hàng ngày!</p>
+              </div>
+            </div>
           </div>
-          <ChevronRight className="w-4 h-4 text-muted-foreground" />
         </motion.div>
 
         {/* Review Section */}
-        <div className="space-y-2">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="space-y-3"
+        >
           <h2 className="font-bold text-foreground text-sm flex items-center gap-2">
-            ⭐ 후기 작성
-            <span className="text-[10px] text-muted-foreground font-normal">Viết đánh giá</span>
+            💬 후기 남기기
+            <span className="text-[10px] text-muted-foreground font-normal">Để lại đánh giá</span>
           </h2>
+          
           <div className="glass-card p-4 rounded-xl space-y-3">
-            {/* Rating Stars */}
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">평점:</span>
-              <div className="flex items-center gap-1">
+              <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
                     onClick={() => setNewRating(star)}
                     className="transition-transform hover:scale-110"
                   >
-                    <Star
-                      className={`w-5 h-5 ${star <= newRating ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground'}`}
+                    <Star 
+                      className={`w-5 h-5 ${star <= newRating ? "text-accent fill-accent" : "text-muted-foreground"}`}
                     />
                   </button>
                 ))}
               </div>
             </div>
             
-            {/* Anonymous Option */}
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isAnonymous}
-                onChange={(e) => setIsAnonymous(e.target.checked)}
-                className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
-              />
-              <span className="text-xs text-muted-foreground">익명으로 등록 / Đăng ẩn danh</span>
-            </label>
-            
-            {/* Review Input */}
             <Textarea
-              placeholder="게임 후기를 남겨주세요 (최대 200자) / Viết đánh giá (tối đa 200 ký tự)"
+              placeholder="게임 후기를 작성해주세요... (200자 이내)"
               value={newReview}
               onChange={(e) => setNewReview(e.target.value)}
-              className="bg-muted border-border text-foreground placeholder:text-muted-foreground min-h-[80px] text-sm resize-none"
-              maxLength={200}
+              className="bg-muted border-border text-foreground placeholder:text-muted-foreground text-sm resize-none h-20"
             />
-            <p className="text-[10px] text-muted-foreground text-right">{newReview.length}/200</p>
             
-            {/* Submit Button */}
-            <Button
-              onClick={handleSubmitReview}
-              disabled={isSubmitting || !newReview.trim()}
-              className="w-full h-9 bg-primary hover:bg-primary/90 text-primary-foreground text-xs"
-            >
-              {isSubmitting ? (
-                "등록중... / Đang đăng..."
-              ) : (
-                <>
-                  <Send className="w-3.5 h-3.5 mr-1.5" />
-                  후기 등록 / Đăng đánh giá
-                </>
-              )}
-            </Button>
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isAnonymous}
+                  onChange={(e) => setIsAnonymous(e.target.checked)}
+                  className="rounded border-border"
+                />
+                익명으로 작성
+              </label>
+              
+              <Button 
+                size="sm"
+                onClick={handleSubmitReview}
+                disabled={isSubmitting || !newReview.trim()}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              >
+                <Send className="w-3.5 h-3.5 mr-1.5" />
+                등록
+              </Button>
+            </div>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Footer */}
-      <AppFooter compact />
+      <Footer />
+
+      {/* LUKATO AI Floating Button */}
+      <a
+        href="https://chat-topikbot.kr"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-24 right-4 z-50"
+      >
+        <motion.div
+          animate={{ 
+            scale: [1, 1.1, 1],
+            boxShadow: [
+              "0 0 0 0 rgba(251, 191, 36, 0.4)",
+              "0 0 0 15px rgba(251, 191, 36, 0)",
+              "0 0 0 0 rgba(251, 191, 36, 0)"
+            ]
+          }}
+          transition={{ 
+            duration: 1.5,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="w-14 h-14 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center shadow-lg shadow-yellow-500/30 cursor-pointer hover:from-yellow-300 hover:to-amber-400 transition-colors"
+        >
+          <MessageCircle className="w-6 h-6 text-white" />
+        </motion.div>
+        <span className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full text-[8px] font-bold bg-white text-amber-600 shadow-sm">
+          AI
+        </span>
+      </a>
     </div>
   );
 };
