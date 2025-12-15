@@ -76,7 +76,13 @@ const Quiz = () => {
     setHintUsed(false);
     setShowHint(false);
     try {
-      const { data, error } = await supabase.functions.invoke("idiom-quiz", { body: { difficulty, exclude: usedExpressions, usedExpressions } });
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id || null;
+      const sessionId = userId ? null : `anon_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+      
+      const { data, error } = await supabase.functions.invoke("idiom-quiz", { 
+        body: { difficulty, userId, sessionId } 
+      });
       if (error) throw error;
       if (data.error) { toast({ title: "오류 / Lỗi", description: data.error, variant: "destructive" }); return; }
       setQuestion(data);

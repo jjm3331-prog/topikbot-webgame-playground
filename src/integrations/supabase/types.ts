@@ -86,6 +86,33 @@ export type Database = {
         }
         Relationships: []
       }
+      quiz_history: {
+        Row: {
+          created_at: string
+          difficulty: string
+          expression: string
+          id: string
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          difficulty: string
+          expression: string
+          id?: string
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          difficulty?: string
+          expression?: string
+          id?: string
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           content: string
@@ -119,6 +146,7 @@ export type Database = {
     }
     Functions: {
       cleanup_expired_cache: { Args: never; Returns: undefined }
+      cleanup_old_quiz_history: { Args: never; Returns: undefined }
       increment_cache_hit: { Args: { p_id: string }; Returns: undefined }
     }
     Enums: {
