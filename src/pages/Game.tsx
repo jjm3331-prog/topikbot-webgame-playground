@@ -2,21 +2,16 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { 
   Heart, 
   Coins, 
   Target, 
-  MapPin, 
-  Dice6, 
   Star,
-  Play,
   Send,
   Crown,
   Sparkles,
-  MessageCircle,
-  ExternalLink
+  MessageCircle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import AppHeader from "@/components/AppHeader";
@@ -36,7 +31,6 @@ interface Profile {
 const Game = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [customLocation, setCustomLocation] = useState("");
   const [newReview, setNewReview] = useState("");
   const [newRating, setNewRating] = useState(5);
   const [isAnonymous, setIsAnonymous] = useState(false);
@@ -105,23 +99,6 @@ const Game = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const handleStartSurvival = () => {
-    toast({
-      title: "서울 생존 시작!",
-      description: "AI가 시나리오를 생성중입니다... / AI đang tạo kịch bản...",
-    });
-    navigate("/chat");
-  };
-
-  const handleCustomLocation = () => {
-    if (customLocation.trim()) {
-      toast({
-        title: `${customLocation}에서 시작합니다!`,
-        description: `Bắt đầu tại ${customLocation}`,
-      });
-      navigate("/chat", { state: { location: customLocation } });
-    }
-  };
 
   if (loading) {
     return (
@@ -216,51 +193,6 @@ const Game = () => {
 
       {/* Main Content */}
       <div className="flex-1 px-4 pb-4 space-y-4 overflow-y-auto">
-        {/* Quick Start Section */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="glass-card p-4 rounded-xl"
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <Play className="w-4 h-4 text-primary" />
-            <h2 className="font-bold text-foreground text-sm">빠른 시작</h2>
-            <span className="text-[10px] text-muted-foreground">Quick Start</span>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <div className="flex items-center gap-1.5 mb-2">
-                <MapPin className="w-3.5 h-3.5 text-destructive" />
-                <span className="text-xs text-muted-foreground">장소 선택</span>
-              </div>
-              <Input
-                placeholder="예: 강남역..."
-                value={customLocation}
-                onChange={(e) => setCustomLocation(e.target.value)}
-                className="bg-muted border-border text-foreground placeholder:text-muted-foreground mb-2 h-9 text-xs"
-              />
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="w-full h-8 border-border text-foreground hover:bg-muted text-xs"
-                onClick={handleCustomLocation}
-              >
-                시작
-              </Button>
-            </div>
-            <div className="flex flex-col items-center justify-center glass-card p-3 rounded-lg">
-              <Dice6 className="w-8 h-8 text-primary mb-2" />
-              <span className="text-xs font-bold text-foreground mb-1">랜덤 서울</span>
-              <Button 
-                size="sm"
-                className="h-8 bg-primary hover:bg-primary/90 text-primary-foreground text-xs px-4"
-                onClick={handleStartSurvival}
-              >
-                10턴 도전!
-              </Button>
-            </div>
-          </div>
-        </motion.div>
 
         {/* NEW Game Featured Section */}
         <motion.div 
