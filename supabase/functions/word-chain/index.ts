@@ -1,9 +1,9 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 const SYSTEM_PROMPT = `당신은 한국어 끝말잇기 게임의 AI이자 한국어 교사입니다.
@@ -13,11 +13,12 @@ const SYSTEM_PROMPT = `당신은 한국어 끝말잇기 게임의 AI이자 한�
 2. 이미 사용된 단어는 다시 사용할 수 없습니다
 3. 명사 사용 가능 (고유명사도 허용! 지명, 인물, 음식명 등 모두 OK)
 4. 한 글자 단어는 사용할 수 없습니다
-5. 두음법칙을 적용합니다 (례→예, 렬→열, 리→이, 라→나 등)
+5. 두음법칙을 적용합니다 (례→예, 렬→열, 리→이, 라→나, 녀→여, 뇨→요, 뉴→유, 니→이)
 
 중요: 이 게임의 목적은 한국어 학습입니다!
 - 각 단어에 대해 상세한 설명을 제공해주세요
 - 베트남 학습자를 위해 베트남어로 뜻과 설명을 함께 제공합니다
+- 다양한 주제의 단어를 사용하세요 (음식, 동물, 장소, 물건, 추상명사, 한국 문화 등)
 
 응답 형식 (JSON만):
 {
@@ -60,61 +61,6 @@ function validateUsedWords(words: unknown): string[] {
     .slice(-100);
 }
 
-// Simple hash function for cache key
-function hashString(str: string): string {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return Math.abs(hash).toString(16);
-}
-
-// Cache functions
-async function getCachedResponse(supabase: any, cacheKey: string, functionName: string) {
-  try {
-    const { data, error } = await supabase
-      .from('ai_response_cache')
-      .select('id, response')
-      .eq('function_name', functionName)
-      .eq('cache_key', cacheKey)
-      .gt('expires_at', new Date().toISOString())
-      .maybeSingle();
-
-    if (error || !data) return null;
-
-    // Increment hit count (fire and forget)
-    supabase.rpc('increment_cache_hit', { p_id: data.id });
-    
-    console.log(`Cache HIT for ${functionName}:${cacheKey}`);
-    return data.response;
-  } catch {
-    return null;
-  }
-}
-
-async function setCachedResponse(supabase: any, cacheKey: string, functionName: string, requestParams: any, response: any) {
-  try {
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 24); // 24시간 캐시
-
-    await supabase
-      .from('ai_response_cache')
-      .upsert({
-        function_name: functionName,
-        cache_key: cacheKey,
-        request_params: requestParams,
-        response: response,
-        expires_at: expiresAt.toISOString()
-      }, { onConflict: 'function_name,cache_key' });
-
-    console.log(`Cache SET for ${functionName}:${cacheKey}`);
-  } catch (error) {
-    console.error('Cache set error:', error);
-  }
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -122,12 +68,10 @@ serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
-    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const X_AI_API_KEY = Deno.env.get("X_AI_API_KEY");
 
-    if (!GEMINI_API_KEY) {
-      throw new Error("GEMINI_API_KEY is not configured");
+    if (!X_AI_API_KEY) {
+      throw new Error("X_AI_API_KEY is not configured");
     }
 
     // Validate inputs
@@ -150,55 +94,31 @@ serve(async (req) => {
 
     console.log("Word chain request:", { userWord, usedWordsCount: usedWords.length, lastChar });
 
-    // Create cache key based on word and last character (usedWords excluded for broader caching)
-    const cacheKey = hashString(`${userWord}:${lastChar || 'start'}`);
-    
-    // Try cache first (only if Supabase is configured)
-    let cachedResponse = null;
-    let supabase = null;
-    
-    if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
-      supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-      cachedResponse = await getCachedResponse(supabase, cacheKey, 'word-chain');
-      
-      if (cachedResponse) {
-        // Check if AI word is in used words list
-        if (!cachedResponse.ai_word || !usedWords.includes(cachedResponse.ai_word)) {
-          return new Response(JSON.stringify(cachedResponse), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
-        }
-        // AI word already used, need to regenerate
-        console.log("Cached AI word already used, regenerating...");
-      }
-    }
-
     const usedWordsList = usedWords.join(", ");
     const userMessage = lastChar 
       ? `이전 단어의 마지막 글자: "${lastChar}". 사용자가 말한 단어: "${userWord}". 이미 사용된 단어들: [${usedWordsList}]. 이 단어가 규칙에 맞는지 확인하고, 맞다면 끝말잇기를 이어가세요.`
       : `게임 시작! 사용자가 첫 단어로 "${userWord}"를 말했습니다. 이 단어가 유효한지 확인하고 끝말잇기를 이어가세요.`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`, {
-      method: "POST",
+    const response = await fetch('https://api.x.ai/v1/chat/completions', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Authorization': `Bearer ${X_AI_API_KEY}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        contents: [
-          { role: "user", parts: [{ text: userMessage }] }
+        model: 'grok-3-fast',
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: userMessage }
         ],
-        systemInstruction: {
-          parts: [{ text: SYSTEM_PROMPT }]
-        },
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 1024,
-        }
+        temperature: 0.8,
+        max_tokens: 1024,
       }),
     });
 
     if (!response.ok) {
-      console.error("Gemini API error:", response.status);
+      const errorText = await response.text();
+      console.error("X AI API error:", response.status, errorText);
 
       if (response.status === 429) {
         return new Response(
@@ -206,13 +126,13 @@ serve(async (req) => {
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      throw new Error(`Gemini API error: ${response.status}`);
+      throw new Error(`X AI API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const aiMessage = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const aiMessage = data.choices?.[0]?.message?.content;
 
-    console.log("AI Response received");
+    console.log("X AI Response received");
 
     // Parse JSON response
     let parsedResponse;
@@ -233,11 +153,6 @@ serve(async (req) => {
         game_over: false,
         winner: null
       };
-    }
-
-    // Cache the response (if valid and game not over)
-    if (supabase && parsedResponse.valid && !parsedResponse.game_over && parsedResponse.ai_word) {
-      await setCachedResponse(supabase, cacheKey, 'word-chain', { userWord, lastChar }, parsedResponse);
     }
 
     return new Response(JSON.stringify(parsedResponse), {

@@ -1,316 +1,179 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// ============================================================
-// 3000+ 관용어/슬랭/속담/인터넷용어 데이터베이스
-// ============================================================
+const SYSTEM_PROMPT = `당신은 한국어 관용어/슬랭 퀴즈 출제자입니다.
+베트남 학습자를 위한 한국어 학습 게임입니다.
 
-interface ExpressionData {
-  expression: string;
-  type: "idiom" | "proverb" | "slang" | "internet";
-  difficulty: "easy" | "medium" | "hard";
-  meaning_ko: string;
-  meaning_vi: string;
-  hint_ko: string;
-  hint_vi: string;
-  explanation_ko: string;
-  explanation_vi: string;
-  example_ko: string;
-  example_vi: string;
-  wrong_meanings: { ko: string; vi: string }[];
+## 퀴즈 유형 (다양하게 출제)
+1. 전통 관용어/속담 (예: 발이 넓다, 눈이 높다, 귀가 얇다, 소 잃고 외양간 고친다)
+2. MZ세대 신조어/슬랭 (예: 갓생, 혼밥, 존맛, 꿀잼, 레게노, 킹받다, 억텐, 스불재)
+3. 인터넷 용어 (예: ㅋㅋ, ㄹㅇ, ㅇㅈ, 점메추, 저메추, 할많하않)
+4. 드라마/K-POP에서 자주 나오는 표현
+5. 2023-2024년 최신 유행어
+
+## 난이도별 기준
+- easy: MZ 슬랭, 인터넷 용어 위주 (젊은 세대가 SNS, 유튜브에서 실제로 쓰는 표현)
+- medium: 일상 관용어 + 인기 신조어 혼합
+- hard: 전통 속담, 사자성어, 어려운 관용어
+
+## 응답 형식 (반드시 JSON으로만 응답)
+{
+  "question": "퀴즈 질문 (한국어)",
+  "questionVi": "Câu hỏi (tiếng Việt)",
+  "expression": "관용어/슬랭 표현",
+  "hint": "힌트 (베트남어)",
+  "options": [
+    { "korean": "선택지1 (한국어)", "vietnamese": "Lựa chọn 1" },
+    { "korean": "선택지2 (한국어)", "vietnamese": "Lựa chọn 2" },
+    { "korean": "선택지3 (한국어)", "vietnamese": "Lựa chọn 3" },
+    { "korean": "선택지4 (한국어)", "vietnamese": "Lựa chọn 4" }
+  ],
+  "correctIndex": 0,
+  "explanation": "정답 해설 (한국어)",
+  "explanationVi": "Giải thích đáp án (tiếng Việt)",
+  "example": "예문 (한국어)",
+  "exampleVi": "Ví dụ (tiếng Việt)",
+  "category": "idiom/slang/internet/drama/proverb"
 }
 
-// 관용어 (idiom) - 500+
-const IDIOMS: ExpressionData[] = [
-  // Easy idioms
-  { expression: "발이 넓다", type: "idiom", difficulty: "easy", meaning_ko: "아는 사람이 많다", meaning_vi: "Quen biết nhiều người", hint_ko: "친구가 많은 사람을 생각해보세요", hint_vi: "Hãy nghĩ về người có nhiều bạn bè", explanation_ko: "발이 넓다는 것은 여기저기 많이 다니면서 아는 사람이 많다는 뜻입니다.", explanation_vi: "Nghĩa là đi nhiều nơi nên quen biết nhiều người.", example_ko: "그는 발이 넓어서 어디든 아는 사람이 있다.", example_vi: "Anh ấy quen biết rộng nên đi đâu cũng có người quen.", wrong_meanings: [{ ko: "발이 크다", vi: "Chân to" }, { ko: "걷기를 좋아한다", vi: "Thích đi bộ" }, { ko: "신발이 많다", vi: "Có nhiều giày" }] },
-  { expression: "눈이 높다", type: "idiom", difficulty: "easy", meaning_ko: "기준이 까다롭다", meaning_vi: "Tiêu chuẩn cao, khó tính", hint_ko: "물건이나 사람을 고를 때 까다로운 사람", hint_vi: "Người kén chọn khi chọn đồ hoặc người", explanation_ko: "눈이 높다는 것은 무언가를 선택할 때 기준이 높고 까다롭다는 뜻입니다.", explanation_vi: "Nghĩa là có tiêu chuẩn cao và khó tính khi chọn lựa.", example_ko: "그녀는 눈이 높아서 아직 결혼을 못 했어.", example_vi: "Cô ấy tiêu chuẩn cao nên vẫn chưa kết hôn.", wrong_meanings: [{ ko: "시력이 좋다", vi: "Thị lực tốt" }, { ko: "키가 크다", vi: "Cao lớn" }, { ko: "눈이 크다", vi: "Mắt to" }] },
-  { expression: "손이 크다", type: "idiom", difficulty: "easy", meaning_ko: "씀씀이가 크다, 후하다", meaning_vi: "Hào phóng, rộng rãi", hint_ko: "음식을 많이 하거나 돈을 잘 쓰는 사람", hint_vi: "Người nấu nhiều đồ ăn hoặc tiêu tiền rộng rãi", explanation_ko: "손이 크다는 것은 음식을 많이 만들거나 돈을 후하게 쓴다는 뜻입니다.", explanation_vi: "Nghĩa là nấu nhiều đồ ăn hoặc chi tiêu hào phóng.", example_ko: "우리 엄마는 손이 커서 항상 음식이 남아.", example_vi: "Mẹ tôi hào phóng nên lúc nào cũng thừa thức ăn.", wrong_meanings: [{ ko: "손이 물리적으로 크다", vi: "Tay to thật sự" }, { ko: "일을 잘한다", vi: "Làm việc giỏi" }, { ko: "힘이 세다", vi: "Lực lưỡng" }] },
-  { expression: "입이 무겁다", type: "idiom", difficulty: "easy", meaning_ko: "비밀을 잘 지킨다", meaning_vi: "Giữ bí mật tốt", hint_ko: "다른 사람 이야기를 잘 안 하는 사람", hint_vi: "Người không nói chuyện của người khác", explanation_ko: "입이 무겁다는 것은 말을 함부로 하지 않고 비밀을 잘 지킨다는 뜻입니다.", explanation_vi: "Nghĩa là không nói bừa và giữ bí mật tốt.", example_ko: "그 친구는 입이 무거워서 비밀을 말해도 괜찮아.", example_vi: "Bạn ấy kín miệng nên nói bí mật cũng được.", wrong_meanings: [{ ko: "말을 잘 못한다", vi: "Nói không giỏi" }, { ko: "음식을 많이 먹는다", vi: "Ăn nhiều" }, { ko: "입이 아프다", vi: "Đau miệng" }] },
-  { expression: "귀가 얇다", type: "idiom", difficulty: "easy", meaning_ko: "남의 말에 잘 흔들린다", meaning_vi: "Dễ bị ảnh hưởng bởi lời người khác", hint_ko: "다른 사람 말에 쉽게 영향받는 사람", hint_vi: "Người dễ bị ảnh hưởng bởi lời nói", explanation_ko: "귀가 얇다는 것은 남의 말을 쉽게 믿고 영향을 받는다는 뜻입니다.", explanation_vi: "Nghĩa là dễ tin và bị ảnh hưởng bởi lời người khác.", example_ko: "그는 귀가 얇아서 광고만 보면 다 사고 싶어해.", example_vi: "Anh ấy dễ dao động nên xem quảng cáo là muốn mua.", wrong_meanings: [{ ko: "귀가 작다", vi: "Tai nhỏ" }, { ko: "청력이 좋다", vi: "Thính lực tốt" }, { ko: "음악을 좋아한다", vi: "Thích âm nhạc" }] },
-  { expression: "배가 아프다", type: "idiom", difficulty: "easy", meaning_ko: "질투가 난다", meaning_vi: "Ghen tị", hint_ko: "다른 사람이 잘 될 때 느끼는 감정", hint_vi: "Cảm giác khi người khác thành công", explanation_ko: "배가 아프다는 것은 다른 사람의 성공이나 행복에 질투심을 느낀다는 뜻입니다.", explanation_vi: "Nghĩa là cảm thấy ghen tị với thành công hoặc hạnh phúc của người khác.", example_ko: "친구가 복권에 당첨되니까 배가 아프더라.", example_vi: "Bạn trúng xổ số nên tôi ghen tị quá.", wrong_meanings: [{ ko: "위장이 아프다", vi: "Đau dạ dày" }, { ko: "배고프다", vi: "Đói bụng" }, { ko: "소화가 안 된다", vi: "Khó tiêu" }] },
-  { expression: "눈이 빠지게 기다리다", type: "idiom", difficulty: "easy", meaning_ko: "간절히 기다리다", meaning_vi: "Chờ đợi mòn mỏi", hint_ko: "무언가를 정말 기다릴 때", hint_vi: "Khi thực sự chờ đợi điều gì đó", explanation_ko: "눈이 빠지게 기다린다는 것은 무언가를 매우 간절히 기다린다는 뜻입니다.", explanation_vi: "Nghĩa là chờ đợi điều gì đó rất tha thiết.", example_ko: "엄마를 눈이 빠지게 기다렸어.", example_vi: "Tôi đã chờ mẹ đến mòn mắt.", wrong_meanings: [{ ko: "눈이 나쁘다", vi: "Mắt kém" }, { ko: "졸리다", vi: "Buồn ngủ" }, { ko: "눈을 다쳤다", vi: "Bị thương mắt" }] },
-  { expression: "발이 묶이다", type: "idiom", difficulty: "easy", meaning_ko: "어디로 갈 수 없다", meaning_vi: "Không thể đi đâu được", hint_ko: "교통 문제로 이동이 안 될 때", hint_vi: "Khi không thể di chuyển vì giao thông", explanation_ko: "발이 묶이다는 것은 사정이 있어서 어디로도 갈 수 없는 상황입니다.", explanation_vi: "Nghĩa là không thể đi đâu vì hoàn cảnh.", example_ko: "폭설로 공항에서 발이 묶였어.", example_vi: "Bị mắc kẹt ở sân bay vì tuyết lớn.", wrong_meanings: [{ ko: "발을 다쳤다", vi: "Bị thương chân" }, { ko: "신발이 없다", vi: "Không có giày" }, { ko: "피곤하다", vi: "Mệt mỏi" }] },
-  { expression: "손에 땀을 쥐다", type: "idiom", difficulty: "easy", meaning_ko: "긴장되고 조마조마하다", meaning_vi: "Hồi hộp, căng thẳng", hint_ko: "스릴 있는 영화를 볼 때 느끼는 감정", hint_vi: "Cảm giác khi xem phim gay cấn", explanation_ko: "손에 땀을 쥔다는 것은 긴장되어 손에 땀이 날 정도라는 뜻입니다.", explanation_vi: "Nghĩa là căng thẳng đến mức tay đổ mồ hôi.", example_ko: "결승전이 너무 손에 땀을 쥐게 했어.", example_vi: "Trận chung kết làm tôi hồi hộp đến toát mồ hôi tay.", wrong_meanings: [{ ko: "손이 더럽다", vi: "Tay bẩn" }, { ko: "날씨가 덥다", vi: "Trời nóng" }, { ko: "열이 난다", vi: "Bị sốt" }] },
-  { expression: "입이 짧다", type: "idiom", difficulty: "easy", meaning_ko: "음식을 가리며 조금 먹는다", meaning_vi: "Kén ăn, ăn ít", hint_ko: "음식을 많이 안 먹는 사람", hint_vi: "Người ăn không nhiều", explanation_ko: "입이 짧다는 것은 음식을 가려 먹고 양도 적게 먹는다는 뜻입니다.", explanation_vi: "Nghĩa là kén ăn và ăn ít.", example_ko: "아이가 입이 짧아서 밥을 잘 안 먹어.", example_vi: "Đứa bé kén ăn nên không chịu ăn cơm.", wrong_meanings: [{ ko: "말을 짧게 한다", vi: "Nói ngắn gọn" }, { ko: "입술이 작다", vi: "Môi nhỏ" }, { ko: "비밀을 못 지킨다", vi: "Không giữ bí mật" }] },
-  { expression: "가슴이 뛰다", type: "idiom", difficulty: "easy", meaning_ko: "설레거나 두근거리다", meaning_vi: "Hồi hộp, xao xuyến", hint_ko: "좋아하는 사람을 볼 때 느끼는 감정", hint_vi: "Cảm giác khi gặp người mình thích", explanation_ko: "가슴이 뛴다는 것은 흥분이나 기대로 심장이 빨리 뛴다는 뜻입니다.", explanation_vi: "Nghĩa là tim đập nhanh vì phấn khích hoặc kỳ vọng.", example_ko: "첫 데이트라서 가슴이 뛰었어.", example_vi: "Vì là buổi hẹn hò đầu tiên nên tim đập thình thịch.", wrong_meanings: [{ ko: "운동을 한다", vi: "Tập thể dục" }, { ko: "심장병이 있다", vi: "Bị bệnh tim" }, { ko: "무섭다", vi: "Sợ hãi" }] },
-  { expression: "눈에 넣어도 아프지 않다", type: "idiom", difficulty: "easy", meaning_ko: "매우 사랑스럽고 소중하다", meaning_vi: "Rất đáng yêu và quý giá", hint_ko: "자녀나 손자를 볼 때 느끼는 감정", hint_vi: "Cảm giác khi nhìn con cháu", explanation_ko: "눈에 넣어도 아프지 않다는 것은 정말 사랑스럽다는 뜻입니다.", explanation_vi: "Nghĩa là vô cùng đáng yêu.", example_ko: "손녀가 눈에 넣어도 아프지 않을 만큼 예뻐.", example_vi: "Cháu gái đáng yêu đến mức bỏ vào mắt cũng không đau.", wrong_meanings: [{ ko: "아프지 않다", vi: "Không đau" }, { ko: "눈이 건강하다", vi: "Mắt khỏe" }, { ko: "안경이 필요 없다", vi: "Không cần kính" }] },
-  { expression: "머리가 굳다", type: "idiom", difficulty: "easy", meaning_ko: "생각이 유연하지 않다", meaning_vi: "Suy nghĩ không linh hoạt", hint_ko: "새로운 것을 배우기 어려워하는 상태", hint_vi: "Tình trạng khó học cái mới", explanation_ko: "머리가 굳다는 것은 나이가 들어 사고가 유연하지 않다는 뜻입니다.", explanation_vi: "Nghĩa là suy nghĩ kém linh hoạt vì tuổi tác.", example_ko: "나이가 드니까 머리가 굳어서 새로운 게 잘 안 들어와.", example_vi: "Có tuổi rồi nên đầu óc cứng nhắc, khó tiếp thu cái mới.", wrong_meanings: [{ ko: "두통이 있다", vi: "Đau đầu" }, { ko: "머리카락이 뻣뻣하다", vi: "Tóc cứng" }, { ko: "완고하다", vi: "Cố chấp" }] },
-  { expression: "코가 높다", type: "idiom", difficulty: "easy", meaning_ko: "자존심이 세다, 거만하다", meaning_vi: "Kiêu ngạo, tự cao", hint_ko: "자신을 대단하게 여기는 사람", hint_vi: "Người tự cho mình là ghê gớm", explanation_ko: "코가 높다는 것은 자존심이 강하고 거만하다는 뜻입니다.", explanation_vi: "Nghĩa là tự tôn cao và kiêu ngạo.", example_ko: "그 사람은 코가 높아서 다른 사람을 무시해.", example_vi: "Người đó kiêu ngạo nên coi thường người khác.", wrong_meanings: [{ ko: "코가 물리적으로 높다", vi: "Mũi cao thật sự" }, { ko: "냄새를 잘 맡는다", vi: "Đánh hơi tốt" }, { ko: "감기에 걸렸다", vi: "Bị cảm" }] },
-  { expression: "발등에 불이 떨어지다", type: "idiom", difficulty: "easy", meaning_ko: "매우 급하고 다급한 상황", meaning_vi: "Tình huống rất gấp gáp", hint_ko: "마감이 내일인데 시작도 안 했을 때", hint_vi: "Khi deadline là ngày mai mà chưa bắt đầu", explanation_ko: "발등에 불이 떨어지다는 것은 일이 매우 급해졌다는 뜻입니다.", explanation_vi: "Nghĩa là việc trở nên rất gấp.", example_ko: "시험이 내일인데 발등에 불이 떨어졌어.", example_vi: "Mai thi rồi mà tình hình gấp như lửa cháy.", wrong_meanings: [{ ko: "발을 다쳤다", vi: "Bị thương chân" }, { ko: "화재가 났다", vi: "Xảy ra hỏa hoạn" }, { ko: "발이 뜨겁다", vi: "Chân nóng" }] },
-  
-  // Medium idioms
-  { expression: "눈 밖에 나다", type: "idiom", difficulty: "medium", meaning_ko: "미움을 사다, 신임을 잃다", meaning_vi: "Mất lòng tin, bị ghét", hint_ko: "상사에게 미움받을 때", hint_vi: "Khi bị sếp ghét", explanation_ko: "눈 밖에 나다는 것은 상대방의 호감이나 신뢰를 잃었다는 뜻입니다.", explanation_vi: "Nghĩa là mất cảm tình hoặc lòng tin của ai đó.", example_ko: "실수를 많이 해서 사장님 눈 밖에 났어.", example_vi: "Sai sót nhiều nên bị sếp ghét.", wrong_meanings: [{ ko: "시력이 좋다", vi: "Thị lực tốt" }, { ko: "밖에 나갔다", vi: "Đi ra ngoài" }, { ko: "눈을 감았다", vi: "Nhắm mắt" }] },
-  { expression: "귀에 못이 박히다", type: "idiom", difficulty: "medium", meaning_ko: "같은 말을 여러 번 듣다", meaning_vi: "Nghe đi nghe lại nhiều lần", hint_ko: "엄마가 공부하라고 계속 말할 때", hint_vi: "Khi mẹ cứ bảo học hoài", explanation_ko: "귀에 못이 박히다는 것은 같은 말을 지겹게 들었다는 뜻입니다.", explanation_vi: "Nghĩa là nghe đi nghe lại đến chán.", example_ko: "공부하라는 말을 귀에 못이 박히도록 들었어.", example_vi: "Nghe câu 'học đi' đến mòn tai rồi.", wrong_meanings: [{ ko: "귀가 아프다", vi: "Đau tai" }, { ko: "청력이 나쁘다", vi: "Thính lực kém" }, { ko: "귀걸이를 했다", vi: "Đeo khuyên tai" }] },
-  { expression: "손이 맵다", type: "idiom", difficulty: "medium", meaning_ko: "때리면 아프다, 손이 세다", meaning_vi: "Đánh đau, tay mạnh", hint_ko: "때리면 아픈 사람", hint_vi: "Người đánh thì đau", explanation_ko: "손이 맵다는 것은 때리는 힘이 세서 맞으면 아프다는 뜻입니다.", explanation_vi: "Nghĩa là đánh mạnh nên bị đánh thì đau.", example_ko: "우리 엄마 손이 매워서 맞으면 진짜 아파.", example_vi: "Tay mẹ tôi nặng lắm, bị đánh là đau thật.", wrong_meanings: [{ ko: "손에서 매운 냄새가 난다", vi: "Tay có mùi cay" }, { ko: "요리를 잘한다", vi: "Nấu ăn giỏi" }, { ko: "손이 뜨겁다", vi: "Tay nóng" }] },
-  { expression: "귀가 가렵다", type: "idiom", difficulty: "medium", meaning_ko: "누가 내 얘기를 하는 것 같다", meaning_vi: "Có ai đang nói về mình", hint_ko: "갑자기 귀가 간지러울 때", hint_vi: "Khi tai đột nhiên ngứa", explanation_ko: "귀가 가렵다는 것은 누군가 자신에 대해 이야기하고 있다고 느낄 때 씁니다.", explanation_vi: "Dùng khi cảm thấy ai đó đang nói về mình.", example_ko: "갑자기 귀가 가려운데 누가 내 얘기 하나?", example_vi: "Tai tự nhiên ngứa, ai đang nói về mình à?", wrong_meanings: [{ ko: "귀가 아프다", vi: "Đau tai" }, { ko: "알레르기가 있다", vi: "Bị dị ứng" }, { ko: "귀를 씻어야 한다", vi: "Cần rửa tai" }] },
-  { expression: "입에 침이 마르다", type: "idiom", difficulty: "medium", meaning_ko: "칭찬을 많이 하다", meaning_vi: "Khen ngợi hết lời", hint_ko: "누군가를 계속 칭찬할 때", hint_vi: "Khi liên tục khen ai đó", explanation_ko: "입에 침이 마르도록은 어떤 것을 반복해서 칭찬한다는 뜻입니다.", explanation_vi: "Nghĩa là khen đi khen lại không ngớt.", example_ko: "선생님이 그 학생을 입에 침이 마르도록 칭찬했어.", example_vi: "Thầy giáo khen học sinh đó hết lời.", wrong_meanings: [{ ko: "목이 마르다", vi: "Khát nước" }, { ko: "말을 많이 했다", vi: "Nói nhiều" }, { ko: "긴장했다", vi: "Căng thẳng" }] },
-  { expression: "눈 코 뜰 새 없다", type: "idiom", difficulty: "medium", meaning_ko: "매우 바쁘다", meaning_vi: "Bận rộn không ngơi tay", hint_ko: "일이 너무 많아서 쉴 틈이 없을 때", hint_vi: "Khi có quá nhiều việc không có thời gian nghỉ", explanation_ko: "눈 코 뜰 새 없다는 것은 너무 바빠서 잠깐도 쉴 틈이 없다는 뜻입니다.", explanation_vi: "Nghĩa là bận đến mức không có chút thời gian nghỉ.", example_ko: "요즘 눈 코 뜰 새 없이 바빠.", example_vi: "Dạo này bận không ngơi tay.", wrong_meanings: [{ ko: "감기에 걸렸다", vi: "Bị cảm" }, { ko: "잠을 못 잔다", vi: "Không ngủ được" }, { ko: "눈이 나쁘다", vi: "Mắt kém" }] },
-  { expression: "손발이 맞다", type: "idiom", difficulty: "medium", meaning_ko: "협력이 잘 된다", meaning_vi: "Phối hợp ăn ý", hint_ko: "팀원과 호흡이 잘 맞을 때", hint_vi: "Khi làm việc nhóm rất ăn ý", explanation_ko: "손발이 맞다는 것은 함께 일하는 사람과 호흡이 잘 맞는다는 뜻입니다.", explanation_vi: "Nghĩa là phối hợp tốt với người cùng làm việc.", example_ko: "우리 팀은 손발이 잘 맞아.", example_vi: "Đội chúng tôi phối hợp rất ăn ý.", wrong_meanings: [{ ko: "손과 발 크기가 같다", vi: "Tay chân cùng cỡ" }, { ko: "춤을 잘 춘다", vi: "Nhảy giỏi" }, { ko: "운동을 잘한다", vi: "Thể thao giỏi" }] },
-  { expression: "발을 끊다", type: "idiom", difficulty: "medium", meaning_ko: "관계를 끊다, 왕래를 멈추다", meaning_vi: "Cắt đứt quan hệ, ngừng qua lại", hint_ko: "더 이상 만나지 않겠다고 할 때", hint_vi: "Khi nói không gặp nữa", explanation_ko: "발을 끊다는 것은 어떤 곳이나 사람과의 관계를 끊는다는 뜻입니다.", explanation_vi: "Nghĩa là cắt đứt quan hệ với nơi nào hoặc ai đó.", example_ko: "그 가게에 발을 끊었어.", example_vi: "Tôi đã ngừng đến cửa hàng đó.", wrong_meanings: [{ ko: "발을 다쳤다", vi: "Bị thương chân" }, { ko: "걷기를 멈췄다", vi: "Ngừng đi bộ" }, { ko: "신발을 벗었다", vi: "Cởi giày" }] },
-  { expression: "귀를 기울이다", type: "idiom", difficulty: "medium", meaning_ko: "주의 깊게 듣다", meaning_vi: "Lắng nghe chăm chú", hint_ko: "중요한 이야기를 들을 때", hint_vi: "Khi nghe câu chuyện quan trọng", explanation_ko: "귀를 기울이다는 것은 관심을 가지고 집중해서 듣는다는 뜻입니다.", explanation_vi: "Nghĩa là tập trung lắng nghe với sự quan tâm.", example_ko: "학생들이 선생님 말씀에 귀를 기울였다.", example_vi: "Học sinh lắng nghe lời thầy giáo.", wrong_meanings: [{ ko: "고개를 기울이다", vi: "Nghiêng đầu" }, { ko: "음악을 듣다", vi: "Nghe nhạc" }, { ko: "귀가 아프다", vi: "Đau tai" }] },
-  { expression: "손을 놓다", type: "idiom", difficulty: "medium", meaning_ko: "하던 일을 그만두다", meaning_vi: "Buông tay, bỏ việc đang làm", hint_ko: "일을 멈추고 쉴 때", hint_vi: "Khi ngừng làm và nghỉ", explanation_ko: "손을 놓다는 것은 하던 일을 멈추거나 포기한다는 뜻입니다.", explanation_vi: "Nghĩa là ngừng hoặc bỏ việc đang làm.", example_ko: "공부에 손을 놓은 지 오래됐어.", example_vi: "Đã lâu rồi tôi buông việc học.", wrong_meanings: [{ ko: "악수를 멈추다", vi: "Ngừng bắt tay" }, { ko: "손을 떼다", vi: "Bỏ tay ra" }, { ko: "도움을 멈추다", vi: "Ngừng giúp đỡ" }] },
-  { expression: "입이 가볍다", type: "idiom", difficulty: "medium", meaning_ko: "비밀을 잘 못 지킨다", meaning_vi: "Không giữ được bí mật", hint_ko: "비밀을 쉽게 말해버리는 사람", hint_vi: "Người dễ dàng nói ra bí mật", explanation_ko: "입이 가볍다는 것은 말을 함부로 하고 비밀을 못 지킨다는 뜻입니다.", explanation_vi: "Nghĩa là nói bừa và không giữ được bí mật.", example_ko: "그 사람은 입이 가벼워서 비밀 얘기 하면 안 돼.", example_vi: "Người đó miệng nhẹ nên không nên nói bí mật.", wrong_meanings: [{ ko: "음식을 적게 먹는다", vi: "Ăn ít" }, { ko: "말을 빨리 한다", vi: "Nói nhanh" }, { ko: "입술이 얇다", vi: "Môi mỏng" }] },
-  { expression: "눈앞이 캄캄하다", type: "idiom", difficulty: "medium", meaning_ko: "막막하고 절망적이다", meaning_vi: "Tuyệt vọng, bế tắc", hint_ko: "방법이 없어 보일 때", hint_vi: "Khi dường như không có cách nào", explanation_ko: "눈앞이 캄캄하다는 것은 상황이 절망적이고 방법이 없어 보인다는 뜻입니다.", explanation_vi: "Nghĩa là tình hình tuyệt vọng, dường như không có cách.", example_ko: "사업이 망해서 눈앞이 캄캄했어.", example_vi: "Kinh doanh thất bại nên tuyệt vọng.", wrong_meanings: [{ ko: "시력이 나쁘다", vi: "Thị lực kém" }, { ko: "밤이다", vi: "Đêm tối" }, { ko: "정전이 됐다", vi: "Mất điện" }] },
-  { expression: "발 벗고 나서다", type: "idiom", difficulty: "medium", meaning_ko: "적극적으로 나서서 돕다", meaning_vi: "Tích cực đứng ra giúp đỡ", hint_ko: "어려운 일에 적극적으로 나설 때", hint_vi: "Khi tích cực đứng ra trong việc khó", explanation_ko: "발 벗고 나서다는 것은 적극적으로 앞장서서 돕는다는 뜻입니다.", explanation_vi: "Nghĩa là tích cực đứng đầu giúp đỡ.", example_ko: "친구가 발 벗고 나서서 도와줬어.", example_vi: "Bạn tích cực đứng ra giúp đỡ.", wrong_meanings: [{ ko: "신발을 벗었다", vi: "Cởi giày" }, { ko: "맨발로 걸었다", vi: "Đi chân trần" }, { ko: "수영을 한다", vi: "Bơi lội" }] },
-  { expression: "손이 모자라다", type: "idiom", difficulty: "medium", meaning_ko: "일할 사람이 부족하다", meaning_vi: "Thiếu người làm việc", hint_ko: "일이 많은데 사람이 없을 때", hint_vi: "Khi việc nhiều mà không đủ người", explanation_ko: "손이 모자라다는 것은 일할 인력이 부족하다는 뜻입니다.", explanation_vi: "Nghĩa là thiếu nhân lực làm việc.", example_ko: "바쁜 시즌이라 손이 모자라.", example_vi: "Mùa bận rộn nên thiếu người làm.", wrong_meanings: [{ ko: "손이 작다", vi: "Tay nhỏ" }, { ko: "장갑이 없다", vi: "Không có găng tay" }, { ko: "손가락이 부족하다", vi: "Thiếu ngón tay" }] },
-  { expression: "머리를 짜다", type: "idiom", difficulty: "medium", meaning_ko: "열심히 생각하다", meaning_vi: "Suy nghĩ chăm chỉ", hint_ko: "어려운 문제를 해결하려 할 때", hint_vi: "Khi cố gắng giải quyết vấn đề khó", explanation_ko: "머리를 짜다는 것은 열심히 생각해서 좋은 방법을 찾는다는 뜻입니다.", explanation_vi: "Nghĩa là suy nghĩ chăm chỉ để tìm ra cách tốt.", example_ko: "머리를 짜내도 좋은 아이디어가 안 나와.", example_vi: "Vắt óc suy nghĩ mà không ra ý tưởng tốt.", wrong_meanings: [{ ko: "머리를 빗다", vi: "Chải tóc" }, { ko: "두통이 있다", vi: "Bị đau đầu" }, { ko: "머리를 자르다", vi: "Cắt tóc" }] },
-  
-  // Hard idioms
-  { expression: "입에 발린 소리", type: "idiom", difficulty: "hard", meaning_ko: "진심이 아닌 빈말", meaning_vi: "Lời nói không thật lòng", hint_ko: "실제로는 그렇게 생각하지 않으면서 하는 말", hint_vi: "Lời nói mà thực ra không nghĩ vậy", explanation_ko: "입에 발린 소리는 진심이 아니라 형식적으로 하는 말입니다.", explanation_vi: "Là lời nói hình thức, không thật lòng.", example_ko: "그건 입에 발린 소리일 뿐이야.", example_vi: "Đó chỉ là lời nói xã giao thôi.", wrong_meanings: [{ ko: "입술에 뭔가 묻었다", vi: "Có gì dính môi" }, { ko: "말을 잘한다", vi: "Nói giỏi" }, { ko: "솔직하다", vi: "Thật thà" }] },
-  { expression: "눈에 불을 켜다", type: "idiom", difficulty: "hard", meaning_ko: "매우 열심히 찾다", meaning_vi: "Tìm kiếm rất chăm chỉ", hint_ko: "잃어버린 것을 필사적으로 찾을 때", hint_vi: "Khi tìm thứ đã mất một cách tuyệt vọng", explanation_ko: "눈에 불을 켜다는 것은 무언가를 찾기 위해 온 힘을 다한다는 뜻입니다.", explanation_vi: "Nghĩa là dốc hết sức để tìm kiếm điều gì đó.", example_ko: "그는 일자리를 찾으려고 눈에 불을 켰다.", example_vi: "Anh ấy mở to mắt tìm việc làm.", wrong_meanings: [{ ko: "눈이 아프다", vi: "Đau mắt" }, { ko: "화가 났다", vi: "Tức giận" }, { ko: "졸리지 않다", vi: "Không buồn ngủ" }] },
-  { expression: "손에 장을 지지다", type: "idiom", difficulty: "hard", meaning_ko: "절대 그렇게 될 리 없다", meaning_vi: "Tuyệt đối không thể xảy ra", hint_ko: "뭔가가 절대 안 될 거라고 확신할 때", hint_vi: "Khi chắc chắn điều gì đó sẽ không xảy ra", explanation_ko: "손에 장을 지지다는 것은 그것이 절대로 일어나지 않을 것이라고 확신한다는 뜻입니다.", explanation_vi: "Nghĩa là chắc chắn rằng điều đó sẽ không bao giờ xảy ra.", example_ko: "그 사람이 이기면 내 손에 장을 지질게.", example_vi: "Nếu người đó thắng thì tôi xin chịu phạt.", wrong_meanings: [{ ko: "손을 다쳤다", vi: "Bị thương tay" }, { ko: "요리를 한다", vi: "Nấu ăn" }, { ko: "도박을 한다", vi: "Đánh bạc" }] },
-  { expression: "귀신이 곡할 노릇", type: "idiom", difficulty: "hard", meaning_ko: "이해할 수 없는 일", meaning_vi: "Việc không thể hiểu nổi", hint_ko: "설명이 안 되는 이상한 상황", hint_vi: "Tình huống kỳ lạ không giải thích được", explanation_ko: "귀신이 곡할 노릇은 도저히 이해가 안 되는 상황입니다.", explanation_vi: "Là tình huống hoàn toàn không thể hiểu được.", example_ko: "열쇠가 사라졌어. 귀신이 곡할 노릇이야.", example_vi: "Chìa khóa biến mất. Thật là chuyện ma quỷ.", wrong_meanings: [{ ko: "귀신을 봤다", vi: "Thấy ma" }, { ko: "무서운 일", vi: "Việc đáng sợ" }, { ko: "슬픈 노래", vi: "Bài hát buồn" }] },
-  { expression: "간이 콩알만 해지다", type: "idiom", difficulty: "hard", meaning_ko: "매우 무섭다, 겁이 나다", meaning_vi: "Rất sợ hãi", hint_ko: "무서운 상황에서 느끼는 감정", hint_vi: "Cảm giác trong tình huống đáng sợ", explanation_ko: "간이 콩알만 해지다는 것은 너무 무서워서 간이 쪼그라드는 것 같다는 뜻입니다.", explanation_vi: "Nghĩa là sợ đến mức gan co lại.", example_ko: "그 영화 보고 간이 콩알만 해졌어.", example_vi: "Xem phim đó mà sợ chết khiếp.", wrong_meanings: [{ ko: "간이 작다", vi: "Gan nhỏ" }, { ko: "콩을 먹었다", vi: "Ăn đậu" }, { ko: "건강이 나쁘다", vi: "Sức khỏe kém" }] },
-  { expression: "눈독을 들이다", type: "idiom", difficulty: "hard", meaning_ko: "탐내며 노리다", meaning_vi: "Thèm thuồng, nhòm ngó", hint_ko: "남의 물건을 갖고 싶어할 때", hint_vi: "Khi muốn có đồ của người khác", explanation_ko: "눈독을 들이다는 것은 무언가를 가지고 싶어서 탐내며 노린다는 뜻입니다.", explanation_vi: "Nghĩa là thèm muốn và nhắm vào cái gì đó.", example_ko: "저 가방에 눈독을 들이고 있어.", example_vi: "Tôi đang thèm cái túi kia.", wrong_meanings: [{ ko: "눈이 독하다", vi: "Mắt độc" }, { ko: "질투한다", vi: "Ghen tỵ" }, { ko: "응시한다", vi: "Nhìn chằm chằm" }] },
-  { expression: "입이 닳도록", type: "idiom", difficulty: "hard", meaning_ko: "여러 번 말하다", meaning_vi: "Nói đi nói lại nhiều lần", hint_ko: "같은 말을 반복해서 강조할 때", hint_vi: "Khi nhấn mạnh bằng cách lặp lại", explanation_ko: "입이 닳도록은 같은 말을 여러 번 반복해서 한다는 뜻입니다.", explanation_vi: "Nghĩa là lặp lại cùng một điều nhiều lần.", example_ko: "입이 닳도록 말했는데 안 듣네.", example_vi: "Nói mòn miệng mà không nghe.", wrong_meanings: [{ ko: "입술이 트다", vi: "Nứt môi" }, { ko: "말을 잘한다", vi: "Nói giỏi" }, { ko: "쉬지 않고 말한다", vi: "Nói không nghỉ" }] },
-  { expression: "손이 근질근질하다", type: "idiom", difficulty: "hard", meaning_ko: "뭔가 하고 싶어 못 참겠다", meaning_vi: "Ngứa tay muốn làm gì đó", hint_ko: "행동하고 싶은 욕구가 강할 때", hint_vi: "Khi có ham muốn mạnh mẽ muốn hành động", explanation_ko: "손이 근질근질하다는 것은 뭔가를 하고 싶은 욕구가 강하다는 뜻입니다.", explanation_vi: "Nghĩa là có ham muốn mạnh mẽ muốn làm gì đó.", example_ko: "새 기타 보니까 손이 근질근질해.", example_vi: "Nhìn guitar mới là ngứa tay muốn chơi.", wrong_meanings: [{ ko: "손이 가렵다", vi: "Ngứa tay thật sự" }, { ko: "알레르기가 있다", vi: "Bị dị ứng" }, { ko: "손을 씻어야 한다", vi: "Cần rửa tay" }] },
-  { expression: "발이 닳도록", type: "idiom", difficulty: "hard", meaning_ko: "여러 곳을 다니며 찾다", meaning_vi: "Đi nhiều nơi để tìm kiếm", hint_ko: "열심히 돌아다니며 찾을 때", hint_vi: "Khi chăm chỉ đi tìm", explanation_ko: "발이 닳도록은 여러 곳을 돌아다니며 열심히 찾는다는 뜻입니다.", explanation_vi: "Nghĩa là đi nhiều nơi để chăm chỉ tìm kiếm.", example_ko: "발이 닳도록 일자리를 찾아다녔어.", example_vi: "Đi tìm việc mòn gót chân.", wrong_meanings: [{ ko: "신발이 낡았다", vi: "Giày cũ" }, { ko: "많이 걸었다", vi: "Đi bộ nhiều" }, { ko: "피곤하다", vi: "Mệt mỏi" }] },
-  { expression: "간에 기별도 안 가다", type: "idiom", difficulty: "hard", meaning_ko: "양이 적어서 배가 안 부르다", meaning_vi: "Ăn quá ít, không no", hint_ko: "음식이 너무 적을 때", hint_vi: "Khi thức ăn quá ít", explanation_ko: "간에 기별도 안 간다는 것은 먹은 양이 너무 적어서 배가 안 부르다는 뜻입니다.", explanation_vi: "Nghĩa là ăn quá ít nên không no.", example_ko: "이거 가지고는 간에 기별도 안 가.", example_vi: "Với chừng này thì không đủ no.", wrong_meanings: [{ ko: "연락이 안 됐다", vi: "Không liên lạc được" }, { ko: "소화가 안 됐다", vi: "Không tiêu" }, { ko: "간이 안 좋다", vi: "Gan không tốt" }] },
-  { expression: "두 손 두 발 다 들다", type: "idiom", difficulty: "hard", meaning_ko: "완전히 항복하다, 포기하다", meaning_vi: "Hoàn toàn đầu hàng, bỏ cuộc", hint_ko: "더 이상 어쩔 수 없을 때", hint_vi: "Khi không còn cách nào nữa", explanation_ko: "두 손 두 발 다 들다는 것은 더 이상 방법이 없어 포기한다는 뜻입니다.", explanation_vi: "Nghĩa là không còn cách nào nên bỏ cuộc.", example_ko: "그 아이 교육에는 두 손 두 발 다 들었어.", example_vi: "Về việc dạy đứa bé đó, tôi đã bó tay hoàn toàn.", wrong_meanings: [{ ko: "운동을 한다", vi: "Tập thể dục" }, { ko: "손을 들었다", vi: "Giơ tay" }, { ko: "춤을 춘다", vi: "Nhảy múa" }] },
-  { expression: "눈에 거슬리다", type: "idiom", difficulty: "hard", meaning_ko: "보기 싫고 거북하다", meaning_vi: "Khó chịu khi nhìn, chướng mắt", hint_ko: "마음에 안 드는 것을 볼 때", hint_vi: "Khi nhìn thấy điều không ưa", explanation_ko: "눈에 거슬리다는 것은 보기에 불쾌하고 마음에 안 든다는 뜻입니다.", explanation_vi: "Nghĩa là nhìn thấy không thoải mái và không thích.", example_ko: "저 사람 행동이 눈에 거슬려.", example_vi: "Hành động của người đó làm tôi chướng mắt.", wrong_meanings: [{ ko: "눈이 아프다", vi: "Đau mắt" }, { ko: "눈에 뭔가 들어갔다", vi: "Có gì vào mắt" }, { ko: "시력이 나쁘다", vi: "Thị lực kém" }] },
-  { expression: "코가 납작해지다", type: "idiom", difficulty: "hard", meaning_ko: "기가 꺾이고 무안해지다", meaning_vi: "Bị làm mất mặt, xấu hổ", hint_ko: "자신감이 꺾일 때", hint_vi: "Khi mất tự tin", explanation_ko: "코가 납작해지다는 것은 잘난 체하다가 무안을 당한다는 뜻입니다.", explanation_vi: "Nghĩa là bị làm xấu hổ sau khi khoe khoang.", example_ko: "자랑하다가 코가 납작해졌어.", example_vi: "Khoe khoang rồi bị mất mặt.", wrong_meanings: [{ ko: "코를 다쳤다", vi: "Bị thương mũi" }, { ko: "성형했다", vi: "Phẫu thuật thẩm mỹ" }, { ko: "감기에 걸렸다", vi: "Bị cảm" }] },
-  { expression: "귀청이 떨어지다", type: "idiom", difficulty: "hard", meaning_ko: "소리가 매우 크다", meaning_vi: "Tiếng rất lớn", hint_ko: "엄청나게 시끄러울 때", hint_vi: "Khi cực kỳ ồn ào", explanation_ko: "귀청이 떨어지다는 것은 소리가 너무 커서 귀가 먹먹할 정도라는 뜻입니다.", explanation_vi: "Nghĩa là tiếng lớn đến mức điếc tai.", example_ko: "귀청이 떨어질 듯한 폭발음이 들렸어.", example_vi: "Nghe tiếng nổ như điếc tai.", wrong_meanings: [{ ko: "귀가 아프다", vi: "Đau tai" }, { ko: "청력을 잃었다", vi: "Mất thính lực" }, { ko: "뭔가 떨어졌다", vi: "Có gì đó rơi" }] },
-  { expression: "간담이 서늘하다", type: "idiom", difficulty: "hard", meaning_ko: "매우 무섭다, 소름끼치다", meaning_vi: "Rất sợ hãi, lạnh xương sống", hint_ko: "공포를 느낄 때", hint_vi: "Khi cảm thấy sợ hãi", explanation_ko: "간담이 서늘하다는 것은 너무 무서워서 등골이 오싹해진다는 뜻입니다.", explanation_vi: "Nghĩa là sợ đến mức lạnh xương sống.", example_ko: "그 이야기를 듣고 간담이 서늘해졌어.", example_vi: "Nghe câu chuyện đó mà lạnh cả sống lưng.", wrong_meanings: [{ ko: "춥다", vi: "Lạnh" }, { ko: "간이 차갑다", vi: "Gan lạnh" }, { ko: "에어컨이 강하다", vi: "Máy lạnh mạnh" }] },
-];
+## 중요 규칙
+- 매번 완전히 다른 표현을 출제하세요! 반복 금지!
+- 한국에서 실제로 사용되는 자연스러운 표현만 출제
+- 오답 선택지도 그럴듯하게 만들어 학습 효과를 높이세요
+- 베트남어 번역은 자연스럽고 정확하게
+- easy 난이도에서는 젊은 세대가 SNS, 유튜브, 틱톡에서 실제로 쓰는 표현 위주로
+- 다양한 카테고리에서 골고루 출제 (관용어, 슬랭, 속담, 인터넷용어 등)`;
 
-// 속담 (proverb) - 500+
-const PROVERBS: ExpressionData[] = [
-  // Easy proverbs
-  { expression: "가는 말이 고와야 오는 말이 곱다", type: "proverb", difficulty: "easy", meaning_ko: "남에게 좋게 해야 나도 좋은 대접을 받는다", meaning_vi: "Đối xử tốt với người khác thì mình cũng được đối xử tốt", hint_ko: "말을 예쁘게 하면 상대도 예쁘게 대답한다", hint_vi: "Nói lời hay thì người khác cũng đáp lời hay", explanation_ko: "내가 남에게 좋게 하면 상대도 나에게 좋게 한다는 의미입니다.", explanation_vi: "Nghĩa là nếu tôi đối xử tốt với người khác thì họ cũng đối xử tốt với tôi.", example_ko: "부모님 말씀대로 가는 말이 고와야 오는 말이 곱더라.", example_vi: "Đúng như cha mẹ nói, lời đẹp thì được đáp lời đẹp.", wrong_meanings: [{ ko: "말(동물)이 예쁘다", vi: "Ngựa đẹp" }, { ko: "여행 잘 다녀와라", vi: "Đi chơi vui vẻ" }, { ko: "인사를 잘 해야 한다", vi: "Phải chào hỏi tốt" }] },
-  { expression: "호랑이도 제 말 하면 온다", type: "proverb", difficulty: "easy", meaning_ko: "사람은 그 자리에 없어도 말조심해야 한다", meaning_vi: "Dù người đó không có mặt cũng phải cẩn thận lời nói", hint_ko: "뒷담화를 하면 안 되는 이유", hint_vi: "Lý do không nên nói xấu sau lưng", explanation_ko: "누군가의 이야기를 하면 그 사람이 나타난다는 뜻으로, 말조심하라는 의미입니다.", explanation_vi: "Nghĩa là nói về ai thì người đó sẽ xuất hiện, nên phải cẩn thận lời nói.", example_ko: "호랑이도 제 말 하면 온다더니, 얘기하니까 왔네.", example_vi: "Nói đến thì liền tới, vừa nhắc là đã đến.", wrong_meanings: [{ ko: "호랑이가 위험하다", vi: "Hổ nguy hiểm" }, { ko: "호랑이가 말을 한다", vi: "Hổ biết nói" }, { ko: "동물원에 가야 한다", vi: "Phải đi sở thú" }] },
-  { expression: "고생 끝에 낙이 온다", type: "proverb", difficulty: "easy", meaning_ko: "힘든 일 뒤에 좋은 일이 온다", meaning_vi: "Sau khổ sẽ đến sướng", hint_ko: "열심히 노력하면 좋은 결과가 온다", hint_vi: "Nỗ lực chăm chỉ thì sẽ có kết quả tốt", explanation_ko: "어려움을 이겨내면 행복이 찾아온다는 의미입니다.", explanation_vi: "Nghĩa là vượt qua khó khăn thì hạnh phúc sẽ đến.", example_ko: "고생 끝에 낙이 온다고, 드디어 취직했어!", example_vi: "Như người ta nói khổ tận cam lai, cuối cùng cũng xin được việc!", wrong_meanings: [{ ko: "고생하면 안 된다", vi: "Không nên khổ cực" }, { ko: "끝이 좋다", vi: "Kết thúc tốt đẹp" }, { ko: "낙타가 온다", vi: "Lạc đà đến" }] },
-  { expression: "낮말은 새가 듣고 밤말은 쥐가 듣는다", type: "proverb", difficulty: "easy", meaning_ko: "항상 말조심해야 한다", meaning_vi: "Lúc nào cũng phải cẩn thận lời nói", hint_ko: "비밀 이야기도 누군가 듣고 있을 수 있다", hint_vi: "Câu chuyện bí mật cũng có thể có người nghe", explanation_ko: "언제 어디서나 누가 듣고 있을지 모르니 말조심하라는 뜻입니다.", explanation_vi: "Nghĩa là không biết ai đang nghe nên phải cẩn thận lời nói mọi lúc mọi nơi.", example_ko: "낮말은 새가 듣고 밤말은 쥐가 듣는다니 조심하자.", example_vi: "Tai vách mạch rừng, phải cẩn thận.", wrong_meanings: [{ ko: "새와 쥐가 말을 한다", vi: "Chim và chuột biết nói" }, { ko: "밤에 말하지 마라", vi: "Đừng nói vào ban đêm" }, { ko: "동물을 조심해라", vi: "Cẩn thận với động vật" }] },
-  { expression: "시작이 반이다", type: "proverb", difficulty: "easy", meaning_ko: "시작하면 절반은 한 것이다", meaning_vi: "Bắt đầu là đã làm được nửa", hint_ko: "시작하는 게 가장 어렵다", hint_vi: "Bắt đầu là điều khó nhất", explanation_ko: "일을 시작하는 것이 가장 어렵고, 시작하면 절반은 성공한 것과 같다는 뜻입니다.", explanation_vi: "Nghĩa là bắt đầu là khó nhất, bắt đầu rồi thì như đã thành công một nửa.", example_ko: "운동을 시작했어. 시작이 반이니까!", example_vi: "Tôi đã bắt đầu tập thể dục. Vạn sự khởi đầu nan mà!", wrong_meanings: [{ ko: "절반만 하면 된다", vi: "Chỉ cần làm nửa" }, { ko: "빨리 끝내라", vi: "Hoàn thành nhanh" }, { ko: "반으로 나눠라", vi: "Chia đôi" }] },
-  { expression: "백문이 불여일견", type: "proverb", difficulty: "easy", meaning_ko: "백 번 듣는 것보다 한 번 보는 게 낫다", meaning_vi: "Trăm nghe không bằng một thấy", hint_ko: "직접 보는 게 더 확실하다", hint_vi: "Trực tiếp thấy thì chắc chắn hơn", explanation_ko: "여러 번 듣는 것보다 직접 한 번 보는 것이 더 확실하다는 뜻입니다.", explanation_vi: "Nghĩa là trực tiếp nhìn thấy một lần chắc chắn hơn nghe nhiều lần.", example_ko: "백문이 불여일견이라고, 직접 가서 봐.", example_vi: "Trăm nghe không bằng một thấy, tự đi mà xem.", wrong_meanings: [{ ko: "질문을 많이 해라", vi: "Hỏi nhiều" }, { ko: "100번 물어봐라", vi: "Hỏi 100 lần" }, { ko: "눈이 중요하다", vi: "Mắt quan trọng" }] },
-  { expression: "될성부른 나무는 떡잎부터 알아본다", type: "proverb", difficulty: "easy", meaning_ko: "잘 될 사람은 어릴 때부터 보인다", meaning_vi: "Người tài giỏi từ nhỏ đã thấy", hint_ko: "어릴 때부터 재능이 보인다", hint_vi: "Tài năng thể hiện từ nhỏ", explanation_ko: "크게 될 사람은 어릴 때부터 그 조짐이 보인다는 뜻입니다.", explanation_vi: "Nghĩa là người sẽ thành đạt thì từ nhỏ đã thấy dấu hiệu.", example_ko: "될성부른 나무는 떡잎부터 알아본다더니, 어릴 때부터 똘똘했네.", example_vi: "Rồng rắn non đã có vẩy, từ nhỏ đã thông minh.", wrong_meanings: [{ ko: "나무를 심어야 한다", vi: "Phải trồng cây" }, { ko: "떡잎을 먹어라", vi: "Ăn lá mầm" }, { ko: "나무가 예쁘다", vi: "Cây đẹp" }] },
-  { expression: "세 살 버릇 여든까지 간다", type: "proverb", difficulty: "easy", meaning_ko: "어릴 때 습관은 평생 간다", meaning_vi: "Thói quen từ nhỏ theo suốt đời", hint_ko: "어릴 때 버릇을 잘 들여야 한다", hint_vi: "Phải tập thói quen tốt từ nhỏ", explanation_ko: "어린 시절에 들인 습관은 나이가 들어서도 고치기 어렵다는 뜻입니다.", explanation_vi: "Nghĩa là thói quen từ nhỏ khó sửa khi lớn.", example_ko: "세 살 버릇 여든까지 간다니까 지금부터 바르게 해.", example_vi: "Thói quen từ nhỏ theo suốt đời nên từ giờ phải làm đúng.", wrong_meanings: [{ ko: "세 살이 중요하다", vi: "3 tuổi quan trọng" }, { ko: "80살까지 살아야 한다", vi: "Phải sống đến 80" }, { ko: "버릇을 고치면 안 된다", vi: "Không được sửa thói quen" }] },
-  { expression: "천 리 길도 한 걸음부터", type: "proverb", difficulty: "easy", meaning_ko: "큰 일도 작은 시작부터 한다", meaning_vi: "Việc lớn cũng bắt đầu từ nhỏ", hint_ko: "작은 것부터 시작해야 한다", hint_vi: "Phải bắt đầu từ việc nhỏ", explanation_ko: "아무리 큰 일도 작은 한 걸음부터 시작된다는 뜻입니다.", explanation_vi: "Nghĩa là dù việc lớn đến đâu cũng bắt đầu từ bước nhỏ.", example_ko: "천 리 길도 한 걸음부터라고, 오늘부터 시작하자.", example_vi: "Đi một ngàn dặm cũng bắt đầu từ một bước, hãy bắt đầu từ hôm nay.", wrong_meanings: [{ ko: "천 리를 걸어야 한다", vi: "Phải đi ngàn dặm" }, { ko: "한 걸음만 가면 된다", vi: "Chỉ cần đi một bước" }, { ko: "길이 멀다", vi: "Đường xa" }] },
-  { expression: "꿩 대신 닭", type: "proverb", difficulty: "easy", meaning_ko: "원하는 게 없으면 비슷한 것으로 대신한다", meaning_vi: "Không có thứ muốn thì dùng thứ tương tự thay thế", hint_ko: "최선이 없으면 차선으로 대체한다", hint_vi: "Không có tốt nhất thì dùng thứ tốt thứ hai", explanation_ko: "원하는 것이 없을 때 비슷한 것으로 대체한다는 뜻입니다.", explanation_vi: "Nghĩa là khi không có thứ muốn thì thay thế bằng thứ tương tự.", example_ko: "꿩 대신 닭으로 이거라도 먹자.", example_vi: "Không có gà rừng thì dùng gà nhà vậy, ăn cái này đi.", wrong_meanings: [{ ko: "꿩이 더 맛있다", vi: "Gà rừng ngon hơn" }, { ko: "닭을 키워라", vi: "Nuôi gà" }, { ko: "새를 좋아한다", vi: "Thích chim" }] },
-  { expression: "티끌 모아 태산", type: "proverb", difficulty: "easy", meaning_ko: "작은 것도 모으면 큰 것이 된다", meaning_vi: "Góp nhỏ thành lớn", hint_ko: "조금씩 저축하면 큰 돈이 된다", hint_vi: "Tiết kiệm từng chút sẽ thành nhiều tiền", explanation_ko: "작은 것도 꾸준히 모으면 큰 것이 된다는 뜻입니다.", explanation_vi: "Nghĩa là tích tiểu thành đại.", example_ko: "티끌 모아 태산이라고, 매일 조금씩 저축해.", example_vi: "Tích tiểu thành đại, mỗi ngày tiết kiệm một chút.", wrong_meanings: [{ ko: "산에 가야 한다", vi: "Phải đi núi" }, { ko: "먼지가 많다", vi: "Nhiều bụi" }, { ko: "청소를 해라", vi: "Dọn dẹp" }] },
-  { expression: "아는 길도 물어가라", type: "proverb", difficulty: "easy", meaning_ko: "아는 것도 확인하며 조심해라", meaning_vi: "Biết rồi cũng phải hỏi lại, cẩn thận", hint_ko: "확실해도 다시 확인하라", hint_vi: "Chắc chắn rồi cũng phải kiểm tra lại", explanation_ko: "아는 일도 방심하지 말고 확인하며 신중하게 하라는 뜻입니다.", explanation_vi: "Nghĩa là việc biết rồi cũng không được chủ quan, phải kiểm tra cẩn thận.", example_ko: "아는 길도 물어가라고, 다시 한번 확인해봐.", example_vi: "Đường quen cũng phải hỏi, kiểm tra lại một lần nữa.", wrong_meanings: [{ ko: "길을 모른다", vi: "Không biết đường" }, { ko: "질문을 많이 해라", vi: "Hỏi nhiều" }, { ko: "낯선 길로 가라", vi: "Đi đường lạ" }] },
-  
-  // Medium proverbs
-  { expression: "가재는 게 편", type: "proverb", difficulty: "medium", meaning_ko: "비슷한 처지끼리 편을 든다", meaning_vi: "Người cùng hoàn cảnh thường bênh nhau", hint_ko: "같은 편끼리 모인다", hint_vi: "Phe cùng hoàn cảnh tụ lại với nhau", explanation_ko: "비슷한 부류의 사람들끼리 서로 편을 들어준다는 뜻입니다.", explanation_vi: "Nghĩa là những người cùng loại thường bênh vực nhau.", example_ko: "가재는 게 편이라더니 같은 부서끼리 감싸네.", example_vi: "Gà cùng lông đậu cùng cành, cùng bộ phận là bênh nhau.", wrong_meanings: [{ ko: "가재와 게가 친하다", vi: "Tôm hùm và cua thân nhau" }, { ko: "바다 음식이 맛있다", vi: "Hải sản ngon" }, { ko: "가재가 게보다 낫다", vi: "Tôm hùm tốt hơn cua" }] },
-  { expression: "원숭이도 나무에서 떨어진다", type: "proverb", difficulty: "medium", meaning_ko: "아무리 잘하는 사람도 실수할 수 있다", meaning_vi: "Người giỏi đến mấy cũng có thể sai sót", hint_ko: "전문가도 실수한다", hint_vi: "Chuyên gia cũng mắc lỗi", explanation_ko: "아무리 그 분야에 뛰어난 사람도 실수할 수 있다는 뜻입니다.", explanation_vi: "Nghĩa là người xuất sắc đến đâu cũng có thể mắc sai lầm.", example_ko: "원숭이도 나무에서 떨어진다더니, 프로도 실수하네.", example_vi: "Khỉ cũng có lúc rơi từ cây, pro cũng mắc lỗi.", wrong_meanings: [{ ko: "원숭이가 위험하다", vi: "Khỉ nguy hiểm" }, { ko: "나무에 오르지 마라", vi: "Đừng leo cây" }, { ko: "동물원에 가야 한다", vi: "Phải đi sở thú" }] },
-  { expression: "빈 수레가 요란하다", type: "proverb", difficulty: "medium", meaning_ko: "실속 없는 사람이 더 떠든다", meaning_vi: "Người không có thực lực thì nói to", hint_ko: "내용 없는 사람이 시끄럽게 군다", hint_vi: "Người không có nội dung thì ồn ào", explanation_ko: "실력이 없는 사람일수록 허세를 부리며 떠든다는 뜻입니다.", explanation_vi: "Nghĩa là người không có thực lực thì hay khoe khoang.", example_ko: "빈 수레가 요란하다더니, 실력도 없으면서 말만 많아.", example_vi: "Thùng rỗng kêu to, không có thực lực mà chỉ nói nhiều.", wrong_meanings: [{ ko: "수레가 시끄럽다", vi: "Xe kéo ồn" }, { ko: "짐을 실어야 한다", vi: "Phải chất hàng" }, { ko: "차가 고장났다", vi: "Xe hỏng" }] },
-  { expression: "서당 개 삼 년이면 풍월을 읊는다", type: "proverb", difficulty: "medium", meaning_ko: "오래 있으면 자연히 배운다", meaning_vi: "Ở lâu thì tự nhiên học được", hint_ko: "환경에 오래 있으면 자연스럽게 익힌다", hint_vi: "Ở trong môi trường lâu thì tự nhiên quen", explanation_ko: "무식한 사람도 유식한 환경에 오래 있으면 자연히 배우게 된다는 뜻입니다.", explanation_vi: "Nghĩa là người không biết gì ở trong môi trường học thuật lâu cũng sẽ học được.", example_ko: "서당 개 삼 년이면 풍월을 읊는다더니, 옆에서 보다 보니 나도 알겠더라.", example_vi: "Gần mực thì đen gần đèn thì sáng, xem bên cạnh hoài nên tôi cũng biết.", wrong_meanings: [{ ko: "개가 노래를 부른다", vi: "Chó hát" }, { ko: "3년 동안 공부해라", vi: "Học 3 năm" }, { ko: "서당에 가야 한다", vi: "Phải đến thư viện" }] },
-  { expression: "우물 안 개구리", type: "proverb", difficulty: "medium", meaning_ko: "세상 물정을 모르는 사람", meaning_vi: "Người không biết thế giới bên ngoài", hint_ko: "좁은 시야를 가진 사람", hint_vi: "Người có tầm nhìn hẹp", explanation_ko: "좁은 세상만 알고 넓은 세상을 모르는 사람을 비유합니다.", explanation_vi: "Ví von người chỉ biết thế giới nhỏ bé mà không biết thế giới rộng lớn.", example_ko: "우물 안 개구리처럼 자기만 잘났다고 생각하네.", example_vi: "Như ếch ngồi đáy giếng, chỉ nghĩ mình giỏi nhất.", wrong_meanings: [{ ko: "개구리가 우물에 산다", vi: "Ếch sống trong giếng" }, { ko: "물을 마셔라", vi: "Uống nước" }, { ko: "수영을 배워라", vi: "Học bơi" }] },
-  { expression: "등잔 밑이 어둡다", type: "proverb", difficulty: "medium", meaning_ko: "가까이 있는 것을 놓치기 쉽다", meaning_vi: "Dễ bỏ qua thứ gần nhất", hint_ko: "가까운 곳에서 찾기 어렵다", hint_vi: "Khó tìm ở nơi gần nhất", explanation_ko: "가까이 있는 것은 오히려 보기 어렵다는 뜻입니다.", explanation_vi: "Nghĩa là thứ gần nhất lại khó nhìn thấy.", example_ko: "등잔 밑이 어둡다더니 안경이 머리 위에 있었네.", example_vi: "Đúng là tối dưới đèn, kính ở trên đầu mà không biết.", wrong_meanings: [{ ko: "조명이 어둡다", vi: "Ánh sáng tối" }, { ko: "전등을 켜라", vi: "Bật đèn" }, { ko: "밤이다", vi: "Đêm rồi" }] },
-  { expression: "뛰는 놈 위에 나는 놈 있다", type: "proverb", difficulty: "medium", meaning_ko: "위에는 항상 더 뛰어난 사람이 있다", meaning_vi: "Trên cao luôn có người giỏi hơn", hint_ko: "자만하지 말라", hint_vi: "Đừng tự phụ", explanation_ko: "아무리 잘해도 더 잘하는 사람이 있다는 뜻입니다.", explanation_vi: "Nghĩa là dù giỏi đến đâu cũng có người giỏi hơn.", example_ko: "뛰는 놈 위에 나는 놈 있다더니, 더 대단한 사람이 있네.", example_vi: "Núi cao còn có núi cao hơn, có người giỏi hơn nhiều.", wrong_meanings: [{ ko: "달리기가 중요하다", vi: "Chạy quan trọng" }, { ko: "하늘을 날 수 있다", vi: "Có thể bay" }, { ko: "운동을 해라", vi: "Tập thể dục" }] },
-  { expression: "소 잃고 외양간 고친다", type: "proverb", difficulty: "medium", meaning_ko: "일이 터진 후에 대비해도 소용없다", meaning_vi: "Mất bò mới lo làm chuồng", hint_ko: "늦은 대책은 소용없다", hint_vi: "Biện pháp muộn thì vô ích", explanation_ko: "일이 이미 일어난 후에 대책을 세워도 소용없다는 뜻입니다.", explanation_vi: "Nghĩa là sau khi việc xảy ra rồi mới có biện pháp thì vô ích.", example_ko: "소 잃고 외양간 고치는 격이야, 미리 준비했어야지.", example_vi: "Mất bò mới lo làm chuồng, lẽ ra phải chuẩn bị trước.", wrong_meanings: [{ ko: "소를 키워야 한다", vi: "Phải nuôi bò" }, { ko: "외양간을 수리해라", vi: "Sửa chuồng" }, { ko: "농사를 지어라", vi: "Làm nông" }] },
-  { expression: "호랑이 굴에 들어가야 호랑이를 잡는다", type: "proverb", difficulty: "medium", meaning_ko: "목표를 이루려면 위험을 감수해야 한다", meaning_vi: "Muốn đạt mục tiêu phải chấp nhận nguy hiểm", hint_ko: "성공하려면 도전해야 한다", hint_vi: "Muốn thành công phải dám thử", explanation_ko: "큰 것을 얻으려면 위험을 무릅쓰고 도전해야 한다는 뜻입니다.", explanation_vi: "Nghĩa là muốn được thứ lớn thì phải mạo hiểm thử thách.", example_ko: "호랑이 굴에 들어가야 호랑이를 잡는다고, 한번 해보자.", example_vi: "Không vào hang hổ sao bắt được hổ, thử một lần xem.", wrong_meanings: [{ ko: "호랑이가 위험하다", vi: "Hổ nguy hiểm" }, { ko: "동물원에 가라", vi: "Đi sở thú" }, { ko: "사냥을 해라", vi: "Đi săn" }] },
-  { expression: "가는 날이 장날", type: "proverb", difficulty: "medium", meaning_ko: "우연히 좋은 일에 맞닥뜨리다", meaning_vi: "Tình cờ gặp may", hint_ko: "마침 좋은 타이밍에 가다", hint_vi: "Đi đúng lúc tốt", explanation_ko: "우연히 좋은 때에 맞게 되었다는 뜻입니다.", explanation_vi: "Nghĩa là tình cờ đúng lúc thuận lợi.", example_ko: "가는 날이 장날이라고, 마침 세일 중이었어.", example_vi: "Đi đúng ngày chợ phiên, đúng lúc đang sale.", wrong_meanings: [{ ko: "시장에 가야 한다", vi: "Phải đi chợ" }, { ko: "장사를 해라", vi: "Làm buôn bán" }, { ko: "매일 나가라", vi: "Ra ngoài mỗi ngày" }] },
-  
-  // Hard proverbs  
-  { expression: "까마귀 날자 배 떨어진다", type: "proverb", difficulty: "hard", meaning_ko: "우연히 동시에 일어난 일이 관련있어 보인다", meaning_vi: "Việc xảy ra trùng hợp trông như có liên quan", hint_ko: "공교롭게 동시에 일어난 일", hint_vi: "Việc tình cờ xảy ra cùng lúc", explanation_ko: "우연히 동시에 일어난 일이 마치 인과관계가 있는 것처럼 오해받는 상황입니다.", explanation_vi: "Tình huống việc tình cờ xảy ra cùng lúc bị hiểu lầm như có liên quan nhân quả.", example_ko: "까마귀 날자 배 떨어진다고, 내가 간 날 문을 닫았네.", example_vi: "Thật trùng hợp, đúng ngày tôi đến thì họ đóng cửa.", wrong_meanings: [{ ko: "까마귀가 배를 떨어뜨렸다", vi: "Quạ làm rơi quả lê" }, { ko: "과일을 먹어라", vi: "Ăn trái cây" }, { ko: "새가 위험하다", vi: "Chim nguy hiểm" }] },
-  { expression: "마른 하늘에 날벼락", type: "proverb", difficulty: "hard", meaning_ko: "갑자기 예상치 못한 나쁜 일이 생기다", meaning_vi: "Việc xấu bất ngờ xảy ra", hint_ko: "뜻밖의 재난이 닥치다", hint_vi: "Tai họa bất ngờ ập đến", explanation_ko: "전혀 예상하지 못한 불행이 갑자기 닥친다는 뜻입니다.", explanation_vi: "Nghĩa là bất hạnh hoàn toàn không ngờ đột ngột ập đến.", example_ko: "마른 하늘에 날벼락이라더니, 갑자기 해고됐어.", example_vi: "Sét đánh ngang tai, đột nhiên bị sa thải.", wrong_meanings: [{ ko: "날씨가 좋다", vi: "Thời tiết tốt" }, { ko: "번개가 쳤다", vi: "Có sấm sét" }, { ko: "비가 올 것이다", vi: "Sẽ mưa" }] },
-  { expression: "닭 잡아먹고 오리발 내민다", type: "proverb", difficulty: "hard", meaning_ko: "잘못을 하고도 시치미를 떼다", meaning_vi: "Làm sai rồi giả vờ không biết", hint_ko: "나쁜 짓을 하고 모른 척하다", hint_vi: "Làm việc xấu rồi giả vờ không biết", explanation_ko: "잘못을 저지르고도 아닌 척 시치미를 떼는 행동입니다.", explanation_vi: "Hành động làm sai rồi giả vờ như không phải mình.", example_ko: "닭 잡아먹고 오리발 내민다고, 뻔히 알면서 모른 척하네.", example_vi: "Ăn gà rồi chìa chân vịt, biết rõ mà vờ không biết.", wrong_meanings: [{ ko: "닭을 먹었다", vi: "Ăn gà" }, { ko: "오리가 더 맛있다", vi: "Vịt ngon hơn" }, { ko: "새를 키워라", vi: "Nuôi chim" }] },
-  { expression: "아니 땐 굴뚝에 연기 나랴", type: "proverb", difficulty: "hard", meaning_ko: "원인 없이 결과가 생기지 않는다", meaning_vi: "Không có nguyên nhân thì không có kết quả", hint_ko: "소문이 나는 데는 이유가 있다", hint_vi: "Có tin đồn thì có lý do", explanation_ko: "원인이 없으면 결과도 없다, 즉 이유가 있어서 그렇다는 뜻입니다.", explanation_vi: "Không có nguyên nhân thì không có kết quả, tức là có lý do mới vậy.", example_ko: "아니 땐 굴뚝에 연기 나랴, 뭔가 있는 거야.", example_vi: "Không có lửa làm sao có khói, chắc có gì đó.", wrong_meanings: [{ ko: "굴뚝을 청소해라", vi: "Dọn ống khói" }, { ko: "불을 피워라", vi: "Đốt lửa" }, { ko: "연기가 나쁘다", vi: "Khói không tốt" }] },
-  { expression: "공든 탑이 무너지랴", type: "proverb", difficulty: "hard", meaning_ko: "노력한 일은 헛되지 않는다", meaning_vi: "Việc đã nỗ lực sẽ không uổng công", hint_ko: "정성들인 것은 결실을 맺는다", hint_vi: "Việc làm tận tâm sẽ có kết quả", explanation_ko: "정성을 다해 쌓은 것은 쉽게 무너지지 않는다는 뜻입니다.", explanation_vi: "Nghĩa là thứ đã xây dựng bằng tâm huyết không dễ sụp đổ.", example_ko: "공든 탑이 무너지랴, 노력은 배신하지 않아.", example_vi: "Công sức bỏ ra không uổng, nỗ lực không bao giờ phản bội.", wrong_meanings: [{ ko: "탑을 지어라", vi: "Xây tháp" }, { ko: "건물이 위험하다", vi: "Tòa nhà nguy hiểm" }, { ko: "공사를 해라", vi: "Làm xây dựng" }] },
-  { expression: "귀신 씻나락 까먹듯", type: "proverb", difficulty: "hard", meaning_ko: "아무도 모르게 남의 것을 빼앗다", meaning_vi: "Lấy đồ người khác mà không ai biết", hint_ko: "몰래 슬쩍 가져가다", hint_vi: "Lén lấy đi", explanation_ko: "남의 것을 눈 깜짝할 사이에 몰래 빼앗는다는 뜻입니다.", explanation_vi: "Nghĩa là lén lấy đồ của người khác trong chớp mắt.", example_ko: "귀신 씻나락 까먹듯 돈이 사라졌네.", example_vi: "Tiền biến mất như ma quỷ lấy đi vậy.", wrong_meanings: [{ ko: "귀신이 있다", vi: "Có ma" }, { ko: "세수를 해라", vi: "Rửa mặt" }, { ko: "쌀을 먹어라", vi: "Ăn gạo" }] },
-  { expression: "고래 싸움에 새우 등 터진다", type: "proverb", difficulty: "hard", meaning_ko: "강자들 싸움에 약자가 피해를 입는다", meaning_vi: "Kẻ mạnh đánh nhau, kẻ yếu chịu họa", hint_ko: "큰 세력 싸움에 작은 자가 당한다", hint_vi: "Thế lực lớn đánh nhau, kẻ nhỏ bị thiệt", explanation_ko: "힘센 자들의 싸움에 약한 자가 피해를 보게 된다는 뜻입니다.", explanation_vi: "Nghĩa là kẻ yếu bị thiệt hại trong cuộc đấu của kẻ mạnh.", example_ko: "고래 싸움에 새우 등 터진다고, 우리만 손해야.", example_vi: "Trâu bò đánh nhau ruồi muỗi chết, chỉ mình thiệt thôi.", wrong_meanings: [{ ko: "고래가 위험하다", vi: "Cá voi nguy hiểm" }, { ko: "새우를 먹어라", vi: "Ăn tôm" }, { ko: "바다에 가라", vi: "Đi biển" }] },
-  { expression: "숯이 검정 나무란다", type: "proverb", difficulty: "hard", meaning_ko: "자기 잘못은 모르고 남 탓한다", meaning_vi: "Không biết lỗi mình mà đổ lỗi người khác", hint_ko: "자기 허물은 안 보고 남만 탓하다", hint_vi: "Không thấy lỗi mình mà chỉ trách người", explanation_ko: "자기가 더 검은데 다른 것을 검다고 탓하는 것처럼, 자기 잘못은 모르고 남 탓한다는 뜻입니다.", explanation_vi: "Giống như than đen hơn mà lại chê gỗ đen, nghĩa là không biết lỗi mình mà trách người khác.", example_ko: "숯이 검정 나무란다더니, 본인이 더 심하면서.", example_vi: "Chậu úp vung kêu, mình còn tệ hơn mà.", wrong_meanings: [{ ko: "숯이 좋다", vi: "Than tốt" }, { ko: "나무를 심어라", vi: "Trồng cây" }, { ko: "검은색이 예쁘다", vi: "Màu đen đẹp" }] },
-  { expression: "구렁이 담 넘어가듯", type: "proverb", difficulty: "hard", meaning_ko: "슬그머니 빠져나가다", meaning_vi: "Lén lút thoát đi", hint_ko: "말없이 조용히 넘어가다", hint_vi: "Im lặng lén lút qua", explanation_ko: "어떤 일을 눈에 띄지 않게 슬쩍 넘어간다는 뜻입니다.", explanation_vi: "Nghĩa là lén lút làm việc gì đó mà không bị chú ý.", example_ko: "구렁이 담 넘어가듯 그냥 넘어갔네.", example_vi: "Như rắn bò qua tường, cứ thế lướt qua.", wrong_meanings: [{ ko: "뱀이 위험하다", vi: "Rắn nguy hiểm" }, { ko: "담을 만들어라", vi: "Xây tường" }, { ko: "동물을 키워라", vi: "Nuôi động vật" }] },
-  { expression: "언 발에 오줌 누기", type: "proverb", difficulty: "hard", meaning_ko: "임시방편으로 근본적 해결이 안 된다", meaning_vi: "Biện pháp tạm thời không giải quyết gốc rễ", hint_ko: "잠깐은 되지만 결국 문제다", hint_vi: "Được chút nhưng cuối cùng vẫn có vấn đề", explanation_ko: "일시적으로는 도움이 되지만 결국 더 나빠지는 임시방편입니다.", explanation_vi: "Là biện pháp tạm thời có ích nhất thời nhưng cuối cùng tệ hơn.", example_ko: "언 발에 오줌 누기라고, 당장은 괜찮아도 나중이 문제야.", example_vi: "Như đái vào chân đông lạnh, bây giờ tốt nhưng sau sẽ có vấn đề.", wrong_meanings: [{ ko: "화장실에 가라", vi: "Đi vệ sinh" }, { ko: "발이 차갑다", vi: "Chân lạnh" }, { ko: "겨울이다", vi: "Mùa đông" }] },
-];
-
-// MZ세대 슬랭 (slang) - 500+
-const SLANG: ExpressionData[] = [
-  // Easy slang
-  { expression: "킹받다", type: "slang", difficulty: "easy", meaning_ko: "매우 화가 나다, 열받다", meaning_vi: "Rất tức giận", hint_ko: "King + 열받다의 합성어", hint_vi: "Ghép từ King + tức giận", explanation_ko: "킹(King)과 열받다를 합쳐서 '매우 화난다'라는 MZ세대 표현입니다.", explanation_vi: "Ghép từ King và tức giận, là cách nói thế hệ MZ nghĩa là 'rất tức giận'.", example_ko: "아 진짜 킹받아! 왜 안 되는 거야!", example_vi: "Thật sự điên tiết! Sao không được vậy!", wrong_meanings: [{ ko: "왕이 되다", vi: "Trở thành vua" }, { ko: "기분이 좋다", vi: "Vui vẻ" }, { ko: "존경받다", vi: "Được tôn kính" }] },
-  { expression: "JMT", type: "slang", difficulty: "easy", meaning_ko: "존맛탱, 매우 맛있다", meaning_vi: "Rất ngon", hint_ko: "맛집에서 자주 쓰는 표현", hint_vi: "Thường dùng khi nói về nhà hàng ngon", explanation_ko: "존맛탱(존나 맛있다)의 약자로, 음식이 매우 맛있다는 표현입니다.", explanation_vi: "Viết tắt của 존맛탱 (cực kỳ ngon), dùng để khen đồ ăn rất ngon.", example_ko: "이 떡볶이 JMT야!", example_vi: "Tteokbokki này ngon số dzách!", wrong_meanings: [{ ko: "점심 먹었다", vi: "Đã ăn trưa" }, { ko: "제주도 음식", vi: "Món Jeju" }, { ko: "일본 음식", vi: "Món Nhật" }] },
-  { expression: "TMI", type: "slang", difficulty: "easy", meaning_ko: "필요 없는 정보, 과한 정보", meaning_vi: "Thông tin không cần thiết, quá nhiều", hint_ko: "Too Much Information의 약자", hint_vi: "Viết tắt của Too Much Information", explanation_ko: "Too Much Information의 약자로, 굳이 말하지 않아도 될 정보라는 뜻입니다.", explanation_vi: "Viết tắt của Too Much Information, nghĩa là thông tin không cần thiết phải nói.", example_ko: "TMI인데, 나 어제 3번 화장실 갔어.", example_vi: "TMI nhưng hôm qua tôi đi toilet 3 lần.", wrong_meanings: [{ ko: "시간", vi: "Thời gian" }, { ko: "중요한 정보", vi: "Thông tin quan trọng" }, { ko: "문자 메시지", vi: "Tin nhắn" }] },
-  { expression: "갑분싸", type: "slang", difficulty: "easy", meaning_ko: "갑자기 분위기가 싸해지다", meaning_vi: "Không khí đột nhiên lạnh lẽo", hint_ko: "분위기가 어색해질 때", hint_vi: "Khi không khí trở nên ngại ngùng", explanation_ko: "갑자기 분위기 싸해짐의 줄임말로, 갑자기 분위기가 어색해질 때 씁니다.", explanation_vi: "Viết tắt của '갑자기 분위기 싸해짐', dùng khi không khí đột nhiên trở nên ngại ngùng.", example_ko: "그 말 한 순간 갑분싸 됐어.", example_vi: "Vừa nói câu đó là không khí tự nhiên im bặt.", wrong_meanings: [{ ko: "갑자기 분노하다", vi: "Đột nhiên tức giận" }, { ko: "갑자기 싸우다", vi: "Đột nhiên cãi nhau" }, { ko: "갑자기 사라지다", vi: "Đột nhiên biến mất" }] },
-  { expression: "플렉스", type: "slang", difficulty: "easy", meaning_ko: "돈을 과시하며 쓰다", meaning_vi: "Tiêu tiền khoe khoang", hint_ko: "명품을 사거나 비싼 것을 자랑할 때", hint_vi: "Khi mua hàng hiệu hoặc khoe đồ đắt", explanation_ko: "영어 Flex에서 온 말로, 돈이나 물건을 과시한다는 뜻입니다.", explanation_vi: "Từ tiếng Anh Flex, nghĩa là khoe khoang tiền bạc hoặc đồ vật.", example_ko: "월급 받았으니까 오늘 플렉스 해야지!", example_vi: "Được lương rồi nên hôm nay flex thôi!", wrong_meanings: [{ ko: "운동하다", vi: "Tập thể dục" }, { ko: "유연하다", vi: "Linh hoạt" }, { ko: "절약하다", vi: "Tiết kiệm" }] },
-  { expression: "갓생", type: "slang", difficulty: "easy", meaning_ko: "매우 성실하고 열심히 사는 삶", meaning_vi: "Cuộc sống chăm chỉ và siêng năng", hint_ko: "God + 인생의 합성어", hint_vi: "Ghép từ God + cuộc sống", explanation_ko: "God(신)과 생활을 합쳐서 '신처럼 완벽한 삶'이라는 뜻입니다.", explanation_vi: "Ghép từ God (thần) và cuộc sống, nghĩa là 'cuộc sống hoàn hảo như thần'.", example_ko: "요즘 운동도 하고 공부도 하고 갓생 살고 있어.", example_vi: "Dạo này vừa tập gym vừa học, sống như thần vậy.", wrong_meanings: [{ ko: "종교 생활", vi: "Cuộc sống tôn giáo" }, { ko: "게으른 삶", vi: "Cuộc sống lười biếng" }, { ko: "파티 생활", vi: "Cuộc sống tiệc tùng" }] },
-  { expression: "인싸", type: "slang", difficulty: "easy", meaning_ko: "인기 많고 사교적인 사람", meaning_vi: "Người nổi tiếng và xã giao tốt", hint_ko: "Insider의 줄임말", hint_vi: "Viết tắt của Insider", explanation_ko: "Insider의 줄임말로, 친구가 많고 인기 있는 사람을 말합니다.", explanation_vi: "Viết tắt của Insider, chỉ người có nhiều bạn và được yêu thích.", example_ko: "그 친구는 완전 인싸야. 모르는 사람이 없어.", example_vi: "Bạn đó là insider thực sự. Không ai không biết.", wrong_meanings: [{ ko: "안에 있는 사람", vi: "Người ở trong" }, { ko: "내성적인 사람", vi: "Người hướng nội" }, { ko: "인터넷 사용자", vi: "Người dùng internet" }] },
-  { expression: "아싸", type: "slang", difficulty: "easy", meaning_ko: "혼자 노는 사람, 친구가 적은 사람", meaning_vi: "Người chơi một mình, ít bạn", hint_ko: "Outsider의 줄임말", hint_vi: "Viết tắt của Outsider", explanation_ko: "Outsider의 줄임말로, 무리에서 벗어나 혼자 있는 사람을 말합니다.", explanation_vi: "Viết tắt của Outsider, chỉ người ở ngoài nhóm, thích ở một mình.", example_ko: "나는 파티보다 집에 있는 게 좋아. 아싸야.", example_vi: "Tôi thích ở nhà hơn tiệc tùng. Tôi là outsider.", wrong_meanings: [{ ko: "바깥에 있는 사람", vi: "Người ở ngoài" }, { ko: "외국인", vi: "Người nước ngoài" }, { ko: "야외 활동을 좋아함", vi: "Thích hoạt động ngoài trời" }] },
-  { expression: "꿀잼", type: "slang", difficulty: "easy", meaning_ko: "매우 재미있다", meaning_vi: "Rất vui, rất thú vị", hint_ko: "꿀 + 재미의 합성어", hint_vi: "Ghép từ mật ong + vui", explanation_ko: "꿀처럼 달콤하게 재미있다는 뜻으로, 아주 재미있다는 표현입니다.", explanation_vi: "Nghĩa là thú vị ngọt ngào như mật ong, tức là rất vui.", example_ko: "그 드라마 꿀잼이야, 꼭 봐!", example_vi: "Phim đó vui lắm, phải xem!", wrong_meanings: [{ ko: "꿀로 만든 잼", vi: "Mứt làm từ mật ong" }, { ko: "달콤한 음식", vi: "Đồ ăn ngọt" }, { ko: "지루하다", vi: "Chán" }] },
-  { expression: "노잼", type: "slang", difficulty: "easy", meaning_ko: "전혀 재미없다", meaning_vi: "Không vui chút nào", hint_ko: "No + 재미의 합성어", hint_vi: "Ghép từ No + vui", explanation_ko: "No(없음)과 재미를 합쳐서 '재미없다'라는 뜻입니다.", explanation_vi: "Ghép từ No (không) và vui, nghĩa là 'không vui'.", example_ko: "그 영화 완전 노잼이었어, 졸렸어.", example_vi: "Phim đó chán quá, buồn ngủ luôn.", wrong_meanings: [{ ko: "잼이 없다", vi: "Không có mứt" }, { ko: "감정이 없다", vi: "Không có cảm xúc" }, { ko: "매우 재미있다", vi: "Rất vui" }] },
-  { expression: "오히려좋아", type: "slang", difficulty: "easy", meaning_ko: "나쁜 상황이 오히려 좋게 됐다", meaning_vi: "Tình huống xấu lại trở nên tốt", hint_ko: "역발상으로 긍정적으로 보다", hint_vi: "Nhìn tích cực theo cách nghịch đảo", explanation_ko: "안 좋은 상황이 오히려 더 좋은 결과가 됐을 때 쓰는 표현입니다.", explanation_vi: "Dùng khi tình huống xấu lại có kết quả tốt hơn.", example_ko: "버스 놓쳤는데 친구 만났어. 오히려좋아!", example_vi: "Lỡ xe buýt nhưng gặp bạn. Như vậy còn tốt hơn!", wrong_meanings: [{ ko: "그냥 좋다", vi: "Bình thường tốt" }, { ko: "별로 안 좋다", vi: "Không tốt lắm" }, { ko: "매우 나쁘다", vi: "Rất tệ" }] },
-  { expression: "레게노", type: "slang", difficulty: "easy", meaning_ko: "레전드, 전설적이다", meaning_vi: "Huyền thoại, truyền thuyết", hint_ko: "Legend의 한국식 발음", hint_vi: "Phát âm kiểu Hàn của Legend", explanation_ko: "Legend(레전드)를 귀엽게 변형한 말로, 대단하다는 뜻입니다.", explanation_vi: "Biến thể dễ thương của Legend, nghĩa là rất tuyệt.", example_ko: "그 플레이 레게노였어!", example_vi: "Pha chơi đó huyền thoại!", wrong_meanings: [{ ko: "레게 음악", vi: "Nhạc Reggae" }, { ko: "노래하다", vi: "Hát" }, { ko: "춤추다", vi: "Nhảy" }] },
-  { expression: "쩔어", type: "slang", difficulty: "easy", meaning_ko: "대단하다, 멋지다", meaning_vi: "Tuyệt vời, tuyệt cú mèo", hint_ko: "감탄할 때 쓰는 표현", hint_vi: "Dùng khi thán phục", explanation_ko: "무언가가 정말 대단하거나 멋질 때 쓰는 감탄 표현입니다.", explanation_vi: "Dùng khi điều gì đó thực sự tuyệt vời hoặc xuất sắc.", example_ko: "와 이 노래 쩔어!", example_vi: "Wow bài hát này chất quá!", wrong_meanings: [{ ko: "젖었다", vi: "Bị ướt" }, { ko: "힘들다", vi: "Khó khăn" }, { ko: "절하다", vi: "Cúi chào" }] },
-  { expression: "멍때리다", type: "slang", difficulty: "easy", meaning_ko: "아무 생각 없이 멍하게 있다", meaning_vi: "Ngồi thẫn thờ không nghĩ gì", hint_ko: "하늘을 보며 넋 놓을 때", hint_vi: "Khi nhìn trời mà thất thần", explanation_ko: "아무 생각 없이 멍하게 있는 상태를 말합니다.", explanation_vi: "Trạng thái ngồi thẫn thờ không nghĩ gì.", example_ko: "요즘 스트레스 받아서 자주 멍때려.", example_vi: "Dạo này stress nên hay ngồi thẫn thờ.", wrong_meanings: [{ ko: "생각을 많이 한다", vi: "Nghĩ nhiều" }, { ko: "열심히 일한다", vi: "Làm việc chăm chỉ" }, { ko: "화가 난다", vi: "Tức giận" }] },
-  { expression: "손민수", type: "slang", difficulty: "easy", meaning_ko: "남이 가진 것을 따라 사다", meaning_vi: "Mua theo thứ người khác có", hint_ko: "친구 물건 보고 똑같이 사는 것", hint_vi: "Thấy đồ bạn rồi mua giống", explanation_ko: "다른 사람이 가진 물건을 보고 따라 사는 행동을 말합니다.", explanation_vi: "Chỉ hành động mua giống đồ người khác có.", example_ko: "언니 가방 예뻐서 손민수 했어.", example_vi: "Túi chị đẹp quá nên mua theo.", wrong_meanings: [{ ko: "사람 이름", vi: "Tên người" }, { ko: "손으로 만들다", vi: "Làm bằng tay" }, { ko: "민수에게 주다", vi: "Đưa cho Minsu" }] },
-  
-  // Medium slang
-  { expression: "뇌절", type: "slang", difficulty: "medium", meaning_ko: "같은 말이나 행동을 반복하다", meaning_vi: "Lặp đi lặp lại lời nói hoặc hành động", hint_ko: "유행어를 계속 반복해서 쓸 때", hint_vi: "Khi dùng từ thịnh hành lặp lại liên tục", explanation_ko: "같은 드립이나 행동을 계속 반복해서 재미가 없어지는 것입니다.", explanation_vi: "Lặp lại cùng một câu đùa hoặc hành động liên tục đến mức không còn vui.", example_ko: "그 농담 뇌절이야, 그만해.", example_vi: "Câu đùa đó nhắc hoài rồi, thôi đi.", wrong_meanings: [{ ko: "뇌가 아프다", vi: "Đau não" }, { ko: "똑똒하다", vi: "Thông minh" }, { ko: "창의적이다", vi: "Sáng tạo" }] },
-  { expression: "어쩔티비", type: "slang", difficulty: "medium", meaning_ko: "어쩌라고, 상대를 무시하는 표현", meaning_vi: "Biết rồi, câu nói xem thường người khác", hint_ko: "어쩔 + TV의 합성어", hint_vi: "Ghép từ 어쩔 + TV", explanation_ko: "어쩌라고의 변형으로, 상대방을 무시하거나 장난칠 때 씁니다.", explanation_vi: "Biến thể của '어쩌라고', dùng khi xem thường hoặc đùa với người khác.", example_ko: "싫으면? 어쩔티비~", example_vi: "Không thích? Thì sao nào~", wrong_meanings: [{ ko: "TV를 보다", vi: "Xem TV" }, { ko: "TV가 고장났다", vi: "TV hỏng" }, { ko: "TV 프로그램", vi: "Chương trình TV" }] },
-  { expression: "저쩔냉장고", type: "slang", difficulty: "medium", meaning_ko: "저쩌라고, 어쩔티비의 대답", meaning_vi: "Câu trả lời cho 어쩔티비", hint_ko: "저쩔 + 냉장고의 합성어", hint_vi: "Ghép từ 저쩔 + tủ lạnh", explanation_ko: "어쩔티비에 대한 대답으로, 장난스러운 말싸움 표현입니다.", explanation_vi: "Câu trả lời cho 어쩔티비, là cách nói đùa cãi nhau.", example_ko: "어쩔티비? 저쩔냉장고!", example_vi: "Thì sao? Thì vậy đấy!", wrong_meanings: [{ ko: "냉장고를 사다", vi: "Mua tủ lạnh" }, { ko: "음식을 보관하다", vi: "Bảo quản thức ăn" }, { ko: "춥다", vi: "Lạnh" }] },
-  { expression: "ㄹㅇ", type: "slang", difficulty: "medium", meaning_ko: "리얼, 진짜로", meaning_vi: "Real, thực sự", hint_ko: "리얼의 초성", hint_vi: "Phụ âm đầu của Real", explanation_ko: "리얼(Real)의 초성으로, '진짜'라는 뜻입니다.", explanation_vi: "Phụ âm đầu của Real, nghĩa là 'thật sự'.", example_ko: "ㄹㅇ 맛있어, 먹어봐.", example_vi: "Thật sự ngon, thử đi.", wrong_meanings: [{ ko: "욕설", vi: "Chửi thề" }, { ko: "웃다", vi: "Cười" }, { ko: "모른다", vi: "Không biết" }] },
-  { expression: "ㅋㅋㅋ", type: "slang", difficulty: "medium", meaning_ko: "웃음 소리, 하하하", meaning_vi: "Tiếng cười, hahaha", hint_ko: "키키키의 초성", hint_vi: "Phụ âm đầu của 키키키", explanation_ko: "웃음을 표현하는 인터넷 용어로, ㅋ가 많을수록 더 웃긴다는 뜻입니다.", explanation_vi: "Từ internet biểu thị tiếng cười, càng nhiều ㅋ càng buồn cười.", example_ko: "ㅋㅋㅋ 진짜 웃겨!", example_vi: "Hahaha thật sự buồn cười!", wrong_meanings: [{ ko: "화났다", vi: "Tức giận" }, { ko: "슬프다", vi: "Buồn" }, { ko: "무관심", vi: "Thờ ơ" }] },
-  { expression: "억텐", type: "slang", difficulty: "medium", meaning_ko: "억지 텐션, 무리해서 밝은 척", meaning_vi: "Tỏ vẻ vui vẻ miễn cưỡng", hint_ko: "힘들어도 밝은 척할 때", hint_vi: "Khi mệt mà vẫn giả vui", explanation_ko: "억지로 텐션을 높이며 밝은 척하는 것입니다.", explanation_vi: "Cố gắng tỏ ra vui vẻ dù không muốn.", example_ko: "지금 완전 억텐이야, 피곤해 죽겠어.", example_vi: "Đang gắng gượng tỏ vẻ vui đây, mệt muốn chết.", wrong_meanings: [{ ko: "진짜 기분 좋다", vi: "Thực sự vui" }, { ko: "에너지가 넘친다", vi: "Tràn đầy năng lượng" }, { ko: "텐트", vi: "Lều" }] },
-  { expression: "중꺾마", type: "slang", difficulty: "medium", meaning_ko: "중요한 건 꺾이지 않는 마음", meaning_vi: "Điều quan trọng là tinh thần không gục ngã", hint_ko: "이기자 선수의 명언", hint_vi: "Câu nói nổi tiếng của tuyển thủ Gigi", explanation_ko: "프로게이머 이기자의 명언에서 유래한 표현으로, 포기하지 않는 정신을 말합니다.", explanation_vi: "Từ câu nói của game thủ chuyên nghiệp Gigi, nói về tinh thần không bỏ cuộc.", example_ko: "어려워도 중꺾마로 해내자!", example_vi: "Dù khó khăn, hãy làm với tinh thần không gục ngã!", wrong_meanings: [{ ko: "중간에 꺾다", vi: "Gãy giữa chừng" }, { ko: "마음이 아프다", vi: "Đau lòng" }, { ko: "중요하지 않다", vi: "Không quan trọng" }] },
-  { expression: "롬곡옾�pp", type: "slang", difficulty: "medium", meaning_ko: "뒤집으면 '문열어봐'", meaning_vi: "Lật ngược lại là 'mở cửa đi'", hint_ko: "글자를 180도 뒤집어 보세요", hint_vi: "Thử lật chữ 180 độ", explanation_ko: "180도 회전하면 '문열어봐'가 되는 인터넷 밈입니다.", explanation_vi: "Meme internet, xoay 180 độ thành '문열어봐' (mở cửa đi).", example_ko: "롬곡옾�pp (배달왔어, 문 열어)", example_vi: "롬곡옾�pp (giao hàng đến rồi, mở cửa đi)", wrong_meanings: [{ ko: "암호", vi: "Mật mã" }, { ko: "욕설", vi: "Chửi thề" }, { ko: "영어 약자", vi: "Viết tắt tiếng Anh" }] },
-  { expression: "취존", type: "slang", difficulty: "medium", meaning_ko: "취향 존중", meaning_vi: "Tôn trọng sở thích", hint_ko: "남의 취향을 존중한다", hint_vi: "Tôn trọng sở thích của người khác", explanation_ko: "취향 존중의 줄임말로, 다른 사람의 취향을 비난하지 않는다는 뜻입니다.", explanation_vi: "Viết tắt của 취향 존중, nghĩa là không chỉ trích sở thích của người khác.", example_ko: "나는 그거 별로인데, 취존해.", example_vi: "Tôi không thích lắm, nhưng tôn trọng sở thích của bạn.", wrong_meanings: [{ ko: "취하다", vi: "Say" }, { ko: "존경하다", vi: "Tôn kính" }, { ko: "취업 존비", vi: "Chuẩn bị xin việc" }] },
-  { expression: "갈비", type: "slang", difficulty: "medium", meaning_ko: "갈수록 비호감", meaning_vi: "Càng ngày càng không thích", hint_ko: "처음엔 괜찮았는데 점점...", hint_vi: "Ban đầu thì ổn nhưng dần dần...", explanation_ko: "처음에는 괜찮았는데 알수록 싫어지는 사람이나 것을 말합니다.", explanation_vi: "Chỉ người hoặc vật ban đầu thì ổn nhưng càng biết càng không thích.", example_ko: "그 사람 알수록 갈비야.", example_vi: "Càng biết người đó càng không ưa.", wrong_meanings: [{ ko: "갈비 음식", vi: "Món sườn" }, { ko: "호감이 간다", vi: "Thích" }, { ko: "길이 나뉘다", vi: "Đường chia" }] },
-  { expression: "혼코노", type: "slang", difficulty: "medium", meaning_ko: "혼자 코인 노래방", meaning_vi: "Đi karaoke một mình", hint_ko: "혼자 노래방 가는 것", hint_vi: "Đi karaoke một mình", explanation_ko: "혼자 코인 노래방을 가는 것의 줄임말입니다.", explanation_vi: "Viết tắt của việc đi karaoke một mình.", example_ko: "스트레스 받으면 혼코노 가.", example_vi: "Stress thì đi karaoke một mình.", wrong_meanings: [{ ko: "코인 모으기", vi: "Thu thập xu" }, { ko: "노래를 싫어함", vi: "Ghét hát" }, { ko: "혼자 게임", vi: "Chơi game một mình" }] },
-  
-  // Hard slang
-  { expression: "내로남불", type: "slang", difficulty: "hard", meaning_ko: "내가 하면 로맨스, 남이 하면 불륜", meaning_vi: "Tôi làm thì lãng mạn, người khác làm thì ngoại tình", hint_ko: "이중잣대를 비꼬는 표현", hint_vi: "Chê bai tiêu chuẩn kép", explanation_ko: "같은 행동을 자기가 할 때와 남이 할 때 다르게 평가하는 이중잣대를 비꼬는 말입니다.", explanation_vi: "Mỉa mai việc đánh giá cùng hành động khác nhau khi mình làm và người khác làm.", example_ko: "완전 내로남불이네. 본인도 똑같이 하면서.", example_vi: "Đúng là tiêu chuẩn kép. Bản thân cũng làm y vậy mà.", wrong_meanings: [{ ko: "로맨틱하다", vi: "Lãng mạn" }, { ko: "불륜을 저질렀다", vi: "Ngoại tình" }, { ko: "관대하다", vi: "Rộng lượng" }] },
-  { expression: "존버", type: "slang", difficulty: "hard", meaning_ko: "끝까지 버티다, 포기하지 않다", meaning_vi: "Kiên trì đến cùng, không bỏ cuộc", hint_ko: "주식이나 코인에서 많이 쓰는 표현", hint_vi: "Thường dùng trong chứng khoán hay coin", explanation_ko: "존(매우) + 버티다의 합성어로, 끝까지 포기하지 않고 버틴다는 뜻입니다.", explanation_vi: "Ghép từ 존 (rất) + kiên trì, nghĩa là không bỏ cuộc và kiên trì đến cùng.", example_ko: "주가 떨어져도 존버한다!", example_vi: "Giá cổ phiếu xuống vẫn kiên trì!", wrong_meanings: [{ ko: "빨리 팔다", vi: "Bán nhanh" }, { ko: "포기하다", vi: "Bỏ cuộc" }, { ko: "버스를 타다", vi: "Đi xe buýt" }] },
-  { expression: "군싹", type: "slang", difficulty: "hard", meaning_ko: "군침이 싹 돈다", meaning_vi: "Chảy nước miếng", hint_ko: "맛있는 음식을 볼 때", hint_vi: "Khi thấy đồ ăn ngon", explanation_ko: "군침이 싹 돈다의 줄임말로, 먹고 싶어서 침이 고인다는 뜻입니다.", explanation_vi: "Viết tắt của '군침이 싹 돈다', nghĩa là muốn ăn đến chảy nước miếng.", example_ko: "저 치킨 보니까 군싹이다.", example_vi: "Nhìn gà rán đó mà chảy nước miếng.", wrong_meanings: [{ ko: "군인 싹", vi: "Mầm quân nhân" }, { ko: "싹이 자라다", vi: "Mầm lớn lên" }, { ko: "배가 부르다", vi: "No bụng" }] },
-  { expression: "알잘딱깔센", type: "slang", difficulty: "hard", meaning_ko: "알아서 잘 딱 깔끔하고 센스있게", meaning_vi: "Tự hiểu, làm tốt, gọn gàng và tinh tế", hint_ko: "완벽하게 처리해달라는 의미", hint_vi: "Nghĩa là hãy xử lý hoàn hảo", explanation_ko: "'알아서 잘 딱 깔끔하고 센스있게'의 줄임말로, 일을 완벽하게 처리해달라는 표현입니다.", explanation_vi: "Viết tắt của '알아서 잘 딱 깔끔하고 센스있게', yêu cầu xử lý công việc hoàn hảo.", example_ko: "이거 알잘딱깔센으로 해줘.", example_vi: "Làm cái này hoàn hảo nhé.", wrong_meanings: [{ ko: "대충 해라", vi: "Làm qua loa" }, { ko: "알려달라", vi: "Cho biết" }, { ko: "신경 쓰지 마라", vi: "Đừng quan tâm" }] },
-  { expression: "싫존주의", type: "slang", difficulty: "hard", meaning_ko: "싫어도 존재는 인정", meaning_vi: "Dù không thích nhưng tôn trọng sự tồn tại", hint_ko: "싫지만 있다는 건 인정하다", hint_vi: "Không thích nhưng công nhận sự hiện diện", explanation_ko: "싫어도 그것의 존재는 인정한다는 뜻으로, 취향은 다르지만 존중한다는 표현입니다.", explanation_vi: "Nghĩa là dù không thích nhưng công nhận sự tồn tại, sở thích khác nhưng vẫn tôn trọng.", example_ko: "그 음악 싫은데 싫존주의할게.", example_vi: "Không thích nhạc đó nhưng tôn trọng sự tồn tại của nó.", wrong_meanings: [{ ko: "완전히 싫다", vi: "Hoàn toàn ghét" }, { ko: "존재하지 않는다", vi: "Không tồn tại" }, { ko: "무시하다", vi: "Phớt lờ" }] },
-  { expression: "캘박", type: "slang", difficulty: "hard", meaning_ko: "캘린더에 박제, 일정 확정", meaning_vi: "Đã đặt trong lịch, xác nhận lịch trình", hint_ko: "약속을 확정할 때", hint_vi: "Khi xác nhận cuộc hẹn", explanation_ko: "캘린더에 박제한다는 뜻으로, 일정이 확정됐다는 표현입니다.", explanation_vi: "Nghĩa là đã ghi vào lịch, tức là lịch trình đã xác nhận.", example_ko: "다음 주 토요일 캘박!", example_vi: "Thứ Bảy tuần sau đã chốt lịch!", wrong_meanings: [{ ko: "캘리포니아 박스", vi: "Hộp California" }, { ko: "일정 취소", vi: "Hủy lịch" }, { ko: "박물관", vi: "Bảo tàng" }] },
-  { expression: "500", type: "slang", difficulty: "hard", meaning_ko: "오백(오빠 바보)", meaning_vi: "Anh ngốc (viết tắt)", hint_ko: "숫자처럼 보이지만 한국어 약자", hint_vi: "Trông như số nhưng là viết tắt tiếng Hàn", explanation_ko: "오백을 오빠 바보로 읽는 인터넷 밈입니다.", explanation_vi: "Meme internet đọc 오백 (500) thành 오빠 바보 (anh ngốc).", example_ko: "500이야 진짜~", example_vi: "Anh ngốc thật đấy~", wrong_meanings: [{ ko: "오백 원", vi: "500 won" }, { ko: "숫자 500", vi: "Số 500" }, { ko: "오빠가 멋있다", vi: "Anh đẹp trai" }] },
-  { expression: "MBTI가 뭐예요", type: "slang", difficulty: "hard", meaning_ko: "첫 만남에서 성격 알기 위한 질문", meaning_vi: "Câu hỏi để biết tính cách khi mới gặp", hint_ko: "한국에서 흔한 첫 질문", hint_vi: "Câu hỏi phổ biến ở Hàn Quốc khi mới gặp", explanation_ko: "한국에서 처음 만났을 때 성격을 알기 위해 자주 하는 질문입니다.", explanation_vi: "Câu hỏi thường gặp ở Hàn Quốc để biết tính cách khi mới quen.", example_ko: "반가워요! MBTI가 뭐예요?", example_vi: "Rất vui! MBTI của bạn là gì?", wrong_meanings: [{ ko: "시험 점수", vi: "Điểm thi" }, { ko: "혈액형", vi: "Nhóm máu" }, { ko: "나이", vi: "Tuổi" }] },
-  { expression: "현타", type: "slang", difficulty: "hard", meaning_ko: "현실 자각 타임", meaning_vi: "Thời điểm nhận ra thực tế", hint_ko: "갑자기 현실을 자각할 때", hint_vi: "Khi đột nhiên nhận ra thực tế", explanation_ko: "현실 자각 타임의 줄임말로, 갑자기 현실을 깨닫고 우울해지는 순간입니다.", explanation_vi: "Viết tắt của thời điểm nhận ra thực tế, khoảnh khắc đột nhiên nhận ra và buồn.", example_ko: "게임 끝나고 현타 왔어...", example_vi: "Chơi game xong rồi nhận ra thực tế...", wrong_meanings: [{ ko: "현금 타다", vi: "Rút tiền mặt" }, { ko: "현재 타임", vi: "Thời gian hiện tại" }, { ko: "기분이 좋다", vi: "Vui vẻ" }] },
-  { expression: "점메추", type: "slang", difficulty: "hard", meaning_ko: "점심 메뉴 추천해줘", meaning_vi: "Gợi ý menu bữa trưa", hint_ko: "점심 뭐 먹을지 물어볼 때", hint_vi: "Khi hỏi ăn trưa gì", explanation_ko: "점심 메뉴 추천의 줄임말로, 점심에 뭘 먹을지 추천해달라는 뜻입니다.", explanation_vi: "Viết tắt của gợi ý menu bữa trưa, nghĩa là nhờ gợi ý ăn trưa gì.", example_ko: "점메추! 오늘 뭐 먹지?", example_vi: "Gợi ý menu đi! Hôm nay ăn gì?", wrong_meanings: [{ ko: "점심 안 먹다", vi: "Không ăn trưa" }, { ko: "점심 예약", vi: "Đặt bàn trưa" }, { ko: "저녁 메뉴", vi: "Menu tối" }] },
-];
-
-// 인터넷 용어 (internet) - 500+
-const INTERNET: ExpressionData[] = [
-  // Easy internet terms
-  { expression: "댓글", type: "internet", difficulty: "easy", meaning_ko: "답글, 코멘트", meaning_vi: "Bình luận, comment", hint_ko: "게시글에 다는 짧은 글", hint_vi: "Đoạn ngắn viết dưới bài đăng", explanation_ko: "인터넷 게시글에 다는 짧은 의견이나 반응입니다.", explanation_vi: "Ý kiến hoặc phản ứng ngắn viết dưới bài đăng trên internet.", example_ko: "이 영상에 댓글 달아줘.", example_vi: "Comment vào video này đi.", wrong_meanings: [{ ko: "대글", vi: "Đoạn lớn" }, { ko: "게시글", vi: "Bài đăng" }, { ko: "메시지", vi: "Tin nhắn" }] },
-  { expression: "좋아요", type: "internet", difficulty: "easy", meaning_ko: "Like, 추천 버튼", meaning_vi: "Like, nút yêu thích", hint_ko: "SNS에서 마음에 들면 누르는 것", hint_vi: "Nút bấm khi thích trên mạng xã hội", explanation_ko: "소셜 미디어에서 게시물이 마음에 들 때 누르는 버튼입니다.", explanation_vi: "Nút bấm khi thích bài đăng trên mạng xã hội.", example_ko: "이 게시물 좋아요 눌러줘!", example_vi: "Like bài này đi!", wrong_meanings: [{ ko: "싫어요", vi: "Không thích" }, { ko: "댓글", vi: "Bình luận" }, { ko: "공유", vi: "Chia sẻ" }] },
-  { expression: "팔로우", type: "internet", difficulty: "easy", meaning_ko: "구독, 따라가기", meaning_vi: "Theo dõi, follow", hint_ko: "누군가의 계정을 구독하다", hint_vi: "Theo dõi tài khoản ai đó", explanation_ko: "다른 사람의 SNS 계정을 구독해서 새 글을 받아보는 것입니다.", explanation_vi: "Theo dõi tài khoản mạng xã hội của người khác để xem bài mới.", example_ko: "제 인스타 팔로우 해주세요!", example_vi: "Follow Instagram của tôi nhé!", wrong_meanings: [{ ko: "언팔로우", vi: "Bỏ theo dõi" }, { ko: "차단", vi: "Chặn" }, { ko: "검색", vi: "Tìm kiếm" }] },
-  { expression: "피드", type: "internet", difficulty: "easy", meaning_ko: "게시물 목록, 타임라인", meaning_vi: "Danh sách bài đăng, timeline", hint_ko: "SNS에서 스크롤하며 보는 화면", hint_vi: "Màn hình cuộn xem trên mạng xã hội", explanation_ko: "소셜 미디어에서 게시물들이 보이는 화면입니다.", explanation_vi: "Màn hình hiển thị các bài đăng trên mạng xã hội.", example_ko: "오늘 피드에 예쁜 사진이 많네.", example_vi: "Hôm nay feed có nhiều ảnh đẹp quá.", wrong_meanings: [{ ko: "음식", vi: "Thức ăn" }, { ko: "동물 먹이", vi: "Thức ăn động vật" }, { ko: "메시지", vi: "Tin nhắn" }] },
-  { expression: "업로드", type: "internet", difficulty: "easy", meaning_ko: "올리기, 게시하기", meaning_vi: "Tải lên, đăng", hint_ko: "인터넷에 파일이나 사진을 올리다", hint_vi: "Đăng file hoặc ảnh lên internet", explanation_ko: "인터넷이나 SNS에 사진, 영상, 글 등을 올리는 것입니다.", explanation_vi: "Đăng ảnh, video, bài viết lên internet hoặc mạng xã hội.", example_ko: "새 영상 업로드했어!", example_vi: "Tôi đã upload video mới!", wrong_meanings: [{ ko: "다운로드", vi: "Tải xuống" }, { ko: "삭제", vi: "Xóa" }, { ko: "저장", vi: "Lưu" }] },
-  { expression: "선팔", type: "internet", difficulty: "easy", meaning_ko: "먼저 팔로우하기", meaning_vi: "Follow trước", hint_ko: "상대가 나를 팔로우하기 전에 먼저 하는 것", hint_vi: "Follow trước khi người đó follow mình", explanation_ko: "상대방이 팔로우하기 전에 먼저 팔로우하는 것입니다.", explanation_vi: "Follow người đó trước khi họ follow mình.", example_ko: "선팔하면 맞팔할게!", example_vi: "Follow trước thì tôi sẽ follow lại!", wrong_meanings: [{ ko: "팔로우 취소", vi: "Hủy follow" }, { ko: "팔로워", vi: "Người theo dõi" }, { ko: "팔로잉", vi: "Đang theo dõi" }] },
-  { expression: "맞팔", type: "internet", difficulty: "easy", meaning_ko: "서로 팔로우하기", meaning_vi: "Theo dõi lẫn nhau", hint_ko: "상대가 팔로우하면 나도 하는 것", hint_vi: "Người đó follow thì mình cũng follow", explanation_ko: "서로 팔로우를 주고받는 것입니다.", explanation_vi: "Hai người follow lẫn nhau.", example_ko: "선팔하면 맞팔 갈게요!", example_vi: "Follow trước thì tôi follow lại!", wrong_meanings: [{ ko: "팔로우 안 하기", vi: "Không follow" }, { ko: "차단하기", vi: "Chặn" }, { ko: "언팔하기", vi: "Bỏ follow" }] },
-  { expression: "스토리", type: "internet", difficulty: "easy", meaning_ko: "24시간 후 사라지는 게시물", meaning_vi: "Bài đăng biến mất sau 24 giờ", hint_ko: "인스타그램이나 페이스북의 짧은 게시물", hint_vi: "Bài ngắn trên Instagram hoặc Facebook", explanation_ko: "24시간 후에 사라지는 짧은 사진이나 영상 게시물입니다.", explanation_vi: "Ảnh hoặc video ngắn biến mất sau 24 giờ.", example_ko: "스토리에 올렸는데 봤어?", example_vi: "Tôi đã đăng story, xem chưa?", wrong_meanings: [{ ko: "이야기", vi: "Câu chuyện" }, { ko: "영구 게시물", vi: "Bài đăng vĩnh viễn" }, { ko: "소설", vi: "Tiểu thuyết" }] },
-  { expression: "리플", type: "internet", difficulty: "easy", meaning_ko: "답글, Reply", meaning_vi: "Trả lời, Reply", hint_ko: "댓글에 다시 다는 댓글", hint_vi: "Trả lời bình luận", explanation_ko: "게시글이나 댓글에 다는 답변입니다.", explanation_vi: "Câu trả lời cho bài đăng hoặc bình luận.", example_ko: "내 댓글에 리플 달아줘!", example_vi: "Reply bình luận của tôi đi!", wrong_meanings: [{ ko: "삭제", vi: "Xóa" }, { ko: "신고", vi: "Báo cáo" }, { ko: "좋아요", vi: "Like" }] },
-  { expression: "DM", type: "internet", difficulty: "easy", meaning_ko: "다이렉트 메시지, 쪽지", meaning_vi: "Tin nhắn trực tiếp", hint_ko: "비공개로 보내는 메시지", hint_vi: "Tin nhắn riêng tư", explanation_ko: "SNS에서 비공개로 보내는 개인 메시지입니다.", explanation_vi: "Tin nhắn riêng tư gửi trên mạng xã hội.", example_ko: "자세한 내용은 DM으로 보내줘.", example_vi: "Chi tiết gửi DM nhé.", wrong_meanings: [{ ko: "공개 댓글", vi: "Bình luận công khai" }, { ko: "이메일", vi: "Email" }, { ko: "전화", vi: "Điện thoại" }] },
-  { expression: "태그", type: "internet", difficulty: "easy", meaning_ko: "@ 언급, 해시태그", meaning_vi: "Đề cập @, hashtag", hint_ko: "누군가를 언급하거나 주제를 분류하는 것", hint_vi: "Nhắc đến ai hoặc phân loại chủ đề", explanation_ko: "SNS에서 다른 사람을 언급하거나 주제를 분류할 때 사용합니다.", explanation_vi: "Dùng để nhắc đến người khác hoặc phân loại chủ đề trên mạng xã hội.", example_ko: "이 사진에 친구 태그했어.", example_vi: "Tôi đã tag bạn trong ảnh này.", wrong_meanings: [{ ko: "가격표", vi: "Thẻ giá" }, { ko: "이름표", vi: "Thẻ tên" }, { ko: "광고", vi: "Quảng cáo" }] },
-  { expression: "인증샷", type: "internet", difficulty: "easy", meaning_ko: "증거 사진", meaning_vi: "Ảnh chứng minh", hint_ko: "무엇을 했다는 것을 증명하는 사진", hint_vi: "Ảnh chứng minh đã làm gì", explanation_ko: "어떤 일을 했다는 것을 증명하는 사진입니다.", explanation_vi: "Ảnh chứng minh đã làm việc gì đó.", example_ko: "운동했으면 인증샷 올려!", example_vi: "Tập gym rồi thì đăng ảnh chứng minh đi!", wrong_meanings: [{ ko: "신분증 사진", vi: "Ảnh chứng minh thư" }, { ko: "여권 사진", vi: "Ảnh hộ chiếu" }, { ko: "셀카", vi: "Selfie" }] },
-  
-  // Medium internet terms
-  { expression: "덕후", type: "internet", difficulty: "medium", meaning_ko: "팬, 마니아", meaning_vi: "Fan cuồng, người đam mê", hint_ko: "일본어 오타쿠에서 온 말", hint_vi: "Từ tiếng Nhật otaku", explanation_ko: "특정 분야에 깊이 빠진 팬이나 마니아를 말합니다.", explanation_vi: "Chỉ fan hoặc người đam mê sâu sắc một lĩnh vực nào đó.", example_ko: "나는 애니메이션 덕후야.", example_vi: "Tôi là fan cuồng anime.", wrong_meanings: [{ ko: "뒤", vi: "Phía sau" }, { ko: "덕분", vi: "Nhờ" }, { ko: "싫어하는 사람", vi: "Người ghét" }] },
-  { expression: "뮤트", type: "internet", difficulty: "medium", meaning_ko: "알림 끄기, 조용히 차단", meaning_vi: "Tắt thông báo, ẩn lặng lẽ", hint_ko: "차단은 아니지만 안 보이게 하는 것", hint_vi: "Không phải chặn nhưng ẩn đi", explanation_ko: "팔로우는 유지하지만 게시물이 안 보이게 하는 기능입니다.", explanation_vi: "Tính năng giữ follow nhưng không hiển thị bài đăng.", example_ko: "그 사람 게시물 너무 많아서 뮤트했어.", example_vi: "Người đó đăng nhiều quá nên tôi đã mute.", wrong_meanings: [{ ko: "차단", vi: "Chặn" }, { ko: "언팔로우", vi: "Bỏ follow" }, { ko: "신고", vi: "Báo cáo" }] },
-  { expression: "알고리즘", type: "internet", difficulty: "medium", meaning_ko: "추천 시스템", meaning_vi: "Hệ thống đề xuất", hint_ko: "SNS가 게시물을 보여주는 방식", hint_vi: "Cách mạng xã hội hiển thị bài đăng", explanation_ko: "SNS가 사용자 취향에 맞는 게시물을 추천해주는 시스템입니다.", explanation_vi: "Hệ thống mạng xã hội đề xuất bài đăng theo sở thích người dùng.", example_ko: "알고리즘이 나한테 맞는 영상만 보여줘.", example_vi: "Thuật toán chỉ cho tôi xem video phù hợp.", wrong_meanings: [{ ko: "수학 공식", vi: "Công thức toán" }, { ko: "프로그램", vi: "Chương trình" }, { ko: "앱", vi: "Ứng dụng" }] },
-  { expression: "조회수", type: "internet", difficulty: "medium", meaning_ko: "본 사람 수, 뷰", meaning_vi: "Số lượt xem, view", hint_ko: "영상이나 글을 본 횟수", hint_vi: "Số lần xem video hoặc bài", explanation_ko: "게시물이나 영상을 본 총 횟수입니다.", explanation_vi: "Tổng số lần xem bài đăng hoặc video.", example_ko: "이 영상 조회수가 100만이야!", example_vi: "Video này có 1 triệu view!", wrong_meanings: [{ ko: "좋아요 수", vi: "Số like" }, { ko: "댓글 수", vi: "Số bình luận" }, { ko: "팔로워 수", vi: "Số follower" }] },
-  { expression: "바이럴", type: "internet", difficulty: "medium", meaning_ko: "입소문으로 퍼지다", meaning_vi: "Lan truyền như virus", hint_ko: "인터넷에서 빠르게 퍼지는 것", hint_vi: "Lan nhanh trên internet", explanation_ko: "콘텐츠가 인터넷에서 빠르게 퍼져나가는 현상입니다.", explanation_vi: "Hiện tượng nội dung lan truyền nhanh trên internet.", example_ko: "그 영상이 바이럴 됐어!", example_vi: "Video đó đã viral!", wrong_meanings: [{ ko: "바이러스", vi: "Virus" }, { ko: "광고", vi: "Quảng cáo" }, { ko: "삭제", vi: "Xóa" }] },
-  { expression: "캡쳐", type: "internet", difficulty: "medium", meaning_ko: "화면 저장, 스크린샷", meaning_vi: "Chụp màn hình, screenshot", hint_ko: "화면을 사진으로 저장하는 것", hint_vi: "Lưu màn hình thành ảnh", explanation_ko: "화면을 이미지로 저장하는 것입니다.", explanation_vi: "Lưu màn hình thành hình ảnh.", example_ko: "그 대화 캡쳐해서 보여줘.", example_vi: "Chụp màn hình cuộc trò chuyện cho xem.", wrong_meanings: [{ ko: "영상 녹화", vi: "Quay video" }, { ko: "삭제", vi: "Xóa" }, { ko: "복사", vi: "Sao chép" }] },
-  { expression: "피싱", type: "internet", difficulty: "medium", meaning_ko: "사기, 개인정보 도용", meaning_vi: "Lừa đảo, đánh cắp thông tin", hint_ko: "가짜 사이트로 정보를 빼가는 것", hint_vi: "Lấy thông tin qua trang web giả", explanation_ko: "가짜 사이트나 메시지로 개인정보를 빼가는 사기입니다.", explanation_vi: "Lừa đảo lấy thông tin cá nhân qua trang web hoặc tin nhắn giả.", example_ko: "이상한 링크 피싱일 수 있어, 조심해.", example_vi: "Link lạ có thể là phishing, cẩn thận.", wrong_meanings: [{ ko: "낚시", vi: "Câu cá" }, { ko: "게임", vi: "Game" }, { ko: "광고", vi: "Quảng cáo" }] },
-  { expression: "접속", type: "internet", difficulty: "medium", meaning_ko: "로그인, 연결하다", meaning_vi: "Đăng nhập, kết nối", hint_ko: "인터넷이나 앱에 연결하다", hint_vi: "Kết nối vào internet hoặc app", explanation_ko: "인터넷 서비스나 앱에 연결하는 것입니다.", explanation_vi: "Kết nối vào dịch vụ internet hoặc ứng dụng.", example_ko: "게임에 접속이 안 돼!", example_vi: "Không kết nối được vào game!", wrong_meanings: [{ ko: "로그아웃", vi: "Đăng xuất" }, { ko: "삭제", vi: "Xóa" }, { ko: "설치", vi: "Cài đặt" }] },
-  { expression: "버퍼링", type: "internet", difficulty: "medium", meaning_ko: "로딩 중, 데이터 불러오는 중", meaning_vi: "Đang tải, đang load dữ liệu", hint_ko: "영상이 멈추고 빙글빙글 돌 때", hint_vi: "Khi video dừng và xoay vòng vòng", explanation_ko: "영상이나 데이터를 불러오는 동안 멈추는 현상입니다.", explanation_vi: "Hiện tượng dừng khi đang tải video hoặc dữ liệu.", example_ko: "인터넷 느려서 버퍼링 걸려.", example_vi: "Mạng chậm nên bị buffering.", wrong_meanings: [{ ko: "다운로드 완료", vi: "Tải xong" }, { ko: "영상 끝", vi: "Hết video" }, { ko: "로그아웃", vi: "Đăng xuất" }] },
-  { expression: "공유", type: "internet", difficulty: "medium", meaning_ko: "다른 사람에게 전달하다", meaning_vi: "Chia sẻ với người khác", hint_ko: "게시물을 다른 곳에 올리다", hint_vi: "Đăng bài lên nơi khác", explanation_ko: "게시물이나 링크를 다른 사람에게 전달하는 것입니다.", explanation_vi: "Chia sẻ bài đăng hoặc link với người khác.", example_ko: "이 기사 공유해도 돼?", example_vi: "Tôi chia sẻ bài này được không?", wrong_meanings: [{ ko: "삭제", vi: "Xóa" }, { ko: "숨기기", vi: "Ẩn" }, { ko: "차단", vi: "Chặn" }] },
-  
-  // Hard internet terms
-  { expression: "어그로", type: "internet", difficulty: "hard", meaning_ko: "관심을 끌기 위한 자극적 행동", meaning_vi: "Hành động khiêu khích để thu hút sự chú ý", hint_ko: "일부러 자극적인 글을 올리는 것", hint_vi: "Cố tình đăng bài khiêu khích", explanation_ko: "Aggro에서 온 말로, 관심을 끌기 위해 자극적인 행동을 하는 것입니다.", explanation_vi: "Từ Aggro, chỉ hành động khiêu khích để thu hút sự chú ý.", example_ko: "그냥 어그로니까 무시해.", example_vi: "Chỉ là câu view thôi, bỏ qua đi.", wrong_meanings: [{ ko: "화가 나다", vi: "Tức giận" }, { ko: "무시하다", vi: "Phớt lờ" }, { ko: "칭찬하다", vi: "Khen ngợi" }] },
-  { expression: "클릭베이트", type: "internet", difficulty: "hard", meaning_ko: "낚시성 제목, 클릭 유도", meaning_vi: "Tiêu đề câu view, dụ click", hint_ko: "자극적인 제목으로 클릭하게 하는 것", hint_vi: "Dùng tiêu đề kích thích để dụ click", explanation_ko: "내용과 다른 자극적인 제목으로 클릭을 유도하는 것입니다.", explanation_vi: "Dùng tiêu đề kích thích khác với nội dung để dụ click.", example_ko: "이 기사 완전 클릭베이트야.", example_vi: "Bài này hoàn toàn là clickbait.", wrong_meanings: [{ ko: "좋은 제목", vi: "Tiêu đề hay" }, { ko: "정직한 기사", vi: "Bài báo trung thực" }, { ko: "낚시", vi: "Câu cá" }] },
-  { expression: "블라인드", type: "internet", difficulty: "hard", meaning_ko: "가리기, 숨기기 처리", meaning_vi: "Che đi, ẩn xử lý", hint_ko: "댓글이나 글을 안 보이게 처리하는 것", hint_vi: "Xử lý ẩn bình luận hoặc bài", explanation_ko: "비속어나 부적절한 내용을 가려서 안 보이게 하는 처리입니다.", explanation_vi: "Xử lý che đi nội dung tục tĩu hoặc không phù hợp.", example_ko: "욕설은 블라인드 처리됩니다.", example_vi: "Từ ngữ tục tĩu sẽ bị ẩn.", wrong_meanings: [{ ko: "창문 가리개", vi: "Rèm cửa" }, { ko: "눈이 안 보이다", vi: "Không thấy" }, { ko: "삭제", vi: "Xóa" }] },
-  { expression: "밈", type: "internet", difficulty: "hard", meaning_ko: "인터넷 유행 이미지나 영상", meaning_vi: "Hình ảnh hoặc video thịnh hành trên internet", hint_ko: "웃긴 이미지가 인터넷에서 퍼지는 것", hint_vi: "Hình ảnh vui lan truyền trên internet", explanation_ko: "인터넷에서 유행하는 재미있는 이미지나 영상, 표현입니다.", explanation_vi: "Hình ảnh, video hoặc biểu cảm vui thịnh hành trên internet.", example_ko: "이 밈 진짜 웃겨!", example_vi: "Meme này cười chết!", wrong_meanings: [{ ko: "노래", vi: "Bài hát" }, { ko: "광고", vi: "Quảng cáo" }, { ko: "뉴스", vi: "Tin tức" }] },
-  { expression: "짤", type: "internet", difficulty: "hard", meaning_ko: "짧은 이미지, 움짤", meaning_vi: "Hình ngắn, ảnh động", hint_ko: "인터넷에서 쓰는 재미있는 이미지", hint_vi: "Hình ảnh vui dùng trên internet", explanation_ko: "인터넷에서 사용하는 짧은 이미지나 GIF입니다.", explanation_vi: "Hình ngắn hoặc GIF dùng trên internet.", example_ko: "이 짤 어디서 났어?", example_vi: "Ảnh này lấy ở đâu vậy?", wrong_meanings: [{ ko: "사진", vi: "Ảnh thường" }, { ko: "영상", vi: "Video" }, { ko: "글", vi: "Bài viết" }] },
-  { expression: "트롤", type: "internet", difficulty: "hard", meaning_ko: "악플러, 방해꾼", meaning_vi: "Người bình luận ác ý, kẻ phá rối", hint_ko: "일부러 분란을 일으키는 사람", hint_vi: "Người cố tình gây rối", explanation_ko: "인터넷에서 일부러 다른 사람을 화나게 하거나 분란을 일으키는 사람입니다.", explanation_vi: "Người cố tình làm người khác tức giận hoặc gây rối trên internet.", example_ko: "트롤은 그냥 무시하는 게 좋아.", example_vi: "Tốt nhất là bỏ qua troll.", wrong_meanings: [{ ko: "요정", vi: "Yêu tinh" }, { ko: "팬", vi: "Fan" }, { ko: "친구", vi: "Bạn bè" }] },
-  { expression: "스포", type: "internet", difficulty: "hard", meaning_ko: "스포일러, 내용 누설", meaning_vi: "Spoiler, tiết lộ nội dung", hint_ko: "드라마나 영화 결말을 미리 말하는 것", hint_vi: "Nói trước kết phim hoặc drama", explanation_ko: "영화나 드라마의 중요한 내용을 미리 알려주는 것입니다.", explanation_vi: "Tiết lộ trước nội dung quan trọng của phim hoặc drama.", example_ko: "스포 하지 마! 아직 안 봤어.", example_vi: "Đừng spoil! Tôi chưa xem.", wrong_meanings: [{ ko: "스포츠", vi: "Thể thao" }, { ko: "광고", vi: "Quảng cáo" }, { ko: "예고편", vi: "Trailer" }] },
-  { expression: "업뎃", type: "internet", difficulty: "hard", meaning_ko: "업데이트, 새로운 소식", meaning_vi: "Update, tin mới", hint_ko: "새로운 정보나 변화", hint_vi: "Thông tin hoặc thay đổi mới", explanation_ko: "새로운 정보나 버전으로 바뀌는 것입니다.", explanation_vi: "Thay đổi thành thông tin hoặc phiên bản mới.", example_ko: "게임 업뎃 언제 돼?", example_vi: "Khi nào game update?", wrong_meanings: [{ ko: "다운로드", vi: "Tải xuống" }, { ko: "삭제", vi: "Xóa" }, { ko: "설치", vi: "Cài đặt" }] },
-  { expression: "렉", type: "internet", difficulty: "hard", meaning_ko: "지연, 끊김 현상", meaning_vi: "Lag, hiện tượng giật", hint_ko: "게임이 느려지거나 끊기는 것", hint_vi: "Game chậm hoặc giật", explanation_ko: "인터넷 속도가 느려서 게임이나 영상이 끊기는 현상입니다.", explanation_vi: "Hiện tượng game hoặc video giật vì mạng chậm.", example_ko: "렉 때문에 게임 못하겠어!", example_vi: "Lag quá không chơi game được!", wrong_meanings: [{ ko: "빠르다", vi: "Nhanh" }, { ko: "좋다", vi: "Tốt" }, { ko: "신호", vi: "Tín hiệu" }] },
-  { expression: "정줄놓", type: "internet", difficulty: "hard", meaning_ko: "정신줄 놓다, 멍때리다", meaning_vi: "Mất tập trung, ngơ ngác", hint_ko: "정신이 딴 데 가있다", hint_vi: "Đầu óc đi đâu rồi", explanation_ko: "정신줄 놓다의 줄임말로, 멍하게 있거나 정신이 딴 데 가있는 상태입니다.", explanation_vi: "Viết tắt của '정신줄 놓다', trạng thái ngơ ngác hoặc đầu óc đi đâu.", example_ko: "회의 중에 정줄놓 하고 있었어.", example_vi: "Trong cuộc họp mà đầu óc đi đâu hết.", wrong_meanings: [{ ko: "집중하다", vi: "Tập trung" }, { ko: "똑똒하다", vi: "Thông minh" }, { ko: "정신이 맑다", vi: "Tinh thần minh mẫn" }] },
-];
-
-// 전체 데이터베이스 합치기
-const ALL_EXPRESSIONS: ExpressionData[] = [
-  ...IDIOMS,
-  ...PROVERBS,
-  ...SLANG,
-  ...INTERNET,
-];
-
-// 난이도별 필터링 함수
-function getExpressionsByDifficulty(difficulty: 'easy' | 'medium' | 'hard'): ExpressionData[] {
-  return ALL_EXPRESSIONS.filter(e => e.difficulty === difficulty);
-}
-
-// 사용되지 않은 표현 찾기
-function getUnusedExpression(difficulty: 'easy' | 'medium' | 'hard', usedExpressions: string[]): ExpressionData | null {
-  const availableExpressions = getExpressionsByDifficulty(difficulty)
-    .filter(e => !usedExpressions.includes(e.expression));
-  
-  if (availableExpressions.length === 0) {
-    // 모든 표현을 다 사용한 경우 전체에서 랜덤 선택
-    const allAvailable = getExpressionsByDifficulty(difficulty);
-    if (allAvailable.length === 0) return null;
-    return allAvailable[Math.floor(Math.random() * allAvailable.length)];
-  }
-  
-  return availableExpressions[Math.floor(Math.random() * availableExpressions.length)];
-}
-
-// Input validation helpers
+// Input validation
 function validateDifficulty(value: unknown): 'easy' | 'medium' | 'hard' {
   if (value === 'easy' || value === 'hard') return value;
   return 'medium';
 }
 
-function validateUsedExpressions(expressions: unknown): string[] {
-  if (!Array.isArray(expressions)) return [];
-  return expressions
-    .filter((e): e is string => typeof e === 'string' && e.length <= 100)
+function validateExcludeList(exclude: unknown): string[] {
+  if (!Array.isArray(exclude)) return [];
+  return exclude
+    .filter((e): e is string => typeof e === 'string')
+    .map(e => e.trim().slice(0, 100))
+    .filter(e => e.length > 0)
     .slice(-200);
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const body = await req.json().catch(() => ({}));
-    
-    // Validate inputs
+    const X_AI_API_KEY = Deno.env.get('X_AI_API_KEY');
+
+    if (!X_AI_API_KEY) {
+      throw new Error('X_AI_API_KEY is not configured');
+    }
+
     const difficulty = validateDifficulty(body.difficulty);
-    const usedExpressions = validateUsedExpressions(body.usedExpressions);
+    const exclude = validateExcludeList(body.exclude);
 
-    console.log("Quiz request:", { 
-      difficulty, 
-      usedExpressionsCount: usedExpressions.length,
-      totalAvailable: getExpressionsByDifficulty(difficulty).length 
+    console.log(`Generating idiom quiz - Difficulty: ${difficulty}, Excluded: ${exclude.length} expressions`);
+
+    const excludeText = exclude.length > 0
+      ? `\n\n절대 출제하면 안 되는 표현들 (이미 나온 것들): ${exclude.join(', ')}`
+      : '';
+
+    const userPrompt = `난이도: ${difficulty}
+${excludeText}
+
+위 조건에 맞는 새로운 관용어/슬랭 퀴즈를 1개 출제해주세요.
+반드시 제외 목록에 없는 완전히 새로운 표현을 사용하세요.
+다양한 카테고리에서 골고루 출제하세요.`;
+
+    const response = await fetch('https://api.x.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${X_AI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'grok-3-fast',
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 1.0,
+        max_tokens: 1024,
+      }),
     });
 
-    // 사용되지 않은 표현 선택
-    const selectedExpression = getUnusedExpression(difficulty, usedExpressions);
-    
-    if (!selectedExpression) {
-      return new Response(
-        JSON.stringify({ error: "No expressions available" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('X AI API error:', response.status, errorText);
+      
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ 
+          error: 'Rate limit exceeded',
+          message: '서버가 바쁩니다. 잠시 후 다시 시도해주세요.'
+        }), {
+          status: 429,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      throw new Error(`X AI API error: ${response.status}`);
     }
 
-    // 옵션 셔플 (정답 + 오답)
-    const correctOption = { ko: selectedExpression.meaning_ko, vi: selectedExpression.meaning_vi };
-    const allOptions = [correctOption, ...selectedExpression.wrong_meanings];
+    const data = await response.json();
+    console.log('X AI response received');
+
+    const content = data.choices?.[0]?.message?.content;
     
-    // Fisher-Yates shuffle
-    for (let i = allOptions.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [allOptions[i], allOptions[j]] = [allOptions[j], allOptions[i]];
+    let parsedResponse;
+    try {
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        parsedResponse = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('No JSON found in response');
+      }
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
+      // Fallback response
+      parsedResponse = {
+        question: "\"갓생\"의 의미는 무엇일까요?",
+        questionVi: "Ý nghĩa của \"갓생\" là gì?",
+        expression: "갓생",
+        hint: "Từ kết hợp giữa 'God' và '인생' (cuộc sống)",
+        options: [
+          { korean: "신처럼 완벽한 하루를 보내는 것", vietnamese: "Sống một ngày hoàn hảo như thần" },
+          { korean: "게임에서 신급 플레이를 하는 것", vietnamese: "Chơi game ở cấp độ thần" },
+          { korean: "종교적인 삶을 사는 것", vietnamese: "Sống cuộc sống tôn giáo" },
+          { korean: "부모님처럼 사는 것", vietnamese: "Sống như bố mẹ" }
+        ],
+        correctIndex: 0,
+        explanation: "갓생은 'God(신)'과 '인생'의 합성어로, 부지런하고 생산적인 하루를 보내는 것을 뜻하는 MZ세대 신조어입니다.",
+        explanationVi: "갓생 là từ ghép của 'God' và '인생' (cuộc sống), là từ lóng của thế hệ MZ có nghĩa là sống một ngày chăm chỉ và hiệu quả.",
+        example: "오늘 아침 6시에 일어나서 운동하고 공부도 했어. 완전 갓생이지!",
+        exampleVi: "Hôm nay mình dậy lúc 6 giờ sáng, tập thể dục và học bài nữa. Đúng là sống kiểu thần!",
+        category: "slang"
+      };
     }
-    
-    // 정답 인덱스 찾기
-    const correctIndex = allOptions.findIndex(opt => opt.ko === correctOption.ko);
 
-    const response = {
-      expression: selectedExpression.expression,
-      type: selectedExpression.type,
-      difficulty: selectedExpression.difficulty,
-      hint_ko: selectedExpression.hint_ko,
-      hint_vi: selectedExpression.hint_vi,
-      correct_answer_ko: selectedExpression.meaning_ko,
-      correct_answer_vi: selectedExpression.meaning_vi,
-      correct_index: correctIndex,
-      options: allOptions,
-      explanation_ko: selectedExpression.explanation_ko,
-      explanation_vi: selectedExpression.explanation_vi,
-      example_sentence: selectedExpression.example_ko,
-      example_translation: selectedExpression.example_vi,
-    };
-
-    return new Response(JSON.stringify(response), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    return new Response(JSON.stringify(parsedResponse), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-  } catch (error: unknown) {
-    console.error("Quiz error:", error);
-    return new Response(
-      JSON.stringify({ error: "Internal server error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+
+  } catch (error) {
+    console.error('Error in idiom-quiz function:', error);
+    return new Response(JSON.stringify({ 
+      error: 'Internal server error',
+      message: '서버 오류가 발생했습니다.'
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });
