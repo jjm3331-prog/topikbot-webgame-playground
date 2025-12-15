@@ -121,7 +121,7 @@ const Auth = () => {
           className="flex items-center gap-2 text-white/70 hover:text-white transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
-          <span className="text-sm">돌아가기</span>
+          <span className="text-sm">돌아가기 / Quay lại</span>
         </button>
         <div className="flex items-center gap-2">
           <img src="/favicon.png" alt="LUKATO" className="w-8 h-8 rounded-full" />
@@ -231,8 +231,8 @@ const Auth = () => {
                 className="text-purple-300 hover:text-white transition-colors text-sm"
               >
                 {isLogin
-                  ? "계정이 없으신가요? 회원가입"
-                  : "이미 계정이 있으신가요? 로그인"}
+                  ? "계정이 없으신가요? 회원가입 / Chưa có tài khoản? Đăng ký"
+                  : "이미 계정이 있으신가요? 로그인 / Đã có tài khoản? Đăng nhập"}
               </button>
             </div>
           </div>

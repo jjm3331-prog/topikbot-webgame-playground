@@ -64,8 +64,8 @@ const BankruptcyRecovery = () => {
     } catch (error) {
       console.error('Error fetching words:', error);
       toast({
-        title: "단어 로딩 오류",
-        description: "단어를 불러오는데 실패했습니다.",
+        title: "단어 로딩 오류 / Lỗi tải từ",
+        description: "단어를 불러오는데 실패했습니다. / Không thể tải từ vựng.",
         variant: "destructive"
       });
     } finally {
@@ -101,8 +101,8 @@ const BankruptcyRecovery = () => {
     } catch (error) {
       console.error('Error starting game:', error);
       toast({
-        title: "게임 시작 오류",
-        description: "게임을 시작하는데 실패했습니다.",
+        title: "게임 시작 오류 / Lỗi bắt đầu game",
+        description: "게임을 시작하는데 실패했습니다. / Không thể bắt đầu game.",
         variant: "destructive"
       });
       setGameState('ready');
@@ -278,14 +278,14 @@ const BankruptcyRecovery = () => {
                       }`}
                     >
                       <p className="font-bold">
-                        {diff === 'easy' && '쉬움'}
-                        {diff === 'medium' && '보통'}
-                        {diff === 'hard' && '어려움'}
+                        {diff === 'easy' && '쉬움 / Dễ'}
+                        {diff === 'medium' && '보통 / TB'}
+                        {diff === 'hard' && '어려움 / Khó'}
                       </p>
                       <p className="text-xs opacity-70">
-                        {diff === 'easy' && '1-3글자'}
-                        {diff === 'medium' && '3-5글자'}
-                        {diff === 'hard' && '5글자+'}
+                        {diff === 'easy' && '1-3글자 / 1-3 chữ'}
+                        {diff === 'medium' && '3-5글자 / 3-5 chữ'}
+                        {diff === 'hard' && '5글자+ / 5+ chữ'}
                       </p>
                     </button>
                   ))}

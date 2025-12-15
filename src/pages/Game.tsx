@@ -163,7 +163,7 @@ const Game = () => {
                 </div>
               </div>
               <p className="text-sm font-bold text-foreground">₩{profile?.money?.toLocaleString()}</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">소지금</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">소지금 / Tiền</p>
             </div>
             
             {/* Missions */}
@@ -174,7 +174,7 @@ const Game = () => {
                 </div>
               </div>
               <p className="text-sm font-bold text-foreground">{profile?.missions_completed}</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">미션</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">미션 / Nhiệm vụ</p>
             </div>
             
             {/* Points */}
@@ -185,7 +185,7 @@ const Game = () => {
                 </div>
               </div>
               <p className="text-sm font-bold text-foreground">{profile?.points?.toLocaleString()}</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">포인트</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">포인트 / Điểm</p>
             </div>
           </div>
         </div>
@@ -228,9 +228,9 @@ const Game = () => {
             </p>
             
             <div className="flex flex-wrap gap-2 mb-4">
-              <span className="px-2 py-1 rounded-full text-[10px] bg-muted/50 text-foreground">🎭 스토리 RPG</span>
-              <span className="px-2 py-1 rounded-full text-[10px] bg-muted/50 text-foreground">🎙️ 음성 대화</span>
-              <span className="px-2 py-1 rounded-full text-[10px] bg-muted/50 text-foreground">📈 성장 시뮬</span>
+              <span className="px-2 py-1 rounded-full text-[10px] bg-muted/50 text-foreground">🎭 스토리 RPG / Story RPG</span>
+              <span className="px-2 py-1 rounded-full text-[10px] bg-muted/50 text-foreground">🎙️ 음성 대화 / Hội thoại</span>
+              <span className="px-2 py-1 rounded-full text-[10px] bg-muted/50 text-foreground">📈 성장 시뮬 / Mô phỏng</span>
             </div>
             
             <Button 
@@ -238,7 +238,7 @@ const Game = () => {
               className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold"
             >
               <Sparkles className="w-4 h-4 mr-2" />
-              지금 시작하기
+              지금 시작하기 / Bắt đầu ngay
             </Button>
           </div>
         </motion.div>
@@ -261,8 +261,8 @@ const Game = () => {
                 <Sparkles className="w-4 h-4 text-primary" />
               </div>
               <div>
-                <p className="text-sm font-medium text-foreground">시즌 1 업데이트 완료!</p>
-                <p className="text-xs text-muted-foreground mt-1">LUKATO 매니저 챕터 1이 추가되었습니다. 지금 바로 체험해보세요!</p>
+                <p className="text-sm font-medium text-foreground">시즌 1 업데이트 완료! / Cập nhật Mùa 1!</p>
+                <p className="text-xs text-muted-foreground mt-1">LUKATO 매니저 챕터 1~12 추가! / Đã thêm Chapter 1~12 LUKATO Manager!</p>
               </div>
             </div>
             
@@ -273,8 +273,8 @@ const Game = () => {
                 <Star className="w-4 h-4 text-accent" />
               </div>
               <div>
-                <p className="text-sm font-medium text-foreground">신규 유저 환영 보너스</p>
-                <p className="text-xs text-muted-foreground mt-1">매일 첫 접속시 보너스 포인트를 받으세요! / Nhận điểm thưởng hàng ngày!</p>
+                <p className="text-sm font-medium text-foreground">신규 유저 환영 보너스 / Thưởng chào mừng</p>
+                <p className="text-xs text-muted-foreground mt-1">매일 첫 접속시 보너스 포인트! / Nhận điểm thưởng hàng ngày!</p>
               </div>
             </div>
           </div>
@@ -294,7 +294,7 @@ const Game = () => {
           
           <div className="glass-card p-4 rounded-xl space-y-3">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">평점:</span>
+              <span className="text-xs text-muted-foreground">평점 / Đánh giá:</span>
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -311,7 +311,7 @@ const Game = () => {
             </div>
             
             <Textarea
-              placeholder="게임 후기를 작성해주세요... (200자 이내)"
+              placeholder="게임 후기를 작성해주세요 (200자 이내) / Viết đánh giá game (tối đa 200 ký tự)"
               value={newReview}
               onChange={(e) => setNewReview(e.target.value)}
               className="bg-muted border-border text-foreground placeholder:text-muted-foreground text-sm resize-none h-20"
@@ -325,7 +325,7 @@ const Game = () => {
                   onChange={(e) => setIsAnonymous(e.target.checked)}
                   className="rounded border-border"
                 />
-                익명으로 작성
+                익명 / Ẩn danh
               </label>
               
               <Button 
@@ -335,7 +335,7 @@ const Game = () => {
                 className="bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 <Send className="w-3.5 h-3.5 mr-1.5" />
-                등록
+                등록 / Gửi
               </Button>
             </div>
           </div>
