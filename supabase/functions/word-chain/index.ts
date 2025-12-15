@@ -122,7 +122,13 @@ function validateUserWordChain(params: {
   const { userWord, lastChar, usedWords } = params;
   
   // 중복 체크
-  if (usedWords.includes(userWord)) {
+  // usedWords는 "이미 사용된 단어(이전 턴까지)"로 받는 것이 정석이지만,
+  // 클라이언트가 실수로 현재 userWord를 마지막에 포함해 보내는 경우도 방어합니다.
+  const occurrences = usedWords.filter((w) => w === userWord).length;
+  const lastIsSame = usedWords.length > 0 && usedWords[usedWords.length - 1] === userWord;
+  const isDuplicate = occurrences > 1 || (occurrences === 1 && !lastIsSame);
+
+  if (isDuplicate) {
     return {
       valid: false,
       reason_ko: `"${userWord}"는 이미 사용된 단어입니다.`,
