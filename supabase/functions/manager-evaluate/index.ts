@@ -62,31 +62,39 @@ const SYSTEM_PROMPT = `당신은 한국어 학습 게임 "LUKATO 매니저"의 S
 3. 의도 충족 (20점): 요구된 구조(공감-사실-대안 등) 준수
 4. 금지어 회피 (10점): 부적절한 표현 사용 여부
 
-⚠️ 응답 형식 (JSON만):
+⚠️ 응답 형식 (순수 JSON만, 다른 텍스트 없이):
 {
   "scores": {
-    "grammar": 0-40,
-    "tone": 0-30,
-    "intent": 0-20,
-    "forbidden": 0-10
+    "grammar": 숫자(0~40),
+    "tone": 숫자(0~30),
+    "intent": 숫자(0~20),
+    "forbidden": 숫자(0~10)
   },
-  "total_score": 0-100,
-  "feedback_ko": "한국어 피드백 (더 자연스러운 표현 제안)",
-  "feedback_vi": "Phản hồi tiếng Việt (giải thích ngắn gọn)",
-  "better_expression": "더 좋은 표현 예시 1문장",
+  "total_score": 숫자(0~100),
+  "feedback_ko": "한국어 피드백",
+  "feedback_vi": "베트남어 피드백",
+  "better_expression": "더 좋은 표현 예시",
   "stat_changes": {
-    "mental": -10 to +10,
-    "chemistry": -10 to +10,
-    "media_tone": -10 to +10,
-    "rumor": -5 to +5
+    "mental": 숫자(-10~10, 양수면 그냥 5 형태로, +5 아님),
+    "chemistry": 숫자(-10~10),
+    "media_tone": 숫자(-10~10),
+    "rumor": 숫자(-5~5)
   },
-  "result": "success" | "warning" | "fail"
+  "result": "success" 또는 "warning" 또는 "fail"
 }
+
+⚠️ 중요: 숫자에 + 기호를 붙이지 마세요! (예: +5 ❌, 5 ✓)
 
 result 기준:
 - success: 70점 이상
 - warning: 40-69점
 - fail: 40점 미만`;
+
+// JSON에서 +숫자를 숫자로 변환하는 함수
+function sanitizeJsonNumbers(jsonStr: string): string {
+  // +숫자 패턴을 숫자로 변환 (예: +5 -> 5, +10 -> 10)
+  return jsonStr.replace(/:\s*\+(\d+)/g, ': $1');
+}
 
 function validateString(value: unknown, maxLength: number): string | null {
   if (typeof value !== 'string') return null;
@@ -173,10 +181,13 @@ ${foundForbidden.length > 0 ? `⚠️ 감지된 금지어: ${foundForbidden.join
     // JSON 추출
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
+      console.error('Failed to extract JSON from:', text);
       throw new Error('채점 결과 파싱 실패');
     }
 
-    const result = JSON.parse(jsonMatch[0]);
+    // +숫자 형태를 숫자로 변환 후 파싱
+    const sanitizedJson = sanitizeJsonNumbers(jsonMatch[0]);
+    const result = JSON.parse(sanitizedJson);
 
     // 금지어 페널티 적용
     if (foundForbidden.length > 0) {
