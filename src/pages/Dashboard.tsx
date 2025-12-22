@@ -346,10 +346,10 @@ const Dashboard = () => {
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-korean-yellow/20 text-korean-yellow font-bold">프리미엄</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-korean-yellow/20 text-korean-yellow font-bold">Premium</span>
                 </div>
-                <h3 className="font-bold text-white text-sm sm:text-base">한국 기업 헤드헌팅 서비스</h3>
-                <p className="text-white/70 text-xs">전문 헤드헌터가 무료로 취업 지원!</p>
+                <h3 className="font-bold text-white text-sm sm:text-base">Headhunting doanh nghiệp Hàn Quốc</h3>
+                <p className="text-white/70 text-xs">Đội ngũ headhunter hỗ trợ xin việc MIỄN PHÍ!</p>
               </div>
             </div>
             <ChevronRight className="w-5 h-5 text-white/70 group-hover:translate-x-1 transition-transform" />
