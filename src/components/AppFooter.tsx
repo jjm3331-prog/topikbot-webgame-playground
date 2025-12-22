@@ -35,14 +35,14 @@ const AppFooter = () => {
               className="flex items-center gap-1.5 text-sm text-white/60 hover:text-white/90 transition-colors"
             >
               <ExternalLink className="w-3.5 h-3.5" />
-              LUKATO AI
+              Q&A Agent
             </a>
           </div>
 
           {/* Copyright */}
           <p className="text-white/40 text-sm">
             © 2025 Powered by{" "}
-            <span className="text-white/60 font-medium">LUKATO AI</span>
+            <span className="text-white/60 font-medium">Q&A Agent</span>
           </p>
         </div>
       </div>
