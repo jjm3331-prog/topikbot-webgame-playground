@@ -35,6 +35,7 @@ import NotFound from "./pages/NotFound";
 import KoreaCareer from "./pages/KoreaCareer";
 import Headhunting from "./pages/Headhunting";
 import QuestionVariant from "./pages/QuestionVariant";
+import Translate from "./pages/Translate";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWAWelcome from "./components/PWAWelcome";
 import SplashScreen from "./components/SplashScreen";
@@ -140,6 +141,7 @@ const App = () => {
               <Route path="/topik-2" element={<TopikII />} />
               <Route path="/lesson/:lessonId" element={<Lesson />} />
               <Route path="/question-variant" element={<QuestionVariant />} />
+              <Route path="/translate" element={<Translate />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/admin" element={<Admin />} />
