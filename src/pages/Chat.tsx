@@ -235,14 +235,14 @@ const Chat = () => {
           variant: "destructive",
         });
         await updateProfile(newHp, newMoney);
-        setTimeout(() => navigate("/game"), 3000);
+        setTimeout(() => navigate("/dashboard"), 3000);
       } else if (data.mission_complete || nextTurn >= gameState.maxTurns) {
         toast({
           title: "🎉 미션 성공! (Mission Complete!)",
           description: "10턴 생존에 성공했습니다! (Bạn đã sống sót 10 lượt!)",
         });
         await updateProfile(newHp, newMoney, true);
-        setTimeout(() => navigate("/game"), 3000);
+        setTimeout(() => navigate("/dashboard"), 3000);
       }
     } catch (error: any) {
       console.error("Send message error:", error);
@@ -286,7 +286,7 @@ const Chat = () => {
 
   const confirmExit = async () => {
     await updateProfile(gameState.hp, gameState.money);
-    navigate("/game");
+    navigate("/dashboard");
   };
 
   const getResultColor = (result?: string) => {

@@ -233,10 +233,10 @@ const Ranking = () => {
 
       {/* Footer Button */}
       <div className="fixed bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-[#0f0f23] to-transparent">
-        <Button
-          onClick={() => navigate("/game")}
-          className="w-full bg-purple-600 hover:bg-purple-700 h-10 text-sm"
-        >
+          <Button
+            onClick={() => navigate("/dashboard")}
+            className="w-full bg-purple-600 hover:bg-purple-700 h-10 text-sm"
+          >
           메인으로 돌아가기 / Quay lại menu
         </Button>
       </div>

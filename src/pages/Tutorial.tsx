@@ -794,7 +794,7 @@ const Tutorial = () => {
         >
           <Button 
             className="w-full h-14 bg-gradient-to-r from-neon-pink to-neon-purple hover:opacity-90 text-white font-bold text-base"
-            onClick={() => navigate("/game")}
+            onClick={() => navigate("/dashboard")}
           >
             <div className="flex flex-col items-center">
               <span>지금 시작하기!</span>

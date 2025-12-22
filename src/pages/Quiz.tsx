@@ -139,7 +139,7 @@ const Quiz = () => {
     fetchQuestion();
   };
 
-  const handleBackToGame = async () => { await saveScoreToProfile(); navigate("/game"); };
+  const handleBackToGame = async () => { await saveScoreToProfile(); navigate("/dashboard"); };
 
   return (
     <div className="min-h-[100dvh] bg-gradient-to-b from-amber-900 via-orange-900 to-[#0f0f23] flex flex-col overflow-hidden">

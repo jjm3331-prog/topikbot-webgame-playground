@@ -375,7 +375,7 @@ export default function Manager() {
 
           {/* 결과 화면 */}
           {phase === 'result' && (
-            <ResultPhase stats={stats} onExit={() => navigate('/game')} />
+            <ResultPhase stats={stats} onExit={() => navigate('/dashboard')} />
           )}
         </AnimatePresence>
       </main>
