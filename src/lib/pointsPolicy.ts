@@ -12,13 +12,14 @@
  * - 게임 클리어 (Hoàn thành game): +100~500 điểm
  * - 주간 목표 달성 (Mục tiêu tuần): +500 điểm
  * 
- * 2. 레벨 시스템 (Hệ thống cấp bậc)
+ * 2. 레벨 시스템 - TOPIK 급수 (Hệ thống cấp bậc TOPIK)
  * ---------------------------------
- * - 초급 (Sơ cấp): 0 ~ 499 điểm
- * - 중급 (Trung cấp): 500 ~ 1,999 điểm
- * - 고급 (Cao đẳng): 2,000 ~ 4,999 điểm
- * - 지역대학 (Đại học Địa phương): 5,000 ~ 9,999 điểm
- * - 국립대학 (Đại học Quốc gia): 10,000+ điểm
+ * - TOPIK 1급: 0 ~ 499 điểm
+ * - TOPIK 2급: 500 ~ 1,499 điểm
+ * - TOPIK 3급: 1,500 ~ 2,999 điểm
+ * - TOPIK 4급: 3,000 ~ 4,999 điểm
+ * - TOPIK 5급: 5,000 ~ 7,999 điểm
+ * - TOPIK 6급: 8,000+ điểm
  * 
  * 3. 프리미엄 기능 (Tính năng Premium)
  * ------------------------------------
@@ -58,11 +59,12 @@ export const POINTS_CONFIG = {
 };
 
 export const LEVEL_THRESHOLDS = {
-  BEGINNER: { min: 0, max: 499, name: "Sơ cấp", nameKo: "초급" },
-  INTERMEDIATE: { min: 500, max: 1999, name: "Trung cấp", nameKo: "중급" },
-  ADVANCED: { min: 2000, max: 4999, name: "Cao đẳng", nameKo: "고급" },
-  LOCAL_UNIVERSITY: { min: 5000, max: 9999, name: "Đại học Địa phương", nameKo: "지역대학" },
-  NATIONAL_UNIVERSITY: { min: 10000, max: Infinity, name: "Đại học Quốc gia", nameKo: "국립대학" },
+  TOPIK_1: { min: 0, max: 499, name: "TOPIK 1급", nameKo: "TOPIK 1급", color: "text-gray-500" },
+  TOPIK_2: { min: 500, max: 1499, name: "TOPIK 2급", nameKo: "TOPIK 2급", color: "text-green-500" },
+  TOPIK_3: { min: 1500, max: 2999, name: "TOPIK 3급", nameKo: "TOPIK 3급", color: "text-blue-500" },
+  TOPIK_4: { min: 3000, max: 4999, name: "TOPIK 4급", nameKo: "TOPIK 4급", color: "text-purple-500" },
+  TOPIK_5: { min: 5000, max: 7999, name: "TOPIK 5급", nameKo: "TOPIK 5급", color: "text-orange-500" },
+  TOPIK_6: { min: 8000, max: Infinity, name: "TOPIK 6급", nameKo: "TOPIK 6급", color: "text-red-500" },
 };
 
 export const FREE_LIMITS = {
@@ -86,57 +88,75 @@ export function getLevelFromPoints(points: number): {
   color: string;
   nextLevelPoints: number;
   progress: number;
+  level: number;
 } {
-  if (points >= LEVEL_THRESHOLDS.NATIONAL_UNIVERSITY.min) {
+  if (points >= LEVEL_THRESHOLDS.TOPIK_6.min) {
     return {
-      name: LEVEL_THRESHOLDS.NATIONAL_UNIVERSITY.name,
-      nameKo: LEVEL_THRESHOLDS.NATIONAL_UNIVERSITY.nameKo,
-      color: "text-korean-purple",
-      nextLevelPoints: 10000,
+      name: LEVEL_THRESHOLDS.TOPIK_6.name,
+      nameKo: LEVEL_THRESHOLDS.TOPIK_6.nameKo,
+      color: LEVEL_THRESHOLDS.TOPIK_6.color,
+      nextLevelPoints: 8000,
       progress: 100,
+      level: 6,
     };
   }
   
-  if (points >= LEVEL_THRESHOLDS.LOCAL_UNIVERSITY.min) {
-    const progress = ((points - 5000) / 5000) * 100;
+  if (points >= LEVEL_THRESHOLDS.TOPIK_5.min) {
+    const progress = ((points - 5000) / 3000) * 100;
     return {
-      name: LEVEL_THRESHOLDS.LOCAL_UNIVERSITY.name,
-      nameKo: LEVEL_THRESHOLDS.LOCAL_UNIVERSITY.nameKo,
-      color: "text-korean-orange",
-      nextLevelPoints: 10000,
+      name: LEVEL_THRESHOLDS.TOPIK_5.name,
+      nameKo: LEVEL_THRESHOLDS.TOPIK_5.nameKo,
+      color: LEVEL_THRESHOLDS.TOPIK_5.color,
+      nextLevelPoints: 8000,
       progress,
+      level: 5,
     };
   }
   
-  if (points >= LEVEL_THRESHOLDS.ADVANCED.min) {
-    const progress = ((points - 2000) / 3000) * 100;
+  if (points >= LEVEL_THRESHOLDS.TOPIK_4.min) {
+    const progress = ((points - 3000) / 2000) * 100;
     return {
-      name: LEVEL_THRESHOLDS.ADVANCED.name,
-      nameKo: LEVEL_THRESHOLDS.ADVANCED.nameKo,
-      color: "text-korean-cyan",
+      name: LEVEL_THRESHOLDS.TOPIK_4.name,
+      nameKo: LEVEL_THRESHOLDS.TOPIK_4.nameKo,
+      color: LEVEL_THRESHOLDS.TOPIK_4.color,
       nextLevelPoints: 5000,
       progress,
+      level: 4,
     };
   }
   
-  if (points >= LEVEL_THRESHOLDS.INTERMEDIATE.min) {
-    const progress = ((points - 500) / 1500) * 100;
+  if (points >= LEVEL_THRESHOLDS.TOPIK_3.min) {
+    const progress = ((points - 1500) / 1500) * 100;
     return {
-      name: LEVEL_THRESHOLDS.INTERMEDIATE.name,
-      nameKo: LEVEL_THRESHOLDS.INTERMEDIATE.nameKo,
-      color: "text-korean-green",
-      nextLevelPoints: 2000,
+      name: LEVEL_THRESHOLDS.TOPIK_3.name,
+      nameKo: LEVEL_THRESHOLDS.TOPIK_3.nameKo,
+      color: LEVEL_THRESHOLDS.TOPIK_3.color,
+      nextLevelPoints: 3000,
       progress,
+      level: 3,
+    };
+  }
+  
+  if (points >= LEVEL_THRESHOLDS.TOPIK_2.min) {
+    const progress = ((points - 500) / 1000) * 100;
+    return {
+      name: LEVEL_THRESHOLDS.TOPIK_2.name,
+      nameKo: LEVEL_THRESHOLDS.TOPIK_2.nameKo,
+      color: LEVEL_THRESHOLDS.TOPIK_2.color,
+      nextLevelPoints: 1500,
+      progress,
+      level: 2,
     };
   }
   
   const progress = (points / 500) * 100;
   return {
-    name: LEVEL_THRESHOLDS.BEGINNER.name,
-    nameKo: LEVEL_THRESHOLDS.BEGINNER.nameKo,
-    color: "text-muted-foreground",
+    name: LEVEL_THRESHOLDS.TOPIK_1.name,
+    nameKo: LEVEL_THRESHOLDS.TOPIK_1.nameKo,
+    color: LEVEL_THRESHOLDS.TOPIK_1.color,
     nextLevelPoints: 500,
     progress,
+    level: 1,
   };
 }
 
