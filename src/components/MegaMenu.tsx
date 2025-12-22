@@ -297,33 +297,33 @@ export const MegaMenu = () => {
                 </button>
 
                 {/* Menu Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8">
+                <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8">
                   {menuSections.map((section) => (
                     <div key={section.title}>
-                      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+                      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 sm:mb-4">
                         {section.title}
                       </h3>
-                      <ul className="space-y-1">
+                      <ul className="space-y-0.5 sm:space-y-1">
                         {section.items.map((item) => (
                           <li key={item.label}>
                             <button
                               onClick={() => handleNavigation(item.href, item.isExternal)}
-                              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all
+                              className={`w-full flex items-start gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg text-left transition-all
                                 ${item.href === "/" 
                                   ? "bg-primary/10 text-primary" 
                                   : "text-foreground hover:bg-muted"
                                 }
                               `}
                             >
-                              <item.icon className="w-4 h-4 shrink-0" />
-                              <span className="text-sm font-medium truncate">{item.label}</span>
+                              <item.icon className="w-4 h-4 shrink-0 mt-0.5" />
+                              <span className="text-xs sm:text-sm font-medium leading-tight break-words">{item.label}</span>
                               {item.isPremium && (
-                                <span className="ml-auto px-1.5 py-0.5 bg-accent text-accent-foreground text-[10px] font-bold rounded">
+                                <span className="shrink-0 ml-auto px-1.5 py-0.5 bg-accent text-accent-foreground text-[10px] font-bold rounded">
                                   Premium
                                 </span>
                               )}
                               {item.isExternal && (
-                                <ExternalLink className="w-3 h-3 ml-auto text-muted-foreground" />
+                                <ExternalLink className="w-3 h-3 ml-auto shrink-0 text-muted-foreground" />
                               )}
                             </button>
                           </li>
