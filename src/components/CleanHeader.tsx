@@ -10,26 +10,40 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
 interface CleanHeaderProps {
+  /**
+   * Optional override.
+   * If omitted, header will auto-detect login state from the current session.
+   */
   isLoggedIn?: boolean;
   username?: string;
 }
 
-export const CleanHeader = ({ isLoggedIn = false, username }: CleanHeaderProps) => {
+export const CleanHeader = ({ isLoggedIn, username }: CleanHeaderProps) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userId, setUserId] = useState<string | undefined>();
+  const [sessionLoggedIn, setSessionLoggedIn] = useState(false);
+
+  const effectiveLoggedIn = isLoggedIn ?? sessionLoggedIn;
 
   useEffect(() => {
-    const getUser = async () => {
+    const loadSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setUserId(session.user.id);
-      }
+      const hasSession = !!session?.user;
+      setSessionLoggedIn(hasSession);
+      setUserId(session?.user?.id);
     };
-    if (isLoggedIn) {
-      getUser();
-    }
-  }, [isLoggedIn]);
+
+    loadSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const hasSession = !!session?.user;
+      setSessionLoggedIn(hasSession);
+      setUserId(session?.user?.id);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleLogout = async () => {
     setIsMenuOpen(false);
@@ -46,11 +60,11 @@ export const CleanHeader = ({ isLoggedIn = false, username }: CleanHeaderProps) 
       <header className="fixed top-0 left-0 right-0 z-50 h-[60px] bg-background">
         <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
           {/* Logo */}
-          <div 
+          <div
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => {
               setIsMenuOpen(false);
-              navigate(isLoggedIn ? "/dashboard" : "/");
+              navigate(effectiveLoggedIn ? "/dashboard" : "/");
             }}
           >
             <span className="text-xl sm:text-2xl">🇰🇷</span>
@@ -60,8 +74,8 @@ export const CleanHeader = ({ isLoggedIn = false, username }: CleanHeaderProps) 
           {/* Right Actions */}
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            
-            {isLoggedIn ? (
+
+            {effectiveLoggedIn ? (
               <>
                 <NotificationDropdown userId={userId} />
                 <Button
@@ -73,7 +87,7 @@ export const CleanHeader = ({ isLoggedIn = false, username }: CleanHeaderProps) 
                 </Button>
               </>
             ) : (
-              <Button 
+              <Button
                 onClick={() => navigate("/auth")}
                 className="h-10 px-4 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
               >
@@ -98,10 +112,10 @@ export const CleanHeader = ({ isLoggedIn = false, username }: CleanHeaderProps) 
         </div>
       </header>
 
-      <MegaMenuOverlay 
-        isOpen={isMenuOpen} 
+      <MegaMenuOverlay
+        isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
-        isLoggedIn={isLoggedIn}
+        isLoggedIn={effectiveLoggedIn}
         onLogout={handleLogout}
       />
     </>

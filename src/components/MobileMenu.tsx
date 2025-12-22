@@ -85,7 +85,6 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
     { path: "/dashboard", icon: Home, labelKo: "대시보드", labelVi: "Dashboard" },
     { path: "/manager", icon: Sparkles, labelKo: "루카토 매니저", labelVi: "LUKATO Manager" },
     { path: "/chat", icon: Dice6, labelKo: "서울 생존", labelVi: "Sinh tồn Seoul" },
-    { path: "/ranking", icon: Trophy, labelKo: "랭킹", labelVi: "Xếp hạng" },
     { path: "/dating", icon: Heart, labelKo: "Seoul Love Signal", labelVi: "Tín hiệu tình yêu" },
     { path: "/bankruptcy", icon: Zap, labelKo: "파산 복구", labelVi: "Phục hồi phá sản" },
     { path: "/parttime", icon: Briefcase, labelKo: "아르바이트", labelVi: "Làm thêm" },

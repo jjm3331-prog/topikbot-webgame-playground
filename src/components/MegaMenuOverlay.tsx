@@ -97,7 +97,6 @@ const myMenuCategory: MenuCategory = {
   emoji: "👤",
   items: [
     { icon: Sparkles, label: "Tiến độ học tập", href: "/dashboard", isPremium: true, isHighlight: true },
-    { icon: Trophy, label: "Xếp hạng của tôi", href: "/ranking" },
     { icon: FileX, label: "Sổ lỗi sai", href: "/mistakes", isPremium: true },
     { icon: BookMarked, label: "Từ vựng đã lưu", href: "/vocabulary" },
     { icon: User, label: "Hồ sơ của tôi", href: "/profile" },
