@@ -92,7 +92,7 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
     { path: "/quiz", icon: MessageSquare, labelKo: "관용어 퀴즈", labelVi: "Quiz thành ngữ" },
     { path: "/kdrama", icon: Film, labelKo: "K-Drama 더빙", labelVi: "Lồng tiếng" },
     { path: "/kpop", icon: Music, labelKo: "K-POP 가사", labelVi: "Lời bài hát" },
-    { path: "/tutorial", icon: HelpCircle, labelKo: "사용법 안내", labelVi: "Hướng dẫn" },
+    { path: "/tutorial", icon: HelpCircle, labelKo: "게임 튜토리얼", labelVi: "Hướng dẫn Game" },
   ];
 
   const menuContent = (

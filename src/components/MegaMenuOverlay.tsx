@@ -77,7 +77,7 @@ const baseMenuCategories: MenuCategory[] = [
       { icon: Music, label: "K-POP Quiz", href: "/kpop" },
       { icon: Clapperboard, label: "K-Drama Lồng tiếng", href: "/kdrama" },
       { icon: Briefcase, label: "Làm thêm Hàn Quốc", href: "/parttime" },
-      { icon: HelpCircle, label: "Hướng dẫn Game", href: "/tutorial" },
+      { icon: HelpCircle, label: "Hướng dẫn sử dụng Game", href: "/tutorial" },
     ]
   },
   {
