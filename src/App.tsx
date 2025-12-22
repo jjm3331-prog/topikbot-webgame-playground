@@ -121,9 +121,10 @@ const App = () => {
               <Route path="/writing-correction" element={<WritingCorrection />} />
 
               {/* Free Routes */}
-              <Route path="/game" element={<Navigate to="/chat" replace />} />
+              <Route path="/game" element={<Navigate to="/dashboard" replace />} />
               <Route path="/chat" element={<Chat />} />
               <Route path="/wordchain" element={<WordChain />} />
+
               <Route path="/quiz" element={<Quiz />} />
               <Route path="/parttime" element={<PartTime />} />
               <Route path="/bankruptcy" element={<BankruptcyRecovery />} />

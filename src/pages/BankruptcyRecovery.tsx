@@ -218,9 +218,10 @@ const BankruptcyRecovery = () => {
 
   return (
     <div className="min-h-[100dvh] bg-gradient-to-b from-green-900 via-emerald-800 to-[#0f0f23] flex flex-col overflow-hidden">
-      <MegaMenu />
-      
+      <CleanHeader />
+
       {/* Stats Bar */}
+
       <div className="flex items-center justify-between p-4 border-b border-white/10">
         <span className="text-white font-medium">파산 복구 / Phục hồi phá sản</span>
         {gameState === 'playing' && (
