@@ -90,7 +90,7 @@ const menuSections: MenuSection[] = [
       { icon: Sparkles, label: "Tiến độ học tập", href: "/progress", isPremium: true },
       { icon: Trophy, label: "Xếp hạng của tôi", href: "/ranking" },
       { icon: Notebook, label: "Sổ lỗi sai", href: "/mistakes", isPremium: true },
-      { icon: Bookmark, label: "Từ vựng đã lưu (50)", href: "/vocabulary" },
+      { icon: Bookmark, label: "Từ vựng đã lưu (15/50)", href: "/vocabulary" },
       { icon: User, label: "Hồ sơ của tôi", href: "/profile" },
       { icon: Users, label: "Mời bạn bè", href: "/profile#invite" },
     ]
