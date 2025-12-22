@@ -53,91 +53,126 @@ serve(async (req) => {
 
   try {
     const { questionImageUrl, answerImageUrl, answerText } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    if (!GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is not configured");
     }
 
-    // Build the messages with images
-    const userContent: any[] = [
-      {
-        type: "text",
-        text: `Đây là đề bài TOPIK II Writing. Hãy phân tích đề bài từ hình ảnh sau:`
-      }
+    // Build the content parts for Gemini
+    const contentParts: any[] = [
+      { text: `Đây là đề bài TOPIK II Writing. Hãy phân tích đề bài từ hình ảnh sau:` }
     ];
 
+    // Fetch and convert question image to base64 if URL provided
     if (questionImageUrl) {
-      userContent.push({
-        type: "image_url",
-        image_url: { url: questionImageUrl }
-      });
+      try {
+        const imgResponse = await fetch(questionImageUrl);
+        const arrayBuffer = await imgResponse.arrayBuffer();
+        const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+        const mimeType = imgResponse.headers.get("content-type") || "image/png";
+        
+        contentParts.push({
+          inline_data: {
+            mime_type: mimeType,
+            data: base64
+          }
+        });
+      } catch (e) {
+        console.error("Failed to fetch question image:", e);
+      }
     }
 
     if (answerImageUrl) {
-      userContent.push({
-        type: "text",
-        text: "Đây là bài làm của thí sinh (hình ảnh):"
-      });
-      userContent.push({
-        type: "image_url",
-        image_url: { url: answerImageUrl }
-      });
+      contentParts.push({ text: "Đây là bài làm của thí sinh (hình ảnh):" });
+      
+      try {
+        const imgResponse = await fetch(answerImageUrl);
+        const arrayBuffer = await imgResponse.arrayBuffer();
+        const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+        const mimeType = imgResponse.headers.get("content-type") || "image/png";
+        
+        contentParts.push({
+          inline_data: {
+            mime_type: mimeType,
+            data: base64
+          }
+        });
+      } catch (e) {
+        console.error("Failed to fetch answer image:", e);
+      }
     }
 
     if (answerText) {
-      userContent.push({
-        type: "text",
+      contentParts.push({
         text: `Đây là bài làm của thí sinh (văn bản):\n\n${answerText}`
       });
     }
 
-    userContent.push({
-      type: "text",
+    contentParts.push({
       text: "Hãy chấm điểm và trả về kết quả theo định dạng JSON đã quy định."
     });
 
-    console.log("Calling Gemini 2.5 Flash via Lovable AI Gateway for writing correction");
+    console.log("Calling Gemini 2.5 Flash DIRECT API with thinkingBudget: 24576, maxOutputTokens: 65536");
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: userContent }
-        ],
-        max_tokens: 65536,
-        temperature: 0.7,
-      }),
-    });
+    // Direct Gemini API call with thinkingBudget
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: SYSTEM_PROMPT }]
+            },
+            {
+              role: "model",
+              parts: [{ text: "Vâng, tôi hiểu. Tôi sẽ chấm điểm bài viết TOPIK II theo tiêu chuẩn chính thức và trả về kết quả JSON." }]
+            },
+            {
+              role: "user",
+              parts: contentParts
+            }
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 65536,
+            thinkingConfig: {
+              thinkingBudget: 24576
+            }
+          },
+          safetySettings: [
+            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+          ]
+        }),
+      }
+    );
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Gemini API error:", response.status, errorText);
+      
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Credits exhausted. Please contact admin." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      const errorText = await response.text();
-      console.error("Lovable AI Gateway error:", response.status, errorText);
-      throw new Error(`Lovable AI Gateway error: ${response.status}`);
+      
+      throw new Error(`Gemini API error: ${response.status}`);
     }
 
     const data = await response.json();
-    let aiResponse = data.choices?.[0]?.message?.content || "";
+    console.log("Gemini API response received - thinkingBudget applied");
 
-    console.log("Lovable AI Gateway response received successfully");
+    let aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     // Extract JSON from response
     const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
@@ -159,7 +194,7 @@ serve(async (req) => {
       improvements: result.improvements || [],
       model_answer: result.model_answer || "",
       detailed_feedback: result.detailed_feedback || "",
-      model: "gemini-2.5-flash"
+      model: "gemini-2.5-flash-thinking"
     };
 
     return new Response(

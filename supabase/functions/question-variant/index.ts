@@ -56,11 +56,11 @@ serve(async (req) => {
 
   try {
     const { imageBase64, imageMimeType, difficulty } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY is not configured");
-      throw new Error("LOVABLE_API_KEY is not configured");
+    if (!GEMINI_API_KEY) {
+      console.error("GEMINI_API_KEY is not configured");
+      throw new Error("GEMINI_API_KEY is not configured");
     }
 
     if (!imageBase64) {
@@ -83,43 +83,63 @@ serve(async (req) => {
 3. 정답과 상세 해설 포함
 4. 학습에 도움되는 포인트 제시`;
 
-    console.log(`Calling Gemini 2.5 Flash via Lovable AI Gateway with difficulty: ${difficulty}`);
+    console.log(`Calling Gemini 2.5 Flash DIRECT API with thinkingBudget: 24576, maxOutputTokens: 65536`);
 
-    // Call via Lovable AI Gateway - supports thinkingBudget and maxOutputTokens
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          {
-            role: "user",
-            content: [
-              {
-                type: "image_url",
-                image_url: {
-                  url: `data:${imageMimeType || "image/png"};base64,${imageBase64}`
-                }
-              },
-              {
-                type: "text",
-                text: userPrompt
-              }
-            ]
-          }
-        ],
-        max_tokens: 65536,
-        temperature: 0.8,
-      }),
-    });
+    // Direct Gemini API call with thinkingBudget
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [
+                { text: SYSTEM_PROMPT },
+              ]
+            },
+            {
+              role: "model",
+              parts: [
+                { text: "네, 이해했습니다. TOPIK 전문가로서 문제 이미지를 분석하고 지정된 난이도에 맞는 변형 문제를 생성하겠습니다." }
+              ]
+            },
+            {
+              role: "user",
+              parts: [
+                {
+                  inline_data: {
+                    mime_type: imageMimeType || "image/png",
+                    data: imageBase64
+                  }
+                },
+                { text: userPrompt }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.8,
+            maxOutputTokens: 65536,
+            thinkingConfig: {
+              thinkingBudget: 24576
+            }
+          },
+          safetySettings: [
+            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+          ]
+        }),
+      }
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Lovable AI Gateway error:", response.status, errorText);
+      console.error("Gemini API error:", response.status, errorText);
       
       if (response.status === 429) {
         return new Response(
@@ -128,27 +148,20 @@ serve(async (req) => {
         );
       }
       
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "크레딧이 부족합니다. 관리자에게 문의하세요." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      
-      throw new Error(`Lovable AI Gateway error: ${response.status}`);
+      throw new Error(`Gemini API error: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log("Lovable AI Gateway response received successfully");
+    console.log("Gemini API response received - thinkingBudget applied");
 
-    const aiResponse = data.choices?.[0]?.message?.content || 
+    const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 
       "문제 분석에 실패했습니다. 다시 시도해주세요.";
 
     return new Response(
       JSON.stringify({ 
         response: aiResponse,
         difficulty: difficulty,
-        model: "gemini-2.5-flash"
+        model: "gemini-2.5-flash-thinking"
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
