@@ -2,222 +2,279 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
-  ChevronLeft, 
+  ArrowLeft, 
   Smartphone, 
   Download, 
   Share, 
   MoreVertical,
   Plus,
   Check,
-  Apple,
-  Chrome
+  Zap,
+  WifiOff,
+  Bell,
+  HelpCircle,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import AppFooter from "@/components/AppFooter";
 
 const PWAGuide = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(0);
+  const [activeTab, setActiveTab] = useState("android");
+
+  const benefits = [
+    { icon: Zap, label: "Khởi động nhanh", color: "text-korean-yellow" },
+    { icon: WifiOff, label: "Dùng offline", color: "text-korean-cyan" },
+    { icon: Bell, label: "Nhận thông báo", color: "text-korean-orange" },
+  ];
 
   const androidSteps = [
     {
-      icon: Chrome,
-      title: "Mở trình duyệt Chrome",
-      desc: "Truy cập game.lukato.kr bằng trình duyệt Chrome.",
-      image: "🌐"
+      step: 1,
+      title: "Mở Chrome",
+      desc: "Truy cập game.lukato.kr bằng Chrome",
+      icon: "🌐",
     },
     {
-      icon: MoreVertical,
-      title: "Nhấn nút menu",
-      desc: "Nhấn vào nút ba chấm (⋮) ở góc trên bên phải.",
-      image: "⋮"
+      step: 2,
+      title: "Nhấn menu ⋮",
+      desc: "Góc trên bên phải màn hình",
+      icon: "⋮",
     },
     {
-      icon: Download,
-      title: "Chọn 'Cài đặt ứng dụng'",
-      desc: "Chọn 'Cài đặt ứng dụng' hoặc 'Thêm vào màn hình chính'.",
-      image: "📲"
+      step: 3,
+      title: "Cài đặt ứng dụng",
+      desc: "Chọn 'Add to Home screen'",
+      icon: "📲",
     },
     {
-      icon: Check,
-      title: "Xác nhận cài đặt",
-      desc: "Nhấn nút 'Cài đặt' trong popup để hoàn tất!",
-      image: "✅"
-    }
+      step: 4,
+      title: "Hoàn tất",
+      desc: "Nhấn 'Install' để xác nhận",
+      icon: "✅",
+    },
   ];
 
   const iosSteps = [
     {
-      icon: Apple,
-      title: "Mở trình duyệt Safari",
-      desc: "Truy cập game.lukato.kr bằng Safari. (Chrome không hỗ trợ)",
-      image: "🧭"
+      step: 1,
+      title: "Mở Safari",
+      desc: "Bắt buộc dùng Safari trên iOS",
+      icon: "🧭",
     },
     {
-      icon: Share,
-      title: "Nhấn nút Chia sẻ",
-      desc: "Nhấn vào nút chia sẻ (□↑) ở cuối màn hình.",
-      image: "📤"
+      step: 2,
+      title: "Nhấn Share",
+      desc: "Nút chia sẻ (□↑) ở dưới",
+      icon: "📤",
     },
     {
-      icon: Plus,
-      title: "Chọn 'Thêm vào MH chính'",
-      desc: "Cuộn xuống và chọn 'Thêm vào Màn hình chính'.",
-      image: "➕"
+      step: 3,
+      title: "Add to Home",
+      desc: "Cuộn và chọn 'Add to Home Screen'",
+      icon: "➕",
     },
     {
-      icon: Check,
-      title: "Nhấn nút 'Thêm'",
-      desc: "Nhấn 'Thêm' ở góc trên bên phải để hoàn tất!",
-      image: "✅"
-    }
+      step: 4,
+      title: "Hoàn tất",
+      desc: "Nhấn 'Add' góc trên phải",
+      icon: "✅",
+    },
   ];
 
-  const StepCard = ({ step, index, isActive }: { step: typeof androidSteps[0], index: number, isActive: boolean }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
-      className={`p-4 rounded-xl border transition-all ${
-        isActive 
-          ? "bg-gradient-to-r from-neon-pink/20 to-neon-purple/20 border-neon-pink/40" 
-          : "bg-white/5 border-white/10"
-      }`}
-      onClick={() => setCurrentStep(index)}
-    >
-      <div className="flex items-start gap-4">
-        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl shrink-0 ${
-          isActive ? "bg-gradient-to-br from-neon-pink to-neon-purple" : "bg-white/10"
-        }`}>
-          {step.image}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-              isActive ? "bg-neon-cyan text-black" : "bg-white/20 text-white"
-            }`}>
-              {index + 1}
-            </span>
-            <h3 className="text-white font-bold text-sm truncate">{step.title}</h3>
-          </div>
-          <p className="text-white/80 text-xs leading-relaxed">{step.desc}</p>
-        </div>
-      </div>
-    </motion.div>
-  );
+  const faqs = [
+    {
+      question: "Không thấy nút cài đặt?",
+      answer: "Có thể ứng dụng đã được cài đặt hoặc trình duyệt không hỗ trợ. Vui lòng sử dụng Chrome (Android) hoặc Safari (iOS).",
+    },
+    {
+      question: "Muốn gỡ cài đặt?",
+      answer: "Nhấn giữ biểu tượng app trên màn hình chính và chọn xóa/gỡ cài đặt như ứng dụng thông thường.",
+    },
+  ];
+
+  const steps = activeTab === "android" ? androidSteps : iosSteps;
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-b from-[#1a1a2e] via-[#16213e] to-[#0f0f23] flex flex-col">
-      {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#1a1a2e]/95 border-b border-white/10 safe-area-top">
-        <div className="flex items-center justify-between px-4 py-3">
+    <div className="min-h-[100dvh] bg-background flex flex-col">
+      {/* Minimal Header */}
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border">
+        <div className="max-w-2xl mx-auto flex items-center justify-between px-4 h-14">
           <button 
             onClick={() => navigate(-1)} 
-            className="p-1 rounded-full hover:bg-white/10 transition-colors"
+            className="p-2 -ml-2 rounded-full hover:bg-muted transition-colors"
           >
-            <ChevronLeft className="w-6 h-6 text-white/70" />
+            <ArrowLeft className="w-5 h-5 text-muted-foreground" />
           </button>
-          <div className="flex items-center gap-2">
-            <Download className="w-5 h-5 text-neon-cyan" />
-            <span className="text-white font-bold">Hướng dẫn cài đặt</span>
-          </div>
-          <div className="w-8" />
+          <span className="font-semibold text-foreground">Cài đặt App</span>
+          <div className="w-9" />
         </div>
       </header>
 
       {/* Main Content */}
-      <div className="flex-1 p-4 overflow-y-auto">
-        {/* Hero Section */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center mb-6"
-        >
-          <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-neon-pink to-neon-purple flex items-center justify-center shadow-lg shadow-neon-pink/30">
-            <Smartphone className="w-10 h-10 text-white" />
-          </div>
-          <h1 className="text-xl font-bold text-white mb-2">
-            Cài đặt Game LUKATO
-          </h1>
-          <p className="text-purple-300/80 text-sm mt-2">
-            Thêm vào màn hình chính để sử dụng như ứng dụng thực thụ!
-          </p>
-        </motion.div>
-
-        {/* Benefits */}
-        <div className="grid grid-cols-3 gap-2 mb-6">
-          <div className="bg-white/5 rounded-xl p-3 text-center border border-white/10">
-            <span className="text-2xl">⚡</span>
-            <p className="text-white/80 text-[10px] mt-1">Khởi động nhanh</p>
-          </div>
-          <div className="bg-white/5 rounded-xl p-3 text-center border border-white/10">
-            <span className="text-2xl">📴</span>
-            <p className="text-white/80 text-[10px] mt-1">Dùng offline</p>
-          </div>
-          <div className="bg-white/5 rounded-xl p-3 text-center border border-white/10">
-            <span className="text-2xl">🔔</span>
-            <p className="text-white/80 text-[10px] mt-1">Nhận thông báo</p>
-          </div>
-        </div>
-
-        {/* Platform Tabs */}
-        <Tabs defaultValue="android" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-white/5 rounded-xl p-1 mb-4">
-            <TabsTrigger 
-              value="android" 
-              className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-500 data-[state=active]:text-white text-white/60"
-            >
-              <span className="mr-2">🤖</span>
-              Android
-            </TabsTrigger>
-            <TabsTrigger 
-              value="ios"
-              className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-gray-600 data-[state=active]:to-gray-500 data-[state=active]:text-white text-white/60"
-            >
-              <Apple className="w-4 h-4 mr-2" />
-              iOS
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="android" className="space-y-3">
-            <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-3 mb-4">
-              <p className="text-green-400 text-xs font-medium">💡 Hãy sử dụng trình duyệt Chrome!</p>
-            </div>
-            {androidSteps.map((step, index) => (
-              <StepCard key={index} step={step} index={index} isActive={currentStep === index} />
-            ))}
-          </TabsContent>
-
-          <TabsContent value="ios" className="space-y-3">
-            <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-3 mb-4">
-              <p className="text-blue-400 text-xs font-medium">⚠️ Chỉ hoạt động với trình duyệt Safari!</p>
-            </div>
-            {iosSteps.map((step, index) => (
-              <StepCard key={index} step={step} index={index} isActive={currentStep === index} />
-            ))}
-          </TabsContent>
-        </Tabs>
-
-        {/* FAQ */}
-        <div className="mt-6 space-y-3">
-          <h3 className="text-white font-bold text-sm">❓ Câu hỏi thường gặp</h3>
+      <main className="flex-1 px-4 py-8">
+        <div className="max-w-2xl mx-auto space-y-8">
           
-          <div className="bg-white/5 rounded-xl p-3 border border-white/10">
-            <p className="text-white/80 text-xs font-medium mb-1">Không thấy nút cài đặt?</p>
-            <p className="text-purple-300/60 text-[10px] mt-2">
-              → Có thể ứng dụng đã được cài đặt hoặc trình duyệt không hỗ trợ. Vui lòng sử dụng Chrome (Android) hoặc Safari (iOS).
+          {/* Hero */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center"
+          >
+            <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-korean-pink to-korean-purple flex items-center justify-center shadow-xl shadow-korean-purple/30">
+              <Smartphone className="w-10 h-10 text-white" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+              Cài đặt LUKATO
+            </h1>
+            <p className="text-muted-foreground text-sm sm:text-base">
+              Thêm vào màn hình chính để trải nghiệm như app thực thụ
             </p>
-          </div>
+          </motion.div>
 
-          <div className="bg-white/5 rounded-xl p-3 border border-white/10">
-            <p className="text-white/80 text-xs font-medium mb-1">Muốn gỡ cài đặt ứng dụng?</p>
-            <p className="text-purple-300/60 text-[10px] mt-2">
-              → Giống như ứng dụng thông thường, bạn có thể nhấn giữ biểu tượng trên màn hình chính và chọn xóa.
-            </p>
-          </div>
+          {/* Benefits */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="grid grid-cols-3 gap-3"
+          >
+            {benefits.map((benefit, idx) => (
+              <div 
+                key={idx}
+                className="glass-card p-4 rounded-xl text-center"
+              >
+                <benefit.icon className={`w-6 h-6 mx-auto mb-2 ${benefit.color}`} />
+                <p className="text-xs sm:text-sm text-foreground font-medium">{benefit.label}</p>
+              </div>
+            ))}
+          </motion.div>
+
+          {/* Platform Tabs */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 h-12 p-1 bg-muted/50 rounded-xl">
+                <TabsTrigger 
+                  value="android" 
+                  className="rounded-lg text-sm font-medium data-[state=active]:bg-korean-green data-[state=active]:text-white transition-all"
+                >
+                  <span className="mr-2">🤖</span>
+                  Android
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="ios"
+                  className="rounded-lg text-sm font-medium data-[state=active]:bg-foreground data-[state=active]:text-background transition-all"
+                >
+                  <span className="mr-2"></span>
+                  iOS
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="android" className="mt-4">
+                <div className="bg-korean-green/10 border border-korean-green/30 rounded-xl px-4 py-3 mb-4">
+                  <p className="text-korean-green text-sm font-medium flex items-center gap-2">
+                    💡 Sử dụng trình duyệt Chrome
+                  </p>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="ios" className="mt-4">
+                <div className="bg-korean-blue/10 border border-korean-blue/30 rounded-xl px-4 py-3 mb-4">
+                  <p className="text-korean-blue text-sm font-medium flex items-center gap-2">
+                    ⚠️ Bắt buộc sử dụng Safari
+                  </p>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </motion.div>
+
+          {/* Steps */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="space-y-3"
+          >
+            {steps.map((item, idx) => (
+              <motion.div
+                key={`${activeTab}-${idx}`}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                className="flex items-center gap-4 p-4 rounded-xl bg-muted/30 border border-border hover:border-primary/30 transition-colors"
+              >
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-2xl shrink-0">
+                  {item.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
+                      {item.step}
+                    </span>
+                    <h3 className="font-semibold text-foreground">{item.title}</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{item.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* FAQ */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+              <HelpCircle className="w-5 h-5 text-korean-orange" />
+              Câu hỏi thường gặp
+            </h2>
+            <Accordion type="single" collapsible className="space-y-2">
+              {faqs.map((faq, idx) => (
+                <AccordionItem 
+                  key={idx} 
+                  value={`faq-${idx}`}
+                  className="border border-border rounded-xl px-4 bg-muted/20"
+                >
+                  <AccordionTrigger className="text-sm font-medium text-foreground hover:no-underline py-4">
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground pb-4">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </motion.div>
+
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="text-center pt-4"
+          >
+            <Button
+              onClick={() => navigate("/dashboard")}
+              size="lg"
+              className="bg-gradient-to-r from-korean-pink to-korean-purple hover:opacity-90 text-white px-8"
+            >
+              Quay lại Dashboard
+            </Button>
+          </motion.div>
         </div>
-      </div>
+      </main>
 
       <AppFooter />
     </div>
