@@ -27,9 +27,12 @@ import {
   ChevronRight,
   ChevronDown,
   LogOut,
+  Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useSubscription } from "@/hooks/useSubscription";
+import { toast } from "sonner";
 
 interface MenuItem {
   icon: React.ElementType;
@@ -115,8 +118,8 @@ const MobileAccordionCategory = ({
   onNavigate,
 }: {
   category: MenuCategory;
+  onNavigate: (href: string, isPremium?: boolean) => void;
   isActive: (href: string) => boolean;
-  onNavigate: (href: string) => void;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const hasActiveItem = category.items.some((item) => isActive(item.href));
@@ -169,7 +172,7 @@ const MobileAccordionCategory = ({
                 return (
                   <li key={item.label}>
                     <button
-                      onClick={() => onNavigate(item.href)}
+                      onClick={() => onNavigate(item.href, item.isPremium)}
                       className={`group flex items-center gap-3 w-full py-3 px-4 rounded-lg text-left transition-all ${
                         active
                           ? 'bg-primary text-primary-foreground'
@@ -227,8 +230,27 @@ export const MegaMenuOverlay = ({
   const location = useLocation();
   const currentPath = location.pathname;
   const isMobile = useIsMobile();
+  const { isPremium } = useSubscription();
 
-  const handleNavigation = (href: string) => {
+  // Premium routes that require subscription
+  const premiumRoutes = ['/dashboard', '/korea-career', '/headhunting', '/writing-correction', '/mistakes'];
+
+  const handleNavigation = (href: string, isPremiumItem?: boolean) => {
+    // Check if trying to access premium feature without subscription
+    if (isPremiumItem && premiumRoutes.includes(href) && !isPremium) {
+      toast.error("Tính năng Premium", {
+        description: "Vui lòng nâng cấp lên Premium để sử dụng tính năng này.",
+        action: {
+          label: "Nâng cấp",
+          onClick: () => {
+            onClose();
+            navigate('/pricing');
+          },
+        },
+        icon: <Lock className="w-4 h-4" />,
+      });
+      return;
+    }
     onClose();
     navigate(href);
   };
@@ -344,7 +366,7 @@ export const MegaMenuOverlay = ({
                               transition={{ duration: 0.2, delay: categoryIndex * 0.05 + itemIndex * 0.03 }}
                             >
                               <motion.button
-                                onClick={() => handleNavigation(item.href)}
+                                onClick={() => handleNavigation(item.href, item.isPremium)}
                                 whileHover={{ x: 4, scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 className={`group flex items-center gap-3 w-full py-2.5 px-3 rounded-lg text-left transition-all relative overflow-hidden ${
