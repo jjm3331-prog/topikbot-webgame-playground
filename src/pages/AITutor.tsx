@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, Send, Crown, ExternalLink, AlertCircle, Loader2, X, Sparkles } from "lucide-react";
@@ -20,6 +20,7 @@ import {
 
 const MAX_FREE_QUESTIONS = 5;
 const RESET_HOURS = 24;
+const AI_TUTOR_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-tutor`;
 
 interface Message {
   role: "user" | "assistant";
@@ -38,6 +39,8 @@ const AITutor = () => {
   const [canAsk, setCanAsk] = useState(true);
   const [nextResetTime, setNextResetTime] = useState<Date | null>(null);
   const [showLimitPopup, setShowLimitPopup] = useState(false);
+  const [streamingContent, setStreamingContent] = useState("");
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     checkAuth();
@@ -120,10 +123,18 @@ const AITutor = () => {
     return `${hours}h ${minutes}m`;
   };
 
+  // Auto-scroll to bottom when messages change or streaming content updates
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages, streamingContent]);
+
   const handleSubmit = async () => {
     if (!question.trim() || !canAsk || sending) return;
 
     setSending(true);
+    setStreamingContent("");
     const userMessage = question.trim();
     setQuestion("");
     
@@ -148,28 +159,82 @@ const AITutor = () => {
         }, 1500);
       }
 
-      // Call AI API
-      const response = await supabase.functions.invoke("ai-tutor", {
-        body: { 
-          messages: [...messages, { role: "user", content: userMessage }]
-        }
+      // Call AI API with streaming
+      const response = await fetch(AI_TUTOR_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          messages: [...messages, { role: "user", content: userMessage }],
+          stream: true
+        }),
       });
 
-      if (response.error) throw response.error;
+      if (!response.ok) {
+        if (response.status === 429) {
+          throw new Error("Rate limit exceeded. Please try again later.");
+        }
+        throw new Error("Failed to get response");
+      }
 
-      setMessages(prev => [...prev, { 
-        role: "assistant", 
-        content: response.data.response 
-      }]);
+      if (!response.body) {
+        throw new Error("No response body");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullContent = "";
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        
+        // Process complete SSE events
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || ""; // Keep incomplete line in buffer
+
+        for (const line of lines) {
+          if (!line.trim() || line.startsWith(":")) continue;
+          if (!line.startsWith("data: ")) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") continue;
+
+          try {
+            const data = JSON.parse(jsonStr);
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+            if (text) {
+              fullContent += text;
+              setStreamingContent(fullContent);
+            }
+          } catch {
+            // Ignore incomplete JSON
+          }
+        }
+      }
+
+      // Add final message
+      if (fullContent) {
+        setMessages(prev => [...prev, { role: "assistant", content: fullContent }]);
+      } else {
+        setMessages(prev => [...prev, { role: "assistant", content: "Xin lỗi, tôi không thể trả lời câu hỏi này. Vui lòng thử lại." }]);
+      }
+      setStreamingContent("");
     } catch (error: any) {
       console.error("Error:", error);
       toast({
         title: "Lỗi",
-        description: "Không thể gửi câu hỏi. Vui lòng thử lại.",
+        description: error.message || "Không thể gửi câu hỏi. Vui lòng thử lại.",
         variant: "destructive"
       });
       // Remove the user message if failed
       setMessages(prev => prev.slice(0, -1));
+      setStreamingContent("");
     } finally {
       setSending(false);
     }
@@ -331,8 +396,8 @@ const AITutor = () => {
           )}
 
           {/* Chat Messages */}
-          <Card className="p-4 min-h-[400px] max-h-[500px] overflow-y-auto bg-card border-border">
-            {messages.length === 0 ? (
+          <Card ref={chatContainerRef} className="p-4 min-h-[400px] max-h-[500px] overflow-y-auto bg-card border-border">
+            {messages.length === 0 && !streamingContent ? (
               <div className="h-full flex items-center justify-center text-center">
                 <div className="space-y-4">
                   <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
@@ -390,14 +455,53 @@ const AITutor = () => {
                     </div>
                   </motion.div>
                 ))}
-                {sending && (
+                
+                {/* Streaming content */}
+                {streamingContent && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex justify-start"
+                  >
+                    <div className="max-w-[85%] rounded-2xl px-5 py-4 bg-muted text-foreground">
+                      <div className="prose prose-sm dark:prose-invert max-w-none
+                        prose-headings:text-foreground prose-headings:font-bold prose-headings:my-3
+                        prose-h1:text-xl prose-h2:text-lg prose-h3:text-base
+                        prose-p:text-foreground prose-p:my-2 prose-p:leading-relaxed
+                        prose-strong:text-primary prose-strong:font-bold
+                        prose-em:text-korean-purple prose-em:italic
+                        prose-ul:my-2 prose-ul:pl-4 prose-ol:my-2 prose-ol:pl-4
+                        prose-li:text-foreground prose-li:my-1
+                        prose-code:bg-background prose-code:text-korean-pink prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono
+                        prose-pre:bg-background prose-pre:border prose-pre:border-border prose-pre:rounded-lg prose-pre:p-4 prose-pre:overflow-x-auto
+                        prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-muted-foreground
+                        prose-a:text-primary prose-a:underline hover:prose-a:text-primary/80
+                        prose-table:w-full prose-table:border-collapse prose-table:my-4
+                        prose-thead:bg-muted/50
+                        prose-th:border prose-th:border-border prose-th:px-3 prose-th:py-2 prose-th:text-left prose-th:font-semibold prose-th:text-foreground
+                        prose-td:border prose-td:border-border prose-td:px-3 prose-td:py-2 prose-td:text-foreground
+                        prose-tr:even:bg-muted/30
+                        prose-hr:border-border prose-hr:my-4
+                      ">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {streamingContent}
+                        </ReactMarkdown>
+                        <span className="inline-block w-2 h-4 bg-primary animate-pulse ml-1" />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Loading indicator when sending but no streaming content yet */}
+                {sending && !streamingContent && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className="flex justify-start"
                   >
-                    <div className="bg-muted rounded-2xl px-4 py-3">
+                    <div className="bg-muted rounded-2xl px-4 py-3 flex items-center gap-2">
                       <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">Đang suy nghĩ</span>
                     </div>
                   </motion.div>
                 )}
