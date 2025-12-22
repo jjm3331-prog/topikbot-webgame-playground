@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -26,10 +26,14 @@ import {
   MessageSquare,
   Bookmark,
   Languages,
-  ExternalLink
+  ExternalLink,
+  LogOut,
+  User
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 interface MenuItem {
   icon: React.ElementType;
@@ -95,6 +99,56 @@ const menuSections: MenuSection[] = [
 export const MegaMenu = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setIsLoggedIn(true);
+        // Fetch username from profiles
+        const { data } = await supabase
+          .from("profiles")
+          .select("username")
+          .eq("id", session.user.id)
+          .single();
+        if (data) {
+          setUsername(data.username);
+        }
+      }
+    };
+
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsLoggedIn(!!session);
+      if (!session) {
+        setUsername(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      setIsOpen(false);
+      toast({
+        title: "Đăng xuất thành công",
+        description: "Hẹn gặp lại bạn!",
+      });
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        title: "Lỗi",
+        description: "Không thể đăng xuất. Vui lòng thử lại.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleNavigation = (href: string, isExternal?: boolean) => {
     setIsOpen(false);
@@ -158,13 +212,41 @@ export const MegaMenu = () => {
               {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
 
-            {/* Single CTA Button */}
-            <Button 
-              onClick={() => navigate("/auth")}
-              className="btn-primary text-primary-foreground rounded-xl font-semibold px-4 sm:px-6 text-sm sm:text-base"
-            >
-              Đăng nhập
-            </Button>
+            {/* Auth Buttons */}
+            {isLoggedIn ? (
+              <div className="flex items-center gap-2">
+                {username && (
+                  <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted border border-border">
+                    <User className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-medium text-foreground max-w-[100px] truncate">
+                      {username}
+                    </span>
+                  </div>
+                )}
+                <Button 
+                  variant="ghost"
+                  onClick={() => navigate("/dashboard")}
+                  className="hidden sm:flex rounded-xl font-semibold px-4 text-sm"
+                >
+                  Dashboard
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={handleLogout}
+                  className="rounded-xl font-semibold px-4 text-sm text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Đăng xuất</span>
+                </Button>
+              </div>
+            ) : (
+              <Button 
+                onClick={() => navigate("/auth")}
+                className="btn-primary text-primary-foreground rounded-xl font-semibold px-4 sm:px-6 text-sm sm:text-base"
+              >
+                Đăng nhập
+              </Button>
+            )}
           </div>
         </div>
       </motion.header>
