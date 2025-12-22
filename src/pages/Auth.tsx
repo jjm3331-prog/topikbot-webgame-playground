@@ -53,8 +53,8 @@ const Auth = () => {
         if (error) throw error;
         setResetEmailSent(true);
         toast({
-          title: "이메일 전송 완료",
-          description: "비밀번호 재설정 링크가 이메일로 발송되었습니다.",
+          title: "Đã gửi email",
+          description: "Link đặt lại mật khẩu đã được gửi tới email của bạn.",
         });
         return;
       }
@@ -71,13 +71,13 @@ const Auth = () => {
           password,
         });
         if (error) throw error;
-        navigate("/dashboard");
+        navigate("/chat");
       } else {
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `${window.location.origin}/chat`,
             data: { username },
           },
         });
@@ -86,7 +86,7 @@ const Auth = () => {
           title: "Đăng ký thành công!",
           description: "Chào mừng bạn đến với LUKATO AI",
         });
-        navigate("/dashboard");
+        navigate("/chat");
       }
     } catch (error: any) {
       let message = error.message;
@@ -112,7 +112,7 @@ const Auth = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${productionUrl}/dashboard`
+          redirectTo: `${productionUrl}/chat`
         }
       });
       if (error) throw error;
@@ -130,7 +130,7 @@ const Auth = () => {
     switch (mode) {
       case "login": return "Đăng nhập";
       case "signup": return "Tạo tài khoản";
-      case "forgot": return "비밀번호 재설정";
+      case "forgot": return "Đặt lại mật khẩu";
     }
   };
 
@@ -138,7 +138,7 @@ const Auth = () => {
     switch (mode) {
       case "login": return "Chào mừng bạn trở lại! Tiếp tục hành trình học tiếng Hàn.";
       case "signup": return "Bắt đầu hành trình chinh phục TOPIK của bạn ngay hôm nay.";
-      case "forgot": return "가입하신 이메일을 입력하시면 비밀번호 재설정 링크를 보내드립니다.";
+      case "forgot": return "Nhập email đã đăng ký để nhận link đặt lại mật khẩu.";
     }
   };
 
@@ -202,26 +202,26 @@ const Auth = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="premium-card p-8"
           >
-            {resetEmailSent && mode === "forgot" ? (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Mail className="w-8 h-8 text-green-600" />
+              {resetEmailSent && mode === "forgot" ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Mail className="w-8 h-8 text-green-600" />
+                  </div>
+                  <h3 className="font-semibold text-lg mb-2">Kiểm tra email của bạn</h3>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    Chúng tôi đã gửi link đặt lại mật khẩu tới {email}.
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setMode("login");
+                      setResetEmailSent(false);
+                    }}
+                  >
+                    Quay lại đăng nhập
+                  </Button>
                 </div>
-                <h3 className="font-semibold text-lg mb-2">이메일을 확인해주세요</h3>
-                <p className="text-muted-foreground text-sm mb-4">
-                  {email}로 비밀번호 재설정 링크를 보냈습니다.
-                </p>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setMode("login");
-                    setResetEmailSent(false);
-                  }}
-                >
-                  로그인으로 돌아가기
-                </Button>
-              </div>
-            ) : (
+              ) : (
               <form onSubmit={handleAuth} className="space-y-4">
                 {mode === "signup" && (
                   <div className="space-y-2">
@@ -279,7 +279,7 @@ const Auth = () => {
                       onClick={() => setMode("forgot")}
                       className="text-sm text-primary hover:underline"
                     >
-                      비밀번호를 잊으셨나요?
+                      Quên mật khẩu?
                     </button>
                   </div>
                 )}
@@ -294,7 +294,7 @@ const Auth = () => {
                   ) : mode === "forgot" ? (
                     <>
                       <Mail className="w-5 h-5 mr-2" />
-                      재설정 링크 보내기
+                      Gửi link đặt lại
                     </>
                   ) : (
                     <>

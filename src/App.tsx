@@ -121,7 +121,7 @@ const App = () => {
               <Route path="/headhunting" element={<PremiumRoute><Headhunting /></PremiumRoute>} />
               <Route path="/writing-correction" element={<PremiumRoute><WritingCorrection /></PremiumRoute>} />
               {/* Free Routes */}
-              <Route path="/game" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/game" element={<Navigate to="/chat" replace />} />
               <Route path="/chat" element={<Chat />} />
               <Route path="/wordchain" element={<WordChain />} />
               <Route path="/quiz" element={<Quiz />} />
