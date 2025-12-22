@@ -32,16 +32,25 @@ const Footer = () => {
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-card text-xs text-white/70 hover:text-white transition-colors"
             >
               <ExternalLink className="w-3 h-3" />
-              하노이 공식 / Hanoi Official
+              Hanoi Official
             </a>
             <a
-              href="https://chat-topikbot.kr"
+              href="/ai-chat"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-card text-xs text-white/70 hover:text-white transition-colors"
             >
               <ExternalLink className="w-3 h-3" />
-              LUKATO AI
+              Q&A Agent
+            </a>
+            <a
+              href="/admin-login"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-card text-xs text-white/70 hover:text-white transition-colors"
+            >
+              <ExternalLink className="w-3 h-3" />
+              ADMIN
             </a>
           </div>
 
