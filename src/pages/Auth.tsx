@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import { ChevronLeft, Loader2, Sparkles, Shield, Users, Play, ArrowRight, Eye, EyeOff, Check } from "lucide-react";
+import { ChevronLeft, Loader2, Sparkles, Shield, Users, Play, ArrowRight, Eye, EyeOff, Check, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 
 const GoogleIcon = () => (
@@ -23,14 +23,17 @@ const authSchema = z.object({
   username: z.string().min(2, "Tên người dùng phải có ít nhất 2 ký tự").optional(),
 });
 
+type AuthMode = "login" | "signup" | "forgot";
+
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -43,13 +46,26 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const validationData = isLogin 
+      if (mode === "forgot") {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/auth`,
+        });
+        if (error) throw error;
+        setResetEmailSent(true);
+        toast({
+          title: "이메일 전송 완료",
+          description: "비밀번호 재설정 링크가 이메일로 발송되었습니다.",
+        });
+        return;
+      }
+
+      const validationData = mode === "login" 
         ? { email, password } 
         : { email, password, username };
       
       authSchema.parse(validationData);
 
-      if (isLogin) {
+      if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -110,6 +126,22 @@ const Auth = () => {
     }
   };
 
+  const getTitle = () => {
+    switch (mode) {
+      case "login": return "Đăng nhập";
+      case "signup": return "Tạo tài khoản";
+      case "forgot": return "비밀번호 재설정";
+    }
+  };
+
+  const getDescription = () => {
+    switch (mode) {
+      case "login": return "Chào mừng bạn trở lại! Tiếp tục hành trình học tiếng Hàn.";
+      case "signup": return "Bắt đầu hành trình chinh phục TOPIK của bạn ngay hôm nay.";
+      case "forgot": return "가입하신 이메일을 입력하시면 비밀번호 재설정 링크를 보내드립니다.";
+    }
+  };
+
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col relative overflow-hidden">
       {/* Background decorations - matching Landing page */}
@@ -127,11 +159,11 @@ const Auth = () => {
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between p-4 md:p-6">
         <button 
-          onClick={() => navigate("/")} 
+          onClick={() => mode === "forgot" ? setMode("login") : navigate("/")} 
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group"
         >
           <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-medium">Quay lại</span>
+          <span className="text-sm font-medium">{mode === "forgot" ? "돌아가기" : "Quay lại"}</span>
         </button>
         <div className="flex items-center gap-2">
           <img src="/favicon.png" alt="LUKATO" className="w-8 h-8 rounded-lg" />
@@ -156,12 +188,10 @@ const Auth = () => {
               <span>Nền tảng học tiếng Hàn #1 Việt Nam</span>
             </div>
             <h1 className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-3">
-              {isLogin ? "Đăng nhập" : "Tạo tài khoản"}
+              {getTitle()}
             </h1>
             <p className="text-muted-foreground">
-              {isLogin 
-                ? "Chào mừng bạn trở lại! Tiếp tục hành trình học tiếng Hàn." 
-                : "Bắt đầu hành trình chinh phục TOPIK của bạn ngay hôm nay."}
+              {getDescription()}
             </p>
           </motion.div>
 
@@ -172,108 +202,152 @@ const Auth = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="premium-card p-8"
           >
-            <form onSubmit={handleAuth} className="space-y-4">
-              {!isLogin && (
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Tên người dùng</label>
-                  <Input
-                    type="text"
-                    placeholder="Nhập tên của bạn"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="h-12 bg-muted/50 border-border focus:border-primary transition-colors"
-                    required={!isLogin}
-                  />
+            {resetEmailSent && mode === "forgot" ? (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Mail className="w-8 h-8 text-green-600" />
                 </div>
-              )}
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Email</label>
-                <Input
-                  type="email"
-                  placeholder="email@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="h-12 bg-muted/50 border-border focus:border-primary transition-colors"
-                  required
-                />
+                <h3 className="font-semibold text-lg mb-2">이메일을 확인해주세요</h3>
+                <p className="text-muted-foreground text-sm mb-4">
+                  {email}로 비밀번호 재설정 링크를 보냈습니다.
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setMode("login");
+                    setResetEmailSent(false);
+                  }}
+                >
+                  로그인으로 돌아가기
+                </Button>
               </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Mật khẩu</label>
-                <div className="relative">
+            ) : (
+              <form onSubmit={handleAuth} className="space-y-4">
+                {mode === "signup" && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">Tên người dùng</label>
+                    <Input
+                      type="text"
+                      placeholder="Nhập tên của bạn"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      className="h-12 bg-muted/50 border-border focus:border-primary transition-colors"
+                      required={mode === "signup"}
+                    />
+                  </div>
+                )}
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Email</label>
                   <Input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Nhập mật khẩu (ít nhất 6 ký tự)"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="h-12 bg-muted/50 border-border focus:border-primary transition-colors pr-12"
+                    type="email"
+                    placeholder="email@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="h-12 bg-muted/50 border-border focus:border-primary transition-colors"
                     required
                   />
+                </div>
+                
+                {mode !== "forgot" && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">Mật khẩu</label>
+                    <div className="relative">
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Nhập mật khẩu (ít nhất 6 ký tự)"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="h-12 bg-muted/50 border-border focus:border-primary transition-colors pr-12"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {mode === "login" && (
+                  <div className="text-right">
+                    <button
+                      type="button"
+                      onClick={() => setMode("forgot")}
+                      className="text-sm text-primary hover:underline"
+                    >
+                      비밀번호를 잊으셨나요?
+                    </button>
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full h-12 btn-primary text-primary-foreground text-base font-semibold rounded-xl mt-6"
+                >
+                  {loading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : mode === "forgot" ? (
+                    <>
+                      <Mail className="w-5 h-5 mr-2" />
+                      재설정 링크 보내기
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-5 h-5 mr-2" />
+                      {mode === "login" ? "Đăng nhập" : "Tạo tài khoản"}
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </>
+                  )}
+                </Button>
+              </form>
+            )}
+
+            {mode !== "forgot" && (
+              <>
+                {/* Divider */}
+                <div className="flex items-center gap-4 my-6">
+                  <div className="flex-1 h-px bg-border"></div>
+                  <span className="text-muted-foreground text-sm">hoặc</span>
+                  <div className="flex-1 h-px bg-border"></div>
+                </div>
+
+                {/* Google Login */}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleGoogleLogin}
+                  disabled={loading}
+                  className="w-full h-12 border-2 border-border hover:border-primary/50 bg-card font-medium flex items-center justify-center gap-3 rounded-xl transition-all"
+                >
+                  {loading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <GoogleIcon />
+                      <span>Tiếp tục với Google</span>
+                    </>
+                  )}
+                </Button>
+
+                {/* Toggle login/signup */}
+                <div className="mt-6 text-center">
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setMode(mode === "login" ? "signup" : "login")}
+                    className="text-primary hover:text-primary/80 transition-colors text-sm font-medium"
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {mode === "login"
+                      ? "Chưa có tài khoản? Đăng ký ngay"
+                      : "Đã có tài khoản? Đăng nhập"}
                   </button>
                 </div>
-              </div>
-
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full h-12 btn-primary text-primary-foreground text-base font-semibold rounded-xl mt-6"
-              >
-                {loading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <>
-                    <Play className="w-5 h-5 mr-2" />
-                    {isLogin ? "Đăng nhập" : "Tạo tài khoản"}
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </>
-                )}
-              </Button>
-            </form>
-
-            {/* Divider */}
-            <div className="flex items-center gap-4 my-6">
-              <div className="flex-1 h-px bg-border"></div>
-              <span className="text-muted-foreground text-sm">hoặc</span>
-              <div className="flex-1 h-px bg-border"></div>
-            </div>
-
-            {/* Google Login */}
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleGoogleLogin}
-              disabled={loading}
-              className="w-full h-12 border-2 border-border hover:border-primary/50 bg-card font-medium flex items-center justify-center gap-3 rounded-xl transition-all"
-            >
-              {loading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <>
-                  <GoogleIcon />
-                  <span>Tiếp tục với Google</span>
-                </>
-              )}
-            </Button>
-
-            {/* Toggle login/signup */}
-            <div className="mt-6 text-center">
-              <button
-                type="button"
-                onClick={() => setIsLogin(!isLogin)}
-                className="text-primary hover:text-primary/80 transition-colors text-sm font-medium"
-              >
-                {isLogin
-                  ? "Chưa có tài khoản? Đăng ký ngay"
-                  : "Đã có tài khoản? Đăng nhập"}
-              </button>
-            </div>
+              </>
+            )}
           </motion.div>
 
           {/* Trust indicators */}
