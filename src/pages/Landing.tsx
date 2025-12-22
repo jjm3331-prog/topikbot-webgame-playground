@@ -2,14 +2,14 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import MegaMenu from "@/components/MegaMenu";
+import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import StickyCTA from "@/components/StickyCTA";
-import { 
-  ArrowRight, 
-  BookOpen, 
-  Headphones, 
-  PenTool, 
+import {
+  ArrowRight,
+  BookOpen,
+  Headphones,
+  PenTool,
   Gamepad2,
   MessageCircle,
   Heart,
@@ -31,7 +31,7 @@ import {
   Trophy,
   Cpu,
   Flame,
-  Swords
+  Swords,
 } from "lucide-react";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 
@@ -58,26 +58,26 @@ const keyDifferentiators = [
     icon: Crown,
     title: "Giáo sư TOPIK Hàn Quốc",
     desc: "Đội ngũ ra đề thi TOPIK chính thức từ Seoul",
-    color: "from-korean-red to-korean-orange"
+    color: "from-korean-red to-korean-orange",
   },
   {
     icon: Cpu,
     title: "LUKATO RAG AI Tech",
     desc: "10,000+ tài liệu TOPIK & văn bản chuyên môn Hàn Quốc",
-    color: "from-korean-blue to-korean-cyan"
+    color: "from-korean-blue to-korean-cyan",
   },
   {
     icon: Headphones,
     title: "STT/TTS Thế Hệ Mới",
     desc: "Nghe & Nói với AI phát âm chuẩn bản xứ 99%",
-    color: "from-korean-purple to-korean-pink"
+    color: "from-korean-purple to-korean-pink",
   },
   {
     icon: Briefcase,
     title: "AI Headhunting",
     desc: "Chấm CV, thư xin việc với độ chính xác cao cấp",
-    color: "from-korean-teal to-korean-green"
-  }
+    color: "from-korean-teal to-korean-green",
+  },
 ];
 
 // Core features - shortened
@@ -110,42 +110,47 @@ const comparisonFeatures = [
 ];
 
 // Counter animation component
-const AnimatedCounter = ({ target, suffix = "", duration = 2 }: { target: number | string, suffix?: string, duration?: number }) => {
+const AnimatedCounter = ({ target, suffix = "", duration = 2 }: { target: number | string; suffix?: string; duration?: number }) => {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
-  
+
   useEffect(() => {
     if (!isInView) return;
-    
-    const numericTarget = typeof target === 'string' ? parseFloat(target.replace(/[^0-9.]/g, '')) : target;
+
+    const numericTarget = typeof target === "string" ? parseFloat(target.replace(/[^0-9.]/g, "")) : target;
     if (isNaN(numericTarget)) return;
-    
+
     const startTime = Date.now();
     const endTime = startTime + duration * 1000;
-    
+
     const updateCount = () => {
       const now = Date.now();
       const progress = Math.min((now - startTime) / (duration * 1000), 1);
       const easeOut = 1 - Math.pow(1 - progress, 3);
       const current = Math.floor(easeOut * numericTarget);
       setCount(current);
-      
+
       if (now < endTime) {
         requestAnimationFrame(updateCount);
       } else {
         setCount(numericTarget);
       }
     };
-    
+
     requestAnimationFrame(updateCount);
   }, [isInView, target, duration]);
-  
-  if (typeof target === 'string' && target.includes('#')) {
+
+  if (typeof target === "string" && target.includes("#")) {
     return <span ref={ref}>{target}</span>;
   }
-  
-  return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
+
+  return (
+    <span ref={ref}>
+      {count.toLocaleString()}
+      {suffix}
+    </span>
+  );
 };
 
 const Landing = () => {
@@ -158,7 +163,7 @@ const Landing = () => {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/chat");
+        navigate("/dashboard");
       }
     });
     setTimeout(() => setIsLoaded(true), 100);
@@ -166,10 +171,10 @@ const Landing = () => {
 
   return (
     <div className="min-h-[100dvh] bg-background relative overflow-x-hidden flex flex-col">
-      <MegaMenu />
+      <CleanHeader />
 
       {/* ========== HERO SECTION ========== */}
-      <motion.section 
+      <motion.section
         style={{ opacity: heroOpacity, scale: heroScale }}
         className="min-h-[90dvh] md:min-h-[100dvh] flex flex-col items-center justify-center px-4 sm:px-6 pt-20 pb-12 relative overflow-hidden"
       >
@@ -213,7 +218,8 @@ const Landing = () => {
           >
             Super App học tiếng Hàn từ
             <br />
-            <span className="text-primary font-semibold">giáo sư ra đề TOPIK</span> + <span className="text-primary font-semibold">LUKATO RAG AI Tech</span>
+            <span className="text-primary font-semibold">giáo sư ra đề TOPIK</span> +{" "}
+            <span className="text-primary font-semibold">LUKATO RAG AI Tech</span>
           </motion.p>
 
           {/* CTA */}
@@ -240,7 +246,7 @@ const Landing = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: isLoaded ? 0.7 : 0 }}
           transition={{ delay: 1 }}
-          onClick={() => document.getElementById('universities')?.scrollIntoView({ behavior: 'smooth' })}
+          onClick={() => document.getElementById("universities")?.scrollIntoView({ behavior: "smooth" })}
           className="absolute bottom-4 left-1/2 -translate-x-1/2"
         >
           <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
@@ -249,7 +255,7 @@ const Landing = () => {
         </motion.button>
       </motion.section>
 
-      {/* ========== UNIVERSITIES SECTION - MOVED UP ========== */}
+
       <section id="universities" className="py-10 sm:py-16 px-4 sm:px-6 bg-muted/30">
         <div className="max-w-5xl mx-auto">
           <motion.div

@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { User, Menu, LogOut, LogIn } from "lucide-react";
+import { ChevronDown, LogIn, LogOut, Menu, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MegaMenuOverlay } from "@/components/MegaMenuOverlay";
@@ -10,11 +10,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
 interface CleanHeaderProps {
-  /**
-   * Optional override.
-   * If omitted, header will auto-detect login state from the current session.
-   */
+  /** Optional override. If omitted, header will auto-detect login state from the current session. */
   isLoggedIn?: boolean;
+  /** Optional override for displaying name in header. */
   username?: string;
 }
 
@@ -23,31 +21,69 @@ export const CleanHeader = ({ isLoggedIn, username }: CleanHeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userId, setUserId] = useState<string | undefined>();
   const [sessionLoggedIn, setSessionLoggedIn] = useState(false);
+  const [sessionUsername, setSessionUsername] = useState<string | undefined>();
 
   const effectiveLoggedIn = isLoggedIn ?? sessionLoggedIn;
+  const displayName = useMemo(() => username ?? sessionUsername, [username, sessionUsername]);
 
   useEffect(() => {
     const loadSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       const hasSession = !!session?.user;
       setSessionLoggedIn(hasSession);
       setUserId(session?.user?.id);
+
+      if (session?.user?.id && !username) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("username")
+          .eq("id", session.user.id)
+          .single();
+        setSessionUsername(data?.username);
+      }
     };
 
     loadSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       const hasSession = !!session?.user;
       setSessionLoggedIn(hasSession);
       setUserId(session?.user?.id);
+
+      if (!hasSession) {
+        setSessionUsername(undefined);
+        return;
+      }
+
+      if (session?.user?.id && !username) {
+        setTimeout(() => {
+          supabase
+            .from("profiles")
+            .select("username")
+            .eq("id", session.user.id)
+            .single()
+            .then(({ data }) => setSessionUsername(data?.username));
+        }, 0);
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [username]);
 
   const handleLogout = async () => {
     setIsMenuOpen(false);
-    await supabase.auth.signOut();
+
+    const { error } = await supabase.auth.signOut({ scope: "local" });
+    if (error) {
+      // "Session not found" 같은 케이스에서도 로컬 세션만 확실히 비우고 진행
+      await supabase.auth.signOut({ scope: "local" });
+    }
+
     toast({
       title: "Đã đăng xuất",
       description: "Hẹn gặp lại bạn!",
@@ -57,56 +93,76 @@ export const CleanHeader = ({ isLoggedIn, username }: CleanHeaderProps) => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 h-[60px] bg-background">
+      <header className="sticky top-0 z-50 h-[60px] bg-background border-b border-border">
         <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
-          {/* Logo */}
+          {/* Brand */}
           <div
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => {
               setIsMenuOpen(false);
               navigate(effectiveLoggedIn ? "/dashboard" : "/");
             }}
+            aria-label="Go to home"
           >
-            <span className="text-xl sm:text-2xl">🇰🇷</span>
-            <span className="font-heading font-bold text-base sm:text-lg text-foreground">LUKATO AI</span>
+            <span className="text-lg sm:text-xl">🇰🇷</span>
+            <div className="leading-tight">
+              <span className="font-heading font-bold text-base sm:text-lg text-foreground">LUKATO AI</span>
+              <span className="hidden sm:block text-xs text-muted-foreground -mt-0.5">Học tiếng Hàn #1 VN</span>
+            </div>
           </div>
 
-          {/* Right Actions */}
-          <div className="flex items-center gap-3">
+          {/* Actions */}
+          <div className="flex items-center gap-2 sm:gap-3">
             <ThemeToggle />
 
             {effectiveLoggedIn ? (
               <>
                 <NotificationDropdown userId={userId} />
+
+                {displayName && (
+                  <Button
+                    variant="secondary"
+                    onClick={() => navigate("/profile")}
+                    className="hidden md:flex h-10 rounded-full px-3 gap-2"
+                  >
+                    <User className="w-4 h-4" />
+                    <span className="max-w-[140px] truncate text-sm font-medium">{displayName}</span>
+                  </Button>
+                )}
+
                 <Button
-                  variant="ghost"
-                  onClick={() => navigate("/profile")}
-                  className="h-10 w-10 p-0 rounded-lg"
+                  variant="outline"
+                  onClick={handleLogout}
+                  className="hidden sm:inline-flex h-10 rounded-full"
                 >
-                  <User className="w-5 h-5" />
+                  <LogOut className="w-4 h-4" />
+                  <span className="ml-2">Đăng xuất</span>
                 </Button>
               </>
             ) : (
-              <Button
-                onClick={() => navigate("/auth")}
-                className="h-10 px-4 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
-              >
+              <Button onClick={() => navigate("/auth")} className="h-10 rounded-full">
                 <LogIn className="w-4 h-4" />
+                <span className="ml-2">Đăng nhập</span>
               </Button>
             )}
 
-            {/* Hamburger Menu Button */}
+            {/* Menu button (THPT AI 스타일) */}
             <Button
               variant="ghost"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="h-10 w-10 p-0 rounded-lg"
+              onClick={() => setIsMenuOpen((v) => !v)}
+              className="h-10 rounded-full px-3 gap-2"
+              aria-expanded={isMenuOpen}
+              aria-label="Open menu"
             >
-              <motion.div
-                animate={{ rotate: isMenuOpen ? 90 : 0 }}
-                transition={{ duration: 0.2 }}
+              <Menu className="w-4 h-4" />
+              <span className="hidden sm:inline">Menu</span>
+              <motion.span
+                animate={{ rotate: isMenuOpen ? 180 : 0 }}
+                transition={{ duration: 0.18 }}
+                className="inline-flex"
               >
-                <Menu className="w-6 h-6" />
-              </motion.div>
+                <ChevronDown className="w-4 h-4" />
+              </motion.span>
             </Button>
           </div>
         </div>
@@ -123,3 +179,4 @@ export const CleanHeader = ({ isLoggedIn, username }: CleanHeaderProps) => {
 };
 
 export default CleanHeader;
+
