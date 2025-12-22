@@ -62,8 +62,8 @@ const keyDifferentiators = [
   },
   {
     icon: Cpu,
-    title: "RAG AI 99.7%",
-    desc: "Công nghệ AI tiên tiến nhất 2024",
+    title: "LUKATO RAG AI",
+    desc: "Công nghệ AI độc quyền tiên tiến nhất",
     color: "from-korean-blue to-korean-cyan"
   },
   {
@@ -101,7 +101,7 @@ const gameModes = [
 // Comparison with competitors
 const comparisonFeatures = [
   { feature: "Giáo sư ra đề TOPIK", lukato: true, others: false },
-  { feature: "RAG AI 2024", lukato: true, others: false },
+  { feature: "LUKATO RAG AI Tech", lukato: true, others: false },
   { feature: "K-Culture tích hợp", lukato: true, others: false },
   { feature: "AI chấm Writing", lukato: true, others: false },
 ];
@@ -175,217 +175,59 @@ const Landing = () => {
           <div className="blob-secondary w-[400px] h-[400px] -bottom-32 -left-32" />
         </div>
 
-        <div className="relative z-10 max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Left: Text Content */}
-            <div className="text-center lg:text-left">
-              {/* Badge */}
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : -20 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="flex items-center justify-center lg:justify-start gap-2 mb-4 sm:mb-6"
-              >
-                <div className="badge-premium text-xs sm:text-sm">
-                  <Crown className="w-3 h-3 sm:w-4 sm:h-4 text-korean-yellow" />
-                  <span>Powered by TOPIK 교수진 🇰🇷</span>
-                </div>
-              </motion.div>
-
-              {/* Headline */}
-              <motion.h1
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 30 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight mb-4"
-              >
-                <span className="text-foreground">Thế giới đầu tiên.</span>
-                <br />
-                <span className="text-gradient-primary">Việt Nam duy nhất.</span>
-              </motion.h1>
-
-              {/* Sub-headline */}
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-                className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-xl mx-auto lg:mx-0 mb-6 px-2 lg:px-0"
-              >
-                Super App học tiếng Hàn từ <span className="text-primary font-semibold">giáo sư ra đề TOPIK</span> + <span className="text-primary font-semibold">RAG AI 2024</span>
-              </motion.p>
-
-              {/* CTA */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
-                transition={{ duration: 0.5, delay: 0.6 }}
-                className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 mb-8 lg:mb-0"
-              >
-                <Button
-                  onClick={() => navigate("/auth")}
-                  size="lg"
-                  className="group w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-10 btn-primary text-primary-foreground text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl"
-                >
-                  <Rocket className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                  Bắt đầu MIỄN PHÍ
-                  <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </motion.div>
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : -20 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="flex items-center justify-center gap-2 mb-4 sm:mb-6"
+          >
+            <div className="badge-premium text-xs sm:text-sm">
+              <Crown className="w-3 h-3 sm:w-4 sm:h-4 text-korean-yellow" />
+              <span>Powered by TOPIK 교수진 🇰🇷</span>
             </div>
+          </motion.div>
 
-            {/* Right: App Mockup */}
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : 50 }}
-              transition={{ duration: 0.7, delay: 0.4 }}
-              className="relative flex justify-center lg:justify-end"
+          {/* Headline */}
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 30 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight mb-4"
+          >
+            <span className="text-foreground">Thế giới đầu tiên.</span>
+            <br />
+            <span className="text-gradient-primary">Việt Nam duy nhất.</span>
+          </motion.h1>
+
+          {/* Sub-headline */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-xl mx-auto mb-6 px-2"
+          >
+            Super App học tiếng Hàn từ <span className="text-primary font-semibold">giáo sư ra đề TOPIK</span> + <span className="text-primary font-semibold">LUKATO RAG AI Tech</span>
+          </motion.p>
+
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8"
+          >
+            <Button
+              onClick={() => navigate("/auth")}
+              size="lg"
+              className="group w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-10 btn-primary text-primary-foreground text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl"
             >
-              {/* Phone mockup */}
-              <div className="relative">
-                {/* Glow effect behind phone */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-korean-purple/20 to-korean-blue/30 blur-3xl scale-110" />
-                
-                {/* Phone frame */}
-                <motion.div
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  className="relative w-[200px] sm:w-[240px] md:w-[280px] aspect-[9/19] bg-gradient-to-b from-gray-800 to-gray-900 rounded-[2.5rem] p-2 shadow-2xl border-4 border-gray-700"
-                >
-                  {/* Screen */}
-                  <div className="w-full h-full bg-background rounded-[2rem] overflow-hidden relative">
-                    {/* Notch */}
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 bg-gray-900 rounded-b-xl z-10" />
-                    
-                    {/* App content mockup */}
-                    <div className="h-full pt-8 pb-4 px-3 flex flex-col bg-gradient-to-b from-background to-muted/30">
-                      {/* Header */}
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center">
-                            <span className="text-xs font-bold text-white">L</span>
-                          </div>
-                          <span className="text-xs font-bold text-foreground">LUKATO</span>
-                        </div>
-                        <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center">
-                          <span className="text-[8px]">👤</span>
-                        </div>
-                      </div>
-
-                      {/* AI Chat preview */}
-                      <div className="flex-1 space-y-2">
-                        {/* AI message */}
-                        <motion.div
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 1 }}
-                          className="flex gap-1.5 items-start"
-                        >
-                          <div className="w-5 h-5 rounded-full bg-gradient-to-br from-korean-blue to-korean-purple flex items-center justify-center flex-shrink-0">
-                            <Brain className="w-3 h-3 text-white" />
-                          </div>
-                          <div className="bg-muted rounded-xl rounded-tl-sm p-2 max-w-[85%]">
-                            <p className="text-[8px] text-foreground leading-relaxed">
-                              안녕하세요! 오늘 어떤 것을 배워볼까요? 🎯
-                            </p>
-                          </div>
-                        </motion.div>
-
-                        {/* User message */}
-                        <motion.div
-                          initial={{ opacity: 0, x: 10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 1.5 }}
-                          className="flex gap-1.5 items-start justify-end"
-                        >
-                          <div className="bg-primary rounded-xl rounded-tr-sm p-2 max-w-[85%]">
-                            <p className="text-[8px] text-primary-foreground leading-relaxed">
-                              TOPIK 쓰기 연습하고 싶어요!
-                            </p>
-                          </div>
-                        </motion.div>
-
-                        {/* AI response */}
-                        <motion.div
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 2 }}
-                          className="flex gap-1.5 items-start"
-                        >
-                          <div className="w-5 h-5 rounded-full bg-gradient-to-br from-korean-blue to-korean-purple flex items-center justify-center flex-shrink-0">
-                            <Brain className="w-3 h-3 text-white" />
-                          </div>
-                          <div className="bg-muted rounded-xl rounded-tl-sm p-2 max-w-[85%]">
-                            <p className="text-[8px] text-foreground leading-relaxed">
-                              좋아요! 먼저 주제를 선택해주세요 ✍️
-                            </p>
-                          </div>
-                        </motion.div>
-                      </div>
-
-                      {/* Bottom nav */}
-                      <div className="flex items-center justify-around pt-2 border-t border-border mt-2">
-                        <div className="flex flex-col items-center gap-0.5">
-                          <BookOpen className="w-3.5 h-3.5 text-muted-foreground" />
-                          <span className="text-[6px] text-muted-foreground">Học</span>
-                        </div>
-                        <div className="flex flex-col items-center gap-0.5">
-                          <Brain className="w-3.5 h-3.5 text-primary" />
-                          <span className="text-[6px] text-primary font-semibold">AI</span>
-                        </div>
-                        <div className="flex flex-col items-center gap-0.5">
-                          <Gamepad2 className="w-3.5 h-3.5 text-muted-foreground" />
-                          <span className="text-[6px] text-muted-foreground">Game</span>
-                        </div>
-                        <div className="flex flex-col items-center gap-0.5">
-                          <Users className="w-3.5 h-3.5 text-muted-foreground" />
-                          <span className="text-[6px] text-muted-foreground">Tôi</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Floating badges around phone */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 1.2, type: "spring" }}
-                  className="absolute -top-4 -left-4 sm:-left-8 bg-white dark:bg-card rounded-xl px-2 py-1.5 shadow-lg border border-border"
-                >
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-korean-green to-korean-teal flex items-center justify-center">
-                      <Check className="w-3 h-3 text-white" />
-                    </div>
-                    <span className="text-[10px] font-bold text-foreground whitespace-nowrap">AI 99.7%</span>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 1.5, type: "spring" }}
-                  className="absolute -bottom-2 -left-6 sm:-left-12 bg-white dark:bg-card rounded-xl px-2 py-1.5 shadow-lg border border-border"
-                >
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-sm">🇰🇷</span>
-                    <span className="text-[10px] font-bold text-foreground whitespace-nowrap">TOPIK 교수진</span>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 1.8, type: "spring" }}
-                  className="absolute top-1/3 -right-4 sm:-right-10 bg-white dark:bg-card rounded-xl px-2 py-1.5 shadow-lg border border-border"
-                >
-                  <div className="flex items-center gap-1.5">
-                    <Users className="w-4 h-4 text-primary" />
-                    <span className="text-[10px] font-bold text-foreground whitespace-nowrap">50K+</span>
-                  </div>
-                </motion.div>
-              </div>
-            </motion.div>
-          </div>
+              <Rocket className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+              Bắt đầu MIỄN PHÍ
+              <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </motion.div>
         </div>
 
         {/* Scroll indicator */}
@@ -762,7 +604,7 @@ const Landing = () => {
             <div className="p-4 rounded-xl bg-card/80 border border-korean-orange/20 backdrop-blur-sm">
               <div className="text-2xl mb-2">🤖</div>
               <p className="text-xs sm:text-sm text-foreground font-medium">AI Chatbot?</p>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">RAG AI của chúng tôi chính xác 99.7%</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">LUKATO RAG AI Tech chính xác 99.7%</p>
             </div>
             <div className="p-4 rounded-xl bg-card/80 border border-korean-yellow/20 backdrop-blur-sm">
               <div className="text-2xl mb-2">🎮</div>
@@ -916,7 +758,7 @@ const Landing = () => {
           >
             <span className="badge-secondary text-xs mb-3">
               <Brain className="w-3 h-3" />
-              RAG AI
+              LUKATO AI
             </span>
             <h2 className="font-heading font-bold text-2xl sm:text-3xl text-foreground">
               Học toàn diện <span className="text-gradient-secondary">4 kỹ năng</span>
@@ -1097,7 +939,7 @@ const Landing = () => {
             Sẵn sàng <span className="text-gradient-primary">chiến thắng</span> TOPIK?
           </h2>
           <p className="text-muted-foreground text-sm sm:text-base mb-6">
-            Giáo sư TOPIK + RAG AI = <span className="text-foreground font-semibold">Không đối thủ</span>
+            Giáo sư TOPIK + LUKATO RAG AI Tech = <span className="text-foreground font-semibold">Không đối thủ</span>
           </p>
           <Button
             onClick={() => navigate("/auth")}
