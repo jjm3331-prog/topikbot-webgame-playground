@@ -86,7 +86,7 @@ const steps = [
     number: 3,
     title: "Cài đặt cá nhân",
     description: "Click vào avatar góc phải trên → Cài đặt để tùy chỉnh ngôn ngữ, giao diện và các tùy chọn khác.",
-    highlight: "Giao diện giống như ChatGPT, dễ sử dụng!"
+    highlight: "Giao diện trực quan, dễ sử dụng!"
   },
   {
     number: 4,
@@ -100,7 +100,7 @@ const notices = [
   "Quyền truy cập AI được cấp ngay lập tức sau khi nâng cấp thành công.",
   "Đăng nhập bằng cùng email Có đăng ký tại LUKATO để nộc nhật.",
   "Các mô hình AI sẽ tự động hiển thị sau khi được cấp quyền.",
-  "Sử dụng giống ChatGPT - đặt câu hỏi và nhận trả lời chi tiết!"
+  "Sử dụng LUKATO RAG AI - đặt câu hỏi và nhận trả lời chi tiết!"
 ];
 
 const AITutor = () => {
