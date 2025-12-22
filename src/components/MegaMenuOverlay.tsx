@@ -76,6 +76,7 @@ const baseMenuCategories: MenuCategory[] = [
     title: "AI",
     emoji: "🤖",
     items: [
+      { icon: MessageSquare, label: "AI Chat", href: "/ai-chat", isHighlight: true },
       { icon: Sparkles, label: "Biến thể đề thi", href: "/question-variant", isPremium: true },
       { icon: PenTool, label: "Chấm bài viết", href: "/writing-correction", isPremium: true },
       { icon: Languages, label: "Roleplay Speaking", href: "/roleplay-speaking" },
