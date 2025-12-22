@@ -1,10 +1,8 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { 
   BookOpen, 
-  MessageCircle,
   Trophy,
   HelpCircle,
-  Compass,
   Notebook,
   Users,
   Sparkles,
@@ -13,7 +11,7 @@ import {
   Gamepad2,
   Heart,
   Briefcase,
-  Drama,
+  Clapperboard,
   Music,
   MessageSquare,
   Bookmark,
@@ -24,7 +22,11 @@ import {
   PanelLeftClose,
   PanelLeft,
   Home,
-  X
+  X,
+  Building,
+  GraduationCap,
+  Star,
+  FileX
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -38,6 +40,7 @@ interface MenuItem {
   label: string;
   href: string;
   isPremium?: boolean;
+  isHighlight?: boolean;
 }
 
 interface MenuSection {
@@ -47,13 +50,14 @@ interface MenuSection {
   defaultOpen?: boolean;
 }
 
+// MegaMenuOverlay와 동일한 구조
 const menuSections: MenuSection[] = [
   {
     title: "DU HỌC & VIỆC LÀM",
     emoji: "✈️",
     items: [
-      { icon: Briefcase, label: "Tìm việc tại Hàn Quốc", href: "/korea-career" },
-      { icon: BookOpen, label: "Tư vấn du học Hàn", href: "/korea-career#study" },
+      { icon: Building, label: "Tìm việc tại Hàn Quốc", href: "/korea-career" },
+      { icon: Users, label: "Headhunting", href: "/headhunting", isPremium: true },
     ],
     defaultOpen: false
   },
@@ -62,7 +66,7 @@ const menuSections: MenuSection[] = [
     emoji: "📚",
     items: [
       { icon: BookOpen, label: "TOPIK I (1-2급)", href: "/topik-1" },
-      { icon: Crown, label: "TOPIK II (3-6급)", href: "/topik-2" },
+      { icon: GraduationCap, label: "TOPIK II (3-6급)", href: "/topik-2" },
     ],
     defaultOpen: true
   },
@@ -75,8 +79,9 @@ const menuSections: MenuSection[] = [
       { icon: Heart, label: "Hẹn hò Hàn Quốc", href: "/dating" },
       { icon: MessageSquare, label: "Nối từ tiếng Hàn", href: "/wordchain" },
       { icon: Music, label: "K-POP Quiz", href: "/kpop" },
-      { icon: Drama, label: "K-Drama Lồng tiếng", href: "/kdrama" },
+      { icon: Clapperboard, label: "K-Drama Lồng tiếng", href: "/kdrama" },
       { icon: Briefcase, label: "Làm thêm Hàn Quốc", href: "/parttime" },
+      { icon: HelpCircle, label: "Hướng dẫn Game", href: "/tutorial" },
     ],
     defaultOpen: true
   },
@@ -84,9 +89,9 @@ const menuSections: MenuSection[] = [
     title: "CÔNG CỤ AI",
     emoji: "🤖",
     items: [
-      { icon: MessageCircle, label: "Hỏi AI (30/ngày)", href: "/ai-tutor" },
       { icon: PenTool, label: "Chấm bài viết", href: "/writing-correction", isPremium: true },
       { icon: Languages, label: "Dịch Hàn-Việt", href: "/translate" },
+      { icon: Star, label: "Bảng giá", href: "/pricing" },
     ],
     defaultOpen: false
   },
@@ -94,22 +99,11 @@ const menuSections: MenuSection[] = [
     title: "CỦA TÔI",
     emoji: "👤",
     items: [
-      { icon: Sparkles, label: "Tiến độ học tập", href: "/progress", isPremium: true },
+      { icon: Sparkles, label: "Tiến độ học tập", href: "/dashboard", isHighlight: true },
       { icon: Trophy, label: "Xếp hạng của tôi", href: "/ranking" },
-      { icon: Notebook, label: "Sổ lỗi sai", href: "/mistakes", isPremium: true },
-      { icon: Bookmark, label: "Từ vựng đã lưu (15/50)", href: "/vocabulary" },
+      { icon: FileX, label: "Sổ lỗi sai", href: "/mistakes" },
+      { icon: Bookmark, label: "Từ vựng đã lưu", href: "/vocabulary" },
       { icon: User, label: "Hồ sơ của tôi", href: "/profile" },
-      { icon: Users, label: "Mời bạn bè", href: "/profile#invite" },
-    ],
-    defaultOpen: false
-  },
-  {
-    title: "KHÁC",
-    emoji: "⚙️",
-    items: [
-      { icon: Crown, label: "Bảng giá", href: "/pricing" },
-      { icon: Compass, label: "Hướng dẫn", href: "/tutorial" },
-      { icon: HelpCircle, label: "Hỗ trợ", href: "/support" },
     ],
     defaultOpen: false
   },
