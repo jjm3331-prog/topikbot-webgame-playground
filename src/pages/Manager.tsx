@@ -5,7 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { ChevronRight, Sparkles, Flame, Music, Star, AlertTriangle, Users, Loader2, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
-import AppHeader from '@/components/AppHeader';
+import MegaMenu from '@/components/MegaMenu';
+import AppFooter from '@/components/AppFooter';
 
 // NPC 캐릭터 이미지 임포트
 import ceoDoyoon from '@/assets/manager/ceo-kangdoyoon.jpg';
@@ -294,12 +295,7 @@ export default function Manager() {
 
   return (
     <div className="min-h-[100dvh] bg-black text-white flex flex-col overflow-hidden">
-      <AppHeader 
-        title="LUKATO 매니저" 
-        titleVi="LUKATO Manager" 
-        showBack
-        showMenu={false}
-      />
+      <MegaMenu />
 
       <main className="flex-1 overflow-hidden relative">
         <AnimatePresence mode="wait">
@@ -379,6 +375,7 @@ export default function Manager() {
           )}
         </AnimatePresence>
       </main>
+      <AppFooter compact />
     </div>
   );
 }

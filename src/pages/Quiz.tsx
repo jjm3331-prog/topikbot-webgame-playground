@@ -12,7 +12,8 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import AppHeader from "@/components/AppHeader";
+import MegaMenu from "@/components/MegaMenu";
+import AppFooter from "@/components/AppFooter";
 
 interface QuizOption {
   ko: string;
@@ -143,27 +144,27 @@ const Quiz = () => {
 
   return (
     <div className="min-h-[100dvh] bg-gradient-to-b from-amber-900 via-orange-900 to-[#0f0f23] flex flex-col overflow-hidden">
-      {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-amber-900/80 border-b border-white/10 shrink-0">
-        <div className="flex items-center justify-between px-3 py-2">
-          <AppHeader title="관용어 퀴즈" titleVi="Quiz thành ngữ" showLogout={false} />
-          <div className="flex items-center gap-2">
-            {streak > 0 && (
-              <div className="flex items-center gap-0.5 text-orange-400">
-                <Flame className="w-4 h-4" />
-                <span className="font-bold text-sm">{streak}</span>
-              </div>
-            )}
-            <div className="flex items-center gap-1 text-yellow-400">
-              <Sparkles className="w-4 h-4" />
-              <span className="font-bold text-sm">{score}점</span>
+      <MegaMenu />
+      
+      {/* Stats Bar */}
+      <div className="px-3 py-2 flex items-center justify-between border-b border-white/10 shrink-0">
+        <span className="text-white font-medium">관용어 퀴즈 / Quiz thành ngữ</span>
+        <div className="flex items-center gap-2">
+          {streak > 0 && (
+            <div className="flex items-center gap-0.5 text-orange-400">
+              <Flame className="w-4 h-4" />
+              <span className="font-bold text-sm">{streak}</span>
             </div>
-            <Button variant="ghost" size="sm" onClick={resetGame} className="text-white/70 hover:text-white h-8 w-8 p-0">
-              <RotateCcw className="w-4 h-4" />
-            </Button>
+          )}
+          <div className="flex items-center gap-1 text-yellow-400">
+            <Sparkles className="w-4 h-4" />
+            <span className="font-bold text-sm">{score}점</span>
           </div>
+          <Button variant="ghost" size="sm" onClick={resetGame} className="text-white/70 hover:text-white h-8 w-8 p-0">
+            <RotateCcw className="w-4 h-4" />
+          </Button>
         </div>
-      </header>
+      </div>
 
       {/* Difficulty Selector */}
       <div className="px-3 py-2 shrink-0">
@@ -304,6 +305,7 @@ const Quiz = () => {
           <span>연속/LT: {streak}</span>
         </div>
       </div>
+      <AppFooter compact />
     </div>
   );
 };

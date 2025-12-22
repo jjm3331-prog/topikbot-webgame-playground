@@ -21,6 +21,8 @@ import {
   Heart
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import MegaMenu from "@/components/MegaMenu";
+import AppFooter from "@/components/AppFooter";
 
 type JobType = 'convenience_store' | 'cafe' | 'restaurant' | 'pc_bang' | 'bookstore';
 type Difficulty = 'easy' | 'medium' | 'hard';
@@ -213,14 +215,11 @@ const PartTime = () => {
 
   return (
     <div className="min-h-[100dvh] bg-gradient-to-b from-purple-900 via-purple-800 to-[#0f0f23] flex flex-col overflow-hidden">
-      {/* Header */}
-      <header className="flex items-center justify-between p-4 border-b border-white/10">
-        <div className="flex items-center gap-2">
-          <button onClick={() => navigate("/dashboard")} className="text-white/70 hover:text-white">
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <span className="text-white font-medium">아르바이트 / Làm thêm</span>
-        </div>
+      <MegaMenu />
+      
+      {/* Stats Bar */}
+      <div className="flex items-center justify-between p-4 border-b border-white/10">
+        <span className="text-white font-medium">아르바이트 / Làm thêm</span>
         {gameState !== 'select_job' && gameState !== 'select_difficulty' && (
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-yellow-400">
@@ -232,7 +231,7 @@ const PartTime = () => {
             </div>
           </div>
         )}
-      </header>
+      </div>
 
       <div className="p-4 max-w-2xl mx-auto">
         <AnimatePresence mode="wait">
@@ -542,6 +541,7 @@ const PartTime = () => {
           )}
         </AnimatePresence>
       </div>
+      <AppFooter compact />
     </div>
   );
 };

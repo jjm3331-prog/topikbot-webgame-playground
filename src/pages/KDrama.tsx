@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Mic, MicOff, RotateCcw, ChevronRight, Volume2, RefreshCw, Loader2, Trophy, Youtube, Timer, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import MegaMenu from "@/components/MegaMenu";
+import AppFooter from "@/components/AppFooter";
 
 interface DramaScene {
   id: string;
@@ -351,8 +353,12 @@ const KDrama = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-[100dvh] bg-gradient-to-b from-slate-900 via-purple-900 to-[#0f0f23] flex items-center justify-center">
-        <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} className="text-6xl">🎬</motion.div>
+      <div className="min-h-[100dvh] bg-gradient-to-b from-slate-900 via-purple-900 to-[#0f0f23] flex flex-col">
+        <MegaMenu />
+        <div className="flex-1 flex items-center justify-center">
+          <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} className="text-6xl">🎬</motion.div>
+        </div>
+        <AppFooter compact />
       </div>
     );
   }
@@ -360,43 +366,48 @@ const KDrama = () => {
   if (gameComplete) {
     const avgScore = attempts > 0 ? Math.round(score / attempts) : 0;
     return (
-      <div className="min-h-[100dvh] bg-gradient-to-b from-slate-900 via-purple-900 to-[#0f0f23] flex items-center justify-center p-4">
-        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="bg-black/60 backdrop-blur-xl rounded-3xl p-8 text-center max-w-md w-full border border-purple-500/30">
-          <Trophy className="w-20 h-20 text-yellow-400 mx-auto mb-4" />
-          <h2 className="text-3xl font-bold text-white mb-2">더빙 완료! 🎬</h2>
-          <p className="text-gray-400 mb-4">Hoàn thành lồng tiếng!</p>
-          <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl p-6 mb-6">
-            <p className="text-gray-400 mb-2">{attempts}개 도전 / {attempts} thử thách</p>
-            <p className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">평균 {avgScore}%</p>
-          </div>
-          <div className="flex gap-3">
-            <Button onClick={() => navigate('/dashboard')} variant="outline" className="flex-1 border-gray-600">
-              <ArrowLeft className="w-4 h-4 mr-2" />대시보드로 / Về Dashboard
-            </Button>
-            <Button onClick={() => { setScore(0); setAttempts(0); setScoreSaved(false); setGameComplete(false); setUsedIds([]); loadScenes(selectedGenre, selectedDifficulty); }} className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500">
-              <RotateCcw className="w-4 h-4 mr-2" />다시하기 / Chơi lại
-            </Button>
-          </div>
-        </motion.div>
+      <div className="min-h-[100dvh] bg-gradient-to-b from-slate-900 via-purple-900 to-[#0f0f23] flex flex-col">
+        <MegaMenu />
+        <div className="flex-1 flex items-center justify-center p-4">
+          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="bg-black/60 backdrop-blur-xl rounded-3xl p-8 text-center max-w-md w-full border border-purple-500/30">
+            <Trophy className="w-20 h-20 text-yellow-400 mx-auto mb-4" />
+            <h2 className="text-3xl font-bold text-white mb-2">더빙 완료! 🎬</h2>
+            <p className="text-gray-400 mb-4">Hoàn thành lồng tiếng!</p>
+            <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl p-6 mb-6">
+              <p className="text-gray-400 mb-2">{attempts}개 도전 / {attempts} thử thách</p>
+              <p className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">평균 {avgScore}%</p>
+            </div>
+            <div className="flex gap-3">
+              <Button onClick={() => navigate('/dashboard')} variant="outline" className="flex-1 border-gray-600">
+                <ArrowLeft className="w-4 h-4 mr-2" />대시보드로 / Về Dashboard
+              </Button>
+              <Button onClick={() => { setScore(0); setAttempts(0); setScoreSaved(false); setGameComplete(false); setUsedIds([]); loadScenes(selectedGenre, selectedDifficulty); }} className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500">
+                <RotateCcw className="w-4 h-4 mr-2" />다시하기 / Chơi lại
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+        <AppFooter compact />
       </div>
     );
   }
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-b from-slate-900 via-purple-900 to-[#0f0f23]">
-      {/* Header */}
-      <div className="sticky top-0 z-50 bg-black/40 backdrop-blur-xl border-b border-purple-500/20">
-        <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
-          <button onClick={handleBackToGame} className="text-white p-2"><ArrowLeft className="w-6 h-6" /></button>
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🎬</span>
-            <span className="text-white font-bold">K-Drama 더빙</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-purple-400 font-bold">{attempts > 0 ? Math.round(score / attempts) : 0}%</span>
-          </div>
+    <div className="min-h-[100dvh] bg-gradient-to-b from-slate-900 via-purple-900 to-[#0f0f23] flex flex-col">
+      <MegaMenu />
+      
+      {/* Stats Bar */}
+      <div className="px-4 py-3 flex items-center justify-between border-b border-purple-500/20 bg-black/40 backdrop-blur-xl">
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">🎬</span>
+          <span className="text-white font-bold">K-Drama 더빙</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-purple-400 font-bold">{attempts > 0 ? Math.round(score / attempts) : 0}%</span>
         </div>
       </div>
+      
+      <main className="flex-1 overflow-y-auto">
 
       <div className="max-w-lg mx-auto px-4 py-4">
         {/* Progress */}
@@ -569,6 +580,8 @@ const KDrama = () => {
           </motion.div>
         </div>
       )}
+      </main>
+      <AppFooter compact />
     </div>
   );
 };
