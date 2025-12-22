@@ -164,7 +164,7 @@ const Landing = () => {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/game");
+        navigate("/dashboard");
       }
     });
     setTimeout(() => setIsLoaded(true), 100);
