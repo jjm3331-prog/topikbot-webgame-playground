@@ -21,6 +21,8 @@ import KPop from "./pages/KPop";
 import Tutorial from "./pages/Tutorial";
 import PWAGuide from "./pages/PWAGuide";
 import Manager from "./pages/Manager";
+import AITutor from "./pages/AITutor";
+import WritingCorrection from "./pages/WritingCorrection";
 import NotFound from "./pages/NotFound";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWAWelcome from "./components/PWAWelcome";
@@ -114,6 +116,8 @@ const App = () => {
               <Route path="/tutorial" element={<Tutorial />} />
               <Route path="/pwa-guide" element={<PWAGuide />} />
               <Route path="/manager" element={<Manager />} />
+              <Route path="/ai-tutor" element={<AITutor />} />
+              <Route path="/writing-correction" element={<WritingCorrection />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

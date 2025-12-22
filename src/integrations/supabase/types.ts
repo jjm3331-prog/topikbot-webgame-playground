@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_question_usage: {
+        Row: {
+          created_at: string
+          id: string
+          last_reset_at: string
+          question_count: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_reset_at?: string
+          question_count?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_reset_at?: string
+          question_count?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_response_cache: {
         Row: {
           cache_key: string
@@ -277,6 +304,42 @@ export type Database = {
           rating?: number
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      writing_corrections: {
+        Row: {
+          answer_image_url: string | null
+          answer_text: string | null
+          correction_report: Json
+          created_at: string
+          id: string
+          question_image_url: string | null
+          score: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answer_image_url?: string | null
+          answer_text?: string | null
+          correction_report?: Json
+          created_at?: string
+          id?: string
+          question_image_url?: string | null
+          score?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answer_image_url?: string | null
+          answer_text?: string | null
+          correction_report?: Json
+          created_at?: string
+          id?: string
+          question_image_url?: string | null
+          score?: number | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
