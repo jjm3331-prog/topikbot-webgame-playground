@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen,
   Gamepad2,
-  MessageCircle,
   Briefcase,
   Crown,
   Heart,
@@ -13,17 +12,12 @@ import {
   Clapperboard,
   Languages,
   PenTool,
-  Trophy,
-  HelpCircle,
-  BookMarked,
   GraduationCap,
   Sparkles,
   X,
   User,
-  FileX,
   Users,
   Star,
-  Building,
   ChevronRight,
   ChevronDown,
   LogOut,
@@ -51,10 +45,9 @@ interface MenuCategory {
 // 기본 메뉴 (로그인 전/후 공통)
 const baseMenuCategories: MenuCategory[] = [
   {
-    title: "DU HỌC & VIỆC LÀM",
-    emoji: "✈️",
+    title: "VIỆC LÀM",
+    emoji: "💼",
     items: [
-      { icon: Building, label: "Tìm việc tại Hàn Quốc", href: "/korea-career", isPremium: true },
       { icon: Users, label: "Headhunting", href: "/headhunting", isPremium: true },
     ]
   },
@@ -67,21 +60,20 @@ const baseMenuCategories: MenuCategory[] = [
     ]
   },
   {
-    title: "GAME HỌC",
+    title: "GAME",
     emoji: "🎮",
     items: [
-      { icon: Crown, label: "LUKATO Manager", href: "/manager" },
-      { icon: Gamepad2, label: "AI Sinh tồn Seoul", href: "/chat" },
-      { icon: Heart, label: "Hẹn hò Hàn Quốc", href: "/dating" },
-      { icon: MessageSquare, label: "Nối từ tiếng Hàn", href: "/wordchain" },
+      { icon: Crown, label: "Manager", href: "/manager" },
+      { icon: Gamepad2, label: "AI Sinh tồn", href: "/chat" },
+      { icon: Heart, label: "Hẹn hò", href: "/dating" },
+      { icon: MessageSquare, label: "Nối từ", href: "/wordchain" },
       { icon: Music, label: "K-POP Quiz", href: "/kpop" },
-      { icon: Clapperboard, label: "K-Drama Lồng tiếng", href: "/kdrama" },
-      { icon: Briefcase, label: "Làm thêm Hàn Quốc", href: "/parttime" },
-      { icon: HelpCircle, label: "Hướng dẫn sử dụng Game", href: "/tutorial" },
+      { icon: Clapperboard, label: "K-Drama", href: "/kdrama" },
+      { icon: Briefcase, label: "Làm thêm", href: "/parttime" },
     ]
   },
   {
-    title: "CÔNG CỤ AI",
+    title: "AI",
     emoji: "🤖",
     items: [
       { icon: Sparkles, label: "Biến thể đề thi", href: "/question-variant", isPremium: true },
@@ -97,9 +89,7 @@ const myMenuCategory: MenuCategory = {
   title: "CỦA TÔI",
   emoji: "👤",
   items: [
-    { icon: FileX, label: "Sổ lỗi sai", href: "/mistakes", isPremium: true },
-    { icon: BookMarked, label: "Từ vựng đã lưu", href: "/vocabulary" },
-    { icon: User, label: "Hồ sơ của tôi", href: "/profile" },
+    { icon: User, label: "Hồ sơ", href: "/profile" },
   ]
 };
 
@@ -234,10 +224,8 @@ export const MegaMenuOverlay = ({
   // Premium routes that require subscription
   const premiumRoutes = [
     "/question-variant",
-    "/korea-career",
     "/headhunting",
     "/writing-correction",
-    "/mistakes",
   ];
 
   const handleNavigation = (href: string, isPremiumItem?: boolean) => {
