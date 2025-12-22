@@ -331,7 +331,7 @@ const WordChain = () => {
                   <RotateCcw className="w-4 h-4 mr-1" />
                   다시 / Lại
                 </Button>
-                <Button variant="outline" onClick={() => navigate("/game")} className="border-white/20 text-white hover:bg-white/10">
+                <Button variant="outline" onClick={() => navigate("/dashboard")} className="border-white/20 text-white hover:bg-white/10">
                   메인 / Menu
                 </Button>
               </div>

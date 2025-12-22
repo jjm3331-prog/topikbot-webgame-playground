@@ -60,6 +60,7 @@ const menuSections: MenuSection[] = [
   {
     title: "GAME HỌC",
     items: [
+      { icon: Crown, label: "LUKATO Manager", href: "/manager" },
       { icon: Gamepad2, label: "AI Sinh tồn Seoul", href: "/chat" },
       { icon: Heart, label: "Hẹn hò Hàn Quốc", href: "/dating" },
       { icon: MessageSquare, label: "Nối từ tiếng Hàn", href: "/wordchain" },

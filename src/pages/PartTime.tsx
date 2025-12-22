@@ -216,7 +216,7 @@ const PartTime = () => {
       {/* Header */}
       <header className="flex items-center justify-between p-4 border-b border-white/10">
         <div className="flex items-center gap-2">
-          <button onClick={() => navigate("/game")} className="text-white/70 hover:text-white">
+          <button onClick={() => navigate("/dashboard")} className="text-white/70 hover:text-white">
             <ChevronLeft className="w-5 h-5" />
           </button>
           <span className="text-white font-medium">아르바이트 / Làm thêm</span>

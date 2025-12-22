@@ -20,7 +20,8 @@ import {
   User,
   Smartphone,
   Apple,
-  ChevronDown
+  ChevronDown,
+  Sparkles
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -74,7 +75,8 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
   };
 
   const menuItems = [
-    { path: "/game", icon: Home, labelKo: "메인 메뉴", labelVi: "Menu chính" },
+    { path: "/dashboard", icon: Home, labelKo: "대시보드", labelVi: "Dashboard" },
+    { path: "/manager", icon: Sparkles, labelKo: "루카토 매니저", labelVi: "LUKATO Manager" },
     { path: "/chat", icon: Dice6, labelKo: "서울 생존", labelVi: "Sinh tồn Seoul" },
     { path: "/ranking", icon: Trophy, labelKo: "랭킹", labelVi: "Xếp hạng" },
     { path: "/dating", icon: Heart, labelKo: "Seoul Love Signal", labelVi: "Tín hiệu tình yêu" },
