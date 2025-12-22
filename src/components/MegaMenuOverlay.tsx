@@ -84,6 +84,7 @@ const baseMenuCategories: MenuCategory[] = [
     title: "CÔNG CỤ AI",
     emoji: "🤖",
     items: [
+      { icon: Sparkles, label: "Biến thể đề thi", href: "/question-variant", isPremium: true },
       { icon: PenTool, label: "Chấm bài viết", href: "/writing-correction", isPremium: true },
       { icon: Languages, label: "Dịch Hàn-Việt", href: "/translate" },
       { icon: Star, label: "Bảng giá", href: "/pricing" },
@@ -96,7 +97,6 @@ const myMenuCategory: MenuCategory = {
   title: "CỦA TÔI",
   emoji: "👤",
   items: [
-    { icon: Sparkles, label: "Tiến độ học tập", href: "/dashboard", isPremium: true, isHighlight: true },
     { icon: FileX, label: "Sổ lỗi sai", href: "/mistakes", isPremium: true },
     { icon: BookMarked, label: "Từ vựng đã lưu", href: "/vocabulary" },
     { icon: User, label: "Hồ sơ của tôi", href: "/profile" },
@@ -232,7 +232,13 @@ export const MegaMenuOverlay = ({
   const { isPremium } = useSubscription();
 
   // Premium routes that require subscription
-  const premiumRoutes = ['/dashboard', '/korea-career', '/headhunting', '/writing-correction', '/mistakes'];
+  const premiumRoutes = [
+    "/question-variant",
+    "/korea-career",
+    "/headhunting",
+    "/writing-correction",
+    "/mistakes",
+  ];
 
   const handleNavigation = (href: string, isPremiumItem?: boolean) => {
     // Pages should still be viewable; show an upsell message for premium features.
