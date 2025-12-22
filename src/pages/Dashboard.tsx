@@ -502,22 +502,6 @@ const Dashboard = () => {
           </Button>
         </motion.div>
 
-        {/* LUKATO AI CTA */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="py-8"
-        >
-          <Button 
-            onClick={() => navigate("/ai-tutor")}
-            className="w-full max-w-md mx-auto flex bg-muted hover:bg-muted/80 text-foreground border border-border h-14 rounded-full"
-          >
-            <Sparkles className="w-5 h-5 mr-2 text-primary" />
-            Khám phá LUKATO AI
-            <ChevronRight className="w-5 h-5 ml-2" />
-          </Button>
-        </motion.div>
       </div>
 
       {/* AI Floating Button */}
