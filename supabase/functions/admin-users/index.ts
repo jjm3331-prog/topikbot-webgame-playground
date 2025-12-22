@@ -54,12 +54,31 @@ serve(async (req) => {
     const { action, userId, plan } = await req.json();
 
     if (action === "list") {
-      // Get all users from auth.users with their profiles and subscriptions
-      const { data: authUsers, error: authError } = await supabaseClient.auth.admin.listUsers();
+      // Get all users from auth.users with pagination
+      let allUsers: any[] = [];
+      let page = 1;
+      const perPage = 1000;
+      
+      while (true) {
+        const { data: authUsers, error: authError } = await supabaseClient.auth.admin.listUsers({
+          page: page,
+          perPage: perPage,
+        });
 
-      if (authError) {
-        throw authError;
+        if (authError) {
+          throw authError;
+        }
+
+        allUsers = allUsers.concat(authUsers.users);
+        
+        // If we got less than perPage, we've reached the end
+        if (authUsers.users.length < perPage) {
+          break;
+        }
+        page++;
       }
+
+      console.log(`Total users fetched: ${allUsers.length}`);
 
       // Get profiles
       const { data: profiles } = await supabaseClient
@@ -72,7 +91,7 @@ serve(async (req) => {
         .select("*");
 
       // Merge data
-      const usersWithDetails = authUsers.users.map((authUser) => {
+      const usersWithDetails = allUsers.map((authUser) => {
         const profile = profiles?.find((p) => p.id === authUser.id);
         const subscription = subscriptions?.find((s) => s.user_id === authUser.id);
         
@@ -88,6 +107,9 @@ serve(async (req) => {
           subscription_expires: subscription?.expires_at,
         };
       });
+
+      // Sort by created_at descending
+      usersWithDetails.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
       return new Response(
         JSON.stringify({ users: usersWithDetails }),
