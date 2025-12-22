@@ -13,8 +13,6 @@ import {
 import { motion } from "framer-motion";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
-import { PremiumPreviewBanner } from "@/components/PremiumPreviewBanner";
-import { useSubscription } from "@/hooks/useSubscription";
 
 interface Profile {
   id: string;
@@ -25,7 +23,7 @@ const Dashboard = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { isPremium } = useSubscription();
+  
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -76,9 +74,6 @@ const Dashboard = () => {
       <CleanHeader />
       <main className="flex-1 pb-8 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto w-full space-y-5">
-          {/* Premium Preview Banner */}
-          {!isPremium && <PremiumPreviewBanner featureName="theo dõi tiến độ học" />}
-          
           {/* Welcome Message */}
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
@@ -215,29 +210,6 @@ const Dashboard = () => {
             ))}
           </motion.div>
 
-          {/* Premium Upgrade */}
-          {!isPremium && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              onClick={() => navigate("/pricing")}
-              className="glass-card p-4 rounded-2xl flex items-center justify-between border-korean-yellow/30 cursor-pointer hover:border-korean-yellow/50 transition-all group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-korean-yellow/20 flex items-center justify-center">
-                  <Crown className="w-5 h-5 text-korean-yellow" />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">Nâng cấp Premium</p>
-                  <p className="text-xs text-muted-foreground">AI không giới hạn • Chấm bài viết • Hỗ trợ xin việc</p>
-                </div>
-              </div>
-              <Button variant="ghost" size="sm" className="text-korean-yellow group-hover:bg-korean-yellow/10">
-                Xem gói <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
-            </motion.div>
-          )}
         </div>
 
         {/* AI Floating Button */}
