@@ -21,7 +21,10 @@ import {
   Check,
   Lock,
   Eye,
-  EyeOff
+  EyeOff,
+  Download,
+  Smartphone,
+  ArrowRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -258,6 +261,36 @@ const Profile = () => {
             <ChevronLeft className="w-5 h-5" />
             <span>Quay lại</span>
           </motion.button>
+
+          {/* PWA Install Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            onClick={() => navigate("/pwa-guide")}
+            className="relative overflow-hidden rounded-2xl mb-6 cursor-pointer group"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-korean-blue via-korean-purple to-korean-orange opacity-90" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.15),transparent)]" />
+            <div className="relative p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                  <Smartphone className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-white text-sm sm:text-base">📲 Cài đặt ứng dụng LUKATO</h3>
+                  <p className="text-white/80 text-xs sm:text-sm">Thêm vào màn hình chính để sử dụng như app thực thụ!</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="hidden sm:flex items-center gap-1 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                  <Download className="w-4 h-4 text-white" />
+                  <span className="text-white text-xs font-medium">Miễn phí</span>
+                </div>
+                <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
+              </div>
+            </div>
+          </motion.div>
 
         {/* Page Title */}
         <motion.div
