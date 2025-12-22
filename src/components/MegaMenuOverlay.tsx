@@ -264,72 +264,90 @@ export const MegaMenuOverlay = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-40 bg-background"
-          style={{ top: "60px" }}
+          className="fixed inset-0 z-50 bg-background"
         >
-          {/* Close Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="absolute top-4 right-4 md:top-6 md:right-8 w-10 h-10 rounded-full border border-border hover:bg-destructive hover:text-destructive-foreground transition-colors z-10"
-          >
-            <X className="w-5 h-5" />
-          </Button>
+          {/* Mobile: Full Screen Header with X */}
+          {isMobile && (
+            <div className="flex items-center justify-between px-4 h-14 border-b border-border">
+              <span className="font-heading font-bold text-lg text-foreground">Menu</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onClose}
+                className="w-10 h-10 rounded-full"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+          )}
+
+          {/* Desktop: Close Button */}
+          {!isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="absolute top-4 right-4 md:top-6 md:right-8 w-10 h-10 rounded-full border border-border hover:bg-destructive hover:text-destructive-foreground transition-colors z-10"
+            >
+              <X className="w-5 h-5" />
+            </Button>
+          )}
 
           {/* Menu Content */}
-          <div className="h-full overflow-y-auto pb-20">
+          <div className={`overflow-y-auto ${isMobile ? "h-[calc(100%-56px)]" : "h-full"} pb-20`}>
             {isMobile ? (
-              /* Mobile: Accordion Style */
-              <div className="pt-4">
-                {menuCategories.map((category) => (
-                  <MobileAccordionCategory
-                    key={category.title}
-                    category={category}
-                    isActive={isActive}
-                    onNavigate={handleNavigation}
-                  />
-                ))}
+              // Mobile: Accordion Style - Full Screen
+              <div className="flex flex-col min-h-full">
+                <div className="flex-1 pt-2">
+                  {menuCategories.map((category) => (
+                    <MobileAccordionCategory
+                      key={category.title}
+                      category={category}
+                      isActive={isActive}
+                      onNavigate={handleNavigation}
+                    />
+                  ))}
 
-                {/* Bottom Menu */}
-                <div className="mt-6 px-4 pt-4 border-t border-border">
-                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                    KHÁC
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {bottomMenuItems.map((item) => {
-                      const active = isActive(item.href);
-                      return (
-                        <button
-                          key={item.label}
-                          onClick={() => handleNavigation(item.href)}
-                          className={`flex items-center gap-2 text-sm px-3 py-2 rounded-lg transition-colors ${
-                            active
-                              ? "bg-primary text-primary-foreground"
-                              : "text-muted-foreground hover:text-primary hover:bg-muted/50"
-                          }`}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          <span>{item.label}</span>
-                        </button>
-                      );
-                    })}
+                  {/* Bottom Menu */}
+                  <div className="mt-4 px-4 pt-4 border-t border-border">
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                      KHÁC
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {bottomMenuItems.map((item) => {
+                        const active = isActive(item.href);
+                        return (
+                          <button
+                            key={item.label}
+                            onClick={() => handleNavigation(item.href)}
+                            className={`flex items-center gap-2 text-sm px-3 py-2 rounded-lg transition-colors ${
+                              active
+                                ? "bg-primary text-primary-foreground"
+                                : "text-muted-foreground hover:text-primary hover:bg-muted/50"
+                            }`}
+                          >
+                            <item.icon className="w-4 h-4" />
+                            <span>{item.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
 
-                {/* Auth Actions */}
+                {/* Auth Actions - Fixed Bottom */}
                 {isLoggedIn && (
-                  <div className="sticky bottom-0 px-4 py-4 border-t border-border bg-background">
+                  <div className="sticky bottom-0 px-4 py-4 border-t border-border bg-background mt-auto">
                     <Button variant="destructive" onClick={handleLogoutClick} className="w-full">
                       <LogOut className="w-4 h-4 mr-2" />
-                      로그아웃
+                      Logout
                     </Button>
                   </div>
                 )}
               </div>
             ) : (
-              /* Desktop: Grid Style */
-              <div className="max-w-7xl mx-auto px-6 py-8 md:py-12">
+              // Desktop: Grid Style
+              <div className="max-w-7xl mx-auto px-6 py-8 md:py-12" style={{ marginTop: "60px" }}>
                 <div className={`grid gap-8 md:gap-10 ${
                   isLoggedIn 
                     ? 'grid-cols-2 md:grid-cols-5' 
