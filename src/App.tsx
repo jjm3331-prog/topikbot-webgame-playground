@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Game from "./pages/Game";
@@ -86,36 +87,38 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <AnimatePresence mode="wait">
-          {isLoading && <SplashScreen key="splash" progress={progress} />}
-        </AnimatePresence>
-        
-        <Toaster />
-        <Sonner />
-        <PWAInstallPrompt />
-        <PWAWelcome />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/game" element={<Game />} />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/ranking" element={<Ranking />} />
-            <Route path="/wordchain" element={<WordChain />} />
-            <Route path="/quiz" element={<Quiz />} />
-            <Route path="/parttime" element={<PartTime />} />
-            <Route path="/bankruptcy" element={<BankruptcyRecovery />} />
-            <Route path="/dating" element={<Dating />} />
-            <Route path="/kdrama" element={<KDrama />} />
-            <Route path="/kpop" element={<KPop />} />
-            <Route path="/tutorial" element={<Tutorial />} />
-            <Route path="/pwa-guide" element={<PWAGuide />} />
-            <Route path="/manager" element={<Manager />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+        <TooltipProvider>
+          <AnimatePresence mode="wait">
+            {isLoading && <SplashScreen key="splash" progress={progress} />}
+          </AnimatePresence>
+          
+          <Toaster />
+          <Sonner />
+          <PWAInstallPrompt />
+          <PWAWelcome />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/game" element={<Game />} />
+              <Route path="/chat" element={<Chat />} />
+              <Route path="/ranking" element={<Ranking />} />
+              <Route path="/wordchain" element={<WordChain />} />
+              <Route path="/quiz" element={<Quiz />} />
+              <Route path="/parttime" element={<PartTime />} />
+              <Route path="/bankruptcy" element={<BankruptcyRecovery />} />
+              <Route path="/dating" element={<Dating />} />
+              <Route path="/kdrama" element={<KDrama />} />
+              <Route path="/kpop" element={<KPop />} />
+              <Route path="/tutorial" element={<Tutorial />} />
+              <Route path="/pwa-guide" element={<PWAGuide />} />
+              <Route path="/manager" element={<Manager />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };
