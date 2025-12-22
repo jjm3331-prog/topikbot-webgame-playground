@@ -24,7 +24,9 @@ import {
   EyeOff,
   Download,
   Smartphone,
-  ArrowRight
+  ArrowRight,
+  Star,
+  Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,6 +36,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import MegaMenu from "@/components/MegaMenu";
 import AppFooter from "@/components/AppFooter";
+import { useSubscription } from "@/hooks/useSubscription";
 
 interface Profile {
   id: string;
@@ -55,6 +58,7 @@ interface UserData {
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { subscription, isPremium, isPlus, isFree, loading: subscriptionLoading } = useSubscription();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -290,6 +294,93 @@ const Profile = () => {
                 <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
+          </motion.div>
+
+          {/* Premium Subscription Status Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.08 }}
+            className="relative overflow-hidden rounded-2xl mb-6"
+          >
+            {isPremium ? (
+              <div className="relative bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500 p-4">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(255,255,255,0.2),transparent)]" />
+                <div className="relative flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                      <Crown className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-white text-base sm:text-lg">👑 PREMIUM MEMBER</h3>
+                        <span className="px-2 py-0.5 bg-white/20 rounded-full text-[10px] font-bold text-white uppercase">Active</span>
+                      </div>
+                      <p className="text-white/90 text-xs sm:text-sm">
+                        {subscription?.expiresAt 
+                          ? `Hết hạn: ${new Date(subscription.expiresAt).toLocaleDateString("vi-VN")}`
+                          : "Vĩnh viễn - Cảm ơn bạn đã hỗ trợ!"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Sparkles className="w-5 h-5 text-white animate-pulse" />
+                    <Star className="w-5 h-5 text-white" />
+                  </div>
+                </div>
+              </div>
+            ) : isPlus ? (
+              <div className="relative bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 p-4">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(255,255,255,0.2),transparent)]" />
+                <div className="relative flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                      <Star className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-white text-base sm:text-lg">⭐ PLUS MEMBER</h3>
+                        <span className="px-2 py-0.5 bg-white/20 rounded-full text-[10px] font-bold text-white uppercase">Active</span>
+                      </div>
+                      <p className="text-white/90 text-xs sm:text-sm">
+                        {subscription?.expiresAt 
+                          ? `Hết hạn: ${new Date(subscription.expiresAt).toLocaleDateString("vi-VN")}`
+                          : "Đang hoạt động"}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={() => navigate("/pricing")}
+                    size="sm"
+                    className="bg-white/20 hover:bg-white/30 text-white border-0"
+                  >
+                    Nâng cấp
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div 
+                onClick={() => navigate("/pricing")}
+                className="relative bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 p-4 cursor-pointer group hover:from-gray-600 hover:to-gray-600 transition-all"
+              >
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.1),transparent)]" />
+                <div className="relative flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                      <Crown className="w-6 h-6 text-gray-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-white text-base sm:text-lg">🆓 Gói Miễn phí</h3>
+                      <p className="text-white/70 text-xs sm:text-sm">Nâng cấp Premium để mở khóa tất cả tính năng!</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="hidden sm:block text-xs text-yellow-400 font-medium">Nâng cấp ngay</span>
+                    <ArrowRight className="w-5 h-5 text-yellow-400 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </div>
+            )}
           </motion.div>
 
         {/* Page Title */}
