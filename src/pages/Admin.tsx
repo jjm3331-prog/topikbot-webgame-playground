@@ -143,17 +143,13 @@ const Admin = () => {
         { count: totalUsers },
         { count: totalQuizHistory },
         { count: totalWritingCorrections },
-        { count: totalReviews },
         { count: totalDocuments },
-        { count: totalAIQuestions },
         { count: totalHeadhunting },
       ] = await Promise.all([
         supabase.from("profiles").select("*", { count: "exact", head: true }),
         supabase.from("quiz_history").select("*", { count: "exact", head: true }),
         supabase.from("writing_corrections").select("*", { count: "exact", head: true }),
-        supabase.from("reviews").select("*", { count: "exact", head: true }),
         supabase.from("knowledge_documents").select("*", { count: "exact", head: true }),
-        supabase.from("ai_question_usage").select("*", { count: "exact", head: true }),
         supabase.from("headhunting_applications").select("*", { count: "exact", head: true }),
       ]);
 
@@ -161,7 +157,6 @@ const Admin = () => {
         { title: "총 사용자", value: totalUsers || 0, icon: <Users className="w-5 h-5" />, color: "text-blue-500" },
         { title: "헤드헌팅 신청", value: totalHeadhunting || 0, icon: <Briefcase className="w-5 h-5" />, color: "text-korean-purple" },
         { title: "작문 교정", value: totalWritingCorrections || 0, icon: <PenTool className="w-5 h-5" />, color: "text-purple-500" },
-        { title: "AI 튜터 질문", value: totalAIQuestions || 0, icon: <MessageSquare className="w-5 h-5" />, color: "text-orange-500" },
         { title: "지식 문서", value: totalDocuments || 0, icon: <BookOpen className="w-5 h-5" />, color: "text-cyan-500" },
         { title: "퀴즈 플레이", value: totalQuizHistory || 0, icon: <Gamepad2 className="w-5 h-5" />, color: "text-green-500" },
       ]);
@@ -381,8 +376,6 @@ const Admin = () => {
     switch (plan) {
       case 'premium':
         return <span className="px-2 py-1 text-xs rounded-full bg-gradient-to-r from-yellow-500 to-amber-500 text-white font-bold">Premium</span>;
-      case 'plus':
-        return <span className="px-2 py-1 text-xs rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold">Plus</span>;
       default:
         return <span className="px-2 py-1 text-xs rounded-full bg-muted text-muted-foreground">Free</span>;
     }
@@ -855,21 +848,11 @@ const Admin = () => {
                             <Button 
                               size="sm" 
                               variant="outline"
-                              disabled={updatingSubscription || selectedUser.subscription_plan === 'free'}
+                              disabled={updatingSubscription || selectedUser.subscription_plan === 'free' || !selectedUser.subscription_plan}
                               onClick={() => handleUpdateSubscription(selectedUser.id, 'free')}
                             >
                               {updatingSubscription ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
                               Free
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              variant="outline"
-                              className="border-blue-500/50 text-blue-500 hover:bg-blue-500/10"
-                              disabled={updatingSubscription || selectedUser.subscription_plan === 'plus'}
-                              onClick={() => handleUpdateSubscription(selectedUser.id, 'plus')}
-                            >
-                              {updatingSubscription ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
-                              Plus
                             </Button>
                             <Button 
                               size="sm" 
