@@ -394,7 +394,7 @@ const Dating = () => {
                 <p className="text-white/50">호감도 100%를 달성하면<br />AI 커플 사진이 생성돼요!</p>
               </div>
             )}
-            <Button onClick={() => setPhase('swipe')} className="w-full mt-6 bg-pink-500 hover:bg-pink-600">돌아가기</Button>
+            <Button onClick={() => setPhase('swipe')} className="w-full mt-6 bg-pink-500 hover:bg-pink-600">스와이프로 / Quay lại</Button>
           </motion.div>
         )}
 
@@ -420,7 +420,7 @@ const Dating = () => {
                 <p className="text-white/50">아직 해금된 엔딩이 없어요<br />호감도 100%를 달성하세요!</p>
               </div>
             )}
-            <Button onClick={() => setPhase('swipe')} className="w-full mt-6 bg-purple-500 hover:bg-purple-600">돌아가기</Button>
+            <Button onClick={() => setPhase('swipe')} className="w-full mt-6 bg-purple-500 hover:bg-purple-600">스와이프로 / Quay lại</Button>
           </motion.div>
         )}
       </AnimatePresence>

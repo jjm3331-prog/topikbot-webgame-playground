@@ -516,11 +516,11 @@ const PartTime = () => {
                   다시 하기 / Chơi lại
                 </Button>
                 <Button
-                  onClick={() => navigate('/game')}
+                  onClick={() => navigate('/dashboard')}
                   variant="outline"
                   className="h-14 border-white/20 text-white hover:bg-white/10"
                 >
-                  메뉴로 / Menu
+                  대시보드로 / Về Dashboard
                 </Button>
               </div>
             </motion.div>

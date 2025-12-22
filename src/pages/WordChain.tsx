@@ -332,7 +332,7 @@ const WordChain = () => {
                   다시 / Lại
                 </Button>
                 <Button variant="outline" onClick={() => navigate("/dashboard")} className="border-white/20 text-white hover:bg-white/10">
-                  메인 / Menu
+                  대시보드로 / Về Dashboard
                 </Button>
               </div>
             </motion.div>

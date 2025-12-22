@@ -525,7 +525,7 @@ const Chat = () => {
               onClick={confirmExit}
               className="flex-1 bg-red-500 hover:bg-red-600 text-white"
             >
-              나가기 (Thoát)
+              대시보드로 / Về Dashboard
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

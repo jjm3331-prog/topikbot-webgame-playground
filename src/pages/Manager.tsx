@@ -1074,7 +1074,7 @@ function ResultPhase({ stats, onExit }: { stats: GameStats; onExit: () => void }
       </div>
 
       <Button onClick={onExit} className="w-full max-w-sm py-4 bg-pink-500 hover:bg-pink-600">
-        메인으로 / Về trang chính
+        대시보드로 / Về Dashboard
       </Button>
       <p className="text-xs text-zinc-500 mt-4">시즌 2 준비중... / Mùa 2 đang chuẩn bị...</p>
     </motion.div>
