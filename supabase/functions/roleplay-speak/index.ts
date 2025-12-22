@@ -174,14 +174,29 @@ Tạo 3-5 câu hỏi trắc nghiệm. Trả về JSON theo format đã quy đị
     }
 
     const data = await response.json();
-    const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    let aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     console.log("Raw AI response:", aiResponse.substring(0, 300));
 
-    // Extract JSON from response
-    const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      console.error("No JSON found in response");
+    // Clean markdown code blocks if present
+    aiResponse = aiResponse.replace(/```json\s*/gi, "").replace(/```\s*/g, "");
+
+    // Extract JSON from response - find the outermost JSON object
+    let jsonStart = aiResponse.indexOf("{");
+    let jsonEnd = -1;
+    let braceCount = 0;
+    
+    for (let i = jsonStart; i < aiResponse.length; i++) {
+      if (aiResponse[i] === "{") braceCount++;
+      if (aiResponse[i] === "}") braceCount--;
+      if (braceCount === 0) {
+        jsonEnd = i + 1;
+        break;
+      }
+    }
+
+    if (jsonStart === -1 || jsonEnd === -1) {
+      console.error("No valid JSON found in response");
       return new Response(
         JSON.stringify({ 
           error: "Invalid response format",
@@ -191,7 +206,31 @@ Tạo 3-5 câu hỏi trắc nghiệm. Trả về JSON theo format đã quy đị
       );
     }
 
-    const result = JSON.parse(jsonMatch[0]);
+    const jsonString = aiResponse.substring(jsonStart, jsonEnd);
+    
+    let result;
+    try {
+      result = JSON.parse(jsonString);
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError);
+      // Try to fix common JSON issues
+      const fixedJson = jsonString
+        .replace(/,\s*}/g, "}")  // Remove trailing commas
+        .replace(/,\s*]/g, "]")  // Remove trailing commas in arrays
+        .replace(/[\x00-\x1F\x7F]/g, ""); // Remove control characters
+      
+      try {
+        result = JSON.parse(fixedJson);
+      } catch (e) {
+        return new Response(
+          JSON.stringify({ 
+            error: "Failed to parse AI response",
+            raw_response: jsonString.substring(0, 500)
+          }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
 
     console.log(`${action} successful`);
 
