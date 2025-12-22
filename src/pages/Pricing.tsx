@@ -8,16 +8,12 @@ import {
   X, 
   CreditCard, 
   Shield, 
-  ChevronRight,
   Sparkles,
   BookOpen,
   Gamepad2,
   PenTool,
-  Briefcase,
-  TrendingUp,
-  FileX,
   Users,
-  HelpCircle
+  HelpCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,20 +44,6 @@ const comparisonFeatures = [
     description: "Bài học theo cấp độ"
   },
   { 
-    icon: Sparkles, 
-    name: "Xếp hạng & Nhận quà", 
-    free: true, 
-    premium: true,
-    description: "Đổi quà qua Zalo"
-  },
-  { 
-    icon: Briefcase, 
-    name: "Tìm việc tại Hàn Quốc", 
-    free: false, 
-    premium: true,
-    description: "Thông tin việc làm & du học"
-  },
-  { 
     icon: Users, 
     name: "Headhunting 1:1", 
     free: false, 
@@ -76,18 +58,11 @@ const comparisonFeatures = [
     description: "AI chấm bài viết chi tiết"
   },
   { 
-    icon: TrendingUp, 
-    name: "Tiến độ học tập", 
+    icon: Sparkles, 
+    name: "Biến thể đề thi AI", 
     free: false, 
     premium: true,
-    description: "Theo dõi & phân tích"
-  },
-  { 
-    icon: FileX, 
-    name: "Sổ lỗi sai", 
-    free: false, 
-    premium: true,
-    description: "Ghi nhớ & ôn tập lỗi"
+    description: "Tạo đề thi mới từ AI"
   },
 ];
 
@@ -102,7 +77,7 @@ const faqItems = [
   },
   {
     question: "Premium bao gồm những gì?",
-    answer: "Premium bao gồm: Dịch vụ tìm việc tại Hàn Quốc, Headhunting 1:1, AI chấm bài viết TOPIK, theo dõi tiến độ học tập chi tiết, và sổ lỗi sai thông minh."
+    answer: "Premium bao gồm: Dịch vụ Headhunting 1:1, AI chấm bài viết TOPIK, và Biến thể đề thi AI."
   },
   {
     question: "Có được hoàn tiền không?",
@@ -260,9 +235,8 @@ const Pricing = () => {
               <ul className="space-y-3 mb-6">
                 {[
                   "Game học TOPIK (tất cả)",
-                  "Xếp hạng & tích điểm",
-                  "Đổi quà qua Zalo",
                   "TOPIK I & II học tập",
+                  "Roleplay Speaking",
                 ].map((feature) => (
                   <li key={feature} className="flex items-start gap-3 text-sm">
                     <Check className="w-4 h-4 shrink-0 mt-0.5 text-korean-green" />
@@ -315,11 +289,9 @@ const Pricing = () => {
               <ul className="space-y-3 mb-6">
                 {[
                   "✅ Tất cả tính năng Miễn phí",
-                  "🏢 Tìm việc tại Hàn Quốc",
                   "👔 Headhunting 1:1",
                   "✍️ Chấm Writing TOPIK AI",
-                  "📊 Tiến độ học tập chi tiết",
-                  "📝 Sổ lỗi sai thông minh",
+                  "🎯 Biến thể đề thi AI",
                 ].map((feature) => (
                   <li key={feature} className="flex items-start gap-3 text-sm">
                     <Check className="w-4 h-4 shrink-0 mt-0.5 text-korean-green" />
