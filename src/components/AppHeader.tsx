@@ -43,10 +43,10 @@ const AppHeader = ({
   };
 
   const handleBack = () => {
-    if (location.pathname === "/game") {
+    if (location.pathname === "/dashboard") {
       navigate("/");
     } else {
-      navigate("/game");
+      navigate("/dashboard");
     }
   };
 
@@ -67,7 +67,7 @@ const AppHeader = ({
           {/* Logo */}
           <div 
             className="flex items-center gap-1.5 cursor-pointer shrink-0" 
-            onClick={() => navigate(username ? "/game" : "/")}
+            onClick={() => navigate(username ? "/dashboard" : "/")}
           >
             <img 
               src="/favicon.png" 
