@@ -135,14 +135,11 @@ const PWAInstallPrompt = () => {
               {/* Content */}
               <div className="text-center mb-6">
                 <h3 className="text-xl font-bold text-white mb-2">
-                  📱 Game LUKATO 설치하기
+                  📱 Cài đặt Game LUKATO
                 </h3>
-                <p className="text-white/70 text-sm mb-1">
-                  Cài đặt Game LUKATO
-                </p>
-                <p className="text-white/60 text-xs mt-3 leading-relaxed">
-                  홈 화면에 추가하면 더 빠르고 편리하게!<br />
-                  <span className="text-white/50">Thêm vào màn hình chính để truy cập nhanh hơn!</span>
+                <p className="text-white/60 text-sm mt-3 leading-relaxed">
+                  Thêm vào màn hình chính để truy cập nhanh hơn!<br />
+                  Trải nghiệm như ứng dụng thực thụ!
                 </p>
               </div>
 
@@ -150,15 +147,15 @@ const PWAInstallPrompt = () => {
               <div className="grid grid-cols-3 gap-2 mb-6">
                 <div className="bg-white/5 rounded-xl p-3 text-center">
                   <span className="text-2xl">⚡</span>
-                  <p className="text-white/80 text-xs mt-1">빠른 실행 / Nhanh</p>
+                  <p className="text-white/80 text-xs mt-1">Khởi động nhanh</p>
                 </div>
                 <div className="bg-white/5 rounded-xl p-3 text-center">
                   <span className="text-2xl">📴</span>
-                  <p className="text-white/80 text-xs mt-1">오프라인 / Offline</p>
+                  <p className="text-white/80 text-xs mt-1">Dùng offline</p>
                 </div>
                 <div className="bg-white/5 rounded-xl p-3 text-center">
                   <span className="text-2xl">🔔</span>
-                  <p className="text-white/80 text-xs mt-1">알림 / Thông báo</p>
+                  <p className="text-white/80 text-xs mt-1">Nhận thông báo</p>
                 </div>
               </div>
 
@@ -169,14 +166,14 @@ const PWAInstallPrompt = () => {
                   onClick={handleDismiss}
                   className="flex-1 border-white/20 text-white/70 hover:bg-white/10 hover:text-white"
                 >
-                  나중에 / Để sau
+                  Để sau
                 </Button>
                 <Button
                   onClick={handleInstall}
                   className="flex-1 bg-gradient-to-r from-neon-cyan to-neon-pink hover:from-neon-cyan/90 hover:to-neon-pink/90 text-white font-bold"
                 >
                   <Download className="w-4 h-4 mr-2" />
-                  설치 / Cài đặt
+                  Cài đặt ngay
                 </Button>
               </div>
             </div>
