@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Home, 
@@ -100,9 +100,12 @@ const menuSections: MenuSection[] = [
 
 export const MegaMenu = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
+  
+  const currentPath = location.pathname;
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -304,30 +307,37 @@ export const MegaMenu = () => {
                         {section.title}
                       </h3>
                       <ul className="space-y-0.5 sm:space-y-1">
-                        {section.items.map((item) => (
-                          <li key={item.label}>
-                            <button
-                              onClick={() => handleNavigation(item.href, item.isExternal)}
-                              className={`w-full flex items-start gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg text-left transition-all
-                                ${item.href === "/" 
-                                  ? "bg-primary/10 text-primary" 
-                                  : "text-foreground hover:bg-muted"
-                                }
-                              `}
-                            >
-                              <item.icon className="w-4 h-4 shrink-0 mt-0.5" />
-                              <span className="text-xs sm:text-sm font-medium leading-tight break-words">{item.label}</span>
-                              {item.isPremium && (
-                                <span className="shrink-0 ml-auto px-1.5 py-0.5 bg-accent text-accent-foreground text-[10px] font-bold rounded">
-                                  Premium
+                        {section.items.map((item) => {
+                          const isActive = currentPath === item.href || 
+                            (item.href !== "/" && currentPath.startsWith(item.href.split("#")[0]));
+                          
+                          return (
+                            <li key={item.label}>
+                              <button
+                                onClick={() => handleNavigation(item.href, item.isExternal)}
+                                className={`w-full flex items-start gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg text-left transition-all
+                                  ${isActive 
+                                    ? "bg-primary/15 text-primary border-l-2 border-primary" 
+                                    : "text-foreground hover:bg-muted"
+                                  }
+                                `}
+                              >
+                                <item.icon className={`w-4 h-4 shrink-0 mt-0.5 ${isActive ? "text-primary" : ""}`} />
+                                <span className={`text-xs sm:text-sm font-medium leading-tight break-words ${isActive ? "text-primary font-semibold" : ""}`}>
+                                  {item.label}
                                 </span>
-                              )}
-                              {item.isExternal && (
-                                <ExternalLink className="w-3 h-3 ml-auto shrink-0 text-muted-foreground" />
-                              )}
-                            </button>
-                          </li>
-                        ))}
+                                {item.isPremium && (
+                                  <span className="shrink-0 ml-auto px-1.5 py-0.5 bg-accent text-accent-foreground text-[10px] font-bold rounded">
+                                    Premium
+                                  </span>
+                                )}
+                                {item.isExternal && (
+                                  <ExternalLink className="w-3 h-3 ml-auto shrink-0 text-muted-foreground" />
+                                )}
+                              </button>
+                            </li>
+                          );
+                        })}
                       </ul>
                     </div>
                   ))}
