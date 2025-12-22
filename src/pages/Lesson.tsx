@@ -16,9 +16,11 @@ import {
   ChevronRight,
   Clock,
   Target,
-  Loader2
+  Loader2,
+  Headphones
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ListeningExercise from "@/components/learning/ListeningExercise";
 
 interface Question {
   id: number;
@@ -99,6 +101,86 @@ const generateDefaultQuestions = (lessonId: string, category: string): Question[
   };
   
   return categoryQuestions[category] || categoryQuestions.vocabulary;
+};
+
+// Listening exercise questions for TTS-based dictation
+interface ListeningQuestion {
+  id: number;
+  korean: string;
+  english: string;
+  hint?: string;
+}
+
+const listeningExercises: Record<string, ListeningQuestion[]> = {
+  // Level 1 Listening
+  "l1-1": [
+    { id: 1, korean: "안녕하세요.", english: "Hello.", hint: "인사말" },
+    { id: 2, korean: "감사합니다.", english: "Thank you.", hint: "감사 표현" },
+    { id: 3, korean: "네, 알겠습니다.", english: "Yes, I understand.", hint: "긍정 대답" },
+    { id: 4, korean: "만나서 반갑습니다.", english: "Nice to meet you.", hint: "첫 만남 인사" },
+    { id: 5, korean: "안녕히 가세요.", english: "Goodbye. (to person leaving)", hint: "작별 인사" },
+  ],
+  "l1-2": [
+    { id: 1, korean: "하나, 둘, 셋.", english: "One, two, three.", hint: "숫자" },
+    { id: 2, korean: "열 개 주세요.", english: "Please give me ten.", hint: "수량 표현" },
+    { id: 3, korean: "몇 시예요?", english: "What time is it?", hint: "시간 질문" },
+    { id: 4, korean: "세 시 삼십 분이에요.", english: "It's 3:30.", hint: "시간 대답" },
+    { id: 5, korean: "오늘은 월요일이에요.", english: "Today is Monday.", hint: "요일 표현" },
+  ],
+  "l1-3": [
+    { id: 1, korean: "저는 학생이에요.", english: "I am a student.", hint: "자기소개" },
+    { id: 2, korean: "한국어를 공부해요.", english: "I study Korean.", hint: "학습 표현" },
+    { id: 3, korean: "어디에서 왔어요?", english: "Where are you from?", hint: "출신 질문" },
+    { id: 4, korean: "커피 한 잔 주세요.", english: "Please give me a cup of coffee.", hint: "주문 표현" },
+    { id: 5, korean: "지하철역이 어디예요?", english: "Where is the subway station?", hint: "길 묻기" },
+  ],
+  // Level 2 Listening
+  "l2-1": [
+    { id: 1, korean: "똑바로 가세요.", english: "Go straight.", hint: "방향 안내" },
+    { id: 2, korean: "왼쪽으로 도세요.", english: "Turn left.", hint: "방향 안내" },
+    { id: 3, korean: "두 번째 신호등에서 우회전하세요.", english: "Turn right at the second traffic light.", hint: "길 안내" },
+    { id: 4, korean: "여기서 가까워요.", english: "It's close from here.", hint: "거리 표현" },
+    { id: 5, korean: "약 10분 정도 걸려요.", english: "It takes about 10 minutes.", hint: "시간 표현" },
+  ],
+  "l2-2": [
+    { id: 1, korean: "여보세요, 김 선생님 계세요?", english: "Hello, is Mr. Kim there?", hint: "전화 시작" },
+    { id: 2, korean: "죄송한데요, 지금 안 계세요.", english: "Sorry, he's not here right now.", hint: "부재 알림" },
+    { id: 3, korean: "메시지 남겨 드릴까요?", english: "Would you like to leave a message?", hint: "메시지 제안" },
+    { id: 4, korean: "나중에 다시 전화할게요.", english: "I'll call back later.", hint: "재통화 약속" },
+    { id: 5, korean: "전화번호가 어떻게 되세요?", english: "What is your phone number?", hint: "번호 질문" },
+  ],
+  "l2-3": [
+    { id: 1, korean: "다음 역은 서울역입니다.", english: "The next station is Seoul Station.", hint: "지하철 안내" },
+    { id: 2, korean: "내리실 문은 오른쪽입니다.", english: "The doors will open on the right.", hint: "하차 안내" },
+    { id: 3, korean: "이번 버스는 종점행입니다.", english: "This bus goes to the terminal.", hint: "버스 안내" },
+    { id: 4, korean: "정차역은 세 정거장 후입니다.", english: "The stop is in three stations.", hint: "정차 안내" },
+    { id: 5, korean: "환승은 이 역에서 하세요.", english: "Transfer at this station.", hint: "환승 안내" },
+  ],
+  // Level 3-6 Listening
+  "l3-1": [
+    { id: 1, korean: "그 일에 대해 어떻게 생각하세요?", english: "What do you think about that?", hint: "의견 질문" },
+    { id: 2, korean: "저는 조금 다르게 생각해요.", english: "I think a little differently.", hint: "의견 표현" },
+    { id: 3, korean: "그 점에 대해서는 동의합니다.", english: "I agree on that point.", hint: "동의 표현" },
+    { id: 4, korean: "자세히 설명해 주시겠어요?", english: "Could you explain in detail?", hint: "설명 요청" },
+    { id: 5, korean: "다음 질문으로 넘어가겠습니다.", english: "Let's move on to the next question.", hint: "진행 표현" },
+  ],
+  "l3-2": [
+    { id: 1, korean: "오늘 강의 주제는 한국의 역사입니다.", english: "Today's lecture topic is Korean history.", hint: "강의 소개" },
+    { id: 2, korean: "이 부분이 시험에 나올 가능성이 높습니다.", english: "This part is likely to be on the exam.", hint: "시험 안내" },
+    { id: 3, korean: "다음 슬라이드를 보시겠습니다.", english: "Let's look at the next slide.", hint: "발표 진행" },
+    { id: 4, korean: "질문이 있으시면 손을 들어 주세요.", english: "Please raise your hand if you have questions.", hint: "질문 안내" },
+    { id: 5, korean: "오늘 수업은 여기까지입니다.", english: "That's all for today's class.", hint: "수업 종료" },
+  ],
+};
+
+const getListeningQuestions = (lessonId: string): ListeningQuestion[] => {
+  return listeningExercises[lessonId] || [
+    { id: 1, korean: "안녕하세요.", english: "Hello.", hint: "인사말" },
+    { id: 2, korean: "감사합니다.", english: "Thank you.", hint: "감사 표현" },
+    { id: 3, korean: "괜찮아요.", english: "It's okay.", hint: "긍정 표현" },
+    { id: 4, korean: "잠시만요.", english: "Just a moment.", hint: "기다림 표현" },
+    { id: 5, korean: "다시 한번 말씀해 주세요.", english: "Please say that again.", hint: "반복 요청" },
+  ];
 };
 
 const Lesson = () => {
@@ -255,7 +337,73 @@ const Lesson = () => {
   
   const score = Math.round((correctCount / totalQuestions) * 100);
   
-  if (!currentQuestion && !quizComplete) {
+  // For listening category, use ListeningExercise component
+  const isListeningCategory = category === "listening";
+  const listeningQuestions = isListeningCategory ? getListeningQuestions(lessonId || "") : [];
+  
+  const handleListeningComplete = useCallback(async (finalScore: number, correct: number, total: number) => {
+    if (!user || !lessonId || saving) return;
+    
+    setSaving(true);
+    const endTime = new Date();
+    const timeSpentSeconds = startTime ? Math.round((endTime.getTime() - startTime.getTime()) / 1000) : 0;
+    
+    try {
+      const { data: existing } = await supabase
+        .from("learning_progress")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("lesson_id", lessonId)
+        .maybeSingle();
+      
+      if (existing) {
+        await supabase
+          .from("learning_progress")
+          .update({
+            score: Math.max(existing.score || 0, finalScore),
+            correct_count: correct,
+            total_count: total,
+            time_spent_seconds: (existing.time_spent_seconds || 0) + timeSpentSeconds,
+            completed: true,
+            completed_at: new Date().toISOString(),
+          })
+          .eq("id", existing.id);
+      } else {
+        await supabase
+          .from("learning_progress")
+          .insert({
+            user_id: user.id,
+            lesson_id: lessonId,
+            level,
+            category,
+            score: finalScore,
+            correct_count: correct,
+            total_count: total,
+            time_spent_seconds: timeSpentSeconds,
+            completed: true,
+            completed_at: new Date().toISOString(),
+          });
+      }
+      
+      toast({
+        title: "학습 완료!",
+        description: `점수가 저장되었습니다: ${finalScore}점`,
+      });
+      
+      setQuizComplete(true);
+    } catch (error) {
+      console.error("Error saving progress:", error);
+      toast({
+        title: "저장 실패",
+        description: "진도 저장에 실패했습니다.",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  }, [user, lessonId, level, category, startTime, saving, toast]);
+  
+  if (!isListeningCategory && !currentQuestion && !quizComplete) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -285,7 +433,7 @@ const Lesson = () => {
               돌아가기
             </Button>
             
-            {!quizComplete && (
+            {!quizComplete && !isListeningCategory && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">
@@ -299,8 +447,28 @@ const Lesson = () => {
                 <Progress value={progressPercent} className="h-2" />
               </div>
             )}
+            
+            {isListeningCategory && !quizComplete && (
+              <div className="flex items-center gap-2 text-primary">
+                <Headphones className="w-5 h-5" />
+                <span className="font-medium">듣기 연습</span>
+              </div>
+            )}
           </motion.div>
           
+          {/* Listening Exercise */}
+          {isListeningCategory && !quizComplete ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="glass-card p-6"
+            >
+              <ListeningExercise
+                questions={listeningQuestions}
+                onComplete={handleListeningComplete}
+              />
+            </motion.div>
+          ) : (
           <AnimatePresence mode="wait">
             {quizComplete ? (
               /* Results Screen */
@@ -487,6 +655,7 @@ const Lesson = () => {
               </motion.div>
             )}
           </AnimatePresence>
+          )}
         </div>
       </main>
       
