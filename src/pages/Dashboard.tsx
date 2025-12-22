@@ -32,12 +32,13 @@ interface Profile {
   total_missions: number;
   points: number;
   last_daily_bonus: string | null;
+  current_streak: number;
+  longest_streak: number;
 }
 
 const Dashboard = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentStreak, setCurrentStreak] = useState(7);
   const [todayChecked, setTodayChecked] = useState(false);
   const navigate = useNavigate();
 
@@ -85,17 +86,54 @@ const Dashboard = () => {
   const handleDailyCheckIn = async () => {
     if (todayChecked || !profile) return;
     
+    const now = new Date();
+    const lastBonus = profile.last_daily_bonus ? new Date(profile.last_daily_bonus) : null;
+    
+    // Calculate new streak
+    let newStreak = 1;
+    if (lastBonus) {
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      // If last check-in was yesterday, continue streak
+      if (lastBonus.toDateString() === yesterday.toDateString()) {
+        newStreak = (profile.current_streak || 0) + 1;
+      }
+    }
+    
+    // Calculate points: 50 base + 500 bonus for 7-day streak
+    let pointsToAdd = 50;
+    let bonusMessage = "";
+    if (newStreak === 7) {
+      pointsToAdd += 500;
+      bonusMessage = " 🎉 +500 điểm bonus 7 ngày liên tiếp!";
+    }
+    
+    const newLongestStreak = Math.max(profile.longest_streak || 0, newStreak);
+    
     const { error } = await supabase
       .from("profiles")
       .update({ 
-        last_daily_bonus: new Date().toISOString(),
-        points: (profile.points || 0) + 50
+        last_daily_bonus: now.toISOString(),
+        points: (profile.points || 0) + pointsToAdd,
+        current_streak: newStreak,
+        longest_streak: newLongestStreak
       })
       .eq("id", profile.id);
 
     if (!error) {
       setTodayChecked(true);
-      setProfile(prev => prev ? { ...prev, points: (prev.points || 0) + 50 } : null);
+      setProfile(prev => prev ? { 
+        ...prev, 
+        points: (prev.points || 0) + pointsToAdd,
+        current_streak: newStreak,
+        longest_streak: newLongestStreak
+      } : null);
+      
+      toast({
+        title: `+${pointsToAdd} điểm!`,
+        description: `Điểm danh ngày ${newStreak} thành công!${bonusMessage}`,
+      });
     }
   };
 
@@ -169,7 +207,7 @@ const Dashboard = () => {
                   <span className="font-medium text-foreground text-sm">Điểm danh hàng ngày</span>
                 </div>
                 <span className="text-xs px-2 py-0.5 rounded-full bg-korean-green/20 text-korean-green">
-                  🔥 {currentStreak} ngày!
+                  🔥 {profile?.current_streak || 0} ngày!
                 </span>
               </div>
 
@@ -179,7 +217,7 @@ const Dashboard = () => {
                   <div 
                     key={day}
                     className={`flex-1 py-1.5 rounded text-center text-xs font-medium transition-colors ${
-                      idx < currentStreak 
+                      idx < ((profile?.current_streak || 0) % 7 || (todayChecked ? 7 : 0))
                         ? 'bg-korean-green text-white' 
                         : 'bg-muted text-muted-foreground'
                     }`}
@@ -205,9 +243,9 @@ const Dashboard = () => {
                 {todayChecked ? 'Đã điểm danh hôm nay!' : 'Điểm danh hôm nay!'}
               </Button>
 
-              {currentStreak > 0 && (
+              {(profile?.current_streak || 0) > 0 && (
                 <p className="text-center text-xs text-korean-orange mt-2">
-                  🔥 Đang có {currentStreak} ngày liên tiếp!
+                  🔥 Đang có {profile?.current_streak} ngày liên tiếp! (Kỷ lục: {profile?.longest_streak || 0} ngày)
                 </p>
               )}
             </div>

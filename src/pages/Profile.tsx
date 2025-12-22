@@ -206,20 +206,22 @@ const Profile = () => {
     });
   };
 
-  // Calculate level based on points - aligned with pointsPolicy.ts
+  // Calculate level based on TOPIK points - aligned with pointsPolicy.ts
   const getLevel = (points: number) => {
-    if (points >= 10000) return { name: "Đại học Quốc gia", nameKo: "국립대학", color: "text-korean-purple" };
-    if (points >= 5000) return { name: "Đại học Địa phương", nameKo: "지역대학", color: "text-korean-orange" };
-    if (points >= 2000) return { name: "Cao đẳng", nameKo: "고급", color: "text-korean-cyan" };
-    if (points >= 500) return { name: "Trung cấp", nameKo: "중급", color: "text-korean-green" };
-    return { name: "Sơ cấp", nameKo: "초급", color: "text-muted-foreground" };
+    if (points >= 8000) return { name: "TOPIK 6급", level: 6, color: "text-red-500" };
+    if (points >= 5000) return { name: "TOPIK 5급", level: 5, color: "text-orange-500" };
+    if (points >= 3000) return { name: "TOPIK 4급", level: 4, color: "text-purple-500" };
+    if (points >= 1500) return { name: "TOPIK 3급", level: 3, color: "text-blue-500" };
+    if (points >= 500) return { name: "TOPIK 2급", level: 2, color: "text-green-500" };
+    return { name: "TOPIK 1급", level: 1, color: "text-gray-500" };
   };
 
   const getNextLevelPoints = (points: number) => {
-    if (points >= 10000) return 10000;
-    if (points >= 5000) return 10000;
-    if (points >= 2000) return 5000;
-    if (points >= 500) return 2000;
+    if (points >= 8000) return 8000;
+    if (points >= 5000) return 8000;
+    if (points >= 3000) return 5000;
+    if (points >= 1500) return 3000;
+    if (points >= 500) return 1500;
     return 500;
   };
 

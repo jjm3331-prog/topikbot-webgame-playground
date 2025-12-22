@@ -375,9 +375,11 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          current_streak: number
           hp: number
           id: string
           last_daily_bonus: string | null
+          longest_streak: number
           missions_completed: number
           money: number
           points: number
@@ -387,9 +389,11 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          current_streak?: number
           hp?: number
           id: string
           last_daily_bonus?: string | null
+          longest_streak?: number
           missions_completed?: number
           money?: number
           points?: number
@@ -399,9 +403,11 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          current_streak?: number
           hp?: number
           id?: string
           last_daily_bonus?: string | null
+          longest_streak?: number
           missions_completed?: number
           money?: number
           points?: number
