@@ -15,7 +15,7 @@ serve(async (req) => {
   }
 
   try {
-    const { text, voiceId, speed = 1.0 } = await req.json();
+    const { text, voiceId, speed = 0.8 } = await req.json();
     const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
     if (!text) {
