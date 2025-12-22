@@ -157,6 +157,33 @@ const Dashboard = () => {
             </div>
           </motion.div>
 
+          {/* AI Chat Banner */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.17 }}
+            onClick={() => navigate("/ai-chat")}
+            className="relative overflow-hidden rounded-2xl cursor-pointer group"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.15),transparent)]" />
+            <div className="relative z-10 p-5 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                  <MessageCircle className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white font-bold">RAG AI</span>
+                  </div>
+                  <h3 className="font-bold text-white">TOPIKBOT AI Chat - Hỏi đáp thông minh</h3>
+                  <p className="text-white/70 text-sm">Hỏi bất cứ điều gì về TOPIK, AI sẽ trả lời!</p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-white/70 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </motion.div>
+
           {/* Game Section */}
           <motion.div 
             initial={{ opacity: 0, y: 10 }}

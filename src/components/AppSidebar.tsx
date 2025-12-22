@@ -89,8 +89,8 @@ const menuSections: MenuSection[] = [
     title: "CÔNG CỤ AI",
     emoji: "🤖",
     items: [
+      { icon: MessageSquare, label: "AI Chat (Q&A)", href: "/ai-chat", isHighlight: true },
       { icon: PenTool, label: "Chấm bài viết", href: "/writing-correction", isPremium: true },
-      { icon: Languages, label: "Dịch Hàn-Việt", href: "/translate" },
       { icon: Star, label: "Bảng giá", href: "/pricing" },
     ],
     defaultOpen: false
