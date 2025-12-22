@@ -1,8 +1,9 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronLeft, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import MobileMenu from "@/components/MobileMenu";
+import { safeSignOut } from "@/lib/safeSignOut";
+
 
 interface UserStats {
   hp: number;
@@ -34,11 +35,7 @@ const AppHeader = ({
   const location = useLocation();
 
   const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+    await safeSignOut();
     window.location.href = "/";
   };
 

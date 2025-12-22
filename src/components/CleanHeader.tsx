@@ -8,6 +8,8 @@ import { MegaMenuOverlay } from "@/components/MegaMenuOverlay";
 import { NotificationDropdown } from "@/components/NotificationDropdown";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { safeSignOut } from "@/lib/safeSignOut";
+
 
 interface CleanHeaderProps {
   /** Optional override. If omitted, header will auto-detect login state from the current session. */
@@ -78,11 +80,7 @@ export const CleanHeader = ({ isLoggedIn, username }: CleanHeaderProps) => {
   const handleLogout = async () => {
     setIsMenuOpen(false);
 
-    const { error } = await supabase.auth.signOut({ scope: "local" });
-    if (error) {
-      // "Session not found" 같은 케이스에서도 로컬 세션만 확실히 비우고 진행
-      await supabase.auth.signOut({ scope: "local" });
-    }
+    await safeSignOut();
 
     toast({
       title: "Đã đăng xuất",
