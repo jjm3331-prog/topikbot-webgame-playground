@@ -71,13 +71,13 @@ const Auth = () => {
           password,
         });
         if (error) throw error;
-        navigate("/chat");
+        navigate("/dashboard");
       } else {
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/chat`,
+            emailRedirectTo: `${window.location.origin}/dashboard`,
             data: { username },
           },
         });
@@ -86,7 +86,7 @@ const Auth = () => {
           title: "Đăng ký thành công!",
           description: "Chào mừng bạn đến với LUKATO AI",
         });
-        navigate("/chat");
+        navigate("/dashboard");
       }
     } catch (error: any) {
       let message = error.message;
@@ -112,7 +112,7 @@ const Auth = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${productionUrl}/chat`
+          redirectTo: `${productionUrl}/dashboard`
         }
       });
       if (error) throw error;
