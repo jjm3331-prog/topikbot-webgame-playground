@@ -12,7 +12,7 @@ import {
   Trash2, Loader2, ChevronLeft, Search, RefreshCw,
   TrendingUp, BookOpen, Gamepad2, MessageSquare, PenTool, Star,
   Briefcase, Eye, CheckCircle, XCircle, Clock, Download, FileDown,
-  Crown, UserCheck
+  Crown, UserCheck, ChevronRight
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -83,6 +83,8 @@ const Admin = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [userSearch, setUserSearch] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
+  const [userCurrentPage, setUserCurrentPage] = useState(1);
+  const usersPerPage = 20;
   const [updatingSubscription, setUpdatingSubscription] = useState(false);
   
   // Documents
@@ -334,6 +336,18 @@ const Admin = () => {
       u.id.toLowerCase().includes(userSearch.toLowerCase()) ||
       (u.email && u.email.toLowerCase().includes(userSearch.toLowerCase()))
   );
+
+  // Pagination calculations
+  const totalUserPages = Math.ceil(filteredUsers.length / usersPerPage);
+  const paginatedUsers = filteredUsers.slice(
+    (userCurrentPage - 1) * usersPerPage,
+    userCurrentPage * usersPerPage
+  );
+
+  // Reset page when search changes
+  useEffect(() => {
+    setUserCurrentPage(1);
+  }, [userSearch]);
 
   const handleUpdateSubscription = async (userId: string, plan: string) => {
     setUpdatingSubscription(true);
@@ -757,8 +771,8 @@ const Admin = () => {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-2 max-h-[600px] overflow-y-auto">
-                      {filteredUsers.map((user) => (
+                    <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                      {paginatedUsers.map((user) => (
                         <div
                           key={user.id}
                           onClick={() => setSelectedUser(user)}
@@ -793,6 +807,58 @@ const Admin = () => {
                         </p>
                       )}
                     </div>
+                    
+                    {/* Pagination */}
+                    {totalUserPages > 1 && (
+                      <div className="flex items-center justify-between pt-4 border-t mt-4">
+                        <p className="text-sm text-muted-foreground">
+                          {filteredUsers.length}명 중 {(userCurrentPage - 1) * usersPerPage + 1}-{Math.min(userCurrentPage * usersPerPage, filteredUsers.length)}명
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={userCurrentPage === 1}
+                            onClick={() => setUserCurrentPage(p => p - 1)}
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                          </Button>
+                          <div className="flex items-center gap-1">
+                            {Array.from({ length: Math.min(5, totalUserPages) }, (_, i) => {
+                              let pageNum: number;
+                              if (totalUserPages <= 5) {
+                                pageNum = i + 1;
+                              } else if (userCurrentPage <= 3) {
+                                pageNum = i + 1;
+                              } else if (userCurrentPage >= totalUserPages - 2) {
+                                pageNum = totalUserPages - 4 + i;
+                              } else {
+                                pageNum = userCurrentPage - 2 + i;
+                              }
+                              return (
+                                <Button
+                                  key={pageNum}
+                                  variant={userCurrentPage === pageNum ? "default" : "outline"}
+                                  size="sm"
+                                  className="w-8 h-8 p-0"
+                                  onClick={() => setUserCurrentPage(pageNum)}
+                                >
+                                  {pageNum}
+                                </Button>
+                              );
+                            })}
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={userCurrentPage === totalUserPages}
+                            onClick={() => setUserCurrentPage(p => p + 1)}
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </div>
