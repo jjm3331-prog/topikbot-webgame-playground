@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import AppLayout from "@/components/AppLayout";
+import CleanHeader from "@/components/CleanHeader";
 import CommonFooter from "@/components/CommonFooter";
 import confetti from "canvas-confetti";
 
@@ -172,8 +172,10 @@ const Dashboard = () => {
   }
 
   return (
-    <AppLayout>
-      <div className="max-w-4xl mx-auto w-full space-y-6">
+    <div className="min-h-screen bg-background">
+      <CleanHeader isLoggedIn={true} username={profile?.username} />
+      <main className="pt-[76px] pb-8 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto w-full space-y-6">
         {/* Welcome Message */}
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
@@ -525,7 +527,9 @@ const Dashboard = () => {
           AI
         </span>
       </a>
-    </AppLayout>
+      </main>
+      <CommonFooter />
+    </div>
   );
 };
 
