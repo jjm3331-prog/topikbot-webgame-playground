@@ -74,6 +74,120 @@ export type Database = {
         }
         Relationships: []
       }
+      headhunting_applications: {
+        Row: {
+          additional_skills: string | null
+          admin_notes: string | null
+          available_start_date: string | null
+          birth_year: number | null
+          career_goals: string | null
+          cover_letter_url: string | null
+          created_at: string
+          current_company: string | null
+          current_job_title: string | null
+          desired_industry: string | null
+          desired_job_type: string | null
+          desired_location: string | null
+          desired_salary_range: string | null
+          education_level: string | null
+          email: string
+          full_name: string
+          graduation_year: number | null
+          id: string
+          introduction: string | null
+          korean_certificate_other: string | null
+          major: string | null
+          nationality: string | null
+          phone: string | null
+          portfolio_url: string | null
+          resume_url: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          strengths: string | null
+          topik_level: number | null
+          university_name: string | null
+          updated_at: string
+          user_id: string
+          work_experience_details: string | null
+          work_experience_years: number | null
+        }
+        Insert: {
+          additional_skills?: string | null
+          admin_notes?: string | null
+          available_start_date?: string | null
+          birth_year?: number | null
+          career_goals?: string | null
+          cover_letter_url?: string | null
+          created_at?: string
+          current_company?: string | null
+          current_job_title?: string | null
+          desired_industry?: string | null
+          desired_job_type?: string | null
+          desired_location?: string | null
+          desired_salary_range?: string | null
+          education_level?: string | null
+          email: string
+          full_name: string
+          graduation_year?: number | null
+          id?: string
+          introduction?: string | null
+          korean_certificate_other?: string | null
+          major?: string | null
+          nationality?: string | null
+          phone?: string | null
+          portfolio_url?: string | null
+          resume_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          strengths?: string | null
+          topik_level?: number | null
+          university_name?: string | null
+          updated_at?: string
+          user_id: string
+          work_experience_details?: string | null
+          work_experience_years?: number | null
+        }
+        Update: {
+          additional_skills?: string | null
+          admin_notes?: string | null
+          available_start_date?: string | null
+          birth_year?: number | null
+          career_goals?: string | null
+          cover_letter_url?: string | null
+          created_at?: string
+          current_company?: string | null
+          current_job_title?: string | null
+          desired_industry?: string | null
+          desired_job_type?: string | null
+          desired_location?: string | null
+          desired_salary_range?: string | null
+          education_level?: string | null
+          email?: string
+          full_name?: string
+          graduation_year?: number | null
+          id?: string
+          introduction?: string | null
+          korean_certificate_other?: string | null
+          major?: string | null
+          nationality?: string | null
+          phone?: string | null
+          portfolio_url?: string | null
+          resume_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          strengths?: string | null
+          topik_level?: number | null
+          university_name?: string | null
+          updated_at?: string
+          user_id?: string
+          work_experience_details?: string | null
+          work_experience_years?: number | null
+        }
+        Relationships: []
+      }
       knowledge_chunks: {
         Row: {
           chunk_index: number
