@@ -167,11 +167,7 @@ const TopikII = () => {
       return;
     }
     
-    toast({
-      title: `${lesson.titleKo} 학습 시작`,
-      description: "학습 콘텐츠를 준비하고 있습니다...",
-    });
-    // TODO: Navigate to lesson detail page
+    navigate(`/lesson/${lesson.id}?level=${lesson.level}&category=${lesson.category}&topik=2`);
   };
 
   return (

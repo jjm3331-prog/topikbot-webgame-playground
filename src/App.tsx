@@ -25,6 +25,7 @@ import AITutor from "./pages/AITutor";
 import WritingCorrection from "./pages/WritingCorrection";
 import TopikI from "./pages/TopikI";
 import TopikII from "./pages/TopikII";
+import Lesson from "./pages/Lesson";
 import NotFound from "./pages/NotFound";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWAWelcome from "./components/PWAWelcome";
@@ -122,6 +123,7 @@ const App = () => {
               <Route path="/writing-correction" element={<WritingCorrection />} />
               <Route path="/topik-1" element={<TopikI />} />
               <Route path="/topik-2" element={<TopikII />} />
+              <Route path="/lesson/:lessonId" element={<Lesson />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
