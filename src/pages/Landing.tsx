@@ -100,13 +100,13 @@ const gameModes = [
 
 // Comparison with competitors
 const comparisonFeatures = [
-  { feature: "TOPIK 출제위원 검증 커리큘럼", lukato: true, others: false },
-  { feature: "LUKATO RAG AI Tech (독자 AI 기술)", lukato: true, others: false },
-  { feature: "10,000+ TOPIK 기출 & 예상문제", lukato: true, others: false },
-  { feature: "AI 음성인식 & TTS (네이티브 발음)", lukato: true, others: false },
-  { feature: "AI Writing & CV 초정밀 채점", lukato: true, others: false },
-  { feature: "Headhunting & 한국 취업 컨설팅", lukato: true, others: false },
-  { feature: "K-Culture 통합 (K-POP, K-Drama)", lukato: true, others: false },
+  { feature: "Giáo sư ra đề TOPIK chính thức", lukato: true, others: false },
+  { feature: "LUKATO RAG AI Tech (Công nghệ AI độc quyền)", lukato: true, others: false },
+  { feature: "10,000+ đề thi TOPIK & tài liệu", lukato: true, others: false },
+  { feature: "AI STT/TTS phát âm chuẩn bản xứ", lukato: true, others: false },
+  { feature: "AI chấm Writing & CV siêu chính xác", lukato: true, others: false },
+  { feature: "Headhunting & Tư vấn việc làm Hàn Quốc", lukato: true, others: false },
+  { feature: "K-Culture tích hợp (K-POP, K-Drama)", lukato: true, others: false },
 ];
 
 // Counter animation component
@@ -188,7 +188,7 @@ const Landing = () => {
           >
             <div className="badge-premium text-xs sm:text-sm">
               <Crown className="w-3 h-3 sm:w-4 sm:h-4 text-korean-yellow" />
-              <span>Powered by TOPIK 교수진 🇰🇷</span>
+              <span>Powered by TOPIK Professors 🇰🇷</span>
             </div>
           </motion.div>
 
@@ -333,7 +333,7 @@ const Landing = () => {
               <div className="font-black text-lg sm:text-2xl md:text-3xl text-gradient-secondary mb-0.5 sm:mb-1">
                 <AnimatedCounter target={99.7} suffix="%" duration={2} />
               </div>
-              <div className="text-muted-foreground text-[10px] sm:text-xs">AI 정확도</div>
+              <div className="text-muted-foreground text-[10px] sm:text-xs">Độ chính xác AI</div>
             </motion.div>
             
             <motion.div
@@ -911,17 +911,19 @@ const Landing = () => {
             </h2>
           </motion.div>
 
-          <div className="grid grid-cols-3 gap-3 sm:gap-4 max-w-2xl mx-auto">
+          <div className="grid grid-cols-3 gap-3 sm:gap-4 max-w-2xl mx-auto items-stretch">
             {/* Free */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="premium-card p-3 sm:p-5 text-center"
+              className="premium-card p-3 sm:p-5 text-center flex flex-col justify-between min-h-[160px] sm:min-h-[180px]"
             >
-              <h3 className="font-bold text-sm sm:text-base text-foreground">Miễn phí</h3>
-              <div className="text-xl sm:text-2xl font-black text-foreground my-1">0₫</div>
-              <p className="text-muted-foreground text-[10px] sm:text-xs mb-3">Mãi mãi</p>
+              <div>
+                <h3 className="font-bold text-sm sm:text-base text-foreground">Miễn phí</h3>
+                <div className="text-xl sm:text-2xl font-black text-foreground my-1">0₫</div>
+                <p className="text-muted-foreground text-[10px] sm:text-xs mb-3">Mãi mãi</p>
+              </div>
               <Button variant="outline" size="sm" className="w-full text-xs rounded-lg" onClick={() => navigate("/auth")}>
                 Bắt đầu
               </Button>
@@ -933,11 +935,13 @@ const Landing = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="premium-card p-3 sm:p-5 text-center"
+              className="premium-card p-3 sm:p-5 text-center flex flex-col justify-between min-h-[160px] sm:min-h-[180px]"
             >
-              <h3 className="font-bold text-sm sm:text-base text-foreground">Plus</h3>
-              <div className="text-xl sm:text-2xl font-black text-foreground my-1">200K</div>
-              <p className="text-muted-foreground text-[10px] sm:text-xs mb-3">/tháng</p>
+              <div>
+                <h3 className="font-bold text-sm sm:text-base text-foreground">Plus</h3>
+                <div className="text-xl sm:text-2xl font-black text-foreground my-1">200K</div>
+                <p className="text-muted-foreground text-[10px] sm:text-xs mb-3">/tháng</p>
+              </div>
               <Button variant="secondary" size="sm" className="w-full text-xs rounded-lg" onClick={() => navigate("/pricing")}>
                 Chi tiết
               </Button>
@@ -949,14 +953,16 @@ const Landing = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="premium-card p-3 sm:p-5 text-center border-2 border-primary/50 relative overflow-visible mt-3"
+              className="premium-card p-3 sm:p-5 text-center border-2 border-primary/50 relative overflow-visible flex flex-col justify-between min-h-[160px] sm:min-h-[180px]"
             >
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full whitespace-nowrap z-10">
                 HOT
               </div>
-              <h3 className="font-bold text-sm sm:text-base text-foreground mt-1">Premium</h3>
-              <div className="text-xl sm:text-2xl font-black text-foreground my-1">500K</div>
-              <p className="text-muted-foreground text-[10px] sm:text-xs mb-3">/tháng</p>
+              <div className="pt-2">
+                <h3 className="font-bold text-sm sm:text-base text-foreground">Premium</h3>
+                <div className="text-xl sm:text-2xl font-black text-foreground my-1">500K</div>
+                <p className="text-muted-foreground text-[10px] sm:text-xs mb-3">/tháng</p>
+              </div>
               <Button size="sm" className="w-full text-xs rounded-lg btn-primary text-primary-foreground" onClick={() => navigate("/pricing")}>
                 Nâng cấp
               </Button>
