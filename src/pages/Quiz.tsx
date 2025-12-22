@@ -305,7 +305,7 @@ const Quiz = () => {
           <span>연속/LT: {streak}</span>
         </div>
       </div>
-      <AppFooter compact />
+      <AppFooter />
     </div>
   );
 };

@@ -541,7 +541,7 @@ const PartTime = () => {
           )}
         </AnimatePresence>
       </div>
-      <AppFooter compact />
+      <AppFooter />
     </div>
   );
 };

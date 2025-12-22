@@ -410,7 +410,7 @@ const Dating = () => {
         )}
       </AnimatePresence>
       </main>
-      <AppFooter compact />
+      <AppFooter />
     </div>
   );
 };
