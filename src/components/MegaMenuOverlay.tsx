@@ -76,10 +76,10 @@ const baseMenuCategories: MenuCategory[] = [
     title: "AI",
     emoji: "🤖",
     items: [
-      { icon: MessageSquare, label: "Q&A Agent", href: "/ai-chat", isHighlight: true },
+      { icon: MessageSquare, label: "Q&A Agent", href: "/ai-chat", isHighlight: true, isPremium: true },
       { icon: Sparkles, label: "Biến thể đề thi", href: "/question-variant", isPremium: true },
       { icon: PenTool, label: "Chấm bài viết", href: "/writing-correction", isPremium: true },
-      { icon: Languages, label: "Roleplay Speaking", href: "/roleplay-speaking" },
+      { icon: Languages, label: "Roleplay Speaking", href: "/roleplay-speaking", isPremium: true },
       { icon: Star, label: "Bảng giá", href: "/pricing" },
     ]
   },
@@ -227,6 +227,8 @@ export const MegaMenuOverlay = ({
     "/question-variant",
     "/headhunting",
     "/writing-correction",
+    "/ai-chat",
+    "/roleplay-speaking",
   ];
 
   const handleNavigation = (href: string, isPremiumItem?: boolean) => {
