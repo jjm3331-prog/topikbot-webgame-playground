@@ -9,6 +9,8 @@ import {
   Crown, Loader2, Gift, Gamepad2, Star, Camera
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import MegaMenu from "@/components/MegaMenu";
+import AppFooter from "@/components/AppFooter";
 
 // Components
 import EmotionEmoji from "@/components/dating/EmotionEmoji";
@@ -224,7 +226,9 @@ const Dating = () => {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-b from-pink-900 via-purple-900 to-[#0f0f23] max-w-md mx-auto relative overflow-hidden">
+    <div className="min-h-[100dvh] bg-gradient-to-b from-pink-900 via-purple-900 to-[#0f0f23] flex flex-col">
+      <MegaMenu />
+      
       {/* Modals */}
       <AnimatePresence>
         {showSpin && <LuckySpin onReward={handleSpinReward} canSpin={canSpin} onClose={() => setShowSpin(false)} />}
@@ -233,26 +237,7 @@ const Dating = () => {
         {showEnding && currentMatch && <SecretEnding ending={showEnding} npcName={currentMatch.name} npcImage={currentMatch.image} onClose={() => setShowEnding(null)} />}
       </AnimatePresence>
 
-      {/* Header */}
-      <header className="flex items-center justify-between p-4 border-b border-white/10 relative z-10">
-        <div className="flex items-center gap-2">
-          <button onClick={() => phase === 'swipe' ? navigate("/dashboard") : resetAndGoBack()} className="text-white/70 hover:text-white">
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <span className="text-white font-medium">Seoul Love Signal 💕</span>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="ghost" size="sm" onClick={() => setShowSpin(true)} className="text-yellow-300 hover:text-yellow-200">
-            <Gift className="w-5 h-5" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => setPhase('endings')} className="text-purple-300 hover:text-purple-200">
-            <Star className="w-5 h-5" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => setPhase('album')} className="text-pink-300 hover:text-pink-200">
-            <ImageIcon className="w-5 h-5" />
-          </Button>
-        </div>
-      </header>
+      <main className="flex-1 max-w-md mx-auto w-full relative overflow-hidden">
 
       <AnimatePresence mode="wait">
         {/* SWIPE PHASE */}
@@ -424,6 +409,8 @@ const Dating = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      </main>
+      <AppFooter compact />
     </div>
   );
 };

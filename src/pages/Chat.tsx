@@ -15,6 +15,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import MegaMenu from "@/components/MegaMenu";
+import AppFooter from "@/components/AppFooter";
 
 interface Message {
   role: "user" | "assistant";
@@ -309,6 +311,7 @@ const Chat = () => {
 
   return (
     <div className={`min-h-[100dvh] bg-gradient-to-b from-[#1a1a2e] to-[#0f0f23] flex flex-col ${shakeScreen ? "animate-shake" : ""}`}>
+      <MegaMenu />
       {/* Feedback Popup */}
       {feedback.show && (
         <div className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-bounce`}>
@@ -541,6 +544,7 @@ const Chat = () => {
           animation: shake 0.5s ease-in-out;
         }
       `}</style>
+      <AppFooter compact />
     </div>
   );
 };

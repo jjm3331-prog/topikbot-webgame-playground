@@ -13,7 +13,8 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import AppHeader from "@/components/AppHeader";
+import MegaMenu from "@/components/MegaMenu";
+import AppFooter from "@/components/AppFooter";
 
 interface WordEntry {
   word: string;
@@ -217,21 +218,21 @@ const WordChain = () => {
 
   return (
     <div className="min-h-[100dvh] bg-gradient-to-b from-cyan-900 via-blue-900 to-[#0f0f23] flex flex-col overflow-hidden">
-      {/* Custom Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-cyan-900/80 border-b border-white/10 shrink-0">
-        <div className="flex items-center justify-between px-3 py-2">
-          <AppHeader title="끝말잇기" titleVi="Nối từ" showLogout={false} />
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 text-yellow-400">
-              <Sparkles className="w-4 h-4" />
-              <span className="font-bold text-sm">{score}점</span>
-            </div>
-            <Button variant="ghost" size="sm" onClick={resetGame} className="text-white/70 hover:text-white h-8 w-8 p-0">
-              <RotateCcw className="w-4 h-4" />
-            </Button>
+      <MegaMenu />
+      
+      {/* Stats Bar */}
+      <div className="px-3 py-2 flex items-center justify-between border-b border-white/10 shrink-0">
+        <span className="text-white font-medium">끝말잇기 / Nối từ</span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 text-yellow-400">
+            <Sparkles className="w-4 h-4" />
+            <span className="font-bold text-sm">{score}점</span>
           </div>
+          <Button variant="ghost" size="sm" onClick={resetGame} className="text-white/70 hover:text-white h-8 w-8 p-0">
+            <RotateCcw className="w-4 h-4" />
+          </Button>
         </div>
-      </header>
+      </div>
 
       {/* Timer & Next Char */}
       <div className="px-3 py-2 shrink-0">
@@ -357,6 +358,7 @@ const WordChain = () => {
         </form>
         <p className="text-white/40 text-[10px] text-center mt-1.5">한국어 명사만 / Chỉ danh từ tiếng Hàn</p>
       </div>
+      <AppFooter compact />
     </div>
   );
 };

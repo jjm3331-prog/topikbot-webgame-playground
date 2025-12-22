@@ -16,6 +16,8 @@ import {
   Loader2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import MegaMenu from "@/components/MegaMenu";
+import AppFooter from "@/components/AppFooter";
 
 type GameState = 'ready' | 'loading' | 'playing' | 'finished';
 type Difficulty = 'easy' | 'medium' | 'hard';
@@ -216,14 +218,11 @@ const BankruptcyRecovery = () => {
 
   return (
     <div className="min-h-[100dvh] bg-gradient-to-b from-green-900 via-emerald-800 to-[#0f0f23] flex flex-col overflow-hidden">
-      {/* Header */}
-      <header className="flex items-center justify-between p-4 border-b border-white/10">
-        <div className="flex items-center gap-2">
-          <button onClick={() => navigate("/dashboard")} className="text-white/70 hover:text-white">
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <span className="text-white font-medium">파산 복구 / Phục hồi phá sản</span>
-        </div>
+      <MegaMenu />
+      
+      {/* Stats Bar */}
+      <div className="flex items-center justify-between p-4 border-b border-white/10">
+        <span className="text-white font-medium">파산 복구 / Phục hồi phá sản</span>
         {gameState === 'playing' && (
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-yellow-400">
@@ -236,7 +235,7 @@ const BankruptcyRecovery = () => {
             </div>
           </div>
         )}
-      </header>
+      </div>
 
       <div className="p-4 max-w-2xl mx-auto">
         <AnimatePresence mode="wait">
@@ -490,6 +489,7 @@ const BankruptcyRecovery = () => {
           )}
         </AnimatePresence>
       </div>
+      <AppFooter compact />
     </div>
   );
 };
