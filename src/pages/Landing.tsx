@@ -28,7 +28,9 @@ import {
   Rocket,
   Lock,
   Trophy,
-  Cpu
+  Cpu,
+  Flame,
+  Swords
 } from "lucide-react";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 
@@ -450,6 +452,99 @@ const Landing = () => {
             </table>
           </motion.div>
         </div>
+      </section>
+
+      {/* ========== CHALLENGE SECTION - 도발적 자신감 ========== */}
+      <section className="py-12 sm:py-20 px-4 sm:px-6 relative overflow-hidden">
+        {/* Aggressive background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-korean-red/5 via-background to-korean-orange/5" />
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-korean-red via-korean-orange to-korean-yellow" />
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-korean-yellow via-korean-orange to-korean-red" />
+        
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          className="relative z-10 max-w-3xl mx-auto text-center"
+        >
+          {/* Icon */}
+          <motion.div
+            initial={{ rotate: -10, scale: 0 }}
+            whileInView={{ rotate: 0, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ type: "spring", stiffness: 200 }}
+            className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-korean-red to-korean-orange flex items-center justify-center shadow-2xl"
+          >
+            <Flame className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+          </motion.div>
+
+          {/* Main challenge headline */}
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="font-heading font-black text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-foreground mb-4 leading-tight"
+          >
+            따라올 테면
+            <br />
+            <span className="text-gradient-primary">따라와 봐.</span>
+          </motion.h2>
+
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="text-muted-foreground text-sm sm:text-base md:text-lg mb-8 max-w-xl mx-auto leading-relaxed"
+          >
+            베트남의 모든 한국어 앱, 웹사이트, 학원들에게 전합니다.
+            <br className="hidden sm:block" />
+            <span className="text-foreground font-semibold">너희가 하는 건 기본이고,</span>
+            <br className="hidden sm:block" />
+            <span className="text-foreground font-semibold">너희가 상상도 못 한 건 우리가 한다.</span>
+          </motion.p>
+
+          {/* Challenge points */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-8"
+          >
+            <div className="p-4 rounded-xl bg-card/80 border border-korean-red/20 backdrop-blur-sm">
+              <div className="text-2xl mb-2">🎯</div>
+              <p className="text-xs sm:text-sm text-foreground font-medium">TOPIK 문제 출제?</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">우린 출제 교수진이 직접 만든다</p>
+            </div>
+            <div className="p-4 rounded-xl bg-card/80 border border-korean-orange/20 backdrop-blur-sm">
+              <div className="text-2xl mb-2">🤖</div>
+              <p className="text-xs sm:text-sm text-foreground font-medium">AI 챗봇?</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">우린 RAG AI로 99.7% 정확도</p>
+            </div>
+            <div className="p-4 rounded-xl bg-card/80 border border-korean-yellow/20 backdrop-blur-sm">
+              <div className="text-2xl mb-2">🎮</div>
+              <p className="text-xs sm:text-sm text-foreground font-medium">학습 게임?</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">우린 K-Culture 전체를 넣었다</p>
+            </div>
+          </motion.div>
+
+          {/* Final challenge statement */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-korean-red/10 via-korean-orange/10 to-korean-yellow/10 border border-korean-orange/30"
+          >
+            <Swords className="w-4 h-4 sm:w-5 sm:h-5 text-korean-orange" />
+            <span className="text-sm sm:text-base font-bold text-foreground">
+              Copy해도 좋아. 근데 따라올 수 있을까?
+            </span>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* ========== FEATURES - COMPACT ========== */}
