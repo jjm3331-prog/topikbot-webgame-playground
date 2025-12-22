@@ -659,12 +659,12 @@ const Landing = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="premium-card p-6 text-center border-2 border-primary/50 relative"
+              className="premium-card p-6 pt-8 text-center border-2 border-primary/50 relative overflow-visible"
             >
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full whitespace-nowrap z-10">
                 Phổ biến
               </div>
-              <h3 className="font-heading font-bold text-xl text-foreground mb-2 mt-2">Premium</h3>
+              <h3 className="font-heading font-bold text-xl text-foreground mb-2">Premium</h3>
               <div className="text-4xl font-black text-foreground mb-2">500K₫</div>
               <p className="text-muted-foreground text-sm mb-4">/tháng</p>
               <ul className="space-y-2 text-sm text-left mb-6">
