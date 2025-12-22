@@ -29,10 +29,10 @@ import {
 } from "lucide-react";
 
 const benefits = [
-  { icon: Crown, title: "전문 헤드헌팅 팀", desc: "한국 기업 전문 헤드헌터가 직접 매칭" },
-  { icon: Building2, title: "500+ 파트너 기업", desc: "삼성, LG, 현대 등 대기업부터 스타트업까지" },
-  { icon: Globe, title: "한국 취업 지원", desc: "비자, 거주, 생활 정보 종합 컨설팅" },
-  { icon: Shield, title: "100% 무료", desc: "프리미엄 회원 대상 완전 무료 서비스" },
+  { icon: Crown, title: "Đội ngũ Headhunter chuyên nghiệp", desc: "Kết nối trực tiếp với doanh nghiệp Hàn Quốc" },
+  { icon: Building2, title: "500+ công ty đối tác", desc: "Từ Samsung, LG, Hyundai đến các startup" },
+  { icon: Globe, title: "Hỗ trợ làm việc tại Hàn", desc: "Tư vấn visa, chỗ ở, cuộc sống" },
+  { icon: Shield, title: "MIỄN PHÍ 100%", desc: "Hoàn toàn miễn phí cho thành viên Premium" },
 ];
 
 interface FileUploadState {
@@ -88,7 +88,7 @@ const Headhunting = () => {
   const checkUser = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
-      toast.error("로그인이 필요합니다");
+      toast.error("Vui lòng đăng nhập để tiếp tục");
       navigate("/auth");
       return;
     }
@@ -131,12 +131,12 @@ const Headhunting = () => {
         .getPublicUrl(fileName);
       
       setUploadState({ file, uploading: false, url: fileName, error: null });
-      toast.success(`${type === 'resume' ? '이력서' : type === 'cover_letter' ? '자기소개서' : '포트폴리오'} 업로드 완료!`);
+      toast.success(`${type === 'resume' ? 'CV' : type === 'cover_letter' ? 'Thư xin việc' : 'Portfolio'} đã tải lên thành công!`);
       return fileName;
     } catch (error: any) {
       console.error('Upload error:', error);
-      setUploadState(prev => ({ ...prev, uploading: false, error: '업로드 실패' }));
-      toast.error('파일 업로드에 실패했습니다');
+      setUploadState(prev => ({ ...prev, uploading: false, error: 'Tải lên thất bại' }));
+      toast.error('Không thể tải file lên');
       return null;
     }
   };
@@ -151,14 +151,14 @@ const Headhunting = () => {
     
     // Validate file size (10MB max)
     if (file.size > 10 * 1024 * 1024) {
-      toast.error('파일 크기는 10MB 이하여야 합니다');
+      toast.error('Kích thước file tối đa là 10MB');
       return;
     }
     
     // Validate file type
     const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     if (!allowedTypes.includes(file.type)) {
-      toast.error('PDF 또는 Word 파일만 업로드 가능합니다');
+      toast.error('Chỉ chấp nhận file PDF hoặc Word');
       return;
     }
     
@@ -220,10 +220,10 @@ const Headhunting = () => {
       });
 
       setSubmitted(true);
-      toast.success("헤드헌팅 서비스 신청이 완료되었습니다!");
+      toast.success("Đăng ký dịch vụ Headhunting thành công!");
     } catch (error: any) {
       console.error("Submit error:", error);
-      toast.error("신청 중 오류가 발생했습니다");
+      toast.error("Có lỗi xảy ra khi đăng ký");
     } finally {
       setLoading(false);
     }
@@ -248,16 +248,16 @@ const Headhunting = () => {
               <CheckCircle2 className="w-10 h-10 text-white" />
             </motion.div>
             <h1 className="font-heading font-bold text-3xl sm:text-4xl text-foreground mb-4">
-              {existingApplication && !submitted ? "이미 신청하셨습니다" : "신청 완료!"}
+              {existingApplication && !submitted ? "Bạn đã đăng ký rồi" : "Đăng ký thành công!"}
             </h1>
             <p className="text-muted-foreground text-lg mb-8">
               {existingApplication && !submitted 
-                ? `현재 상태: ${existingApplication.status === 'pending' ? '검토 대기중' : existingApplication.status === 'reviewing' ? '검토 중' : existingApplication.status === 'matched' ? '매칭 진행중' : existingApplication.status}`
-                : "헤드헌팅 팀이 곧 연락드리겠습니다. 평균 3-5일 내 피드백을 받으실 수 있습니다."
+                ? `Trạng thái hiện tại: ${existingApplication.status === 'pending' ? 'Đang chờ xét duyệt' : existingApplication.status === 'reviewing' ? 'Đang xem xét' : existingApplication.status === 'matched' ? 'Đang kết nối' : existingApplication.status}`
+                : "Đội ngũ Headhunter sẽ liên hệ với bạn sớm. Bạn sẽ nhận được phản hồi trong 3-5 ngày."
               }
             </p>
             <Button onClick={() => navigate("/dashboard")} className="btn-primary text-primary-foreground">
-              대시보드로 돌아가기
+              Quay về Dashboard
             </Button>
           </div>
         </main>
@@ -282,7 +282,7 @@ const Headhunting = () => {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-6"
           >
             <Crown className="w-4 h-4 text-korean-yellow" />
-            프리미엄 전용 서비스
+            Dịch vụ dành cho Premium
           </motion.div>
           
           <motion.h1
@@ -291,7 +291,7 @@ const Headhunting = () => {
             transition={{ delay: 0.1 }}
             className="font-heading font-black text-3xl sm:text-4xl md:text-5xl text-foreground mb-4"
           >
-            한국 기업 <span className="text-gradient-primary">헤드헌팅</span> 서비스
+            Dịch vụ <span className="text-gradient-primary">Headhunting</span> doanh nghiệp Hàn Quốc
           </motion.h1>
           
           <motion.p
@@ -300,9 +300,9 @@ const Headhunting = () => {
             transition={{ delay: 0.2 }}
             className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto mb-8"
           >
-            LUKATO 전문 헤드헌팅 팀이 한국 기업 취업을 도와드립니다.
+            Đội ngũ Headhunter chuyên nghiệp của LUKATO hỗ trợ bạn xin việc tại doanh nghiệp Hàn Quốc.
             <br />
-            <span className="text-foreground font-semibold">베트남 내 한국 기업부터 한국 현지 취업까지</span>
+            <span className="text-foreground font-semibold">Từ công ty Hàn Quốc tại Việt Nam đến cơ hội làm việc tại Hàn Quốc!</span>
           </motion.p>
 
           {/* Benefits */}
@@ -327,18 +327,18 @@ const Headhunting = () => {
       <section className="py-12 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* 기본 정보 */}
+            {/* Thông tin cơ bản */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users className="w-5 h-5 text-primary" />
-                  기본 정보
+                  Thông tin cơ bản
                 </CardTitle>
-                <CardDescription>정확한 정보를 입력해주세요</CardDescription>
+                <CardDescription>Vui lòng điền thông tin chính xác</CardDescription>
               </CardHeader>
               <CardContent className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="full_name">이름 (Full Name) *</Label>
+                  <Label htmlFor="full_name">Họ và tên *</Label>
                   <Input
                     id="full_name"
                     value={formData.full_name}
@@ -348,7 +348,7 @@ const Headhunting = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">이메일 *</Label>
+                  <Label htmlFor="email">Email *</Label>
                   <Input
                     id="email"
                     type="email"
@@ -358,7 +358,7 @@ const Headhunting = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone">전화번호</Label>
+                  <Label htmlFor="phone">Số điện thoại</Label>
                   <Input
                     id="phone"
                     value={formData.phone}
@@ -367,7 +367,7 @@ const Headhunting = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="birth_year">출생연도</Label>
+                  <Label htmlFor="birth_year">Năm sinh</Label>
                   <Input
                     id="birth_year"
                     type="number"
@@ -381,90 +381,90 @@ const Headhunting = () => {
               </CardContent>
             </Card>
 
-            {/* 학력 */}
+            {/* Học vấn */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Star className="w-5 h-5 text-korean-yellow" />
-                  학력 & 한국어 능력
+                  Học vấn & Trình độ tiếng Hàn
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>최종 학력</Label>
+                  <Label>Trình độ học vấn</Label>
                   <Select value={formData.education_level} onValueChange={(v) => handleChange("education_level", v)}>
-                    <SelectTrigger><SelectValue placeholder="선택하세요" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="Chọn" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="high_school">고등학교 졸업</SelectItem>
-                      <SelectItem value="college">전문대 졸업</SelectItem>
-                      <SelectItem value="bachelor">대학교 졸업</SelectItem>
-                      <SelectItem value="master">석사</SelectItem>
-                      <SelectItem value="phd">박사</SelectItem>
+                      <SelectItem value="high_school">Tốt nghiệp THPT</SelectItem>
+                      <SelectItem value="college">Tốt nghiệp Cao đẳng</SelectItem>
+                      <SelectItem value="bachelor">Tốt nghiệp Đại học</SelectItem>
+                      <SelectItem value="master">Thạc sĩ</SelectItem>
+                      <SelectItem value="phd">Tiến sĩ</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="university_name">학교명</Label>
+                  <Label htmlFor="university_name">Tên trường</Label>
                   <Input
                     id="university_name"
                     value={formData.university_name}
                     onChange={(e) => handleChange("university_name", e.target.value)}
-                    placeholder="University of..."
+                    placeholder="Đại học..."
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="major">전공</Label>
+                  <Label htmlFor="major">Chuyên ngành</Label>
                   <Input
                     id="major"
                     value={formData.major}
                     onChange={(e) => handleChange("major", e.target.value)}
-                    placeholder="Korean Language, IT, Business..."
+                    placeholder="Ngôn ngữ Hàn, CNTT, Kinh doanh..."
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>TOPIK 등급</Label>
+                  <Label>Trình độ TOPIK</Label>
                   <Select value={formData.topik_level} onValueChange={(v) => handleChange("topik_level", v)}>
-                    <SelectTrigger><SelectValue placeholder="선택하세요" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="Chọn" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="0">없음 / 준비중</SelectItem>
-                      <SelectItem value="1">TOPIK 1급</SelectItem>
-                      <SelectItem value="2">TOPIK 2급</SelectItem>
-                      <SelectItem value="3">TOPIK 3급</SelectItem>
-                      <SelectItem value="4">TOPIK 4급</SelectItem>
-                      <SelectItem value="5">TOPIK 5급</SelectItem>
-                      <SelectItem value="6">TOPIK 6급</SelectItem>
+                      <SelectItem value="0">Chưa có / Đang chuẩn bị</SelectItem>
+                      <SelectItem value="1">TOPIK 1</SelectItem>
+                      <SelectItem value="2">TOPIK 2</SelectItem>
+                      <SelectItem value="3">TOPIK 3</SelectItem>
+                      <SelectItem value="4">TOPIK 4</SelectItem>
+                      <SelectItem value="5">TOPIK 5</SelectItem>
+                      <SelectItem value="6">TOPIK 6</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </CardContent>
             </Card>
 
-            {/* 경력 */}
+            {/* Kinh nghiệm làm việc */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Briefcase className="w-5 h-5 text-korean-blue" />
-                  경력 사항
+                  Kinh nghiệm làm việc
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid gap-4">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label>경력 연수</Label>
+                    <Label>Số năm kinh nghiệm</Label>
                     <Select value={formData.work_experience_years} onValueChange={(v) => handleChange("work_experience_years", v)}>
-                      <SelectTrigger><SelectValue placeholder="선택하세요" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder="Chọn" /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="0">신입 (경력 없음)</SelectItem>
-                        <SelectItem value="1">1년 미만</SelectItem>
-                        <SelectItem value="2">1-2년</SelectItem>
-                        <SelectItem value="3">3-5년</SelectItem>
-                        <SelectItem value="5">5-10년</SelectItem>
-                        <SelectItem value="10">10년 이상</SelectItem>
+                        <SelectItem value="0">Sinh viên mới ra trường</SelectItem>
+                        <SelectItem value="1">Dưới 1 năm</SelectItem>
+                        <SelectItem value="2">1-2 năm</SelectItem>
+                        <SelectItem value="3">3-5 năm</SelectItem>
+                        <SelectItem value="5">5-10 năm</SelectItem>
+                        <SelectItem value="10">Trên 10 năm</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="current_company">현재/최근 회사</Label>
+                    <Label htmlFor="current_company">Công ty hiện tại/gần nhất</Label>
                     <Input
                       id="current_company"
                       value={formData.current_company}
@@ -474,95 +474,95 @@ const Headhunting = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="work_experience_details">경력 상세 (선택)</Label>
+                  <Label htmlFor="work_experience_details">Chi tiết kinh nghiệm (tùy chọn)</Label>
                   <Textarea
                     id="work_experience_details"
                     value={formData.work_experience_details}
                     onChange={(e) => handleChange("work_experience_details", e.target.value)}
-                    placeholder="주요 업무, 성과, 프로젝트 경험 등..."
+                    placeholder="Công việc chính, thành tích, dự án đã tham gia..."
                     rows={3}
                   />
                 </div>
               </CardContent>
             </Card>
 
-            {/* 희망 조건 */}
+            {/* Yêu cầu công việc */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Rocket className="w-5 h-5 text-korean-orange" />
-                  희망 조건
+                  Yêu cầu công việc mong muốn
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>희망 고용 형태</Label>
+                  <Label>Hình thức làm việc</Label>
                   <Select value={formData.desired_job_type} onValueChange={(v) => handleChange("desired_job_type", v)}>
-                    <SelectTrigger><SelectValue placeholder="선택하세요" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="Chọn" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="fulltime">정규직</SelectItem>
-                      <SelectItem value="contract">계약직</SelectItem>
-                      <SelectItem value="intern">인턴</SelectItem>
-                      <SelectItem value="any">무관</SelectItem>
+                      <SelectItem value="fulltime">Toàn thời gian</SelectItem>
+                      <SelectItem value="contract">Hợp đồng</SelectItem>
+                      <SelectItem value="intern">Thực tập sinh</SelectItem>
+                      <SelectItem value="any">Không giới hạn</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>희망 산업</Label>
+                  <Label>Ngành nghề mong muốn</Label>
                   <Select value={formData.desired_industry} onValueChange={(v) => handleChange("desired_industry", v)}>
-                    <SelectTrigger><SelectValue placeholder="선택하세요" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="Chọn" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="it">IT / 소프트웨어</SelectItem>
-                      <SelectItem value="manufacturing">제조업</SelectItem>
-                      <SelectItem value="trading">무역 / 수출입</SelectItem>
-                      <SelectItem value="service">서비스업</SelectItem>
-                      <SelectItem value="education">교육</SelectItem>
-                      <SelectItem value="finance">금융</SelectItem>
-                      <SelectItem value="any">무관</SelectItem>
+                      <SelectItem value="it">IT / Phần mềm</SelectItem>
+                      <SelectItem value="manufacturing">Sản xuất</SelectItem>
+                      <SelectItem value="trading">Thương mại / Xuất nhập khẩu</SelectItem>
+                      <SelectItem value="service">Dịch vụ</SelectItem>
+                      <SelectItem value="education">Giáo dục</SelectItem>
+                      <SelectItem value="finance">Tài chính</SelectItem>
+                      <SelectItem value="any">Không giới hạn</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>희망 근무지</Label>
+                  <Label>Địa điểm làm việc</Label>
                   <Select value={formData.desired_location} onValueChange={(v) => handleChange("desired_location", v)}>
-                    <SelectTrigger><SelectValue placeholder="선택하세요" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="Chọn" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="vietnam_korean">베트남 내 한국 기업</SelectItem>
-                      <SelectItem value="korea">한국 현지</SelectItem>
-                      <SelectItem value="both">둘 다 가능</SelectItem>
+                      <SelectItem value="vietnam_korean">Công ty Hàn Quốc tại Việt Nam</SelectItem>
+                      <SelectItem value="korea">Hàn Quốc</SelectItem>
+                      <SelectItem value="both">Cả hai đều được</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>희망 연봉</Label>
+                  <Label>Mức lương mong muốn</Label>
                   <Select value={formData.desired_salary_range} onValueChange={(v) => handleChange("desired_salary_range", v)}>
-                    <SelectTrigger><SelectValue placeholder="선택하세요" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="Chọn" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="negotiable">협의 가능</SelectItem>
-                      <SelectItem value="10-15m">10-15백만 VND</SelectItem>
-                      <SelectItem value="15-25m">15-25백만 VND</SelectItem>
-                      <SelectItem value="25-40m">25-40백만 VND</SelectItem>
-                      <SelectItem value="40m+">40백만 VND 이상</SelectItem>
-                      <SelectItem value="korea_standard">한국 현지 수준</SelectItem>
+                      <SelectItem value="negotiable">Thỏa thuận</SelectItem>
+                      <SelectItem value="10-15m">10-15 triệu VND</SelectItem>
+                      <SelectItem value="15-25m">15-25 triệu VND</SelectItem>
+                      <SelectItem value="25-40m">25-40 triệu VND</SelectItem>
+                      <SelectItem value="40m+">Trên 40 triệu VND</SelectItem>
+                      <SelectItem value="korea_standard">Mức lương tại Hàn Quốc</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </CardContent>
             </Card>
 
-            {/* 파일 업로드 */}
+            {/* Tải file lên */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Upload className="w-5 h-5 text-korean-purple" />
-                  파일 첨부
+                  Tải file đính kèm
                 </CardTitle>
-                <CardDescription>이력서, 자기소개서, 포트폴리오를 PDF 또는 Word 파일로 업로드하세요 (최대 10MB)</CardDescription>
+                <CardDescription>Tải CV, thư xin việc, portfolio dưới dạng PDF hoặc Word (tối đa 10MB)</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Resume Upload */}
                 <div className="space-y-2">
-                  <Label>이력서 (Resume)</Label>
+                  <Label>CV (Resume)</Label>
                   <input
                     ref={resumeInputRef}
                     type="file"
@@ -574,7 +574,7 @@ const Headhunting = () => {
                     <div className="flex items-center justify-between p-3 rounded-lg bg-korean-green/10 border border-korean-green/30">
                       <div className="flex items-center gap-2">
                         <FileText className="w-5 h-5 text-korean-green" />
-                        <span className="text-sm text-foreground">{resumeUpload.file?.name || '이력서 업로드 완료'}</span>
+                        <span className="text-sm text-foreground">{resumeUpload.file?.name || 'CV đã tải lên'}</span>
                       </div>
                       <Button
                         type="button"
@@ -598,14 +598,14 @@ const Headhunting = () => {
                       ) : (
                         <Upload className="w-5 h-5 mr-2" />
                       )}
-                      {resumeUpload.uploading ? '업로드 중...' : '이력서 업로드 (PDF/Word)'}
+                      {resumeUpload.uploading ? 'Đang tải lên...' : 'Tải CV lên (PDF/Word)'}
                     </Button>
                   )}
                 </div>
 
                 {/* Cover Letter Upload */}
                 <div className="space-y-2">
-                  <Label>자기소개서 (Cover Letter)</Label>
+                  <Label>Thư xin việc (Cover Letter)</Label>
                   <input
                     ref={coverLetterInputRef}
                     type="file"
@@ -617,7 +617,7 @@ const Headhunting = () => {
                     <div className="flex items-center justify-between p-3 rounded-lg bg-korean-green/10 border border-korean-green/30">
                       <div className="flex items-center gap-2">
                         <FileText className="w-5 h-5 text-korean-green" />
-                        <span className="text-sm text-foreground">{coverLetterUpload.file?.name || '자기소개서 업로드 완료'}</span>
+                        <span className="text-sm text-foreground">{coverLetterUpload.file?.name || 'Thư xin việc đã tải lên'}</span>
                       </div>
                       <Button
                         type="button"
@@ -641,14 +641,14 @@ const Headhunting = () => {
                       ) : (
                         <Upload className="w-5 h-5 mr-2" />
                       )}
-                      {coverLetterUpload.uploading ? '업로드 중...' : '자기소개서 업로드 (PDF/Word)'}
+                      {coverLetterUpload.uploading ? 'Đang tải lên...' : 'Tải thư xin việc lên (PDF/Word)'}
                     </Button>
                   )}
                 </div>
 
                 {/* Portfolio Upload */}
                 <div className="space-y-2">
-                  <Label>포트폴리오 (선택)</Label>
+                  <Label>Portfolio (tùy chọn)</Label>
                   <input
                     ref={portfolioInputRef}
                     type="file"
@@ -660,7 +660,7 @@ const Headhunting = () => {
                     <div className="flex items-center justify-between p-3 rounded-lg bg-korean-green/10 border border-korean-green/30">
                       <div className="flex items-center gap-2">
                         <FileText className="w-5 h-5 text-korean-green" />
-                        <span className="text-sm text-foreground">{portfolioUpload.file?.name || '포트폴리오 업로드 완료'}</span>
+                        <span className="text-sm text-foreground">{portfolioUpload.file?.name || 'Portfolio đã tải lên'}</span>
                       </div>
                       <Button
                         type="button"
@@ -684,50 +684,50 @@ const Headhunting = () => {
                       ) : (
                         <Upload className="w-5 h-5 mr-2" />
                       )}
-                      {portfolioUpload.uploading ? '업로드 중...' : '포트폴리오 업로드 (PDF/Word)'}
+                      {portfolioUpload.uploading ? 'Đang tải lên...' : 'Tải portfolio lên (PDF/Word)'}
                     </Button>
                   )}
                 </div>
               </CardContent>
             </Card>
 
-            {/* 자기소개 */}
+            {/* Giới thiệu bản thân */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Globe className="w-5 h-5 text-korean-teal" />
-                  자기소개
+                  Giới thiệu bản thân
                 </CardTitle>
-                <CardDescription>헤드헌터가 당신을 더 잘 이해할 수 있도록 작성해주세요</CardDescription>
+                <CardDescription>Hãy viết để headhunter hiểu bạn hơn</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="introduction">자기소개</Label>
+                  <Label htmlFor="introduction">Giới thiệu bản thân</Label>
                   <Textarea
                     id="introduction"
                     value={formData.introduction}
                     onChange={(e) => handleChange("introduction", e.target.value)}
-                    placeholder="간단한 자기소개를 작성해주세요..."
+                    placeholder="Viết vài dòng giới thiệu về bản thân..."
                     rows={3}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="strengths">강점 및 특기</Label>
+                  <Label htmlFor="strengths">Điểm mạnh & Kỹ năng</Label>
                   <Textarea
                     id="strengths"
                     value={formData.strengths}
                     onChange={(e) => handleChange("strengths", e.target.value)}
-                    placeholder="본인의 강점, 특기, 자격증 등..."
+                    placeholder="Điểm mạnh, kỹ năng, chứng chỉ của bạn..."
                     rows={2}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="career_goals">커리어 목표</Label>
+                  <Label htmlFor="career_goals">Mục tiêu nghề nghiệp</Label>
                   <Textarea
                     id="career_goals"
                     value={formData.career_goals}
                     onChange={(e) => handleChange("career_goals", e.target.value)}
-                    placeholder="향후 커리어 목표와 비전..."
+                    placeholder="Mục tiêu và tầm nhìn nghề nghiệp trong tương lai..."
                     rows={2}
                   />
                 </div>
@@ -745,17 +745,17 @@ const Headhunting = () => {
                 {loading ? (
                   <>
                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    신청 중...
+                    Đang gửi...
                   </>
                 ) : (
                   <>
-                    헤드헌팅 서비스 신청하기
+                    Đăng ký dịch vụ Headhunting
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </>
                 )}
               </Button>
               <p className="text-xs text-muted-foreground text-center">
-                제출된 정보는 헤드헌팅 목적으로만 사용되며 안전하게 보호됩니다.
+                Thông tin của bạn chỉ được sử dụng cho mục đích headhunting và được bảo mật an toàn.
               </p>
             </div>
           </form>
