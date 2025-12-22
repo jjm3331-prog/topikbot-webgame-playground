@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { safeSignOut } from "@/lib/safeSignOut";
 import { z } from "zod";
 import { ChevronLeft, Loader2, Shield, Eye, EyeOff, Lock, Settings } from "lucide-react";
 import { motion } from "framer-motion";
@@ -68,7 +69,7 @@ const AdminLogin = () => {
         .single();
 
       if (roleError || !roleData) {
-        await supabase.auth.signOut();
+        await safeSignOut();
         throw new Error("관리자 권한이 없습니다.");
       }
 

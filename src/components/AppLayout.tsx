@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import NotificationBell from "@/components/NotificationBell";
 import AppSidebar from "@/components/AppSidebar";
+import { safeSignOut } from "@/lib/safeSignOut";
+
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -36,16 +38,12 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   }, []);
 
   const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      toast({
-        title: "Đăng xuất thành công",
-        description: "Hẹn gặp lại bạn!",
-      });
-      navigate("/");
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+    await safeSignOut();
+    toast({
+      title: "Đăng xuất thành công",
+      description: "Hẹn gặp lại bạn!",
+    });
+    navigate("/");
   };
 
   return (

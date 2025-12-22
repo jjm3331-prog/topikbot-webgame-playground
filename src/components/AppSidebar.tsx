@@ -34,6 +34,8 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { safeSignOut } from "@/lib/safeSignOut";
+
 
 interface MenuItem {
   icon: React.ElementType;
@@ -135,21 +137,12 @@ export const AppSidebar = ({ username, isOpen, onClose, isCollapsed, onToggleCol
   });
 
   const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      toast({
-        title: "Đăng xuất thành công",
-        description: "Hẹn gặp lại bạn!",
-      });
-      navigate("/");
-    } catch (error) {
-      console.error("Logout error:", error);
-      toast({
-        title: "Lỗi",
-        description: "Không thể đăng xuất. Vui lòng thử lại.",
-        variant: "destructive",
-      });
-    }
+    await safeSignOut();
+    toast({
+      title: "Đăng xuất thành công",
+      description: "Hẹn gặp lại bạn!",
+    });
+    navigate("/");
   };
 
   const handleNavigation = (href: string) => {
