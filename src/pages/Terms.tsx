@@ -1,27 +1,25 @@
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import CommonFooter from "@/components/CommonFooter";
+import MegaMenu from "@/components/MegaMenu";
+import AppFooter from "@/components/AppFooter";
 
 const Terms = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-          <button 
-            onClick={() => navigate(-1)} 
+    <div className="min-h-screen bg-background flex flex-col">
+      <MegaMenu />
+
+      <main className="flex-1 pt-[76px] container mx-auto px-4 py-12 max-w-4xl">
+        <div className="mb-6">
+          <button
+            onClick={() => navigate(-1)}
             className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group"
           >
             <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
             <span className="text-sm font-medium">Back</span>
           </button>
-          <h1 className="font-heading font-bold text-xl">Điều Khoản Sử Dụng</h1>
         </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-12 max-w-4xl">
         <div className="prose prose-lg dark:prose-invert max-w-none">
           <h1 className="font-heading text-4xl font-bold mb-8">Điều Khoản Sử Dụng (Terms of Use)</h1>
           
@@ -234,7 +232,7 @@ const Terms = () => {
         </div>
       </main>
 
-      <CommonFooter />
+      <AppFooter />
     </div>
   );
 };

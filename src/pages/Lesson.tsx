@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import CleanHeader from "@/components/CleanHeader";
-import CommonFooter from "@/components/CommonFooter";
+import MegaMenu from "@/components/MegaMenu";
+import AppFooter from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
@@ -412,10 +412,10 @@ const Lesson = () => {
   }
   
   return (
-    <div className="min-h-screen bg-background">
-      <CleanHeader isLoggedIn={!!user} username={user?.email?.split('@')[0]} />
+    <div className="min-h-screen bg-background flex flex-col">
+      <MegaMenu />
       
-      <main className="pt-[76px] pb-24">
+      <main className="flex-1 pt-[76px] pb-24">
         <div className="container mx-auto px-4 max-w-3xl">
           {/* Header */}
           <motion.div
@@ -659,7 +659,7 @@ const Lesson = () => {
         </div>
       </main>
       
-      <CommonFooter />
+      <AppFooter />
     </div>
   );
 };

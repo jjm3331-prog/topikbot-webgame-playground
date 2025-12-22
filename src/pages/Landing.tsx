@@ -2,8 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import CleanHeader from "@/components/CleanHeader";
-import CommonFooter from "@/components/CommonFooter";
+import MegaMenu from "@/components/MegaMenu";
+import AppFooter from "@/components/AppFooter";
 import StickyCTA from "@/components/StickyCTA";
 import { 
   ArrowRight, 
@@ -165,8 +165,8 @@ const Landing = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-[100dvh] bg-background relative overflow-x-hidden">
-      <CleanHeader />
+    <div className="min-h-[100dvh] bg-background relative overflow-x-hidden flex flex-col">
+      <MegaMenu />
 
       {/* ========== HERO SECTION ========== */}
       <motion.section 
@@ -997,7 +997,7 @@ const Landing = () => {
         </motion.div>
       </section>
 
-      <CommonFooter />
+      <AppFooter />
       
       {/* Sticky CTA for Mobile */}
       <StickyCTA />
