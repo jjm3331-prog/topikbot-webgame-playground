@@ -23,34 +23,26 @@ const PWAGuide = () => {
   const androidSteps = [
     {
       icon: Chrome,
-      titleKo: "Chrome 브라우저 열기",
-      titleVi: "Mở trình duyệt Chrome",
-      descKo: "Chrome 브라우저에서 game.lukato.kr 에 접속하세요.",
-      descVi: "Truy cập game.lukato.kr bằng trình duyệt Chrome.",
+      title: "Mở trình duyệt Chrome",
+      desc: "Truy cập game.lukato.kr bằng trình duyệt Chrome.",
       image: "🌐"
     },
     {
       icon: MoreVertical,
-      titleKo: "메뉴 버튼 클릭",
-      titleVi: "Nhấn nút menu",
-      descKo: "오른쪽 상단의 점 세 개(⋮) 메뉴 버튼을 탭하세요.",
-      descVi: "Nhấn vào nút ba chấm (⋮) ở góc trên bên phải.",
+      title: "Nhấn nút menu",
+      desc: "Nhấn vào nút ba chấm (⋮) ở góc trên bên phải.",
       image: "⋮"
     },
     {
       icon: Download,
-      titleKo: "'앱 설치' 선택",
-      titleVi: "Chọn 'Cài đặt ứng dụng'",
-      descKo: "'앱 설치' 또는 '홈 화면에 추가' 옵션을 선택하세요.",
-      descVi: "Chọn 'Cài đặt ứng dụng' hoặc 'Thêm vào màn hình chính'.",
+      title: "Chọn 'Cài đặt ứng dụng'",
+      desc: "Chọn 'Cài đặt ứng dụng' hoặc 'Thêm vào màn hình chính'.",
       image: "📲"
     },
     {
       icon: Check,
-      titleKo: "설치 확인",
-      titleVi: "Xác nhận cài đặt",
-      descKo: "팝업에서 '설치' 버튼을 탭하면 완료됩니다!",
-      descVi: "Nhấn nút 'Cài đặt' trong popup để hoàn tất!",
+      title: "Xác nhận cài đặt",
+      desc: "Nhấn nút 'Cài đặt' trong popup để hoàn tất!",
       image: "✅"
     }
   ];
@@ -58,34 +50,26 @@ const PWAGuide = () => {
   const iosSteps = [
     {
       icon: Apple,
-      titleKo: "Safari 브라우저 열기",
-      titleVi: "Mở trình duyệt Safari",
-      descKo: "Safari 브라우저에서 game.lukato.kr 에 접속하세요. (Chrome 불가)",
-      descVi: "Truy cập game.lukato.kr bằng Safari. (Chrome không hỗ trợ)",
+      title: "Mở trình duyệt Safari",
+      desc: "Truy cập game.lukato.kr bằng Safari. (Chrome không hỗ trợ)",
       image: "🧭"
     },
     {
       icon: Share,
-      titleKo: "공유 버튼 클릭",
-      titleVi: "Nhấn nút Chia sẻ",
-      descKo: "화면 하단의 공유 버튼 (□↑) 을 탭하세요.",
-      descVi: "Nhấn vào nút chia sẻ (□↑) ở cuối màn hình.",
+      title: "Nhấn nút Chia sẻ",
+      desc: "Nhấn vào nút chia sẻ (□↑) ở cuối màn hình.",
       image: "📤"
     },
     {
       icon: Plus,
-      titleKo: "'홈 화면에 추가' 선택",
-      titleVi: "Chọn 'Thêm vào MH chính'",
-      descKo: "스크롤해서 '홈 화면에 추가' 옵션을 찾아 선택하세요.",
-      descVi: "Cuộn xuống và chọn 'Thêm vào Màn hình chính'.",
+      title: "Chọn 'Thêm vào MH chính'",
+      desc: "Cuộn xuống và chọn 'Thêm vào Màn hình chính'.",
       image: "➕"
     },
     {
       icon: Check,
-      titleKo: "'추가' 버튼 클릭",
-      titleVi: "Nhấn nút 'Thêm'",
-      descKo: "오른쪽 상단의 '추가' 버튼을 탭하면 완료됩니다!",
-      descVi: "Nhấn 'Thêm' ở góc trên bên phải để hoàn tất!",
+      title: "Nhấn nút 'Thêm'",
+      desc: "Nhấn 'Thêm' ở góc trên bên phải để hoàn tất!",
       image: "✅"
     }
   ];
@@ -115,11 +99,9 @@ const PWAGuide = () => {
             }`}>
               {index + 1}
             </span>
-            <h3 className="text-white font-bold text-sm truncate">{step.titleKo}</h3>
+            <h3 className="text-white font-bold text-sm truncate">{step.title}</h3>
           </div>
-          <p className="text-white/60 text-xs mb-1">{step.titleVi}</p>
-          <p className="text-white/80 text-xs leading-relaxed">{step.descKo}</p>
-          <p className="text-purple-300/60 text-[10px] mt-1">{step.descVi}</p>
+          <p className="text-white/80 text-xs leading-relaxed">{step.desc}</p>
         </div>
       </div>
     </motion.div>
@@ -138,7 +120,7 @@ const PWAGuide = () => {
           </button>
           <div className="flex items-center gap-2">
             <Download className="w-5 h-5 text-neon-cyan" />
-            <span className="text-white font-bold">앱 설치 안내</span>
+            <span className="text-white font-bold">Hướng dẫn cài đặt</span>
           </div>
           <div className="w-8" />
         </div>
@@ -156,16 +138,10 @@ const PWAGuide = () => {
             <Smartphone className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-xl font-bold text-white mb-2">
-            Game LUKATO 설치하기
-          </h1>
-          <p className="text-white/60 text-sm">
             Cài đặt Game LUKATO
-          </p>
-          <p className="text-purple-300/80 text-xs mt-2">
-            홈 화면에 추가하면 앱처럼 사용할 수 있어요!
-          </p>
-          <p className="text-purple-300/60 text-[10px]">
-            Thêm vào màn hình chính để sử dụng như ứng dụng!
+          </h1>
+          <p className="text-purple-300/80 text-sm mt-2">
+            Thêm vào màn hình chính để sử dụng như ứng dụng thực thụ!
           </p>
         </motion.div>
 
@@ -173,18 +149,15 @@ const PWAGuide = () => {
         <div className="grid grid-cols-3 gap-2 mb-6">
           <div className="bg-white/5 rounded-xl p-3 text-center border border-white/10">
             <span className="text-2xl">⚡</span>
-            <p className="text-white/80 text-[10px] mt-1">빠른 실행</p>
-            <p className="text-white/40 text-[8px]">Khởi chạy nhanh</p>
+            <p className="text-white/80 text-[10px] mt-1">Khởi động nhanh</p>
           </div>
           <div className="bg-white/5 rounded-xl p-3 text-center border border-white/10">
             <span className="text-2xl">📴</span>
-            <p className="text-white/80 text-[10px] mt-1">오프라인</p>
-            <p className="text-white/40 text-[8px]">Ngoại tuyến</p>
+            <p className="text-white/80 text-[10px] mt-1">Dùng offline</p>
           </div>
           <div className="bg-white/5 rounded-xl p-3 text-center border border-white/10">
             <span className="text-2xl">🔔</span>
-            <p className="text-white/80 text-[10px] mt-1">알림</p>
-            <p className="text-white/40 text-[8px]">Thông báo</p>
+            <p className="text-white/80 text-[10px] mt-1">Nhận thông báo</p>
           </div>
         </div>
 
@@ -209,8 +182,7 @@ const PWAGuide = () => {
 
           <TabsContent value="android" className="space-y-3">
             <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-3 mb-4">
-              <p className="text-green-400 text-xs font-medium">💡 Chrome 브라우저를 사용하세요!</p>
-              <p className="text-green-400/60 text-[10px]">Sử dụng trình duyệt Chrome!</p>
+              <p className="text-green-400 text-xs font-medium">💡 Hãy sử dụng trình duyệt Chrome!</p>
             </div>
             {androidSteps.map((step, index) => (
               <StepCard key={index} step={step} index={index} isActive={currentStep === index} />
@@ -219,8 +191,7 @@ const PWAGuide = () => {
 
           <TabsContent value="ios" className="space-y-3">
             <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-3 mb-4">
-              <p className="text-blue-400 text-xs font-medium">⚠️ Safari 브라우저만 가능합니다!</p>
-              <p className="text-blue-400/60 text-[10px]">Chỉ hoạt động với Safari!</p>
+              <p className="text-blue-400 text-xs font-medium">⚠️ Chỉ hoạt động với trình duyệt Safari!</p>
             </div>
             {iosSteps.map((step, index) => (
               <StepCard key={index} step={step} index={index} isActive={currentStep === index} />
@@ -230,21 +201,19 @@ const PWAGuide = () => {
 
         {/* FAQ */}
         <div className="mt-6 space-y-3">
-          <h3 className="text-white font-bold text-sm">❓ 자주 묻는 질문 / FAQ</h3>
+          <h3 className="text-white font-bold text-sm">❓ Câu hỏi thường gặp</h3>
           
           <div className="bg-white/5 rounded-xl p-3 border border-white/10">
-            <p className="text-white/80 text-xs font-medium mb-1">설치 버튼이 안 보여요</p>
-            <p className="text-white/50 text-[10px]">Không thấy nút cài đặt</p>
+            <p className="text-white/80 text-xs font-medium mb-1">Không thấy nút cài đặt?</p>
             <p className="text-purple-300/60 text-[10px] mt-2">
-              → 이미 설치되었거나, 지원되지 않는 브라우저일 수 있습니다. Chrome(Android) 또는 Safari(iOS)를 사용해주세요.
+              → Có thể ứng dụng đã được cài đặt hoặc trình duyệt không hỗ trợ. Vui lòng sử dụng Chrome (Android) hoặc Safari (iOS).
             </p>
           </div>
 
           <div className="bg-white/5 rounded-xl p-3 border border-white/10">
-            <p className="text-white/80 text-xs font-medium mb-1">삭제하고 싶어요</p>
-            <p className="text-white/50 text-[10px]">Muốn xóa ứng dụng</p>
+            <p className="text-white/80 text-xs font-medium mb-1">Muốn gỡ cài đặt ứng dụng?</p>
             <p className="text-purple-300/60 text-[10px] mt-2">
-              → 일반 앱처럼 홈 화면에서 아이콘을 길게 눌러 삭제할 수 있습니다.
+              → Giống như ứng dụng thông thường, bạn có thể nhấn giữ biểu tượng trên màn hình chính và chọn xóa.
             </p>
           </div>
         </div>
