@@ -711,34 +711,34 @@ const Landing = () => {
                   <br className="hidden sm:block" />
                   Từ công ty Hàn Quốc tại Việt Nam đến cơ hội làm việc tại Seoul!
                 </p>
-                <div className="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-5 text-sm text-white mb-5">
-                  <span className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                    <Check className="w-4 h-4 text-korean-green" /> 
-                    <span className="font-semibold">500+ công ty đối tác</span>
+                <div className="flex flex-wrap justify-center lg:justify-start gap-2 text-xs sm:text-sm text-white mb-5">
+                  <span className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">
+                    <Check className="w-3.5 h-3.5 text-korean-green" /> 
+                    <span className="font-semibold">500+ công ty</span>
                   </span>
-                  <span className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                    <Check className="w-4 h-4 text-korean-green" /> 
-                    <span className="font-semibold">Tư vấn CV chuyên nghiệp</span>
+                  <span className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">
+                    <Check className="w-3.5 h-3.5 text-korean-green" /> 
+                    <span className="font-semibold">Tư vấn CV</span>
                   </span>
-                  <span className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                    <Check className="w-4 h-4 text-korean-green" /> 
-                    <span className="font-semibold">Hỗ trợ Visa làm việc</span>
+                  <span className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">
+                    <Check className="w-3.5 h-3.5 text-korean-green" /> 
+                    <span className="font-semibold">Hỗ trợ Visa</span>
                   </span>
                 </div>
               </div>
               
               {/* Premium CTA */}
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 w-full lg:w-auto">
                 <Button
                   onClick={() => navigate("/headhunting")}
                   size="lg"
-                  className="h-14 sm:h-16 px-8 sm:px-10 bg-white hover:bg-white/95 text-korean-blue font-black text-base sm:text-lg rounded-2xl group shadow-2xl border-2 border-white/50 hover:scale-105 transition-all duration-300"
+                  className="w-full lg:w-auto h-12 sm:h-14 px-6 sm:px-8 bg-white hover:bg-white/95 text-korean-blue font-black text-sm sm:text-base rounded-xl group shadow-2xl border-2 border-white/50 hover:scale-105 transition-all duration-300"
                 >
-                  <Rocket className="w-5 h-5 mr-2" />
+                  <Rocket className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   Đăng ký ngay
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
-                <p className="text-white/80 text-xs text-center mt-2 font-medium">
+                <p className="text-white/80 text-[10px] sm:text-xs text-center mt-1.5 font-medium">
                   Hoàn toàn miễn phí
                 </p>
               </div>
