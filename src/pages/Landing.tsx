@@ -234,11 +234,11 @@ const Landing = () => {
             transition={{ duration: 0.7, delay: 0.4 }}
             className="mb-8"
           >
-            <h1 className="font-heading font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.05] tracking-tight mb-8">
+            <h1 className="font-heading font-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.1] tracking-tight mb-6">
               <span className="text-foreground block">Chinh phục TOPIK</span>
-              <span className="text-gradient-primary block py-2">Chỉ 10 phút mỗi ngày</span>
+              <span className="text-gradient-primary block py-1">Chỉ 10 phút mỗi ngày</span>
             </h1>
-            <p className="text-muted-foreground text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed">
+            <p className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
               Học tiếng Hàn như <span className="text-primary font-semibold">chơi game</span>. 
               Công nghệ AI tiên tiến giúp bạn nói chuẩn, viết đẹp, 
               <br className="hidden md:block" />
@@ -313,9 +313,9 @@ const Landing = () => {
       </motion.section>
 
       {/* ========== STATS SECTION ========== */}
-      <section id="stats" className="py-20 px-6 relative bg-muted/30">
+      <section id="stats" className="py-16 px-6 relative bg-muted/30">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {stats.map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -331,6 +331,40 @@ const Landing = () => {
               </motion.div>
             ))}
           </div>
+
+          {/* Partner Universities - Moved here */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="pt-8 border-t border-border/30"
+          >
+            <p className="text-center text-sm text-muted-foreground mb-6">
+              🤝 Đối tác chính thức với các trường đại học hàng đầu Việt Nam
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8">
+              {partnerUniversities.map((uni) => (
+                <motion.div
+                  key={uni.name}
+                  whileHover={{ scale: 1.05 }}
+                  className="group relative"
+                >
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white rounded-lg p-1.5 shadow-sm hover:shadow-md transition-shadow flex items-center justify-center">
+                    <img 
+                      src={uni.logo} 
+                      alt={uni.name}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                    <span className="text-[10px] text-muted-foreground bg-background/90 px-2 py-0.5 rounded shadow-sm">
+                      {uni.name}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -531,50 +565,6 @@ const Landing = () => {
             ))}
           </div>
 
-          {/* Partner Universities Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mt-16 pt-12 border-t border-border/50"
-          >
-            <div className="text-center mb-8">
-              <h3 className="font-heading font-bold text-2xl sm:text-3xl text-foreground mb-3">
-                Đối tác <span className="text-gradient-secondary">đại học</span>
-              </h3>
-              <p className="text-muted-foreground text-sm">
-                Hợp tác chính thức với các trường đại học hàng đầu Việt Nam
-              </p>
-            </div>
-            
-            {/* University logos */}
-            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
-              {partnerUniversities.map((uni) => (
-                <motion.div
-                  key={uni.name}
-                  whileHover={{ scale: 1.05 }}
-                  className="group relative"
-                >
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-xl p-2 shadow-md hover:shadow-lg transition-shadow flex items-center justify-center">
-                    <img 
-                      src={uni.logo} 
-                      alt={uni.name}
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                  <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                    <span className="text-xs text-muted-foreground bg-background/80 px-2 py-1 rounded">
-                      {uni.name}
-                    </span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-            
-            <p className="text-center text-xs text-muted-foreground mt-10">
-              🤝 MOU chính thức đã ký kết với các trường đại học hàng đầu Việt Nam
-            </p>
-          </motion.div>
         </div>
       </section>
 
