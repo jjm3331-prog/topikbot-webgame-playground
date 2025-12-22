@@ -513,6 +513,43 @@ const Landing = () => {
               </motion.div>
             ))}
           </div>
+
+          {/* Partner Universities Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-16 pt-12 border-t border-border/50"
+          >
+            <div className="text-center mb-8">
+              <h3 className="font-heading font-bold text-2xl sm:text-3xl text-foreground mb-3">
+                Đối tác <span className="text-gradient-secondary">đại học</span>
+              </h3>
+              <p className="text-muted-foreground text-sm">
+                Hợp tác chính thức với các trường đại học hàng đầu Việt Nam
+              </p>
+            </div>
+            
+            {/* University logos placeholder - Will be replaced with actual logos */}
+            <div className="flex flex-wrap items-center justify-center gap-8 opacity-60">
+              <div className="w-24 h-16 bg-muted/50 rounded-lg flex items-center justify-center text-muted-foreground text-xs">
+                Logo 1
+              </div>
+              <div className="w-24 h-16 bg-muted/50 rounded-lg flex items-center justify-center text-muted-foreground text-xs">
+                Logo 2
+              </div>
+              <div className="w-24 h-16 bg-muted/50 rounded-lg flex items-center justify-center text-muted-foreground text-xs">
+                Logo 3
+              </div>
+              <div className="w-24 h-16 bg-muted/50 rounded-lg flex items-center justify-center text-muted-foreground text-xs">
+                Logo 4
+              </div>
+            </div>
+            
+            <p className="text-center text-xs text-muted-foreground mt-6">
+              * MOU chính thức đã ký kết - Logo sẽ được cập nhật
+            </p>
+          </motion.div>
         </div>
       </section>
 

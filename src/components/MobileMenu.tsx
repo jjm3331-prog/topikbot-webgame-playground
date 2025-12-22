@@ -21,7 +21,8 @@ import {
   Smartphone,
   Apple,
   ChevronDown,
-  Sparkles
+  Sparkles,
+  GraduationCap
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -73,6 +74,12 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
     setIsOpen(false);
     navigate(path);
   };
+
+  // Du học & Việc làm section (priority)
+  const careerItems = [
+    { path: "/korea-career", icon: Briefcase, labelKo: "한국 취업", labelVi: "Việc làm Hàn Quốc" },
+    { path: "/korea-career#study", icon: GraduationCap, labelKo: "한국 유학", labelVi: "Du học Hàn Quốc" },
+  ];
 
   const menuItems = [
     { path: "/dashboard", icon: Home, labelKo: "대시보드", labelVi: "Dashboard" },
@@ -203,6 +210,48 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
               padding: '16px 12px',
               backgroundColor: '#0a0a14',
             }}>
+              {/* Du học & Việc làm Section - Priority */}
+              <div style={{ marginBottom: '16px' }}>
+                <div style={{ padding: '0 8px', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#facc15', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    🎓 Du học & Việc làm
+                  </span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  {careerItems.map((item) => {
+                    const isActive = location.pathname === item.path;
+                    const IconComponent = item.icon;
+                    return (
+                      <button
+                        key={item.path}
+                        onClick={() => handleNavigate(item.path)}
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          padding: '12px',
+                          borderRadius: '12px',
+                          border: isActive ? '1px solid rgba(250,204,21,0.3)' : '1px solid rgba(250,204,21,0.15)',
+                          background: isActive ? 'linear-gradient(to right, rgba(250,204,21,0.2), rgba(234,179,8,0.2))' : 'rgba(250,204,21,0.05)',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                        }}
+                      >
+                        <IconComponent style={{ width: '20px', height: '20px', color: '#facc15' }} />
+                        <div>
+                          <div style={{ fontSize: '14px', fontWeight: 500, color: isActive ? 'white' : 'rgba(255,255,255,0.8)' }}>
+                            {item.labelKo}
+                          </div>
+                          <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>{item.labelVi}</div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Regular Menu Items */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 {menuItems.map((item) => {
                   const isActive = location.pathname === item.path;
