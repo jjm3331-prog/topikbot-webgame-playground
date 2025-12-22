@@ -49,13 +49,13 @@ const Auth = () => {
           password,
         });
         if (error) throw error;
-        navigate("/game");
+        navigate("/dashboard");
       } else {
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/game`,
+            emailRedirectTo: `${window.location.origin}/dashboard`,
             data: { username },
           },
         });
@@ -64,7 +64,7 @@ const Auth = () => {
           title: "회원가입 성공! (Đăng ký thành công!)",
           description: "게임을 시작합니다. (Bắt đầu trò chơi.)",
         });
-        navigate("/game");
+        navigate("/dashboard");
       }
     } catch (error: any) {
       let message = error.message;
@@ -91,7 +91,7 @@ const Auth = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${productionUrl}/game`
+          redirectTo: `${productionUrl}/dashboard`
         }
       });
       if (error) throw error;

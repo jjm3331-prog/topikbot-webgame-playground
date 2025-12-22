@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
+import Dashboard from "./pages/Dashboard";
 import Game from "./pages/Game";
 import Chat from "./pages/Chat";
 import Ranking from "./pages/Ranking";
@@ -106,6 +107,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Landing />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/game" element={<Game />} />
               <Route path="/chat" element={<Chat />} />
               <Route path="/ranking" element={<Ranking />} />
