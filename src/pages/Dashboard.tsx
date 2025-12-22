@@ -251,21 +251,21 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
-        {/* Quick Actions - Quiz CTA */}
+        {/* Quick Actions - Korean Learning CTA */}
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          onClick={() => navigate("/quiz")}
+          onClick={() => navigate("/topik-1")}
           className="glass-card p-4 rounded-2xl cursor-pointer hover:border-primary/50 transition-colors flex items-center justify-between group"
         >
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-korean-pink/20 flex items-center justify-center">
-              <MessageCircle className="w-6 h-6 text-korean-pink" />
+              <span className="text-2xl">🇰🇷</span>
             </div>
             <div>
-              <h3 className="font-bold text-foreground">Làm quiz ngay!</h3>
-              <p className="text-sm text-muted-foreground">Toán • Lý • Hóa • Sinh • Anh</p>
+              <h3 className="font-bold text-foreground">Học TOPIK ngay!</h3>
+              <p className="text-sm text-muted-foreground">Ngữ pháp • Từ vựng • Đọc • Nghe • Viết</p>
             </div>
           </div>
           <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -301,16 +301,18 @@ const Dashboard = () => {
           </div>
 
           <div 
+            onClick={() => navigate("/mistakes")}
             className="glass-card p-4 rounded-xl cursor-pointer hover:border-primary/50 transition-colors text-center"
           >
             <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-muted flex items-center justify-center">
               <FileX className="w-5 h-5 text-foreground" />
             </div>
-            <p className="text-sm font-medium text-foreground">Số lỗi sai</p>
+            <p className="text-sm font-medium text-foreground">Sổ lỗi sai</p>
             <p className="text-xs text-muted-foreground">AI phân tích</p>
           </div>
 
           <div 
+            onClick={() => navigate("/profile")}
             className="glass-card p-4 rounded-xl cursor-pointer hover:border-primary/50 transition-colors text-center"
           >
             <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-muted flex items-center justify-center">
@@ -344,26 +346,35 @@ const Dashboard = () => {
           </Button>
         </motion.div>
 
-        {/* Additional Features */}
+        {/* Korean Learning Features */}
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35 }}
           className="space-y-3"
         >
-          <p className="text-sm text-muted-foreground">Thêm tính năng</p>
+          <p className="text-sm text-muted-foreground">Game học tiếng Hàn</p>
           <div className="grid grid-cols-3 gap-3">
-            <div className="glass-card p-4 rounded-xl text-center cursor-pointer hover:border-primary/50 transition-colors">
-              <StickyNote className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-sm text-foreground">Ghi chú</p>
+            <div 
+              onClick={() => navigate("/chat")}
+              className="glass-card p-4 rounded-xl text-center cursor-pointer hover:border-primary/50 transition-colors"
+            >
+              <span className="text-2xl block mb-2">🎮</span>
+              <p className="text-sm text-foreground">AI Sinh tồn</p>
             </div>
-            <div className="glass-card p-4 rounded-xl text-center cursor-pointer hover:border-primary/50 transition-colors">
-              <FileText className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-sm text-foreground">Tài liệu</p>
+            <div 
+              onClick={() => navigate("/dating")}
+              className="glass-card p-4 rounded-xl text-center cursor-pointer hover:border-primary/50 transition-colors"
+            >
+              <span className="text-2xl block mb-2">💕</span>
+              <p className="text-sm text-foreground">Hẹn hò</p>
             </div>
-            <div className="glass-card p-4 rounded-xl text-center cursor-pointer hover:border-primary/50 transition-colors">
-              <Users className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-sm text-foreground">Cộng đồng</p>
+            <div 
+              onClick={() => navigate("/kpop")}
+              className="glass-card p-4 rounded-xl text-center cursor-pointer hover:border-primary/50 transition-colors"
+            >
+              <span className="text-2xl block mb-2">🎵</span>
+              <p className="text-sm text-foreground">K-POP Quiz</p>
             </div>
           </div>
         </motion.div>
@@ -373,6 +384,7 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
+          onClick={() => navigate("/profile#invite")}
           className="glass-card p-4 rounded-2xl flex items-center justify-between cursor-pointer hover:border-primary/50 transition-colors"
         >
           <div className="flex items-center gap-3">
@@ -383,7 +395,7 @@ const Dashboard = () => {
               <p className="font-medium text-foreground flex items-center gap-2">
                 🎉 Mời bạn bè
               </p>
-              <p className="text-xs text-muted-foreground">+500đ cho bạn, +200đ cho bạn bè</p>
+              <p className="text-xs text-muted-foreground">+500 điểm cho bạn, +200 điểm cho bạn bè</p>
             </div>
           </div>
           <ChevronRight className="w-5 h-5 text-muted-foreground" />
@@ -394,7 +406,8 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45 }}
-          className="glass-card p-4 rounded-2xl flex items-center justify-between border-korean-yellow/30"
+          onClick={() => navigate("/pricing")}
+          className="glass-card p-4 rounded-2xl flex items-center justify-between border-korean-yellow/30 cursor-pointer hover:border-korean-yellow/50 transition-colors"
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-korean-yellow/20 flex items-center justify-center">
@@ -402,7 +415,7 @@ const Dashboard = () => {
             </div>
             <div>
               <p className="font-medium text-foreground">Nâng cấp Premium</p>
-              <p className="text-xs text-muted-foreground">AI không giới hạn • HSA/TSA/APT</p>
+              <p className="text-xs text-muted-foreground">AI không giới hạn • Chấm bài viết • Phân tích lỗi sai</p>
             </div>
           </div>
           <Button variant="ghost" size="sm" className="text-muted-foreground">

@@ -206,13 +206,13 @@ const Profile = () => {
     });
   };
 
-  // Calculate level based on points
+  // Calculate level based on points - aligned with pointsPolicy.ts
   const getLevel = (points: number) => {
-    if (points >= 10000) return { name: "Đại học Quốc gia", color: "text-korean-purple" };
-    if (points >= 5000) return { name: "Đại học Địa phương", color: "text-korean-orange" };
-    if (points >= 2000) return { name: "Cao đẳng", color: "text-korean-cyan" };
-    if (points >= 500) return { name: "Trung cấp", color: "text-korean-green" };
-    return { name: "Sơ cấp", color: "text-muted-foreground" };
+    if (points >= 10000) return { name: "Đại học Quốc gia", nameKo: "국립대학", color: "text-korean-purple" };
+    if (points >= 5000) return { name: "Đại học Địa phương", nameKo: "지역대학", color: "text-korean-orange" };
+    if (points >= 2000) return { name: "Cao đẳng", nameKo: "고급", color: "text-korean-cyan" };
+    if (points >= 500) return { name: "Trung cấp", nameKo: "중급", color: "text-korean-green" };
+    return { name: "Sơ cấp", nameKo: "초급", color: "text-muted-foreground" };
   };
 
   const getNextLevelPoints = (points: number) => {
