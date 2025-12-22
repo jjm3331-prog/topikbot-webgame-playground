@@ -48,10 +48,8 @@ const menuSections: MenuSection[] = [
   {
     title: "HỌC TOPIK",
     items: [
-      { icon: BookOpen, label: "TOPIK I (Cấp 1-2)", href: "/topik-1" },
-      { icon: BookOpen, label: "TOPIK II (Cấp 3-4)", href: "/topik-2-basic" },
-      { icon: Crown, label: "TOPIK II (Cấp 5-6)", href: "/topik-2-advanced", isPremium: true },
-      { icon: PenTool, label: "Đề thi thử", href: "/practice-test" },
+      { icon: BookOpen, label: "TOPIK I (1-2급)", href: "/topik-1" },
+      { icon: Crown, label: "TOPIK II (3-6급)", href: "/topik-2" },
     ]
   },
   {
