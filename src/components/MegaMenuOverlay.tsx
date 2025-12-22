@@ -82,7 +82,6 @@ const baseMenuCategories: MenuCategory[] = [
     title: "CÔNG CỤ AI",
     emoji: "🤖",
     items: [
-      { icon: MessageCircle, label: "Hỏi AI (30/ngày)", href: "/ai-tutor", isHighlight: true },
       { icon: PenTool, label: "Chấm bài viết", href: "/writing-correction", isPremium: true },
       { icon: Languages, label: "Dịch Hàn-Việt", href: "/translate" },
       { icon: Star, label: "Bảng giá", href: "/pricing" },
@@ -95,9 +94,9 @@ const myMenuCategory: MenuCategory = {
   title: "CỦA TÔI",
   emoji: "👤",
   items: [
-    { icon: Sparkles, label: "Tiến độ học tập", href: "/dashboard", isPremium: true },
+    { icon: Sparkles, label: "Tiến độ học tập", href: "/dashboard", isHighlight: true },
     { icon: Trophy, label: "Xếp hạng của tôi", href: "/ranking" },
-    { icon: FileX, label: "Sổ lỗi sai", href: "/mistakes", isPremium: true },
+    { icon: FileX, label: "Sổ lỗi sai", href: "/mistakes" },
     { icon: BookMarked, label: "Từ vựng đã lưu", href: "/vocabulary" },
     { icon: User, label: "Hồ sơ của tôi", href: "/profile" },
   ]
