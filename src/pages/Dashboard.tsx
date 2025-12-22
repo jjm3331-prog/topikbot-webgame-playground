@@ -16,9 +16,7 @@ import {
   Sparkles,
   Flame,
   Check,
-  Gift,
-  LogOut,
-  Settings
+  Gift
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
@@ -101,24 +99,6 @@ const Dashboard = () => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      toast({
-        title: "Đăng xuất thành công",
-        description: "Hẹn gặp lại bạn!",
-      });
-      navigate("/");
-    } catch (error) {
-      console.error("Logout error:", error);
-      toast({
-        title: "Lỗi",
-        description: "Không thể đăng xuất. Vui lòng thử lại.",
-        variant: "destructive",
-      });
-    }
-  };
-
   const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 
   if (loading) {
@@ -139,7 +119,7 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <main className="flex-1 px-4 py-6 pt-20 max-w-4xl mx-auto w-full space-y-6 overflow-y-auto">
-        {/* Welcome Message + Logout */}
+        {/* Welcome Message */}
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -153,25 +133,6 @@ const Dashboard = () => {
               </h1>
               <p className="text-muted-foreground text-sm">Hôm nay bạn muốn học gì?</p>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => navigate("/settings")}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <Settings className="w-5 h-5" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={handleLogout}
-              className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-2"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">Đăng xuất</span>
-            </Button>
           </div>
         </motion.div>
 

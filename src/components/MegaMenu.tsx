@@ -34,6 +34,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import NotificationBell from "@/components/NotificationBell";
 
 interface MenuItem {
   icon: React.ElementType;
@@ -203,6 +204,21 @@ export const MegaMenu = () => {
           <div className="flex items-center gap-2 sm:gap-3">
             <ThemeToggle />
             
+            {/* Notification Bell - Only for logged in users */}
+            {isLoggedIn && <NotificationBell />}
+            
+            {/* Profile Button - Only for logged in users */}
+            {isLoggedIn && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate("/profile")}
+                className="hidden sm:flex"
+              >
+                <User className="w-5 h-5" />
+              </Button>
+            )}
+            
             {/* Mobile Menu Toggle */}
             <Button
               variant="ghost"
@@ -217,26 +233,22 @@ export const MegaMenu = () => {
             {isLoggedIn ? (
               <div className="flex items-center gap-2">
                 {username && (
-                  <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted border border-border">
+                  <button
+                    onClick={() => navigate("/profile")}
+                    className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted border border-border hover:bg-muted/80 transition-colors"
+                  >
                     <User className="w-4 h-4 text-primary" />
                     <span className="text-sm font-medium text-foreground max-w-[100px] truncate">
                       {username}
                     </span>
-                  </div>
+                  </button>
                 )}
-                <Button 
-                  variant="ghost"
-                  onClick={() => navigate("/dashboard")}
-                  className="hidden sm:flex rounded-xl font-semibold px-4 text-sm"
-                >
-                  Dashboard
-                </Button>
                 <Button 
                   variant="outline"
                   onClick={handleLogout}
                   className="rounded-xl font-semibold px-4 text-sm text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
                 >
-                  <LogOut className="w-4 h-4 mr-2" />
+                  <LogOut className="w-4 h-4 sm:mr-2" />
                   <span className="hidden sm:inline">Đăng xuất</span>
                 </Button>
               </div>
