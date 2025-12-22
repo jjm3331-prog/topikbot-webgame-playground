@@ -635,6 +635,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_subscriptions: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          started_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          started_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          started_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       writing_corrections: {
         Row: {
           answer_image_url: string | null
@@ -686,6 +716,8 @@ export type Database = {
         Returns: boolean
       }
       increment_cache_hit: { Args: { p_id: string }; Returns: undefined }
+      is_plus_or_premium: { Args: { _user_id: string }; Returns: boolean }
+      is_premium: { Args: { _user_id: string }; Returns: boolean }
       search_knowledge: {
         Args: {
           match_count?: number
@@ -706,6 +738,7 @@ export type Database = {
       app_role: "admin" | "moderator" | "user"
       group_concept: "fresh" | "crush" | "hiphop" | "retro" | "dark" | "band"
       group_gender: "male" | "female" | "mixed"
+      subscription_plan: "free" | "plus" | "premium"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -836,6 +869,7 @@ export const Constants = {
       app_role: ["admin", "moderator", "user"],
       group_concept: ["fresh", "crush", "hiphop", "retro", "dark", "band"],
       group_gender: ["male", "female", "mixed"],
+      subscription_plan: ["free", "plus", "premium"],
     },
   },
 } as const

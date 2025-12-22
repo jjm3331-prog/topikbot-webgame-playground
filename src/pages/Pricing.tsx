@@ -10,12 +10,14 @@ import {
   Shield, 
   ChevronRight,
   Sparkles,
-  MessageCircle,
   BookOpen,
   Gamepad2,
   PenTool,
-  HelpCircle,
-  Lock
+  Briefcase,
+  TrendingUp,
+  FileX,
+  Users,
+  HelpCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -50,88 +52,93 @@ const pricingPlans: PricingPlan[] = [
       "12-months": { price: 0, perMonth: 0 },
     },
     features: [
-      "Game học TOPIK cơ bản",
+      "Game học TOPIK (tất cả)",
       "Xếp hạng & tích điểm",
       "Đổi quà qua Zalo",
-      "Cộng đồng học tập",
+      "TOPIK I & II học tập",
     ],
     isCurrent: true,
     buttonText: "Đăng nhập để bắt đầu",
     buttonVariant: "outline",
   },
   {
-    name: "Plus",
-    icon: Sparkles,
-    prices: {
-      "1-month": { price: 200000, perMonth: 200000 },
-      "6-months": { price: 960000, perMonth: 160000, savings: 240000 },
-      "12-months": { price: 1440000, perMonth: 120000, savings: 960000 },
-    },
-    features: [
-      "Tất cả tính năng Miễn phí",
-      "Truy cập AI Chat (20 lần/ngày)",
-      "Game học nâng cao",
-      "Hỗ trợ ưu tiên",
-    ],
-    buttonText: "Đăng nhập để bắt đầu",
-    buttonVariant: "secondary",
-  },
-  {
     name: "Premium",
     icon: Crown,
     prices: {
-      "1-month": { price: 500000, perMonth: 500000 },
-      "6-months": { price: 2400000, perMonth: 400000, savings: 600000 },
-      "12-months": { price: 3600000, perMonth: 300000, savings: 2400000 },
+      "1-month": { price: 299000, perMonth: 299000 },
+      "6-months": { price: 1494000, perMonth: 249000, savings: 300000 },
+      "12-months": { price: 2388000, perMonth: 199000, savings: 1200000 },
     },
     features: [
-      "Tất cả tính năng Plus",
-      "AI Chat không giới hạn",
-      "Chấm Writing TOPIK AI",
-      "Phân tích câu sai AI",
-      "Báo cáo học tập AI",
+      "Tất cả tính năng Miễn phí",
+      "🏢 Tìm việc tại Hàn Quốc",
+      "👔 Headhunting 1:1",
+      "✍️ Chấm Writing TOPIK AI",
+      "📊 Tiến độ học tập chi tiết",
+      "📝 Sổ lỗi sai thông minh",
     ],
     isPopular: true,
-    buttonText: "Đăng nhập để bắt đầu",
+    buttonText: "Nâng cấp Premium",
     buttonVariant: "default",
   },
 ];
 
 const comparisonFeatures = [
   { 
-    icon: BookOpen, 
-    name: "Game học TOPIK cơ bản", 
-    free: true, 
-    plus: true, 
-    premium: true 
-  },
-  { 
     icon: Gamepad2, 
-    name: "Game học nâng cao", 
-    free: false, 
-    plus: true, 
-    premium: true 
+    name: "Game học TOPIK (tất cả)", 
+    free: true, 
+    premium: true,
+    description: "8 game học tiếng Hàn"
   },
   { 
-    icon: MessageCircle, 
-    name: "AI Chat", 
-    free: false, 
-    plus: true, 
-    premium: true 
-  },
-  { 
-    icon: PenTool, 
-    name: "Chấm Writing TOPIK AI", 
-    free: false, 
-    plus: false, 
-    premium: true 
+    icon: BookOpen, 
+    name: "TOPIK I & II học tập", 
+    free: true, 
+    premium: true,
+    description: "Bài học theo cấp độ"
   },
   { 
     icon: Sparkles, 
     name: "Xếp hạng & Nhận quà", 
     free: true, 
-    plus: true, 
-    premium: true 
+    premium: true,
+    description: "Đổi quà qua Zalo"
+  },
+  { 
+    icon: Briefcase, 
+    name: "Tìm việc tại Hàn Quốc", 
+    free: false, 
+    premium: true,
+    description: "Thông tin việc làm & du học"
+  },
+  { 
+    icon: Users, 
+    name: "Headhunting 1:1", 
+    free: false, 
+    premium: true,
+    description: "Tư vấn việc làm cá nhân"
+  },
+  { 
+    icon: PenTool, 
+    name: "Chấm Writing TOPIK AI", 
+    free: false, 
+    premium: true,
+    description: "AI chấm bài viết chi tiết"
+  },
+  { 
+    icon: TrendingUp, 
+    name: "Tiến độ học tập", 
+    free: false, 
+    premium: true,
+    description: "Theo dõi & phân tích"
+  },
+  { 
+    icon: FileX, 
+    name: "Sổ lỗi sai", 
+    free: false, 
+    premium: true,
+    description: "Ghi nhớ & ôn tập lỗi"
   },
 ];
 
@@ -145,8 +152,8 @@ const faqItems = [
     answer: "Chúng tôi hỗ trợ thanh toán qua ZaloPay, MoMo, VNPay, và chuyển khoản ngân hàng. Tất cả các giao dịch đều được mã hóa SSL an toàn."
   },
   {
-    question: "Gói Premium khác gì với Plus?",
-    answer: "Gói Premium bao gồm tất cả tính năng của Plus, cộng thêm AI Chat không giới hạn, chấm Writing TOPIK bằng AI, phân tích câu sai chi tiết, và báo cáo học tập cá nhân hóa."
+    question: "Premium bao gồm những gì?",
+    answer: "Premium bao gồm: Dịch vụ tìm việc tại Hàn Quốc, Headhunting 1:1, AI chấm bài viết TOPIK, theo dõi tiến độ học tập chi tiết, và sổ lỗi sai thông minh."
   },
   {
     question: "Có được hoàn tiền không?",
@@ -359,7 +366,7 @@ const Pricing = () => {
               So sánh chi tiết
             </h2>
             <div className="overflow-x-auto">
-              <table className="w-full max-w-3xl mx-auto">
+              <table className="w-full max-w-2xl mx-auto">
                 <thead>
                   <tr className="border-b border-border">
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
@@ -367,9 +374,6 @@ const Pricing = () => {
                     </th>
                     <th className="text-center py-4 px-4 text-sm font-medium text-muted-foreground">
                       Miễn phí
-                    </th>
-                    <th className="text-center py-4 px-4 text-sm font-medium text-korean-cyan">
-                      Plus
                     </th>
                     <th className="text-center py-4 px-4 text-sm font-medium text-korean-green">
                       Premium
@@ -382,19 +386,15 @@ const Pricing = () => {
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-3">
                           <feature.icon className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm text-foreground">{feature.name}</span>
+                          <div>
+                            <span className="text-sm text-foreground block">{feature.name}</span>
+                            <span className="text-xs text-muted-foreground">{feature.description}</span>
+                          </div>
                         </div>
                       </td>
                       <td className="text-center py-4 px-4">
                         {feature.free ? (
                           <Check className="w-5 h-5 text-korean-green mx-auto" />
-                        ) : (
-                          <X className="w-5 h-5 text-muted-foreground/50 mx-auto" />
-                        )}
-                      </td>
-                      <td className="text-center py-4 px-4">
-                        {feature.plus ? (
-                          <Check className="w-5 h-5 text-korean-cyan mx-auto" />
                         ) : (
                           <X className="w-5 h-5 text-muted-foreground/50 mx-auto" />
                         )}

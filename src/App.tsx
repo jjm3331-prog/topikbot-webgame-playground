@@ -38,6 +38,7 @@ import Headhunting from "./pages/Headhunting";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWAWelcome from "./components/PWAWelcome";
 import SplashScreen from "./components/SplashScreen";
+import PremiumRoute from "./components/PremiumRoute";
 
 const queryClient = new QueryClient();
 
@@ -114,7 +115,12 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Landing />} />
               <Route path="/auth" element={<Auth />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              {/* Premium Routes */}
+              <Route path="/dashboard" element={<PremiumRoute><Dashboard /></PremiumRoute>} />
+              <Route path="/korea-career" element={<PremiumRoute><KoreaCareer /></PremiumRoute>} />
+              <Route path="/headhunting" element={<PremiumRoute><Headhunting /></PremiumRoute>} />
+              <Route path="/writing-correction" element={<PremiumRoute><WritingCorrection /></PremiumRoute>} />
+              {/* Free Routes */}
               <Route path="/game" element={<Navigate to="/dashboard" replace />} />
               <Route path="/chat" element={<Chat />} />
               <Route path="/wordchain" element={<WordChain />} />
@@ -128,18 +134,16 @@ const App = () => {
               <Route path="/pwa-guide" element={<PWAGuide />} />
               <Route path="/manager" element={<Manager />} />
               <Route path="/ai-tutor" element={<AITutor />} />
-              <Route path="/writing-correction" element={<WritingCorrection />} />
               <Route path="/topik-1" element={<TopikI />} />
               <Route path="/topik-2" element={<TopikII />} />
               <Route path="/lesson/:lessonId" element={<Lesson />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/ranking" element={<Ranking />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
-              <Route path="/korea-career" element={<KoreaCareer />} />
-              <Route path="/headhunting" element={<Headhunting />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
