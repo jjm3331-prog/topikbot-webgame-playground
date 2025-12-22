@@ -25,24 +25,10 @@ const ROLEPLAY_SYSTEM_PROMPT = `Bạn là giáo viên tiếng Hàn chuyên nghi�
 4. Tạo tình huống mới khi cuộc hội thoại kết thúc tự nhiên
 5. Sử dụng emoji phù hợp để tạo không khí vui vẻ
 
-**Định dạng JSON bắt buộc:**
-{
-  "korean_response": "Câu tiếng Hàn của bạn",
-  "vietnamese_meaning": "Nghĩa tiếng Việt",
-  "pronunciation": "Phiên âm tiếng Việt",
-  "feedback": {
-    "is_correct": true/false,
-    "correction": "Câu sửa lỗi nếu có",
-    "explanation": "Giải thích ngắn gọn"
-  },
-  "scenario_context": "Mô tả ngắn tình huống hiện tại",
-  "suggested_responses": ["gợi ý trả lời 1", "gợi ý trả lời 2"],
-  "grammar_highlight": {
-    "pattern": "Cấu trúc ngữ pháp chính",
-    "level": "TOPIK 1/2",
-    "usage": "Cách sử dụng"
-  }
-}`;
+**Định dạng JSON (giữ ngắn gọn):**
+{"korean_response":"Câu Hàn","vietnamese_meaning":"Nghĩa Việt","pronunciation":"Phiên âm","feedback":{"is_correct":true,"correction":"","explanation":""},"scenario_context":"Tình huống","suggested_responses":["gợi ý 1","gợi ý 2"],"grammar_highlight":{"pattern":"Ngữ pháp","level":"TOPIK 1","usage":"Cách dùng"}}
+
+QUAN TRỌNG: Giữ mỗi field NGẮN NHẤT có thể. Không quá 30 ký tự mỗi field.`;
 
 const QUIZ_SYSTEM_PROMPT = `Bạn là chuyên gia ngữ pháp tiếng Hàn TOPIK. Dựa trên nội dung hội thoại đã cho, tạo câu hỏi trắc nghiệm về ngữ pháp.
 
@@ -154,8 +140,8 @@ Tạo 3-5 câu hỏi trắc nghiệm. Trả về JSON theo format đã quy đị
             }
           ],
           generationConfig: {
-            temperature: 0.8,
-            maxOutputTokens: 2048,
+            temperature: 0.7,
+            maxOutputTokens: 4096,
           }
         }),
       }
