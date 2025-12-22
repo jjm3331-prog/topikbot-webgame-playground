@@ -60,8 +60,8 @@ const AIChat = () => {
     },
     {
       icon: Brain,
-      title: "Mô hình AI mới nhất",
-      description: "Tích hợp các engine AI hàng đầu: GPT-4, Gemini Pro, Claude"
+      title: "LUKATO RAG AI",
+      description: "Mô hình AI độc quyền được tối ưu hóa riêng cho việc học TOPIK"
     },
     {
       icon: Zap,
