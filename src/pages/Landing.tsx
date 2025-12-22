@@ -33,6 +33,23 @@ import {
 } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
+// University partner logos
+import hanuLogo from "@/assets/universities/hanu.png";
+import dainamLogo from "@/assets/universities/dainam.png";
+import thanglongLogo from "@/assets/universities/thanglong.png";
+import phenikaaLogo from "@/assets/universities/phenikaa.png";
+import netcLogo from "@/assets/universities/netc.png";
+import ptitLogo from "@/assets/universities/ptit.png";
+
+const partnerUniversities = [
+  { name: "Đại học Hà Nội (HANU)", logo: hanuLogo },
+  { name: "Đại học Đại Nam", logo: dainamLogo },
+  { name: "Đại học Thăng Long", logo: thanglongLogo },
+  { name: "Đại học Phenikaa", logo: phenikaaLogo },
+  { name: "Cao đẳng NETC", logo: netcLogo },
+  { name: "PTIT International", logo: ptitLogo },
+];
+
 // TOPIK Levels for Vietnamese learners
 const topikLevels = [
   { level: "TOPIK I", grades: "Cấp 1-2", desc: "Giao tiếp cơ bản", color: "from-korean-green to-korean-teal" },
@@ -530,24 +547,32 @@ const Landing = () => {
               </p>
             </div>
             
-            {/* University logos placeholder - Will be replaced with actual logos */}
-            <div className="flex flex-wrap items-center justify-center gap-8 opacity-60">
-              <div className="w-24 h-16 bg-muted/50 rounded-lg flex items-center justify-center text-muted-foreground text-xs">
-                Logo 1
-              </div>
-              <div className="w-24 h-16 bg-muted/50 rounded-lg flex items-center justify-center text-muted-foreground text-xs">
-                Logo 2
-              </div>
-              <div className="w-24 h-16 bg-muted/50 rounded-lg flex items-center justify-center text-muted-foreground text-xs">
-                Logo 3
-              </div>
-              <div className="w-24 h-16 bg-muted/50 rounded-lg flex items-center justify-center text-muted-foreground text-xs">
-                Logo 4
-              </div>
+            {/* University logos */}
+            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
+              {partnerUniversities.map((uni) => (
+                <motion.div
+                  key={uni.name}
+                  whileHover={{ scale: 1.05 }}
+                  className="group relative"
+                >
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-xl p-2 shadow-md hover:shadow-lg transition-shadow flex items-center justify-center">
+                    <img 
+                      src={uni.logo} 
+                      alt={uni.name}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    <span className="text-xs text-muted-foreground bg-background/80 px-2 py-1 rounded">
+                      {uni.name}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
             </div>
             
-            <p className="text-center text-xs text-muted-foreground mt-6">
-              * MOU chính thức đã ký kết - Logo sẽ được cập nhật
+            <p className="text-center text-xs text-muted-foreground mt-10">
+              🤝 MOU chính thức đã ký kết với các trường đại học hàng đầu Việt Nam
             </p>
           </motion.div>
         </div>
