@@ -66,7 +66,7 @@ const AIChat = () => {
     {
       icon: Zap,
       title: "Phản hồi thời gian thực",
-      description: "Trả lời nhanh trong vòng 2 giây, duy trì nhịp học tập"
+      description: "Trả lời nhanh trong khoảng 10 giây, duy trì nhịp học tập"
     },
     {
       icon: Clock,
@@ -110,7 +110,6 @@ const AIChat = () => {
 
   const notices = [
     "chat-topikbot.kr là dịch vụ Q&A AI chính thức của LUKATO",
-    "Đăng nhập cùng email để đồng bộ lịch sử học tập",
     "Thành viên miễn phí được hỏi một số lượng câu hỏi nhất định mỗi ngày",
     "Thành viên Premium được hỏi không giới hạn và sử dụng các mô hình AI cao cấp"
   ];
