@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { MegaMenu } from "@/components/MegaMenu";
 import { 
   ArrowRight, 
   Sparkles, 
@@ -172,55 +172,8 @@ const Landing = () => {
 
   return (
     <div className="min-h-[100dvh] bg-background relative overflow-x-hidden">
-      {/* Fixed Header */}
-      <motion.header 
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border/50"
-      >
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          {/* Logo */}
-          <motion.div 
-            whileHover={{ scale: 1.02 }}
-            className="flex items-center gap-3"
-          >
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center shadow-glow-primary">
-              <span className="text-primary-foreground font-heading font-black text-xl">L</span>
-            </div>
-            <div className="hidden sm:block">
-              <span className="font-heading font-bold text-xl text-foreground">LUKATO</span>
-              <span className="block text-xs text-muted-foreground -mt-0.5">Học tiếng Hàn #1 VN</span>
-            </div>
-          </motion.div>
-
-          {/* Nav */}
-          <nav className="hidden lg:flex items-center gap-8">
-            <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors font-medium link-underline">Tính năng</a>
-            <a href="#games" className="text-muted-foreground hover:text-foreground transition-colors font-medium link-underline">Game học</a>
-            <a href="#testimonials" className="text-muted-foreground hover:text-foreground transition-colors font-medium link-underline">Đánh giá</a>
-            <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors font-medium link-underline">Bảng giá</a>
-          </nav>
-
-          {/* Actions */}
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate("/auth")}
-              className="hidden sm:flex font-medium"
-            >
-              Đăng nhập
-            </Button>
-            <Button 
-              onClick={() => navigate("/auth")}
-              className="btn-primary text-primary-foreground rounded-xl font-semibold px-5"
-            >
-              Bắt đầu miễn phí
-            </Button>
-          </div>
-        </div>
-      </motion.header>
+      {/* Mega Menu Header */}
+      <MegaMenu />
 
       {/* ========== HERO SECTION ========== */}
       <motion.section 
