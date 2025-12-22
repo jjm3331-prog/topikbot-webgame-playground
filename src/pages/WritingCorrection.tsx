@@ -219,15 +219,14 @@ const WritingCorrection = () => {
 
     setSaving(true);
     try {
-      const insertData = {
+      const { error } = await supabase.from("writing_corrections").insert([{
         user_id: user.id,
         question_image_url: questionImagePreview,
         answer_image_url: answerImagePreview,
         answer_text: answerText || null,
-        correction_report: result as unknown as Record<string, unknown>,
+        correction_report: JSON.parse(JSON.stringify(result)),
         score: result.overall_score
-      };
-      const { error } = await supabase.from("writing_corrections").insert(insertData);
+      }]);
 
       if (error) throw error;
 
