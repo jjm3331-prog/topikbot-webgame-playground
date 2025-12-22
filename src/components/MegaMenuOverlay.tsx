@@ -260,56 +260,53 @@ export const MegaMenuOverlay = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
           className="fixed inset-0 z-50 bg-background"
         >
-          {/* Mobile: Full Screen Header with X */}
-          {isMobile && (
-            <div className="flex items-center justify-between px-4 h-14 border-b border-border">
-              <span className="font-heading font-bold text-lg text-foreground">Menu</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onClose}
-                className="w-10 h-10 rounded-full"
-              >
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
-          )}
-
-          {/* Desktop: Close Button */}
-          {!isMobile && (
+          {/* Full Screen Header with X - Both Mobile & Desktop */}
+          <div className="flex items-center justify-between px-4 md:px-8 h-14 md:h-16 border-b border-border">
+            <span className="font-heading font-bold text-lg md:text-xl text-foreground">Menu</span>
             <Button
               variant="ghost"
               size="icon"
               onClick={onClose}
-              className="absolute top-4 right-4 md:top-6 md:right-8 w-10 h-10 rounded-full border border-border hover:bg-destructive hover:text-destructive-foreground transition-colors z-10"
+              className="w-10 h-10 rounded-full hover:bg-destructive hover:text-destructive-foreground transition-colors"
             >
               <X className="w-5 h-5" />
             </Button>
-          )}
+          </div>
 
           {/* Menu Content */}
-          <div className={`overflow-y-auto ${isMobile ? "h-[calc(100%-56px)]" : "h-full"} pb-20`}>
+          <div className="overflow-y-auto h-[calc(100%-56px)] md:h-[calc(100%-64px)]">
             {isMobile ? (
-              // Mobile: Accordion Style - Full Screen
+              // Mobile: Accordion Style
               <div className="flex flex-col min-h-full">
                 <div className="flex-1 pt-2">
-                  {menuCategories.map((category) => (
-                    <MobileAccordionCategory
+                  {menuCategories.map((category, idx) => (
+                    <motion.div
                       key={category.title}
-                      category={category}
-                      isActive={isActive}
-                      onNavigate={handleNavigation}
-                    />
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                    >
+                      <MobileAccordionCategory
+                        category={category}
+                        isActive={isActive}
+                        onNavigate={handleNavigation}
+                      />
+                    </motion.div>
                   ))}
 
                   {/* Bottom Menu */}
-                  <div className="mt-4 px-4 pt-4 border-t border-border">
+                  <motion.div 
+                    className="mt-4 px-4 pt-4 border-t border-border"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                  >
                     <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                       KHÁC
                     </h3>
@@ -332,7 +329,7 @@ export const MegaMenuOverlay = ({
                         );
                       })}
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
 
                 {/* Auth Actions - Fixed Bottom */}
@@ -346,13 +343,14 @@ export const MegaMenuOverlay = ({
                 )}
               </div>
             ) : (
-              // Desktop: Grid Style
-              <div className="max-w-7xl mx-auto px-6 py-8 md:py-12" style={{ marginTop: "60px" }}>
-                <div className={`grid gap-8 md:gap-10 ${
-                  isLoggedIn 
-                    ? 'grid-cols-2 md:grid-cols-5' 
-                    : 'grid-cols-2 md:grid-cols-4'
-                }`}>
+              // Desktop: Full Screen Grid Style
+              <div className="flex flex-col min-h-full">
+                <div className="flex-1 max-w-7xl mx-auto px-6 py-8 md:py-12 w-full">
+                  <div className={`grid gap-8 md:gap-10 ${
+                    isLoggedIn 
+                      ? 'grid-cols-2 md:grid-cols-5' 
+                      : 'grid-cols-2 md:grid-cols-4'
+                  }`}>
                   {menuCategories.map((category, categoryIndex) => (
                     <motion.div
                       key={category.title}
@@ -437,40 +435,53 @@ export const MegaMenuOverlay = ({
                       </ul>
                     </motion.div>
                   ))}
+                  </div>
+
+                  {/* Bottom Menu */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="mt-12 pt-6 border-t border-border"
+                  >
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+                      KHÁC
+                    </h3>
+                    <div className="flex flex-wrap gap-4">
+                      {bottomMenuItems.map((item) => {
+                        const active = isActive(item.href);
+                        return (
+                          <motion.button
+                            key={item.label}
+                            onClick={() => handleNavigation(item.href)}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className={`flex items-center gap-2 text-sm transition-all px-3 py-2 rounded-lg ${
+                              active 
+                                ? 'bg-primary text-primary-foreground' 
+                                : 'text-muted-foreground hover:text-primary hover:bg-muted/50'
+                            }`}
+                          >
+                            <item.icon className="w-4 h-4" />
+                            <span>{item.label}</span>
+                          </motion.button>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
                 </div>
 
-                {/* Bottom Menu */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="mt-12 pt-6 border-t border-border"
-                >
-                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-                    KHÁC
-                  </h3>
-                  <div className="flex flex-wrap gap-4">
-                    {bottomMenuItems.map((item) => {
-                      const active = isActive(item.href);
-                      return (
-                        <motion.button
-                          key={item.label}
-                          onClick={() => handleNavigation(item.href)}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className={`flex items-center gap-2 text-sm transition-all px-3 py-2 rounded-lg ${
-                            active 
-                              ? 'bg-primary text-primary-foreground' 
-                              : 'text-muted-foreground hover:text-primary hover:bg-muted/50'
-                          }`}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          <span>{item.label}</span>
-                        </motion.button>
-                      );
-                    })}
+                {/* Desktop: Auth Actions - Fixed Bottom */}
+                {isLoggedIn && (
+                  <div className="sticky bottom-0 px-6 py-4 border-t border-border bg-background mt-auto">
+                    <div className="max-w-7xl mx-auto">
+                      <Button variant="destructive" onClick={handleLogoutClick} className="w-auto">
+                        <LogOut className="w-4 h-4 mr-2" />
+                        Logout
+                      </Button>
+                    </div>
                   </div>
-                </motion.div>
+                )}
               </div>
             )}
           </div>
