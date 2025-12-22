@@ -26,7 +26,8 @@ import {
   Smartphone,
   ArrowRight,
   Star,
-  Sparkles
+  Sparkles,
+  Camera
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -74,6 +75,10 @@ const Profile = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
+  
+  // Avatar states
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -180,6 +185,53 @@ const Profile = () => {
       setShowPasswordSection(false);
     }
     setChangingPassword(false);
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Lỗi",
+        description: "Vui lòng chọn file hình ảnh.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Lỗi",
+        description: "File quá lớn. Vui lòng chọn file dưới 5MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setUploadingAvatar(true);
+    
+    try {
+      // Create a local URL for the image
+      const imageUrl = URL.createObjectURL(file);
+      setAvatarUrl(imageUrl);
+      
+      toast({
+        title: "Thành công",
+        description: "Đã cập nhật ảnh đại diện!",
+      });
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      toast({
+        title: "Lỗi",
+        description: "Không thể tải ảnh lên. Vui lòng thử lại.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingAvatar(false);
+    }
   };
 
   const handleCopyReferralCode = () => {
@@ -400,10 +452,39 @@ const Profile = () => {
             transition={{ delay: 0.1 }}
             className="glass-card rounded-2xl p-6 mb-6"
           >
-            {/* User Info */}
+            {/* User Info with Avatar Upload */}
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center text-primary-foreground font-bold text-xl">
-                {profile?.username?.charAt(0).toUpperCase() || "U"}
+              <div className="relative group">
+                {avatarUrl ? (
+                  <img 
+                    src={avatarUrl} 
+                    alt="Profile" 
+                    className="w-16 h-16 rounded-full object-cover border-2 border-primary/20"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center text-primary-foreground font-bold text-xl">
+                    {profile?.username?.charAt(0).toUpperCase() || "U"}
+                  </div>
+                )}
+                <label 
+                  htmlFor="avatar-upload"
+                  className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                >
+                  <Camera className="w-5 h-5 text-white" />
+                </label>
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                  disabled={uploadingAvatar}
+                />
+                {uploadingAvatar && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
               </div>
               <div>
                 <h2 className="text-xl font-bold text-foreground">{profile?.username}</h2>
@@ -654,42 +735,6 @@ const Profile = () => {
             </div>
           </motion.div>
 
-          {/* Weekly Goals Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="glass-card rounded-2xl p-6 mb-6"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Target className="w-5 h-5 text-korean-orange" />
-                <div>
-                  <h3 className="font-semibold text-foreground">Mục tiêu tuần này</h3>
-                  <p className="text-xs text-muted-foreground">21/12 - 27/12 • 7 ngày còn lại</p>
-                </div>
-              </div>
-              <Button variant="outline" size="sm">
-                <Edit3 className="w-3 h-3 mr-1" />
-                Đặt mục tiêu
-              </Button>
-            </div>
-
-            <div className="text-center py-8">
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-                <Target className="w-8 h-8 text-muted-foreground" />
-              </div>
-              <h4 className="font-medium text-foreground mb-2">Chưa có mục tiêu tuần này</h4>
-              <p className="text-sm text-muted-foreground mb-4">
-                Đặt mục tiêu học tập để theo dõi tiến độ và nhận{" "}
-                <span className="text-korean-green font-bold">+500 điểm</span> khi hoàn thành!
-              </p>
-              <Button className="bg-korean-orange hover:bg-korean-orange/90 text-white">
-                <Target className="w-4 h-4 mr-2" />
-                Đặt mục tiêu ngay
-              </Button>
-            </div>
-          </motion.div>
         </div>
       </main>
 
