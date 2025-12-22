@@ -536,81 +536,109 @@ const Landing = () => {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-10">
             {/* Free Plan */}
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="premium-card p-8"
+              className="premium-card p-6 text-center"
             >
-              <div className="text-center mb-8">
-                <h3 className="font-heading font-bold text-2xl text-foreground mb-2">Miễn phí</h3>
-                <div className="text-5xl font-black text-foreground mb-2">0₫</div>
-                <p className="text-muted-foreground">Miễn phí mãi mãi</p>
-              </div>
-              <ul className="space-y-4 mb-8">
-                {[
-                  "5 bài học AI mỗi ngày",
-                  "Tất cả 6 chế độ game",
-                  "Bảng xếp hạng toàn quốc",
-                  "Điểm danh nhận thưởng",
-                  "Hỗ trợ cộng đồng"
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-foreground">
-                    <Check className="w-5 h-5 text-korean-green shrink-0" />
+              <h3 className="font-heading font-bold text-xl text-foreground mb-2">Miễn phí</h3>
+              <div className="text-4xl font-black text-foreground mb-2">0₫</div>
+              <p className="text-muted-foreground text-sm mb-4">Miễn phí mãi mãi</p>
+              <ul className="space-y-2 text-sm text-left mb-6">
+                {["5 bài học AI/ngày", "Tất cả game học", "Bảng xếp hạng"].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-muted-foreground">
+                    <Check className="w-4 h-4 text-korean-green shrink-0" />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
               <Button 
                 variant="outline" 
-                className="w-full h-12 rounded-xl font-semibold text-base"
+                className="w-full rounded-xl font-semibold"
                 onClick={() => navigate("/auth")}
               >
-                Bắt đầu miễn phí
+                Bắt đầu
               </Button>
             </motion.div>
 
-            {/* Premium Plan */}
+            {/* Plus Plan */}
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="premium-card p-8 border-2 border-primary/50 relative overflow-hidden"
+              transition={{ delay: 0.1 }}
+              className="premium-card p-6 text-center"
             >
-              <div className="absolute top-4 right-4 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full">
-                Phổ biến nhất
-              </div>
-              <div className="text-center mb-8">
-                <h3 className="font-heading font-bold text-2xl text-foreground mb-2">Premium</h3>
-                <div className="text-5xl font-black text-foreground mb-2">99.000₫</div>
-                <p className="text-muted-foreground">/tháng</p>
-              </div>
-              <ul className="space-y-4 mb-8">
-                {[
-                  "Không giới hạn bài học AI",
-                  "AI chấm bài viết chi tiết",
-                  "Sổ ghi chú lỗi sai thông minh",
-                  "Báo cáo tiến độ hàng tuần",
-                  "Lộ trình học cá nhân hóa",
-                  "Không quảng cáo",
-                  "Hỗ trợ ưu tiên 24/7"
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-foreground">
-                    <Check className="w-5 h-5 text-primary shrink-0" />
+              <h3 className="font-heading font-bold text-xl text-foreground mb-2">Plus</h3>
+              <div className="text-4xl font-black text-foreground mb-2">200K₫</div>
+              <p className="text-muted-foreground text-sm mb-4">/tháng</p>
+              <ul className="space-y-2 text-sm text-left mb-6">
+                {["AI Chat 20 lần/ngày", "Game nâng cao", "Hỗ trợ ưu tiên"].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-muted-foreground">
+                    <Check className="w-4 h-4 text-korean-cyan shrink-0" />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
               <Button 
-                className="w-full h-12 rounded-xl font-semibold text-base btn-primary text-primary-foreground"
-                onClick={() => navigate("/auth")}
+                variant="secondary" 
+                className="w-full rounded-xl font-semibold"
+                onClick={() => navigate("/pricing")}
               >
-                Nâng cấp Premium
+                Xem chi tiết
+              </Button>
+            </motion.div>
+
+            {/* Premium Plan */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="premium-card p-6 text-center border-2 border-primary/50 relative"
+            >
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full">
+                Phổ biến
+              </div>
+              <h3 className="font-heading font-bold text-xl text-foreground mb-2 mt-2">Premium</h3>
+              <div className="text-4xl font-black text-foreground mb-2">500K₫</div>
+              <p className="text-muted-foreground text-sm mb-4">/tháng</p>
+              <ul className="space-y-2 text-sm text-left mb-6">
+                {["AI không giới hạn", "Chấm Writing AI", "Báo cáo học tập"].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-muted-foreground">
+                    <Check className="w-4 h-4 text-primary shrink-0" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <Button 
+                className="w-full rounded-xl font-semibold btn-primary text-primary-foreground"
+                onClick={() => navigate("/pricing")}
+              >
+                Nâng cấp
               </Button>
             </motion.div>
           </div>
+
+          {/* View Full Pricing Link */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/pricing")}
+              className="text-primary hover:text-primary/80 font-medium"
+            >
+              Xem bảng giá đầy đủ
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </motion.div>
         </div>
       </section>
 
