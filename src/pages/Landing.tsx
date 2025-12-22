@@ -346,19 +346,27 @@ const Landing = () => {
               {partnerUniversities.map((uni) => (
                 <motion.div
                   key={uni.name}
-                  whileHover={{ scale: 1.08 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="group relative flex flex-col items-center"
+                  whileHover={{ 
+                    scale: 1.08,
+                    y: -4,
+                    transition: { 
+                      type: "spring", 
+                      stiffness: 400, 
+                      damping: 17 
+                    }
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                  className="group relative flex flex-col items-center cursor-pointer"
                 >
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-white rounded-xl p-2 sm:p-3 shadow-md hover:shadow-xl transition-all duration-300 flex items-center justify-center border border-border/20">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-white rounded-xl p-2 sm:p-3 shadow-md group-hover:shadow-2xl transition-shadow duration-500 ease-out flex items-center justify-center border border-border/20 group-hover:border-primary/30">
                     <img 
                       src={uni.logo} 
                       alt={uni.name}
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
                     />
                   </div>
                   {/* Mobile: Always show name below */}
-                  <span className="mt-2 text-[10px] sm:text-xs text-muted-foreground text-center leading-tight line-clamp-2 max-w-[80px] sm:max-w-[100px]">
+                  <span className="mt-2 text-[10px] sm:text-xs text-muted-foreground group-hover:text-foreground text-center leading-tight line-clamp-2 max-w-[80px] sm:max-w-[100px] transition-colors duration-300">
                     {uni.name.split('(')[0].trim()}
                   </span>
                 </motion.div>
