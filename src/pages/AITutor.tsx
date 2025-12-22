@@ -18,7 +18,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
-const MAX_FREE_QUESTIONS = 5;
+const MAX_FREE_QUESTIONS = 30;
 const RESET_HOURS = 24;
 const AI_TUTOR_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-tutor`;
 

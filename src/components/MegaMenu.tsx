@@ -71,27 +71,27 @@ const menuSections: MenuSection[] = [
   {
     title: "CÔNG CỤ AI",
     items: [
-      { icon: MessageCircle, label: "Hỏi AI (5 lần/ngày)", href: "/ai-tutor" },
-      { icon: PenTool, label: "Chấm Writing TOPIK", href: "/writing-correction", isPremium: true },
+      { icon: MessageCircle, label: "Hỏi AI (30/ngày)", href: "/ai-tutor" },
+      { icon: PenTool, label: "Chấm bài viết", href: "/writing-correction", isPremium: true },
       { icon: Languages, label: "Dịch Hàn-Việt", href: "/translate" },
+      { icon: Briefcase, label: "Du học & Việc làm", href: "/korea-career" },
     ]
   },
   {
     title: "CỦA TÔI",
     items: [
       { icon: User, label: "Hồ sơ của tôi", href: "/profile" },
-      { icon: Sparkles, label: "Tiến độ học tập", href: "/progress" },
+      { icon: Sparkles, label: "Tiến độ học tập", href: "/progress", isPremium: true },
       { icon: Notebook, label: "Sổ lỗi sai", href: "/mistakes", isPremium: true },
       { icon: Bookmark, label: "Từ vựng đã lưu", href: "/vocabulary" },
-      { icon: History, label: "Lịch sử học tập", href: "/history" },
+      { icon: Trophy, label: "Xếp hạng của tôi", href: "/ranking" },
+      { icon: Users, label: "Mời bạn bè", href: "/profile#invite" },
     ]
   },
   {
     title: "KHÁC",
     items: [
       { icon: Crown, label: "Bảng giá", href: "/pricing" },
-      { icon: Trophy, label: "Bảng xếp hạng", href: "/ranking" },
-      { icon: Users, label: "Cộng đồng", href: "/community" },
       { icon: Compass, label: "Hướng dẫn", href: "/tutorial" },
       { icon: HelpCircle, label: "Hỗ trợ", href: "/support" },
     ]
