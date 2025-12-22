@@ -176,8 +176,8 @@ const Dashboard = () => {
                   <div className="flex items-center gap-2 mb-0.5">
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white font-bold">RAG AI</span>
                   </div>
-                  <h3 className="font-bold text-white">TOPIKBOT AI Chat - Hỏi đáp thông minh</h3>
-                  <p className="text-white/70 text-sm">Hỏi bất cứ điều gì về TOPIK, AI sẽ trả lời!</p>
+                  <h3 className="font-bold text-white">LUKATO Q&A Agent</h3>
+                  <p className="text-white/70 text-sm">Hỏi trực tiếp các mô hình Premium với Q&A Agent hiệu suất cao nhất!</p>
                 </div>
               </div>
               <ChevronRight className="w-5 h-5 text-white/70 group-hover:translate-x-1 transition-transform" />

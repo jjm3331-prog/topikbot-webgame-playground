@@ -28,91 +28,91 @@ const AIChat = () => {
   const steps = [
     {
       number: 1,
-      title: "접속하기",
-      description: "chat-topikbot.kr에 접속하여 Google 또는 이메일로 로그인하세요.",
-      tip: "TOPIKBOT 계정과 동일한 이메일로 로그인하면 연동됩니다!"
+      title: "Truy cập",
+      description: "Truy cập chat-topikbot.kr và đăng nhập bằng Google hoặc email.",
+      tip: "Đăng nhập bằng email giống với tài khoản LUKATO để đồng bộ!"
     },
     {
       number: 2,
-      title: "AI 모델 선택",
-      description: "학습 목적에 맞는 최적의 AI 모델을 선택하세요.",
-      tip: "'TOPIK Master' 모델은 한국어 학습에 최적화되어 있습니다."
+      title: "Chọn mô hình AI",
+      description: "Chọn mô hình AI phù hợp nhất với mục đích học tập của bạn.",
+      tip: "Mô hình 'TOPIK Master' được tối ưu hóa cho việc học tiếng Hàn."
     },
     {
       number: 3,
-      title: "질문하기",
-      description: "문법, 어휘, 시험 전략 등 무엇이든 질문하세요.",
-      tip: "구체적으로 질문할수록 더 정확한 답변을 받을 수 있습니다."
+      title: "Đặt câu hỏi",
+      description: "Hỏi bất cứ điều gì về ngữ pháp, từ vựng, chiến lược thi.",
+      tip: "Câu hỏi càng cụ thể, câu trả lời càng chính xác."
     },
     {
       number: 4,
-      title: "학습하기",
-      description: "AI의 상세한 설명과 예시로 깊이 있게 학습하세요.",
-      tip: "이해가 안 되면 '더 쉽게 설명해줘'라고 요청해보세요!"
+      title: "Học tập",
+      description: "Học sâu hơn với giải thích chi tiết và ví dụ từ AI.",
+      tip: "Nếu không hiểu, hãy yêu cầu 'Giải thích đơn giản hơn'!"
     }
   ];
 
   const features = [
     {
       icon: Database,
-      title: "전문 RAG 시스템",
-      description: "TOPIK 기출문제, 문법서, 교재 등 방대한 데이터베이스 기반"
+      title: "Hệ thống RAG chuyên nghiệp",
+      description: "Dựa trên cơ sở dữ liệu khổng lồ: đề thi TOPIK, sách ngữ pháp, giáo trình"
     },
     {
       icon: Brain,
-      title: "최신 AI 모델",
-      description: "GPT-4, Gemini Pro 등 최고 성능 AI 엔진 탑재"
+      title: "Mô hình AI mới nhất",
+      description: "Tích hợp các engine AI hàng đầu: GPT-4, Gemini Pro, Claude"
     },
     {
       icon: Zap,
-      title: "실시간 응답",
-      description: "평균 2초 이내 빠른 답변으로 학습 흐름 유지"
+      title: "Phản hồi thời gian thực",
+      description: "Trả lời nhanh trong vòng 2 giây, duy trì nhịp học tập"
     },
     {
       icon: Clock,
-      title: "24시간 운영",
-      description: "새벽에도 시험 직전에도 언제든 질문 가능"
+      title: "Hoạt động 24/7",
+      description: "Hỏi bất cứ lúc nào, kể cả lúc nửa đêm hay trước kỳ thi"
     },
     {
       icon: BookOpen,
-      title: "맞춤형 설명",
-      description: "학습자 수준에 맞춰 쉽게 또는 심화 설명"
+      title: "Giải thích theo trình độ",
+      description: "Điều chỉnh độ khó phù hợp với trình độ của người học"
     },
     {
       icon: Shield,
-      title: "정확한 정보",
-      description: "검증된 TOPIK 자료 기반으로 오류 최소화"
+      title: "Thông tin chính xác",
+      description: "Dựa trên tài liệu TOPIK đã được xác minh, giảm thiểu sai sót"
     }
   ];
 
   const whyExternal = [
     {
       icon: Globe,
-      title: "전용 인프라",
-      description: "Q&A 전용으로 최적화된 서버에서 안정적이고 빠른 응답을 제공합니다."
+      title: "Hạ tầng chuyên dụng",
+      description: "Server được tối ưu riêng cho Q&A, đảm bảo phản hồi ổn định và nhanh chóng."
     },
     {
       icon: Database,
-      title: "대용량 지식 베이스",
-      description: "TOPIK 전문 데이터베이스를 별도 운영하여 더 정확한 답변이 가능합니다."
+      title: "Cơ sở tri thức khổng lồ",
+      description: "Vận hành database TOPIK riêng biệt để cung cấp câu trả lời chính xác hơn."
     },
     {
       icon: Users,
-      title: "통합 학습 생태계",
-      description: "게임으로 재미있게 배우고, 모르는 건 AI에게 물어보는 완벽한 학습 사이클!"
+      title: "Hệ sinh thái học tập tích hợp",
+      description: "Học vui qua game, thắc mắc hỏi AI - chu trình học tập hoàn hảo!"
     },
     {
       icon: GraduationCap,
-      title: "TOPIK 특화",
-      description: "일반 ChatGPT와 달리 TOPIK 시험에 특화된 RAG 시스템을 갖추고 있습니다."
+      title: "Chuyên biệt cho TOPIK",
+      description: "Khác với ChatGPT thông thường, hệ thống RAG được thiết kế riêng cho kỳ thi TOPIK."
     }
   ];
 
   const notices = [
-    "chat-topikbot.kr은 TOPIKBOT의 공식 AI 질의응답 서비스입니다",
-    "동일한 이메일로 로그인하면 학습 이력이 연동됩니다",
-    "무료 회원도 하루 일정 횟수 질문이 가능합니다",
-    "Premium 회원은 무제한 질문 및 고급 AI 모델 사용 가능"
+    "chat-topikbot.kr là dịch vụ Q&A AI chính thức của LUKATO",
+    "Đăng nhập cùng email để đồng bộ lịch sử học tập",
+    "Thành viên miễn phí được hỏi một số lượng câu hỏi nhất định mỗi ngày",
+    "Thành viên Premium được hỏi không giới hạn và sử dụng các mô hình AI cao cấp"
   ];
 
   return (
@@ -131,22 +131,22 @@ const AIChat = () => {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
               <MessageSquare className="w-4 h-4" />
-              AI Chat - 질의응답 서비스
+              Q&A Agent - Dịch vụ hỏi đáp
               <span className="px-2 py-0.5 rounded-full bg-korean-green/20 text-korean-green text-xs">
-                RAG 기반
+                RAG
               </span>
             </div>
             
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              <span className="text-primary">TOPIKBOT</span>{" "}
+              <span className="text-primary">LUKATO</span>{" "}
               <span className="bg-gradient-to-r from-korean-blue to-korean-green bg-clip-text text-transparent">
-                AI Chat
+                Q&A Agent
               </span>
             </h1>
             
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              TOPIK 학습 중 궁금한 점이 있으신가요?<br />
-              <strong className="text-foreground">chat-topikbot.kr</strong>에서 최고 성능의 RAG AI에게 물어보세요!
+              Bạn có thắc mắc trong quá trình học TOPIK?<br />
+              <strong className="text-foreground">Hãy hỏi trực tiếp các mô hình Premium với LUKATO Q&A Agent hiệu suất cao nhất!</strong>
             </p>
             
             <Button 
@@ -155,13 +155,9 @@ const AIChat = () => {
               className="bg-gradient-to-r from-korean-blue to-korean-green hover:opacity-90 text-white gap-2 px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
             >
               <Sparkles className="w-5 h-5" />
-              AI Chat 시작하기
+              Q&A Agent bắt đầu
               <ExternalLink className="w-4 h-4" />
             </Button>
-            
-            <p className="text-sm text-muted-foreground mt-4">
-              🔗 chat-topikbot.kr 에서 이용 가능
-            </p>
           </motion.div>
         </div>
       </section>
@@ -176,10 +172,10 @@ const AIChat = () => {
             className="text-center mb-12"
           >
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              왜 별도 사이트에서 운영하나요?
+              Tại sao vận hành trên trang riêng?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              더 나은 학습 경험을 위해 전문 Q&A 서비스를 분리 운영합니다
+              Để mang lại trải nghiệm học tập tốt hơn, chúng tôi vận hành dịch vụ Q&A chuyên biệt riêng
             </p>
           </motion.div>
 
@@ -217,10 +213,10 @@ const AIChat = () => {
             className="text-center mb-12"
           >
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              이용 방법
+              Cách sử dụng
             </h2>
             <p className="text-muted-foreground">
-              4단계로 간단하게 시작하세요
+              Bắt đầu đơn giản chỉ với 4 bước
             </p>
           </motion.div>
 
@@ -266,10 +262,10 @@ const AIChat = () => {
             className="text-center mb-12"
           >
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              주요 기능
+              Tính năng chính
             </h2>
             <p className="text-muted-foreground">
-              TOPIKBOT AI Chat만의 특별한 기능들
+              Những tính năng đặc biệt chỉ có ở LUKATO Q&A Agent
             </p>
           </motion.div>
 
@@ -310,7 +306,7 @@ const AIChat = () => {
               <CardContent className="p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <AlertCircle className="w-5 h-5 text-primary" />
-                  <h3 className="font-semibold">알아두세요</h3>
+                  <h3 className="font-semibold">Lưu ý</h3>
                 </div>
                 <ul className="space-y-3">
                   {notices.map((notice, index) => (
@@ -340,11 +336,11 @@ const AIChat = () => {
             </div>
             
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              지금 바로 AI에게 물어보세요!
+              Hãy hỏi AI ngay bây giờ!
             </h2>
             <p className="text-muted-foreground mb-8">
-              게임으로 즐겁게 배우고, 궁금한 건 AI에게!<br />
-              TOPIK 학습의 완벽한 파트너가 되어드립니다.
+              Học vui qua game, thắc mắc hỏi AI!<br />
+              Người bạn đồng hành hoàn hảo trong hành trình chinh phục TOPIK.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -354,7 +350,7 @@ const AIChat = () => {
                 className="bg-gradient-to-r from-korean-blue to-korean-green hover:opacity-90 text-white gap-2"
               >
                 <Sparkles className="w-5 h-5" />
-                AI Chat 열기
+                Mở Q&A Agent
                 <ExternalLink className="w-4 h-4" />
               </Button>
               <Button 
@@ -364,7 +360,7 @@ const AIChat = () => {
                 className="gap-2"
               >
                 <BookOpen className="w-5 h-5" />
-                게임으로 학습하기
+                Học qua game
               </Button>
             </div>
           </motion.div>
