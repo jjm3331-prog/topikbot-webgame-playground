@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,10 @@ import {
   Shield,
   Star,
   ArrowRight,
-  Loader2
+  Loader2,
+  Upload,
+  FileText,
+  X
 } from "lucide-react";
 
 const benefits = [
@@ -32,12 +35,27 @@ const benefits = [
   { icon: Shield, title: "100% 무료", desc: "프리미엄 회원 대상 완전 무료 서비스" },
 ];
 
+interface FileUploadState {
+  file: File | null;
+  uploading: boolean;
+  url: string | null;
+  error: string | null;
+}
+
 const Headhunting = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [existingApplication, setExistingApplication] = useState<any>(null);
+  
+  const resumeInputRef = useRef<HTMLInputElement>(null);
+  const coverLetterInputRef = useRef<HTMLInputElement>(null);
+  const portfolioInputRef = useRef<HTMLInputElement>(null);
+  
+  const [resumeUpload, setResumeUpload] = useState<FileUploadState>({ file: null, uploading: false, url: null, error: null });
+  const [coverLetterUpload, setCoverLetterUpload] = useState<FileUploadState>({ file: null, uploading: false, url: null, error: null });
+  const [portfolioUpload, setPortfolioUpload] = useState<FileUploadState>({ file: null, uploading: false, url: null, error: null });
   
   const [formData, setFormData] = useState({
     full_name: "",
@@ -89,6 +107,72 @@ const Headhunting = () => {
     }
   };
 
+  const uploadFile = async (
+    file: File,
+    type: 'resume' | 'cover_letter' | 'portfolio',
+    setUploadState: React.Dispatch<React.SetStateAction<FileUploadState>>
+  ): Promise<string | null> => {
+    if (!user) return null;
+    
+    setUploadState(prev => ({ ...prev, uploading: true, error: null }));
+    
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${type}_${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('resumes')
+        .upload(fileName, file, { upsert: true });
+      
+      if (uploadError) throw uploadError;
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from('resumes')
+        .getPublicUrl(fileName);
+      
+      setUploadState({ file, uploading: false, url: fileName, error: null });
+      toast.success(`${type === 'resume' ? '이력서' : type === 'cover_letter' ? '자기소개서' : '포트폴리오'} 업로드 완료!`);
+      return fileName;
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      setUploadState(prev => ({ ...prev, uploading: false, error: '업로드 실패' }));
+      toast.error('파일 업로드에 실패했습니다');
+      return null;
+    }
+  };
+
+  const handleFileSelect = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: 'resume' | 'cover_letter' | 'portfolio',
+    setUploadState: React.Dispatch<React.SetStateAction<FileUploadState>>
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Validate file size (10MB max)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('파일 크기는 10MB 이하여야 합니다');
+      return;
+    }
+    
+    // Validate file type
+    const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('PDF 또는 Word 파일만 업로드 가능합니다');
+      return;
+    }
+    
+    await uploadFile(file, type, setUploadState);
+  };
+
+  const removeFile = (
+    setUploadState: React.Dispatch<React.SetStateAction<FileUploadState>>,
+    inputRef: React.RefObject<HTMLInputElement>
+  ) => {
+    setUploadState({ file: null, uploading: false, url: null, error: null });
+    if (inputRef.current) inputRef.current.value = '';
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -118,6 +202,9 @@ const Headhunting = () => {
         strengths: formData.strengths || null,
         career_goals: formData.career_goals || null,
         additional_skills: formData.additional_skills || null,
+        resume_url: resumeUpload.url || null,
+        cover_letter_url: coverLetterUpload.url || null,
+        portfolio_url: portfolioUpload.url || null,
         status: "pending",
       });
 
@@ -450,6 +537,147 @@ const Headhunting = () => {
                       <SelectItem value="korea_standard">한국 현지 수준</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 파일 업로드 */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Upload className="w-5 h-5 text-korean-purple" />
+                  파일 첨부
+                </CardTitle>
+                <CardDescription>이력서, 자기소개서, 포트폴리오를 PDF 또는 Word 파일로 업로드하세요 (최대 10MB)</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Resume Upload */}
+                <div className="space-y-2">
+                  <Label>이력서 (Resume)</Label>
+                  <input
+                    ref={resumeInputRef}
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e) => handleFileSelect(e, 'resume', setResumeUpload)}
+                    className="hidden"
+                  />
+                  {resumeUpload.url ? (
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-korean-green/10 border border-korean-green/30">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-5 h-5 text-korean-green" />
+                        <span className="text-sm text-foreground">{resumeUpload.file?.name || '이력서 업로드 완료'}</span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeFile(setResumeUpload, resumeInputRef)}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full h-20 border-dashed"
+                      onClick={() => resumeInputRef.current?.click()}
+                      disabled={resumeUpload.uploading}
+                    >
+                      {resumeUpload.uploading ? (
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      ) : (
+                        <Upload className="w-5 h-5 mr-2" />
+                      )}
+                      {resumeUpload.uploading ? '업로드 중...' : '이력서 업로드 (PDF/Word)'}
+                    </Button>
+                  )}
+                </div>
+
+                {/* Cover Letter Upload */}
+                <div className="space-y-2">
+                  <Label>자기소개서 (Cover Letter)</Label>
+                  <input
+                    ref={coverLetterInputRef}
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e) => handleFileSelect(e, 'cover_letter', setCoverLetterUpload)}
+                    className="hidden"
+                  />
+                  {coverLetterUpload.url ? (
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-korean-green/10 border border-korean-green/30">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-5 h-5 text-korean-green" />
+                        <span className="text-sm text-foreground">{coverLetterUpload.file?.name || '자기소개서 업로드 완료'}</span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeFile(setCoverLetterUpload, coverLetterInputRef)}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full h-20 border-dashed"
+                      onClick={() => coverLetterInputRef.current?.click()}
+                      disabled={coverLetterUpload.uploading}
+                    >
+                      {coverLetterUpload.uploading ? (
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      ) : (
+                        <Upload className="w-5 h-5 mr-2" />
+                      )}
+                      {coverLetterUpload.uploading ? '업로드 중...' : '자기소개서 업로드 (PDF/Word)'}
+                    </Button>
+                  )}
+                </div>
+
+                {/* Portfolio Upload */}
+                <div className="space-y-2">
+                  <Label>포트폴리오 (선택)</Label>
+                  <input
+                    ref={portfolioInputRef}
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e) => handleFileSelect(e, 'portfolio', setPortfolioUpload)}
+                    className="hidden"
+                  />
+                  {portfolioUpload.url ? (
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-korean-green/10 border border-korean-green/30">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-5 h-5 text-korean-green" />
+                        <span className="text-sm text-foreground">{portfolioUpload.file?.name || '포트폴리오 업로드 완료'}</span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeFile(setPortfolioUpload, portfolioInputRef)}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full h-20 border-dashed"
+                      onClick={() => portfolioInputRef.current?.click()}
+                      disabled={portfolioUpload.uploading}
+                    >
+                      {portfolioUpload.uploading ? (
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      ) : (
+                        <Upload className="w-5 h-5 mr-2" />
+                      )}
+                      {portfolioUpload.uploading ? '업로드 중...' : '포트폴리오 업로드 (PDF/Word)'}
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>

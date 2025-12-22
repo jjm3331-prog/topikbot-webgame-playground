@@ -625,6 +625,68 @@ const Landing = () => {
         </motion.div>
       </section>
 
+      {/* ========== HEADHUNTING PROMO BANNER ========== */}
+      <section className="py-10 sm:py-16 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="relative overflow-hidden rounded-2xl sm:rounded-3xl"
+          >
+            {/* Gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-korean-purple via-korean-blue to-korean-cyan opacity-90" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.1),transparent)]" />
+            
+            <div className="relative z-10 p-6 sm:p-10 flex flex-col md:flex-row items-center gap-6">
+              {/* Icon */}
+              <div className="flex-shrink-0">
+                <motion.div
+                  animate={{ y: [0, -5, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-xl"
+                >
+                  <Briefcase className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
+                </motion.div>
+              </div>
+              
+              {/* Content */}
+              <div className="flex-1 text-center md:text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-semibold mb-3">
+                  <Crown className="w-3 h-3 text-korean-yellow" />
+                  프리미엄 전용 서비스
+                </div>
+                <h3 className="font-heading font-black text-xl sm:text-2xl md:text-3xl text-white mb-2">
+                  한국 기업 <span className="text-korean-yellow">헤드헌팅</span> 서비스
+                </h3>
+                <p className="text-white/80 text-sm sm:text-base mb-4">
+                  전문 헤드헌터가 한국 기업 취업을 100% 무료로 도와드립니다.
+                  <br className="hidden sm:block" />
+                  베트남 내 한국 기업부터 한국 현지 취업까지!
+                </p>
+                <div className="flex flex-wrap justify-center md:justify-start gap-2 sm:gap-4 text-xs sm:text-sm text-white/90 mb-4">
+                  <span className="flex items-center gap-1"><Check className="w-4 h-4 text-korean-green" /> 500+ 파트너 기업</span>
+                  <span className="flex items-center gap-1"><Check className="w-4 h-4 text-korean-green" /> 이력서 컨설팅</span>
+                  <span className="flex items-center gap-1"><Check className="w-4 h-4 text-korean-green" /> 비자 지원</span>
+                </div>
+              </div>
+              
+              {/* CTA */}
+              <div className="flex-shrink-0">
+                <Button
+                  onClick={() => navigate("/headhunting")}
+                  size="lg"
+                  className="h-12 sm:h-14 px-6 sm:px-8 bg-white hover:bg-white/90 text-korean-purple font-bold rounded-xl group"
+                >
+                  무료 신청하기
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ========== FEATURES - COMPACT ========== */}
       <section id="features" className="py-10 sm:py-16 px-4 sm:px-6 bg-muted/30">
         <div className="max-w-4xl mx-auto">
