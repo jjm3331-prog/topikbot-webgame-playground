@@ -678,13 +678,11 @@ const Landing = () => {
       <footer className="py-12 px-6 border-t border-border bg-muted/30">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center">
-                <span className="text-primary-foreground font-heading font-bold text-lg">L</span>
-              </div>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="text-2xl sm:text-3xl">🇰🇷</span>
               <div>
-                <span className="font-heading font-bold text-foreground">LUKATO</span>
-                <span className="block text-xs text-muted-foreground">베트남 1위 한국어 학습 플랫폼</span>
+                <span className="font-heading font-bold text-lg sm:text-xl text-foreground">LUKATO AI</span>
+                <span className="block text-xs text-muted-foreground -mt-0.5">Học tiếng Hàn #1 VN</span>
               </div>
             </div>
             
