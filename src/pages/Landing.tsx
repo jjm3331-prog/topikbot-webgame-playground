@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { MegaMenu } from "@/components/MegaMenu";
+import { SimpleHeader } from "@/components/SimpleHeader";
 import CommonFooter from "@/components/CommonFooter";
 import { 
   ArrowRight, 
@@ -190,8 +190,8 @@ const Landing = () => {
 
   return (
     <div className="min-h-[100dvh] bg-background relative overflow-x-hidden">
-      {/* Mega Menu Header */}
-      <MegaMenu />
+      {/* Simple Header for non-logged users */}
+      <SimpleHeader />
 
       {/* ========== HERO SECTION ========== */}
       <motion.section 
