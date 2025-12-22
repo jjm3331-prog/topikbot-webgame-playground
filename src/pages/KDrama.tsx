@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Mic, MicOff, RotateCcw, ChevronRight, Volume2, RefreshCw, Loader2, Trophy, Youtube, Timer, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import MegaMenu from "@/components/MegaMenu";
+import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 
 interface DramaScene {
@@ -354,7 +354,7 @@ const KDrama = () => {
   if (isLoading) {
     return (
       <div className="min-h-[100dvh] bg-gradient-to-b from-slate-900 via-purple-900 to-[#0f0f23] flex flex-col">
-        <MegaMenu />
+        <CleanHeader />
         <div className="flex-1 flex items-center justify-center">
           <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} className="text-6xl">🎬</motion.div>
         </div>
@@ -367,7 +367,7 @@ const KDrama = () => {
     const avgScore = attempts > 0 ? Math.round(score / attempts) : 0;
     return (
       <div className="min-h-[100dvh] bg-gradient-to-b from-slate-900 via-purple-900 to-[#0f0f23] flex flex-col">
-        <MegaMenu />
+        <CleanHeader />
         <div className="flex-1 flex items-center justify-center p-4">
           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="bg-black/60 backdrop-blur-xl rounded-3xl p-8 text-center max-w-md w-full border border-purple-500/30">
             <Trophy className="w-20 h-20 text-yellow-400 mx-auto mb-4" />
@@ -394,7 +394,7 @@ const KDrama = () => {
 
   return (
     <div className="min-h-[100dvh] bg-gradient-to-b from-slate-900 via-purple-900 to-[#0f0f23] flex flex-col">
-      <MegaMenu />
+      <CleanHeader />
       
       {/* Stats Bar */}
       <div className="px-4 py-3 flex items-center justify-between border-b border-purple-500/20 bg-black/40 backdrop-blur-xl">

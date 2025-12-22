@@ -21,7 +21,7 @@ import {
   Heart
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import MegaMenu from "@/components/MegaMenu";
+import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 
 type JobType = 'convenience_store' | 'cafe' | 'restaurant' | 'pc_bang' | 'bookstore';
@@ -215,7 +215,7 @@ const PartTime = () => {
 
   return (
     <div className="min-h-[100dvh] bg-gradient-to-b from-purple-900 via-purple-800 to-[#0f0f23] flex flex-col overflow-hidden">
-      <MegaMenu />
+      <CleanHeader />
       
       {/* Stats Bar */}
       <div className="flex items-center justify-between p-4 border-b border-white/10">

@@ -15,7 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import MegaMenu from "@/components/MegaMenu";
+import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 
 interface Message {
@@ -311,7 +311,7 @@ const Chat = () => {
 
   return (
     <div className={`min-h-[100dvh] bg-gradient-to-b from-[#1a1a2e] to-[#0f0f23] flex flex-col ${shakeScreen ? "animate-shake" : ""}`}>
-      <MegaMenu />
+      <CleanHeader />
       {/* Feedback Popup */}
       {feedback.show && (
         <div className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-bounce`}>
@@ -346,7 +346,7 @@ const Chat = () => {
       )}
 
       {/* Header */}
-      <header className="flex items-center justify-between p-4 border-b border-white/10 bg-gray-900/80 backdrop-blur-sm sticky top-0 z-40">
+      <header className="flex items-center justify-between p-4 border-b border-white/10 bg-gray-900/80 backdrop-blur-sm sticky top-[60px] z-40">
         <div className="flex items-center gap-3">
           <button onClick={handleExit} className="text-white/70 hover:text-white transition-colors">
             <ChevronLeft className="w-6 h-6" />

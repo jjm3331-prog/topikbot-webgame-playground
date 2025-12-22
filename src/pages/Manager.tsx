@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { ChevronRight, Sparkles, Flame, Music, Star, AlertTriangle, Users, Loader2, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
-import MegaMenu from '@/components/MegaMenu';
+import CleanHeader from '@/components/CleanHeader';
 import AppFooter from '@/components/AppFooter';
 
 // NPC 캐릭터 이미지 임포트
@@ -295,7 +295,7 @@ export default function Manager() {
 
   return (
     <div className="min-h-[100dvh] bg-black text-white flex flex-col overflow-hidden">
-      <MegaMenu />
+      <CleanHeader />
 
       <main className="flex-1 overflow-hidden relative">
         <AnimatePresence mode="wait">
