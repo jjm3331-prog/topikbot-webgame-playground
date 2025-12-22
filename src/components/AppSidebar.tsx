@@ -14,7 +14,6 @@ import {
   Clapperboard,
   Music,
   MessageSquare,
-  Bookmark,
   Languages,
   User,
   LogOut,
@@ -25,8 +24,7 @@ import {
   X,
   Building,
   GraduationCap,
-  Star,
-  FileX
+  Star
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -102,8 +100,6 @@ const menuSections: MenuSection[] = [
     emoji: "👤",
     items: [
       { icon: Sparkles, label: "Tiến độ học tập", href: "/dashboard", isPremium: true, isHighlight: true },
-      { icon: FileX, label: "Sổ lỗi sai", href: "/mistakes", isPremium: true },
-      { icon: Bookmark, label: "Từ vựng đã lưu", href: "/vocabulary" },
       { icon: User, label: "Hồ sơ của tôi", href: "/profile" },
     ],
     defaultOpen: false
