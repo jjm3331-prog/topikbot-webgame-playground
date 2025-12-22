@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
@@ -10,16 +9,13 @@ import {
   BookOpen,
   Users,
   CheckCircle,
-  ArrowRight,
   Zap,
   Brain,
-  Headphones
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import CleanHeader from "@/components/CleanHeader";
-import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
+import MegaMenu from "@/components/MegaMenu";
+import Footer from "@/components/Footer";
 
 const LUKATO_AI_CHAT_URL = "https://chat-topikbot.kr";
 
@@ -109,15 +105,6 @@ const notices = [
 
 const AITutor = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user || null);
-    };
-    checkAuth();
-  }, []);
 
   const handleOpenChat = () => {
     window.open(LUKATO_AI_CHAT_URL, "_blank");
@@ -125,7 +112,7 @@ const AITutor = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <CleanHeader isLoggedIn={!!user} username={user?.email?.split('@')[0]} />
+      <MegaMenu />
       
       <main className="pt-20">
         {/* Hero Section */}
@@ -347,6 +334,8 @@ const AITutor = () => {
           </div>
         </section>
       </main>
+
+      <Footer />
     </div>
   );
 };

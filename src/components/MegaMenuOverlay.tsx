@@ -53,7 +53,6 @@ const baseMenuCategories: MenuCategory[] = [
     items: [
       { icon: Building, label: "Tìm việc tại Hàn Quốc", href: "/korea-career" },
       { icon: Users, label: "Headhunting", href: "/headhunting", isPremium: true },
-      { icon: BookOpen, label: "Tư vấn du học Hàn", href: "/tutorial" },
     ]
   },
   {
@@ -62,7 +61,6 @@ const baseMenuCategories: MenuCategory[] = [
     items: [
       { icon: BookOpen, label: "TOPIK I (1-2급)", href: "/topik-1" },
       { icon: GraduationCap, label: "TOPIK II (3-6급)", href: "/topik-2" },
-      { icon: HelpCircle, label: "Hướng dẫn học", href: "/tutorial" },
     ]
   },
   {
@@ -76,6 +74,7 @@ const baseMenuCategories: MenuCategory[] = [
       { icon: Music, label: "K-POP Quiz", href: "/kpop" },
       { icon: Clapperboard, label: "K-Drama Lồng tiếng", href: "/kdrama" },
       { icon: Briefcase, label: "Làm thêm Hàn Quốc", href: "/parttime" },
+      { icon: HelpCircle, label: "Hướng dẫn Game", href: "/tutorial" },
     ]
   },
   {
