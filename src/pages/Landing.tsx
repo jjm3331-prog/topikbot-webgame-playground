@@ -465,17 +465,95 @@ const Landing = () => {
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="relative z-10 max-w-3xl mx-auto text-center"
+          className="relative z-10 max-w-4xl mx-auto text-center"
         >
-          {/* Icon */}
+          {/* Competitor vs LUKATO Visual */}
           <motion.div
-            initial={{ rotate: -10, scale: 0 }}
-            whileInView={{ rotate: 0, scale: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ type: "spring", stiffness: 200 }}
-            className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-korean-red to-korean-orange flex items-center justify-center shadow-2xl"
+            className="relative flex items-center justify-center gap-3 sm:gap-6 mb-8"
           >
-            <Flame className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+            {/* Blurred competitors - left side */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              {[1, 2, 3].map((i) => (
+                <motion.div
+                  key={`left-${i}`}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="relative"
+                >
+                  <div 
+                    className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-muted/60 backdrop-blur-sm border border-border/30 flex items-center justify-center opacity-40 grayscale"
+                    style={{ filter: `blur(${(4 - i) * 0.5}px)` }}
+                  >
+                    <span className="text-lg sm:text-xl opacity-50">
+                      {i === 1 ? '📚' : i === 2 ? '🎧' : '📝'}
+                    </span>
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-muted-foreground/30 flex items-center justify-center">
+                    <span className="text-[8px] sm:text-[10px]">?</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* LUKATO - center, glowing */}
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              whileInView={{ scale: 1, rotate: 0 }}
+              viewport={{ once: true }}
+              transition={{ type: "spring", stiffness: 200, delay: 0.3 }}
+              className="relative z-10"
+            >
+              {/* Glow effect */}
+              <div className="absolute inset-0 w-16 h-16 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-korean-red to-korean-orange blur-xl opacity-60 animate-pulse" />
+              
+              {/* Main logo container */}
+              <div className="relative w-16 h-16 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-korean-red via-korean-orange to-korean-yellow flex items-center justify-center shadow-2xl border-2 border-white/20">
+                <div className="text-center">
+                  <Crown className="w-6 h-6 sm:w-8 sm:h-8 text-white mx-auto mb-0.5" />
+                  <span className="text-[10px] sm:text-xs font-black text-white tracking-tight">LUKATO</span>
+                </div>
+              </div>
+              
+              {/* Crown on top */}
+              <motion.div
+                animate={{ y: [0, -3, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="absolute -top-2 sm:-top-3 left-1/2 -translate-x-1/2"
+              >
+                <span className="text-lg sm:text-xl">👑</span>
+              </motion.div>
+            </motion.div>
+
+            {/* Blurred competitors - right side */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              {[3, 2, 1].map((i) => (
+                <motion.div
+                  key={`right-${i}`}
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="relative"
+                >
+                  <div 
+                    className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-muted/60 backdrop-blur-sm border border-border/30 flex items-center justify-center opacity-40 grayscale"
+                    style={{ filter: `blur(${(4 - i) * 0.5}px)` }}
+                  >
+                    <span className="text-lg sm:text-xl opacity-50">
+                      {i === 1 ? '🎓' : i === 2 ? '💬' : '🏫'}
+                    </span>
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-muted-foreground/30 flex items-center justify-center">
+                    <span className="text-[8px] sm:text-[10px]">?</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
 
           {/* Main challenge headline */}
