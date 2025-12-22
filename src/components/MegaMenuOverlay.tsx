@@ -18,7 +18,12 @@ import {
   BookMarked,
   GraduationCap,
   Sparkles,
-  X
+  X,
+  User,
+  FileX,
+  Users,
+  Star,
+  Building
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -27,36 +32,36 @@ interface MenuItem {
   label: string;
   href: string;
   isPremium?: boolean;
+  isHighlight?: boolean;
 }
 
 interface MenuCategory {
   title: string;
+  emoji?: string;
   items: MenuItem[];
 }
 
-const menuCategories: MenuCategory[] = [
+// 기본 메뉴 (로그인 전/후 공통)
+const baseMenuCategories: MenuCategory[] = [
   {
-    title: "MENU CHÍNH",
+    title: "DU HỌC & VIỆC LÀM",
+    emoji: "✈️",
     items: [
-      { icon: Home, label: "Trang chủ", href: "/" },
-      { icon: BookOpen, label: "TOPIK I (Sơ cấp)", href: "/topik-1" },
-      { icon: GraduationCap, label: "TOPIK II (Trung-Cao)", href: "/topik-2" },
-      { icon: MessageCircle, label: "Hỏi AI", href: "/ai-tutor" },
+      { icon: Building, label: "Tìm việc tại Hàn Quốc", href: "/korea-career" },
+      { icon: BookOpen, label: "Tư vấn du học Hàn", href: "/tutorial" },
     ]
   },
   {
-    title: "KHÁM PHÁ",
+    title: "HỌC TOPIK",
     items: [
-      { icon: Trophy, label: "Xếp hạng", href: "/ranking" },
-      { icon: Briefcase, label: "Việc làm Hàn Quốc", href: "/korea-career" },
-      { icon: HelpCircle, label: "Hướng dẫn", href: "/tutorial" },
-      { icon: Crown, label: "Nâng cấp", href: "/pricing" },
+      { icon: BookOpen, label: "TOPIK I (1-2급)", href: "/topik-1" },
+      { icon: GraduationCap, label: "TOPIK II (3-6급)", href: "/topik-2" },
     ]
   },
   {
-    title: "GAME HỌC TIẾNG HÀN",
+    title: "GAME HỌC",
     items: [
-      { icon: Sparkles, label: "LUKATO Manager", href: "/manager", isPremium: true },
+      { icon: Crown, label: "LUKATO Manager", href: "/manager" },
       { icon: Gamepad2, label: "AI Sinh tồn Seoul", href: "/chat" },
       { icon: Heart, label: "Hẹn hò Hàn Quốc", href: "/dating" },
       { icon: MessageSquare, label: "Nối từ tiếng Hàn", href: "/wordchain" },
@@ -68,26 +73,50 @@ const menuCategories: MenuCategory[] = [
   {
     title: "CÔNG CỤ AI",
     items: [
-      { icon: MessageCircle, label: "Hỏi AI (30/ngày)", href: "/ai-tutor" },
+      { icon: MessageCircle, label: "Hỏi AI (30/ngày)", href: "/ai-tutor", isHighlight: true },
       { icon: PenTool, label: "Chấm bài viết", href: "/writing-correction", isPremium: true },
       { icon: Languages, label: "Dịch Hàn-Việt", href: "/translate" },
-      { icon: BookMarked, label: "Thành ngữ Quiz", href: "/quiz" },
     ]
   },
+];
+
+// 로그인 후 추가되는 "CỦA TÔI" 메뉴
+const myMenuCategory: MenuCategory = {
+  title: "CỦA TÔI",
+  items: [
+    { icon: Sparkles, label: "Tiến độ học tập", href: "/dashboard", isPremium: true },
+    { icon: Trophy, label: "Xếp hạng của tôi", href: "/ranking" },
+    { icon: FileX, label: "Sổ lỗi sai", href: "/mistakes", isPremium: true },
+    { icon: BookMarked, label: "Từ vựng đã lưu (15/50)", href: "/vocabulary" },
+    { icon: User, label: "Hồ sơ của tôi", href: "/profile" },
+    { icon: Users, label: "Mời bạn bè", href: "/profile#invite" },
+  ]
+};
+
+// 하단 메뉴
+const bottomMenuItems: MenuItem[] = [
+  { icon: Star, label: "Bảng giá", href: "/pricing" },
+  { icon: HelpCircle, label: "Hướng dẫn", href: "/tutorial" },
 ];
 
 interface MegaMenuOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  isLoggedIn?: boolean;
 }
 
-export const MegaMenuOverlay = ({ isOpen, onClose }: MegaMenuOverlayProps) => {
+export const MegaMenuOverlay = ({ isOpen, onClose, isLoggedIn = false }: MegaMenuOverlayProps) => {
   const navigate = useNavigate();
 
   const handleNavigation = (href: string) => {
     onClose();
     navigate(href);
   };
+
+  // 로그인 상태에 따라 메뉴 구성
+  const menuCategories = isLoggedIn 
+    ? [...baseMenuCategories, myMenuCategory]
+    : baseMenuCategories;
 
   return (
     <AnimatePresence>
@@ -97,7 +126,7 @@ export const MegaMenuOverlay = ({ isOpen, onClose }: MegaMenuOverlayProps) => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-40 bg-background/95 backdrop-blur-xl"
+          className="fixed inset-0 z-40 bg-background"
           style={{ top: "60px" }}
         >
           {/* Close Button */}
@@ -111,8 +140,12 @@ export const MegaMenuOverlay = ({ isOpen, onClose }: MegaMenuOverlayProps) => {
           </Button>
 
           {/* Menu Content */}
-          <div className="max-w-6xl mx-auto px-6 py-8 md:py-12">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+          <div className="max-w-7xl mx-auto px-6 py-8 md:py-12">
+            <div className={`grid gap-8 md:gap-10 ${
+              isLoggedIn 
+                ? 'grid-cols-2 md:grid-cols-5' 
+                : 'grid-cols-2 md:grid-cols-4'
+            }`}>
               {menuCategories.map((category, categoryIndex) => (
                 <motion.div
                   key={category.title}
@@ -121,7 +154,8 @@ export const MegaMenuOverlay = ({ isOpen, onClose }: MegaMenuOverlayProps) => {
                   transition={{ duration: 0.3, delay: categoryIndex * 0.05 }}
                 >
                   {/* Category Title */}
-                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4 md:mb-6">
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4 md:mb-6 flex items-center gap-2">
+                    {category.emoji && <span>{category.emoji}</span>}
                     {category.title}
                   </h3>
 
@@ -136,10 +170,22 @@ export const MegaMenuOverlay = ({ isOpen, onClose }: MegaMenuOverlayProps) => {
                       >
                         <button
                           onClick={() => handleNavigation(item.href)}
-                          className="group flex items-center gap-3 w-full py-2.5 text-left transition-colors hover:text-primary"
+                          className={`group flex items-center gap-3 w-full py-2.5 px-3 rounded-lg text-left transition-all ${
+                            item.isHighlight 
+                              ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                              : 'hover:bg-muted'
+                          }`}
                         >
-                          <item.icon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                          <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                          <item.icon className={`w-4 h-4 ${
+                            item.isHighlight 
+                              ? 'text-primary-foreground' 
+                              : 'text-muted-foreground group-hover:text-primary'
+                          } transition-colors`} />
+                          <span className={`text-sm font-medium ${
+                            item.isHighlight 
+                              ? 'text-primary-foreground' 
+                              : 'text-foreground group-hover:text-primary'
+                          } transition-colors`}>
                             {item.label}
                           </span>
                           {item.isPremium && (
@@ -154,6 +200,30 @@ export const MegaMenuOverlay = ({ isOpen, onClose }: MegaMenuOverlayProps) => {
                 </motion.div>
               ))}
             </div>
+
+            {/* Bottom Menu */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="mt-12 pt-6 border-t border-border"
+            >
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+                KHÁC
+              </h3>
+              <div className="flex flex-wrap gap-4">
+                {bottomMenuItems.map((item) => (
+                  <button
+                    key={item.label}
+                    onClick={() => handleNavigation(item.href)}
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <item.icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            </motion.div>
           </div>
         </motion.div>
       )}
