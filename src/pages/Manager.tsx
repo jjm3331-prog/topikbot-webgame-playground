@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { ChevronRight, Sparkles, Flame, Music, Star, AlertTriangle, Users, Loader2, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
+import { ChevronRight, Sparkles, Flame, Music, Star, AlertTriangle, Users, Loader2 } from 'lucide-react';
 import CleanHeader from '@/components/CleanHeader';
 import AppFooter from '@/components/AppFooter';
 
@@ -148,10 +148,6 @@ export default function Manager() {
   const [groupConcept, setGroupConcept] = useState<GroupConcept>('fresh');
   const [groupGender, setGroupGender] = useState<GroupGender>('mixed');
   
-  // STT/TTS 설정
-  const [sttEnabled, setSttEnabled] = useState(false);
-  const [ttsEnabled, setTtsEnabled] = useState(false);
-  
   // 게임 상태
   const [currentChapter, setCurrentChapter] = useState(1);
   const [storyData, setStoryData] = useState<StoryData | null>(null);
@@ -167,12 +163,6 @@ export default function Manager() {
   const [userInput, setUserInput] = useState('');
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [scoreResult, setScoreResult] = useState<any>(null);
-  
-  // 오디오 상태
-  const [isRecording, setIsRecording] = useState(false);
-  const [isTtsPlaying, setIsTtsPlaying] = useState(false);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
 
   // 스토리 로드
   const loadStory = async (chapter: number) => {
@@ -308,10 +298,6 @@ export default function Manager() {
               setGroupGender={setGroupGender}
               groupConcept={groupConcept}
               setGroupConcept={setGroupConcept}
-              sttEnabled={sttEnabled}
-              setSttEnabled={setSttEnabled}
-              ttsEnabled={ttsEnabled}
-              setTtsEnabled={setTtsEnabled}
               isLoading={isLoading}
               onStart={startGame}
             />
@@ -327,7 +313,6 @@ export default function Manager() {
             <ProloguePhase 
               storyData={storyData} 
               onContinue={startDialogue}
-              ttsEnabled={ttsEnabled}
             />
           )}
 
@@ -338,9 +323,6 @@ export default function Manager() {
               dialogueIndex={dialogueIndex}
               stats={stats}
               onNext={nextDialogue}
-              ttsEnabled={ttsEnabled}
-              isTtsPlaying={isTtsPlaying}
-              setIsTtsPlaying={setIsTtsPlaying}
             />
           )}
 
@@ -352,11 +334,6 @@ export default function Manager() {
               userInput={userInput}
               setUserInput={setUserInput}
               onSubmit={submitMission}
-              sttEnabled={sttEnabled}
-              isRecording={isRecording}
-              setIsRecording={setIsRecording}
-              mediaRecorderRef={mediaRecorderRef}
-              audioChunksRef={audioChunksRef}
             />
           )}
 
@@ -383,8 +360,7 @@ export default function Manager() {
 // ================== 설정 화면 ==================
 function SetupPhase({ 
   groupName, setGroupName, groupGender, setGroupGender, 
-  groupConcept, setGroupConcept, sttEnabled, setSttEnabled,
-  ttsEnabled, setTtsEnabled, isLoading, onStart 
+  groupConcept, setGroupConcept, isLoading, onStart 
 }: any) {
   return (
     <motion.div
@@ -501,53 +477,6 @@ function SetupPhase({
           </div>
         </div>
 
-        {/* STT/TTS 설정 */}
-        <div className="space-y-3 bg-zinc-800/50 border border-zinc-700 rounded-xl p-4">
-          <p className="text-sm font-medium text-zinc-300">🔊 음성 설정 / Cài đặt giọng nói</p>
-          
-          {/* TTS 토글 */}
-          <button
-            onClick={() => setTtsEnabled(!ttsEnabled)}
-            className={`w-full flex items-center justify-between p-3 rounded-lg border transition-all ${
-              ttsEnabled 
-                ? 'bg-purple-500/20 border-purple-500' 
-                : 'bg-zinc-700/50 border-zinc-600'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              {ttsEnabled ? <Volume2 className="w-5 h-5 text-purple-400" /> : <VolumeX className="w-5 h-5 text-zinc-500" />}
-              <div className="text-left">
-                <p className="text-sm font-medium">TTS (음성 출력)</p>
-                <p className="text-xs text-zinc-500">NPC 대사를 음성으로 듣기 / Nghe lời thoại NPC</p>
-              </div>
-            </div>
-            <div className={`w-12 h-6 rounded-full transition-colors ${ttsEnabled ? 'bg-purple-500' : 'bg-zinc-600'}`}>
-              <div className={`w-5 h-5 bg-white rounded-full mt-0.5 transition-transform ${ttsEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
-            </div>
-          </button>
-
-          {/* STT 토글 */}
-          <button
-            onClick={() => setSttEnabled(!sttEnabled)}
-            className={`w-full flex items-center justify-between p-3 rounded-lg border transition-all ${
-              sttEnabled 
-                ? 'bg-pink-500/20 border-pink-500' 
-                : 'bg-zinc-700/50 border-zinc-600'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              {sttEnabled ? <Mic className="w-5 h-5 text-pink-400" /> : <MicOff className="w-5 h-5 text-zinc-500" />}
-              <div className="text-left">
-                <p className="text-sm font-medium">STT (음성 입력)</p>
-                <p className="text-xs text-zinc-500">마이크로 한국어 말하기 / Nói tiếng Hàn bằng mic</p>
-              </div>
-            </div>
-            <div className={`w-12 h-6 rounded-full transition-colors ${sttEnabled ? 'bg-pink-500' : 'bg-zinc-600'}`}>
-              <div className={`w-5 h-5 bg-white rounded-full mt-0.5 transition-transform ${sttEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
-            </div>
-          </button>
-        </div>
-
         <Button
           onClick={onStart}
           disabled={isLoading}
@@ -583,46 +512,9 @@ function LoadingPhase({ chapter }: { chapter: number }) {
 }
 
 // ================== 프롤로그 화면 ==================
-function ProloguePhase({ storyData, onContinue, ttsEnabled }: { 
-  storyData: StoryData; onContinue: () => void; ttsEnabled: boolean 
+function ProloguePhase({ storyData, onContinue }: { 
+  storyData: StoryData; onContinue: () => void;
 }) {
-  const [isTtsPlaying, setIsTtsPlaying] = useState(false);
-
-  const playTts = async (text: string) => {
-    if (!ttsEnabled || !text) return;
-    setIsTtsPlaying(true);
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/drama-tts`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({ text, voice: 'nova' }),
-        }
-      );
-      const data = await response.json();
-      if (data.audioContent) {
-        const audio = new Audio(`data:audio/mpeg;base64,${data.audioContent}`);
-        audio.onended = () => setIsTtsPlaying(false);
-        await audio.play();
-      }
-    } catch (error) {
-      console.error('TTS error:', error);
-    } finally {
-      setIsTtsPlaying(false);
-    }
-  };
-
-  useEffect(() => {
-    if (ttsEnabled && storyData.scene.prologue_ko) {
-      const timer = setTimeout(() => playTts(storyData.scene.prologue_ko), 800);
-      return () => clearTimeout(timer);
-    }
-  }, [ttsEnabled, storyData.scene.prologue_ko]);
-
   return (
     <motion.div
       key="prologue"
@@ -663,18 +555,7 @@ function ProloguePhase({ storyData, onContinue, ttsEnabled }: {
           transition={{ delay: 0.6 }}
           className="max-w-md text-center space-y-6 bg-black/40 backdrop-blur-sm p-6 rounded-2xl"
         >
-          <div className="relative">
-            <p className="text-xl text-zinc-200 leading-relaxed font-medium">{storyData.scene.prologue_ko}</p>
-            {isTtsPlaying && (
-              <motion.div
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ repeat: Infinity, duration: 1 }}
-                className="absolute -right-2 -top-2 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center"
-              >
-                <Volume2 className="w-3 h-3 text-white" />
-              </motion.div>
-            )}
-          </div>
+          <p className="text-xl text-zinc-200 leading-relaxed font-medium">{storyData.scene.prologue_ko}</p>
           <p className="text-sm text-zinc-400">{storyData.scene.prologue_vi}</p>
           <div className="pt-4 text-zinc-500 text-sm">{storyData.scene.setting_ko}</div>
         </motion.div>
@@ -695,46 +576,11 @@ function ProloguePhase({ storyData, onContinue, ttsEnabled }: {
 }
 
 // ================== 대화 화면 ==================
-function DialoguePhase({ storyData, dialogueIndex, stats, onNext, ttsEnabled, isTtsPlaying, setIsTtsPlaying }: { 
+function DialoguePhase({ storyData, dialogueIndex, stats, onNext }: { 
   storyData: StoryData; dialogueIndex: number; stats: GameStats; onNext: () => void;
-  ttsEnabled: boolean; isTtsPlaying: boolean; setIsTtsPlaying: (v: boolean) => void;
 }) {
   const currentLine = storyData.dialogue[dialogueIndex];
   const progress = ((dialogueIndex + 1) / storyData.dialogue.length) * 100;
-
-  const playTts = async (text: string) => {
-    if (!ttsEnabled || !text) return;
-    setIsTtsPlaying(true);
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/drama-tts`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({ text, voice: 'nova' }),
-        }
-      );
-      const data = await response.json();
-      if (data.audioContent) {
-        const audio = new Audio(`data:audio/mpeg;base64,${data.audioContent}`);
-        audio.onended = () => setIsTtsPlaying(false);
-        await audio.play();
-      }
-    } catch (error) {
-      console.error('TTS error:', error);
-    } finally {
-      setIsTtsPlaying(false);
-    }
-  };
-
-  useEffect(() => {
-    if (ttsEnabled && currentLine?.text_ko) {
-      playTts(currentLine.text_ko);
-    }
-  }, [dialogueIndex, ttsEnabled]);
 
   return (
     <motion.div
@@ -756,19 +602,7 @@ function DialoguePhase({ storyData, dialogueIndex, stats, onNext, ttsEnabled, is
       <div className="p-3 bg-black/60 backdrop-blur-sm border-b border-zinc-700/50">
         <div className="flex justify-between items-center text-xs mb-2">
           <span className="text-zinc-400">📍 {storyData.chapter.location}</span>
-          <div className="flex items-center gap-2">
-            {isTtsPlaying && (
-              <motion.div
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ repeat: Infinity, duration: 1 }}
-                className="flex items-center gap-1 text-purple-400"
-              >
-                <Volume2 className="w-3 h-3" />
-                <span>재생중</span>
-              </motion.div>
-            )}
-            <span className="text-pink-400">{dialogueIndex + 1} / {storyData.dialogue.length}</span>
-          </div>
+          <span className="text-pink-400">{dialogueIndex + 1} / {storyData.dialogue.length}</span>
         </div>
         <div className="h-1 bg-zinc-800 rounded-full overflow-hidden">
           <motion.div 
@@ -788,7 +622,7 @@ function DialoguePhase({ storyData, dialogueIndex, stats, onNext, ttsEnabled, is
         >
           {getNpcPortrait(currentLine?.speaker || '') ? (
             <div className="relative mx-auto mb-4">
-              <div className={`w-32 h-32 rounded-full overflow-hidden border-3 border-purple-400/50 shadow-[0_0_50px_rgba(168,85,247,0.4)] ${isTtsPlaying ? 'animate-pulse' : ''}`}>
+              <div className="w-32 h-32 rounded-full overflow-hidden border-3 border-purple-400/50 shadow-[0_0_50px_rgba(168,85,247,0.4)]">
                 <img 
                   src={getNpcPortrait(currentLine?.speaker || '')!}
                   alt={currentLine?.speaker}
@@ -802,7 +636,7 @@ function DialoguePhase({ storyData, dialogueIndex, stats, onNext, ttsEnabled, is
               </div>
             </div>
           ) : (
-            <div className={`w-28 h-28 mx-auto rounded-full bg-gradient-to-br from-purple-500/30 to-pink-500/30 border-2 border-purple-400/50 flex items-center justify-center shadow-[0_0_50px_rgba(168,85,247,0.3)] mb-4 ${isTtsPlaying ? 'animate-pulse' : ''}`}>
+            <div className="w-28 h-28 mx-auto rounded-full bg-gradient-to-br from-purple-500/30 to-pink-500/30 border-2 border-purple-400/50 flex items-center justify-center shadow-[0_0_50px_rgba(168,85,247,0.3)] mb-4">
               <span className="text-5xl">
                 {currentLine?.emotion ? EMOTION_EMOJIS[currentLine.emotion] || '😐' : '🎭'}
               </span>
@@ -839,49 +673,10 @@ function DialoguePhase({ storyData, dialogueIndex, stats, onNext, ttsEnabled, is
 }
 
 // ================== 미션 화면 ==================
-function MissionPhase({ storyData, stats, userInput, setUserInput, onSubmit, sttEnabled, isRecording, setIsRecording, mediaRecorderRef, audioChunksRef }: {
+function MissionPhase({ storyData, stats, userInput, setUserInput, onSubmit }: {
   storyData: StoryData; stats: GameStats; userInput: string; setUserInput: (v: string) => void; onSubmit: () => void;
-  sttEnabled: boolean; isRecording: boolean; setIsRecording: (v: boolean) => void;
-  mediaRecorderRef: React.MutableRefObject<MediaRecorder | null>;
-  audioChunksRef: React.MutableRefObject<Blob[]>;
 }) {
   const mission = storyData.mission;
-  const [isTranscribing, setIsTranscribing] = useState(false);
-
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
-      mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunksRef.current.push(e.data); };
-      mediaRecorder.onstop = async () => {
-        stream.getTracks().forEach(t => t.stop());
-        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        setIsTranscribing(true);
-        const reader = new FileReader();
-        reader.readAsDataURL(blob);
-        reader.onloadend = async () => {
-          try {
-            const base64 = (reader.result as string).split(',')[1];
-            const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/manager-stt`, {
-              method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
-              body: JSON.stringify({ audio: base64 }),
-            });
-            const data = await res.json();
-            if (data.transcribedText) { setUserInput(data.transcribedText); toast.success('✓ 음성 인식 완료!'); }
-            else if (data.error) { toast.error(`음성 인식 실패: ${data.error}`); }
-          } catch (e) { toast.error('음성 인식 실패'); }
-          setIsTranscribing(false);
-        };
-      };
-      mediaRecorder.start();
-      setIsRecording(true);
-      toast.info('🎤 녹음 중... / Đang ghi âm...');
-    } catch { toast.error('마이크 접근 실패'); }
-  };
-
-  const stopRecording = () => { if (mediaRecorderRef.current && isRecording) { mediaRecorderRef.current.stop(); setIsRecording(false); } };
 
   return (
     <motion.div key="mission" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full flex flex-col overflow-y-auto">
@@ -917,16 +712,13 @@ function MissionPhase({ storyData, stats, userInput, setUserInput, onSubmit, stt
           </div>
         </div>
         <div className="space-y-3">
-          <div className="relative">
-            <textarea value={userInput} onChange={(e) => setUserInput(e.target.value)} placeholder="한국어로 응답하세요... / Trả lời bằng tiếng Hàn..." className="w-full bg-zinc-900/80 border-2 border-pink-500/30 rounded-xl px-4 py-3 resize-none h-28 focus:border-pink-500 focus:outline-none text-white placeholder:text-zinc-500" />
-            {sttEnabled && (
-              <button onClick={isRecording ? stopRecording : startRecording} disabled={isTranscribing} className={`absolute right-3 bottom-3 w-12 h-12 rounded-full flex items-center justify-center ${isRecording ? 'bg-red-500 animate-pulse' : isTranscribing ? 'bg-yellow-500' : 'bg-pink-500 hover:bg-pink-600'}`}>
-                {isTranscribing ? <Loader2 className="w-5 h-5 text-white animate-spin" /> : isRecording ? <MicOff className="w-5 h-5 text-white" /> : <Mic className="w-5 h-5 text-white" />}
-              </button>
-            )}
-          </div>
-          {sttEnabled && <p className="text-xs text-zinc-500 text-center">{isRecording ? '🔴 녹음 중...' : '🎤 마이크 버튼으로 음성 입력'}</p>}
-          <Button onClick={onSubmit} disabled={!userInput.trim() || isRecording || isTranscribing} className="w-full py-4 bg-gradient-to-r from-pink-500 to-purple-600 text-lg font-bold disabled:opacity-50">
+          <textarea 
+            value={userInput} 
+            onChange={(e) => setUserInput(e.target.value)} 
+            placeholder="한국어로 응답하세요... / Trả lời bằng tiếng Hàn..." 
+            className="w-full bg-zinc-900/80 border-2 border-pink-500/30 rounded-xl px-4 py-3 resize-none h-28 focus:border-pink-500 focus:outline-none text-white placeholder:text-zinc-500" 
+          />
+          <Button onClick={onSubmit} disabled={!userInput.trim()} className="w-full py-4 bg-gradient-to-r from-pink-500 to-purple-600 text-lg font-bold disabled:opacity-50">
             제출하기 / Gửi ✓
           </Button>
         </div>
