@@ -21,66 +21,145 @@ import {
   Zap,
   Target,
   Users,
-  Check
+  Check,
+  Play,
+  Mic,
+  Brain,
+  GraduationCap,
+  TrendingUp,
+  Shield,
+  Award
 } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
-// Feature data for TOPIK learning
-const topikFeatures = [
+// TOPIK Levels for Vietnamese learners
+const topikLevels = [
+  { level: "TOPIK I", grades: "Cấp 1-2", desc: "Giao tiếp cơ bản", color: "from-korean-green to-korean-teal" },
+  { level: "TOPIK II", grades: "Cấp 3-4", desc: "Trung cấp nâng cao", color: "from-korean-blue to-korean-indigo" },
+  { level: "TOPIK II", grades: "Cấp 5-6", desc: "Thành thạo chuyên nghiệp", color: "from-korean-purple to-korean-pink" },
+];
+
+// Core features
+const coreFeatures = [
   {
     icon: Headphones,
-    title: "듣기 마스터",
-    titleVi: "Luyện Nghe",
-    desc: "실전 TOPIK 듣기 문제와 함께 청해력 향상",
-    color: "from-korean-blue to-korean-teal",
+    title: "Luyện Nghe TOPIK",
+    desc: "Hệ thống bài thi nghe chuẩn TOPIK với AI phân tích phát âm và ngữ điệu chuẩn bản xứ",
+    color: "from-korean-blue to-korean-cyan",
+    stat: "500+",
+    statLabel: "bài nghe"
   },
   {
     icon: BookOpen,
-    title: "읽기 정복",
-    titleVi: "Luyện Đọc",
-    desc: "체계적인 독해 훈련으로 읽기 실력 강화",
-    color: "from-korean-green to-secondary",
+    title: "Đọc Hiểu Chuyên Sâu",
+    desc: "Luyện đọc văn bản từ cơ bản đến nâng cao với giải thích ngữ pháp chi tiết bằng tiếng Việt",
+    color: "from-korean-teal to-korean-green",
+    stat: "1,000+",
+    statLabel: "bài đọc"
   },
   {
     icon: PenTool,
-    title: "쓰기 완성",
-    titleVi: "Luyện Viết",
-    desc: "AI 첨삭으로 완벽한 쓰기 실력 달성",
-    color: "from-korean-purple to-korean-pink",
+    title: "AI Chấm Viết 24/7",
+    desc: "Nộp bài viết và nhận phản hồi chi tiết từ AI trong vài giây. Sửa lỗi ngữ pháp, từ vựng, cấu trúc câu",
+    color: "from-korean-purple to-korean-indigo",
+    stat: "Tức thì",
+    statLabel: "phản hồi"
   },
   {
-    icon: Trophy,
-    title: "급수 달성",
-    titleVi: "Đạt Cấp Độ",
-    desc: "TOPIK I (1-2급) / TOPIK II (3-6급) 목표 달성",
-    color: "from-accent to-korean-orange",
+    icon: Mic,
+    title: "Luyện Phát Âm AI",
+    desc: "Công nghệ nhận dạng giọng nói giúp bạn phát âm chuẩn như người Hàn Quốc bản xứ",
+    color: "from-korean-pink to-korean-red",
+    stat: "99%",
+    statLabel: "chính xác"
   },
 ];
 
-// Game modes
+// Game modes - Vietnamese native
 const gameModes = [
-  { icon: MessageCircle, name: "AI 채팅", color: "bg-korean-teal" },
-  { icon: Heart, name: "러브 시그널", color: "bg-korean-pink" },
-  { icon: Gamepad2, name: "끝말잇기", color: "bg-korean-blue" },
-  { icon: Music, name: "K-POP 퀴즈", color: "bg-korean-purple" },
-  { icon: Film, name: "드라마 더빙", color: "bg-korean-orange" },
-  { icon: Briefcase, name: "알바 시뮬", color: "bg-secondary" },
+  { 
+    icon: MessageCircle, 
+    name: "Sinh Tồn AI", 
+    desc: "10 lượt hội thoại quyết định số phận. Bạn có thoát được?",
+    color: "from-korean-red to-korean-orange",
+    badge: "Hot"
+  },
+  { 
+    icon: Heart, 
+    name: "Tình Yêu Seoul", 
+    desc: "Hẹn hò với người Hàn Quốc qua chat. Luyện ngôn ngữ yêu đương",
+    color: "from-korean-pink to-korean-red",
+    badge: "Mới"
+  },
+  { 
+    icon: Gamepad2, 
+    name: "Nối Từ Tiếng Hàn", 
+    desc: "Đấu trí với AI trong trò chơi nối đuôi từ vựng kinh điển",
+    color: "from-korean-blue to-korean-purple",
+    badge: null
+  },
+  { 
+    icon: Music, 
+    name: "K-POP Quiz", 
+    desc: "Học từ lời bài hát BTS, BLACKPINK, NewJeans và hơn thế nữa",
+    color: "from-korean-purple to-korean-pink",
+    badge: "⭐"
+  },
+  { 
+    icon: Film, 
+    name: "Lồng Tiếng K-Drama", 
+    desc: "Nhập vai diễn viên, lồng tiếng những cảnh phim huyền thoại",
+    color: "from-korean-orange to-korean-yellow",
+    badge: null
+  },
+  { 
+    icon: Briefcase, 
+    name: "Làm Thêm Hàn Quốc", 
+    desc: "Mô phỏng thực tế làm việc part-time tại các cửa hàng Hàn Quốc",
+    color: "from-korean-teal to-korean-green",
+    badge: "Thực tế"
+  },
 ];
 
 // Stats
 const stats = [
-  { value: "50,000+", label: "학습자", icon: Users },
-  { value: "98%", label: "만족도", icon: Star },
-  { value: "6급", label: "최고 달성", icon: Trophy },
-  { value: "10분", label: "하루 학습", icon: Zap },
+  { value: "50,000+", label: "Học viên Việt Nam", icon: Users },
+  { value: "98%", label: "Hài lòng", icon: Star },
+  { value: "TOPIK 6", label: "Cấp cao nhất đạt được", icon: Trophy },
+  { value: "10 phút", label: "Mỗi ngày là đủ", icon: Zap },
+];
+
+// Testimonials
+const testimonials = [
+  {
+    name: "Nguyễn Thị Mai",
+    role: "Sinh viên ĐH Ngoại Ngữ Hà Nội",
+    content: "Mình đã đạt TOPIK 4 chỉ sau 6 tháng học với LUKATO. Phương pháp học qua game thực sự hiệu quả!",
+    avatar: "M",
+    rating: 5
+  },
+  {
+    name: "Trần Văn Hùng", 
+    role: "Nhân viên Samsung Việt Nam",
+    content: "Công cụ luyện phát âm AI giúp mình tự tin giao tiếp với đồng nghiệp Hàn Quốc mỗi ngày.",
+    avatar: "H",
+    rating: 5
+  },
+  {
+    name: "Lê Hoàng Yến",
+    role: "Du học sinh tại Seoul",
+    content: "Trước khi sang Hàn, mình đã học với LUKATO. Giờ mình có thể theo kịp bài giảng đại học!",
+    avatar: "Y",
+    rating: 5
+  }
 ];
 
 const Landing = () => {
   const navigate = useNavigate();
   const [isLoaded, setIsLoaded] = useState(false);
   const { scrollYProgress } = useScroll();
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.3], [1, 0.95]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+  const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.98]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -92,31 +171,35 @@ const Landing = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-[100dvh] bg-background korean-pattern relative overflow-x-hidden">
+    <div className="min-h-[100dvh] bg-background relative overflow-x-hidden">
       {/* Fixed Header */}
       <motion.header 
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="fixed top-0 left-0 right-0 z-50 px-6 py-4"
+        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border/50"
       >
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           {/* Logo */}
           <motion.div 
             whileHover={{ scale: 1.02 }}
-            className="flex items-center gap-2"
+            className="flex items-center gap-3"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center shadow-glow-primary">
-              <span className="text-white font-bold text-lg font-heading">토</span>
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center shadow-glow-primary">
+              <span className="text-primary-foreground font-heading font-black text-xl">L</span>
             </div>
-            <span className="font-heading font-bold text-xl text-foreground">TOPIK</span>
+            <div className="hidden sm:block">
+              <span className="font-heading font-bold text-xl text-foreground">LUKATO</span>
+              <span className="block text-xs text-muted-foreground -mt-0.5">Học tiếng Hàn #1 VN</span>
+            </div>
           </motion.div>
 
           {/* Nav */}
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors font-medium link-underline">기능</a>
-            <a href="#games" className="text-muted-foreground hover:text-foreground transition-colors font-medium link-underline">게임</a>
-            <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors font-medium link-underline">가격</a>
+          <nav className="hidden lg:flex items-center gap-8">
+            <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors font-medium link-underline">Tính năng</a>
+            <a href="#games" className="text-muted-foreground hover:text-foreground transition-colors font-medium link-underline">Game học</a>
+            <a href="#testimonials" className="text-muted-foreground hover:text-foreground transition-colors font-medium link-underline">Đánh giá</a>
+            <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors font-medium link-underline">Bảng giá</a>
           </nav>
 
           {/* Actions */}
@@ -125,64 +208,52 @@ const Landing = () => {
             <Button 
               variant="ghost" 
               onClick={() => navigate("/auth")}
-              className="hidden sm:flex"
+              className="hidden sm:flex font-medium"
             >
-              로그인
+              Đăng nhập
             </Button>
             <Button 
               onClick={() => navigate("/auth")}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground btn-glow-primary rounded-xl font-semibold"
+              className="btn-primary text-primary-foreground rounded-xl font-semibold px-5"
             >
-              시작하기
+              Bắt đầu miễn phí
             </Button>
           </div>
         </div>
       </motion.header>
 
-      {/* Hero Section */}
+      {/* ========== HERO SECTION ========== */}
       <motion.section 
         style={{ opacity: heroOpacity, scale: heroScale }}
-        className="min-h-[100dvh] flex flex-col items-center justify-center px-6 pt-24 pb-16 relative"
+        className="min-h-[100dvh] flex flex-col items-center justify-center px-6 pt-28 pb-20 relative overflow-hidden"
       >
         {/* Background decorations */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Gradient blobs */}
+          {/* Primary blob */}
+          <div className="blob-primary w-[800px] h-[800px] -top-60 -right-40" />
+          {/* Secondary blob */}
+          <div className="blob-secondary w-[600px] h-[600px] -bottom-40 -left-40" />
+          {/* Accent blob */}
           <motion.div 
-            animate={{ 
-              scale: [1, 1.1, 1],
-              rotate: [0, 5, 0]
-            }}
+            animate={{ y: [0, -30, 0], x: [0, 20, 0] }}
             transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-primary/20 via-korean-orange/15 to-transparent rounded-full blur-3xl" 
+            className="absolute top-1/3 right-1/4 w-[300px] h-[300px] bg-korean-purple/10 rounded-full blur-3xl" 
           />
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.15, 1],
-              rotate: [0, -5, 0]
-            }}
-            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-gradient-to-tr from-secondary/20 via-korean-teal/15 to-transparent rounded-full blur-3xl" 
-          />
-          <motion.div 
-            animate={{ y: [0, -30, 0] }}
-            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/3 right-1/4 w-[300px] h-[300px] bg-gradient-to-r from-korean-purple/10 to-korean-pink/10 rounded-full blur-3xl" 
-          />
+          {/* Grid pattern */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.03)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
         </div>
 
         {/* Content */}
-        <div className="relative z-10 max-w-4xl mx-auto text-center">
+        <div className="relative z-10 max-w-5xl mx-auto text-center">
           {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : -20 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-card/80 backdrop-blur-md rounded-full border border-border/50 shadow-soft mb-8"
+            className="badge-premium mb-8"
           >
-            <Sparkles className="w-4 h-4 text-accent" />
-            <span className="text-sm font-medium text-foreground">
-              🇻🇳 베트남 최초 한국어 학습 게임 플랫폼
-            </span>
+            <Sparkles className="w-4 h-4" />
+            <span>🇻🇳 Nền tảng học tiếng Hàn #1 dành cho người Việt</span>
           </motion.div>
 
           {/* Main headline */}
@@ -192,14 +263,15 @@ const Landing = () => {
             transition={{ duration: 0.7, delay: 0.4 }}
             className="mb-8"
           >
-            <h1 className="font-heading font-bold text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.1] tracking-tight mb-6">
-              <span className="text-foreground block">TikTok 대신</span>
-              <span className="text-gradient-sunrise block py-2">TOPIK!</span>
+            <h1 className="font-heading font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.05] tracking-tight mb-8">
+              <span className="text-foreground block">Chinh phục TOPIK</span>
+              <span className="text-gradient-primary block py-2">Chỉ 10 phút mỗi ngày</span>
             </h1>
-            <p className="text-muted-foreground text-lg sm:text-xl md:text-2xl max-w-2xl mx-auto leading-relaxed font-medium">
-              매일 <span className="text-primary font-bold">10분</span>, 게임하듯 즐기며
-              <br className="hidden sm:block" />
-              한국어 실력이 쑥쑥 자랍니다
+            <p className="text-muted-foreground text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed">
+              Học tiếng Hàn như <span className="text-primary font-semibold">chơi game</span>. 
+              Công nghệ AI tiên tiến giúp bạn nói chuẩn, viết đẹp, 
+              <br className="hidden md:block" />
+              và đạt chứng chỉ TOPIK nhanh nhất.
             </p>
           </motion.div>
 
@@ -213,41 +285,41 @@ const Landing = () => {
             <Button
               onClick={() => navigate("/auth")}
               size="lg"
-              className="group w-full sm:w-auto h-14 px-8 bg-gradient-to-r from-primary to-korean-orange hover:from-primary/90 hover:to-korean-orange/90 text-white text-lg font-bold rounded-2xl shadow-glow-primary transition-all duration-300"
+              className="group w-full sm:w-auto h-14 px-8 btn-primary text-primary-foreground text-lg font-bold rounded-2xl transition-all duration-300"
             >
-              무료로 시작하기
+              <Play className="w-5 h-5 mr-2" />
+              Học thử miễn phí
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button
               variant="outline"
               size="lg"
               onClick={() => navigate("/tutorial")}
-              className="w-full sm:w-auto h-14 px-8 border-2 border-border hover:border-primary/50 text-foreground text-lg font-semibold rounded-2xl transition-all duration-300"
+              className="w-full sm:w-auto h-14 px-8 border-2 border-border hover:border-primary/50 text-foreground text-lg font-semibold rounded-2xl transition-all duration-300 bg-card/50 backdrop-blur-sm"
             >
-              사용법 보기
+              Xem hướng dẫn
             </Button>
           </motion.div>
 
-          {/* Game mode pills */}
+          {/* Trust indicators */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
             transition={{ duration: 0.6, delay: 0.8 }}
-            className="flex flex-wrap items-center justify-center gap-3"
+            className="flex flex-wrap items-center justify-center gap-6 text-muted-foreground"
           >
-            {gameModes.map((mode, i) => (
-              <motion.div
-                key={mode.name}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.9 + i * 0.1 }}
-                whileHover={{ scale: 1.05, y: -2 }}
-                className="flex items-center gap-2 px-4 py-2 bg-card/60 backdrop-blur-sm rounded-full border border-border/50 shadow-soft cursor-pointer"
-              >
-                <mode.icon className={`w-4 h-4 text-foreground`} />
-                <span className="text-sm font-medium text-foreground">{mode.name}</span>
-              </motion.div>
-            ))}
+            <div className="flex items-center gap-2">
+              <Shield className="w-5 h-5 text-korean-green" />
+              <span className="text-sm font-medium">Miễn phí trọn đời</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Award className="w-5 h-5 text-korean-blue" />
+              <span className="text-sm font-medium">50,000+ học viên</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-korean-purple" />
+              <span className="text-sm font-medium">Tỷ lệ đỗ TOPIK 95%</span>
+            </div>
           </motion.div>
         </div>
 
@@ -255,11 +327,11 @@ const Landing = () => {
         <motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: isLoaded ? 1 : 0 }}
-          transition={{ delay: 1.5 }}
-          onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+          transition={{ delay: 1.2 }}
+          onClick={() => document.getElementById('stats')?.scrollIntoView({ behavior: 'smooth' })}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
         >
-          <span className="text-xs font-medium">더 알아보기</span>
+          <span className="text-xs font-medium">Khám phá thêm</span>
           <motion.div
             animate={{ y: [0, 6, 0] }}
             transition={{ duration: 1.5, repeat: Infinity }}
@@ -269,10 +341,10 @@ const Landing = () => {
         </motion.button>
       </motion.section>
 
-      {/* Stats Section */}
-      <section className="py-16 px-6 relative">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      {/* ========== STATS SECTION ========== */}
+      <section id="stats" className="py-20 px-6 relative bg-muted/30">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {stats.map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -280,18 +352,18 @@ const Landing = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="glass-card p-6 text-center"
+                className="floating-card p-6 text-center"
               >
-                <stat.icon className="w-8 h-8 mx-auto mb-3 text-primary" />
-                <div className="text-3xl sm:text-4xl font-bold text-foreground mb-1">{stat.value}</div>
-                <div className="text-muted-foreground font-medium">{stat.label}</div>
+                <stat.icon className="w-8 h-8 mx-auto mb-4 text-primary" />
+                <div className="stat-number text-4xl sm:text-5xl mb-2">{stat.value}</div>
+                <div className="text-muted-foreground font-medium text-sm">{stat.label}</div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* ========== FEATURES SECTION ========== */}
       <section id="features" className="py-24 px-6 relative">
         <div className="max-w-6xl mx-auto">
           {/* Section header */}
@@ -301,43 +373,96 @@ const Landing = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <span className="inline-block px-4 py-2 bg-secondary/10 text-secondary font-semibold text-sm rounded-full mb-4">
-              TOPIK 완벽 대비
+            <span className="badge-secondary mb-6">
+              <Brain className="w-4 h-4" />
+              Công nghệ AI tiên tiến
             </span>
-            <h2 className="font-heading font-bold text-4xl sm:text-5xl text-foreground mb-4">
-              체계적인 <span className="text-gradient-ocean">학습 시스템</span>
+            <h2 className="font-heading font-bold text-4xl sm:text-5xl lg:text-6xl text-foreground mb-6">
+              Học toàn diện <span className="text-gradient-secondary">4 kỹ năng</span>
             </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              듣기, 읽기, 쓰기 모든 영역을 게임처럼 재미있게 마스터하세요
+            <p className="text-muted-foreground text-lg sm:text-xl max-w-2xl mx-auto">
+              Hệ thống luyện thi TOPIK hoàn chỉnh với AI hỗ trợ 24/7, 
+              được thiết kế đặc biệt cho người Việt Nam
             </p>
           </motion.div>
 
           {/* Feature cards */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {topikFeatures.map((feature, i) => (
+          <div className="grid md:grid-cols-2 gap-6">
+            {coreFeatures.map((feature, i) => (
               <motion.div
                 key={feature.title}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -8 }}
-                className="glass-card p-6 group cursor-pointer"
+                whileHover={{ y: -6 }}
+                className="premium-card p-8 group cursor-pointer"
               >
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform`}>
-                  <feature.icon className="w-7 h-7 text-white" />
+                <div className="flex items-start gap-6">
+                  <div className={`icon-wrapper w-16 h-16 shrink-0 bg-gradient-to-br ${feature.color}`}>
+                    <feature.icon className="w-8 h-8 text-primary-foreground" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-heading font-bold text-xl text-foreground mb-2 group-hover:text-primary transition-colors">
+                      {feature.title}
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed mb-4">
+                      {feature.desc}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl font-bold text-gradient-primary">{feature.stat}</span>
+                      <span className="text-muted-foreground text-sm">{feature.statLabel}</span>
+                    </div>
+                  </div>
                 </div>
-                <h3 className="font-heading font-bold text-xl text-foreground mb-1">{feature.title}</h3>
-                <p className="text-primary text-sm font-medium mb-3">{feature.titleVi}</p>
-                <p className="text-muted-foreground text-sm leading-relaxed">{feature.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Games Section */}
-      <section id="games" className="py-24 px-6 bg-gradient-to-b from-transparent via-muted/30 to-transparent relative">
+      {/* ========== TOPIK LEVELS ========== */}
+      <section className="py-20 px-6 bg-muted/30 relative">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="font-heading font-bold text-3xl sm:text-4xl text-foreground mb-4">
+              Lộ trình học theo <span className="text-gradient-primary">cấp độ TOPIK</span>
+            </h2>
+            <p className="text-muted-foreground text-lg">
+              Chương trình được cá nhân hóa theo mục tiêu của bạn
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {topikLevels.map((level, i) => (
+              <motion.div
+                key={level.grades}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                whileHover={{ scale: 1.03 }}
+                className="floating-card p-6 text-center cursor-pointer"
+              >
+                <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br ${level.color} flex items-center justify-center`}>
+                  <GraduationCap className="w-8 h-8 text-primary-foreground" />
+                </div>
+                <div className="text-sm font-semibold text-primary mb-1">{level.level}</div>
+                <div className="font-heading font-bold text-2xl text-foreground mb-2">{level.grades}</div>
+                <p className="text-muted-foreground text-sm">{level.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ========== GAMES SECTION ========== */}
+      <section id="games" className="py-24 px-6 relative">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -345,94 +470,152 @@ const Landing = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <span className="inline-block px-4 py-2 bg-korean-purple/10 text-korean-purple font-semibold text-sm rounded-full mb-4">
-              8가지 게임 모드
+            <span className="badge-premium mb-6">
+              <Gamepad2 className="w-4 h-4" />
+              6 chế độ game độc quyền
             </span>
-            <h2 className="font-heading font-bold text-4xl sm:text-5xl text-foreground mb-4">
-              재미있게 <span className="text-gradient-hanbok">배우는 한국어</span>
+            <h2 className="font-heading font-bold text-4xl sm:text-5xl lg:text-6xl text-foreground mb-6">
+              Học mà như <span className="text-gradient-primary">chơi game</span>
             </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              지루한 교과서는 그만! 게임하듯 즐기며 한국어가 늡니다
+            <p className="text-muted-foreground text-lg sm:text-xl max-w-2xl mx-auto">
+              Quên đi những bài tập nhàm chán! Tiến bộ mỗi ngày với các 
+              mini-game thú vị, nghiện và hiệu quả
             </p>
           </motion.div>
 
-          {/* Game preview cards - simplified */}
+          {/* Game cards */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { icon: MessageCircle, title: "AI 채팅 서바이벌", desc: "AI와 10턴 대화하며 위기 탈출", color: "from-korean-teal to-korean-blue" },
-              { icon: Heart, title: "서울 러브 시그널", desc: "한국인 이성과 로맨틱 대화", color: "from-korean-pink to-korean-red" },
-              { icon: Gamepad2, title: "끝말잇기", desc: "AI와 한국어 끝말잇기 대결", color: "from-korean-blue to-korean-purple" },
-              { icon: Music, title: "K-POP 가사 퀴즈", desc: "좋아하는 K-POP으로 학습", color: "from-korean-purple to-korean-pink" },
-              { icon: Film, title: "K-Drama 더빙", desc: "드라마 명대사 따라하기", color: "from-korean-orange to-accent" },
-              { icon: Briefcase, title: "알바 시뮬레이터", desc: "한국 알바 현장 체험", color: "from-secondary to-korean-teal" },
-            ].map((game, i) => (
+            {gameModes.map((game, i) => (
               <motion.div
-                key={game.title}
+                key={game.name}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -6, scale: 1.02 }}
-                className="glass-card p-6 cursor-pointer group"
+                transition={{ delay: i * 0.08 }}
+                whileHover={{ y: -8, scale: 1.02 }}
+                className="premium-card p-6 cursor-pointer group relative overflow-hidden"
               >
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${game.color} flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform`}>
-                  <game.icon className="w-6 h-6 text-white" />
+                {game.badge && (
+                  <div className="absolute top-4 right-4 px-2 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full">
+                    {game.badge}
+                  </div>
+                )}
+                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${game.color} flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform`}>
+                  <game.icon className="w-7 h-7 text-primary-foreground" />
                 </div>
-                <h3 className="font-heading font-bold text-lg text-foreground mb-2">{game.title}</h3>
-                <p className="text-muted-foreground text-sm">{game.desc}</p>
+                <h3 className="font-heading font-bold text-xl text-foreground mb-2 group-hover:text-primary transition-colors">
+                  {game.name}
+                </h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{game.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="py-24 px-6 relative">
-        <div className="max-w-4xl mx-auto">
+      {/* ========== TESTIMONIALS ========== */}
+      <section id="testimonials" className="py-24 px-6 bg-muted/30 relative">
+        <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <span className="inline-block px-4 py-2 bg-accent/10 text-accent font-semibold text-sm rounded-full mb-4">
-              심플한 가격
+            <span className="badge-secondary mb-6">
+              <Star className="w-4 h-4" />
+              Đánh giá từ học viên
             </span>
-            <h2 className="font-heading font-bold text-4xl sm:text-5xl text-foreground mb-4">
-              <span className="text-gradient-sunrise">무료</span>로 시작하세요
+            <h2 className="font-heading font-bold text-4xl sm:text-5xl text-foreground mb-6">
+              Hơn <span className="text-gradient-secondary">50,000 học viên</span> tin dùng
+            </h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {testimonials.map((testimonial, i) => (
+              <motion.div
+                key={testimonial.name}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="premium-card p-6"
+              >
+                <div className="flex items-center gap-1 mb-4">
+                  {[...Array(testimonial.rating)].map((_, j) => (
+                    <Star key={j} className="w-4 h-4 fill-korean-yellow text-korean-yellow" />
+                  ))}
+                </div>
+                <p className="text-foreground mb-6 leading-relaxed">"{testimonial.content}"</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center">
+                    <span className="text-primary-foreground font-bold">{testimonial.avatar}</span>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-foreground">{testimonial.name}</div>
+                    <div className="text-sm text-muted-foreground">{testimonial.role}</div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ========== PRICING SECTION ========== */}
+      <section id="pricing" className="py-24 px-6 relative">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <span className="badge-premium mb-6">
+              <Zap className="w-4 h-4" />
+              Bảng giá đơn giản
+            </span>
+            <h2 className="font-heading font-bold text-4xl sm:text-5xl text-foreground mb-6">
+              Bắt đầu <span className="text-gradient-primary">miễn phí</span> ngay hôm nay
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              기본 기능은 영원히 무료! 더 많은 기능이 필요할 때만 업그레이드
+              Tất cả tính năng cơ bản đều miễn phí. Nâng cấp khi bạn cần thêm
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Free Plan */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="glass-card p-8"
+              className="premium-card p-8"
             >
-              <div className="text-center mb-6">
-                <h3 className="font-heading font-bold text-2xl text-foreground mb-2">무료</h3>
-                <div className="text-4xl font-bold text-foreground mb-1">₫0</div>
-                <p className="text-muted-foreground text-sm">영원히 무료</p>
+              <div className="text-center mb-8">
+                <h3 className="font-heading font-bold text-2xl text-foreground mb-2">Miễn phí</h3>
+                <div className="text-5xl font-black text-foreground mb-2">0₫</div>
+                <p className="text-muted-foreground">Miễn phí mãi mãi</p>
               </div>
-              <ul className="space-y-3 mb-8">
-                {["하루 5개 AI 퀴즈", "기본 게임 모드", "랭킹 시스템", "출석 체크"].map((item) => (
+              <ul className="space-y-4 mb-8">
+                {[
+                  "5 bài học AI mỗi ngày",
+                  "Tất cả 6 chế độ game",
+                  "Bảng xếp hạng toàn quốc",
+                  "Điểm danh nhận thưởng",
+                  "Hỗ trợ cộng đồng"
+                ].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-foreground">
-                    <Check className="w-5 h-5 text-secondary" />
+                    <Check className="w-5 h-5 text-korean-green shrink-0" />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
               <Button 
                 variant="outline" 
-                className="w-full h-12 rounded-xl font-semibold"
+                className="w-full h-12 rounded-xl font-semibold text-base"
                 onClick={() => navigate("/auth")}
               >
-                무료로 시작
+                Bắt đầu miễn phí
               </Button>
             </motion.div>
 
@@ -441,75 +624,98 @@ const Landing = () => {
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="glass-card p-8 border-2 border-primary/50 relative overflow-hidden"
+              className="premium-card p-8 border-2 border-primary/50 relative overflow-hidden"
             >
               <div className="absolute top-4 right-4 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full">
-                추천
+                Phổ biến nhất
               </div>
-              <div className="text-center mb-6">
-                <h3 className="font-heading font-bold text-2xl text-foreground mb-2">프리미엄</h3>
-                <div className="text-4xl font-bold text-foreground mb-1">₫99,000</div>
-                <p className="text-muted-foreground text-sm">/월</p>
+              <div className="text-center mb-8">
+                <h3 className="font-heading font-bold text-2xl text-foreground mb-2">Premium</h3>
+                <div className="text-5xl font-black text-foreground mb-2">99.000₫</div>
+                <p className="text-muted-foreground">/tháng</p>
               </div>
-              <ul className="space-y-3 mb-8">
-                {["무제한 AI 퀴즈", "AI 쓰기 첨삭", "오답 노트", "학습 리포트", "모든 게임 모드", "광고 제거"].map((item) => (
+              <ul className="space-y-4 mb-8">
+                {[
+                  "Không giới hạn bài học AI",
+                  "AI chấm bài viết chi tiết",
+                  "Sổ ghi chú lỗi sai thông minh",
+                  "Báo cáo tiến độ hàng tuần",
+                  "Lộ trình học cá nhân hóa",
+                  "Không quảng cáo",
+                  "Hỗ trợ ưu tiên 24/7"
+                ].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-foreground">
-                    <Check className="w-5 h-5 text-primary" />
+                    <Check className="w-5 h-5 text-primary shrink-0" />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
               <Button 
-                className="w-full h-12 rounded-xl font-semibold bg-gradient-to-r from-primary to-korean-orange hover:opacity-90 btn-glow-primary"
+                className="w-full h-12 rounded-xl font-semibold text-base btn-primary text-primary-foreground"
                 onClick={() => navigate("/auth")}
               >
-                프리미엄 시작
+                Nâng cấp Premium
               </Button>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="py-24 px-6 relative">
+      {/* ========== FINAL CTA ========== */}
+      <section className="py-24 px-6 relative overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
+        
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="max-w-3xl mx-auto text-center"
+          className="relative z-10 max-w-3xl mx-auto text-center"
         >
-          <h2 className="font-heading font-bold text-4xl sm:text-5xl text-foreground mb-6">
-            지금 바로 <span className="text-gradient-sunrise">시작</span>하세요
+          <h2 className="font-heading font-bold text-4xl sm:text-5xl lg:text-6xl text-foreground mb-6">
+            Sẵn sàng chinh phục <span className="text-gradient-primary">tiếng Hàn</span>?
           </h2>
-          <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
-            매일 10분, 게임하듯 즐기다 보면 어느새 TOPIK 6급!
+          <p className="text-muted-foreground text-lg sm:text-xl mb-10 max-w-2xl mx-auto">
+            Tham gia cùng hơn 50,000 học viên Việt Nam. Chỉ cần 10 phút mỗi ngày, 
+            bạn sẽ ngạc nhiên với sự tiến bộ của mình!
           </p>
-          <Button
-            onClick={() => navigate("/auth")}
-            size="lg"
-            className="group h-14 px-10 bg-gradient-to-r from-primary to-korean-orange hover:opacity-90 text-white text-lg font-bold rounded-2xl shadow-glow-primary"
-          >
-            무료로 시작하기
-            <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </Button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button
+              onClick={() => navigate("/auth")}
+              size="lg"
+              className="group h-14 px-10 btn-primary text-primary-foreground text-lg font-bold rounded-2xl"
+            >
+              <Sparkles className="w-5 h-5 mr-2" />
+              Bắt đầu học ngay
+              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </div>
         </motion.div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 px-6 border-t border-border/50">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center">
-              <span className="text-white font-bold text-sm">토</span>
+      {/* ========== FOOTER ========== */}
+      <footer className="py-12 px-6 border-t border-border bg-muted/30">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center">
+                <span className="text-primary-foreground font-heading font-bold text-lg">L</span>
+              </div>
+              <div>
+                <span className="font-heading font-bold text-foreground">LUKATO</span>
+                <span className="block text-xs text-muted-foreground">Nền tảng học tiếng Hàn #1 Việt Nam</span>
+              </div>
             </div>
-            <span className="font-heading font-bold text-foreground">TOPIK 슈퍼앱</span>
-          </div>
-          <p className="text-muted-foreground text-sm">
-            © 2025 LUKATO. All rights reserved.
-          </p>
-          <div className="flex items-center gap-4">
-            <a href="#" className="text-muted-foreground hover:text-foreground text-sm">이용약관</a>
-            <a href="#" className="text-muted-foreground hover:text-foreground text-sm">개인정보</a>
+            
+            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <a href="#" className="hover:text-foreground transition-colors">Điều khoản</a>
+              <a href="#" className="hover:text-foreground transition-colors">Bảo mật</a>
+              <a href="#" className="hover:text-foreground transition-colors">Liên hệ</a>
+            </div>
+            
+            <p className="text-muted-foreground text-sm">
+              © 2025 LUKATO Vietnam. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>
