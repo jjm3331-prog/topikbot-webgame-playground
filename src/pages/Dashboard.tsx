@@ -10,6 +10,7 @@ import {
   Target,
   ChevronRight,
   Crown,
+  Briefcase,
   Users,
   FileText,
   StickyNote,
@@ -326,6 +327,33 @@ const Dashboard = () => {
             </div>
           </div>
           <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+        </motion.div>
+
+        {/* Headhunting Promo Banner */}
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.22 }}
+          onClick={() => navigate("/headhunting")}
+          className="relative overflow-hidden rounded-2xl cursor-pointer group"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-korean-purple via-korean-blue to-korean-cyan" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(255,255,255,0.1),transparent)]" />
+          <div className="relative z-10 p-4 sm:p-5 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                <Briefcase className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-korean-yellow/20 text-korean-yellow font-bold">프리미엄</span>
+                </div>
+                <h3 className="font-bold text-white text-sm sm:text-base">한국 기업 헤드헌팅 서비스</h3>
+                <p className="text-white/70 text-xs">전문 헤드헌터가 무료로 취업 지원!</p>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-white/70 group-hover:translate-x-1 transition-transform" />
+          </div>
         </motion.div>
 
         {/* Quick Action Grid */}
