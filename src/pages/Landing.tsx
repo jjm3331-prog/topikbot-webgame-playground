@@ -337,30 +337,30 @@ const Landing = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="pt-8 border-t border-border/30"
+            className="pt-10 border-t border-border/30"
           >
-            <p className="text-center text-sm text-muted-foreground mb-6">
+            <p className="text-center text-sm sm:text-base text-muted-foreground mb-8">
               🤝 Đối tác chính thức với các trường đại học hàng đầu Việt Nam
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8">
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-4 sm:gap-6 max-w-4xl mx-auto">
               {partnerUniversities.map((uni) => (
                 <motion.div
                   key={uni.name}
-                  whileHover={{ scale: 1.05 }}
-                  className="group relative"
+                  whileHover={{ scale: 1.08 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="group relative flex flex-col items-center"
                 >
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white rounded-lg p-1.5 shadow-sm hover:shadow-md transition-shadow flex items-center justify-center">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-white rounded-xl p-2 sm:p-3 shadow-md hover:shadow-xl transition-all duration-300 flex items-center justify-center border border-border/20">
                     <img 
                       src={uni.logo} 
                       alt={uni.name}
                       className="w-full h-full object-contain"
                     />
                   </div>
-                  <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                    <span className="text-[10px] text-muted-foreground bg-background/90 px-2 py-0.5 rounded shadow-sm">
-                      {uni.name}
-                    </span>
-                  </div>
+                  {/* Mobile: Always show name below */}
+                  <span className="mt-2 text-[10px] sm:text-xs text-muted-foreground text-center leading-tight line-clamp-2 max-w-[80px] sm:max-w-[100px]">
+                    {uni.name.split('(')[0].trim()}
+                  </span>
                 </motion.div>
               ))}
             </div>
