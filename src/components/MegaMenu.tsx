@@ -8,19 +8,25 @@ import {
   Trophy,
   HelpCircle,
   Compass,
-  GraduationCap,
-  FileText,
   History,
   Notebook,
   Users,
-  Gift,
   Sparkles,
   Crown,
   PenTool,
-  AlertCircle,
   ChevronDown,
   X,
-  Menu
+  Menu,
+  Gamepad2,
+  Heart,
+  Mic2,
+  Briefcase,
+  Drama,
+  Music,
+  MessageSquare,
+  Bookmark,
+  Languages,
+  ExternalLink
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -30,6 +36,7 @@ interface MenuItem {
   label: string;
   href: string;
   isPremium?: boolean;
+  isExternal?: boolean;
 }
 
 interface MenuSection {
@@ -39,45 +46,49 @@ interface MenuSection {
 
 const menuSections: MenuSection[] = [
   {
-    title: "MENU CHÍNH",
+    title: "HỌC TOPIK",
     items: [
-      { icon: Home, label: "Trang chủ", href: "/" },
-      { icon: BookOpen, label: "Môn học", href: "/game" },
-      { icon: MessageCircle, label: "Hỏi AI", href: "/chat" },
+      { icon: BookOpen, label: "TOPIK I (Cấp 1-2)", href: "/topik-1" },
+      { icon: BookOpen, label: "TOPIK II (Cấp 3-4)", href: "/topik-2-basic" },
+      { icon: Crown, label: "TOPIK II (Cấp 5-6)", href: "/topik-2-advanced", isPremium: true },
+      { icon: PenTool, label: "Đề thi thử", href: "/practice-test" },
     ]
   },
   {
-    title: "KHÁM PHÁ",
+    title: "GAME HỌC",
     items: [
-      { icon: Trophy, label: "Xếp hạng", href: "/ranking" },
-      { icon: HelpCircle, label: "Hỗ trợ", href: "#" },
-      { icon: Compass, label: "Hướng dẫn", href: "/tutorial" },
-      { icon: Crown, label: "Nâng cấp", href: "#pricing" },
+      { icon: Gamepad2, label: "AI Sinh tồn Seoul", href: "/chat" },
+      { icon: Heart, label: "Hẹn hò Hàn Quốc", href: "/dating" },
+      { icon: MessageSquare, label: "Nối từ tiếng Hàn", href: "/wordchain" },
+      { icon: Music, label: "K-POP Quiz", href: "/kpop" },
+      { icon: Drama, label: "K-Drama Lồng tiếng", href: "/kdrama" },
+      { icon: Briefcase, label: "Làm thêm Hàn Quốc", href: "/parttime" },
     ]
   },
   {
-    title: "HỌC TẬP",
+    title: "CÔNG CỤ AI",
     items: [
-      { icon: GraduationCap, label: "Snapshot Coaching", href: "#", isPremium: true },
-      { icon: FileText, label: "Báo cáo Tuyển sinh", href: "#", isPremium: true },
-      { icon: PenTool, label: "Chấm văn AI", href: "#", isPremium: true },
+      { icon: MessageCircle, label: "Hỏi AI (5 lần/ngày)", href: "/ai-tutor" },
+      { icon: PenTool, label: "Chấm Writing TOPIK", href: "/writing-correction", isPremium: true },
+      { icon: Languages, label: "Dịch Hàn-Việt", href: "/translate" },
     ]
   },
   {
-    title: "HỌC TẬP CỦA TÔI",
+    title: "CỦA TÔI",
     items: [
-      { icon: Notebook, label: "Ghi chú", href: "#" },
-      { icon: FileText, label: "Tài liệu", href: "#", isPremium: true },
-      { icon: History, label: "Lịch sử", href: "#" },
-      { icon: AlertCircle, label: "Sổ lỗi sai", href: "#", isPremium: true },
+      { icon: Sparkles, label: "Tiến độ học tập", href: "/progress" },
+      { icon: Notebook, label: "Sổ lỗi sai", href: "/mistakes", isPremium: true },
+      { icon: Bookmark, label: "Từ vựng đã lưu", href: "/vocabulary" },
+      { icon: History, label: "Lịch sử học tập", href: "/history" },
     ]
   },
   {
     title: "KHÁC",
     items: [
-      { icon: Users, label: "Cộng đồng", href: "#" },
-      { icon: Gift, label: "Điểm thưởng", href: "#" },
-      { icon: Sparkles, label: "Tính năng", href: "#features" },
+      { icon: Trophy, label: "Bảng xếp hạng", href: "/ranking" },
+      { icon: Users, label: "Cộng đồng", href: "/community" },
+      { icon: Compass, label: "Hướng dẫn", href: "/tutorial" },
+      { icon: HelpCircle, label: "Hỗ trợ", href: "/support" },
     ]
   },
 ];
@@ -86,9 +97,11 @@ export const MegaMenu = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleNavigation = (href: string) => {
+  const handleNavigation = (href: string, isExternal?: boolean) => {
     setIsOpen(false);
-    if (href.startsWith("#")) {
+    if (isExternal) {
+      window.open(href, "_blank");
+    } else if (href.startsWith("#")) {
       const element = document.querySelector(href);
       element?.scrollIntoView({ behavior: "smooth" });
     } else {
@@ -177,7 +190,7 @@ export const MegaMenu = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="fixed left-0 right-0 z-50 bg-card border-b border-border shadow-2xl"
+              className="fixed left-0 right-0 z-50 bg-card border-b border-border shadow-2xl max-h-[80vh] overflow-y-auto"
               style={{ top: "64px" }}
             >
               <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
@@ -200,7 +213,7 @@ export const MegaMenu = () => {
                         {section.items.map((item) => (
                           <li key={item.label}>
                             <button
-                              onClick={() => handleNavigation(item.href)}
+                              onClick={() => handleNavigation(item.href, item.isExternal)}
                               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all
                                 ${item.href === "/" 
                                   ? "bg-primary/10 text-primary" 
@@ -215,6 +228,9 @@ export const MegaMenu = () => {
                                   Premium
                                 </span>
                               )}
+                              {item.isExternal && (
+                                <ExternalLink className="w-3 h-3 ml-auto text-muted-foreground" />
+                              )}
                             </button>
                           </li>
                         ))}
@@ -223,7 +239,7 @@ export const MegaMenu = () => {
                   ))}
                 </div>
 
-                {/* Bottom Banner */}
+                {/* Premium AI Banner */}
                 <div className="mt-8 pt-6 border-t border-border">
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-r from-primary/10 via-korean-purple/10 to-korean-pink/10 rounded-2xl p-4 sm:p-6">
                     <div className="flex items-center gap-3 text-center sm:text-left">
@@ -231,19 +247,29 @@ export const MegaMenu = () => {
                         <Crown className="w-5 h-5 text-primary-foreground" />
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">Nâng cấp Premium</p>
-                        <p className="text-sm text-muted-foreground">Mở khóa tất cả tính năng học tập</p>
+                        <p className="font-semibold text-foreground">🚀 LUKATO AI Premium</p>
+                        <p className="text-sm text-muted-foreground">Hỏi AI không giới hạn + Chấm Writing chuyên sâu</p>
                       </div>
                     </div>
-                    <Button 
-                      onClick={() => {
-                        setIsOpen(false);
-                        document.querySelector("#pricing")?.scrollIntoView({ behavior: "smooth" });
-                      }}
-                      className="btn-primary text-primary-foreground rounded-xl font-semibold"
-                    >
-                      Xem bảng giá
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline"
+                        onClick={() => window.open("https://chat-topikbot.kr", "_blank")}
+                        className="rounded-xl font-semibold"
+                      >
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        LUKATO AI Engine
+                      </Button>
+                      <Button 
+                        onClick={() => {
+                          setIsOpen(false);
+                          document.querySelector("#pricing")?.scrollIntoView({ behavior: "smooth" });
+                        }}
+                        className="btn-primary text-primary-foreground rounded-xl font-semibold"
+                      >
+                        Xem bảng giá
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
