@@ -100,7 +100,7 @@ const notices = [
   "Quyền truy cập AI được cấp ngay lập tức sau khi nâng cấp thành công.",
   "Đăng nhập bằng cùng email Có đăng ký tại LUKATO để nộc nhật.",
   "Các mô hình AI sẽ tự động hiển thị sau khi được cấp quyền.",
-  "Sử dụng giống ChatGPT/Gemini - đặt câu hỏi và nhận trả lời chi tiết!"
+  "Sử dụng giống ChatGPT - đặt câu hỏi và nhận trả lời chi tiết!"
 ];
 
 const AITutor = () => {

@@ -656,7 +656,7 @@ export default function Translate() {
               className="max-w-5xl mx-auto mt-8 grid sm:grid-cols-3 gap-4"
             >
               {[
-                { icon: Sparkles, title: "AI Gemini 2.5", desc: "Dịch chính xác nhất" },
+                { icon: Sparkles, title: "LUKATO RAG AI", desc: "Dịch chính xác nhất" },
                 { icon: Volume2, title: "TTS Chuẩn", desc: "Phát âm bản ngữ" },
                 { icon: GraduationCap, title: "Học TOPIK", desc: "Ngữ pháp & từ vựng" },
               ].map((feature, i) => (
