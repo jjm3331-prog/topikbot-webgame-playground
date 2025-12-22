@@ -38,7 +38,6 @@ import Headhunting from "./pages/Headhunting";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWAWelcome from "./components/PWAWelcome";
 import SplashScreen from "./components/SplashScreen";
-import PremiumRoute from "./components/PremiumRoute";
 
 const queryClient = new QueryClient();
 
@@ -68,7 +67,7 @@ const App = () => {
     const handleLoad = () => {
       // Complete progress to 100%
       setProgress(100);
-      
+
       // Small delay to show 100% before hiding
       setTimeout(() => {
         setIsLoading(false);
@@ -106,7 +105,7 @@ const App = () => {
           <AnimatePresence mode="wait">
             {isLoading && <SplashScreen key="splash" progress={progress} />}
           </AnimatePresence>
-          
+
           <Toaster />
           <Sonner />
           <PWAInstallPrompt />
@@ -115,11 +114,13 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Landing />} />
               <Route path="/auth" element={<Auth />} />
-              {/* Premium Routes */}
-              <Route path="/dashboard" element={<PremiumRoute><Dashboard /></PremiumRoute>} />
-              <Route path="/korea-career" element={<PremiumRoute><KoreaCareer /></PremiumRoute>} />
-              <Route path="/headhunting" element={<PremiumRoute><Headhunting /></PremiumRoute>} />
-              <Route path="/writing-correction" element={<PremiumRoute><WritingCorrection /></PremiumRoute>} />
+
+              {/* Pages are viewable for everyone (Premium is handled in-page / on actions) */}
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/korea-career" element={<KoreaCareer />} />
+              <Route path="/headhunting" element={<Headhunting />} />
+              <Route path="/writing-correction" element={<WritingCorrection />} />
+
               {/* Free Routes */}
               <Route path="/game" element={<Navigate to="/chat" replace />} />
               <Route path="/chat" element={<Chat />} />
