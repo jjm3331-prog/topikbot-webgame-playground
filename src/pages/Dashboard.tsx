@@ -72,8 +72,8 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <CleanHeader />
-      <main className="flex-1 pb-8 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto w-full space-y-5">
+      <main className="flex-1 pt-8 pb-8 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto w-full space-y-6">
           {/* Welcome Message */}
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
