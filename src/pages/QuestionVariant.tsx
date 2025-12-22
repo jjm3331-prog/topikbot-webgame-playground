@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Upload, Wand2, Loader2, Crown, ImageIcon, RefreshCw, BookOpen, Lightbulb, CheckCircle2, XCircle, Target } from "lucide-react";
+import { Sparkles, Upload, Wand2, Loader2, Crown, ImageIcon, RefreshCw, BookOpen, Lightbulb, CheckCircle2, XCircle, Target, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import CleanHeader from "@/components/CleanHeader";
@@ -9,7 +9,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-
+import { jsPDF } from "jspdf";
 const usageExamples = [
   { subject: "Toán", example: "Chụp bài toán hàm số → AI tạo bài tương tự với số khác" },
   { subject: "Lý", example: "Chụp bài động lực học → AI tạo bài với giá trị khác, thêm/bớt điều kiện" },
@@ -101,6 +101,148 @@ export default function QuestionVariant() {
     }
 
     return result;
+  };
+
+  const handleDownloadPDF = () => {
+    if (!generatedContent && !rawContent) {
+      toast.error("다운로드할 내용이 없습니다");
+      return;
+    }
+
+    try {
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 15;
+      const maxWidth = pageWidth - margin * 2;
+      let yPos = 20;
+
+      // Helper function to add text with word wrap
+      const addText = (text: string, fontSize: number = 10, isBold: boolean = false) => {
+        doc.setFontSize(fontSize);
+        if (isBold) {
+          doc.setFont("helvetica", "bold");
+        } else {
+          doc.setFont("helvetica", "normal");
+        }
+        
+        const lines = doc.splitTextToSize(text, maxWidth);
+        const lineHeight = fontSize * 0.5;
+        
+        for (const line of lines) {
+          if (yPos > 280) {
+            doc.addPage();
+            yPos = 20;
+          }
+          doc.text(line, margin, yPos);
+          yPos += lineHeight;
+        }
+        yPos += 3;
+      };
+
+      const addSection = (title: string, koContent: string, viContent: string) => {
+        if (yPos > 250) {
+          doc.addPage();
+          yPos = 20;
+        }
+        
+        // Section title
+        doc.setFillColor(59, 130, 246);
+        doc.rect(margin, yPos - 5, maxWidth, 10, 'F');
+        doc.setTextColor(255, 255, 255);
+        addText(title, 12, true);
+        doc.setTextColor(0, 0, 0);
+        yPos += 5;
+
+        // Korean content
+        addText("[Korean]", 10, true);
+        addText(koContent || "-", 10);
+        yPos += 3;
+
+        // Vietnamese content
+        addText("[Vietnamese / Tieng Viet]", 10, true);
+        addText(viContent || koContent || "-", 10);
+        yPos += 8;
+      };
+
+      // Title
+      doc.setFillColor(245, 158, 11);
+      doc.rect(0, 0, pageWidth, 25, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(18);
+      doc.setFont("helvetica", "bold");
+      doc.text("TOPIK Question Variant / Bien the de thi", pageWidth / 2, 16, { align: "center" });
+      doc.setTextColor(0, 0, 0);
+      yPos = 35;
+
+      // Date
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Generated: ${new Date().toLocaleString()}`, margin, yPos);
+      yPos += 10;
+
+      if (generatedContent) {
+        if (generatedContent.originalAnalysis) {
+          addSection(
+            "1. Original Analysis / Phan tich de goc",
+            generatedContent.originalAnalysis.ko,
+            generatedContent.originalAnalysis.vi
+          );
+        }
+        if (generatedContent.variantQuestion) {
+          addSection(
+            "2. Variant Question / Cau hoi bien the",
+            generatedContent.variantQuestion.ko,
+            generatedContent.variantQuestion.vi
+          );
+        }
+        if (generatedContent.answer) {
+          addSection(
+            "3. Answer / Dap an",
+            generatedContent.answer.ko,
+            generatedContent.answer.vi
+          );
+        }
+        if (generatedContent.explanation) {
+          addSection(
+            "4. Explanation / Giai thich chi tiet",
+            generatedContent.explanation.ko,
+            generatedContent.explanation.vi
+          );
+        }
+        if (generatedContent.learningPoints) {
+          addSection(
+            "5. Learning Points / Diem hoc tap",
+            generatedContent.learningPoints.ko,
+            generatedContent.learningPoints.vi
+          );
+        }
+      } else if (rawContent) {
+        addText("Result / Ket qua:", 12, true);
+        addText(rawContent, 10);
+      }
+
+      // Footer
+      const pageCount = doc.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(128, 128, 128);
+        doc.text(
+          `LUKATO AI - TOPIK Question Variant | Page ${i} of ${pageCount}`,
+          pageWidth / 2,
+          290,
+          { align: "center" }
+        );
+      }
+
+      // Save
+      const filename = `topik-variant-${new Date().toISOString().slice(0, 10)}.pdf`;
+      doc.save(filename);
+      toast.success("PDF 다운로드 완료!");
+    } catch (error) {
+      console.error("PDF generation error:", error);
+      toast.error("PDF 생성 중 오류가 발생했습니다");
+    }
   };
 
   const handleGenerate = async () => {
@@ -348,6 +490,16 @@ export default function QuestionVariant() {
               animate={{ opacity: 1, y: 0 }}
               className="mt-8 space-y-6"
             >
+              {/* Download Button */}
+              <div className="flex justify-end">
+                <Button
+                  onClick={handleDownloadPDF}
+                  className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  PDF 다운로드 / Tải PDF
+                </Button>
+              </div>
               {/* Section 1: Original Analysis */}
               {generatedContent?.originalAnalysis && (
                 <Card className="overflow-hidden border-2 border-blue-500/30 bg-gradient-to-br from-blue-500/5 to-indigo-500/5">
