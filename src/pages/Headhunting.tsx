@@ -265,7 +265,7 @@ const Headhunting = () => {
             </Button>
           </div>
         </main>
-        <CommonFooter />
+        <AppFooter />
       </div>
     );
   }

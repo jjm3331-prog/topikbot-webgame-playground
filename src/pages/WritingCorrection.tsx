@@ -25,6 +25,7 @@ import { supabase } from "@/integrations/supabase/client";
 import MegaMenu from "@/components/MegaMenu";
 import AppFooter from "@/components/AppFooter";
 import { PremiumPreviewBanner } from "@/components/PremiumPreviewBanner";
+import { useSubscription } from "@/hooks/useSubscription";
 
 interface CorrectionResult {
   overall_score: number;
