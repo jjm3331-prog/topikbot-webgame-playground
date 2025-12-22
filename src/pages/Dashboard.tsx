@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { 
-  MessageCircle, 
+import {
+  MessageCircle,
   Trophy,
   FileX,
   Star,
@@ -17,11 +17,11 @@ import {
   Sparkles,
   Flame,
   Check,
-  Gift
+  Gift,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import MegaMenu from "@/components/MegaMenu";
+import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import confetti from "canvas-confetti";
 import { PremiumPreviewBanner } from "@/components/PremiumPreviewBanner";
@@ -177,8 +177,8 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <MegaMenu />
-      <main className="flex-1 pt-[76px] pb-8 px-4 sm:px-6">
+      <CleanHeader />
+      <main className="flex-1 pb-8 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto w-full space-y-6">
         {/* Premium Preview Banner */}
         {!isPremium && <PremiumPreviewBanner featureName="theo dõi tiến độ học" />}
