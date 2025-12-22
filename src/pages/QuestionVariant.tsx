@@ -9,7 +9,6 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { jsPDF } from "jspdf";
 const usageExamples = [
   { subject: "Toán", example: "Chụp bài toán hàm số → AI tạo bài tương tự với số khác" },
   { subject: "Lý", example: "Chụp bài động lực học → AI tạo bài với giá trị khác, thêm/bớt điều kiện" },
@@ -110,135 +109,246 @@ export default function QuestionVariant() {
     }
 
     try {
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const margin = 15;
-      const maxWidth = pageWidth - margin * 2;
-      let yPos = 20;
+      // Create printable HTML content
+      const printContent = `
+        <!DOCTYPE html>
+        <html lang="ko">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>TOPIK 변형 문제 - ${new Date().toLocaleDateString()}</title>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&family=Noto+Sans:wght@400;600;700&display=swap');
+            
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
+            
+            body {
+              font-family: 'Noto Sans KR', 'Noto Sans', sans-serif;
+              line-height: 1.6;
+              color: #1a1a1a;
+              padding: 40px;
+              background: white;
+            }
+            
+            .header {
+              text-align: center;
+              margin-bottom: 30px;
+              padding-bottom: 20px;
+              border-bottom: 3px solid #f59e0b;
+            }
+            
+            .header h1 {
+              font-size: 24px;
+              color: #f59e0b;
+              margin-bottom: 8px;
+            }
+            
+            .header .date {
+              font-size: 12px;
+              color: #666;
+            }
+            
+            .section {
+              margin-bottom: 25px;
+              break-inside: avoid;
+            }
+            
+            .section-title {
+              font-size: 14px;
+              font-weight: 700;
+              color: white;
+              padding: 10px 15px;
+              margin-bottom: 15px;
+              border-radius: 6px;
+            }
+            
+            .section-1 .section-title { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+            .section-2 .section-title { background: linear-gradient(135deg, #f59e0b, #d97706); }
+            .section-3 .section-title { background: linear-gradient(135deg, #10b981, #059669); }
+            .section-4 .section-title { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+            .section-5 .section-title { background: linear-gradient(135deg, #ec4899, #be185d); }
+            
+            .content-grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 20px;
+            }
+            
+            .lang-block {
+              padding: 15px;
+              border-radius: 8px;
+              background: #f8fafc;
+              border: 1px solid #e2e8f0;
+            }
+            
+            .lang-label {
+              font-size: 11px;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              margin-bottom: 10px;
+              padding-bottom: 8px;
+              border-bottom: 2px solid;
+            }
+            
+            .lang-ko .lang-label {
+              color: #3b82f6;
+              border-color: #3b82f6;
+            }
+            
+            .lang-vi .lang-label {
+              color: #10b981;
+              border-color: #10b981;
+            }
+            
+            .lang-content {
+              font-size: 13px;
+              line-height: 1.8;
+              white-space: pre-wrap;
+            }
+            
+            .footer {
+              margin-top: 40px;
+              padding-top: 20px;
+              border-top: 1px solid #e2e8f0;
+              text-align: center;
+              font-size: 11px;
+              color: #999;
+            }
+            
+            @media print {
+              body {
+                padding: 20px;
+              }
+              .section {
+                break-inside: avoid;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>✨ TOPIK 변형 문제 / Biến thể đề thi</h1>
+            <div class="date">생성일: ${new Date().toLocaleString('ko-KR')} | Ngày tạo: ${new Date().toLocaleString('vi-VN')}</div>
+          </div>
+          
+          ${generatedContent ? `
+            ${generatedContent.originalAnalysis ? `
+              <div class="section section-1">
+                <div class="section-title">📋 원문 분석 | Phân tích đề gốc</div>
+                <div class="content-grid">
+                  <div class="lang-block lang-ko">
+                    <div class="lang-label">🇰🇷 한국어</div>
+                    <div class="lang-content">${generatedContent.originalAnalysis.ko || '-'}</div>
+                  </div>
+                  <div class="lang-block lang-vi">
+                    <div class="lang-label">🇻🇳 Tiếng Việt</div>
+                    <div class="lang-content">${generatedContent.originalAnalysis.vi || '-'}</div>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+            
+            ${generatedContent.variantQuestion ? `
+              <div class="section section-2">
+                <div class="section-title">📝 변형 문제 | Câu hỏi biến thể</div>
+                <div class="content-grid">
+                  <div class="lang-block lang-ko">
+                    <div class="lang-label">🇰🇷 한국어</div>
+                    <div class="lang-content">${generatedContent.variantQuestion.ko || '-'}</div>
+                  </div>
+                  <div class="lang-block lang-vi">
+                    <div class="lang-label">🇻🇳 Tiếng Việt</div>
+                    <div class="lang-content">${generatedContent.variantQuestion.vi || '-'}</div>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+            
+            ${generatedContent.answer ? `
+              <div class="section section-3">
+                <div class="section-title">✅ 정답 | Đáp án</div>
+                <div class="content-grid">
+                  <div class="lang-block lang-ko">
+                    <div class="lang-label">🇰🇷 한국어</div>
+                    <div class="lang-content">${generatedContent.answer.ko || '-'}</div>
+                  </div>
+                  <div class="lang-block lang-vi">
+                    <div class="lang-label">🇻🇳 Tiếng Việt</div>
+                    <div class="lang-content">${generatedContent.answer.vi || '-'}</div>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+            
+            ${generatedContent.explanation ? `
+              <div class="section section-4">
+                <div class="section-title">💡 해설 | Giải thích chi tiết</div>
+                <div class="content-grid">
+                  <div class="lang-block lang-ko">
+                    <div class="lang-label">🇰🇷 한국어</div>
+                    <div class="lang-content">${generatedContent.explanation.ko || '-'}</div>
+                  </div>
+                  <div class="lang-block lang-vi">
+                    <div class="lang-label">🇻🇳 Tiếng Việt</div>
+                    <div class="lang-content">${generatedContent.explanation.vi || '-'}</div>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+            
+            ${generatedContent.learningPoints ? `
+              <div class="section section-5">
+                <div class="section-title">🎯 학습 포인트 | Điểm học tập</div>
+                <div class="content-grid">
+                  <div class="lang-block lang-ko">
+                    <div class="lang-label">🇰🇷 한국어</div>
+                    <div class="lang-content">${generatedContent.learningPoints.ko || '-'}</div>
+                  </div>
+                  <div class="lang-block lang-vi">
+                    <div class="lang-label">🇻🇳 Tiếng Việt</div>
+                    <div class="lang-content">${generatedContent.learningPoints.vi || '-'}</div>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+          ` : `
+            <div class="section">
+              <div class="section-title" style="background: linear-gradient(135deg, #6b7280, #4b5563);">결과 / Kết quả</div>
+              <div class="lang-block">
+                <div class="lang-content">${rawContent || '-'}</div>
+              </div>
+            </div>
+          `}
+          
+          <div class="footer">
+            LUKATO AI - TOPIK Question Variant Generator | © ${new Date().getFullYear()}
+          </div>
+        </body>
+        </html>
+      `;
 
-      // Helper function to add text with word wrap
-      const addText = (text: string, fontSize: number = 10, isBold: boolean = false) => {
-        doc.setFontSize(fontSize);
-        if (isBold) {
-          doc.setFont("helvetica", "bold");
-        } else {
-          doc.setFont("helvetica", "normal");
-        }
+      // Open print window
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(printContent);
+        printWindow.document.close();
         
-        const lines = doc.splitTextToSize(text, maxWidth);
-        const lineHeight = fontSize * 0.5;
+        // Wait for fonts to load then print
+        printWindow.onload = () => {
+          setTimeout(() => {
+            printWindow.print();
+          }, 500);
+        };
         
-        for (const line of lines) {
-          if (yPos > 280) {
-            doc.addPage();
-            yPos = 20;
-          }
-          doc.text(line, margin, yPos);
-          yPos += lineHeight;
-        }
-        yPos += 3;
-      };
-
-      const addSection = (title: string, koContent: string, viContent: string) => {
-        if (yPos > 250) {
-          doc.addPage();
-          yPos = 20;
-        }
-        
-        // Section title
-        doc.setFillColor(59, 130, 246);
-        doc.rect(margin, yPos - 5, maxWidth, 10, 'F');
-        doc.setTextColor(255, 255, 255);
-        addText(title, 12, true);
-        doc.setTextColor(0, 0, 0);
-        yPos += 5;
-
-        // Korean content
-        addText("[Korean]", 10, true);
-        addText(koContent || "-", 10);
-        yPos += 3;
-
-        // Vietnamese content
-        addText("[Vietnamese / Tieng Viet]", 10, true);
-        addText(viContent || koContent || "-", 10);
-        yPos += 8;
-      };
-
-      // Title
-      doc.setFillColor(245, 158, 11);
-      doc.rect(0, 0, pageWidth, 25, 'F');
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(18);
-      doc.setFont("helvetica", "bold");
-      doc.text("TOPIK Question Variant / Bien the de thi", pageWidth / 2, 16, { align: "center" });
-      doc.setTextColor(0, 0, 0);
-      yPos = 35;
-
-      // Date
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "normal");
-      doc.text(`Generated: ${new Date().toLocaleString()}`, margin, yPos);
-      yPos += 10;
-
-      if (generatedContent) {
-        if (generatedContent.originalAnalysis) {
-          addSection(
-            "1. Original Analysis / Phan tich de goc",
-            generatedContent.originalAnalysis.ko,
-            generatedContent.originalAnalysis.vi
-          );
-        }
-        if (generatedContent.variantQuestion) {
-          addSection(
-            "2. Variant Question / Cau hoi bien the",
-            generatedContent.variantQuestion.ko,
-            generatedContent.variantQuestion.vi
-          );
-        }
-        if (generatedContent.answer) {
-          addSection(
-            "3. Answer / Dap an",
-            generatedContent.answer.ko,
-            generatedContent.answer.vi
-          );
-        }
-        if (generatedContent.explanation) {
-          addSection(
-            "4. Explanation / Giai thich chi tiet",
-            generatedContent.explanation.ko,
-            generatedContent.explanation.vi
-          );
-        }
-        if (generatedContent.learningPoints) {
-          addSection(
-            "5. Learning Points / Diem hoc tap",
-            generatedContent.learningPoints.ko,
-            generatedContent.learningPoints.vi
-          );
-        }
-      } else if (rawContent) {
-        addText("Result / Ket qua:", 12, true);
-        addText(rawContent, 10);
+        toast.success("PDF 인쇄 창이 열렸습니다!");
+      } else {
+        toast.error("팝업이 차단되었습니다. 팝업을 허용해주세요.");
       }
-
-      // Footer
-      const pageCount = doc.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(128, 128, 128);
-        doc.text(
-          `LUKATO AI - TOPIK Question Variant | Page ${i} of ${pageCount}`,
-          pageWidth / 2,
-          290,
-          { align: "center" }
-        );
-      }
-
-      // Save
-      const filename = `topik-variant-${new Date().toISOString().slice(0, 10)}.pdf`;
-      doc.save(filename);
-      toast.success("PDF 다운로드 완료!");
     } catch (error) {
       console.error("PDF generation error:", error);
       toast.error("PDF 생성 중 오류가 발생했습니다");
