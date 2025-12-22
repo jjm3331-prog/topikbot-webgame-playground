@@ -56,3 +56,12 @@ verify_jwt = false
 
 [functions.korean-stt]
 verify_jwt = false
+
+[functions.rag-embed]
+verify_jwt = true
+
+[functions.rag-search]
+verify_jwt = false
+
+[functions.rag-delete]
+verify_jwt = true
