@@ -10,7 +10,6 @@ import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Chat from "./pages/Chat";
-import Ranking from "./pages/Ranking";
 import WordChain from "./pages/WordChain";
 import Quiz from "./pages/Quiz";
 import PartTime from "./pages/PartTime";
@@ -140,7 +139,6 @@ const App = () => {
               <Route path="/lesson/:lessonId" element={<Lesson />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/ranking" element={<Ranking />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/terms" element={<Terms />} />
