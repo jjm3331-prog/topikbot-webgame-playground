@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import MegaMenu from "@/components/MegaMenu";
+import AppLayout from "@/components/AppLayout";
 import CommonFooter from "@/components/CommonFooter";
 import confetti from "canvas-confetti";
 
@@ -172,12 +172,8 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-background flex flex-col">
-      {/* Header */}
-      <MegaMenu />
-
-      {/* Main Content */}
-      <main className="flex-1 px-4 py-6 pt-20 max-w-4xl mx-auto w-full space-y-6 overflow-y-auto">
+    <AppLayout>
+      <div className="max-w-4xl mx-auto w-full space-y-6">
         {/* Welcome Message */}
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
@@ -498,10 +494,7 @@ const Dashboard = () => {
             <ChevronRight className="w-5 h-5 ml-2" />
           </Button>
         </motion.div>
-      </main>
-
-      {/* Footer */}
-      <CommonFooter />
+      </div>
 
       {/* AI Floating Button */}
       <a
@@ -532,7 +525,7 @@ const Dashboard = () => {
           AI
         </span>
       </a>
-    </div>
+    </AppLayout>
   );
 };
 
