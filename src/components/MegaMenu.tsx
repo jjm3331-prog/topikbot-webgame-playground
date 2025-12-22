@@ -83,6 +83,7 @@ const menuSections: MenuSection[] = [
   {
     title: "KHÁC",
     items: [
+      { icon: Crown, label: "Bảng giá", href: "/pricing" },
       { icon: Trophy, label: "Bảng xếp hạng", href: "/ranking" },
       { icon: Users, label: "Cộng đồng", href: "/community" },
       { icon: Compass, label: "Hướng dẫn", href: "/tutorial" },
