@@ -86,7 +86,7 @@ const baseMenuCategories: MenuCategory[] = [
     items: [
       { icon: Sparkles, label: "Biến thể đề thi", href: "/question-variant", isPremium: true },
       { icon: PenTool, label: "Chấm bài viết", href: "/writing-correction", isPremium: true },
-      { icon: Languages, label: "Dịch Hàn-Việt", href: "/translate" },
+      { icon: Languages, label: "Roleplay Speaking", href: "/roleplay-speaking" },
       { icon: Star, label: "Bảng giá", href: "/pricing" },
     ]
   },
