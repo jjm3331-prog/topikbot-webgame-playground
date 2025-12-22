@@ -42,7 +42,7 @@ const AppFooter = () => {
           {/* Copyright */}
           <p className="text-white/40 text-sm">
             © 2025 Powered by{" "}
-            <span className="text-white/60 font-medium">Q&A Agent</span>
+            <span className="text-white/60 font-medium">LUKAS Edutainment</span>
           </p>
         </div>
       </div>
