@@ -236,21 +236,21 @@ export const MegaMenuOverlay = ({
   const premiumRoutes = ['/dashboard', '/korea-career', '/headhunting', '/writing-correction', '/mistakes'];
 
   const handleNavigation = (href: string, isPremiumItem?: boolean) => {
-    // Check if trying to access premium feature without subscription
+    // Pages should still be viewable; show an upsell message for premium features.
     if (isPremiumItem && premiumRoutes.includes(href) && !isPremium) {
-      toast.error("Tính năng Premium", {
-        description: "Vui lòng nâng cấp lên Premium để sử dụng tính năng này.",
+      toast.message("Tính năng Premium", {
+        description: "Bạn vẫn có thể xem trang, nhưng để sử dụng đầy đủ tính năng vui lòng nâng cấp Premium.",
         action: {
           label: "Nâng cấp",
           onClick: () => {
             onClose();
-            navigate('/pricing');
+            navigate("/pricing");
           },
         },
         icon: <Lock className="w-4 h-4" />,
       });
-      return;
     }
+
     onClose();
     navigate(href);
   };
