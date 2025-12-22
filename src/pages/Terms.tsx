@@ -1,5 +1,6 @@
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import CommonFooter from "@/components/CommonFooter";
 
 const Terms = () => {
   const navigate = useNavigate();
@@ -233,11 +234,7 @@ const Terms = () => {
         </div>
       </main>
 
-      <footer className="py-8 px-4 border-t border-border bg-muted/30">
-        <p className="text-center text-muted-foreground text-sm">
-          © 2025 LUKATO AI. All rights reserved.
-        </p>
-      </footer>
+      <CommonFooter />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { MegaMenu } from "@/components/MegaMenu";
+import CommonFooter from "@/components/CommonFooter";
 import { 
   ArrowRight, 
   Sparkles, 
@@ -675,48 +676,7 @@ const Landing = () => {
       </section>
 
       {/* ========== FOOTER ========== */}
-      <footer className="py-12 px-6 border-t border-border bg-muted/30">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <span className="text-2xl sm:text-3xl">🇰🇷</span>
-              <div>
-                <span className="font-heading font-bold text-lg sm:text-xl text-foreground">LUKATO AI</span>
-                <span className="block text-xs text-muted-foreground -mt-0.5">Học tiếng Hàn #1 VN</span>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <a 
-                href="/terms" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="hover:text-foreground transition-colors"
-              >
-                TERMS
-              </a>
-              <a 
-                href="/privacy" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="hover:text-foreground transition-colors"
-              >
-                PRIVACY
-              </a>
-              <a 
-                href="/admin-login" 
-                className="hover:text-foreground transition-colors"
-              >
-                ADMIN
-              </a>
-            </div>
-            
-            <p className="text-muted-foreground text-sm">
-              © 2025 LUKATO Vietnam. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <CommonFooter />
     </div>
   );
 };

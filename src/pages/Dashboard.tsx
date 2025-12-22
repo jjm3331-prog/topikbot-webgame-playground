@@ -21,7 +21,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import MegaMenu from "@/components/MegaMenu";
-import Footer from "@/components/Footer";
+import CommonFooter from "@/components/CommonFooter";
 
 interface Profile {
   id: string;
@@ -429,7 +429,7 @@ const Dashboard = () => {
       </main>
 
       {/* Footer */}
-      <Footer />
+      <CommonFooter />
 
       {/* AI Floating Button */}
       <a
