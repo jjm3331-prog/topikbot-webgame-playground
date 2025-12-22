@@ -24,6 +24,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import CleanHeader from "@/components/CleanHeader";
 import CommonFooter from "@/components/CommonFooter";
 import confetti from "canvas-confetti";
+import { PremiumPreviewBanner } from "@/components/PremiumPreviewBanner";
+import { useSubscription } from "@/hooks/useSubscription";
 
 interface Profile {
   id: string;
@@ -43,6 +45,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [todayChecked, setTodayChecked] = useState(false);
   const navigate = useNavigate();
+  const { isPremium } = useSubscription();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -177,6 +180,8 @@ const Dashboard = () => {
       <CleanHeader isLoggedIn={true} username={profile?.username} />
       <main className="pt-[76px] pb-8 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto w-full space-y-6">
+        {/* Premium Preview Banner */}
+        {!isPremium && <PremiumPreviewBanner featureName="theo dõi tiến độ học" />}
         {/* Welcome Message */}
         <motion.div 
           initial={{ opacity: 0, y: 10 }}

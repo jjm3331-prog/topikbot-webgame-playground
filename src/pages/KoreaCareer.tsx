@@ -15,7 +15,8 @@ import {
   ChevronRight,
   Building2,
   BookOpen,
-  Users
+  Users,
+  Lock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -26,10 +27,13 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import CleanHeader from "@/components/CleanHeader";
 import CommonFooter from "@/components/CommonFooter";
+import { PremiumPreviewBanner } from "@/components/PremiumPreviewBanner";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const KoreaCareer = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isPremium } = useSubscription();
   const [activeTab, setActiveTab] = useState("search");
   const [searchQuery, setSearchQuery] = useState("");
   const [searching, setSearching] = useState(false);
@@ -209,6 +213,9 @@ const KoreaCareer = () => {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-8"
         >
+          {/* Premium Preview Banner */}
+          {!isPremium && <PremiumPreviewBanner featureName="dịch vụ tìm việc" />}
+
           {/* Header */}
           <div className="text-center space-y-4">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-korean-blue/20 to-korean-cyan/20 text-korean-blue">
@@ -277,11 +284,11 @@ const KoreaCareer = () => {
                     onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   />
                   <Button 
-                    onClick={handleSearch} 
-                    disabled={searching || !searchQuery.trim()}
-                    className="btn-primary"
+                    onClick={isPremium ? handleSearch : () => navigate("/pricing")} 
+                    disabled={searching || (!isPremium && false) || !searchQuery.trim()}
+                    className={isPremium ? "btn-primary" : "bg-gradient-to-r from-korean-orange to-korean-pink text-white"}
                   >
-                    {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                    {!isPremium ? <Lock className="w-4 h-4" /> : searching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                   </Button>
                 </div>
 
@@ -383,11 +390,16 @@ const KoreaCareer = () => {
                   className="min-h-[200px] mb-4"
                 />
                 <Button 
-                  onClick={handleResumeCorrection}
+                  onClick={isPremium ? handleResumeCorrection : () => navigate("/pricing")}
                   disabled={correcting || !resumeText.trim()}
-                  className="w-full btn-primary"
+                  className={`w-full ${isPremium ? "btn-primary" : "bg-gradient-to-r from-korean-orange to-korean-pink text-white"}`}
                 >
-                  {correcting ? (
+                  {!isPremium ? (
+                    <>
+                      <Lock className="w-4 h-4 mr-2" />
+                      Nâng cấp Premium
+                    </>
+                  ) : correcting ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       Đang phân tích...
@@ -435,15 +447,18 @@ const KoreaCareer = () => {
                     <p className="text-sm text-muted-foreground mb-4">
                       Luyện tập phỏng vấn xin việc tại công ty Hàn Quốc. AI sẽ đóng vai HR và đặt câu hỏi bằng tiếng Hàn.
                     </p>
-                    <Button className="w-full">
-                      Bắt đầu phỏng vấn
+                    <Button 
+                      className="w-full"
+                      onClick={() => isPremium ? startInterview("company") : navigate("/pricing")}
+                    >
+                      {isPremium ? "Bắt đầu phỏng vấn" : <><Lock className="w-4 h-4 mr-2" />Premium</>}
                       <ChevronRight className="w-4 h-4 ml-2" />
                     </Button>
                   </Card>
 
                   <Card 
                     className="p-6 cursor-pointer hover:ring-2 hover:ring-primary transition-all"
-                    onClick={() => startInterview("visa")}
+                    onClick={() => isPremium ? startInterview("visa") : navigate("/pricing")}
                   >
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-korean-purple to-korean-pink flex items-center justify-center mb-4">
                       <Plane className="w-6 h-6 text-white" />
@@ -453,7 +468,7 @@ const KoreaCareer = () => {
                       Chuẩn bị cho buổi phỏng vấn visa tại Đại sứ quán Hàn Quốc. AI sẽ hỏi các câu hỏi thường gặp.
                     </p>
                     <Button className="w-full">
-                      Bắt đầu phỏng vấn
+                      {isPremium ? "Bắt đầu phỏng vấn" : <><Lock className="w-4 h-4 mr-2" />Premium</>}
                       <ChevronRight className="w-4 h-4 ml-2" />
                     </Button>
                   </Card>

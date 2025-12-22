@@ -13,7 +13,8 @@ import {
   AlertCircle,
   CheckCircle,
   X,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Lock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,6 +23,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import CleanHeader from "@/components/CleanHeader";
+import { PremiumPreviewBanner } from "@/components/PremiumPreviewBanner";
+import { useSubscription } from "@/hooks/useSubscription";
 
 interface CorrectionResult {
   overall_score: number;
@@ -51,6 +54,7 @@ interface SavedCorrection {
 const WritingCorrection = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isPremium } = useSubscription();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
@@ -315,6 +319,8 @@ const WritingCorrection = () => {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-6"
         >
+          {/* Premium Preview Banner */}
+          {!isPremium && <PremiumPreviewBanner featureName="chấm bài viết AI" />}
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="text-center flex-1">
@@ -504,23 +510,33 @@ const WritingCorrection = () => {
               </Card>
 
               {/* Submit Button */}
-              <Button
-                onClick={handleSubmit}
-                disabled={processing || !questionImage}
-                className="w-full btn-primary text-primary-foreground h-14 text-lg"
-              >
-                {processing ? (
-                  <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Đang chấm điểm...
-                  </>
-                ) : (
-                  <>
-                    <PenTool className="w-5 h-5 mr-2" />
-                    Chấm điểm AI
-                  </>
-                )}
-              </Button>
+              {isPremium ? (
+                <Button
+                  onClick={handleSubmit}
+                  disabled={processing || !questionImage}
+                  className="w-full btn-primary text-primary-foreground h-14 text-lg"
+                >
+                  {processing ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Đang chấm điểm...
+                    </>
+                  ) : (
+                    <>
+                      <PenTool className="w-5 h-5 mr-2" />
+                      Chấm điểm AI
+                    </>
+                  )}
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => navigate("/pricing")}
+                  className="w-full bg-gradient-to-r from-korean-orange to-korean-pink hover:opacity-90 text-white h-14 text-lg"
+                >
+                  <Lock className="w-5 h-5 mr-2" />
+                  Nâng cấp Premium để chấm điểm
+                </Button>
+              )}
             </div>
 
             {/* Result Section */}

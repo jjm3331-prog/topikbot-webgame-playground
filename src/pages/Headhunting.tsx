@@ -25,8 +25,11 @@ import {
   Loader2,
   Upload,
   FileText,
-  X
+  X,
+  Lock
 } from "lucide-react";
+import { PremiumPreviewBanner } from "@/components/PremiumPreviewBanner";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const benefits = [
   { icon: Crown, title: "Đội ngũ Headhunter chuyên nghiệp", desc: "Kết nối trực tiếp với doanh nghiệp Hàn Quốc" },
@@ -44,6 +47,7 @@ interface FileUploadState {
 
 const Headhunting = () => {
   const navigate = useNavigate();
+  const { isPremium } = useSubscription();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -272,6 +276,12 @@ const Headhunting = () => {
       
       {/* Hero Section */}
       <section className="pt-24 pb-12 px-4 sm:px-6 relative overflow-hidden">
+        {/* Premium Preview Banner */}
+        {!isPremium && (
+          <div className="max-w-4xl mx-auto mb-6">
+            <PremiumPreviewBanner featureName="dịch vụ Headhunting" />
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-br from-korean-purple/10 via-background to-korean-blue/10" />
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-korean-purple via-korean-blue to-korean-cyan" />
         
@@ -736,24 +746,36 @@ const Headhunting = () => {
 
             {/* Submit */}
             <div className="flex flex-col items-center gap-4">
-              <Button
-                type="submit"
-                size="lg"
-                disabled={loading || !formData.full_name || !formData.email}
-                className="w-full sm:w-auto h-14 px-10 btn-primary text-primary-foreground text-lg font-bold rounded-2xl"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Đang gửi...
-                  </>
-                ) : (
-                  <>
-                    Đăng ký dịch vụ Headhunting
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </>
-                )}
-              </Button>
+              {isPremium ? (
+                <Button
+                  type="submit"
+                  size="lg"
+                  disabled={loading || !formData.full_name || !formData.email}
+                  className="w-full sm:w-auto h-14 px-10 btn-primary text-primary-foreground text-lg font-bold rounded-2xl"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Đang gửi...
+                    </>
+                  ) : (
+                    <>
+                      Đăng ký dịch vụ Headhunting
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </>
+                  )}
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  size="lg"
+                  onClick={() => navigate("/pricing")}
+                  className="w-full sm:w-auto h-14 px-10 bg-gradient-to-r from-korean-orange to-korean-pink text-white text-lg font-bold rounded-2xl"
+                >
+                  <Lock className="w-5 h-5 mr-2" />
+                  Nâng cấp Premium để đăng ký
+                </Button>
+              )}
               <p className="text-xs text-muted-foreground text-center">
                 Thông tin của bạn chỉ được sử dụng cho mục đích headhunting và được bảo mật an toàn.
               </p>
