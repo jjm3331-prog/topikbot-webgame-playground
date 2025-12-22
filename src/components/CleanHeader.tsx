@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { User, Bell, Menu, LogOut, LogIn } from "lucide-react";
+import { User, Menu, LogOut, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MegaMenuOverlay } from "@/components/MegaMenuOverlay";
+import { NotificationDropdown } from "@/components/NotificationDropdown";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -16,6 +17,19 @@ interface CleanHeaderProps {
 export const CleanHeader = ({ isLoggedIn = false, username }: CleanHeaderProps) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [userId, setUserId] = useState<string | undefined>();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUserId(session.user.id);
+      }
+    };
+    if (isLoggedIn) {
+      getUser();
+    }
+  }, [isLoggedIn]);
 
   const handleLogout = async () => {
     setIsMenuOpen(false);
@@ -80,14 +94,8 @@ export const CleanHeader = ({ isLoggedIn = false, username }: CleanHeaderProps) 
             
             {isLoggedIn ? (
               <>
-                {/* Notification Bell */}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-9 h-9 rounded-full"
-                >
-                  <Bell className="w-4 h-4" />
-                </Button>
+                {/* Notification Dropdown */}
+                <NotificationDropdown userId={userId} />
 
                 {/* User Profile Button */}
                 <Button
