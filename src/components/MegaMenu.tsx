@@ -78,6 +78,7 @@ const menuSections: MenuSection[] = [
   {
     title: "CỦA TÔI",
     items: [
+      { icon: User, label: "Hồ sơ của tôi", href: "/profile" },
       { icon: Sparkles, label: "Tiến độ học tập", href: "/progress" },
       { icon: Notebook, label: "Sổ lỗi sai", href: "/mistakes", isPremium: true },
       { icon: Bookmark, label: "Từ vựng đã lưu", href: "/vocabulary" },
