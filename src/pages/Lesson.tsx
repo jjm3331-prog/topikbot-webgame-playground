@@ -413,9 +413,10 @@ const Lesson = () => {
   
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <MegaMenu />
-      
-      <main className="flex-1 pt-[76px] pb-24">
+      <CleanHeader />
+
+      <main className="flex-1 pt-8 pb-24">
+
         <div className="container mx-auto px-4 max-w-3xl">
           {/* Header */}
           <motion.div

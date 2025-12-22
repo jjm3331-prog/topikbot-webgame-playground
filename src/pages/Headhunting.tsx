@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import MegaMenu from "@/components/MegaMenu";
+import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { motion } from "framer-motion";
+
 import { 
   Briefcase, 
   Crown, 
@@ -240,9 +241,10 @@ const Headhunting = () => {
   if (submitted || existingApplication) {
     return (
       <div className="min-h-[100dvh] bg-background flex flex-col">
-        <MegaMenu />
+        <CleanHeader />
         <main className="flex-1 pt-24 pb-20 px-4 sm:px-6">
           <div className="max-w-2xl mx-auto text-center">
+
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -272,9 +274,10 @@ const Headhunting = () => {
 
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col">
-      <MegaMenu />
+      <CleanHeader />
       
       {/* Hero Section */}
+
       <section className="pt-24 pb-12 px-4 sm:px-6 relative overflow-hidden">
         {/* Premium Preview Banner */}
         {!isPremium && (

@@ -157,9 +157,10 @@ const Pricing = () => {
 
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col">
-      <MegaMenu />
+      <CleanHeader />
 
-      <main className="flex-1 pt-[76px] pb-12">
+      <main className="flex-1 pt-8 pb-12">
+
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           {/* Header */}
           <motion.div

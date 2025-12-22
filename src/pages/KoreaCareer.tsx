@@ -205,10 +205,11 @@ const KoreaCareer = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <MegaMenu />
-      
-      <main className="flex-1 pt-[76px] pb-12 px-4 max-w-6xl mx-auto">
+      <CleanHeader />
+
+      <main className="flex-1 pt-8 pb-12 px-4 max-w-6xl mx-auto">
         <motion.div
+
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="space-y-8"
