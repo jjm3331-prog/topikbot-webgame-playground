@@ -12,7 +12,7 @@ import {
   Trash2, Loader2, ChevronLeft, Search, RefreshCw,
   TrendingUp, BookOpen, Gamepad2, MessageSquare, PenTool, Star,
   Briefcase, Eye, CheckCircle, XCircle, Clock, Download, FileDown,
-  Crown, UserCheck, ChevronRight
+  Crown, UserCheck, ChevronRight, Shield
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -69,6 +69,8 @@ interface HeadhuntingApplication {
   portfolio_url: string | null;
 }
 
+const ADMIN_EMAIL = "lukas@tam9.me";
+
 const Admin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -108,6 +110,17 @@ const Admin = () => {
       
       if (!user) {
         navigate("/auth");
+        return;
+      }
+
+      // CRITICAL: Only allow lukas@tam9.me to access admin
+      if (user.email !== ADMIN_EMAIL) {
+        toast({
+          title: "접근 거부",
+          description: "관리자 권한이 없습니다.",
+          variant: "destructive",
+        });
+        navigate("/dashboard");
         return;
       }
 
@@ -784,8 +797,13 @@ const Admin = () => {
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-1">
+                              <div className="flex items-center gap-2 mb-1 flex-wrap">
                                 <h4 className="font-semibold truncate">{user.username}</h4>
+                                {user.email === ADMIN_EMAIL && (
+                                  <span className="px-2 py-0.5 text-xs rounded-full bg-gradient-to-r from-red-500 to-rose-600 text-white font-bold flex items-center gap-1">
+                                    <Shield className="w-3 h-3" /> ADMIN
+                                  </span>
+                                )}
                                 {getSubscriptionBadge(user.subscription_plan)}
                               </div>
                               <p className="text-sm text-muted-foreground truncate">{user.email || 'No email'}</p>
@@ -877,7 +895,14 @@ const Admin = () => {
                       <div className="space-y-4 text-sm">
                         <div>
                           <p className="text-muted-foreground text-xs mb-1">사용자명</p>
-                          <p className="font-medium">{selectedUser.username}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium">{selectedUser.username}</p>
+                            {selectedUser.email === ADMIN_EMAIL && (
+                              <span className="px-2 py-0.5 text-xs rounded-full bg-gradient-to-r from-red-500 to-rose-600 text-white font-bold flex items-center gap-1">
+                                <Shield className="w-3 h-3" /> ADMIN
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <div>
                           <p className="text-muted-foreground text-xs mb-1">이메일</p>
