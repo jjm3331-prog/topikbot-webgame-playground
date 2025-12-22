@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { User, Bell, Menu, LogOut } from "lucide-react";
+import { User, Bell, Menu, LogOut, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MegaMenuOverlay } from "@/components/MegaMenuOverlay";
@@ -75,56 +75,39 @@ export const CleanHeader = ({ isLoggedIn = false, username }: CleanHeaderProps) 
           </Button>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-1 sm:gap-2">
+          <div className="flex items-center gap-2">
             <ThemeToggle />
             
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-9 h-9 rounded-full"
-            >
-              <Bell className="w-4 h-4" />
-            </Button>
-
             {isLoggedIn ? (
               <>
-                {/* User Badge */}
-                <Button
-                  variant="outline"
-                  onClick={() => navigate("/profile")}
-                  className="flex items-center gap-2 h-9 px-3 rounded-full"
-                >
-                  <User className="w-4 h-4" />
-                  <span className="hidden sm:inline text-sm font-medium">{username || 'User'}</span>
-                </Button>
-
-                {/* Logout Button */}
-                <Button 
-                  variant="outline"
-                  onClick={handleLogout}
-                  className="h-9 px-3 rounded-full border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                >
-                  <LogOut className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline text-sm font-medium">Đăng xuất</span>
-                </Button>
-              </>
-            ) : (
-              <>
-                {/* Guest User Icon */}
+                {/* Notification Bell - Only when logged in */}
                 <Button
                   variant="ghost"
                   size="icon"
                   className="w-9 h-9 rounded-full"
                 >
-                  <User className="w-4 h-4" />
+                  <Bell className="w-4 h-4" />
                 </Button>
 
-                {/* Login Button */}
+                {/* User Profile - Only when logged in */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => navigate("/profile")}
+                  className="w-9 h-9 rounded-full"
+                >
+                  <User className="w-4 h-4" />
+                </Button>
+              </>
+            ) : (
+              <>
+                {/* Login Button - THPT AI style */}
                 <Button 
                   onClick={() => navigate("/auth")}
-                  className="h-9 px-4 rounded-full btn-primary text-primary-foreground text-sm font-semibold"
+                  className="h-10 px-4 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-medium flex items-center gap-2"
                 >
-                  Đăng nhập
+                  <LogIn className="w-4 h-4" />
+                  <span className="hidden sm:inline">Đăng nhập</span>
                 </Button>
               </>
             )}
