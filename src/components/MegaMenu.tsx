@@ -74,6 +74,7 @@ const menuSections: MenuSection[] = [
       { icon: Music, label: "K-POP Quiz", href: "/kpop" },
       { icon: Drama, label: "K-Drama Lồng tiếng", href: "/kdrama" },
       { icon: Briefcase, label: "Làm thêm Hàn Quốc", href: "/parttime" },
+      { icon: HelpCircle, label: "Hướng dẫn sử dụng Game", href: "/tutorial" },
     ]
   },
   {

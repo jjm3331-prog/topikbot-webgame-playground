@@ -14,7 +14,8 @@ import {
   Music,
   Drama,
   Languages,
-  PenTool
+  PenTool,
+  HelpCircle
 } from "lucide-react";
 
 interface SubMenuItem {
@@ -62,6 +63,7 @@ const menuItems: MenuItem[] = [
       { icon: Music, label: "K-POP Quiz", href: "/kpop" },
       { icon: Drama, label: "K-Drama Lồng tiếng", href: "/kdrama" },
       { icon: Briefcase, label: "Làm thêm Hàn Quốc", href: "/parttime" },
+      { icon: HelpCircle, label: "Hướng dẫn sử dụng Game", href: "/tutorial" },
     ]
   },
   {
