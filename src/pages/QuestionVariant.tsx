@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Upload, Wand2, Loader2, Crown, ImageIcon, RefreshCw } from "lucide-react";
+import { Sparkles, Upload, Wand2, Loader2, Crown, ImageIcon, RefreshCw, BookOpen, Lightbulb, CheckCircle2, XCircle, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import CleanHeader from "@/components/CleanHeader";
@@ -8,38 +8,7 @@ import AppFooter from "@/components/AppFooter";
 import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { useNavigate } from "react-router-dom";
-
-type Difficulty = "easier" | "similar" | "harder";
-
-const difficultyOptions = [
-  {
-    id: "easier" as Difficulty,
-    emoji: "😊",
-    label: "Dễ hơn",
-    sublabel: "Số đơn giản, ít bước",
-    color: "from-green-500 to-emerald-600",
-    borderColor: "border-green-500",
-  },
-  {
-    id: "similar" as Difficulty,
-    emoji: "🎯",
-    label: "Tương tự",
-    sublabel: "Độ khó giữ nguyên",
-    color: "from-amber-500 to-orange-600",
-    borderColor: "border-amber-500",
-  },
-  {
-    id: "harder" as Difficulty,
-    emoji: "🔥",
-    label: "Khó hơn",
-    sublabel: "Thêm bước, số phức tạp",
-    color: "from-red-500 to-rose-600",
-    borderColor: "border-red-500",
-  },
-];
 
 const usageExamples = [
   { subject: "Toán", example: "Chụp bài toán hàm số → AI tạo bài tương tự với số khác" },
@@ -48,6 +17,29 @@ const usageExamples = [
   { subject: "Anh", example: "Chụp bài điền từ → AI tạo đoạn văn khác với cấu trúc ngữ pháp tương tự" },
 ];
 
+interface ParsedResult {
+  originalAnalysis?: {
+    ko: string;
+    vi: string;
+  };
+  variantQuestion?: {
+    ko: string;
+    vi: string;
+  };
+  answer?: {
+    ko: string;
+    vi: string;
+  };
+  explanation?: {
+    ko: string;
+    vi: string;
+  };
+  learningPoints?: {
+    ko: string;
+    vi: string;
+  };
+}
+
 export default function QuestionVariant() {
   const { isPremium, loading: subscriptionLoading } = useSubscription();
   const navigate = useNavigate();
@@ -55,9 +47,9 @@ export default function QuestionVariant() {
   
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>("similar");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedContent, setGeneratedContent] = useState<string | null>(null);
+  const [generatedContent, setGeneratedContent] = useState<ParsedResult | null>(null);
+  const [rawContent, setRawContent] = useState<string | null>(null);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -72,13 +64,43 @@ export default function QuestionVariant() {
         setSelectedImage(event.target?.result as string);
         setImageFile(file);
         setGeneratedContent(null);
+        setRawContent(null);
       };
       reader.readAsDataURL(file);
     }
   };
 
   const handleChangeImage = () => {
-    fileInputRef.current?.click();
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+      fileInputRef.current.click();
+    }
+  };
+
+  const parseGeneratedContent = (content: string): ParsedResult => {
+    const result: ParsedResult = {};
+    
+    // Parse sections using regex
+    const sections = {
+      originalAnalysis: /##\s*📋\s*원본\s*문제\s*분석\s*[\s\S]*?(?=##|$)/i,
+      variantQuestion: /##\s*✨\s*변형\s*문제\s*[\s\S]*?(?=##|$)/i,
+      answer: /##\s*✅\s*정답\s*[\s\S]*?(?=##|$)/i,
+      explanation: /##\s*📝\s*해설\s*[\s\S]*?(?=##|$)/i,
+      learningPoints: /##\s*💡\s*학습\s*포인트\s*[\s\S]*?(?=##|$)/i,
+    };
+
+    for (const [key, regex] of Object.entries(sections)) {
+      const match = content.match(regex);
+      if (match) {
+        let text = match[0].replace(/^##\s*[📋✨✅📝💡]\s*[^\n]+\n?/, '').trim();
+        result[key as keyof ParsedResult] = {
+          ko: text,
+          vi: '' // Will be filled by Vietnamese translation in edge function
+        };
+      }
+    }
+
+    return result;
   };
 
   const handleGenerate = async () => {
@@ -94,9 +116,9 @@ export default function QuestionVariant() {
 
     setIsGenerating(true);
     setGeneratedContent(null);
+    setRawContent(null);
 
     try {
-      // Convert image to base64 without the data URL prefix
       const base64Data = selectedImage.split(",")[1];
       const mimeType = imageFile.type;
 
@@ -104,7 +126,7 @@ export default function QuestionVariant() {
         body: {
           imageBase64: base64Data,
           imageMimeType: mimeType,
-          difficulty: selectedDifficulty,
+          difficulty: "similar",
         },
       });
 
@@ -117,7 +139,17 @@ export default function QuestionVariant() {
         throw new Error(data.error);
       }
 
-      setGeneratedContent(data.response);
+      // Store raw content for fallback
+      setRawContent(data.response);
+      
+      // Try to parse the structured response
+      if (data.parsed) {
+        setGeneratedContent(data.parsed);
+      } else {
+        // Fallback to parsing the raw markdown
+        setGeneratedContent(parseGeneratedContent(data.response));
+      }
+      
       toast.success("Tạo câu hỏi biến thể thành công!");
     } catch (error) {
       console.error("Error generating variant:", error);
@@ -139,6 +171,16 @@ export default function QuestionVariant() {
     <div className="min-h-screen bg-background">
       <CleanHeader />
       
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleImageSelect}
+        className="hidden"
+        disabled={!isPremium}
+      />
+      
       <main className="container mx-auto px-4 py-8 pt-24">
         {/* Header */}
         <motion.div
@@ -155,7 +197,7 @@ export default function QuestionVariant() {
             </span>
           </h1>
           <p className="text-muted-foreground text-lg">
-            Chụp ảnh câu hỏi → AI tạo câu hỏi tương tự với độ khó tùy chọn
+            Chụp ảnh câu hỏi → AI tạo câu hỏi tương tự + giải thích chi tiết
           </p>
         </motion.div>
 
@@ -195,7 +237,6 @@ export default function QuestionVariant() {
         >
           <Card className="bg-card/50 border-border/50">
             <CardContent className="p-6">
-              {/* Steps */}
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center">
                   <span className="text-amber-500 text-sm">💡</span>
@@ -203,11 +244,10 @@ export default function QuestionVariant() {
                 <h3 className="font-semibold text-amber-500">Hướng dẫn sử dụng (Rất đơn giản!)</h3>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 {[
                   { step: 1, title: "Chụp ảnh câu hỏi", desc: "Chụp màn hình hoặc chụp ảnh câu hỏi từ đề thi/sách" },
-                  { step: 2, title: "Chọn độ khó", desc: "Dễ hơn, tương tự, hoặc khó hơn câu gốc" },
-                  { step: 3, title: "Nhận kết quả", desc: "AI tạo câu hỏi mới + giải thích chi tiết" },
+                  { step: 2, title: "Nhận kết quả", desc: "AI tạo câu hỏi mới + giải thích chi tiết bằng 2 ngôn ngữ" },
                 ].map((item) => (
                   <div key={item.step} className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
@@ -221,7 +261,6 @@ export default function QuestionVariant() {
                 ))}
               </div>
 
-              {/* Examples */}
               <div className="bg-amber-500/10 rounded-lg p-4">
                 <h4 className="font-medium text-amber-500 mb-2 flex items-center gap-2">
                   💡 Ví dụ cách sử dụng:
@@ -257,7 +296,7 @@ export default function QuestionVariant() {
                   />
                   <Button
                     onClick={handleChangeImage}
-                    className="absolute top-4 right-4 bg-background/80 hover:bg-background text-foreground"
+                    className="absolute top-4 right-4 bg-background/90 hover:bg-background text-foreground border border-border"
                     size="sm"
                     disabled={!isPremium}
                   >
@@ -266,17 +305,10 @@ export default function QuestionVariant() {
                   </Button>
                 </div>
               ) : (
-                <label 
+                <div 
+                  onClick={() => isPremium && fileInputRef.current?.click()}
                   className={`flex flex-col items-center justify-center min-h-[300px] cursor-pointer border-2 border-dashed border-border/50 hover:border-primary/50 transition-colors ${!isPremium ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageSelect}
-                    className="hidden"
-                    disabled={!isPremium}
-                  />
                   <ImageIcon className="w-16 h-16 text-muted-foreground mb-4" />
                   <p className="text-lg font-medium text-foreground mb-2">
                     Tải ảnh câu hỏi lên
@@ -284,45 +316,10 @@ export default function QuestionVariant() {
                   <p className="text-sm text-muted-foreground">
                     Nhấn hoặc kéo thả ảnh vào đây (tối đa 10MB)
                   </p>
-                </label>
+                </div>
               )}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageSelect}
-                className="hidden"
-                disabled={!isPremium}
-              />
             </CardContent>
           </Card>
-
-          {/* Difficulty Selection */}
-          <div className="mb-6">
-            <h3 className="text-lg font-medium text-foreground mb-4">
-              Chọn độ khó của câu hỏi biến thể:
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {difficultyOptions.map((option) => (
-                <button
-                  key={option.id}
-                  onClick={() => isPremium && setSelectedDifficulty(option.id)}
-                  disabled={!isPremium}
-                  className={`p-4 rounded-xl border-2 transition-all ${
-                    selectedDifficulty === option.id
-                      ? `${option.borderColor} bg-gradient-to-br ${option.color} text-white`
-                      : "border-border bg-card hover:border-primary/50"
-                  } ${!isPremium ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-                >
-                  <div className="text-3xl mb-2">{option.emoji}</div>
-                  <div className="font-bold">{option.label}</div>
-                  <div className={`text-sm ${selectedDifficulty === option.id ? "text-white/80" : "text-muted-foreground"}`}>
-                    {option.sublabel}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
 
           {/* Generate Button */}
           <Button
@@ -334,7 +331,7 @@ export default function QuestionVariant() {
             {isGenerating ? (
               <>
                 <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                Đang tạo câu hỏi biến thể...
+                Đang phân tích và tạo câu hỏi biến thể...
               </>
             ) : (
               <>
@@ -344,26 +341,219 @@ export default function QuestionVariant() {
             )}
           </Button>
 
-          {/* Generated Result */}
-          {generatedContent && (
+          {/* Generated Result - Production Quality */}
+          {(generatedContent || rawContent) && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-8"
+              className="mt-8 space-y-6"
             >
-              <Card className="bg-card border-primary/30">
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-primary" />
-                    Kết quả biến thể
-                  </h3>
-                  <div className="prose prose-invert max-w-none">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {generatedContent}
-                    </ReactMarkdown>
+              {/* Section 1: Original Analysis */}
+              {generatedContent?.originalAnalysis && (
+                <Card className="overflow-hidden border-2 border-blue-500/30 bg-gradient-to-br from-blue-500/5 to-indigo-500/5">
+                  <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
+                    <h3 className="text-xl font-bold text-white flex items-center gap-3">
+                      <BookOpen className="w-6 h-6" />
+                      <span>원본 문제 분석</span>
+                      <span className="text-white/70">|</span>
+                      <span className="text-white/90">Phân tích đề gốc</span>
+                    </h3>
                   </div>
-                </CardContent>
-              </Card>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Korean */}
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 pb-2 border-b border-blue-500/20">
+                          <span className="text-lg">🇰🇷</span>
+                          <span className="font-bold text-blue-400">한국어</span>
+                        </div>
+                        <div className="text-foreground leading-relaxed whitespace-pre-wrap">
+                          {generatedContent.originalAnalysis.ko}
+                        </div>
+                      </div>
+                      {/* Vietnamese */}
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 pb-2 border-b border-indigo-500/20">
+                          <span className="text-lg">🇻🇳</span>
+                          <span className="font-bold text-indigo-400">Tiếng Việt</span>
+                        </div>
+                        <div className="text-foreground leading-relaxed whitespace-pre-wrap">
+                          {generatedContent.originalAnalysis.vi || generatedContent.originalAnalysis.ko}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Section 2: Variant Question */}
+              {generatedContent?.variantQuestion && (
+                <Card className="overflow-hidden border-2 border-amber-500/30 bg-gradient-to-br from-amber-500/5 to-orange-500/5">
+                  <div className="bg-gradient-to-r from-amber-600 to-orange-600 px-6 py-4">
+                    <h3 className="text-xl font-bold text-white flex items-center gap-3">
+                      <Sparkles className="w-6 h-6" />
+                      <span>변형 문제</span>
+                      <span className="text-white/70">|</span>
+                      <span className="text-white/90">Câu hỏi biến thể</span>
+                    </h3>
+                  </div>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Korean */}
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 pb-2 border-b border-amber-500/20">
+                          <span className="text-lg">🇰🇷</span>
+                          <span className="font-bold text-amber-400">한국어</span>
+                        </div>
+                        <div className="text-foreground leading-relaxed whitespace-pre-wrap bg-amber-500/10 p-4 rounded-lg border border-amber-500/20">
+                          {generatedContent.variantQuestion.ko}
+                        </div>
+                      </div>
+                      {/* Vietnamese */}
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 pb-2 border-b border-orange-500/20">
+                          <span className="text-lg">🇻🇳</span>
+                          <span className="font-bold text-orange-400">Tiếng Việt</span>
+                        </div>
+                        <div className="text-foreground leading-relaxed whitespace-pre-wrap bg-orange-500/10 p-4 rounded-lg border border-orange-500/20">
+                          {generatedContent.variantQuestion.vi || generatedContent.variantQuestion.ko}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Section 3: Answer */}
+              {generatedContent?.answer && (
+                <Card className="overflow-hidden border-2 border-green-500/30 bg-gradient-to-br from-green-500/5 to-emerald-500/5">
+                  <div className="bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-4">
+                    <h3 className="text-xl font-bold text-white flex items-center gap-3">
+                      <CheckCircle2 className="w-6 h-6" />
+                      <span>정답</span>
+                      <span className="text-white/70">|</span>
+                      <span className="text-white/90">Đáp án</span>
+                    </h3>
+                  </div>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Korean */}
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 pb-2 border-b border-green-500/20">
+                          <span className="text-lg">🇰🇷</span>
+                          <span className="font-bold text-green-400">한국어</span>
+                        </div>
+                        <div className="text-foreground leading-relaxed whitespace-pre-wrap text-lg font-semibold bg-green-500/10 p-4 rounded-lg border border-green-500/20">
+                          {generatedContent.answer.ko}
+                        </div>
+                      </div>
+                      {/* Vietnamese */}
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 pb-2 border-b border-emerald-500/20">
+                          <span className="text-lg">🇻🇳</span>
+                          <span className="font-bold text-emerald-400">Tiếng Việt</span>
+                        </div>
+                        <div className="text-foreground leading-relaxed whitespace-pre-wrap text-lg font-semibold bg-emerald-500/10 p-4 rounded-lg border border-emerald-500/20">
+                          {generatedContent.answer.vi || generatedContent.answer.ko}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Section 4: Explanation */}
+              {generatedContent?.explanation && (
+                <Card className="overflow-hidden border-2 border-purple-500/30 bg-gradient-to-br from-purple-500/5 to-violet-500/5">
+                  <div className="bg-gradient-to-r from-purple-600 to-violet-600 px-6 py-4">
+                    <h3 className="text-xl font-bold text-white flex items-center gap-3">
+                      <Target className="w-6 h-6" />
+                      <span>해설</span>
+                      <span className="text-white/70">|</span>
+                      <span className="text-white/90">Giải thích chi tiết</span>
+                    </h3>
+                  </div>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Korean */}
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 pb-2 border-b border-purple-500/20">
+                          <span className="text-lg">🇰🇷</span>
+                          <span className="font-bold text-purple-400">한국어</span>
+                        </div>
+                        <div className="text-foreground leading-relaxed whitespace-pre-wrap">
+                          {generatedContent.explanation.ko}
+                        </div>
+                      </div>
+                      {/* Vietnamese */}
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 pb-2 border-b border-violet-500/20">
+                          <span className="text-lg">🇻🇳</span>
+                          <span className="font-bold text-violet-400">Tiếng Việt</span>
+                        </div>
+                        <div className="text-foreground leading-relaxed whitespace-pre-wrap">
+                          {generatedContent.explanation.vi || generatedContent.explanation.ko}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Section 5: Learning Points */}
+              {generatedContent?.learningPoints && (
+                <Card className="overflow-hidden border-2 border-cyan-500/30 bg-gradient-to-br from-cyan-500/5 to-teal-500/5">
+                  <div className="bg-gradient-to-r from-cyan-600 to-teal-600 px-6 py-4">
+                    <h3 className="text-xl font-bold text-white flex items-center gap-3">
+                      <Lightbulb className="w-6 h-6" />
+                      <span>학습 포인트</span>
+                      <span className="text-white/70">|</span>
+                      <span className="text-white/90">Điểm học tập</span>
+                    </h3>
+                  </div>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Korean */}
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 pb-2 border-b border-cyan-500/20">
+                          <span className="text-lg">🇰🇷</span>
+                          <span className="font-bold text-cyan-400">한국어</span>
+                        </div>
+                        <div className="text-foreground leading-relaxed whitespace-pre-wrap">
+                          {generatedContent.learningPoints.ko}
+                        </div>
+                      </div>
+                      {/* Vietnamese */}
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 pb-2 border-b border-teal-500/20">
+                          <span className="text-lg">🇻🇳</span>
+                          <span className="font-bold text-teal-400">Tiếng Việt</span>
+                        </div>
+                        <div className="text-foreground leading-relaxed whitespace-pre-wrap">
+                          {generatedContent.learningPoints.vi || generatedContent.learningPoints.ko}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Fallback: Raw Content if parsing failed */}
+              {rawContent && !generatedContent?.variantQuestion && (
+                <Card className="overflow-hidden border-2 border-primary/30">
+                  <div className="bg-gradient-to-r from-primary to-primary/80 px-6 py-4">
+                    <h3 className="text-xl font-bold text-white flex items-center gap-3">
+                      <Sparkles className="w-6 h-6" />
+                      Kết quả biến thể
+                    </h3>
+                  </div>
+                  <CardContent className="p-6">
+                    <div className="prose prose-invert max-w-none text-foreground leading-relaxed whitespace-pre-wrap">
+                      {rawContent}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </motion.div>
           )}
         </motion.div>
