@@ -218,7 +218,7 @@ const KPop = () => {
     <div className="min-h-[100dvh] bg-gradient-to-b from-purple-900 via-pink-900 to-[#0f0f23]">
       <div className="sticky top-0 z-50 bg-black/40 backdrop-blur-xl border-b border-pink-500/20">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
-          <button onClick={() => navigate('/game')} className="text-white p-2"><ArrowLeft className="w-6 h-6" /></button>
+          <button onClick={() => navigate('/dashboard')} className="text-white p-2"><ArrowLeft className="w-6 h-6" /></button>
           <div className="flex items-center gap-2"><Music className="w-5 h-5 text-pink-400" /><span className="text-white font-bold">K-POP MV 퀴즈</span></div>
           <div className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-yellow-400" /><span className="text-yellow-400 font-bold">{score}</span></div>
         </div>

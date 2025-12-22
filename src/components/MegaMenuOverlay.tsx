@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Home,
@@ -23,7 +23,8 @@ import {
   FileX,
   Users,
   Star,
-  Building
+  Building,
+  ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -107,10 +108,19 @@ interface MegaMenuOverlayProps {
 
 export const MegaMenuOverlay = ({ isOpen, onClose, isLoggedIn = false }: MegaMenuOverlayProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
 
   const handleNavigation = (href: string) => {
     onClose();
     navigate(href);
+  };
+
+  const isActive = (href: string) => {
+    if (href === '/dashboard') {
+      return currentPath === '/dashboard';
+    }
+    return currentPath === href || currentPath.startsWith(href + '/');
   };
 
   // 로그인 상태에 따라 메뉴 구성
@@ -140,7 +150,7 @@ export const MegaMenuOverlay = ({ isOpen, onClose, isLoggedIn = false }: MegaMen
           </Button>
 
           {/* Menu Content */}
-          <div className="max-w-7xl mx-auto px-6 py-8 md:py-12">
+          <div className="max-w-7xl mx-auto px-6 py-8 md:py-12 overflow-y-auto max-h-[calc(100vh-60px)]">
             <div className={`grid gap-8 md:gap-10 ${
               isLoggedIn 
                 ? 'grid-cols-2 md:grid-cols-5' 
@@ -161,41 +171,72 @@ export const MegaMenuOverlay = ({ isOpen, onClose, isLoggedIn = false }: MegaMen
 
                   {/* Menu Items */}
                   <ul className="space-y-1">
-                    {category.items.map((item, itemIndex) => (
-                      <motion.li
-                        key={item.label}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.2, delay: categoryIndex * 0.05 + itemIndex * 0.03 }}
-                      >
-                        <button
-                          onClick={() => handleNavigation(item.href)}
-                          className={`group flex items-center gap-3 w-full py-2.5 px-3 rounded-lg text-left transition-all ${
-                            item.isHighlight 
-                              ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
-                              : 'hover:bg-muted'
-                          }`}
+                    {category.items.map((item, itemIndex) => {
+                      const active = isActive(item.href);
+                      return (
+                        <motion.li
+                          key={item.label}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.2, delay: categoryIndex * 0.05 + itemIndex * 0.03 }}
                         >
-                          <item.icon className={`w-4 h-4 ${
-                            item.isHighlight 
-                              ? 'text-primary-foreground' 
-                              : 'text-muted-foreground group-hover:text-primary'
-                          } transition-colors`} />
-                          <span className={`text-sm font-medium ${
-                            item.isHighlight 
-                              ? 'text-primary-foreground' 
-                              : 'text-foreground group-hover:text-primary'
-                          } transition-colors`}>
-                            {item.label}
-                          </span>
-                          {item.isPremium && (
-                            <span className="px-1.5 py-0.5 bg-accent text-accent-foreground text-[10px] font-bold rounded">
-                              Premium
+                          <motion.button
+                            onClick={() => handleNavigation(item.href)}
+                            whileHover={{ x: 4, scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className={`group flex items-center gap-3 w-full py-2.5 px-3 rounded-lg text-left transition-all relative overflow-hidden ${
+                              active
+                                ? 'bg-primary text-primary-foreground shadow-md'
+                                : item.isHighlight 
+                                  ? 'bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground' 
+                                  : 'hover:bg-muted/80'
+                            }`}
+                          >
+                            {/* Active indicator bar */}
+                            {active && (
+                              <motion.div
+                                layoutId="activeIndicator"
+                                className="absolute left-0 top-0 bottom-0 w-1 bg-primary-foreground rounded-r-full"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.2 }}
+                              />
+                            )}
+                            
+                            <item.icon className={`w-4 h-4 transition-all duration-200 ${
+                              active
+                                ? 'text-primary-foreground'
+                                : item.isHighlight 
+                                  ? 'text-primary group-hover:text-primary-foreground' 
+                                  : 'text-muted-foreground group-hover:text-primary group-hover:scale-110'
+                            }`} />
+                            
+                            <span className={`text-sm font-medium transition-colors duration-200 flex-1 ${
+                              active
+                                ? 'text-primary-foreground'
+                                : item.isHighlight 
+                                  ? 'text-primary group-hover:text-primary-foreground' 
+                                  : 'text-foreground group-hover:text-primary'
+                            }`}>
+                              {item.label}
                             </span>
-                          )}
-                        </button>
-                      </motion.li>
-                    ))}
+                            
+                            {item.isPremium && !active && (
+                              <span className="px-1.5 py-0.5 bg-accent text-accent-foreground text-[10px] font-bold rounded">
+                                Premium
+                              </span>
+                            )}
+                            
+                            {/* Hover arrow indicator */}
+                            <ChevronRight className={`w-3 h-3 opacity-0 -translate-x-2 transition-all duration-200 ${
+                              active 
+                                ? 'text-primary-foreground opacity-100 translate-x-0' 
+                                : 'group-hover:opacity-100 group-hover:translate-x-0 text-muted-foreground group-hover:text-primary'
+                            }`} />
+                          </motion.button>
+                        </motion.li>
+                      );
+                    })}
                   </ul>
                 </motion.div>
               ))}
@@ -212,16 +253,25 @@ export const MegaMenuOverlay = ({ isOpen, onClose, isLoggedIn = false }: MegaMen
                 KHÁC
               </h3>
               <div className="flex flex-wrap gap-4">
-                {bottomMenuItems.map((item) => (
-                  <button
-                    key={item.label}
-                    onClick={() => handleNavigation(item.href)}
-                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    <item.icon className="w-4 h-4" />
-                    <span>{item.label}</span>
-                  </button>
-                ))}
+                {bottomMenuItems.map((item) => {
+                  const active = isActive(item.href);
+                  return (
+                    <motion.button
+                      key={item.label}
+                      onClick={() => handleNavigation(item.href)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={`flex items-center gap-2 text-sm transition-all px-3 py-2 rounded-lg ${
+                        active 
+                          ? 'bg-primary text-primary-foreground' 
+                          : 'text-muted-foreground hover:text-primary hover:bg-muted/50'
+                      }`}
+                    >
+                      <item.icon className="w-4 h-4" />
+                      <span>{item.label}</span>
+                    </motion.button>
+                  );
+                })}
               </div>
             </motion.div>
           </div>
