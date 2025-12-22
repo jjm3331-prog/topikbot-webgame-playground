@@ -101,55 +101,42 @@ export default function Translate() {
     }
   };
 
-  const handleSpeak = async (text: string, lang: "ko" | "vi") => {
+  // Only Korean TTS using ElevenLabs
+  const handleSpeak = async (text: string) => {
     if (!text.trim() || isSpeaking) return;
 
     setIsSpeaking(true);
 
     try {
-      // Use korean-tts for Korean text
-      if (lang === "ko") {
-        const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/korean-tts`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-            },
-            body: JSON.stringify({ text, voice: "nova", speed: 0.9 }),
-          }
-        );
-
-        if (!response.ok) throw new Error("TTS request failed");
-
-        const audioBlob = await response.blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
-        
-        if (audioRef.current) {
-          audioRef.current.pause();
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ text }),
         }
-        
-        audioRef.current = new Audio(audioUrl);
-        audioRef.current.onended = () => setIsSpeaking(false);
-        audioRef.current.onerror = () => {
-          setIsSpeaking(false);
-          toast.error("Lỗi phát âm thanh");
-        };
-        await audioRef.current.play();
-      } else {
-        // Use browser TTS for Vietnamese
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = "vi-VN";
-        utterance.rate = 0.9;
-        utterance.onend = () => setIsSpeaking(false);
-        utterance.onerror = () => {
-          setIsSpeaking(false);
-          toast.error("Trình duyệt không hỗ trợ TTS tiếng Việt");
-        };
-        speechSynthesis.speak(utterance);
+      );
+
+      if (!response.ok) throw new Error("TTS request failed");
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      if (audioRef.current) {
+        audioRef.current.pause();
       }
+      
+      audioRef.current = new Audio(audioUrl);
+      audioRef.current.onended = () => setIsSpeaking(false);
+      audioRef.current.onerror = () => {
+        setIsSpeaking(false);
+        toast.error("Lỗi phát âm thanh");
+      };
+      await audioRef.current.play();
     } catch (error) {
       console.error("TTS error:", error);
       setIsSpeaking(false);
@@ -312,15 +299,20 @@ export default function Translate() {
 
                     {/* Source Actions */}
                     <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleSpeak(sourceText, sourceLang)}
-                        disabled={!sourceText.trim() || isSpeaking}
-                      >
-                        <Volume2 className={`w-4 h-4 mr-2 ${isSpeaking ? "animate-pulse" : ""}`} />
-                        Nghe
-                      </Button>
+                      {/* Only show Listen button for Korean */}
+                      {sourceLang === "ko" ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleSpeak(sourceText)}
+                          disabled={!sourceText.trim() || isSpeaking}
+                        >
+                          <Volume2 className={`w-4 h-4 mr-2 ${isSpeaking ? "animate-pulse" : ""}`} />
+                          Nghe
+                        </Button>
+                      ) : (
+                        <div /> 
+                      )}
                       
                       <Button
                         variant="ghost"
@@ -450,15 +442,20 @@ export default function Translate() {
 
                     {/* Target Actions */}
                     <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => result && handleSpeak(result.translation, targetLang as "ko" | "vi")}
-                        disabled={!result || isSpeaking}
-                      >
-                        <Volume2 className={`w-4 h-4 mr-2 ${isSpeaking ? "animate-pulse" : ""}`} />
-                        Nghe
-                      </Button>
+                      {/* Only show Listen button for Korean translation */}
+                      {targetLang === "ko" ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => result && handleSpeak(result.translation)}
+                          disabled={!result || isSpeaking}
+                        >
+                          <Volume2 className={`w-4 h-4 mr-2 ${isSpeaking ? "animate-pulse" : ""}`} />
+                          Nghe
+                        </Button>
+                      ) : (
+                        <div />
+                      )}
                       
                       <Button
                         variant="ghost"
@@ -594,7 +591,7 @@ export default function Translate() {
                                     variant="ghost"
                                     size="icon"
                                     className="h-8 w-8"
-                                    onClick={() => handleSpeak(vocab.word, "ko")}
+                                    onClick={() => handleSpeak(vocab.word)}
                                   >
                                     <Volume2 className="w-4 h-4" />
                                   </Button>

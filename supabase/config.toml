@@ -74,3 +74,6 @@ verify_jwt = true
 
 [functions.translate-ko-vi]
 verify_jwt = false
+
+[functions.elevenlabs-tts]
+verify_jwt = false
