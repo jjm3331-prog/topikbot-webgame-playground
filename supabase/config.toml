@@ -77,3 +77,6 @@ verify_jwt = false
 
 [functions.elevenlabs-tts]
 verify_jwt = false
+
+[functions.roleplay-speak]
+verify_jwt = false

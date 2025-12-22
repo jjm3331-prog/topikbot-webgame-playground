@@ -73,7 +73,7 @@ const menuItems: MenuItem[] = [
     items: [
       { icon: MessageCircle, label: "Hỏi AI (30/ngày)", href: "/ai-tutor" },
       { icon: PenTool, label: "Chấm bài viết", href: "/writing-correction", isPremium: true },
-      { icon: Languages, label: "Dịch Hàn-Việt", href: "/translate" },
+      { icon: Languages, label: "Roleplay Speaking", href: "/roleplay-speaking" },
     ]
   },
 ];
