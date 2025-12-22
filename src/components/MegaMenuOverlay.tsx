@@ -51,7 +51,7 @@ const baseMenuCategories: MenuCategory[] = [
     title: "DU HỌC & VIỆC LÀM",
     emoji: "✈️",
     items: [
-      { icon: Building, label: "Tìm việc tại Hàn Quốc", href: "/korea-career" },
+      { icon: Building, label: "Tìm việc tại Hàn Quốc", href: "/korea-career", isPremium: true },
       { icon: Users, label: "Headhunting", href: "/headhunting", isPremium: true },
     ]
   },
@@ -93,9 +93,9 @@ const myMenuCategory: MenuCategory = {
   title: "CỦA TÔI",
   emoji: "👤",
   items: [
-    { icon: Sparkles, label: "Tiến độ học tập", href: "/dashboard", isHighlight: true },
+    { icon: Sparkles, label: "Tiến độ học tập", href: "/dashboard", isPremium: true, isHighlight: true },
     { icon: Trophy, label: "Xếp hạng của tôi", href: "/ranking" },
-    { icon: FileX, label: "Sổ lỗi sai", href: "/mistakes" },
+    { icon: FileX, label: "Sổ lỗi sai", href: "/mistakes", isPremium: true },
     { icon: BookMarked, label: "Từ vựng đã lưu", href: "/vocabulary" },
     { icon: User, label: "Hồ sơ của tôi", href: "/profile" },
   ]
