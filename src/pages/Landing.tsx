@@ -158,7 +158,7 @@ const Landing = () => {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/dashboard");
+        navigate("/chat");
       }
     });
     setTimeout(() => setIsLoaded(true), 100);

@@ -25,26 +25,26 @@ const PremiumRequired = () => (
     >
       <Card className="p-8 text-center bg-card border-border">
         <div className="w-16 h-16 rounded-full bg-gradient-to-br from-korean-orange to-korean-pink flex items-center justify-center mx-auto mb-6">
-          <Lock className="w-8 h-8 text-white" />
+          <Lock className="w-8 h-8 text-primary-foreground" />
         </div>
         
         <h1 className="text-2xl font-heading font-bold text-foreground mb-3">
-          Premium 전용 기능
+          Tính năng Premium
         </h1>
         
         <p className="text-muted-foreground mb-6">
-          이 기능은 Premium 회원만 이용할 수 있습니다.<br />
-          지금 업그레이드하고 모든 기능을 이용해보세요!
+          Tính năng này chỉ dành cho thành viên Premium.<br />
+          Nâng cấp ngay để mở khóa tất cả tính năng!
         </p>
 
         <div className="space-y-3">
           <Button
             asChild
-            className="w-full bg-gradient-to-r from-korean-orange to-korean-pink hover:from-korean-orange/90 hover:to-korean-pink/90 text-white font-bold"
+            className="w-full bg-gradient-to-r from-korean-orange to-korean-pink hover:from-korean-orange/90 hover:to-korean-pink/90 text-primary-foreground font-bold"
           >
             <a href="/pricing">
               <Crown className="w-4 h-4 mr-2" />
-              Premium 업그레이드
+              Nâng cấp Premium
             </a>
           </Button>
           
@@ -53,28 +53,28 @@ const PremiumRequired = () => (
             asChild
             className="w-full"
           >
-            <a href="/">홈으로 돌아가기</a>
+            <a href="/">Về trang chủ</a>
           </Button>
         </div>
 
         <div className="mt-6 pt-6 border-t border-border">
-          <h3 className="text-sm font-semibold text-foreground mb-3">Premium 혜택</h3>
+          <h3 className="text-sm font-semibold text-foreground mb-3">Quyền lợi Premium</h3>
           <ul className="text-sm text-muted-foreground space-y-2 text-left">
             <li className="flex items-center gap-2">
               <span className="text-korean-green">✓</span>
-              취업 서비스 (한국 취업 정보 + Headhunting)
+              Dịch vụ việc làm (Tìm việc tại Hàn + Headhunting)
             </li>
             <li className="flex items-center gap-2">
               <span className="text-korean-green">✓</span>
-              AI 작문 첨삭 (Writing Correction)
+              AI chấm bài viết (Writing Correction)
             </li>
             <li className="flex items-center gap-2">
               <span className="text-korean-green">✓</span>
-              학습 진도 추적 & 분석
+              Theo dõi & phân tích tiến độ học
             </li>
             <li className="flex items-center gap-2">
               <span className="text-korean-green">✓</span>
-              오답노트 관리
+              Quản lý sổ lỗi sai
             </li>
           </ul>
         </div>
