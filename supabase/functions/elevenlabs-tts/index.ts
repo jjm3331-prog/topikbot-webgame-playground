@@ -5,13 +5,17 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Default voice: Sarah (natural and clear for Korean)
+// User can change to Anna Kim or other voices by providing voiceId
+const DEFAULT_VOICE_ID = "EXAVITQu4vr4xnSDxMaL";
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { text, voiceId } = await req.json();
+    const { text, voiceId, speed = 1.0 } = await req.json();
     const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
     if (!text) {
@@ -22,9 +26,7 @@ serve(async (req) => {
       throw new Error("ELEVENLABS_API_KEY is not configured");
     }
 
-    // Default to 'Rachel' voice which sounds natural for Korean
-    // Other good options: EXAVITQu4vr4xnSDxMaL (Sarah), onwK4e9ZLuTAKqWW03F9 (Daniel)
-    const selectedVoice = voiceId || "EXAVITQu4vr4xnSDxMaL"; // Sarah - natural and clear
+    const selectedVoice = voiceId || DEFAULT_VOICE_ID;
 
     console.log(`Generating ElevenLabs TTS for text: "${text.substring(0, 50)}..." with voice: ${selectedVoice}`);
 
@@ -38,14 +40,14 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           text,
-          model_id: "eleven_multilingual_v2",
+          model_id: "eleven_turbo_v2_5", // Fast and cost-effective
           output_format: "mp3_44100_128",
           voice_settings: {
             stability: 0.5,
             similarity_boost: 0.75,
             style: 0.3,
             use_speaker_boost: true,
-            speed: 0.95,
+            speed: speed,
           },
         }),
       }
