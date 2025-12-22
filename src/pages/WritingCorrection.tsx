@@ -22,9 +22,9 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import CleanHeader from "@/components/CleanHeader";
+import MegaMenu from "@/components/MegaMenu";
+import AppFooter from "@/components/AppFooter";
 import { PremiumPreviewBanner } from "@/components/PremiumPreviewBanner";
-import { useSubscription } from "@/hooks/useSubscription";
 
 interface CorrectionResult {
   overall_score: number;
@@ -310,10 +310,10 @@ const WritingCorrection = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <CleanHeader isLoggedIn={!!user} username={user?.email?.split('@')[0]} />
+    <div className="min-h-screen bg-background flex flex-col">
+      <MegaMenu />
       
-      <main className="pt-[76px] pb-8 px-4 max-w-6xl mx-auto">
+      <main className="flex-1 pt-[76px] pb-8 px-4 max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -715,6 +715,7 @@ const WritingCorrection = () => {
           )}
         </motion.div>
       </main>
+      <AppFooter />
     </div>
   );
 };

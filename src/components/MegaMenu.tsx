@@ -188,7 +188,7 @@ export const MegaMenu = () => {
           <motion.div 
             whileHover={{ scale: 1.02 }}
             className="flex items-center gap-2 sm:gap-3 cursor-pointer"
-            onClick={() => navigate("/")}
+            onClick={() => navigate(isLoggedIn ? "/dashboard" : "/")}
           >
             <span className="text-2xl sm:text-3xl">🇰🇷</span>
             <div>

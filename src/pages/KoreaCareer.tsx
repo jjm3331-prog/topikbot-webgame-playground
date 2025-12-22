@@ -25,8 +25,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import CleanHeader from "@/components/CleanHeader";
-import CommonFooter from "@/components/CommonFooter";
+import MegaMenu from "@/components/MegaMenu";
+import AppFooter from "@/components/AppFooter";
 import { PremiumPreviewBanner } from "@/components/PremiumPreviewBanner";
 import { useSubscription } from "@/hooks/useSubscription";
 
@@ -204,10 +204,10 @@ const KoreaCareer = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <CleanHeader />
+    <div className="min-h-screen bg-background flex flex-col">
+      <MegaMenu />
       
-      <main className="pt-[76px] pb-12 px-4 max-w-6xl mx-auto">
+      <main className="flex-1 pt-[76px] pb-12 px-4 max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -548,7 +548,7 @@ const KoreaCareer = () => {
         </motion.div>
       </main>
 
-      <CommonFooter />
+      <AppFooter />
     </div>
   );
 };

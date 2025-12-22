@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import MegaMenu from "@/components/MegaMenu";
-import Footer from "@/components/Footer";
+import AppFooter from "@/components/AppFooter";
 
 const LUKATO_AI_CHAT_URL = "https://chat-topikbot.kr";
 
@@ -335,7 +335,7 @@ const AITutor = () => {
         </section>
       </main>
 
-      <Footer />
+      <AppFooter />
     </div>
   );
 };

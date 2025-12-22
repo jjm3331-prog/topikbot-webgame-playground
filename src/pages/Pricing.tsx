@@ -26,8 +26,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import CleanHeader from "@/components/CleanHeader";
-import CommonFooter from "@/components/CommonFooter";
+import MegaMenu from "@/components/MegaMenu";
+import AppFooter from "@/components/AppFooter";
 import { supabase } from "@/integrations/supabase/client";
 
 type BillingPeriod = "1-month" | "6-months" | "12-months";
@@ -157,7 +157,7 @@ const Pricing = () => {
 
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col">
-      <CleanHeader isLoggedIn={isLoggedIn} username={username} />
+      <MegaMenu />
 
       <main className="flex-1 pt-[76px] pb-12">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
@@ -517,7 +517,7 @@ const Pricing = () => {
         </div>
       </main>
 
-      <CommonFooter />
+      <AppFooter />
     </div>
   );
 };

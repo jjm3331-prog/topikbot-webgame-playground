@@ -21,8 +21,8 @@ import {
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import CleanHeader from "@/components/CleanHeader";
-import CommonFooter from "@/components/CommonFooter";
+import MegaMenu from "@/components/MegaMenu";
+import AppFooter from "@/components/AppFooter";
 import confetti from "canvas-confetti";
 import { PremiumPreviewBanner } from "@/components/PremiumPreviewBanner";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -176,9 +176,9 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <CleanHeader isLoggedIn={true} username={profile?.username} />
-      <main className="pt-[76px] pb-8 px-4 sm:px-6">
+    <div className="min-h-screen bg-background flex flex-col">
+      <MegaMenu />
+      <main className="flex-1 pt-[76px] pb-8 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto w-full space-y-6">
         {/* Premium Preview Banner */}
         {!isPremium && <PremiumPreviewBanner featureName="theo dõi tiến độ học" />}
@@ -550,7 +550,7 @@ const Dashboard = () => {
         </span>
       </a>
       </main>
-      <CommonFooter />
+      <AppFooter />
     </div>
   );
 };

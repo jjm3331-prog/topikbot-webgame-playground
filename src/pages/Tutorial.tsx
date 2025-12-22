@@ -29,8 +29,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import CleanHeader from "@/components/CleanHeader";
-import CommonFooter from "@/components/CommonFooter";
+import MegaMenu from "@/components/MegaMenu";
+import AppFooter from "@/components/AppFooter";
 
 const Tutorial = () => {
   const navigate = useNavigate();
@@ -177,10 +177,10 @@ const Tutorial = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <CleanHeader />
+    <div className="min-h-screen bg-background flex flex-col">
+      <MegaMenu />
 
-      <main className="pt-[76px] pb-8 px-4 sm:px-6 lg:px-8">
+      <main className="flex-1 pt-[76px] pb-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           {/* Hero Section */}
           <motion.div
@@ -465,7 +465,7 @@ const Tutorial = () => {
         </div>
       </main>
 
-      <CommonFooter />
+      <AppFooter />
     </div>
   );
 };
