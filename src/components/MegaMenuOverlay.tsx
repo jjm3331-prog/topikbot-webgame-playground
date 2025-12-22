@@ -138,8 +138,8 @@ const MobileAccordionCategory = ({
         }`}
       >
         <div className="flex items-center gap-3">
-          {category.emoji && <span className="text-lg">{category.emoji}</span>}
-          <span className={`text-sm font-semibold uppercase tracking-wide ${
+          {category.emoji && <span className="text-2xl">{category.emoji}</span>}
+          <span className={`text-base font-bold uppercase tracking-wide ${
             hasActiveItem ? "text-primary" : "text-foreground"
           }`}>
             {category.title}
@@ -149,7 +149,7 @@ const MobileAccordionCategory = ({
           animate={{ rotate: isExpanded ? 180 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          <ChevronDown className={`w-4 h-4 ${
+          <ChevronDown className={`w-5 h-5 ${
             hasActiveItem ? "text-primary" : "text-muted-foreground"
           }`} />
         </motion.div>
@@ -180,12 +180,12 @@ const MobileAccordionCategory = ({
                             : 'hover:bg-muted/80'
                       }`}
                     >
-                      <item.icon className={`w-4 h-4 ${
+                      <item.icon className={`w-5 h-5 ${
                         active
                           ? 'text-primary-foreground'
                           : item.isHighlight 
                             ? 'text-primary' 
-                            : 'text-muted-foreground'
+                            : 'text-foreground/70'
                       }`} />
                       
                       <span className={`text-sm font-medium flex-1 ${
@@ -262,17 +262,30 @@ export const MegaMenuOverlay = ({
           transition={{ duration: 0.3, ease: "easeOut" }}
           className="fixed inset-0 z-50 bg-background"
         >
-          {/* Full Screen Header with X - Both Mobile & Desktop */}
+          {/* Full Screen Header with X & Logout */}
           <div className="flex items-center justify-between px-4 md:px-8 h-14 md:h-16 border-b border-border">
             <span className="font-heading font-bold text-lg md:text-xl text-foreground">Menu</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="w-10 h-10 rounded-full hover:bg-destructive hover:text-destructive-foreground transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </Button>
+            <div className="flex items-center gap-2">
+              {isLoggedIn && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLogoutClick}
+                  className="text-destructive hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onClose}
+                className="w-10 h-10 rounded-full hover:bg-muted transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
           </div>
 
           {/* Menu Content */}
@@ -298,15 +311,6 @@ export const MegaMenuOverlay = ({
 
                 </div>
 
-                {/* Auth Actions - Fixed Bottom */}
-                {isLoggedIn && (
-                  <div className="sticky bottom-0 px-4 py-4 border-t border-border bg-background mt-auto">
-                    <Button variant="destructive" onClick={handleLogoutClick} className="w-full">
-                      <LogOut className="w-4 h-4 mr-2" />
-                      Logout
-                    </Button>
-                  </div>
-                )}
               </div>
             ) : (
               // Desktop: Full Screen Grid Style
@@ -325,8 +329,8 @@ export const MegaMenuOverlay = ({
                       transition={{ duration: 0.3, delay: categoryIndex * 0.05 }}
                     >
                       {/* Category Title */}
-                      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4 md:mb-6 flex items-center gap-2">
-                        {category.emoji && <span>{category.emoji}</span>}
+                      <h3 className="text-sm font-bold text-foreground uppercase tracking-wider mb-4 md:mb-6 flex items-center gap-3">
+                        {category.emoji && <span className="text-xl">{category.emoji}</span>}
                         {category.title}
                       </h3>
 
@@ -364,12 +368,12 @@ export const MegaMenuOverlay = ({
                                   />
                                 )}
                                 
-                                <item.icon className={`w-4 h-4 transition-all duration-200 ${
+                                <item.icon className={`w-5 h-5 transition-all duration-200 ${
                                   active
                                     ? 'text-primary-foreground'
                                     : item.isHighlight 
                                       ? 'text-primary group-hover:text-primary-foreground' 
-                                      : 'text-muted-foreground group-hover:text-primary group-hover:scale-110'
+                                      : 'text-foreground/70 group-hover:text-primary group-hover:scale-110'
                                 }`} />
                                 
                                 <span className={`text-sm font-medium transition-colors duration-200 flex-1 ${
@@ -405,17 +409,6 @@ export const MegaMenuOverlay = ({
 
                 </div>
 
-                {/* Desktop: Auth Actions - Fixed Bottom */}
-                {isLoggedIn && (
-                  <div className="sticky bottom-0 px-6 py-4 border-t border-border bg-background mt-auto">
-                    <div className="max-w-7xl mx-auto">
-                      <Button variant="destructive" onClick={handleLogoutClick} className="w-auto">
-                        <LogOut className="w-4 h-4 mr-2" />
-                        Logout
-                      </Button>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </div>
