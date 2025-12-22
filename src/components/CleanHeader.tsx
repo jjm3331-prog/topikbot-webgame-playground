@@ -43,16 +43,10 @@ export const CleanHeader = ({ isLoggedIn = false, username }: CleanHeaderProps) 
 
   return (
     <>
-      <motion.header 
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="fixed top-0 left-0 right-0 z-50 h-[60px] bg-background border-b border-border"
-      >
+      <header className="fixed top-0 left-0 right-0 z-50 h-[60px] bg-background">
         <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
           {/* Logo */}
-          <motion.div 
-            whileHover={{ scale: 1.02 }}
+          <div 
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => {
               setIsMenuOpen(false);
@@ -60,80 +54,49 @@ export const CleanHeader = ({ isLoggedIn = false, username }: CleanHeaderProps) 
             }}
           >
             <span className="text-xl sm:text-2xl">🇰🇷</span>
-            <div className="flex flex-col">
-              <span className="font-heading font-bold text-base sm:text-lg text-foreground leading-tight">LUKATO AI</span>
-              {!isLoggedIn && (
-                <span className="text-[10px] text-muted-foreground hidden sm:block">Học tiếng Hàn #1 VN</span>
-              )}
-            </div>
-          </motion.div>
-
-          {/* Center Menu Button */}
-          <Button
-            variant={isMenuOpen ? "default" : "outline"}
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={`flex items-center gap-2 h-9 px-4 rounded-full transition-all ${
-              isMenuOpen 
-                ? "bg-primary text-primary-foreground" 
-                : "border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-            }`}
-          >
-            <Menu className="w-4 h-4" />
-            <span className="font-medium">Menu</span>
-            <motion.span
-              animate={{ rotate: isMenuOpen ? 180 : 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              ∧
-            </motion.span>
-          </Button>
+            <span className="font-heading font-bold text-base sm:text-lg text-foreground">LUKATO AI</span>
+          </div>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <ThemeToggle />
             
             {isLoggedIn ? (
               <>
-                {/* Notification Dropdown */}
                 <NotificationDropdown userId={userId} />
-
-                {/* User Profile Button */}
                 <Button
                   variant="ghost"
                   onClick={() => navigate("/profile")}
-                  className="h-9 px-3 rounded-full flex items-center gap-2"
+                  className="h-10 w-10 p-0 rounded-lg"
                 >
-                  <User className="w-4 h-4" />
-                  <span className="hidden sm:inline text-sm font-medium max-w-[100px] truncate">
-                    {username || 'User'}
-                  </span>
-                </Button>
-
-                {/* Logout Button */}
-                <Button 
-                  variant="outline"
-                  onClick={handleLogout}
-                  className="h-9 px-3 rounded-lg border-destructive/50 text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                >
-                  <LogOut className="w-4 h-4 sm:mr-1" />
-                  <span className="hidden sm:inline text-sm">Đăng xuất</span>
+                  <User className="w-5 h-5" />
                 </Button>
               </>
             ) : (
-              <>
-                {/* Login Button - THPT AI style */}
-                <Button 
-                  onClick={() => navigate("/auth")}
-                  className="h-10 px-4 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-medium flex items-center gap-2"
-                >
-                  <LogIn className="w-4 h-4" />
-                  <span className="hidden sm:inline">Đăng nhập</span>
-                </Button>
-              </>
+              <Button 
+                onClick={() => navigate("/auth")}
+                className="h-10 px-4 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+              >
+                <LogIn className="w-4 h-4" />
+              </Button>
             )}
+
+            {/* Hamburger Menu Button */}
+            <Button
+              variant="ghost"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="h-10 w-10 p-0 rounded-lg"
+            >
+              <motion.div
+                animate={{ rotate: isMenuOpen ? 90 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Menu className="w-6 h-6" />
+              </motion.div>
+            </Button>
           </div>
         </div>
-      </motion.header>
+      </header>
 
       <MegaMenuOverlay 
         isOpen={isMenuOpen} 
