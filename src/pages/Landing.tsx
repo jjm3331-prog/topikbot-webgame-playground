@@ -62,20 +62,20 @@ const keyDifferentiators = [
   },
   {
     icon: Cpu,
-    title: "LUKATO RAG AI",
-    desc: "Công nghệ AI độc quyền tiên tiến nhất",
+    title: "LUKATO RAG AI Tech",
+    desc: "10,000+ tài liệu TOPIK & văn bản chuyên môn Hàn Quốc",
     color: "from-korean-blue to-korean-cyan"
   },
   {
-    icon: Shield,
-    title: "10,000+ đề thi",
-    desc: "Ngân hàng đề từ 20 năm TOPIK",
+    icon: Headphones,
+    title: "STT/TTS Thế Hệ Mới",
+    desc: "Nghe & Nói với AI phát âm chuẩn bản xứ 99%",
     color: "from-korean-purple to-korean-pink"
   },
   {
-    icon: Target,
-    title: "World's First",
-    desc: "Super App K-Culture + TOPIK duy nhất",
+    icon: Briefcase,
+    title: "AI Headhunting",
+    desc: "Chấm CV, thư xin việc với độ chính xác cao cấp",
     color: "from-korean-teal to-korean-green"
   }
 ];
@@ -100,10 +100,12 @@ const gameModes = [
 
 // Comparison with competitors
 const comparisonFeatures = [
-  { feature: "Giáo sư ra đề TOPIK", lukato: true, others: false },
-  { feature: "LUKATO RAG AI Tech", lukato: true, others: false },
-  { feature: "K-Culture tích hợp", lukato: true, others: false },
-  { feature: "AI chấm Writing", lukato: true, others: false },
+  { feature: "Giáo sư ra đề TOPIK Hàn Quốc chính thức", lukato: true, others: false },
+  { feature: "10,000+ tài liệu TOPIK & kiến thức Hàn Quốc", lukato: true, others: false },
+  { feature: "STT/TTS AI nghe-nói chuẩn bản xứ", lukato: true, others: false },
+  { feature: "AI chấm Writing & CV siêu chính xác", lukato: true, others: false },
+  { feature: "Headhunting & Tư vấn việc làm Hàn Quốc", lukato: true, others: false },
+  { feature: "K-Culture tích hợp (K-POP, K-Drama)", lukato: true, others: false },
 ];
 
 // Counter animation component
