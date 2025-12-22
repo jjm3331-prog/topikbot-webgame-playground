@@ -2,10 +2,10 @@ import { Link } from "react-router-dom";
 
 const CommonFooter = () => {
   return (
-    <footer className="py-12 px-6 border-t border-border bg-muted/30">
+    <footer className="py-6 sm:py-8 px-4 sm:px-6 border-t border-border bg-muted/30">
       <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          {/* Logo - 이모지 잘림 방지를 위해 overflow-visible 추가 */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
+          {/* Logo */}
           <div className="flex items-center gap-3 shrink-0">
             <span className="text-2xl sm:text-3xl leading-none" style={{ lineHeight: 1.2 }}>🇰🇷</span>
             <div className="flex flex-col">
@@ -15,7 +15,7 @@ const CommonFooter = () => {
           </div>
           
           {/* Links */}
-          <div className="flex items-center gap-6 text-sm text-muted-foreground">
+          <div className="flex items-center gap-4 sm:gap-6 text-sm text-muted-foreground">
             <a 
               href="/terms" 
               target="_blank" 
@@ -32,6 +32,14 @@ const CommonFooter = () => {
             >
               PRIVACY
             </a>
+            <a 
+              href="https://hanoi.topikbot.kr" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-foreground transition-colors font-medium"
+            >
+              Hanoi Official
+            </a>
             <Link 
               to="/admin-login" 
               className="hover:text-foreground transition-colors font-medium"
@@ -41,7 +49,7 @@ const CommonFooter = () => {
           </div>
           
           {/* Copyright */}
-          <p className="text-muted-foreground text-sm shrink-0">
+          <p className="text-muted-foreground text-xs sm:text-sm shrink-0">
             © 2025 LUKATO Vietnam. All rights reserved.
           </p>
         </div>
