@@ -7,47 +7,46 @@ const corsHeaders = {
 
 const SYSTEM_PROMPT = `당신은 TOPIK 한국어 시험 전문가입니다. 사용자가 업로드한 문제 이미지를 분석하고 변형 문제를 생성합니다.
 
+**중요: 반드시 한국어와 베트남어를 병기해서 출력하세요.**
+
 **역할:**
 - 원본 문제의 유형, 구조, 난이도를 정확히 파악
-- 지정된 난이도에 맞는 새로운 변형 문제 생성
+- 비슷한 난이도의 새로운 변형 문제 생성
 - 정답과 상세한 해설 제공
+- 모든 내용을 한국어와 베트남어로 병기
 
-**난이도별 변형 전략:**
-🟢 **쉽게 (easier):**
-- 어휘를 더 기본적인 것으로 변경
-- 문장 구조 단순화
-- 힌트나 맥락 추가
-- 보기 중 정답을 더 명확하게
+**출력 형식 (반드시 이 JSON 형식으로 출력하세요):**
 
-🟡 **비슷하게 (similar):**
-- 같은 문법/어휘 수준 유지
-- 주제나 소재만 변경
-- 문제 형식 동일하게 유지
-- 함정 요소 비슷하게 배치
+\`\`\`json
+{
+  "originalAnalysis": {
+    "ko": "원본 문제 분석 내용 (한국어)",
+    "vi": "Nội dung phân tích đề gốc (tiếng Việt)"
+  },
+  "variantQuestion": {
+    "ko": "변형 문제 전체 내용 - 지문과 보기 포함 (한국어)",
+    "vi": "Nội dung câu hỏi biến thể đầy đủ - bao gồm đoạn văn và các lựa chọn (tiếng Việt)"
+  },
+  "answer": {
+    "ko": "정답 (한국어)",
+    "vi": "Đáp án (tiếng Việt)"
+  },
+  "explanation": {
+    "ko": "상세 해설 - 왜 이것이 정답인지, 오답은 왜 틀린지 설명 (한국어)",
+    "vi": "Giải thích chi tiết - tại sao đây là đáp án đúng, các đáp án sai thì sai ở đâu (tiếng Việt)"
+  },
+  "learningPoints": {
+    "ko": "이 문제를 통해 배울 수 있는 핵심 개념 (한국어)",
+    "vi": "Những điểm học tập quan trọng từ câu hỏi này (tiếng Việt)"
+  }
+}
+\`\`\`
 
-🔴 **어렵게 (harder):**
-- 고급 어휘와 복잡한 문법 사용
-- 더 많은 추론 요구
-- 함정 보기 추가
-- 문맥 파악이 어려운 구조
-
-**출력 형식:**
-항상 다음 구조로 답변:
-
-## 📋 원본 문제 분석
-[원본 문제의 유형, 핵심 개념, 난이도 분석]
-
-## ✨ 변형 문제
-[완전한 새 문제 - 지문, 보기 포함]
-
-## ✅ 정답
-[정답 표시]
-
-## 📝 해설
-[왜 이것이 정답인지, 오답은 왜 틀린지 상세 설명]
-
-## 💡 학습 포인트
-[이 문제를 통해 배울 수 있는 핵심 개념]`;
+**주의사항:**
+- 반드시 위 JSON 형식으로만 출력하세요
+- 한국어와 베트남어 모두 완전하고 자연스럽게 작성하세요
+- 베트남어는 번역이 아닌 네이티브 수준의 자연스러운 표현을 사용하세요
+- JSON 외의 다른 텍스트는 출력하지 마세요`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -55,7 +54,7 @@ serve(async (req) => {
   }
 
   try {
-    const { imageBase64, imageMimeType, difficulty } = await req.json();
+    const { imageBase64, imageMimeType } = await req.json();
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 
     if (!GEMINI_API_KEY) {
@@ -67,25 +66,12 @@ serve(async (req) => {
       throw new Error("이미지가 제공되지 않았습니다.");
     }
 
-    const difficultyMap: Record<string, string> = {
-      easier: "쉽게 (easier) - 더 기본적인 어휘, 단순한 구조, 명확한 힌트",
-      similar: "비슷하게 (similar) - 같은 수준 유지, 주제/소재만 변경",
-      harder: "어렵게 (harder) - 고급 어휘, 복잡한 추론, 함정 추가"
-    };
+    const userPrompt = `이 문제 이미지를 분석하고, 비슷한 난이도의 변형 문제를 생성해주세요.
 
-    const difficultyInstruction = difficultyMap[difficulty] || difficultyMap.similar;
+반드시 JSON 형식으로만 출력하세요. 한국어와 베트남어를 모두 네이티브 수준으로 작성해주세요.`;
 
-    const userPrompt = `이 문제 이미지를 분석하고, "${difficultyInstruction}" 수준으로 변형 문제를 생성해주세요.
+    console.log(`Calling Gemini 2.5 Flash DIRECT API with thinkingBudget: 24576`);
 
-변형 문제는 반드시:
-1. 원본과 같은 문제 유형 유지
-2. 지정된 난이도에 맞게 조정
-3. 정답과 상세 해설 포함
-4. 학습에 도움되는 포인트 제시`;
-
-    console.log(`Calling Gemini 2.5 Flash DIRECT API with thinkingBudget: 24576, maxOutputTokens: 65536`);
-
-    // Direct Gemini API call with thinkingBudget
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
@@ -104,7 +90,7 @@ serve(async (req) => {
             {
               role: "model",
               parts: [
-                { text: "네, 이해했습니다. TOPIK 전문가로서 문제 이미지를 분석하고 지정된 난이도에 맞는 변형 문제를 생성하겠습니다." }
+                { text: "네, 이해했습니다. TOPIK 전문가로서 문제 이미지를 분석하고 한국어와 베트남어를 병기한 JSON 형식으로 변형 문제를 생성하겠습니다." }
               ]
             },
             {
@@ -121,7 +107,7 @@ serve(async (req) => {
             }
           ],
           generationConfig: {
-            temperature: 0.8,
+            temperature: 0.7,
             maxOutputTokens: 65536,
             thinkingConfig: {
               thinkingBudget: 24576
@@ -152,15 +138,37 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log("Gemini API response received - thinkingBudget applied");
+    console.log("Gemini API response received");
 
-    const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 
-      "문제 분석에 실패했습니다. 다시 시도해주세요.";
+    const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    
+    // Try to parse JSON from response
+    let parsed = null;
+    try {
+      // Extract JSON from response (handle markdown code blocks)
+      let jsonStr = aiResponse;
+      const jsonMatch = aiResponse.match(/```json\s*([\s\S]*?)\s*```/);
+      if (jsonMatch) {
+        jsonStr = jsonMatch[1];
+      } else {
+        // Try to find raw JSON
+        const startIdx = aiResponse.indexOf('{');
+        const endIdx = aiResponse.lastIndexOf('}');
+        if (startIdx !== -1 && endIdx !== -1) {
+          jsonStr = aiResponse.substring(startIdx, endIdx + 1);
+        }
+      }
+      
+      parsed = JSON.parse(jsonStr);
+      console.log("Successfully parsed JSON response");
+    } catch (parseError) {
+      console.log("Could not parse JSON, returning raw response");
+    }
 
     return new Response(
       JSON.stringify({ 
         response: aiResponse,
-        difficulty: difficulty,
+        parsed: parsed,
         model: "gemini-2.5-flash-thinking"
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
