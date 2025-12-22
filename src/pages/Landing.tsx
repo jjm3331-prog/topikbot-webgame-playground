@@ -130,27 +130,27 @@ const stats = [
   { value: "10 phút", label: "Mỗi ngày là đủ", icon: Zap },
 ];
 
-// Testimonials
+// Testimonials - Compelling reviews without real names
 const testimonials = [
   {
-    name: "Nguyễn Thị Mai",
-    role: "Sinh viên ĐH Ngoại Ngữ Hà Nội",
-    content: "Mình đã đạt TOPIK 4 chỉ sau 6 tháng học với LUKATO. Phương pháp học qua game thực sự hiệu quả!",
-    avatar: "M",
+    name: "Học viên TOPIK 6",
+    role: "Đã đậu TOPIK 6 sau 8 tháng",
+    content: "Từ zero tiếng Hàn, mình đã đạt TOPIK 6 chỉ trong 8 tháng nhờ LUKATO! Game AI Sinh tồn Seoul giúp mình học ngữ pháp một cách tự nhiên mà không nhàm chán. Writing AI chấm bài chi tiết hơn cả giáo viên thật!",
+    avatar: "🏆",
     rating: 5
   },
   {
-    name: "Trần Văn Hùng", 
-    role: "Nhân viên Samsung Việt Nam",
-    content: "Công cụ luyện phát âm AI giúp mình tự tin giao tiếp với đồng nghiệp Hàn Quốc mỗi ngày.",
-    avatar: "H",
+    name: "Nhân viên tại Samsung VN", 
+    role: "Thăng tiến nhờ tiếng Hàn",
+    content: "Làm việc tại Samsung, tiếng Hàn là lợi thế cạnh tranh lớn nhất. LUKATO giúp mình học trong giờ nghỉ trưa - chỉ 10-15 phút mỗi ngày. Sau 6 tháng, mình đã có thể họp trực tiếp với đối tác Hàn Quốc!",
+    avatar: "💼",
     rating: 5
   },
   {
-    name: "Lê Hoàng Yến",
-    role: "Du học sinh tại Seoul",
-    content: "Trước khi sang Hàn, mình đã học với LUKATO. Giờ mình có thể theo kịp bài giảng đại học!",
-    avatar: "Y",
+    name: "Du học sinh tại Seoul",
+    role: "Nhận học bổng 100% tại Hàn Quốc",
+    content: "Mình đã nhận được học bổng toàn phần từ trường đại học Hàn Quốc nhờ điểm TOPIK 5. LUKATO Manager giúp mình hiểu văn hóa Hàn Quốc sâu sắc hơn - điều mà không sách giáo khoa nào dạy được!",
+    avatar: "🎓",
     rating: 5
   }
 ];
@@ -502,8 +502,8 @@ const Landing = () => {
                 </div>
                 <p className="text-foreground mb-6 leading-relaxed">"{testimonial.content}"</p>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center">
-                    <span className="text-primary-foreground font-bold">{testimonial.avatar}</span>
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center text-xl">
+                    {testimonial.avatar}
                   </div>
                   <div>
                     <div className="font-semibold text-foreground">{testimonial.name}</div>

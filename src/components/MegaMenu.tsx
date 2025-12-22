@@ -51,6 +51,13 @@ interface MenuSection {
 
 const menuSections: MenuSection[] = [
   {
+    title: "🎓 DU HỌC & VIỆC LÀM",
+    items: [
+      { icon: Briefcase, label: "Tìm việc tại Hàn Quốc", href: "/korea-career" },
+      { icon: BookOpen, label: "Tư vấn du học Hàn", href: "/korea-career#study" },
+    ]
+  },
+  {
     title: "HỌC TOPIK",
     items: [
       { icon: BookOpen, label: "TOPIK I (1-2급)", href: "/topik-1" },
@@ -75,17 +82,16 @@ const menuSections: MenuSection[] = [
       { icon: MessageCircle, label: "Hỏi AI (30/ngày)", href: "/ai-tutor" },
       { icon: PenTool, label: "Chấm bài viết", href: "/writing-correction", isPremium: true },
       { icon: Languages, label: "Dịch Hàn-Việt", href: "/translate" },
-      { icon: Briefcase, label: "Du học & Việc làm", href: "/korea-career" },
     ]
   },
   {
     title: "CỦA TÔI",
     items: [
-      { icon: User, label: "Hồ sơ của tôi", href: "/profile" },
       { icon: Sparkles, label: "Tiến độ học tập", href: "/progress", isPremium: true },
-      { icon: Notebook, label: "Sổ lỗi sai", href: "/mistakes", isPremium: true },
-      { icon: Bookmark, label: "Từ vựng đã lưu", href: "/vocabulary" },
       { icon: Trophy, label: "Xếp hạng của tôi", href: "/ranking" },
+      { icon: Notebook, label: "Sổ lỗi sai", href: "/mistakes", isPremium: true },
+      { icon: Bookmark, label: "Từ vựng đã lưu (50)", href: "/vocabulary" },
+      { icon: User, label: "Hồ sơ của tôi", href: "/profile" },
       { icon: Users, label: "Mời bạn bè", href: "/profile#invite" },
     ]
   },
@@ -351,9 +357,9 @@ export const MegaMenu = () => {
                       <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center">
                         <Crown className="w-5 h-5 text-primary-foreground" />
                       </div>
-                      <div>
+                    <div>
                         <p className="font-semibold text-foreground">🚀 LUKATO AI Premium</p>
-                        <p className="text-sm text-muted-foreground">Hỏi AI không giới hạn + Chấm Writing chuyên sâu</p>
+                        <p className="text-sm text-muted-foreground">Hỏi AI không giới hạn + Writing AI + Từ vựng không giới hạn</p>
                       </div>
                     </div>
                     <div className="flex gap-2">
