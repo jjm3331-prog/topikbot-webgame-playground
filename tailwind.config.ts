@@ -74,6 +74,9 @@ export default {
         "3xl": "1.5rem",
         "4xl": "2rem",
       },
+      spacing: {
+        '70': '17.5rem', // 280px for sidebar
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
