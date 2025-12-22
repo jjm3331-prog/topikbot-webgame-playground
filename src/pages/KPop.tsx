@@ -197,7 +197,7 @@ const KPop = () => {
         <div className="flex-1 flex items-center justify-center">
           <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} className="text-6xl">🎵</motion.div>
         </div>
-        <AppFooter compact />
+        <AppFooter />
       </div>
     );
   }
@@ -219,7 +219,7 @@ const KPop = () => {
             </div>
           </motion.div>
         </div>
-        <AppFooter compact />
+        <AppFooter />
       </div>
     );
   }
@@ -334,7 +334,7 @@ const KPop = () => {
         </div>
       )}
       </main>
-      <AppFooter compact />
+      <AppFooter />
     </div>
   );
 };

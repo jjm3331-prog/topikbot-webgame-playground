@@ -544,7 +544,7 @@ const Chat = () => {
           animation: shake 0.5s ease-in-out;
         }
       `}</style>
-      <AppFooter compact />
+      <AppFooter />
     </div>
   );
 };

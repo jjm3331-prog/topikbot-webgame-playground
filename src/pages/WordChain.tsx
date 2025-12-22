@@ -358,7 +358,7 @@ const WordChain = () => {
         </form>
         <p className="text-white/40 text-[10px] text-center mt-1.5">한국어 명사만 / Chỉ danh từ tiếng Hàn</p>
       </div>
-      <AppFooter compact />
+      <AppFooter />
     </div>
   );
 };

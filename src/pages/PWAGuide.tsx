@@ -219,7 +219,7 @@ const PWAGuide = () => {
         </div>
       </div>
 
-      <AppFooter compact />
+      <AppFooter />
     </div>
   );
 };
