@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  BookOpen, 
-  Gamepad2, 
-  MessageCircle, 
+import {
+  BookOpen,
+  Gamepad2,
+  MessageCircle,
   Briefcase,
   Crown,
   Heart,
@@ -25,7 +25,8 @@ import {
   Star,
   Building,
   ChevronRight,
-  ChevronDown
+  ChevronDown,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -110,25 +111,26 @@ interface MegaMenuOverlayProps {
   isOpen: boolean;
   onClose: () => void;
   isLoggedIn?: boolean;
+  onLogout?: () => void;
 }
 
 // Mobile Accordion Category Component
-const MobileAccordionCategory = ({ 
-  category, 
-  isActive, 
-  onNavigate 
-}: { 
-  category: MenuCategory; 
+const MobileAccordionCategory = ({
+  category,
+  isActive,
+  onNavigate,
+}: {
+  category: MenuCategory;
   isActive: (href: string) => boolean;
   onNavigate: (href: string) => void;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const hasActiveItem = category.items.some(item => isActive(item.href));
+  const hasActiveItem = category.items.some((item) => isActive(item.href));
 
   // Auto-expand if has active item
-  useState(() => {
+  useEffect(() => {
     if (hasActiveItem) setIsExpanded(true);
-  });
+  }, [hasActiveItem]);
 
   return (
     <div className="border-b border-border last:border-b-0">
@@ -221,7 +223,12 @@ const MobileAccordionCategory = ({
   );
 };
 
-export const MegaMenuOverlay = ({ isOpen, onClose, isLoggedIn = false }: MegaMenuOverlayProps) => {
+export const MegaMenuOverlay = ({
+  isOpen,
+  onClose,
+  isLoggedIn = false,
+  onLogout,
+}: MegaMenuOverlayProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
@@ -230,6 +237,11 @@ export const MegaMenuOverlay = ({ isOpen, onClose, isLoggedIn = false }: MegaMen
   const handleNavigation = (href: string) => {
     onClose();
     navigate(href);
+  };
+
+  const handleLogoutClick = () => {
+    onClose();
+    onLogout?.();
   };
 
   const isActive = (href: string) => {
@@ -292,9 +304,9 @@ export const MegaMenuOverlay = ({ isOpen, onClose, isLoggedIn = false }: MegaMen
                           key={item.label}
                           onClick={() => handleNavigation(item.href)}
                           className={`flex items-center gap-2 text-sm px-3 py-2 rounded-lg transition-colors ${
-                            active 
-                              ? 'bg-primary text-primary-foreground' 
-                              : 'text-muted-foreground hover:text-primary hover:bg-muted/50'
+                            active
+                              ? "bg-primary text-primary-foreground"
+                              : "text-muted-foreground hover:text-primary hover:bg-muted/50"
                           }`}
                         >
                           <item.icon className="w-4 h-4" />
@@ -304,6 +316,16 @@ export const MegaMenuOverlay = ({ isOpen, onClose, isLoggedIn = false }: MegaMen
                     })}
                   </div>
                 </div>
+
+                {/* Auth Actions */}
+                {isLoggedIn && (
+                  <div className="sticky bottom-0 px-4 py-4 border-t border-border bg-background">
+                    <Button variant="destructive" onClick={handleLogoutClick} className="w-full">
+                      <LogOut className="w-4 h-4 mr-2" />
+                      로그아웃
+                    </Button>
+                  </div>
+                )}
               </div>
             ) : (
               /* Desktop: Grid Style */
