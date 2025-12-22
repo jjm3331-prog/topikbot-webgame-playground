@@ -249,7 +249,7 @@ const AITutor = () => {
               🤖 Hỏi AI Gia sư
             </h1>
             <p className="text-muted-foreground">
-              Đặt câu hỏi về tiếng Hàn, TOPIK, ngữ pháp, từ vựng...
+              Đặt câu hỏi về tiếng Hàn, TOPIK, ngữ pháp và từ vựng.
             </p>
           </div>
 
@@ -304,7 +304,7 @@ const AITutor = () => {
                     Đã hết lượt hỏi miễn phí hôm nay!
                   </h3>
                   <p className="text-muted-foreground mb-4">
-                    Bạn đã sử dụng hết {MAX_FREE_QUESTIONS} câu hỏi miễn phí trong 24 giờ. 
+                    Bạn đã sử dụng hết {MAX_FREE_QUESTIONS} câu hỏi miễn phí trong 24 giờ.
                     Nâng cấp Premium để hỏi AI không giới hạn với công nghệ RAG AI tiên tiến nhất!
                   </p>
                   <div className="flex flex-wrap gap-3">
@@ -339,7 +339,7 @@ const AITutor = () => {
                   <div>
                     <p className="font-semibold text-foreground">Chào bạn! 👋</p>
                     <p className="text-muted-foreground text-sm">
-                      Hãy đặt câu hỏi về tiếng Hàn, TOPIK, ngữ pháp...
+                      Hãy đặt câu hỏi về tiếng Hàn, TOPIK hoặc ngữ pháp.
                     </p>
                   </div>
                 </div>
@@ -382,7 +382,7 @@ const AITutor = () => {
             <Textarea
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
-              placeholder={canAsk ? "Nhập câu hỏi của bạn..." : "Đã hết lượt hỏi miễn phí"}
+              placeholder={canAsk ? "Nhập câu hỏi của bạn" : "Bạn đã hết lượt hỏi miễn phí hôm nay"}
               disabled={!canAsk || sending}
               className="resize-none min-h-[60px]"
               onKeyDown={(e) => {
