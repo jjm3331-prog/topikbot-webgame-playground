@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import CleanHeader from "@/components/CleanHeader";
 import CommonFooter from "@/components/CommonFooter";
+import StickyCTA from "@/components/StickyCTA";
 import { 
   ArrowRight, 
   BookOpen, 
@@ -174,59 +175,217 @@ const Landing = () => {
           <div className="blob-secondary w-[400px] h-[400px] -bottom-32 -left-32" />
         </div>
 
-        <div className="relative z-10 max-w-4xl mx-auto text-center">
-          {/* Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : -20 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex items-center justify-center gap-2 mb-4 sm:mb-6"
-          >
-            <div className="badge-premium text-xs sm:text-sm">
-              <Crown className="w-3 h-3 sm:w-4 sm:h-4 text-korean-yellow" />
-              <span>Powered by TOPIK 교수진 🇰🇷</span>
+        <div className="relative z-10 max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Left: Text Content */}
+            <div className="text-center lg:text-left">
+              {/* Badge */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : -20 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="flex items-center justify-center lg:justify-start gap-2 mb-4 sm:mb-6"
+              >
+                <div className="badge-premium text-xs sm:text-sm">
+                  <Crown className="w-3 h-3 sm:w-4 sm:h-4 text-korean-yellow" />
+                  <span>Powered by TOPIK 교수진 🇰🇷</span>
+                </div>
+              </motion.div>
+
+              {/* Headline */}
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 30 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight mb-4"
+              >
+                <span className="text-foreground">Thế giới đầu tiên.</span>
+                <br />
+                <span className="text-gradient-primary">Việt Nam duy nhất.</span>
+              </motion.h1>
+
+              {/* Sub-headline */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+                className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-xl mx-auto lg:mx-0 mb-6 px-2 lg:px-0"
+              >
+                Super App học tiếng Hàn từ <span className="text-primary font-semibold">giáo sư ra đề TOPIK</span> + <span className="text-primary font-semibold">RAG AI 2024</span>
+              </motion.p>
+
+              {/* CTA */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+                className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 mb-8 lg:mb-0"
+              >
+                <Button
+                  onClick={() => navigate("/auth")}
+                  size="lg"
+                  className="group w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-10 btn-primary text-primary-foreground text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl"
+                >
+                  <Rocket className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  Bắt đầu MIỄN PHÍ
+                  <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </motion.div>
             </div>
-          </motion.div>
 
-          {/* Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 30 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight mb-4"
-          >
-            <span className="text-foreground">Thế giới đầu tiên.</span>
-            <br />
-            <span className="text-gradient-primary">Việt Nam duy nhất.</span>
-          </motion.h1>
-
-          {/* Sub-headline */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-xl mx-auto mb-6 px-2"
-          >
-            Super App học tiếng Hàn từ <span className="text-primary font-semibold">giáo sư ra đề TOPIK</span> + <span className="text-primary font-semibold">RAG AI 2024</span>
-          </motion.p>
-
-          {/* CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8"
-          >
-            <Button
-              onClick={() => navigate("/auth")}
-              size="lg"
-              className="group w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-10 btn-primary text-primary-foreground text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl"
+            {/* Right: App Mockup */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : 50 }}
+              transition={{ duration: 0.7, delay: 0.4 }}
+              className="relative flex justify-center lg:justify-end"
             >
-              <Rocket className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-              Bắt đầu MIỄN PHÍ
-              <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </motion.div>
+              {/* Phone mockup */}
+              <div className="relative">
+                {/* Glow effect behind phone */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-korean-purple/20 to-korean-blue/30 blur-3xl scale-110" />
+                
+                {/* Phone frame */}
+                <motion.div
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  className="relative w-[200px] sm:w-[240px] md:w-[280px] aspect-[9/19] bg-gradient-to-b from-gray-800 to-gray-900 rounded-[2.5rem] p-2 shadow-2xl border-4 border-gray-700"
+                >
+                  {/* Screen */}
+                  <div className="w-full h-full bg-background rounded-[2rem] overflow-hidden relative">
+                    {/* Notch */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 bg-gray-900 rounded-b-xl z-10" />
+                    
+                    {/* App content mockup */}
+                    <div className="h-full pt-8 pb-4 px-3 flex flex-col bg-gradient-to-b from-background to-muted/30">
+                      {/* Header */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center">
+                            <span className="text-xs font-bold text-white">L</span>
+                          </div>
+                          <span className="text-xs font-bold text-foreground">LUKATO</span>
+                        </div>
+                        <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center">
+                          <span className="text-[8px]">👤</span>
+                        </div>
+                      </div>
+
+                      {/* AI Chat preview */}
+                      <div className="flex-1 space-y-2">
+                        {/* AI message */}
+                        <motion.div
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 1 }}
+                          className="flex gap-1.5 items-start"
+                        >
+                          <div className="w-5 h-5 rounded-full bg-gradient-to-br from-korean-blue to-korean-purple flex items-center justify-center flex-shrink-0">
+                            <Brain className="w-3 h-3 text-white" />
+                          </div>
+                          <div className="bg-muted rounded-xl rounded-tl-sm p-2 max-w-[85%]">
+                            <p className="text-[8px] text-foreground leading-relaxed">
+                              안녕하세요! 오늘 어떤 것을 배워볼까요? 🎯
+                            </p>
+                          </div>
+                        </motion.div>
+
+                        {/* User message */}
+                        <motion.div
+                          initial={{ opacity: 0, x: 10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 1.5 }}
+                          className="flex gap-1.5 items-start justify-end"
+                        >
+                          <div className="bg-primary rounded-xl rounded-tr-sm p-2 max-w-[85%]">
+                            <p className="text-[8px] text-primary-foreground leading-relaxed">
+                              TOPIK 쓰기 연습하고 싶어요!
+                            </p>
+                          </div>
+                        </motion.div>
+
+                        {/* AI response */}
+                        <motion.div
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 2 }}
+                          className="flex gap-1.5 items-start"
+                        >
+                          <div className="w-5 h-5 rounded-full bg-gradient-to-br from-korean-blue to-korean-purple flex items-center justify-center flex-shrink-0">
+                            <Brain className="w-3 h-3 text-white" />
+                          </div>
+                          <div className="bg-muted rounded-xl rounded-tl-sm p-2 max-w-[85%]">
+                            <p className="text-[8px] text-foreground leading-relaxed">
+                              좋아요! 먼저 주제를 선택해주세요 ✍️
+                            </p>
+                          </div>
+                        </motion.div>
+                      </div>
+
+                      {/* Bottom nav */}
+                      <div className="flex items-center justify-around pt-2 border-t border-border mt-2">
+                        <div className="flex flex-col items-center gap-0.5">
+                          <BookOpen className="w-3.5 h-3.5 text-muted-foreground" />
+                          <span className="text-[6px] text-muted-foreground">Học</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-0.5">
+                          <Brain className="w-3.5 h-3.5 text-primary" />
+                          <span className="text-[6px] text-primary font-semibold">AI</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-0.5">
+                          <Gamepad2 className="w-3.5 h-3.5 text-muted-foreground" />
+                          <span className="text-[6px] text-muted-foreground">Game</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-0.5">
+                          <Users className="w-3.5 h-3.5 text-muted-foreground" />
+                          <span className="text-[6px] text-muted-foreground">Tôi</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Floating badges around phone */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1.2, type: "spring" }}
+                  className="absolute -top-4 -left-4 sm:-left-8 bg-white dark:bg-card rounded-xl px-2 py-1.5 shadow-lg border border-border"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-korean-green to-korean-teal flex items-center justify-center">
+                      <Check className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="text-[10px] font-bold text-foreground whitespace-nowrap">AI 99.7%</span>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1.5, type: "spring" }}
+                  className="absolute -bottom-2 -left-6 sm:-left-12 bg-white dark:bg-card rounded-xl px-2 py-1.5 shadow-lg border border-border"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm">🇰🇷</span>
+                    <span className="text-[10px] font-bold text-foreground whitespace-nowrap">TOPIK 교수진</span>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1.8, type: "spring" }}
+                  className="absolute top-1/3 -right-4 sm:-right-10 bg-white dark:bg-card rounded-xl px-2 py-1.5 shadow-lg border border-border"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <Users className="w-4 h-4 text-primary" />
+                    <span className="text-[10px] font-bold text-foreground whitespace-nowrap">50K+</span>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
         </div>
 
         {/* Scroll indicator */}
@@ -252,10 +411,13 @@ const Landing = () => {
             viewport={{ once: true }}
             className="text-center mb-6 sm:mb-8"
           >
-            <p className="text-xs sm:text-sm text-muted-foreground mb-2">🤝 Đối tác chính thức</p>
-            <h2 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl text-foreground">
+            <p className="text-xs sm:text-sm text-muted-foreground mb-2">🤝 Đối tác chiến lược</p>
+            <h2 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl text-foreground mb-2">
               <span className="text-gradient-primary">6 trường đại học</span> hàng đầu Việt Nam
             </h2>
+            <p className="text-sm text-muted-foreground">
+              Được tin dùng bởi các trường đại học hàng đầu tại Việt Nam
+            </p>
           </motion.div>
           
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-4 max-w-3xl mx-auto">
@@ -625,62 +787,118 @@ const Landing = () => {
         </motion.div>
       </section>
 
-      {/* ========== HEADHUNTING PROMO BANNER ========== */}
-      <section className="py-10 sm:py-16 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto">
+      {/* ========== HEADHUNTING PROMO BANNER - PREMIUM DESIGN ========== */}
+      <section className="py-12 sm:py-20 px-4 sm:px-6 relative overflow-hidden">
+        {/* Premium background decorations */}
+        <div className="absolute inset-0 bg-gradient-to-br from-korean-yellow/5 via-background to-korean-blue/5" />
+        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-korean-yellow via-korean-orange to-korean-blue" />
+        <div className="absolute bottom-0 left-0 w-full h-1.5 bg-gradient-to-r from-korean-blue via-korean-purple to-korean-yellow" />
+        
+        <div className="max-w-4xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="relative overflow-hidden rounded-2xl sm:rounded-3xl"
+            className="relative overflow-hidden rounded-3xl shadow-2xl"
           >
-            {/* Gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-korean-purple via-korean-blue to-korean-cyan opacity-90" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.1),transparent)]" />
+            {/* Premium Gold/Blue gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-korean-yellow via-korean-orange to-korean-blue" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,255,0.25),transparent_50%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(0,0,0,0.1),transparent_50%)]" />
             
-            <div className="relative z-10 p-6 sm:p-10 flex flex-col md:flex-row items-center gap-6">
-              {/* Icon */}
+            {/* Animated sparkles */}
+            <div className="absolute top-4 right-4 sm:top-8 sm:right-8">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="text-2xl sm:text-3xl"
+              >
+                ✨
+              </motion.div>
+            </div>
+            <div className="absolute bottom-4 left-4 sm:bottom-8 sm:left-8">
+              <motion.div
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="text-xl sm:text-2xl"
+              >
+                🌟
+              </motion.div>
+            </div>
+            
+            <div className="relative z-10 p-6 sm:p-10 lg:p-12 flex flex-col lg:flex-row items-center gap-6 lg:gap-10">
+              {/* Premium Icon */}
               <div className="flex-shrink-0">
                 <motion.div
-                  animate={{ y: [0, -5, 0] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-xl"
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  className="relative"
                 >
-                  <Briefcase className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
+                  {/* Glow effect */}
+                  <div className="absolute inset-0 w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white/40 blur-xl" />
+                  <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br from-white to-white/80 flex items-center justify-center shadow-2xl border-2 border-white/50">
+                    <div className="text-center">
+                      <Briefcase className="w-10 h-10 sm:w-12 sm:h-12 text-korean-blue mx-auto mb-1" />
+                      <span className="text-[10px] sm:text-xs font-black text-korean-blue tracking-tight">CAREER</span>
+                    </div>
+                  </div>
+                  {/* Crown on top */}
+                  <motion.div
+                    animate={{ y: [0, -3, 0] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute -top-3 left-1/2 -translate-x-1/2"
+                  >
+                    <span className="text-2xl">👑</span>
+                  </motion.div>
                 </motion.div>
               </div>
               
               {/* Content */}
-              <div className="flex-1 text-center md:text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-semibold mb-3">
-                  <Crown className="w-3 h-3 text-korean-yellow" />
-                  Dịch vụ dành cho Premium
+              <div className="flex-1 text-center lg:text-left">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/30 backdrop-blur-sm text-white text-xs sm:text-sm font-bold mb-4 border border-white/40">
+                  <Crown className="w-4 h-4 text-korean-yellow" />
+                  <span>DỊCH VỤ ĐỘC QUYỀN PREMIUM</span>
                 </div>
-                <h3 className="font-heading font-black text-xl sm:text-2xl md:text-3xl text-white mb-2">
-                  Dịch vụ <span className="text-korean-yellow">Headhunting</span> doanh nghiệp Hàn Quốc
+                <h3 className="font-heading font-black text-2xl sm:text-3xl lg:text-4xl text-white mb-3 leading-tight">
+                  Kết nối trực tiếp
+                  <br />
+                  <span className="text-korean-yellow drop-shadow-lg">Doanh nghiệp Hàn Quốc</span>
                 </h3>
-                <p className="text-white/80 text-sm sm:text-base mb-4">
-                  Đội ngũ headhunter chuyên nghiệp hỗ trợ bạn xin việc tại doanh nghiệp Hàn Quốc MIỄN PHÍ 100%.
+                <p className="text-white/90 text-sm sm:text-base lg:text-lg mb-5 leading-relaxed">
+                  Đội ngũ headhunter chuyên nghiệp hỗ trợ bạn xin việc <strong className="text-white">MIỄN PHÍ 100%</strong>.
                   <br className="hidden sm:block" />
-                  Từ công ty Hàn Quốc tại Việt Nam đến cơ hội làm việc tại Hàn Quốc!
+                  Từ công ty Hàn Quốc tại Việt Nam đến cơ hội làm việc tại Seoul!
                 </p>
-                <div className="flex flex-wrap justify-center md:justify-start gap-2 sm:gap-4 text-xs sm:text-sm text-white/90 mb-4">
-                  <span className="flex items-center gap-1"><Check className="w-4 h-4 text-korean-green" /> 500+ công ty đối tác</span>
-                  <span className="flex items-center gap-1"><Check className="w-4 h-4 text-korean-green" /> Tư vấn CV</span>
-                  <span className="flex items-center gap-1"><Check className="w-4 h-4 text-korean-green" /> Hỗ trợ Visa</span>
+                <div className="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-5 text-sm text-white mb-5">
+                  <span className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                    <Check className="w-4 h-4 text-korean-green" /> 
+                    <span className="font-semibold">500+ công ty đối tác</span>
+                  </span>
+                  <span className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                    <Check className="w-4 h-4 text-korean-green" /> 
+                    <span className="font-semibold">Tư vấn CV chuyên nghiệp</span>
+                  </span>
+                  <span className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                    <Check className="w-4 h-4 text-korean-green" /> 
+                    <span className="font-semibold">Hỗ trợ Visa làm việc</span>
+                  </span>
                 </div>
               </div>
               
-              {/* CTA */}
+              {/* Premium CTA */}
               <div className="flex-shrink-0">
                 <Button
                   onClick={() => navigate("/headhunting")}
                   size="lg"
-                  className="h-12 sm:h-14 px-6 sm:px-8 bg-white hover:bg-white/90 text-korean-purple font-bold rounded-xl group"
+                  className="h-14 sm:h-16 px-8 sm:px-10 bg-white hover:bg-white/95 text-korean-blue font-black text-base sm:text-lg rounded-2xl group shadow-2xl border-2 border-white/50 hover:scale-105 transition-all duration-300"
                 >
-                  Đăng ký miễn phí
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <Rocket className="w-5 h-5 mr-2" />
+                  Đăng ký ngay
+                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
+                <p className="text-white/80 text-xs text-center mt-2 font-medium">
+                  Hoàn toàn miễn phí
+                </p>
               </div>
             </div>
           </motion.div>
@@ -894,6 +1112,9 @@ const Landing = () => {
       </section>
 
       <CommonFooter />
+      
+      {/* Sticky CTA for Mobile */}
+      <StickyCTA />
     </div>
   );
 };
