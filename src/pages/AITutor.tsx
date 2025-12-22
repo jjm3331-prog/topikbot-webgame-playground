@@ -1,13 +1,20 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { MessageCircle, Send, Crown, ExternalLink, AlertCircle, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { MessageCircle, Send, Crown, ExternalLink, AlertCircle, Loader2, X, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { MegaMenu } from "@/components/MegaMenu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 const MAX_FREE_QUESTIONS = 5;
 const RESET_HOURS = 24;
@@ -28,6 +35,7 @@ const AITutor = () => {
   const [questionCount, setQuestionCount] = useState(0);
   const [canAsk, setCanAsk] = useState(true);
   const [nextResetTime, setNextResetTime] = useState<Date | null>(null);
+  const [showLimitPopup, setShowLimitPopup] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -85,7 +93,13 @@ const AITutor = () => {
       setCanAsk(true);
     } else {
       setQuestionCount(data.question_count);
-      setCanAsk(data.question_count < MAX_FREE_QUESTIONS);
+      const limitReached = data.question_count >= MAX_FREE_QUESTIONS;
+      setCanAsk(!limitReached);
+      
+      // Show popup if limit was already reached
+      if (limitReached) {
+        setShowLimitPopup(true);
+      }
       
       // Calculate next reset time
       const resetTime = new Date(lastReset.getTime() + RESET_HOURS * 60 * 60 * 1000);
@@ -122,8 +136,14 @@ const AITutor = () => {
         .eq("user_id", user.id);
       
       setQuestionCount(newCount);
+      
+      // Check if limit reached after this question
       if (newCount >= MAX_FREE_QUESTIONS) {
         setCanAsk(false);
+        // Show popup after the response is received
+        setTimeout(() => {
+          setShowLimitPopup(true);
+        }, 1500);
       }
 
       // Call AI API
@@ -165,6 +185,58 @@ const AITutor = () => {
     <div className="min-h-screen bg-background">
       <MegaMenu />
       
+      {/* Limit Reached Popup Dialog */}
+      <Dialog open={showLimitPopup} onOpenChange={setShowLimitPopup}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <AlertCircle className="w-6 h-6 text-korean-orange" />
+              Đã hết lượt hỏi miễn phí!
+            </DialogTitle>
+            <DialogDescription className="text-left pt-4 space-y-4">
+              <p>
+                Bạn đã sử dụng hết <span className="font-bold text-primary">{MAX_FREE_QUESTIONS} câu hỏi miễn phí</span> trong 24 giờ.
+              </p>
+              <p>
+                Reset sau: <span className="font-bold text-korean-green">{formatTimeRemaining()}</span>
+              </p>
+              
+              <div className="bg-gradient-to-r from-primary/10 via-korean-purple/10 to-korean-pink/10 rounded-xl p-4 mt-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Crown className="w-5 h-5 text-korean-yellow" />
+                  <span className="font-bold text-foreground">Dành cho Plus / Premium</span>
+                </div>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Trải nghiệm <span className="font-bold text-primary">LUKATO AI Agent</span> - dịch vụ hỏi đáp AI cao cấp nhất với công nghệ RAG AI tiên tiến, không giới hạn số lượng câu hỏi!
+                </p>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Sparkles className="w-4 h-4 text-korean-yellow" />
+                  <span>Trả lời chính xác hơn • Không giới hạn • Hỗ trợ 24/7</span>
+                </div>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex flex-col gap-3 mt-4">
+            <Button
+              onClick={() => window.open("https://chat-topikbot.kr", "_blank")}
+              className="w-full bg-gradient-to-r from-korean-orange to-korean-pink hover:from-korean-orange/90 hover:to-korean-pink/90 text-white font-bold"
+            >
+              <Crown className="w-4 h-4 mr-2" />
+              Truy cập LUKATO AI Agent
+              <ExternalLink className="w-4 h-4 ml-2" />
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowLimitPopup(false)}
+              className="w-full"
+            >
+              Đóng
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
       <main className="pt-24 pb-8 px-4 max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -205,18 +277,18 @@ const AITutor = () => {
               
               {!canAsk && (
                 <Button
-                  onClick={() => window.open("https://chat-topikbot.kr", "_blank")}
-                  className="btn-primary text-primary-foreground"
+                  onClick={() => setShowLimitPopup(true)}
+                  className="bg-gradient-to-r from-korean-orange to-korean-pink hover:from-korean-orange/90 hover:to-korean-pink/90 text-white"
                 >
                   <Crown className="w-4 h-4 mr-2" />
-                  LUKATO AI không giới hạn
+                  <span className="hidden sm:inline">LUKATO AI Agent</span>
                   <ExternalLink className="w-4 h-4 ml-2" />
                 </Button>
               )}
             </div>
           </Card>
 
-          {/* Limit Reached Warning */}
+          {/* Limit Reached Warning Banner */}
           {!canAsk && (
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -235,18 +307,18 @@ const AITutor = () => {
                     Bạn đã sử dụng hết {MAX_FREE_QUESTIONS} câu hỏi miễn phí trong 24 giờ. 
                     Nâng cấp Premium để hỏi AI không giới hạn với công nghệ RAG AI tiên tiến nhất!
                   </p>
-                  <div className="flex gap-3">
+                  <div className="flex flex-wrap gap-3">
                     <Button
                       onClick={() => window.open("https://chat-topikbot.kr", "_blank")}
-                      className="btn-primary text-primary-foreground"
+                      className="bg-gradient-to-r from-korean-orange to-korean-pink hover:from-korean-orange/90 hover:to-korean-pink/90 text-white"
                     >
                       <Crown className="w-4 h-4 mr-2" />
-                      Truy cập LUKATO AI Engine
+                      Truy cập LUKATO AI Agent
                       <ExternalLink className="w-4 h-4 ml-2" />
                     </Button>
                     <Button
                       variant="outline"
-                      onClick={() => navigate("/#pricing")}
+                      onClick={() => navigate("/pricing")}
                     >
                       Xem bảng giá Premium
                     </Button>
