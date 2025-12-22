@@ -5,52 +5,64 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Default voice: Sarah (natural and clear for Korean)
+const DEFAULT_VOICE_ID = "EXAVITQu4vr4xnSDxMaL";
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { text, voice } = await req.json();
+    const { text, voiceId, speed = 0.9 } = await req.json();
+    const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
     if (!text) {
-      throw new Error('Text is required');
+      throw new Error("Text is required");
     }
 
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-    if (!OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY is not configured');
+    if (!ELEVENLABS_API_KEY) {
+      throw new Error("ELEVENLABS_API_KEY is not configured");
     }
 
-    console.log('Generating TTS for:', text);
+    const selectedVoice = voiceId || DEFAULT_VOICE_ID;
 
-    // Generate speech from text using OpenAI TTS
-    const response = await fetch('https://api.openai.com/v1/audio/speech', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'tts-1',
-        input: text,
-        voice: voice || 'nova', // nova sounds good for Korean
-        response_format: 'mp3',
-        speed: 0.9, // Slightly slower for learning
-      }),
-    });
+    console.log(`Generating drama TTS for text: "${text.substring(0, 50)}..." with voice: ${selectedVoice}`);
+
+    const response = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${selectedVoice}`,
+      {
+        method: "POST",
+        headers: {
+          "xi-api-key": ELEVENLABS_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text,
+          model_id: "eleven_turbo_v2_5", // Fast and cost-effective
+          output_format: "mp3_44100_128",
+          voice_settings: {
+            stability: 0.4, // More expressive for drama
+            similarity_boost: 0.8,
+            style: 0.5, // More stylized for drama
+            use_speaker_boost: true,
+            speed: speed,
+          },
+        }),
+      }
+    );
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error('TTS API error:', error);
-      throw new Error('Failed to generate speech');
+      const errorText = await response.text();
+      console.error("ElevenLabs drama TTS error:", response.status, errorText);
+      throw new Error(`ElevenLabs API error: ${response.status}`);
     }
 
-    // Convert audio buffer to base64 using chunked approach to avoid stack overflow
-    const arrayBuffer = await response.arrayBuffer();
-    const uint8Array = new Uint8Array(arrayBuffer);
+    // Return base64 for compatibility with existing drama code
+    const audioBuffer = await response.arrayBuffer();
+    const uint8Array = new Uint8Array(audioBuffer);
     
-    // Process in chunks to avoid "Maximum call stack size exceeded"
+    // Process in chunks to avoid stack overflow
     const chunkSize = 8192;
     let binaryString = '';
     for (let i = 0; i < uint8Array.length; i += chunkSize) {
@@ -59,7 +71,7 @@ serve(async (req) => {
     }
     const base64Audio = btoa(binaryString);
 
-    console.log('TTS generated successfully, audio length:', base64Audio.length);
+    console.log(`Drama TTS generated successfully, audio length: ${base64Audio.length}`);
 
     return new Response(
       JSON.stringify({ audioContent: base64Audio }),
@@ -67,13 +79,13 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
-  } catch (error) {
-    console.error('TTS error:', error);
+  } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error in drama-tts function:', errorMessage);
     return new Response(
       JSON.stringify({ error: errorMessage }),
       {
-        status: 400,
+        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
