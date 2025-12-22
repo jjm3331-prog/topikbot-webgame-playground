@@ -29,14 +29,14 @@ const AIChat = () => {
     {
       number: 1,
       title: "Truy cập",
-      description: "Truy cập chat-topikbot.kr và đăng nhập bằng Google hoặc email.",
+      description: "Truy cập Q&A Agent và đăng nhập bằng Google hoặc email.",
       tip: "Đăng nhập bằng email giống với tài khoản LUKATO để đồng bộ!"
     },
     {
       number: 2,
       title: "Chọn mô hình AI",
       description: "Chọn mô hình AI phù hợp nhất với mục đích học tập của bạn.",
-      tip: "Mô hình 'TOPIK Master' được tối ưu hóa cho việc học tiếng Hàn."
+      tip: "Q&A Agent được cấu thành từ nhiều mô hình AI hiệu suất cao nhất."
     },
     {
       number: 3,
@@ -172,10 +172,10 @@ const AIChat = () => {
             className="text-center mb-12"
           >
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Tại sao vận hành trên trang riêng?
+              Tại sao cung cấp dịch vụ như một Agent độc lập?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Để mang lại trải nghiệm học tập tốt hơn, chúng tôi vận hành dịch vụ Q&A chuyên biệt riêng
+              Để mang lại trải nghiệm học tập tốt hơn, chúng tôi vận hành dịch vụ Q&A Agent chuyên biệt
             </p>
           </motion.div>
 
@@ -265,7 +265,7 @@ const AIChat = () => {
               Tính năng chính
             </h2>
             <p className="text-muted-foreground">
-              Những tính năng đặc biệt chỉ có ở LUKATO Q&A Agent
+              Những tính năng đặc biệt chỉ có ở Q&A Agent
             </p>
           </motion.div>
 
