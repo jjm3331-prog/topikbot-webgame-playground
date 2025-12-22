@@ -42,6 +42,8 @@ interface Profile {
   points: number;
   last_daily_bonus: string | null;
   created_at: string;
+  current_streak: number;
+  longest_streak: number;
 }
 
 interface UserData {
@@ -318,10 +320,10 @@ const Profile = () => {
             {/* Stats Grid */}
             <div className="grid grid-cols-4 gap-3 mb-4">
               {[
-                { icon: Zap, value: profile?.points || 0, label: "Tuần này", color: "text-korean-orange" },
-                { icon: CalendarDays, value: profile?.points || 0, label: "Tháng này", color: "text-muted-foreground" },
-                { icon: Percent, value: "22%", label: "Độ chính xác", color: "text-korean-green" },
-                { icon: Flame, value: 4, label: "Streak cao nhất", color: "text-korean-orange" },
+                { icon: Zap, value: profile?.points || 0, label: "Tổng điểm", color: "text-korean-orange" },
+                { icon: Flame, value: profile?.current_streak || 0, label: "Streak hiện tại", color: "text-korean-green" },
+                { icon: Target, value: profile?.longest_streak || 0, label: "Streak cao nhất", color: "text-korean-orange" },
+                { icon: GraduationCap, value: `${level.level}급`, label: "Cấp TOPIK", color: level.color },
               ].map((stat, idx) => (
                 <div key={idx} className="text-center">
                   <stat.icon className={`w-4 h-4 mx-auto mb-1 ${stat.color}`} />
