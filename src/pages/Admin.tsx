@@ -10,7 +10,8 @@ import { useToast } from "@/hooks/use-toast";
 import { 
   Users, FileText, BarChart3, Bell, Settings, Upload, 
   Trash2, Loader2, ChevronLeft, Search, RefreshCw,
-  TrendingUp, BookOpen, Gamepad2, MessageSquare, PenTool, Star
+  TrendingUp, BookOpen, Gamepad2, MessageSquare, PenTool, Star,
+  Briefcase, Eye, CheckCircle, XCircle, Clock
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -39,6 +40,28 @@ interface UserProfile {
   created_at: string;
 }
 
+interface HeadhuntingApplication {
+  id: string;
+  user_id: string;
+  full_name: string;
+  email: string;
+  phone: string | null;
+  birth_year: number | null;
+  education_level: string | null;
+  university_name: string | null;
+  major: string | null;
+  topik_level: number | null;
+  work_experience_years: number;
+  current_company: string | null;
+  desired_job_type: string | null;
+  desired_industry: string | null;
+  desired_location: string | null;
+  introduction: string | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
 const Admin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -58,6 +81,11 @@ const Admin = () => {
   const [newDocTitle, setNewDocTitle] = useState("");
   const [newDocContent, setNewDocContent] = useState("");
   const [uploadingDoc, setUploadingDoc] = useState(false);
+  
+  // Headhunting
+  const [headhuntingApplications, setHeadhuntingApplications] = useState<HeadhuntingApplication[]>([]);
+  const [selectedApplication, setSelectedApplication] = useState<HeadhuntingApplication | null>(null);
+  const [headhuntingSearch, setHeadhuntingSearch] = useState("");
 
   useEffect(() => {
     checkAdminAccess();
@@ -109,6 +137,7 @@ const Admin = () => {
         { count: totalReviews },
         { count: totalDocuments },
         { count: totalAIQuestions },
+        { count: totalHeadhunting },
       ] = await Promise.all([
         supabase.from("profiles").select("*", { count: "exact", head: true }),
         supabase.from("quiz_history").select("*", { count: "exact", head: true }),
@@ -116,15 +145,16 @@ const Admin = () => {
         supabase.from("reviews").select("*", { count: "exact", head: true }),
         supabase.from("knowledge_documents").select("*", { count: "exact", head: true }),
         supabase.from("ai_question_usage").select("*", { count: "exact", head: true }),
+        supabase.from("headhunting_applications").select("*", { count: "exact", head: true }),
       ]);
 
       setStats([
         { title: "총 사용자", value: totalUsers || 0, icon: <Users className="w-5 h-5" />, color: "text-blue-500" },
-        { title: "퀴즈 플레이", value: totalQuizHistory || 0, icon: <Gamepad2 className="w-5 h-5" />, color: "text-green-500" },
+        { title: "헤드헌팅 신청", value: totalHeadhunting || 0, icon: <Briefcase className="w-5 h-5" />, color: "text-korean-purple" },
         { title: "작문 교정", value: totalWritingCorrections || 0, icon: <PenTool className="w-5 h-5" />, color: "text-purple-500" },
         { title: "AI 튜터 질문", value: totalAIQuestions || 0, icon: <MessageSquare className="w-5 h-5" />, color: "text-orange-500" },
         { title: "지식 문서", value: totalDocuments || 0, icon: <BookOpen className="w-5 h-5" />, color: "text-cyan-500" },
-        { title: "리뷰", value: totalReviews || 0, icon: <Star className="w-5 h-5" />, color: "text-yellow-500" },
+        { title: "퀴즈 플레이", value: totalQuizHistory || 0, icon: <Gamepad2 className="w-5 h-5" />, color: "text-green-500" },
       ]);
 
       // Load users
@@ -141,6 +171,13 @@ const Admin = () => {
         .select("id, title, content, created_at, file_type")
         .order("created_at", { ascending: false });
       setDocuments(docsData || []);
+
+      // Load headhunting applications
+      const { data: headhuntingData } = await supabase
+        .from("headhunting_applications")
+        .select("*")
+        .order("created_at", { ascending: false });
+      setHeadhuntingApplications(headhuntingData || []);
 
     } catch (error) {
       console.error("Load data error:", error);
@@ -247,11 +284,60 @@ const Admin = () => {
     }
   };
 
+  const handleUpdateApplicationStatus = async (appId: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from("headhunting_applications")
+        .update({ status: newStatus, updated_at: new Date().toISOString() })
+        .eq("id", appId);
+
+      if (error) throw error;
+
+      toast({
+        title: "상태 업데이트",
+        description: `신청서 상태가 "${newStatus}"로 변경되었습니다.`,
+      });
+
+      await loadDashboardData();
+      setSelectedApplication(null);
+    } catch (error: any) {
+      console.error("Update status error:", error);
+      toast({
+        title: "업데이트 실패",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   const filteredUsers = users.filter(
     (u) =>
       u.username.toLowerCase().includes(userSearch.toLowerCase()) ||
       u.id.toLowerCase().includes(userSearch.toLowerCase())
   );
+
+  const filteredHeadhunting = headhuntingApplications.filter(
+    (app) =>
+      app.full_name.toLowerCase().includes(headhuntingSearch.toLowerCase()) ||
+      app.email.toLowerCase().includes(headhuntingSearch.toLowerCase())
+  );
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return <span className="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">대기중</span>;
+      case 'reviewing':
+        return <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">검토중</span>;
+      case 'matched':
+        return <span className="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">매칭중</span>;
+      case 'hired':
+        return <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">채용완료</span>;
+      case 'rejected':
+        return <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">거절</span>;
+      default:
+        return <span className="px-2 py-1 text-xs rounded-full bg-muted text-muted-foreground">{status}</span>;
+    }
+  };
 
   if (loading) {
     return (
@@ -298,10 +384,14 @@ const Admin = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
               <span className="hidden sm:inline">대시보드</span>
+            </TabsTrigger>
+            <TabsTrigger value="headhunting" className="flex items-center gap-2">
+              <Briefcase className="w-4 h-4" />
+              <span className="hidden sm:inline">헤드헌팅</span>
             </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
@@ -376,6 +466,140 @@ const Admin = () => {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+          </TabsContent>
+
+          {/* Headhunting Tab */}
+          <TabsContent value="headhunting">
+            <div className="grid lg:grid-cols-3 gap-6">
+              {/* Applications List */}
+              <div className="lg:col-span-2">
+                <Card>
+                  <CardHeader>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <CardTitle className="flex items-center gap-2">
+                        <Briefcase className="w-5 h-5 text-korean-purple" />
+                        헤드헌팅 신청 ({headhuntingApplications.length})
+                      </CardTitle>
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          placeholder="이름, 이메일 검색..."
+                          value={headhuntingSearch}
+                          onChange={(e) => setHeadhuntingSearch(e.target.value)}
+                          className="pl-10 w-full sm:w-[250px]"
+                        />
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3 max-h-[600px] overflow-y-auto">
+                      {filteredHeadhunting.map((app) => (
+                        <div
+                          key={app.id}
+                          onClick={() => setSelectedApplication(app)}
+                          className={`p-4 rounded-lg border cursor-pointer transition-all ${
+                            selectedApplication?.id === app.id
+                              ? 'border-primary bg-primary/5'
+                              : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="font-semibold truncate">{app.full_name}</h4>
+                                {getStatusBadge(app.status)}
+                              </div>
+                              <p className="text-sm text-muted-foreground truncate">{app.email}</p>
+                              <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                                {app.topik_level && <span>TOPIK {app.topik_level}급</span>}
+                                {app.desired_location && (
+                                  <span>{app.desired_location === 'korea' ? '🇰🇷 한국' : app.desired_location === 'vietnam_korean' ? '🇻🇳 베트남 내 한국기업' : '양쪽 가능'}</span>
+                                )}
+                              </div>
+                            </div>
+                            <Eye className="w-4 h-4 text-muted-foreground shrink-0" />
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            {new Date(app.created_at).toLocaleDateString("ko-KR")} 신청
+                          </p>
+                        </div>
+                      ))}
+                      {filteredHeadhunting.length === 0 && (
+                        <p className="text-center py-8 text-muted-foreground">
+                          {headhuntingSearch ? '검색 결과가 없습니다.' : '신청 내역이 없습니다.'}
+                        </p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Application Detail */}
+              <div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">신청서 상세</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {selectedApplication ? (
+                      <div className="space-y-4 text-sm">
+                        <div>
+                          <p className="text-muted-foreground text-xs mb-1">이름</p>
+                          <p className="font-medium">{selectedApplication.full_name}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground text-xs mb-1">이메일</p>
+                          <p>{selectedApplication.email}</p>
+                        </div>
+                        {selectedApplication.phone && (
+                          <div>
+                            <p className="text-muted-foreground text-xs mb-1">전화번호</p>
+                            <p>{selectedApplication.phone}</p>
+                          </div>
+                        )}
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <p className="text-muted-foreground text-xs mb-1">TOPIK</p>
+                            <p>{selectedApplication.topik_level ? `${selectedApplication.topik_level}급` : '-'}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground text-xs mb-1">경력</p>
+                            <p>{selectedApplication.work_experience_years}년</p>
+                          </div>
+                        </div>
+                        {selectedApplication.introduction && (
+                          <div>
+                            <p className="text-muted-foreground text-xs mb-1">자기소개</p>
+                            <p className="text-xs leading-relaxed">{selectedApplication.introduction}</p>
+                          </div>
+                        )}
+                        <div className="pt-4 border-t space-y-2">
+                          <p className="text-muted-foreground text-xs mb-2">상태 변경</p>
+                          <div className="flex flex-wrap gap-2">
+                            <Button size="sm" variant="outline" onClick={() => handleUpdateApplicationStatus(selectedApplication.id, 'reviewing')}>
+                              <Clock className="w-3 h-3 mr-1" /> 검토중
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => handleUpdateApplicationStatus(selectedApplication.id, 'matched')}>
+                              <CheckCircle className="w-3 h-3 mr-1" /> 매칭중
+                            </Button>
+                            <Button size="sm" variant="default" onClick={() => handleUpdateApplicationStatus(selectedApplication.id, 'hired')}>
+                              <CheckCircle className="w-3 h-3 mr-1" /> 채용완료
+                            </Button>
+                            <Button size="sm" variant="destructive" onClick={() => handleUpdateApplicationStatus(selectedApplication.id, 'rejected')}>
+                              <XCircle className="w-3 h-3 mr-1" /> 거절
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground text-sm text-center py-8">
+                        왼쪽에서 신청서를 선택하세요
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </TabsContent>
 

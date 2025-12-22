@@ -34,6 +34,7 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 import KoreaCareer from "./pages/KoreaCareer";
+import Headhunting from "./pages/Headhunting";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWAWelcome from "./components/PWAWelcome";
 import SplashScreen from "./components/SplashScreen";
@@ -138,6 +139,7 @@ const App = () => {
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/korea-career" element={<KoreaCareer />} />
+              <Route path="/headhunting" element={<Headhunting />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
