@@ -5,20 +5,9 @@ import {
   ChevronLeft, 
   User, 
   Mail, 
-  Calendar, 
   Edit3, 
   Save, 
-  Users, 
-  Copy, 
-  Share2,
-  Target,
-  Zap,
-  CalendarDays,
-  Percent,
-  Flame,
   Crown,
-  GraduationCap,
-  Check,
   Lock,
   Eye,
   EyeOff,
@@ -32,7 +21,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import CleanHeader from "@/components/CleanHeader";
@@ -42,15 +30,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 interface Profile {
   id: string;
   username: string;
-  hp: number;
-  money: number;
-  missions_completed: number;
-  total_missions: number;
-  points: number;
-  last_daily_bonus: string | null;
   created_at: string;
-  current_streak: number;
-  longest_streak: number;
 }
 
 interface UserData {
@@ -65,14 +45,11 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [newUsername, setNewUsername] = useState("");
-  const [referralCode, setReferralCode] = useState("");
   
   // Password change states
   const [showPasswordSection, setShowPasswordSection] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
   
@@ -92,7 +69,7 @@ const Profile = () => {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, username, created_at")
         .eq("id", session.user.id)
         .single();
 
@@ -101,8 +78,6 @@ const Profile = () => {
       } else {
         setProfile(data);
         setNewUsername(data.username);
-        // Generate referral code from user id
-        setReferralCode(session.user.id.substring(0, 8).toUpperCase());
       }
       setLoading(false);
     };
@@ -179,7 +154,6 @@ const Profile = () => {
         title: "Thành công",
         description: "Đã đổi mật khẩu thành công!",
       });
-      setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
       setShowPasswordSection(false);
@@ -234,56 +208,12 @@ const Profile = () => {
     }
   };
 
-  const handleCopyReferralCode = () => {
-    navigator.clipboard.writeText(referralCode);
-    toast({
-      title: "Đã sao chép",
-      description: "Mã giới thiệu đã được sao chép!",
-    });
-  };
-
-  const handleShareReferralLink = () => {
-    const shareUrl = `${window.location.origin}?ref=${referralCode}`;
-    if (navigator.share) {
-      navigator.share({
-        title: "LUKATO AI - Học tiếng Hàn",
-        text: "Cùng học tiếng Hàn với tôi trên LUKATO AI!",
-        url: shareUrl,
-      });
-    } else {
-      navigator.clipboard.writeText(shareUrl);
-      toast({
-        title: "Đã sao chép link",
-        description: "Link giới thiệu đã được sao chép!",
-      });
-    }
-  };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("vi-VN", {
       day: "numeric",
       month: "numeric",
       year: "numeric"
     });
-  };
-
-  // Calculate level based on TOPIK points - aligned with pointsPolicy.ts
-  const getLevel = (points: number) => {
-    if (points >= 8000) return { name: "TOPIK 6급", level: 6, color: "text-red-500" };
-    if (points >= 5000) return { name: "TOPIK 5급", level: 5, color: "text-orange-500" };
-    if (points >= 3000) return { name: "TOPIK 4급", level: 4, color: "text-purple-500" };
-    if (points >= 1500) return { name: "TOPIK 3급", level: 3, color: "text-blue-500" };
-    if (points >= 500) return { name: "TOPIK 2급", level: 2, color: "text-green-500" };
-    return { name: "TOPIK 1급", level: 1, color: "text-gray-500" };
-  };
-
-  const getNextLevelPoints = (points: number) => {
-    if (points >= 8000) return 8000;
-    if (points >= 5000) return 8000;
-    if (points >= 3000) return 5000;
-    if (points >= 1500) return 3000;
-    if (points >= 500) return 1500;
-    return 500;
   };
 
   if (loading) {
@@ -296,10 +226,6 @@ const Profile = () => {
       </div>
     );
   }
-
-  const level = getLevel(profile?.points || 0);
-  const nextLevelPoints = getNextLevelPoints(profile?.points || 0);
-  const progressPercent = ((profile?.points || 0) / nextLevelPoints) * 100;
 
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col">
@@ -453,16 +379,16 @@ const Profile = () => {
             className="glass-card rounded-2xl p-6 mb-6"
           >
             {/* User Info with Avatar Upload */}
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center gap-4">
               <div className="relative group">
                 {avatarUrl ? (
                   <img 
                     src={avatarUrl} 
                     alt="Profile" 
-                    className="w-16 h-16 rounded-full object-cover border-2 border-primary/20"
+                    className="w-20 h-20 rounded-full object-cover border-2 border-primary/20"
                   />
                 ) : (
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center text-primary-foreground font-bold text-xl">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center text-primary-foreground font-bold text-2xl">
                     {profile?.username?.charAt(0).toUpperCase() || "U"}
                   </div>
                 )}
@@ -470,7 +396,7 @@ const Profile = () => {
                   htmlFor="avatar-upload"
                   className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                 >
-                  <Camera className="w-5 h-5 text-white" />
+                  <Camera className="w-6 h-6 text-white" />
                 </label>
                 <input
                   id="avatar-upload"
@@ -488,67 +414,9 @@ const Profile = () => {
               </div>
               <div>
                 <h2 className="text-xl font-bold text-foreground">{profile?.username}</h2>
-                <p className={`text-sm font-medium ${level.color}`}>
-                  <GraduationCap className="w-4 h-4 inline mr-1" />
-                  {level.name}
+                <p className="text-sm text-muted-foreground">
+                  {isPremium ? "👑 Premium Member" : isPlus ? "⭐ Plus Member" : "Thành viên"}
                 </p>
-              </div>
-            </div>
-
-            {/* Points Display */}
-            <div className="bg-gradient-to-r from-korean-blue/20 to-korean-cyan/20 rounded-xl p-4 mb-4 text-center">
-              <p className="text-sm text-muted-foreground mb-1">Tổng điểm</p>
-              <p className="text-4xl font-bold text-korean-orange">
-                {(profile?.points || 0).toLocaleString()}
-              </p>
-              <p className="text-sm text-muted-foreground">điểm</p>
-            </div>
-
-            {/* Level Progress */}
-            <div className="mb-4">
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span className="text-muted-foreground flex items-center gap-1">
-                  <Zap className="w-4 h-4" />
-                  Tiến độ lên cấp
-                </span>
-                <span className={`font-medium ${level.color}`}>
-                  <GraduationCap className="w-4 h-4 inline mr-1" />
-                  {level.name}
-                </span>
-              </div>
-              <Progress value={progressPercent} className="h-2 mb-2" />
-              <p className="text-xs text-center text-muted-foreground">
-                Còn {(nextLevelPoints - (profile?.points || 0)).toLocaleString()} điểm nữa để lên cấp
-              </p>
-            </div>
-
-            {/* Stats Grid */}
-            <div className="grid grid-cols-4 gap-3 mb-4">
-              {[
-                { icon: Zap, value: profile?.points || 0, label: "Tổng điểm", color: "text-korean-orange" },
-                { icon: Flame, value: profile?.current_streak || 0, label: "Streak hiện tại", color: "text-korean-green" },
-                { icon: Target, value: profile?.longest_streak || 0, label: "Streak cao nhất", color: "text-korean-orange" },
-                { icon: GraduationCap, value: `${level.level}급`, label: "Cấp TOPIK", color: level.color },
-              ].map((stat, idx) => (
-                <div key={idx} className="text-center">
-                  <stat.icon className={`w-4 h-4 mx-auto mb-1 ${stat.color}`} />
-                  <p className="text-lg font-bold text-foreground">
-                    {typeof stat.value === "number" ? stat.value.toLocaleString() : stat.value}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground">{stat.label}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Quiz Stats */}
-            <div className="border-t border-border pt-4 space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Tổng câu hỏi đã làm:</span>
-                <span className="font-medium text-foreground">250 câu</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Câu trả lời đúng:</span>
-                <span className="font-medium text-korean-green">55 câu</span>
               </div>
             </div>
           </motion.div>
@@ -578,7 +446,7 @@ const Profile = () => {
                   placeholder="Nhập biệt danh..."
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Tên này sẽ hiển thị trên bảng xếp hạng
+                  Tên này sẽ hiển thị trong ứng dụng
                 </p>
               </div>
 
@@ -679,62 +547,6 @@ const Profile = () => {
               )}
             </div>
           </motion.div>
-
-          {/* Invite Friends Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="glass-card rounded-2xl p-6 mb-6 border-korean-orange/30"
-          >
-            <h3 className="font-semibold text-foreground flex items-center gap-2 mb-2">
-              <Users className="w-4 h-4 text-korean-orange" />
-              Mời bạn bè
-            </h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Mời bạn bè tham gia và nhận <span className="text-korean-orange font-bold">500 điểm</span> cho mỗi người! 
-              Bạn bè của bạn cũng nhận <span className="text-korean-green font-bold">200 điểm</span>.
-            </p>
-
-            <div className="mb-4">
-              <Label className="text-xs text-muted-foreground">Mã giới thiệu của bạn</Label>
-              <div className="flex gap-2 mt-1">
-                <div className="flex-1 bg-muted rounded-lg px-4 py-3 font-mono text-lg font-bold text-korean-orange">
-                  {referralCode}
-                </div>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleCopyReferralCode}
-                  className="shrink-0"
-                >
-                  <Copy className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-
-            <Button
-              onClick={handleShareReferralLink}
-              className="w-full bg-korean-orange hover:bg-korean-orange/90 text-white"
-            >
-              <Share2 className="w-4 h-4 mr-2" />
-              Chia sẻ link mời
-            </Button>
-
-            <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-border">
-              <div className="text-center">
-                <Users className="w-5 h-5 mx-auto mb-1 text-muted-foreground" />
-                <p className="text-xl font-bold text-foreground">0</p>
-                <p className="text-xs text-muted-foreground">Tổng mời</p>
-              </div>
-              <div className="text-center">
-                <Crown className="w-5 h-5 mx-auto mb-1 text-korean-orange" />
-                <p className="text-xl font-bold text-foreground">30</p>
-                <p className="text-xs text-muted-foreground">Còn lại tháng này</p>
-              </div>
-            </div>
-          </motion.div>
-
         </div>
       </main>
 

@@ -1,49 +1,29 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   MessageCircle,
-  Trophy,
-  FileX,
-  Star,
-  Target,
   ChevronRight,
   Crown,
   Briefcase,
   Users,
-  FileText,
-  StickyNote,
-  Sparkles,
-  Flame,
-  Check,
-  Gift,
+  User,
 } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
-import confetti from "canvas-confetti";
 import { PremiumPreviewBanner } from "@/components/PremiumPreviewBanner";
 import { useSubscription } from "@/hooks/useSubscription";
 
 interface Profile {
   id: string;
   username: string;
-  hp: number;
-  money: number;
-  missions_completed: number;
-  total_missions: number;
-  points: number;
-  last_daily_bonus: string | null;
-  current_streak: number;
-  longest_streak: number;
 }
 
 const Dashboard = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [todayChecked, setTodayChecked] = useState(false);
   const navigate = useNavigate();
   const { isPremium } = useSubscription();
 
@@ -57,7 +37,7 @@ const Dashboard = () => {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, username")
         .eq("id", session.user.id)
         .single();
 
@@ -65,14 +45,6 @@ const Dashboard = () => {
         console.error("Error fetching profile:", error);
       } else {
         setProfile(data);
-        // Check if user has checked in today
-        if (data.last_daily_bonus) {
-          const lastBonus = new Date(data.last_daily_bonus);
-          const today = new Date();
-          if (lastBonus.toDateString() === today.toDateString()) {
-            setTodayChecked(true);
-          }
-        }
       }
       setLoading(false);
     };
@@ -87,82 +59,6 @@ const Dashboard = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
-
-  const handleDailyCheckIn = async () => {
-    if (todayChecked || !profile) return;
-    
-    const now = new Date();
-    const lastBonus = profile.last_daily_bonus ? new Date(profile.last_daily_bonus) : null;
-    
-    // Calculate new streak
-    let newStreak = 1;
-    if (lastBonus) {
-      const yesterday = new Date(now);
-      yesterday.setDate(yesterday.getDate() - 1);
-      
-      // If last check-in was yesterday, continue streak
-      if (lastBonus.toDateString() === yesterday.toDateString()) {
-        newStreak = (profile.current_streak || 0) + 1;
-      }
-    }
-    
-    // Calculate points: 50 base + 500 bonus for 7-day streak
-    let pointsToAdd = 50;
-    let bonusMessage = "";
-    if (newStreak === 7) {
-      pointsToAdd += 500;
-      bonusMessage = " 🎉 +500 điểm bonus 7 ngày liên tiếp!";
-    }
-    
-    const newLongestStreak = Math.max(profile.longest_streak || 0, newStreak);
-    
-    const { error } = await supabase
-      .from("profiles")
-      .update({ 
-        last_daily_bonus: now.toISOString(),
-        points: (profile.points || 0) + pointsToAdd,
-        current_streak: newStreak,
-        longest_streak: newLongestStreak
-      })
-      .eq("id", profile.id);
-
-    if (!error) {
-      setTodayChecked(true);
-      setProfile(prev => prev ? { 
-        ...prev, 
-        points: (prev.points || 0) + pointsToAdd,
-        current_streak: newStreak,
-        longest_streak: newLongestStreak
-      } : null);
-      
-      // Celebration confetti animation
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#F38181']
-      });
-      
-      // Extra confetti for 7-day streak bonus
-      if (newStreak === 7) {
-        setTimeout(() => {
-          confetti({
-            particleCount: 200,
-            spread: 100,
-            origin: { y: 0.5 },
-            colors: ['#FFD700', '#FFA500', '#FF4500']
-          });
-        }, 300);
-      }
-      
-      toast({
-        title: `🎉 +${pointsToAdd} điểm!`,
-        description: `Điểm danh ngày ${newStreak} thành công!${bonusMessage}`,
-      });
-    }
-  };
-
-  const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 
   if (loading) {
     return (
@@ -182,6 +78,7 @@ const Dashboard = () => {
         <div className="max-w-4xl mx-auto w-full space-y-6">
         {/* Premium Preview Banner */}
         {!isPremium && <PremiumPreviewBanner featureName="theo dõi tiến độ học" />}
+        
         {/* Welcome Message */}
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
@@ -199,126 +96,11 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
-        {/* Daily Missions Section */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="glass-card p-5 rounded-2xl"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Flame className="w-5 h-5 text-destructive" />
-              <span className="font-semibold text-foreground">Nhiệm vụ hàng ngày</span>
-            </div>
-            <span className="text-xs px-3 py-1 rounded-full bg-secondary/20 text-secondary font-medium flex items-center gap-1">
-              🔥 Duy trì streak!
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2 mb-3">
-            <Target className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">Nhiệm vụ hàng ngày</span>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            {/* Daily Check-in Card */}
-            <div className="bg-muted/30 rounded-xl p-4 border border-border/50">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded bg-korean-green/20 flex items-center justify-center">
-                    <Check className="w-3.5 h-3.5 text-korean-green" />
-                  </div>
-                  <span className="font-medium text-foreground text-sm">Điểm danh hàng ngày</span>
-                </div>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-korean-green/20 text-korean-green">
-                  🔥 {profile?.current_streak || 0} ngày!
-                </span>
-              </div>
-
-              {/* Week days */}
-              <div className="flex gap-1 mb-3">
-                {weekDays.map((day, idx) => (
-                  <div 
-                    key={day}
-                    className={`flex-1 py-1.5 rounded text-center text-xs font-medium transition-colors ${
-                      idx < ((profile?.current_streak || 0) % 7 || (todayChecked ? 7 : 0))
-                        ? 'bg-korean-green text-white' 
-                        : 'bg-muted text-muted-foreground'
-                    }`}
-                  >
-                    {day}
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
-                <span>Mỗi ngày <span className="text-secondary font-medium">+50 điểm</span></span>
-                <span>🎁 7 ngày liên tiếp: <span className="text-secondary font-medium">+500</span></span>
-              </div>
-
-              <Button 
-                onClick={handleDailyCheckIn}
-                disabled={todayChecked}
-                className={`w-full ${todayChecked 
-                  ? 'bg-muted text-muted-foreground' 
-                  : 'bg-korean-green hover:bg-korean-green/90 text-white'}`}
-              >
-                <Check className="w-4 h-4 mr-2" />
-                {todayChecked ? 'Đã điểm danh hôm nay!' : 'Điểm danh hôm nay!'}
-              </Button>
-
-              {(profile?.current_streak || 0) > 0 && (
-                <p className="text-center text-xs text-korean-orange mt-2">
-                  🔥 Đang có {profile?.current_streak} ngày liên tiếp! (Kỷ lục: {profile?.longest_streak || 0} ngày)
-                </p>
-              )}
-            </div>
-
-            {/* Quiz Reward Card */}
-            <div className="bg-muted/30 rounded-xl p-4 border border-border/50">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-6 h-6 rounded bg-korean-yellow/20 flex items-center justify-center">
-                  <Star className="w-3.5 h-3.5 text-korean-yellow" />
-                </div>
-                <span className="font-medium text-foreground text-sm">Thưởng quiz hoàn hảo</span>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-korean-yellow/20 flex items-center justify-center">
-                      <Trophy className="w-4 h-4 text-korean-yellow" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-foreground">Đúng cả 5 câu</p>
-                      <p className="text-xs text-muted-foreground">Khi hoàn thành quiz hoàn hảo</p>
-                    </div>
-                  </div>
-                  <span className="text-korean-orange font-bold">+200<br/><span className="text-xs font-normal">điểm</span></span>
-                </div>
-
-                <div className="h-px bg-border" />
-
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Tổng quiz hoàn hảo</span>
-                  <span className="text-secondary font-bold">0 lần</span>
-                </div>
-              </div>
-
-              <p className="text-xs text-korean-yellow mt-3 flex items-center gap-1">
-                <Sparkles className="w-3 h-3" />
-                Nhận thêm 200 điểm ngoài điểm cơ bản. Hãy tập trung làm bài nhé!
-              </p>
-            </div>
-          </div>
-        </motion.div>
-
         {/* Quick Actions - Korean Learning CTA */}
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.1 }}
           onClick={() => navigate("/topik-1")}
           className="glass-card p-4 rounded-2xl cursor-pointer hover:border-primary/50 transition-colors flex items-center justify-between group"
         >
@@ -338,7 +120,7 @@ const Dashboard = () => {
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.22 }}
+          transition={{ delay: 0.15 }}
           onClick={() => navigate("/headhunting")}
           className="relative overflow-hidden rounded-2xl cursor-pointer group"
         >
@@ -365,8 +147,8 @@ const Dashboard = () => {
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-          className="grid grid-cols-3 gap-3"
+          transition={{ delay: 0.2 }}
+          className="grid grid-cols-2 gap-3"
         >
           <div 
             onClick={() => navigate("/ai-tutor")}
@@ -380,56 +162,22 @@ const Dashboard = () => {
           </div>
 
           <div 
-            onClick={() => navigate("/mistakes")}
-            className="glass-card p-4 rounded-xl cursor-pointer hover:border-primary/50 transition-colors text-center"
-          >
-            <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-muted flex items-center justify-center">
-              <FileX className="w-5 h-5 text-foreground" />
-            </div>
-            <p className="text-sm font-medium text-foreground">Sổ lỗi sai</p>
-            <p className="text-xs text-muted-foreground">AI phân tích</p>
-          </div>
-
-          <div 
             onClick={() => navigate("/profile")}
             className="glass-card p-4 rounded-xl cursor-pointer hover:border-primary/50 transition-colors text-center"
           >
             <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-muted flex items-center justify-center">
-              <Star className="w-5 h-5 text-foreground" />
+              <User className="w-5 h-5 text-foreground" />
             </div>
-            <p className="text-sm font-medium text-foreground">Điểm của tôi</p>
-            <p className="text-xs text-muted-foreground">Xem hồ sơ</p>
+            <p className="text-sm font-medium text-foreground">Hồ sơ của tôi</p>
+            <p className="text-xs text-muted-foreground">Tài khoản</p>
           </div>
-        </motion.div>
-
-        {/* Weekly Goals */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="glass-card p-4 rounded-2xl"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Target className="w-5 h-5 text-korean-orange" />
-              <span className="font-semibold text-foreground">Mục tiêu tuần</span>
-            </div>
-            <span className="text-xs px-2 py-1 rounded-full bg-korean-green/20 text-korean-green font-medium">
-              +500đ bonus
-            </span>
-          </div>
-          <p className="text-sm text-muted-foreground mb-3">Đặt mục tiêu cá nhân, hoàn thành = nhận thưởng!</p>
-          <Button variant="outline" size="sm" className="gap-2">
-            <Target className="w-4 h-4" />
-            Đặt mục tiêu
-          </Button>
         </motion.div>
 
         {/* Korean Learning Features */}
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
+          transition={{ delay: 0.25 }}
           className="space-y-3"
         >
           <p className="text-sm text-muted-foreground">Game học tiếng Hàn</p>
@@ -458,33 +206,41 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
-        {/* Invite Friends */}
+        {/* More Games */}
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          onClick={() => navigate("/profile#invite")}
-          className="glass-card p-4 rounded-2xl flex items-center justify-between cursor-pointer hover:border-primary/50 transition-colors"
+          transition={{ delay: 0.3 }}
+          className="grid grid-cols-3 gap-3"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-korean-blue/20 flex items-center justify-center">
-              <Users className="w-5 h-5 text-korean-blue" />
-            </div>
-            <div>
-              <p className="font-medium text-foreground flex items-center gap-2">
-                🎉 Mời bạn bè
-              </p>
-              <p className="text-xs text-muted-foreground">+500 điểm cho bạn, +200 điểm cho bạn bè</p>
-            </div>
+          <div 
+            onClick={() => navigate("/manager")}
+            className="glass-card p-4 rounded-xl text-center cursor-pointer hover:border-primary/50 transition-colors"
+          >
+            <span className="text-2xl block mb-2">👑</span>
+            <p className="text-sm text-foreground">Manager</p>
           </div>
-          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+          <div 
+            onClick={() => navigate("/kdrama")}
+            className="glass-card p-4 rounded-xl text-center cursor-pointer hover:border-primary/50 transition-colors"
+          >
+            <span className="text-2xl block mb-2">🎬</span>
+            <p className="text-sm text-foreground">K-Drama</p>
+          </div>
+          <div 
+            onClick={() => navigate("/wordchain")}
+            className="glass-card p-4 rounded-xl text-center cursor-pointer hover:border-primary/50 transition-colors"
+          >
+            <span className="text-2xl block mb-2">🔗</span>
+            <p className="text-sm text-foreground">Nối từ</p>
+          </div>
         </motion.div>
 
         {/* Premium Upgrade */}
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45 }}
+          transition={{ delay: 0.35 }}
           onClick={() => navigate("/pricing")}
           className="glass-card p-4 rounded-2xl flex items-center justify-between border-korean-yellow/30 cursor-pointer hover:border-korean-yellow/50 transition-colors"
         >
