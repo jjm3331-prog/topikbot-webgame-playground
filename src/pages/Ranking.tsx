@@ -237,7 +237,7 @@ const Ranking = () => {
             onClick={() => navigate("/dashboard")}
             className="w-full bg-purple-600 hover:bg-purple-700 h-10 text-sm"
           >
-          메인으로 돌아가기 / Quay lại menu
+          대시보드로 / Về Dashboard
         </Button>
       </div>
     </div>

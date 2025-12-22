@@ -320,7 +320,7 @@ const KDrama = () => {
 
   const handleBackToGame = async () => {
     await saveScoreToProfile(score);
-    navigate('/game');
+    navigate('/dashboard');
   };
 
   const getDifficultyStyle = (d: string) => {
@@ -370,11 +370,11 @@ const KDrama = () => {
             <p className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">평균 {avgScore}%</p>
           </div>
           <div className="flex gap-3">
-            <Button onClick={() => navigate('/game')} variant="outline" className="flex-1 border-gray-600">
-              <ArrowLeft className="w-4 h-4 mr-2" />돌아가기
+            <Button onClick={() => navigate('/dashboard')} variant="outline" className="flex-1 border-gray-600">
+              <ArrowLeft className="w-4 h-4 mr-2" />대시보드로 / Về Dashboard
             </Button>
             <Button onClick={() => { setScore(0); setAttempts(0); setScoreSaved(false); setGameComplete(false); setUsedIds([]); loadScenes(selectedGenre, selectedDifficulty); }} className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500">
-              <RotateCcw className="w-4 h-4 mr-2" />다시하기
+              <RotateCcw className="w-4 h-4 mr-2" />다시하기 / Chơi lại
             </Button>
           </div>
         </motion.div>

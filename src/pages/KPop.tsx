@@ -206,8 +206,8 @@ const KPop = () => {
             <p className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400">{score}점</p>
           </div>
           <div className="flex gap-3">
-            <Button onClick={() => navigate('/game')} variant="outline" className="flex-1 border-gray-600"><ArrowLeft className="w-4 h-4 mr-2" />돌아가기</Button>
-            <Button onClick={() => { setScore(0); setStreak(0); setScoreSaved(false); setGameComplete(false); loadQuestions(difficulty); }} className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500"><RotateCcw className="w-4 h-4 mr-2" />다시하기</Button>
+            <Button onClick={() => navigate('/dashboard')} variant="outline" className="flex-1 border-gray-600"><ArrowLeft className="w-4 h-4 mr-2" />대시보드로 / Về Dashboard</Button>
+            <Button onClick={() => { setScore(0); setStreak(0); setScoreSaved(false); setGameComplete(false); loadQuestions(difficulty); }} className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500"><RotateCcw className="w-4 h-4 mr-2" />다시하기 / Chơi lại</Button>
           </div>
         </motion.div>
       </div>
