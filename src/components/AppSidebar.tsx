@@ -21,12 +21,12 @@ import {
   User,
   LogOut,
   ChevronDown,
-  ChevronRight,
   PanelLeftClose,
   PanelLeft,
-  Home
+  Home,
+  X
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -117,21 +117,23 @@ const menuSections: MenuSection[] = [
 
 interface AppSidebarProps {
   username?: string | null;
+  isOpen: boolean;
+  onClose: () => void;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
-export const AppSidebar = ({ username }: AppSidebarProps) => {
+export const AppSidebar = ({ username, isOpen, onClose, isCollapsed, onToggleCollapse }: AppSidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
   
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const [openSections, setOpenSections] = useState<Set<string>>(() => {
     const initialOpen = new Set<string>();
     menuSections.forEach(section => {
       if (section.defaultOpen) {
         initialOpen.add(section.title);
       }
-      // Also open section containing current route
       if (section.items.some(item => currentPath === item.href || currentPath.startsWith(item.href.split("#")[0]))) {
         initialOpen.add(section.title);
       }
@@ -158,6 +160,7 @@ export const AppSidebar = ({ username }: AppSidebarProps) => {
   };
 
   const handleNavigation = (href: string) => {
+    onClose();
     if (href.startsWith("#")) {
       const element = document.querySelector(href);
       element?.scrollIntoView({ behavior: "smooth" });
@@ -182,46 +185,46 @@ export const AppSidebar = ({ username }: AppSidebarProps) => {
     return currentPath === href || (href !== "/" && currentPath.startsWith(href.split("#")[0]));
   };
 
-  return (
-    <motion.aside
-      initial={{ x: -280 }}
-      animate={{ 
-        x: 0,
-        width: isCollapsed ? 64 : 280 
-      }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
-      className={cn(
-        "fixed left-0 top-0 bottom-0 z-40 bg-card border-r border-border flex flex-col",
-        isCollapsed ? "w-16" : "w-70"
-      )}
-    >
+  const sidebarContent = (
+    <>
       {/* Header */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-border">
+      <div className="h-16 flex items-center justify-between px-4 border-b border-border shrink-0">
         {!isCollapsed && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="flex items-center gap-2 cursor-pointer"
-            onClick={() => navigate("/")}
+            onClick={() => handleNavigation("/")}
           >
             <span className="text-2xl">🇰🇷</span>
             <span className="font-heading font-bold text-lg text-foreground">LUKATO</span>
           </motion.div>
         )}
         
+        {/* Desktop collapse button */}
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className={isCollapsed ? "mx-auto" : ""}
+          onClick={onToggleCollapse}
+          className={cn("hidden lg:flex", isCollapsed && "mx-auto")}
         >
           {isCollapsed ? <PanelLeft className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
+        </Button>
+
+        {/* Mobile close button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="lg:hidden"
+        >
+          <X className="w-5 h-5" />
         </Button>
       </div>
 
       {/* User Profile */}
       {!isCollapsed && username && (
-        <div className="px-4 py-3 border-b border-border">
+        <div className="px-4 py-3 border-b border-border shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
               <User className="w-5 h-5 text-primary" />
@@ -239,7 +242,7 @@ export const AppSidebar = ({ username }: AppSidebarProps) => {
         {/* Home Link */}
         <div className="px-2 mb-2">
           <button
-            onClick={() => navigate("/")}
+            onClick={() => handleNavigation("/")}
             className={cn(
               "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors",
               currentPath === "/" 
@@ -320,7 +323,7 @@ export const AppSidebar = ({ username }: AppSidebarProps) => {
       </nav>
 
       {/* Footer */}
-      <div className="p-2 border-t border-border">
+      <div className="p-2 border-t border-border shrink-0">
         {!isCollapsed ? (
           <Button 
             variant="outline"
@@ -341,7 +344,54 @@ export const AppSidebar = ({ username }: AppSidebarProps) => {
           </Button>
         )}
       </div>
-    </motion.aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Desktop Sidebar */}
+      <motion.aside
+        initial={{ x: -280 }}
+        animate={{ 
+          x: 0,
+          width: isCollapsed ? 64 : 280 
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className={cn(
+          "fixed left-0 top-0 bottom-0 z-40 bg-card border-r border-border flex-col hidden lg:flex",
+          isCollapsed ? "w-16" : "w-70"
+        )}
+      >
+        {sidebarContent}
+      </motion.aside>
+
+      {/* Mobile Sidebar with Backdrop */}
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={onClose}
+              className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden"
+            />
+
+            {/* Slide-out Menu */}
+            <motion.aside
+              initial={{ x: -280 }}
+              animate={{ x: 0 }}
+              exit={{ x: -280 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="fixed left-0 top-0 bottom-0 z-50 w-72 bg-card border-r border-border flex flex-col lg:hidden"
+            >
+              {sidebarContent}
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 
