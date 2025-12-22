@@ -1,0 +1,375 @@
+import { useState, useRef } from "react";
+import { motion } from "framer-motion";
+import { Sparkles, Upload, Wand2, Loader2, Crown, ImageIcon, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import CleanHeader from "@/components/CleanHeader";
+import AppFooter from "@/components/AppFooter";
+import { useSubscription } from "@/hooks/useSubscription";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { useNavigate } from "react-router-dom";
+
+type Difficulty = "easier" | "similar" | "harder";
+
+const difficultyOptions = [
+  {
+    id: "easier" as Difficulty,
+    emoji: "😊",
+    label: "Dễ hơn",
+    sublabel: "Số đơn giản, ít bước",
+    color: "from-green-500 to-emerald-600",
+    borderColor: "border-green-500",
+  },
+  {
+    id: "similar" as Difficulty,
+    emoji: "🎯",
+    label: "Tương tự",
+    sublabel: "Độ khó giữ nguyên",
+    color: "from-amber-500 to-orange-600",
+    borderColor: "border-amber-500",
+  },
+  {
+    id: "harder" as Difficulty,
+    emoji: "🔥",
+    label: "Khó hơn",
+    sublabel: "Thêm bước, số phức tạp",
+    color: "from-red-500 to-rose-600",
+    borderColor: "border-red-500",
+  },
+];
+
+const usageExamples = [
+  { subject: "Toán", example: "Chụp bài toán hàm số → AI tạo bài tương tự với số khác" },
+  { subject: "Lý", example: "Chụp bài động lực học → AI tạo bài với giá trị khác, thêm/bớt điều kiện" },
+  { subject: "Hóa", example: "Chụp bài cân bằng phương trình → AI tạo phương trình mới cùng dạng" },
+  { subject: "Anh", example: "Chụp bài điền từ → AI tạo đoạn văn khác với cấu trúc ngữ pháp tương tự" },
+];
+
+export default function QuestionVariant() {
+  const { isPremium, loading: subscriptionLoading } = useSubscription();
+  const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>("similar");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedContent, setGeneratedContent] = useState<string | null>(null);
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("Kích thước ảnh tối đa 10MB");
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setSelectedImage(event.target?.result as string);
+        setImageFile(file);
+        setGeneratedContent(null);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleChangeImage = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleGenerate = async () => {
+    if (!selectedImage || !imageFile) {
+      toast.error("Vui lòng chọn ảnh câu hỏi");
+      return;
+    }
+
+    if (!isPremium) {
+      toast.error("Tính năng dành cho thành viên Premium");
+      return;
+    }
+
+    setIsGenerating(true);
+    setGeneratedContent(null);
+
+    try {
+      // Convert image to base64 without the data URL prefix
+      const base64Data = selectedImage.split(",")[1];
+      const mimeType = imageFile.type;
+
+      const { data, error } = await supabase.functions.invoke("question-variant", {
+        body: {
+          imageBase64: base64Data,
+          imageMimeType: mimeType,
+          difficulty: selectedDifficulty,
+        },
+      });
+
+      if (error) {
+        console.error("Edge function error:", error);
+        throw new Error(error.message || "Lỗi khi gọi API");
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
+      setGeneratedContent(data.response);
+      toast.success("Tạo câu hỏi biến thể thành công!");
+    } catch (error) {
+      console.error("Error generating variant:", error);
+      toast.error(error instanceof Error ? error.message : "Có lỗi xảy ra, vui lòng thử lại");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  if (subscriptionLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <CleanHeader />
+      
+      <main className="container mx-auto px-4 py-8 pt-24">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
+        >
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground flex items-center justify-center gap-3 mb-3">
+            <Sparkles className="w-8 h-8 text-yellow-500" />
+            Biến thể đề thi
+            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white text-sm font-medium">
+              <Crown className="w-4 h-4" />
+              Premium
+            </span>
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            Chụp ảnh câu hỏi → AI tạo câu hỏi tương tự với độ khó tùy chọn
+          </p>
+        </motion.div>
+
+        {/* Premium Gate */}
+        {!isPremium && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="max-w-2xl mx-auto mb-8"
+          >
+            <Card className="border-amber-500/50 bg-gradient-to-br from-amber-500/10 to-orange-500/10">
+              <CardContent className="p-6 text-center">
+                <Crown className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-foreground mb-2">
+                  Tính năng Premium
+                </h3>
+                <p className="text-muted-foreground mb-4">
+                  Nâng cấp lên Premium để sử dụng tính năng biến thể đề thi không giới hạn
+                </p>
+                <Button 
+                  onClick={() => navigate("/pricing")}
+                  className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700"
+                >
+                  Nâng cấp Premium
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Instructions Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="max-w-4xl mx-auto mb-8"
+        >
+          <Card className="bg-card/50 border-border/50">
+            <CardContent className="p-6">
+              {/* Steps */}
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center">
+                  <span className="text-amber-500 text-sm">💡</span>
+                </div>
+                <h3 className="font-semibold text-amber-500">Hướng dẫn sử dụng (Rất đơn giản!)</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                {[
+                  { step: 1, title: "Chụp ảnh câu hỏi", desc: "Chụp màn hình hoặc chụp ảnh câu hỏi từ đề thi/sách" },
+                  { step: 2, title: "Chọn độ khó", desc: "Dễ hơn, tương tự, hoặc khó hơn câu gốc" },
+                  { step: 3, title: "Nhận kết quả", desc: "AI tạo câu hỏi mới + giải thích chi tiết" },
+                ].map((item) => (
+                  <div key={item.step} className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                      <span className="text-primary font-bold">{item.step}</span>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-foreground">{item.title}</h4>
+                      <p className="text-sm text-muted-foreground">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Examples */}
+              <div className="bg-amber-500/10 rounded-lg p-4">
+                <h4 className="font-medium text-amber-500 mb-2 flex items-center gap-2">
+                  💡 Ví dụ cách sử dụng:
+                </h4>
+                <ul className="space-y-1 text-sm text-muted-foreground">
+                  {usageExamples.map((ex, i) => (
+                    <li key={i}>
+                      <span className="text-amber-400 font-medium">• {ex.subject}:</span> {ex.example}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Main Content */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="max-w-4xl mx-auto"
+        >
+          {/* Image Upload Area */}
+          <Card className="mb-6 overflow-hidden">
+            <CardContent className="p-0">
+              {selectedImage ? (
+                <div className="relative">
+                  <img 
+                    src={selectedImage} 
+                    alt="Uploaded question" 
+                    className="w-full max-h-[500px] object-contain bg-black/50"
+                  />
+                  <Button
+                    onClick={handleChangeImage}
+                    className="absolute top-4 right-4 bg-background/80 hover:bg-background text-foreground"
+                    size="sm"
+                    disabled={!isPremium}
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Đổi ảnh
+                  </Button>
+                </div>
+              ) : (
+                <label 
+                  className={`flex flex-col items-center justify-center min-h-[300px] cursor-pointer border-2 border-dashed border-border/50 hover:border-primary/50 transition-colors ${!isPremium ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                    className="hidden"
+                    disabled={!isPremium}
+                  />
+                  <ImageIcon className="w-16 h-16 text-muted-foreground mb-4" />
+                  <p className="text-lg font-medium text-foreground mb-2">
+                    Tải ảnh câu hỏi lên
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Nhấn hoặc kéo thả ảnh vào đây (tối đa 10MB)
+                  </p>
+                </label>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageSelect}
+                className="hidden"
+                disabled={!isPremium}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Difficulty Selection */}
+          <div className="mb-6">
+            <h3 className="text-lg font-medium text-foreground mb-4">
+              Chọn độ khó của câu hỏi biến thể:
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {difficultyOptions.map((option) => (
+                <button
+                  key={option.id}
+                  onClick={() => isPremium && setSelectedDifficulty(option.id)}
+                  disabled={!isPremium}
+                  className={`p-4 rounded-xl border-2 transition-all ${
+                    selectedDifficulty === option.id
+                      ? `${option.borderColor} bg-gradient-to-br ${option.color} text-white`
+                      : "border-border bg-card hover:border-primary/50"
+                  } ${!isPremium ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                >
+                  <div className="text-3xl mb-2">{option.emoji}</div>
+                  <div className="font-bold">{option.label}</div>
+                  <div className={`text-sm ${selectedDifficulty === option.id ? "text-white/80" : "text-muted-foreground"}`}>
+                    {option.sublabel}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Generate Button */}
+          <Button
+            onClick={handleGenerate}
+            disabled={!selectedImage || !isPremium || isGenerating}
+            className="w-full py-6 text-lg font-bold bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 disabled:opacity-50"
+            size="lg"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Đang tạo câu hỏi biến thể...
+              </>
+            ) : (
+              <>
+                <Wand2 className="w-5 h-5 mr-2" />
+                Tạo câu hỏi biến thể
+              </>
+            )}
+          </Button>
+
+          {/* Generated Result */}
+          {generatedContent && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-8"
+            >
+              <Card className="bg-card border-primary/30">
+                <CardContent className="p-6">
+                  <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    Kết quả biến thể
+                  </h3>
+                  <div className="prose prose-invert max-w-none">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {generatedContent}
+                    </ReactMarkdown>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+        </motion.div>
+      </main>
+
+      <AppFooter />
+    </div>
+  );
+}

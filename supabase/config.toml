@@ -68,3 +68,6 @@ verify_jwt = true
 
 [functions.korea-career-search]
 verify_jwt = false
+
+[functions.question-variant]
+verify_jwt = true
