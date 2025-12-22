@@ -684,14 +684,33 @@ const Landing = () => {
               </div>
               <div>
                 <span className="font-heading font-bold text-foreground">LUKATO</span>
-                <span className="block text-xs text-muted-foreground">Nền tảng học tiếng Hàn #1 Việt Nam</span>
+                <span className="block text-xs text-muted-foreground">베트남 1위 한국어 학습 플랫폼</span>
               </div>
             </div>
             
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-foreground transition-colors">Điều khoản</a>
-              <a href="#" className="hover:text-foreground transition-colors">Bảo mật</a>
-              <a href="#" className="hover:text-foreground transition-colors">Liên hệ</a>
+              <a 
+                href="/terms" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:text-foreground transition-colors"
+              >
+                TERMS
+              </a>
+              <a 
+                href="/privacy" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:text-foreground transition-colors"
+              >
+                PRIVACY
+              </a>
+              <a 
+                href="/admin-login" 
+                className="hover:text-foreground transition-colors"
+              >
+                ADMIN
+              </a>
             </div>
             
             <p className="text-muted-foreground text-sm">
