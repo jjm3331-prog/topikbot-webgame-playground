@@ -5,19 +5,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
 const SYSTEM_PROMPTS = {
-  search: `Bạn là chuyên gia tư vấn du học và việc làm tại Hàn Quốc.
-Nhiệm vụ: Trả lời câu hỏi về du học, visa, việc làm tại Hàn Quốc cho người Việt Nam.
-
-Hướng dẫn:
-- Cung cấp thông tin chính xác, cập nhật về visa, học bổng, tuyển dụng
-- Nêu rõ các bước thủ tục, hồ sơ cần thiết
-- Đề cập đến các nguồn tham khảo chính thức (đại sứ quán, TOPIK, v.v.)
-- Trả lời bằng tiếng Việt, có thể kèm thuật ngữ tiếng Hàn khi cần
-- Format rõ ràng với bullet points và headers`,
-
   resume: `Bạn là chuyên gia chỉnh sửa CV và 자기소개서 (thư giới thiệu bản thân) cho người Việt xin việc tại Hàn Quốc.
 
 Nhiệm vụ:
@@ -64,6 +55,97 @@ Câu hỏi thường gặp:
 - Công việc hiện tại của bạn là gì?`
 };
 
+// Use Perplexity for real-time web search
+async function searchWithPerplexity(query: string): Promise<string> {
+  if (!PERPLEXITY_API_KEY) {
+    throw new Error("Perplexity API key not configured");
+  }
+
+  console.log("Searching with Perplexity:", query);
+
+  const response = await fetch("https://api.perplexity.ai/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${PERPLEXITY_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "sonar",
+      messages: [
+        { 
+          role: "system", 
+          content: `Bạn là chuyên gia tư vấn du học và việc làm tại Hàn Quốc cho người Việt Nam.
+Trả lời câu hỏi dựa trên thông tin mới nhất từ web.
+Luôn trích dẫn nguồn khi có thể.
+Trả lời bằng tiếng Việt, format rõ ràng với bullet points.
+Nếu có thông tin về thủ tục, hồ sơ, hãy liệt kê chi tiết.` 
+        },
+        { role: "user", content: query }
+      ],
+      search_recency_filter: "month",
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Perplexity API error:", response.status, errorText);
+    throw new Error(`Perplexity API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  let result = data.choices?.[0]?.message?.content || "Không tìm thấy kết quả.";
+  
+  // Append citations if available
+  if (data.citations && data.citations.length > 0) {
+    result += "\n\n📚 **Nguồn tham khảo:**\n";
+    data.citations.slice(0, 5).forEach((citation: string, idx: number) => {
+      result += `${idx + 1}. ${citation}\n`;
+    });
+  }
+
+  return result;
+}
+
+// Use Lovable AI for resume and interview
+async function chatWithLovableAI(systemPrompt: string, messages: Array<{role: string; content: string}>): Promise<string> {
+  if (!LOVABLE_API_KEY) {
+    throw new Error("Lovable API key not configured");
+  }
+
+  const apiMessages = [
+    { role: "system", content: systemPrompt },
+    ...messages
+  ];
+
+  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "google/gemini-2.5-flash",
+      messages: apiMessages,
+      max_tokens: 2000,
+      temperature: 0.7,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Lovable AI error:", response.status, errorText);
+    
+    if (response.status === 429) {
+      throw new Error("Quá nhiều yêu cầu. Vui lòng thử lại sau.");
+    }
+    
+    throw new Error("AI service error");
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || "Không thể xử lý yêu cầu.";
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -79,65 +161,33 @@ serve(async (req) => {
       );
     }
 
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY not configured");
-      return new Response(
-        JSON.stringify({ error: "API key not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    let result: string;
 
-    let systemPrompt = SYSTEM_PROMPTS.search;
-    
-    if (type === "resume") {
-      systemPrompt = SYSTEM_PROMPTS.resume;
+    if (type === "search") {
+      // Use Perplexity for real-time web search
+      console.log("Processing search request with Perplexity");
+      result = await searchWithPerplexity(query);
+    } else if (type === "resume") {
+      // Use Lovable AI for resume correction
+      console.log("Processing resume correction");
+      result = await chatWithLovableAI(SYSTEM_PROMPTS.resume, [
+        ...messages.map((m: any) => ({ role: m.role, content: m.content })),
+        { role: "user", content: query }
+      ]);
     } else if (type === "interview") {
-      systemPrompt = interviewType === "company" 
+      // Use Lovable AI for interview simulation
+      console.log("Processing interview simulation");
+      const systemPrompt = interviewType === "company" 
         ? SYSTEM_PROMPTS.interview_company 
         : SYSTEM_PROMPTS.interview_visa;
+      result = await chatWithLovableAI(systemPrompt, [
+        ...messages.map((m: any) => ({ role: m.role, content: m.content })),
+        { role: "user", content: query }
+      ]);
+    } else {
+      // Default to Perplexity search
+      result = await searchWithPerplexity(query);
     }
-
-    const apiMessages = [
-      { role: "system", content: systemPrompt },
-      ...messages.map((m: any) => ({ role: m.role, content: m.content })),
-      { role: "user", content: query }
-    ];
-
-    console.log(`Processing ${type} request:`, query.substring(0, 100));
-
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: apiMessages,
-        max_tokens: 2000,
-        temperature: 0.7,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("AI API error:", response.status, errorText);
-      
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Quá nhiều yêu cầu. Vui lòng thử lại sau." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      
-      return new Response(
-        JSON.stringify({ error: "AI service error" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const data = await response.json();
-    const result = data.choices?.[0]?.message?.content || "Không thể xử lý yêu cầu.";
 
     console.log(`${type} response generated successfully`);
 
