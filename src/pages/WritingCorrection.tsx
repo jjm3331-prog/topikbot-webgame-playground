@@ -21,7 +21,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { MegaMenu } from "@/components/MegaMenu";
+import CleanHeader from "@/components/CleanHeader";
 
 interface CorrectionResult {
   overall_score: number;
@@ -307,9 +307,9 @@ const WritingCorrection = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <MegaMenu />
+      <CleanHeader isLoggedIn={!!user} username={user?.email?.split('@')[0]} />
       
-      <main className="pt-24 pb-8 px-4 max-w-6xl mx-auto">
+      <main className="pt-[76px] pb-8 px-4 max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

@@ -80,7 +80,7 @@ export const CleanHeader = ({ isLoggedIn = false, username }: CleanHeaderProps) 
             
             {isLoggedIn ? (
               <>
-                {/* Notification Bell - Only when logged in */}
+                {/* Notification Bell */}
                 <Button
                   variant="ghost"
                   size="icon"
@@ -89,14 +89,26 @@ export const CleanHeader = ({ isLoggedIn = false, username }: CleanHeaderProps) 
                   <Bell className="w-4 h-4" />
                 </Button>
 
-                {/* User Profile - Only when logged in */}
+                {/* User Profile Button */}
                 <Button
                   variant="ghost"
-                  size="icon"
                   onClick={() => navigate("/profile")}
-                  className="w-9 h-9 rounded-full"
+                  className="h-9 px-3 rounded-full flex items-center gap-2"
                 >
                   <User className="w-4 h-4" />
+                  <span className="hidden sm:inline text-sm font-medium max-w-[100px] truncate">
+                    {username || 'User'}
+                  </span>
+                </Button>
+
+                {/* Logout Button */}
+                <Button 
+                  variant="outline"
+                  onClick={handleLogout}
+                  className="h-9 px-3 rounded-lg border-destructive/50 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                >
+                  <LogOut className="w-4 h-4 sm:mr-1" />
+                  <span className="hidden sm:inline text-sm">Đăng xuất</span>
                 </Button>
               </>
             ) : (

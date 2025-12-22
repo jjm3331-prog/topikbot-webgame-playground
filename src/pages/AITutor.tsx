@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { MegaMenu } from "@/components/MegaMenu";
+import CleanHeader from "@/components/CleanHeader";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
@@ -250,7 +250,7 @@ const AITutor = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <MegaMenu />
+      <CleanHeader isLoggedIn={!!user} username={user?.email?.split('@')[0]} />
       
       {/* Limit Reached Popup Dialog */}
       <Dialog open={showLimitPopup} onOpenChange={setShowLimitPopup}>
