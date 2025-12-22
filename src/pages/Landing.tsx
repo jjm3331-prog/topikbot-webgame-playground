@@ -564,9 +564,9 @@ const Landing = () => {
             transition={{ delay: 0.1 }}
             className="font-heading font-black text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-foreground mb-4 leading-tight"
           >
-            따라올 테면
+            Đủ giỏi thì
             <br />
-            <span className="text-gradient-primary">따라와 봐.</span>
+            <span className="text-gradient-primary">theo kịp đi.</span>
           </motion.h2>
 
           {/* Subtitle */}
@@ -577,11 +577,11 @@ const Landing = () => {
             transition={{ delay: 0.2 }}
             className="text-muted-foreground text-sm sm:text-base md:text-lg mb-8 max-w-xl mx-auto leading-relaxed"
           >
-            베트남의 모든 한국어 앱, 웹사이트, 학원들에게 전합니다.
+            Gửi đến tất cả các app, website, trung tâm dạy tiếng Hàn tại Việt Nam.
             <br className="hidden sm:block" />
-            <span className="text-foreground font-semibold">너희가 하는 건 기본이고,</span>
+            <span className="text-foreground font-semibold">Những gì các bạn làm được, chúng tôi làm tốt hơn.</span>
             <br className="hidden sm:block" />
-            <span className="text-foreground font-semibold">너희가 상상도 못 한 건 우리가 한다.</span>
+            <span className="text-foreground font-semibold">Những gì các bạn không dám nghĩ tới, chúng tôi đã làm rồi.</span>
           </motion.p>
 
           {/* Challenge points */}
@@ -594,18 +594,18 @@ const Landing = () => {
           >
             <div className="p-4 rounded-xl bg-card/80 border border-korean-red/20 backdrop-blur-sm">
               <div className="text-2xl mb-2">🎯</div>
-              <p className="text-xs sm:text-sm text-foreground font-medium">TOPIK 문제 출제?</p>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">우린 출제 교수진이 직접 만든다</p>
+              <p className="text-xs sm:text-sm text-foreground font-medium">Ra đề TOPIK?</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Chúng tôi có giáo sư ra đề TOPIK chính thức</p>
             </div>
             <div className="p-4 rounded-xl bg-card/80 border border-korean-orange/20 backdrop-blur-sm">
               <div className="text-2xl mb-2">🤖</div>
-              <p className="text-xs sm:text-sm text-foreground font-medium">AI 챗봇?</p>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">우린 RAG AI로 99.7% 정확도</p>
+              <p className="text-xs sm:text-sm text-foreground font-medium">AI Chatbot?</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">RAG AI của chúng tôi chính xác 99.7%</p>
             </div>
             <div className="p-4 rounded-xl bg-card/80 border border-korean-yellow/20 backdrop-blur-sm">
               <div className="text-2xl mb-2">🎮</div>
-              <p className="text-xs sm:text-sm text-foreground font-medium">학습 게임?</p>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">우린 K-Culture 전체를 넣었다</p>
+              <p className="text-xs sm:text-sm text-foreground font-medium">Game học tập?</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Chúng tôi tích hợp cả K-Culture vào đây</p>
             </div>
           </motion.div>
 
@@ -619,7 +619,7 @@ const Landing = () => {
           >
             <Swords className="w-4 h-4 sm:w-5 sm:h-5 text-korean-orange" />
             <span className="text-sm sm:text-base font-bold text-foreground">
-              Copy해도 좋아. 근데 따라올 수 있을까?
+              Copy thoải mái. Nhưng liệu có theo kịp không?
             </span>
           </motion.div>
         </motion.div>
@@ -654,20 +654,20 @@ const Landing = () => {
               <div className="flex-1 text-center md:text-left">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-semibold mb-3">
                   <Crown className="w-3 h-3 text-korean-yellow" />
-                  프리미엄 전용 서비스
+                  Dịch vụ dành cho Premium
                 </div>
                 <h3 className="font-heading font-black text-xl sm:text-2xl md:text-3xl text-white mb-2">
-                  한국 기업 <span className="text-korean-yellow">헤드헌팅</span> 서비스
+                  Dịch vụ <span className="text-korean-yellow">Headhunting</span> doanh nghiệp Hàn Quốc
                 </h3>
                 <p className="text-white/80 text-sm sm:text-base mb-4">
-                  전문 헤드헌터가 한국 기업 취업을 100% 무료로 도와드립니다.
+                  Đội ngũ headhunter chuyên nghiệp hỗ trợ bạn xin việc tại doanh nghiệp Hàn Quốc MIỄN PHÍ 100%.
                   <br className="hidden sm:block" />
-                  베트남 내 한국 기업부터 한국 현지 취업까지!
+                  Từ công ty Hàn Quốc tại Việt Nam đến cơ hội làm việc tại Hàn Quốc!
                 </p>
                 <div className="flex flex-wrap justify-center md:justify-start gap-2 sm:gap-4 text-xs sm:text-sm text-white/90 mb-4">
-                  <span className="flex items-center gap-1"><Check className="w-4 h-4 text-korean-green" /> 500+ 파트너 기업</span>
-                  <span className="flex items-center gap-1"><Check className="w-4 h-4 text-korean-green" /> 이력서 컨설팅</span>
-                  <span className="flex items-center gap-1"><Check className="w-4 h-4 text-korean-green" /> 비자 지원</span>
+                  <span className="flex items-center gap-1"><Check className="w-4 h-4 text-korean-green" /> 500+ công ty đối tác</span>
+                  <span className="flex items-center gap-1"><Check className="w-4 h-4 text-korean-green" /> Tư vấn CV</span>
+                  <span className="flex items-center gap-1"><Check className="w-4 h-4 text-korean-green" /> Hỗ trợ Visa</span>
                 </div>
               </div>
               
@@ -678,7 +678,7 @@ const Landing = () => {
                   size="lg"
                   className="h-12 sm:h-14 px-6 sm:px-8 bg-white hover:bg-white/90 text-korean-purple font-bold rounded-xl group"
                 >
-                  무료 신청하기
+                  Đăng ký miễn phí
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
