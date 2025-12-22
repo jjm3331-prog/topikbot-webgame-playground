@@ -52,6 +52,7 @@ const baseMenuCategories: MenuCategory[] = [
     emoji: "✈️",
     items: [
       { icon: Building, label: "Tìm việc tại Hàn Quốc", href: "/korea-career" },
+      { icon: Users, label: "Headhunting", href: "/headhunting", isPremium: true },
       { icon: BookOpen, label: "Tư vấn du học Hàn", href: "/tutorial" },
     ]
   },
@@ -61,6 +62,7 @@ const baseMenuCategories: MenuCategory[] = [
     items: [
       { icon: BookOpen, label: "TOPIK I (1-2급)", href: "/topik-1" },
       { icon: GraduationCap, label: "TOPIK II (3-6급)", href: "/topik-2" },
+      { icon: HelpCircle, label: "Hướng dẫn học", href: "/tutorial" },
     ]
   },
   {
@@ -83,6 +85,7 @@ const baseMenuCategories: MenuCategory[] = [
       { icon: MessageCircle, label: "Hỏi AI (30/ngày)", href: "/ai-tutor", isHighlight: true },
       { icon: PenTool, label: "Chấm bài viết", href: "/writing-correction", isPremium: true },
       { icon: Languages, label: "Dịch Hàn-Việt", href: "/translate" },
+      { icon: Star, label: "Bảng giá", href: "/pricing" },
     ]
   },
 ];
@@ -95,17 +98,10 @@ const myMenuCategory: MenuCategory = {
     { icon: Sparkles, label: "Tiến độ học tập", href: "/dashboard", isPremium: true },
     { icon: Trophy, label: "Xếp hạng của tôi", href: "/ranking" },
     { icon: FileX, label: "Sổ lỗi sai", href: "/mistakes", isPremium: true },
-    { icon: BookMarked, label: "Từ vựng đã lưu (15/50)", href: "/vocabulary" },
+    { icon: BookMarked, label: "Từ vựng đã lưu", href: "/vocabulary" },
     { icon: User, label: "Hồ sơ của tôi", href: "/profile" },
-    { icon: Users, label: "Mời bạn bè", href: "/profile#invite" },
   ]
 };
-
-// 하단 메뉴
-const bottomMenuItems: MenuItem[] = [
-  { icon: Star, label: "Bảng giá", href: "/pricing" },
-  { icon: HelpCircle, label: "Hướng dẫn", href: "/tutorial" },
-];
 
 interface MegaMenuOverlayProps {
   isOpen: boolean;
@@ -300,36 +296,6 @@ export const MegaMenuOverlay = ({
                     </motion.div>
                   ))}
 
-                  {/* Bottom Menu */}
-                  <motion.div 
-                    className="mt-4 px-4 pt-4 border-t border-border"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                  >
-                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                      KHÁC
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {bottomMenuItems.map((item) => {
-                        const active = isActive(item.href);
-                        return (
-                          <button
-                            key={item.label}
-                            onClick={() => handleNavigation(item.href)}
-                            className={`flex items-center gap-2 text-sm px-3 py-2 rounded-lg transition-colors ${
-                              active
-                                ? "bg-primary text-primary-foreground"
-                                : "text-muted-foreground hover:text-primary hover:bg-muted/50"
-                            }`}
-                          >
-                            <item.icon className="w-4 h-4" />
-                            <span>{item.label}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </motion.div>
                 </div>
 
                 {/* Auth Actions - Fixed Bottom */}
@@ -437,38 +403,6 @@ export const MegaMenuOverlay = ({
                   ))}
                   </div>
 
-                  {/* Bottom Menu */}
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                    className="mt-12 pt-6 border-t border-border"
-                  >
-                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-                      KHÁC
-                    </h3>
-                    <div className="flex flex-wrap gap-4">
-                      {bottomMenuItems.map((item) => {
-                        const active = isActive(item.href);
-                        return (
-                          <motion.button
-                            key={item.label}
-                            onClick={() => handleNavigation(item.href)}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className={`flex items-center gap-2 text-sm transition-all px-3 py-2 rounded-lg ${
-                              active 
-                                ? 'bg-primary text-primary-foreground' 
-                                : 'text-muted-foreground hover:text-primary hover:bg-muted/50'
-                            }`}
-                          >
-                            <item.icon className="w-4 h-4" />
-                            <span>{item.label}</span>
-                          </motion.button>
-                        );
-                      })}
-                    </div>
-                  </motion.div>
                 </div>
 
                 {/* Desktop: Auth Actions - Fixed Bottom */}
