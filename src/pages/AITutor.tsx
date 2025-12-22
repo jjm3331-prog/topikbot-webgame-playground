@@ -8,6 +8,8 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { MegaMenu } from "@/components/MegaMenu";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   Dialog,
   DialogContent,
@@ -353,12 +355,38 @@ const AITutor = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                   >
-                    <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                    <div className={`max-w-[85%] rounded-2xl px-5 py-4 ${
                       msg.role === "user" 
                         ? "bg-primary text-primary-foreground" 
                         : "bg-muted text-foreground"
                     }`}>
-                      <p className="whitespace-pre-wrap">{msg.content}</p>
+                      {msg.role === "user" ? (
+                        <p className="whitespace-pre-wrap">{msg.content}</p>
+                      ) : (
+                        <div className="prose prose-sm dark:prose-invert max-w-none
+                          prose-headings:text-foreground prose-headings:font-bold prose-headings:my-3
+                          prose-h1:text-xl prose-h2:text-lg prose-h3:text-base
+                          prose-p:text-foreground prose-p:my-2 prose-p:leading-relaxed
+                          prose-strong:text-primary prose-strong:font-bold
+                          prose-em:text-korean-purple prose-em:italic
+                          prose-ul:my-2 prose-ul:pl-4 prose-ol:my-2 prose-ol:pl-4
+                          prose-li:text-foreground prose-li:my-1
+                          prose-code:bg-background prose-code:text-korean-pink prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono
+                          prose-pre:bg-background prose-pre:border prose-pre:border-border prose-pre:rounded-lg prose-pre:p-4 prose-pre:overflow-x-auto
+                          prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-muted-foreground
+                          prose-a:text-primary prose-a:underline hover:prose-a:text-primary/80
+                          prose-table:w-full prose-table:border-collapse prose-table:my-4
+                          prose-thead:bg-muted/50
+                          prose-th:border prose-th:border-border prose-th:px-3 prose-th:py-2 prose-th:text-left prose-th:font-semibold prose-th:text-foreground
+                          prose-td:border prose-td:border-border prose-td:px-3 prose-td:py-2 prose-td:text-foreground
+                          prose-tr:even:bg-muted/30
+                          prose-hr:border-border prose-hr:my-4
+                        ">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {msg.content}
+                          </ReactMarkdown>
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 ))}
