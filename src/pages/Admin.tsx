@@ -11,7 +11,8 @@ import {
   Users, FileText, BarChart3, Bell, Settings, Upload, 
   Trash2, Loader2, ChevronLeft, Search, RefreshCw,
   TrendingUp, BookOpen, Gamepad2, MessageSquare, PenTool, Star,
-  Briefcase, Eye, CheckCircle, XCircle, Clock, Download, FileDown
+  Briefcase, Eye, CheckCircle, XCircle, Clock, Download, FileDown,
+  Crown, UserCheck
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -34,10 +35,13 @@ interface Document {
 interface UserProfile {
   id: string;
   username: string;
+  email?: string;
   points: number;
   money: number;
   hp: number;
   created_at: string;
+  subscription_plan?: string;
+  subscription_expires?: string;
 }
 
 interface HeadhuntingApplication {
@@ -78,6 +82,8 @@ const Admin = () => {
   // Users
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [userSearch, setUserSearch] = useState("");
+  const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
+  const [updatingSubscription, setUpdatingSubscription] = useState(false);
   
   // Documents
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -160,13 +166,27 @@ const Admin = () => {
         { title: "퀴즈 플레이", value: totalQuizHistory || 0, icon: <Gamepad2 className="w-5 h-5" />, color: "text-green-500" },
       ]);
 
-      // Load users
-      const { data: usersData } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(100);
-      setUsers(usersData || []);
+      // Load users via edge function to get emails
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${session?.access_token}`,
+            },
+            body: JSON.stringify({ action: "list" }),
+          }
+        );
+        const result = await response.json();
+        if (response.ok && result.users) {
+          setUsers(result.users);
+        }
+      } catch (error) {
+        console.error("Load users error:", error);
+      }
 
       // Load documents
       const { data: docsData } = await supabase
@@ -316,8 +336,57 @@ const Admin = () => {
   const filteredUsers = users.filter(
     (u) =>
       u.username.toLowerCase().includes(userSearch.toLowerCase()) ||
-      u.id.toLowerCase().includes(userSearch.toLowerCase())
+      u.id.toLowerCase().includes(userSearch.toLowerCase()) ||
+      (u.email && u.email.toLowerCase().includes(userSearch.toLowerCase()))
   );
+
+  const handleUpdateSubscription = async (userId: string, plan: string) => {
+    setUpdatingSubscription(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({ action: "update_subscription", userId, plan }),
+        }
+      );
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to update subscription");
+      }
+      toast({
+        title: "구독 변경 완료",
+        description: `사용자의 구독이 ${plan === 'premium' ? 'Premium' : plan === 'plus' ? 'Plus' : 'Free'}로 변경되었습니다.`,
+      });
+      await loadDashboardData();
+      setSelectedUser(null);
+    } catch (error: any) {
+      console.error("Update subscription error:", error);
+      toast({
+        title: "구독 변경 실패",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingSubscription(false);
+    }
+  };
+
+  const getSubscriptionBadge = (plan?: string) => {
+    switch (plan) {
+      case 'premium':
+        return <span className="px-2 py-1 text-xs rounded-full bg-gradient-to-r from-yellow-500 to-amber-500 text-white font-bold">Premium</span>;
+      case 'plus':
+        return <span className="px-2 py-1 text-xs rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold">Plus</span>;
+      default:
+        return <span className="px-2 py-1 text-xs rounded-full bg-muted text-muted-foreground">Free</span>;
+    }
+  };
 
   const filteredHeadhunting = headhuntingApplications.filter(
     (app) =>
@@ -673,53 +742,156 @@ const Admin = () => {
 
           {/* Users Tab */}
           <TabsContent value="users">
-            <Card>
-              <CardHeader>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <CardTitle>사용자 관리</CardTitle>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      placeholder="사용자 검색..."
-                      value={userSearch}
-                      onChange={(e) => setUserSearch(e.target.value)}
-                      className="pl-10 w-full sm:w-[300px]"
-                    />
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">사용자명</th>
-                        <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">포인트</th>
-                        <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">머니</th>
-                        <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">HP</th>
-                        <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">가입일</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+            <div className="grid lg:grid-cols-3 gap-6">
+              {/* Users List */}
+              <div className="lg:col-span-2">
+                <Card>
+                  <CardHeader>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <CardTitle className="flex items-center gap-2">
+                        <Users className="w-5 h-5 text-blue-500" />
+                        사용자 관리 ({users.length})
+                      </CardTitle>
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          placeholder="이름, 이메일 검색..."
+                          value={userSearch}
+                          onChange={(e) => setUserSearch(e.target.value)}
+                          className="pl-10 w-full sm:w-[250px]"
+                        />
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2 max-h-[600px] overflow-y-auto">
                       {filteredUsers.map((user) => (
-                        <tr key={user.id} className="border-b border-border/50 hover:bg-muted/50">
-                          <td className="py-3 px-4 text-sm font-medium">{user.username}</td>
-                          <td className="py-3 px-4 text-sm">{user.points.toLocaleString()}</td>
-                          <td className="py-3 px-4 text-sm">{user.money.toLocaleString()}₩</td>
-                          <td className="py-3 px-4 text-sm">{user.hp}</td>
-                          <td className="py-3 px-4 text-sm text-muted-foreground">
-                            {new Date(user.created_at).toLocaleDateString("ko-KR")}
-                          </td>
-                        </tr>
+                        <div
+                          key={user.id}
+                          onClick={() => setSelectedUser(user)}
+                          className={`p-4 rounded-lg border cursor-pointer transition-all ${
+                            selectedUser?.id === user.id
+                              ? 'border-primary bg-primary/5'
+                              : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="font-semibold truncate">{user.username}</h4>
+                                {getSubscriptionBadge(user.subscription_plan)}
+                              </div>
+                              <p className="text-sm text-muted-foreground truncate">{user.email || 'No email'}</p>
+                              <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                                <span>포인트: {user.points.toLocaleString()}</span>
+                                <span>머니: {user.money.toLocaleString()}₩</span>
+                              </div>
+                            </div>
+                            <Eye className="w-4 h-4 text-muted-foreground shrink-0" />
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            {new Date(user.created_at).toLocaleDateString("ko-KR")} 가입
+                          </p>
+                        </div>
                       ))}
-                    </tbody>
-                  </table>
-                  {filteredUsers.length === 0 && (
-                    <p className="text-center py-8 text-muted-foreground">검색 결과가 없습니다.</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                      {filteredUsers.length === 0 && (
+                        <p className="text-center py-8 text-muted-foreground">
+                          {userSearch ? '검색 결과가 없습니다.' : '사용자가 없습니다.'}
+                        </p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* User Detail */}
+              <div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <UserCheck className="w-4 h-4" />
+                      사용자 상세
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {selectedUser ? (
+                      <div className="space-y-4 text-sm">
+                        <div>
+                          <p className="text-muted-foreground text-xs mb-1">사용자명</p>
+                          <p className="font-medium">{selectedUser.username}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground text-xs mb-1">이메일</p>
+                          <p className="break-all">{selectedUser.email || '-'}</p>
+                        </div>
+                        <div className="grid grid-cols-3 gap-3">
+                          <div>
+                            <p className="text-muted-foreground text-xs mb-1">포인트</p>
+                            <p>{selectedUser.points.toLocaleString()}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground text-xs mb-1">머니</p>
+                            <p>{selectedUser.money.toLocaleString()}₩</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground text-xs mb-1">HP</p>
+                            <p>{selectedUser.hp}</p>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground text-xs mb-1">현재 구독</p>
+                          <div className="mt-1">{getSubscriptionBadge(selectedUser.subscription_plan)}</div>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground text-xs mb-1">가입일</p>
+                          <p>{new Date(selectedUser.created_at).toLocaleDateString("ko-KR")}</p>
+                        </div>
+                        
+                        <div className="pt-4 border-t space-y-2">
+                          <p className="text-muted-foreground text-xs mb-2 flex items-center gap-1">
+                            <Crown className="w-3 h-3" /> 구독 권한 변경
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              disabled={updatingSubscription || selectedUser.subscription_plan === 'free'}
+                              onClick={() => handleUpdateSubscription(selectedUser.id, 'free')}
+                            >
+                              {updatingSubscription ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
+                              Free
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              className="border-blue-500/50 text-blue-500 hover:bg-blue-500/10"
+                              disabled={updatingSubscription || selectedUser.subscription_plan === 'plus'}
+                              onClick={() => handleUpdateSubscription(selectedUser.id, 'plus')}
+                            >
+                              {updatingSubscription ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
+                              Plus
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              className="bg-gradient-to-r from-yellow-500 to-amber-500 text-white hover:from-yellow-600 hover:to-amber-600"
+                              disabled={updatingSubscription || selectedUser.subscription_plan === 'premium'}
+                              onClick={() => handleUpdateSubscription(selectedUser.id, 'premium')}
+                            >
+                              {updatingSubscription ? <Loader2 className="w-3 h-3 animate-spin" /> : <Crown className="w-3 h-3 mr-1" />}
+                              Premium
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground text-sm text-center py-8">
+                        왼쪽에서 사용자를 선택하세요
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </TabsContent>
 
           {/* Documents Tab */}
