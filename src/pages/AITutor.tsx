@@ -274,7 +274,7 @@ const AITutor = () => {
                   <span className="font-bold text-foreground">Dành cho Plus / Premium</span>
                 </div>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Trải nghiệm <span className="font-bold text-primary">LUKATO AI Agent</span> - dịch vụ hỏi đáp AI cao cấp nhất với công nghệ RAG AI tiên tiến, không giới hạn số lượng câu hỏi!
+                  Trải nghiệm <span className="font-bold text-primary">LUKATO AI Agent</span> - dịch vụ hỏi đáp AI cao cấp nhất với công nghệ LUKATO RAG AI Tech tiên tiến, không giới hạn số lượng câu hỏi!
                 </p>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Sparkles className="w-4 h-4 text-korean-yellow" />
@@ -372,7 +372,7 @@ const AITutor = () => {
                   </h3>
                   <p className="text-muted-foreground mb-4">
                     Bạn đã sử dụng hết {MAX_FREE_QUESTIONS} câu hỏi miễn phí trong 24 giờ.
-                    Nâng cấp Premium để hỏi AI không giới hạn với công nghệ RAG AI tiên tiến nhất!
+                    Nâng cấp Premium để hỏi AI không giới hạn với công nghệ LUKATO RAG AI Tech tiên tiến nhất!
                   </p>
                   <div className="flex flex-wrap gap-3">
                     <Button
