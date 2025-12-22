@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -19,9 +19,10 @@ import {
   Gift
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import MegaMenu from "@/components/MegaMenu";
 import CommonFooter from "@/components/CommonFooter";
+import confetti from "canvas-confetti";
 
 interface Profile {
   id: string;
@@ -130,8 +131,28 @@ const Dashboard = () => {
         longest_streak: newLongestStreak
       } : null);
       
+      // Celebration confetti animation
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#F38181']
+      });
+      
+      // Extra confetti for 7-day streak bonus
+      if (newStreak === 7) {
+        setTimeout(() => {
+          confetti({
+            particleCount: 200,
+            spread: 100,
+            origin: { y: 0.5 },
+            colors: ['#FFD700', '#FFA500', '#FF4500']
+          });
+        }, 300);
+      }
+      
       toast({
-        title: `+${pointsToAdd} điểm!`,
+        title: `🎉 +${pointsToAdd} điểm!`,
         description: `Điểm danh ngày ${newStreak} thành công!${bonusMessage}`,
       });
     }
