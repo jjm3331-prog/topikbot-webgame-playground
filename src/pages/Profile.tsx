@@ -29,8 +29,8 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import MegaMenu from "@/components/MegaMenu";
-import Footer from "@/components/Footer";
+import CleanHeader from "@/components/CleanHeader";
+import CommonFooter from "@/components/CommonFooter";
 
 interface Profile {
   id: string;
@@ -244,9 +244,9 @@ const Profile = () => {
 
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col">
-      <MegaMenu />
+      <CleanHeader isLoggedIn={true} username={profile?.username} />
 
-      <main className="flex-1 pt-20 pb-12 px-4">
+      <main className="flex-1 pt-[76px] pb-12 px-4">
         <div className="max-w-2xl mx-auto">
           {/* Back Button */}
           <motion.button
@@ -569,7 +569,7 @@ const Profile = () => {
         </div>
       </main>
 
-      <Footer />
+      <CommonFooter />
     </div>
   );
 };

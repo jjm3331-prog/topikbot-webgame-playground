@@ -13,8 +13,8 @@ import {
   Flame
 } from "lucide-react";
 import { motion } from "framer-motion";
-import AppHeader from "@/components/AppHeader";
-import AppFooter from "@/components/AppFooter";
+import CleanHeader from "@/components/CleanHeader";
+import CommonFooter from "@/components/CommonFooter";
 
 interface RankingProfile {
   id: string;
@@ -83,8 +83,8 @@ const Ranking = () => {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-b from-[#1a1a2e] via-[#16213e] to-[#0f0f23] flex flex-col">
-      <AppHeader title="랭킹" titleVi="Xếp hạng" />
+    <div className="min-h-[100dvh] bg-background flex flex-col">
+      <CleanHeader isLoggedIn={!!currentUserId} />
 
       {/* Title */}
       <div className="px-4 py-3 text-center shrink-0">
