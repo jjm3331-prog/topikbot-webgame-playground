@@ -100,8 +100,9 @@ export const CleanHeader = ({ isLoggedIn = false, username }: CleanHeaderProps) 
 
       <MegaMenuOverlay 
         isOpen={isMenuOpen} 
-        onClose={() => setIsMenuOpen(false)} 
+        onClose={() => setIsMenuOpen(false)}
         isLoggedIn={isLoggedIn}
+        onLogout={handleLogout}
       />
     </>
   );
