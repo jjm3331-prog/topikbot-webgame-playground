@@ -50,3 +50,9 @@ verify_jwt = true
 
 [functions.writing-correction]
 verify_jwt = true
+
+[functions.korean-tts]
+verify_jwt = false
+
+[functions.korean-stt]
+verify_jwt = false
