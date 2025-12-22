@@ -206,9 +206,11 @@ const Landing = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
             transition={{ duration: 0.5, delay: 0.5 }}
-            className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-xl mx-auto mb-6 px-2"
+            className="text-muted-foreground text-xs sm:text-sm md:text-base max-w-xl mx-auto mb-6 px-2"
           >
-            Super App học tiếng Hàn từ <span className="text-primary font-semibold">giáo sư ra đề TOPIK</span> + <span className="text-primary font-semibold">LUKATO RAG AI Tech</span>
+            Super App học tiếng Hàn từ
+            <br />
+            <span className="text-primary font-semibold">giáo sư ra đề TOPIK</span> + <span className="text-primary font-semibold">LUKATO RAG AI Tech</span>
           </motion.p>
 
           {/* CTA */}
@@ -288,13 +290,13 @@ const Landing = () => {
       {/* ========== STATS SECTION WITH ANIMATED COUNTERS ========== */}
       <section className="py-10 sm:py-16 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0 }}
-              className="floating-card p-4 sm:p-6 text-center group"
+              className="floating-card p-3 sm:p-6 text-center group"
             >
               <motion.div
                 initial={{ scale: 0 }}
@@ -302,12 +304,12 @@ const Landing = () => {
                 viewport={{ once: true }}
                 transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
               >
-                <Users className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 sm:mb-3 text-primary group-hover:scale-110 transition-transform" />
+                <Users className="w-5 h-5 sm:w-8 sm:h-8 mx-auto mb-1.5 sm:mb-3 text-primary group-hover:scale-110 transition-transform" />
               </motion.div>
-              <div className="font-black text-2xl sm:text-3xl md:text-4xl text-gradient-primary mb-1">
+              <div className="font-black text-lg sm:text-2xl md:text-3xl text-gradient-primary mb-0.5 sm:mb-1">
                 <AnimatedCounter target={50000} suffix="+" duration={2.5} />
               </div>
-              <div className="text-muted-foreground text-xs sm:text-sm">Học viên</div>
+              <div className="text-muted-foreground text-[10px] sm:text-xs">Học viên</div>
             </motion.div>
             
             <motion.div
@@ -315,7 +317,7 @@ const Landing = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="floating-card p-4 sm:p-6 text-center group"
+              className="floating-card p-3 sm:p-6 text-center group"
             >
               <motion.div
                 initial={{ scale: 0 }}
@@ -323,12 +325,12 @@ const Landing = () => {
                 viewport={{ once: true }}
                 transition={{ type: "spring", stiffness: 200, delay: 0.3 }}
               >
-                <Cpu className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 sm:mb-3 text-korean-purple group-hover:scale-110 transition-transform" />
+                <Cpu className="w-5 h-5 sm:w-8 sm:h-8 mx-auto mb-1.5 sm:mb-3 text-korean-purple group-hover:scale-110 transition-transform" />
               </motion.div>
-              <div className="font-black text-2xl sm:text-3xl md:text-4xl text-gradient-secondary mb-1">
+              <div className="font-black text-lg sm:text-2xl md:text-3xl text-gradient-secondary mb-0.5 sm:mb-1">
                 <AnimatedCounter target={99.7} suffix="%" duration={2} />
               </div>
-              <div className="text-muted-foreground text-xs sm:text-sm">AI 정확도</div>
+              <div className="text-muted-foreground text-[10px] sm:text-xs">AI 정확도</div>
             </motion.div>
             
             <motion.div
@@ -336,7 +338,7 @@ const Landing = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="floating-card p-4 sm:p-6 text-center group"
+              className="floating-card p-3 sm:p-6 text-center group"
             >
               <motion.div
                 initial={{ scale: 0 }}
@@ -344,12 +346,12 @@ const Landing = () => {
                 viewport={{ once: true }}
                 transition={{ type: "spring", stiffness: 200, delay: 0.4 }}
               >
-                <Trophy className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 sm:mb-3 text-korean-yellow group-hover:scale-110 transition-transform" />
+                <Trophy className="w-5 h-5 sm:w-8 sm:h-8 mx-auto mb-1.5 sm:mb-3 text-korean-yellow group-hover:scale-110 transition-transform" />
               </motion.div>
-              <div className="font-black text-2xl sm:text-3xl md:text-4xl text-korean-yellow mb-1">
+              <div className="font-black text-lg sm:text-2xl md:text-3xl text-korean-yellow mb-0.5 sm:mb-1">
                 #1
               </div>
-              <div className="text-muted-foreground text-xs sm:text-sm">TOPIK App VN</div>
+              <div className="text-muted-foreground text-[10px] sm:text-xs">TOPIK App VN</div>
             </motion.div>
             
             <motion.div
@@ -357,7 +359,7 @@ const Landing = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className="floating-card p-4 sm:p-6 text-center group"
+              className="floating-card p-3 sm:p-6 text-center group"
             >
               <motion.div
                 initial={{ scale: 0 }}
@@ -365,12 +367,12 @@ const Landing = () => {
                 viewport={{ once: true }}
                 transition={{ type: "spring", stiffness: 200, delay: 0.5 }}
               >
-                <Zap className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 sm:mb-3 text-korean-green group-hover:scale-110 transition-transform" />
+                <Zap className="w-5 h-5 sm:w-8 sm:h-8 mx-auto mb-1.5 sm:mb-3 text-korean-green group-hover:scale-110 transition-transform" />
               </motion.div>
-              <div className="font-black text-2xl sm:text-3xl md:text-4xl text-korean-green mb-1">
+              <div className="font-black text-lg sm:text-2xl md:text-3xl text-korean-green mb-0.5 sm:mb-1">
                 24/7
               </div>
-              <div className="text-muted-foreground text-xs sm:text-sm">AI hỗ trợ</div>
+              <div className="text-muted-foreground text-[10px] sm:text-xs">AI hỗ trợ</div>
             </motion.div>
           </div>
         </div>
