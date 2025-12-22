@@ -74,6 +74,54 @@ export type Database = {
         }
         Relationships: []
       }
+      learning_progress: {
+        Row: {
+          category: string
+          completed: boolean | null
+          completed_at: string | null
+          correct_count: number | null
+          created_at: string
+          id: string
+          lesson_id: string
+          level: number
+          score: number | null
+          time_spent_seconds: number | null
+          total_count: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          completed?: boolean | null
+          completed_at?: string | null
+          correct_count?: number | null
+          created_at?: string
+          id?: string
+          lesson_id: string
+          level: number
+          score?: number | null
+          time_spent_seconds?: number | null
+          total_count?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          completed?: boolean | null
+          completed_at?: string | null
+          correct_count?: number | null
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          level?: number
+          score?: number | null
+          time_spent_seconds?: number | null
+          total_count?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       manager_chapter_logs: {
         Row: {
           chapter_number: number
