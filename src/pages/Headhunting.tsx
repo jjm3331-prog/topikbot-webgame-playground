@@ -210,6 +210,15 @@ const Headhunting = () => {
 
       if (error) throw error;
 
+      // Send notification to user
+      await supabase.from("notifications").insert({
+        title: "🎉 헤드헌팅 서비스 신청 완료!",
+        message: `${formData.full_name}님의 헤드헌팅 서비스 신청이 접수되었습니다. 전문 헤드헌터가 3-5일 내에 검토 후 연락드리겠습니다.`,
+        type: "success",
+        target_user_id: user.id,
+        is_global: false,
+      });
+
       setSubmitted(true);
       toast.success("헤드헌팅 서비스 신청이 완료되었습니다!");
     } catch (error: any) {

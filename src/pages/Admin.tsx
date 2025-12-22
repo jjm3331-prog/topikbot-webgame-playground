@@ -11,7 +11,7 @@ import {
   Users, FileText, BarChart3, Bell, Settings, Upload, 
   Trash2, Loader2, ChevronLeft, Search, RefreshCw,
   TrendingUp, BookOpen, Gamepad2, MessageSquare, PenTool, Star,
-  Briefcase, Eye, CheckCircle, XCircle, Clock
+  Briefcase, Eye, CheckCircle, XCircle, Clock, Download, FileDown
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -60,6 +60,9 @@ interface HeadhuntingApplication {
   status: string;
   created_at: string;
   updated_at: string;
+  resume_url: string | null;
+  cover_letter_url: string | null;
+  portfolio_url: string | null;
 }
 
 const Admin = () => {
@@ -572,6 +575,71 @@ const Admin = () => {
                           <div>
                             <p className="text-muted-foreground text-xs mb-1">자기소개</p>
                             <p className="text-xs leading-relaxed">{selectedApplication.introduction}</p>
+                          </div>
+                        )}
+                        
+                        {/* File Downloads Section */}
+                        {(selectedApplication.resume_url || selectedApplication.cover_letter_url || selectedApplication.portfolio_url) && (
+                          <div className="pt-3 border-t">
+                            <p className="text-muted-foreground text-xs mb-2 flex items-center gap-1">
+                              <FileDown className="w-3 h-3" /> 첨부 파일
+                            </p>
+                            <div className="space-y-2">
+                              {selectedApplication.resume_url && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="w-full justify-start gap-2"
+                                  onClick={async () => {
+                                    const { data } = await supabase.storage
+                                      .from('resumes')
+                                      .createSignedUrl(selectedApplication.resume_url!, 60);
+                                    if (data?.signedUrl) {
+                                      window.open(data.signedUrl, '_blank');
+                                    }
+                                  }}
+                                >
+                                  <Download className="w-3 h-3" />
+                                  이력서 다운로드
+                                </Button>
+                              )}
+                              {selectedApplication.cover_letter_url && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="w-full justify-start gap-2"
+                                  onClick={async () => {
+                                    const { data } = await supabase.storage
+                                      .from('resumes')
+                                      .createSignedUrl(selectedApplication.cover_letter_url!, 60);
+                                    if (data?.signedUrl) {
+                                      window.open(data.signedUrl, '_blank');
+                                    }
+                                  }}
+                                >
+                                  <Download className="w-3 h-3" />
+                                  자기소개서 다운로드
+                                </Button>
+                              )}
+                              {selectedApplication.portfolio_url && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="w-full justify-start gap-2"
+                                  onClick={async () => {
+                                    const { data } = await supabase.storage
+                                      .from('resumes')
+                                      .createSignedUrl(selectedApplication.portfolio_url!, 60);
+                                    if (data?.signedUrl) {
+                                      window.open(data.signedUrl, '_blank');
+                                    }
+                                  }}
+                                >
+                                  <Download className="w-3 h-3" />
+                                  포트폴리오 다운로드
+                                </Button>
+                              )}
+                            </div>
                           </div>
                         )}
                         <div className="pt-4 border-t space-y-2">
