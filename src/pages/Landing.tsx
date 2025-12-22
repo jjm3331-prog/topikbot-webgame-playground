@@ -100,12 +100,13 @@ const gameModes = [
 
 // Comparison with competitors
 const comparisonFeatures = [
-  { feature: "Giáo sư ra đề TOPIK Hàn Quốc chính thức", lukato: true, others: false },
-  { feature: "10,000+ tài liệu TOPIK & kiến thức Hàn Quốc", lukato: true, others: false },
-  { feature: "STT/TTS AI nghe-nói chuẩn bản xứ", lukato: true, others: false },
-  { feature: "AI chấm Writing & CV siêu chính xác", lukato: true, others: false },
-  { feature: "Headhunting & Tư vấn việc làm Hàn Quốc", lukato: true, others: false },
-  { feature: "K-Culture tích hợp (K-POP, K-Drama)", lukato: true, others: false },
+  { feature: "TOPIK 출제위원 검증 커리큘럼", lukato: true, others: false },
+  { feature: "LUKATO RAG AI Tech (독자 AI 기술)", lukato: true, others: false },
+  { feature: "10,000+ TOPIK 기출 & 예상문제", lukato: true, others: false },
+  { feature: "AI 음성인식 & TTS (네이티브 발음)", lukato: true, others: false },
+  { feature: "AI Writing & CV 초정밀 채점", lukato: true, others: false },
+  { feature: "Headhunting & 한국 취업 컨설팅", lukato: true, others: false },
+  { feature: "K-Culture 통합 (K-POP, K-Drama)", lukato: true, others: false },
 ];
 
 // Counter animation component
