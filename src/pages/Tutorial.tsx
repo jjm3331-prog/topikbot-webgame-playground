@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import MegaMenu from "@/components/MegaMenu";
+import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 
 const Tutorial = () => {
@@ -178,9 +178,9 @@ const Tutorial = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <MegaMenu />
+      <CleanHeader />
 
-      <main className="flex-1 pt-[76px] pb-8 px-4 sm:px-6 lg:px-8">
+      <main className="flex-1 pb-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           {/* Hero Section */}
           <motion.div

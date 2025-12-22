@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import MegaMenu from "@/components/MegaMenu";
+import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 
 interface QuizOption {
@@ -144,7 +144,7 @@ const Quiz = () => {
 
   return (
     <div className="min-h-[100dvh] bg-gradient-to-b from-amber-900 via-orange-900 to-[#0f0f23] flex flex-col overflow-hidden">
-      <MegaMenu />
+      <CleanHeader />
       
       {/* Stats Bar */}
       <div className="px-3 py-2 flex items-center justify-between border-b border-white/10 shrink-0">

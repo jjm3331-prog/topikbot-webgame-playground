@@ -1,6 +1,6 @@
 import { ChevronLeft, Mail, Phone, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import MegaMenu from "@/components/MegaMenu";
+import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 
 const Privacy = () => {
@@ -8,9 +8,9 @@ const Privacy = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <MegaMenu />
+      <CleanHeader />
 
-      <main className="flex-1 pt-[76px] container mx-auto px-4 py-12 max-w-4xl">
+      <main className="flex-1 container mx-auto px-4 py-12 max-w-4xl">
         <div className="mb-6">
           <button
             onClick={() => navigate(-1)}

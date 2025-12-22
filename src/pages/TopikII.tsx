@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import MegaMenu from "@/components/MegaMenu";
+import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import CategoryTabs, { LearningCategory } from "@/components/learning/CategoryTabs";
 import LessonCard from "@/components/learning/LessonCard";
@@ -172,9 +172,9 @@ const TopikII = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <MegaMenu />
+      <CleanHeader />
       
-      <main className="flex-1 pt-[76px] pb-24">
+      <main className="flex-1 pb-24">
         <div className="container mx-auto px-4 max-w-6xl">
           {/* Header */}
           <motion.div

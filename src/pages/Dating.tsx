@@ -9,7 +9,7 @@ import {
   Crown, Loader2, Gift, Gamepad2, Star, Camera
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import MegaMenu from "@/components/MegaMenu";
+import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 
 // Components
@@ -227,7 +227,7 @@ const Dating = () => {
 
   return (
     <div className="min-h-[100dvh] bg-gradient-to-b from-pink-900 via-purple-900 to-[#0f0f23] flex flex-col">
-      <MegaMenu />
+      <CleanHeader />
       
       {/* Modals */}
       <AnimatePresence>
