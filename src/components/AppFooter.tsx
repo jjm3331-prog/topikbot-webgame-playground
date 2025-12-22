@@ -37,6 +37,15 @@ const AppFooter = () => {
               <ExternalLink className="w-3.5 h-3.5" />
               Q&A Agent
             </a>
+            <a 
+              href="/admin-login" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-sm text-white/60 hover:text-white/90 transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              ADMIN
+            </a>
           </div>
 
           {/* Copyright */}
