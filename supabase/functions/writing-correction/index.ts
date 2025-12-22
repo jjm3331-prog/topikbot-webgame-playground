@@ -97,6 +97,8 @@ serve(async (req) => {
       text: "Hãy chấm điểm và trả về kết quả theo định dạng JSON đã quy định."
     });
 
+    console.log("Calling Gemini 2.5 Flash via Lovable AI Gateway for writing correction");
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -104,11 +106,13 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: userContent }
         ],
+        max_tokens: 65536,
+        temperature: 0.7,
       }),
     });
 
@@ -119,13 +123,21 @@ serve(async (req) => {
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: "Credits exhausted. Please contact admin." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
       const errorText = await response.text();
-      console.error("AI API error:", response.status, errorText);
-      throw new Error(`AI API error: ${response.status}`);
+      console.error("Lovable AI Gateway error:", response.status, errorText);
+      throw new Error(`Lovable AI Gateway error: ${response.status}`);
     }
 
     const data = await response.json();
     let aiResponse = data.choices?.[0]?.message?.content || "";
+
+    console.log("Lovable AI Gateway response received successfully");
 
     // Extract JSON from response
     const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
@@ -146,7 +158,8 @@ serve(async (req) => {
       strengths: result.strengths || [],
       improvements: result.improvements || [],
       model_answer: result.model_answer || "",
-      detailed_feedback: result.detailed_feedback || ""
+      detailed_feedback: result.detailed_feedback || "",
+      model: "gemini-2.5-flash"
     };
 
     return new Response(
