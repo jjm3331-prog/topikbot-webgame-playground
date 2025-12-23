@@ -14,7 +14,9 @@ import {
   CheckCircle,
   X,
   Image as ImageIcon,
-  Lock
+  Lock,
+  Edit3,
+  Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -72,8 +74,21 @@ const WritingCorrection = () => {
   const [savedCorrections, setSavedCorrections] = useState<SavedCorrection[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   
+  // Daily free usage state
+  const [canUseFreeToday, setCanUseFreeToday] = useState(false);
+  const [nextFreeTime, setNextFreeTime] = useState<Date | null>(null);
+  const [checkingFreeUsage, setCheckingFreeUsage] = useState(true);
+  
+  // OCR text editing state
+  const [ocrRecognizedText, setOcrRecognizedText] = useState<string>("");
+  const [showOcrEditModal, setShowOcrEditModal] = useState(false);
+  const [ocrEditingType, setOcrEditingType] = useState<"question" | "answer" | null>(null);
+  const [ocrProcessing, setOcrProcessing] = useState(false);
+  
   const questionInputRef = useRef<HTMLInputElement>(null);
+  const questionCameraRef = useRef<HTMLInputElement>(null);
   const answerInputRef = useRef<HTMLInputElement>(null);
+  const answerCameraRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     checkAuth();
@@ -86,8 +101,74 @@ const WritingCorrection = () => {
       return;
     }
     setUser(session.user);
-    await loadHistory(session.user.id);
+    await Promise.all([
+      loadHistory(session.user.id),
+      checkDailyFreeUsage(session.user.id)
+    ]);
     setLoading(false);
+  };
+
+  const checkDailyFreeUsage = async (userId: string) => {
+    setCheckingFreeUsage(true);
+    try {
+      const { data, error } = await supabase
+        .from("writing_free_usage")
+        .select("*")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error("Error checking free usage:", error);
+        setCanUseFreeToday(true); // Default to allowing if error
+        return;
+      }
+
+      if (!data) {
+        // No usage record, user can use for free
+        setCanUseFreeToday(true);
+        setNextFreeTime(null);
+      } else {
+        const lastUsed = new Date(data.last_used_at);
+        const now = new Date();
+        const hoursSinceLastUse = (now.getTime() - lastUsed.getTime()) / (1000 * 60 * 60);
+        
+        if (hoursSinceLastUse >= 24) {
+          setCanUseFreeToday(true);
+          setNextFreeTime(null);
+        } else {
+          setCanUseFreeToday(false);
+          const nextAvailable = new Date(lastUsed.getTime() + 24 * 60 * 60 * 1000);
+          setNextFreeTime(nextAvailable);
+        }
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setCanUseFreeToday(true);
+    } finally {
+      setCheckingFreeUsage(false);
+    }
+  };
+
+  const recordFreeUsage = async (userId: string) => {
+    const { data: existing } = await supabase
+      .from("writing_free_usage")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (existing) {
+      await supabase
+        .from("writing_free_usage")
+        .update({ last_used_at: new Date().toISOString() })
+        .eq("user_id", userId);
+    } else {
+      await supabase
+        .from("writing_free_usage")
+        .insert({ user_id: userId, last_used_at: new Date().toISOString() });
+    }
+    
+    setCanUseFreeToday(false);
+    setNextFreeTime(new Date(Date.now() + 24 * 60 * 60 * 1000));
   };
 
   const loadHistory = async (userId: string) => {
@@ -124,9 +205,52 @@ const WritingCorrection = () => {
       } else {
         setAnswerImage(file);
         setAnswerImagePreview(preview);
+        // When answer image is uploaded, offer OCR editing
+        setOcrEditingType("answer");
+        performOCR(preview, "answer");
       }
     };
     reader.readAsDataURL(file);
+  };
+
+  const performOCR = async (imageBase64: string, type: "question" | "answer") => {
+    if (type !== "answer") return; // Only OCR for answer images
+    
+    setOcrProcessing(true);
+    try {
+      // Use Gemini to extract text from image
+      const response = await supabase.functions.invoke("writing-correction", {
+        body: {
+          ocrOnly: true,
+          answerImageUrl: imageBase64
+        }
+      });
+
+      if (response.data?.extractedText) {
+        setOcrRecognizedText(response.data.extractedText);
+        setShowOcrEditModal(true);
+      }
+    } catch (error) {
+      console.error("OCR error:", error);
+      // If OCR fails, just continue without it
+    } finally {
+      setOcrProcessing(false);
+    }
+  };
+
+  const handleOcrConfirm = () => {
+    if (ocrRecognizedText.trim()) {
+      setAnswerText(ocrRecognizedText);
+      setAnswerMethod("text"); // Switch to text mode with edited text
+    }
+    setShowOcrEditModal(false);
+    setOcrRecognizedText("");
+  };
+
+  const handleOcrCancel = () => {
+    setShowOcrEditModal(false);
+    setOcrRecognizedText("");
+    // Keep using image mode
   };
 
   const uploadImage = async (file: File, path: string): Promise<string | null> => {
@@ -203,6 +327,12 @@ const WritingCorrection = () => {
       if (response.error) throw response.error;
 
       setResult(response.data);
+      
+      // If using free usage, record it
+      if (!isPremium && canUseFreeToday) {
+        await recordFreeUsage(user.id);
+      }
+      
       toast({
         title: "Chấm điểm hoàn tất!",
         description: `Điểm số: ${response.data.overall_score}/100`
@@ -255,7 +385,6 @@ const WritingCorrection = () => {
   const handleExportPDF = () => {
     if (!result) return;
     
-    // Create printable content
     const content = `
       TOPIK Writing Correction Report
       ================================
@@ -302,6 +431,18 @@ const WritingCorrection = () => {
     });
   };
 
+  const formatTimeRemaining = (targetDate: Date) => {
+    const now = new Date();
+    const diff = targetDate.getTime() - now.getTime();
+    if (diff <= 0) return "Có thể sử dụng ngay";
+    
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours}h ${minutes}m`;
+  };
+
+  const canSubmit = isPremium || canUseFreeToday;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -322,6 +463,34 @@ const WritingCorrection = () => {
         >
           {/* Premium Preview Banner */}
           {!isPremium && <PremiumPreviewBanner featureName="chấm bài viết AI" />}
+          
+          {/* Daily Free Usage Banner for non-premium users */}
+          {!isPremium && !checkingFreeUsage && (
+            <Card className={`p-4 ${canUseFreeToday ? 'bg-green-500/10 border-green-500/30' : 'bg-blue-500/10 border-blue-500/30'}`}>
+              <div className="flex items-center gap-3">
+                <Clock className={`w-5 h-5 ${canUseFreeToday ? 'text-green-500' : 'text-blue-500'} shrink-0`} />
+                <div className="flex-1">
+                  {canUseFreeToday ? (
+                    <>
+                      <p className="font-medium text-green-600 dark:text-green-400">🎁 Bạn có 1 lượt chấm miễn phí hôm nay!</p>
+                      <p className="text-sm text-muted-foreground">
+                        Mỗi ngày bạn được sử dụng 1 lần miễn phí. Nâng cấp Premium để không giới hạn.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="font-medium text-blue-600 dark:text-blue-400">⏰ Đã sử dụng lượt miễn phí hôm nay</p>
+                      <p className="text-sm text-muted-foreground">
+                        Lượt miễn phí tiếp theo: {nextFreeTime ? formatTimeRemaining(nextFreeTime) : 'N/A'}. 
+                        Nâng cấp Premium để không giới hạn.
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
+            </Card>
+          )}
+          
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="text-center flex-1">
@@ -366,8 +535,17 @@ const WritingCorrection = () => {
                   1. Upload đề bài gốc
                 </h3>
                 
+                {/* File upload input (no capture - for file selection) */}
                 <input
                   ref={questionInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload(e, "question")}
+                  className="hidden"
+                />
+                {/* Camera input (with capture - for camera) */}
+                <input
+                  ref={questionCameraRef}
                   type="file"
                   accept="image/*"
                   capture="environment"
@@ -407,12 +585,7 @@ const WritingCorrection = () => {
                     <Button
                       variant="outline"
                       className="flex-1"
-                      onClick={() => {
-                        if (questionInputRef.current) {
-                          questionInputRef.current.capture = "environment";
-                          questionInputRef.current.click();
-                        }
-                      }}
+                      onClick={() => questionCameraRef.current?.click()}
                     >
                       <Camera className="w-4 h-4 mr-2" />
                       Chụp ảnh
@@ -453,8 +626,17 @@ const WritingCorrection = () => {
                   </TabsContent>
 
                   <TabsContent value="image">
+                    {/* File upload input (no capture - for file selection) */}
                     <input
                       ref={answerInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, "answer")}
+                      className="hidden"
+                    />
+                    {/* Camera input (with capture - for camera) */}
+                    <input
+                      ref={answerCameraRef}
                       type="file"
                       accept="image/*"
                       capture="environment"
@@ -480,6 +662,14 @@ const WritingCorrection = () => {
                         >
                           <X className="w-4 h-4" />
                         </Button>
+                        {ocrProcessing && (
+                          <div className="absolute inset-0 bg-background/80 flex items-center justify-center rounded-lg">
+                            <div className="text-center">
+                              <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
+                              <p className="text-sm">Đang nhận dạng văn bản...</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div className="flex gap-3">
@@ -494,12 +684,7 @@ const WritingCorrection = () => {
                         <Button
                           variant="outline"
                           className="flex-1"
-                          onClick={() => {
-                            if (answerInputRef.current) {
-                              answerInputRef.current.capture = "environment";
-                              answerInputRef.current.click();
-                            }
-                          }}
+                          onClick={() => answerCameraRef.current?.click()}
                         >
                           <Camera className="w-4 h-4 mr-2" />
                           Chụp ảnh
@@ -511,7 +696,7 @@ const WritingCorrection = () => {
               </Card>
 
               {/* Submit Button */}
-              {isPremium ? (
+              {canSubmit ? (
                 <Button
                   onClick={handleSubmit}
                   disabled={processing || !questionImage}
@@ -525,7 +710,7 @@ const WritingCorrection = () => {
                   ) : (
                     <>
                       <PenTool className="w-5 h-5 mr-2" />
-                      Chấm điểm AI
+                      {isPremium ? 'Chấm điểm AI' : '🎁 Chấm điểm miễn phí (1/ngày)'}
                     </>
                   )}
                 </Button>
@@ -712,6 +897,62 @@ const WritingCorrection = () => {
                   ))}
                 </div>
               </Card>
+            </motion.div>
+          )}
+
+          {/* OCR Edit Modal */}
+          {showOcrEditModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              onClick={() => setShowOcrEditModal(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="bg-card border border-border rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
+                    <Edit3 className="w-5 h-5 text-primary" />
+                    Chỉnh sửa văn bản nhận dạng
+                  </h3>
+                  <Button variant="ghost" size="sm" onClick={handleOcrCancel}>
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+                
+                <p className="text-sm text-muted-foreground mb-4">
+                  AI đã nhận dạng văn bản từ hình ảnh. Vui lòng kiểm tra và chỉnh sửa nếu có lỗi:
+                </p>
+                
+                <Textarea
+                  value={ocrRecognizedText}
+                  onChange={(e) => setOcrRecognizedText(e.target.value)}
+                  placeholder="Văn bản nhận dạng từ hình ảnh..."
+                  className="min-h-[200px] resize-none mb-4"
+                />
+                
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={handleOcrCancel}
+                  >
+                    Bỏ qua, dùng ảnh gốc
+                  </Button>
+                  <Button
+                    className="flex-1 btn-primary text-primary-foreground"
+                    onClick={handleOcrConfirm}
+                    disabled={!ocrRecognizedText.trim()}
+                  >
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Xác nhận văn bản
+                  </Button>
+                </div>
+              </motion.div>
             </motion.div>
           )}
         </motion.div>
