@@ -586,7 +586,7 @@ ${prioritySection}
           )}
           
           {/* Header */}
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 mt-6 pt-4">
             <div className="text-center flex-1">
               <h1 className="text-xl sm:text-2xl font-heading font-bold text-foreground">
                 ✍️ Chấm Writing TOPIK II (51~54)
