@@ -22,14 +22,11 @@ export const SimpleHeader = () => {
           {/* Logo */}
           <motion.div 
             whileHover={{ scale: 1.02 }}
-            className="flex items-center gap-2 sm:gap-3 cursor-pointer"
+            className="flex items-center gap-2 cursor-pointer"
             onClick={() => navigate("/")}
           >
-            <span className="text-2xl sm:text-3xl">🇰🇷</span>
-            <div>
-              <span className="font-heading font-bold text-lg sm:text-xl text-foreground">LUKATO AI</span>
-              <span className="hidden sm:block text-xs text-muted-foreground -mt-0.5">Học tiếng Hàn #1 VN</span>
-            </div>
+            <span className="text-xl sm:text-2xl">🇰🇷</span>
+            <span className="font-heading font-bold text-base sm:text-lg text-foreground whitespace-nowrap">LUKATO AI</span>
           </motion.div>
 
           {/* Desktop Navigation Trigger */}
@@ -62,7 +59,8 @@ export const SimpleHeader = () => {
             {/* Login Button */}
             <Button 
               onClick={() => navigate("/auth")}
-              className="btn-primary text-primary-foreground rounded-xl font-semibold px-4 sm:px-6 text-sm sm:text-base"
+              size="sm"
+              className="btn-primary text-primary-foreground rounded-lg font-medium px-3 text-xs sm:text-sm"
             >
               Đăng nhập
             </Button>
