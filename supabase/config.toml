@@ -80,3 +80,9 @@ verify_jwt = false
 
 [functions.roleplay-speak]
 verify_jwt = false
+
+[functions.company-deep-report]
+verify_jwt = false
+
+[functions.interview-simulation]
+verify_jwt = false
