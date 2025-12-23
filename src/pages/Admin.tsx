@@ -12,8 +12,17 @@ import {
   Trash2, Loader2, ChevronLeft, Search, RefreshCw,
   TrendingUp, BookOpen, Gamepad2, MessageSquare, PenTool, Star,
   Briefcase, Eye, CheckCircle, XCircle, Clock, Download, FileDown,
-  Crown, UserCheck, ChevronRight, Shield
+  Crown, UserCheck, ChevronRight, Shield, Send, Globe, User, AlertTriangle, Info
 } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { motion } from "framer-motion";
 
 interface StatCard {
@@ -102,6 +111,24 @@ const Admin = () => {
   const [headhuntingSearch, setHeadhuntingSearch] = useState("");
   const [adminMessage, setAdminMessage] = useState("");
   const [sendingMessage, setSendingMessage] = useState(false);
+
+  // Notifications
+  const [notificationTitle, setNotificationTitle] = useState("");
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [notificationType, setNotificationType] = useState<"info" | "success" | "warning" | "error">("info");
+  const [isGlobalNotification, setIsGlobalNotification] = useState(true);
+  const [targetUserId, setTargetUserId] = useState("");
+  const [sendingNotification, setSendingNotification] = useState(false);
+  const [notifications, setNotifications] = useState<Array<{
+    id: string;
+    title: string;
+    message: string;
+    type: string;
+    is_global: boolean;
+    target_user_id: string | null;
+    created_at: string;
+  }>>([]);
+  const [loadingNotifications, setLoadingNotifications] = useState(false);
 
   useEffect(() => {
     checkAdminAccess();
@@ -215,11 +242,119 @@ const Admin = () => {
         .order("created_at", { ascending: false });
       setHeadhuntingApplications(headhuntingData || []);
 
+      // Load notifications
+      await loadNotifications();
+
     } catch (error) {
       console.error("Load data error:", error);
       toast({
         title: "데이터 로드 실패",
         description: "데이터를 불러오는 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const loadNotifications = async () => {
+    setLoadingNotifications(true);
+    try {
+      const { data, error } = await supabase
+        .from("notifications")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(50);
+      
+      if (error) throw error;
+      setNotifications(data || []);
+    } catch (error) {
+      console.error("Load notifications error:", error);
+    } finally {
+      setLoadingNotifications(false);
+    }
+  };
+
+  const handleSendNotification = async () => {
+    if (!notificationTitle.trim() || !notificationMessage.trim()) {
+      toast({
+        title: "입력 오류",
+        description: "제목과 내용을 모두 입력해주세요.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isGlobalNotification && !targetUserId.trim()) {
+      toast({
+        title: "입력 오류",
+        description: "특정 사용자에게 보내려면 사용자 ID를 입력해주세요.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSendingNotification(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const { error } = await supabase.from("notifications").insert({
+        title: notificationTitle.trim(),
+        message: notificationMessage.trim(),
+        type: notificationType,
+        is_global: isGlobalNotification,
+        target_user_id: isGlobalNotification ? null : targetUserId.trim(),
+        created_by: user?.id,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "알림 발송 완료",
+        description: isGlobalNotification 
+          ? "모든 사용자에게 알림이 발송되었습니다." 
+          : "특정 사용자에게 알림이 발송되었습니다.",
+      });
+
+      // Reset form
+      setNotificationTitle("");
+      setNotificationMessage("");
+      setNotificationType("info");
+      setIsGlobalNotification(true);
+      setTargetUserId("");
+
+      // Reload notifications
+      await loadNotifications();
+    } catch (error) {
+      console.error("Send notification error:", error);
+      toast({
+        title: "알림 발송 실패",
+        description: "알림을 발송하는 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    } finally {
+      setSendingNotification(false);
+    }
+  };
+
+  const handleDeleteNotification = async (notificationId: string) => {
+    try {
+      const { error } = await supabase
+        .from("notifications")
+        .delete()
+        .eq("id", notificationId);
+
+      if (error) throw error;
+
+      toast({
+        title: "알림 삭제 완료",
+        description: "알림이 삭제되었습니다.",
+      });
+
+      setNotifications(prev => prev.filter(n => n.id !== notificationId));
+    } catch (error) {
+      console.error("Delete notification error:", error);
+      toast({
+        title: "알림 삭제 실패",
+        description: "알림을 삭제하는 중 오류가 발생했습니다.",
         variant: "destructive",
       });
     }
@@ -1154,19 +1289,205 @@ const Admin = () => {
 
           {/* Notifications Tab */}
           <TabsContent value="notifications">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Bell className="w-5 h-5" />
-                  알림 관리
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  알림 발송 기능은 추후 추가 예정입니다.
-                </p>
-              </CardContent>
-            </Card>
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Send Notification Form */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Send className="w-5 h-5" />
+                    새 알림 발송
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="notification-title">알림 제목</Label>
+                    <Input
+                      id="notification-title"
+                      placeholder="알림 제목을 입력하세요"
+                      value={notificationTitle}
+                      onChange={(e) => setNotificationTitle(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="notification-message">알림 내용</Label>
+                    <Textarea
+                      id="notification-message"
+                      placeholder="알림 내용을 입력하세요"
+                      value={notificationMessage}
+                      onChange={(e) => setNotificationMessage(e.target.value)}
+                      rows={4}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>알림 유형</Label>
+                    <Select value={notificationType} onValueChange={(value: "info" | "success" | "warning" | "error") => setNotificationType(value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="info">
+                          <div className="flex items-center gap-2">
+                            <Info className="w-4 h-4 text-blue-500" />
+                            정보
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="success">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4 text-green-500" />
+                            성공
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="warning">
+                          <div className="flex items-center gap-2">
+                            <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                            경고
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="error">
+                          <div className="flex items-center gap-2">
+                            <XCircle className="w-4 h-4 text-red-500" />
+                            오류
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>발송 대상</Label>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant={isGlobalNotification ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setIsGlobalNotification(true)}
+                        className="flex-1"
+                      >
+                        <Globe className="w-4 h-4 mr-2" />
+                        전체 사용자
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={!isGlobalNotification ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setIsGlobalNotification(false)}
+                        className="flex-1"
+                      >
+                        <User className="w-4 h-4 mr-2" />
+                        특정 사용자
+                      </Button>
+                    </div>
+                  </div>
+
+                  {!isGlobalNotification && (
+                    <div className="space-y-2">
+                      <Label htmlFor="target-user">대상 사용자 ID</Label>
+                      <Input
+                        id="target-user"
+                        placeholder="사용자 ID (UUID)"
+                        value={targetUserId}
+                        onChange={(e) => setTargetUserId(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        사용자 탭에서 사용자 ID를 확인할 수 있습니다.
+                      </p>
+                    </div>
+                  )}
+
+                  <Button
+                    onClick={handleSendNotification}
+                    disabled={sendingNotification}
+                    className="w-full"
+                  >
+                    {sendingNotification ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        발송 중...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4 mr-2" />
+                        알림 발송
+                      </>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Notifications List */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Bell className="w-5 h-5" />
+                      발송된 알림 ({notifications.length})
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={loadNotifications}>
+                      <RefreshCw className={`w-4 h-4 ${loadingNotifications ? "animate-spin" : ""}`} />
+                    </Button>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                    {loadingNotifications ? (
+                      <div className="flex justify-center py-8">
+                        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                      </div>
+                    ) : notifications.length === 0 ? (
+                      <p className="text-center py-8 text-muted-foreground">
+                        발송된 알림이 없습니다.
+                      </p>
+                    ) : (
+                      notifications.map((notification) => (
+                        <div
+                          key={notification.id}
+                          className="p-4 bg-muted/50 rounded-lg flex items-start justify-between gap-4"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h4 className="font-medium truncate">{notification.title}</h4>
+                              <Badge variant={
+                                notification.type === "success" ? "default" :
+                                notification.type === "warning" ? "secondary" :
+                                notification.type === "error" ? "destructive" : "outline"
+                              }>
+                                {notification.type === "info" && "정보"}
+                                {notification.type === "success" && "성공"}
+                                {notification.type === "warning" && "경고"}
+                                {notification.type === "error" && "오류"}
+                              </Badge>
+                              <Badge variant="outline">
+                                {notification.is_global ? (
+                                  <><Globe className="w-3 h-3 mr-1" />전체</>
+                                ) : (
+                                  <><User className="w-3 h-3 mr-1" />개인</>
+                                )}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                              {notification.message}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-2">
+                              {new Date(notification.created_at).toLocaleString("ko-KR")}
+                            </p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => handleDeleteNotification(notification.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </main>
