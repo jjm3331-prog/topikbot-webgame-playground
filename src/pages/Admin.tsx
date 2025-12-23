@@ -67,6 +67,7 @@ interface HeadhuntingApplication {
   resume_url: string | null;
   cover_letter_url: string | null;
   portfolio_url: string | null;
+  admin_notes: string | null;
 }
 
 const ADMIN_EMAIL = "lukas@tam9.me";
@@ -99,6 +100,8 @@ const Admin = () => {
   const [headhuntingApplications, setHeadhuntingApplications] = useState<HeadhuntingApplication[]>([]);
   const [selectedApplication, setSelectedApplication] = useState<HeadhuntingApplication | null>(null);
   const [headhuntingSearch, setHeadhuntingSearch] = useState("");
+  const [adminMessage, setAdminMessage] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
 
   useEffect(() => {
     checkAdminAccess();
@@ -340,6 +343,61 @@ const Admin = () => {
         description: error.message,
         variant: "destructive",
       });
+    }
+  };
+
+  const handleSendMessageToApplicant = async () => {
+    if (!selectedApplication || !adminMessage.trim()) {
+      toast({
+        title: "메시지 입력 필요",
+        description: "전송할 메시지를 입력해주세요.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSendingMessage(true);
+    try {
+      // Update admin_notes in application
+      const { error: updateError } = await supabase
+        .from("headhunting_applications")
+        .update({ 
+          admin_notes: adminMessage,
+          updated_at: new Date().toISOString() 
+        })
+        .eq("id", selectedApplication.id);
+
+      if (updateError) throw updateError;
+
+      // Send notification to user
+      const { error: notifError } = await supabase
+        .from("notifications")
+        .insert({
+          title: "📩 Headhunting: Tin nhắn mới từ tư vấn viên",
+          message: adminMessage,
+          type: "info",
+          target_user_id: selectedApplication.user_id,
+          is_global: false,
+        });
+
+      if (notifError) throw notifError;
+
+      toast({
+        title: "메시지 전송 완료",
+        description: `${selectedApplication.full_name}님에게 메시지가 전송되었습니다.`,
+      });
+
+      setAdminMessage("");
+      await loadDashboardData();
+    } catch (error: any) {
+      console.error("Send message error:", error);
+      toast({
+        title: "전송 실패",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSendingMessage(false);
     }
   };
 
@@ -731,6 +789,38 @@ const Admin = () => {
                             </div>
                           </div>
                         )}
+                        {/* Message to Applicant */}
+                        <div className="pt-4 border-t space-y-2">
+                          <p className="text-muted-foreground text-xs mb-2 flex items-center gap-1">
+                            <MessageSquare className="w-3 h-3" /> 지원자에게 메시지 보내기
+                          </p>
+                          {selectedApplication.admin_notes && (
+                            <div className="p-2 bg-muted/50 rounded-lg text-xs mb-2">
+                              <p className="text-muted-foreground mb-1">이전 메시지:</p>
+                              <p className="text-foreground">{selectedApplication.admin_notes}</p>
+                            </div>
+                          )}
+                          <Textarea
+                            placeholder="지원자에게 전송할 메시지를 입력하세요..."
+                            value={adminMessage}
+                            onChange={(e) => setAdminMessage(e.target.value)}
+                            className="min-h-[80px] text-sm"
+                          />
+                          <Button 
+                            size="sm" 
+                            className="w-full"
+                            onClick={handleSendMessageToApplicant}
+                            disabled={sendingMessage || !adminMessage.trim()}
+                          >
+                            {sendingMessage ? (
+                              <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                            ) : (
+                              <Bell className="w-3 h-3 mr-1" />
+                            )}
+                            알림 메시지 전송
+                          </Button>
+                        </div>
+
                         <div className="pt-4 border-t space-y-2">
                           <p className="text-muted-foreground text-xs mb-2">상태 변경</p>
                           <div className="flex flex-wrap gap-2">

@@ -27,7 +27,11 @@ import {
   Upload,
   FileText,
   X,
-  Lock
+  Lock,
+  Pencil,
+  Trash2,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import { PremiumPreviewBanner } from "@/components/PremiumPreviewBanner";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -54,6 +58,9 @@ const Headhunting = () => {
   const [submitted, setSubmitted] = useState(false);
   const [applications, setApplications] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [editingApplication, setEditingApplication] = useState<any | null>(null);
+  const [expandedAppId, setExpandedAppId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   
   const resumeInputRef = useRef<HTMLInputElement>(null);
   const coverLetterInputRef = useRef<HTMLInputElement>(null);
@@ -162,6 +169,59 @@ const Headhunting = () => {
     setResumeUpload({ file: null, uploading: false, url: null, error: null });
     setCoverLetterUpload({ file: null, uploading: false, url: null, error: null });
     setPortfolioUpload({ file: null, uploading: false, url: null, error: null });
+    setEditingApplication(null);
+  };
+
+  const handleEditApplication = (app: any) => {
+    setEditingApplication(app);
+    setFormData({
+      full_name: app.full_name || "",
+      email: app.email || "",
+      phone: app.phone || "",
+      birth_year: app.birth_year?.toString() || "",
+      education_level: app.education_level || "",
+      university_name: app.university_name || "",
+      major: app.major || "",
+      graduation_year: app.graduation_year?.toString() || "",
+      topik_level: app.topik_level?.toString() || "",
+      work_experience_years: app.work_experience_years?.toString() || "",
+      current_job_title: app.current_job_title || "",
+      current_company: app.current_company || "",
+      work_experience_details: app.work_experience_details || "",
+      desired_job_type: app.desired_job_type || "",
+      desired_industry: app.desired_industry || "",
+      desired_location: app.desired_location || "",
+      desired_salary_range: app.desired_salary_range || "",
+      introduction: app.introduction || "",
+      strengths: app.strengths || "",
+      career_goals: app.career_goals || "",
+      additional_skills: app.additional_skills || "",
+    });
+    setShowForm(true);
+  };
+
+  const handleDeleteApplication = async (appId: string) => {
+    if (!confirm("Bạn có chắc muốn xóa đơn đăng ký này? Hành động này không thể hoàn tác.")) {
+      return;
+    }
+
+    setDeletingId(appId);
+    try {
+      const { error } = await supabase
+        .from("headhunting_applications")
+        .delete()
+        .eq("id", appId);
+
+      if (error) throw error;
+
+      toast.success("Đã xóa đơn đăng ký thành công");
+      await checkUser();
+    } catch (error: any) {
+      console.error("Delete error:", error);
+      toast.error("Không thể xóa đơn đăng ký");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const uploadFile = async (
@@ -236,8 +296,7 @@ const Headhunting = () => {
 
     setLoading(true);
     try {
-      const { error } = await supabase.from("headhunting_applications").insert({
-        user_id: user.id,
+      const applicationData = {
         full_name: formData.full_name,
         email: formData.email,
         phone: formData.phone || null,
@@ -259,25 +318,45 @@ const Headhunting = () => {
         strengths: formData.strengths || null,
         career_goals: formData.career_goals || null,
         additional_skills: formData.additional_skills || null,
-        resume_url: resumeUpload.url || null,
-        cover_letter_url: coverLetterUpload.url || null,
-        portfolio_url: portfolioUpload.url || null,
-        status: "pending",
-      });
+        resume_url: resumeUpload.url || editingApplication?.resume_url || null,
+        cover_letter_url: coverLetterUpload.url || editingApplication?.cover_letter_url || null,
+        portfolio_url: portfolioUpload.url || editingApplication?.portfolio_url || null,
+        updated_at: new Date().toISOString(),
+      };
 
-      if (error) throw error;
+      if (editingApplication) {
+        // Update existing application
+        const { error } = await supabase
+          .from("headhunting_applications")
+          .update(applicationData)
+          .eq("id", editingApplication.id);
 
-      // Send notification to user
-      await supabase.from("notifications").insert({
-        title: "🎉 헤드헌팅 서비스 신청 완료!",
-        message: `${formData.full_name}님의 헤드헌팅 서비스 신청이 접수되었습니다. 전문 헤드헌터가 3-5일 내에 검토 후 연락드리겠습니다.`,
-        type: "success",
-        target_user_id: user.id,
-        is_global: false,
-      });
+        if (error) throw error;
+        toast.success("Đã cập nhật đơn đăng ký thành công!");
+      } else {
+        // Create new application
+        const { error } = await supabase.from("headhunting_applications").insert({
+          user_id: user.id,
+          ...applicationData,
+          status: "pending",
+        });
+
+        if (error) throw error;
+
+        // Send notification to user
+        await supabase.from("notifications").insert({
+          title: "🎉 Đăng ký Headhunting thành công!",
+          message: `${formData.full_name}, đơn đăng ký của bạn đã được gửi. Đội ngũ Headhunter sẽ liên hệ trong 3-5 ngày.`,
+          type: "success",
+          target_user_id: user.id,
+          is_global: false,
+        });
+
+        toast.success("Đăng ký dịch vụ Headhunting thành công!");
+      }
 
       setSubmitted(true);
-      toast.success("Đăng ký dịch vụ Headhunting thành công!");
+      setEditingApplication(null);
     } catch (error: any) {
       console.error("Submit error:", error);
       toast.error("Có lỗi xảy ra khi đăng ký");
@@ -318,6 +397,9 @@ const Headhunting = () => {
             <div className="space-y-4 mb-8">
               {applications.map((app, idx) => {
                 const statusInfo = getStatusInfo(app.status);
+                const isExpanded = expandedAppId === app.id;
+                const canEdit = app.status === 'pending' || app.status === 'rejected';
+                
                 return (
                   <motion.div
                     key={app.id}
@@ -325,47 +407,101 @@ const Headhunting = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.1 }}
                   >
-                    <Card className="p-5 hover:shadow-lg transition-shadow">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="text-2xl">{statusInfo.icon}</span>
-                            <div>
-                              <h3 className="font-semibold text-foreground">{app.full_name}</h3>
-                              <p className="text-xs text-muted-foreground">
-                                {new Date(app.created_at).toLocaleDateString('vi-VN', {
-                                  year: 'numeric',
-                                  month: 'long',
-                                  day: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
-                              </p>
+                    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+                      <div className="p-5">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className="text-2xl">{statusInfo.icon}</span>
+                              <div>
+                                <h3 className="font-semibold text-foreground">{app.full_name}</h3>
+                                <p className="text-xs text-muted-foreground">
+                                  {new Date(app.created_at).toLocaleDateString('vi-VN', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                              {app.desired_job_type && (
+                                <span className="px-2 py-0.5 bg-muted rounded-full">{app.desired_job_type}</span>
+                              )}
+                              {app.desired_industry && (
+                                <span className="px-2 py-0.5 bg-muted rounded-full">{app.desired_industry}</span>
+                              )}
+                              {app.topik_level && (
+                                <span className="px-2 py-0.5 bg-muted rounded-full">TOPIK {app.topik_level}</span>
+                              )}
                             </div>
                           </div>
-                          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                            {app.desired_job_type && (
-                              <span className="px-2 py-0.5 bg-muted rounded-full">{app.desired_job_type}</span>
-                            )}
-                            {app.desired_industry && (
-                              <span className="px-2 py-0.5 bg-muted rounded-full">{app.desired_industry}</span>
-                            )}
-                            {app.topik_level && (
-                              <span className="px-2 py-0.5 bg-muted rounded-full">TOPIK {app.topik_level}</span>
-                            )}
+                          <div className="flex items-center gap-2">
+                            <span className={`px-3 py-1.5 rounded-full text-xs font-medium border ${statusInfo.color}`}>
+                              {statusInfo.label}
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="shrink-0"
+                              onClick={() => setExpandedAppId(isExpanded ? null : app.id)}
+                            >
+                              {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                            </Button>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <span className={`px-3 py-1.5 rounded-full text-xs font-medium border ${statusInfo.color}`}>
-                            {statusInfo.label}
-                          </span>
-                        </div>
+                        
+                        {app.admin_notes && (
+                          <div className="mt-4 p-3 bg-muted/50 rounded-lg border border-border/50">
+                            <p className="text-xs text-muted-foreground font-medium mb-1">💬 Phản hồi từ Headhunter:</p>
+                            <p className="text-sm text-foreground">{app.admin_notes}</p>
+                          </div>
+                        )}
                       </div>
-                      {app.admin_notes && (
-                        <div className="mt-4 p-3 bg-muted/50 rounded-lg border border-border/50">
-                          <p className="text-xs text-muted-foreground font-medium mb-1">💬 Phản hồi từ Headhunter:</p>
-                          <p className="text-sm text-foreground">{app.admin_notes}</p>
-                        </div>
+                      
+                      {/* Expanded Actions */}
+                      {isExpanded && (
+                        <motion.div 
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="border-t border-border bg-muted/30 px-5 py-4"
+                        >
+                          <div className="flex flex-wrap gap-3">
+                            {canEdit && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEditApplication(app)}
+                                className="gap-2"
+                              >
+                                <Pencil className="w-4 h-4" />
+                                Chỉnh sửa
+                              </Button>
+                            )}
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleDeleteApplication(app.id)}
+                              disabled={deletingId === app.id}
+                              className="gap-2"
+                            >
+                              {deletingId === app.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="w-4 h-4" />
+                              )}
+                              Xóa đơn
+                            </Button>
+                          </div>
+                          {!canEdit && (
+                            <p className="text-xs text-muted-foreground mt-2">
+                              ⚠️ Không thể chỉnh sửa đơn đã được xử lý. Bạn có thể tạo đơn đăng ký mới.
+                            </p>
+                          )}
+                        </motion.div>
                       )}
                     </Card>
                   </motion.div>
@@ -480,8 +616,17 @@ const Headhunting = () => {
             animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-6"
           >
-            <Crown className="w-4 h-4 text-korean-yellow" />
-            Dịch vụ dành cho Premium
+            {editingApplication ? (
+              <>
+                <Pencil className="w-4 h-4" />
+                Chỉnh sửa đơn đăng ký
+              </>
+            ) : (
+              <>
+                <Crown className="w-4 h-4 text-korean-yellow" />
+                Dịch vụ dành cho Premium
+              </>
+            )}
           </motion.div>
           
           <motion.h1
@@ -490,7 +635,11 @@ const Headhunting = () => {
             transition={{ delay: 0.1 }}
             className="font-heading font-black text-3xl sm:text-4xl md:text-5xl text-foreground mb-4"
           >
-            Dịch vụ <span className="text-gradient-primary">Headhunting</span> doanh nghiệp Hàn Quốc
+            {editingApplication ? (
+              <>Chỉnh sửa <span className="text-gradient-primary">đơn đăng ký</span></>
+            ) : (
+              <>Dịch vụ <span className="text-gradient-primary">Headhunting</span> doanh nghiệp Hàn Quốc</>
+            )}
           </motion.h1>
           
           <motion.p
