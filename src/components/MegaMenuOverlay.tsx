@@ -22,6 +22,8 @@ import {
   ChevronDown,
   LogOut,
   Lock,
+  Search,
+  Mic,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -49,6 +51,8 @@ const baseMenuCategories: MenuCategory[] = [
     emoji: "💼",
     items: [
       { icon: Users, label: "Headhunting", href: "/headhunting", isPremium: true },
+      { icon: Search, label: "Báo cáo Doanh nghiệp", href: "/company-report", isPremium: true },
+      { icon: Mic, label: "Phỏng vấn Mô phỏng", href: "/interview-simulation", isPremium: true },
     ]
   },
   {
