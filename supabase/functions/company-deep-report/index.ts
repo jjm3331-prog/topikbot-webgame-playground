@@ -31,63 +31,115 @@ serve(async (req) => {
 
     console.log(`Generating deep report for: ${companyName}`);
 
-    const systemPrompt = `Bạn là chuyên gia nghiên cứu doanh nghiệp Hàn Quốc cấp cao, chuyên TÌM KIẾM THÔNG TIN ẨN và khó tìm cho người Việt Nam muốn làm việc tại Hàn Quốc.
+    const systemPrompt = `Bạn là chuyên gia nghiên cứu doanh nghiệp Hàn Quốc cấp cao với 20 năm kinh nghiệm trong ngành tuyển dụng quốc tế, chuyên TÌM KIẾM THÔNG TIN ẨN và khó tìm cho người Việt Nam muốn làm việc tại Hàn Quốc.
 
-NHIỆM VỤ QUAN TRỌNG:
-- Bạn PHẢI tìm kiếm TOÀN BỘ nguồn thông tin có thể: blog cá nhân, diễn đàn, JobPlanet (잡플래닛), Blind (블라인드), Glassdoor, LinkedIn, Reddit, Naver Cafe, Naver Blog, Daum Cafe, Tistory, Velog, các trang review công ty Hàn Quốc
-- Bạn PHẢI tìm các bài viết của nhân viên hiện tại, cựu nhân viên, ứng viên đã phỏng vấn
-- Bạn PHẢI tổng hợp thông tin từ các nguồn ẩn danh, review thực tế của người trong cuộc
-- KHÔNG BAO GIỜ nói "thông tin không có sẵn" hoặc "không tìm thấy" - hãy tìm kiếm sâu hơn từ mọi nguồn có thể
-- Nếu không có thông tin chính xác, hãy ước tính dựa trên ngành nghề, quy mô công ty, và các nguồn tương tự
+## NGUYÊN TẮC BẮT BUỘC:
 
-QUAN TRỌNG: 
-- Luôn trả lời bằng TIẾNG VIỆT
-- Chỉ giữ lại tên công ty, thuật ngữ chuyên ngành bằng tiếng Hàn/Anh khi cần thiết
-- Định dạng phản hồi bằng Markdown với các phần rõ ràng
-- KHÔNG BAO GIỜ bao gồm thẻ <think> hoặc bất kỳ thẻ suy luận nào trong phản hồi`;
+### 1. CHÍNH XÁC THUẬT NGỮ CHUYÊN NGÀNH (CỰC KỲ QUAN TRỌNG)
+**Bán dẫn/Semiconductor:**
+- **IDM (Integrated Device Manufacturer)**: Công ty sản xuất chip toàn diện (thiết kế + sản xuất). Ví dụ: Samsung, SK Hynix, Intel
+- **Fabless**: Công ty CHỈ thiết kế chip, KHÔNG có nhà máy sản xuất. Ví dụ: Nvidia, AMD, Qualcomm
+- **Foundry**: Công ty CHỈ sản xuất chip theo đơn đặt hàng. Ví dụ: TSMC, Samsung Foundry
+- **Fab (Fabrication Plant)**: Nhà máy sản xuất chip/wafer, nơi có phòng sạch (Cleanroom)
+- **8 công đoạn chính**: Wafer Fabrication, Oxidation, Photolithography, Etching, Deposition, Ion Implantation, CMP, Packaging/Test
 
-    const userPrompt = `Hãy viết báo cáo CHUYÊN SÂU về công ty ${companyName}.
+**TUYỆT ĐỐI KHÔNG NHẦM LẪN**: 
+- SK Hynix, Samsung Electronics = IDM (có Fab)
+- Nvidia, AMD = Fabless (KHÔNG có Fab)
 
-⚠️ YÊU CẦU TÌM KIẾM CỰC KỲ QUAN TRỌNG:
-- Tìm kiếm trên JobPlanet (잡플래닛), Blind (블라인드), Glassdoor, LinkedIn
-- Tìm kiếm các blog cá nhân: Naver Blog, Tistory, Velog, Medium
-- Tìm kiếm các diễn đàn: Naver Cafe, Daum Cafe, Reddit, Quora
-- Tìm kiếm các bài viết review công ty từ nhân viên hiện tại/cựu nhân viên
-- Tìm kiếm các bài chia sẻ kinh nghiệm phỏng vấn
-- Tìm kiếm thông tin về lương từ các nguồn ẩn danh
+### 2. ĐỘ CHÍNH XÁC DỮ LIỆU TÀI CHÍNH
+- LUÔN ghi rõ năm của số liệu: "Doanh thu năm 2024: XX tỷ Won"
+- LUÔN ghi nguồn: "(Theo báo cáo tài chính Q3/2024)"
+- Phân biệt: Doanh thu thực tế vs Dự kiến vs Mục tiêu
+- Đơn vị tiền tệ chính xác: tỷ Won (조 원), triệu Won (백만 원)
 
-Bao gồm các phần sau (BẮT BUỘC phải có thông tin cụ thể cho MỖI phần):
+### 3. CHẤT LƯỢNG VĂN BẢN
+- KHÔNG BAO GIỜ trộn lẫn ký tự từ ngôn ngữ khác (日本語, 中文, etc.)
+- Sử dụng tiếng Việt chuẩn, dấu đầy đủ
+- Số liệu viết đúng định dạng: 66.193 nghìn tỷ → 66,193 nghìn tỷ hoặc 66.2 nghìn tỷ
 
-## 1. Tổng Quan Công Ty (회사 개요)
-- Năm thành lập, địa điểm trụ sở chính, lĩnh vực kinh doanh chính
-- Doanh thu gần đây, số lượng nhân viên và thông tin cơ bản khác
-- Thông tin về các chi nhánh/nhà máy tại Việt Nam (nếu có)
+### 4. THÔNG TIN PHỎNG VẤN CHI TIẾT (BẮT BUỘC)
+- **Thi tuyển năng lực**: SKCT (SK Competency Test), GSAT (Samsung), HMAT (Hyundai)
+- **Câu hỏi kỹ thuật phổ biến**: Giải thích quy trình 8 công đoạn, nguyên lý DRAM/NAND, yield improvement
+- **Câu hỏi hành vi**: Tình huống teamwork, xử lý deadline, kinh nghiệm làm việc ca đêm
+- **Tip chuẩn bị**: Nghiên cứu sản phẩm chủ lực, tin tức M&A gần đây, đối thủ cạnh tranh
 
-## 2. Thông Tin Lương (연봉 정보)
-- Mức lương dự kiến cho nhân viên mới/có kinh nghiệm (TÌM TỪ JobPlanet, Blind, Glassdoor)
-- Cơ cấu thưởng hiệu suất, bonus (Tết, hiệu suất, cổ phiếu)
-- Phúc lợi chi tiết (ký túc xá, phụ cấp ăn, phí đi lại, bảo hiểm, nghỉ phép, v.v.)
-- So sánh với mức lương trung bình ngành
+### 5. NGUỒN TÌM KIẾM (TÌM SÂU)
+- JobPlanet (잡플래닛), Blind (블라인드), Glassdoor, LinkedIn
+- Naver Blog, Tistory, Velog, Medium
+- Naver Cafe, Daum Cafe, Reddit, Quora
+- Báo cáo tài chính chính thức, thông cáo báo chí
 
-## 3. Văn Hóa Công Ty (기업 문화)
-- Môi trường và không khí làm việc thực tế (TÌM TỪ review của nhân viên)
-- Đánh giá Work-Life Balance thực tế (giờ làm thêm, áp lực công việc)
-- Thái độ đối với nhân viên người nước ngoài
-- Cơ hội thăng tiến và phát triển
-- Điểm mạnh và điểm yếu của văn hóa công ty (từ review thực tế)
+## QUAN TRỌNG: 
+- Luôn trả lời bằng TIẾNG VIỆT chuẩn
+- Chỉ giữ tên công ty, thuật ngữ chuyên ngành bằng tiếng Hàn/Anh khi cần thiết
+- Định dạng Markdown rõ ràng với emoji phù hợp
+- KHÔNG BAO GIỜ bao gồm thẻ <think> hoặc bất kỳ thẻ suy luận nào
+- KHÔNG BAO GIỜ nói "thông tin không có sẵn" - hãy ước tính dựa trên ngành nghề, quy mô`;
 
-## 4. Review Phỏng Vấn (면접 후기)
-- Quy trình phỏng vấn chi tiết (số vòng, hình thức, thời gian)
-- Các câu hỏi phỏng vấn THỰC TẾ thường gặp (từ các bài chia sẻ kinh nghiệm)
-- Mẹo phỏng vấn cụ thể cho công ty này
-- Độ khó phỏng vấn và tỷ lệ đậu ước tính
+    const userPrompt = `Hãy viết báo cáo CHUYÊN SÂU HOÀN HẢO về công ty ${companyName}.
 
-## 5. Tin Tức & Xu Hướng Mới Nhất (최신 뉴스)
-- Tin tức quan trọng gần đây của công ty
-- Xu hướng tuyển dụng và các vị trí đang tìm kiếm
-- Triển vọng tương lai và kế hoạch mở rộng
+⚠️ LƯU Ý ĐẶC BIỆT:
+- Xác định chính xác loại hình công ty (IDM/Fabless/Foundry nếu là bán dẫn)
+- Mọi số liệu tài chính PHẢI kèm năm và nguồn
+- KHÔNG trộn lẫn ký tự từ ngôn ngữ khác
 
-Hãy tập trung vào thông tin THỰC SỰ HỮU ÍCH và KHÓ TÌM cho người Việt Nam muốn xin việc tại công ty này. KHÔNG nói "không có thông tin" - hãy tìm kiếm sâu hơn!`;
+📍 TÌM KIẾM TRÊN:
+- JobPlanet (잡플래닛), Blind (블라인드), Glassdoor, LinkedIn
+- Naver Blog, Tistory, Velog, Medium, các blog cá nhân
+- Naver Cafe, Daum Cafe, Reddit, Quora
+- Review từ nhân viên hiện tại/cựu nhân viên
+- Báo cáo tài chính, thông cáo báo chí chính thức
+
+## 1. 🏢 Tổng Quan Công Ty (회사 개요)
+- Năm thành lập, trụ sở chính, lĩnh vực kinh doanh
+- **Loại hình**: IDM/Fabless/Foundry/Tập đoàn đa ngành (giải thích rõ)
+- Doanh thu **năm 2024** (ghi rõ nguồn), số lượng nhân viên
+- Sản phẩm/dịch vụ chủ lực, thị phần toàn cầu
+- Chi nhánh/nhà máy tại Việt Nam (nếu có)
+
+## 2. 💰 Thông Tin Lương & Phúc Lợi (연봉 정보)
+- Mức lương theo cấp bậc (신입/경력) - nguồn: JobPlanet, Blind
+- **Cơ cấu thưởng chi tiết**: 
+  - Thưởng cố định (Tết Nguyên đán, Chuseok)
+  - Thưởng hiệu suất (PS - Profit Sharing)
+  - Thưởng khuyến khích (PI - Performance Incentive)
+  - RSU/Stock Options (nếu có)
+- **Phúc lợi**: Ký túc xá, phụ cấp ăn/đi lại, bảo hiểm, nghỉ phép, đào tạo
+- So sánh với mức trung bình ngành và đối thủ cạnh tranh
+
+## 3. 🏠 Văn Hóa Công Ty (기업 문화)
+- Môi trường làm việc thực tế (từ review nhân viên)
+- **Work-Life Balance**: Giờ làm thêm trung bình, OT có trả lương không
+- Hệ thống làm việc ca (nếu là nhà máy Fab/sản xuất)
+- Thái độ với nhân viên nước ngoài, hỗ trợ visa
+- Cơ hội thăng tiến, chương trình đào tạo
+- **Điểm mạnh/yếu** từ review thực tế (trích dẫn nếu có)
+
+## 4. 📝 Quy Trình & Kinh Nghiệm Phỏng Vấn (면접 후기)
+- **Quy trình tuyển dụng**: Số vòng, hình thức (online/offline), thời gian
+- **Bài thi năng lực** (nếu có): SKCT, GSAT, HMAT, hoặc thi riêng
+- **Câu hỏi phỏng vấn THỰC TẾ** (ít nhất 5 câu):
+  - Câu hỏi kỹ thuật/chuyên môn
+  - Câu hỏi hành vi/tình huống
+  - Câu hỏi về động lực làm việc
+- **Mẹo phỏng vấn cụ thể** cho công ty này
+- Tỷ lệ cạnh tranh, độ khó phỏng vấn (1-5 sao)
+
+## 5. 📰 Tin Tức & Xu Hướng Mới Nhất (최신 뉴스)
+- Tin tức quan trọng trong 6 tháng gần đây
+- Kế hoạch đầu tư, mở rộng, M&A
+- Xu hướng tuyển dụng: Vị trí đang tìm, kỹ năng ưu tiên
+- Triển vọng tương lai của công ty và ngành
+
+## 6. 🎯 Lời Khuyên Cho Ứng Viên Việt Nam
+- Kỹ năng cần chuẩn bị (tiếng Hàn, chuyên môn, soft skills)
+- Lộ trình apply tối ưu
+- Những điều cần lưu ý đặc biệt
+- Tài liệu tham khảo hữu ích
+
+---
+💡 Tập trung vào thông tin THỰC SỰ HỮU ÍCH, CỤ THỂ và KHÓ TÌM. Mỗi thông tin phải có giá trị thực tiễn cho người Việt Nam muốn xin việc tại công ty này.`;
 
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
@@ -123,9 +175,22 @@ Hãy tập trung vào thông tin THỰC SỰ HỮU ÍCH và KHÓ TÌM cho ngư�
 
     // Filter out <think> tags and their content
     report = report.replace(/<think>[\s\S]*?<\/think>/gi, '');
-    // Also filter out any remaining think-related patterns
     report = report.replace(/<\/?think>/gi, '');
-    // Clean up extra whitespace that might be left
+    
+    // Fix encoding errors - remove mixed language characters
+    report = report.replace(/[\u3040-\u309F\u30A0-\u30FF]/g, ''); // Remove Japanese hiragana/katakana
+    report = report.replace(/[\u4E00-\u9FFF]/g, (match: string) => {
+      // Keep only common Chinese characters used in Korean company names
+      const allowedChars = ['株', '式', '會', '社', '有', '限', '公', '司'];
+      return allowedChars.includes(match) ? match : '';
+    });
+    
+    // Fix common OCR/encoding issues in Vietnamese
+    report = report.replace(/nghìん/g, 'nghìn');
+    report = report.replace(/nghìu/g, 'nghìn');
+    report = report.replace(/tỷん/g, 'tỷ');
+    
+    // Clean up extra whitespace
     report = report.replace(/^\s*\n\s*\n/gm, '\n\n').trim();
 
     console.log(`Report generated successfully for ${companyName}, citations: ${citations.length}`);
