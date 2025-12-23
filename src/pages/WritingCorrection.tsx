@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import CleanHeader from "@/components/CleanHeader";
@@ -804,81 +805,93 @@ const WritingCorrection = () => {
                     </div>
                   </Card>
 
-                  {/* SWOT Analysis */}
+                  {/* SWOT Analysis - Accordion */}
                   {result.swot_analysis && (
                     <Card className="p-4 bg-card border-border">
-                      <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                      <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                         📊 SWOT 분석
                       </h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <Accordion type="multiple" defaultValue={["strengths"]} className="space-y-2">
                         {/* Strengths */}
-                        <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/30">
-                          <h5 className="font-medium text-green-600 dark:text-green-400 mb-2 flex items-center gap-1.5 text-sm">
-                            ✅ Strengths (강점)
-                          </h5>
-                          <div className="space-y-2">
-                            {result.swot_analysis.strengths?.map((s: any, i: number) => (
-                              <div key={i} className="text-xs">
-                                <p className="font-medium text-foreground">{s.title}</p>
-                                {s.evidence && <p className="text-muted-foreground italic">"{s.evidence}"</p>}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
+                        <AccordionItem value="strengths" className="border rounded-lg bg-green-500/10 border-green-500/30 px-3">
+                          <AccordionTrigger className="text-sm font-medium text-green-600 dark:text-green-400 hover:no-underline py-3">
+                            ✅ Strengths (강점) ({result.swot_analysis.strengths?.length || 0})
+                          </AccordionTrigger>
+                          <AccordionContent className="pb-3">
+                            <div className="space-y-2">
+                              {result.swot_analysis.strengths?.map((s, i) => (
+                                <div key={i} className="text-xs p-2 bg-background/50 rounded">
+                                  <p className="font-medium text-foreground">{s.title}</p>
+                                  {s.evidence && <p className="text-muted-foreground italic mt-1">"{s.evidence}"</p>}
+                                  {s.analysis && <p className="text-muted-foreground mt-1">{s.analysis}</p>}
+                                </div>
+                              ))}
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
 
                         {/* Weaknesses */}
-                        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30">
-                          <h5 className="font-medium text-red-600 dark:text-red-400 mb-2 flex items-center gap-1.5 text-sm">
-                            ⚠️ Weaknesses (약점)
-                          </h5>
-                          <div className="space-y-2">
-                            {result.swot_analysis.weaknesses?.map((w: any, i: number) => (
-                              <div key={i} className="text-xs">
-                                <p className="font-medium text-foreground">{w.title}</p>
-                                {w.impact && <p className="text-muted-foreground">{w.impact}</p>}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
+                        <AccordionItem value="weaknesses" className="border rounded-lg bg-red-500/10 border-red-500/30 px-3">
+                          <AccordionTrigger className="text-sm font-medium text-red-600 dark:text-red-400 hover:no-underline py-3">
+                            ⚠️ Weaknesses (약점) ({result.swot_analysis.weaknesses?.length || 0})
+                          </AccordionTrigger>
+                          <AccordionContent className="pb-3">
+                            <div className="space-y-2">
+                              {result.swot_analysis.weaknesses?.map((w, i) => (
+                                <div key={i} className="text-xs p-2 bg-background/50 rounded">
+                                  <p className="font-medium text-foreground">{w.title}</p>
+                                  {w.issue && <p className="text-muted-foreground mt-1">{w.issue}</p>}
+                                  {w.impact && <p className="text-muted-foreground mt-1">영향: {w.impact}</p>}
+                                </div>
+                              ))}
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
 
                         {/* Opportunities */}
-                        <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/30">
-                          <h5 className="font-medium text-blue-600 dark:text-blue-400 mb-2 flex items-center gap-1.5 text-sm">
-                            🌟 Opportunities (기회)
-                          </h5>
-                          <div className="space-y-2">
-                            {result.swot_analysis.opportunities?.map((o: any, i: number) => (
-                              <div key={i} className="text-xs">
-                                <p className="font-medium text-foreground">{o.title}</p>
-                                {o.action && <p className="text-muted-foreground">{o.action}</p>}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
+                        <AccordionItem value="opportunities" className="border rounded-lg bg-blue-500/10 border-blue-500/30 px-3">
+                          <AccordionTrigger className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:no-underline py-3">
+                            🌟 Opportunities (기회) ({result.swot_analysis.opportunities?.length || 0})
+                          </AccordionTrigger>
+                          <AccordionContent className="pb-3">
+                            <div className="space-y-2">
+                              {result.swot_analysis.opportunities?.map((o, i) => (
+                                <div key={i} className="text-xs p-2 bg-background/50 rounded">
+                                  <p className="font-medium text-foreground">{o.title}</p>
+                                  {o.action && <p className="text-muted-foreground mt-1">방법: {o.action}</p>}
+                                  {o.benefit && <p className="text-green-600 dark:text-green-400 mt-1">효과: {o.benefit}</p>}
+                                </div>
+                              ))}
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
 
                         {/* Threats */}
-                        <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/30">
-                          <h5 className="font-medium text-orange-600 dark:text-orange-400 mb-2 flex items-center gap-1.5 text-sm">
-                            🚧 Threats (위협)
-                          </h5>
-                          <div className="space-y-2">
-                            {result.swot_analysis.threats?.map((t: any, i: number) => (
-                              <div key={i} className="text-xs">
-                                <p className="font-medium text-foreground">{t.title}</p>
-                                {t.risk_level && (
-                                  <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                                    t.risk_level === '상' ? 'bg-red-500/20 text-red-600' :
-                                    t.risk_level === '중' ? 'bg-orange-500/20 text-orange-600' :
-                                    'bg-green-500/20 text-green-600'
-                                  }`}>
-                                    위험도: {t.risk_level}
-                                  </span>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
+                        <AccordionItem value="threats" className="border rounded-lg bg-orange-500/10 border-orange-500/30 px-3">
+                          <AccordionTrigger className="text-sm font-medium text-orange-600 dark:text-orange-400 hover:no-underline py-3">
+                            🚧 Threats (위협) ({result.swot_analysis.threats?.length || 0})
+                          </AccordionTrigger>
+                          <AccordionContent className="pb-3">
+                            <div className="space-y-2">
+                              {result.swot_analysis.threats?.map((t, i) => (
+                                <div key={i} className="text-xs p-2 bg-background/50 rounded">
+                                  <p className="font-medium text-foreground">{t.title}</p>
+                                  {t.risk_level && (
+                                    <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium mt-1 ${
+                                      t.risk_level === '상' ? 'bg-red-500/20 text-red-600' :
+                                      t.risk_level === '중' ? 'bg-orange-500/20 text-orange-600' :
+                                      'bg-green-500/20 text-green-600'
+                                    }`}>
+                                      위험도: {t.risk_level}
+                                    </span>
+                                  )}
+                                  {t.prevention && <p className="text-muted-foreground mt-1">예방: {t.prevention}</p>}
+                                </div>
+                              ))}
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
                     </Card>
                   )}
 
@@ -911,22 +924,107 @@ const WritingCorrection = () => {
                     </div>
                   )}
 
-                  {/* Corrections */}
-                  {result.corrections.length > 0 && (
+                  {/* First Aid - Tabbed */}
+                  {(result.corrections.length > 0 || result.vocabulary_upgrades?.length || result.structure_improvements?.length) && (
                     <Card className="p-4 bg-card border-border">
-                      <h4 className="font-semibold text-foreground mb-3">📝 Chi tiết sửa lỗi</h4>
-                      <div className="space-y-3 max-h-[300px] overflow-y-auto">
-                        {result.corrections.map((c, i) => (
-                          <div key={i} className="p-3 bg-muted rounded-lg">
-                            <div className="flex gap-2 items-start mb-2">
-                              <span className="text-destructive line-through">{c.original}</span>
-                              <span>→</span>
-                              <span className="text-green-600 dark:text-green-400 font-medium">{c.corrected}</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground">{c.explanation}</p>
+                      <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                        🚑 First Aid (응급 처치)
+                      </h4>
+                      <Tabs defaultValue="grammar" className="w-full">
+                        <TabsList className="grid w-full grid-cols-3 h-9">
+                          <TabsTrigger value="grammar" className="text-xs">
+                            🔴 문법 ({result.corrections.filter(c => c.type === 'grammar' || c.type === 'spelling').length || result.corrections.length})
+                          </TabsTrigger>
+                          <TabsTrigger value="vocabulary" className="text-xs">
+                            🟡 어휘 ({result.vocabulary_upgrades?.length || result.corrections.filter(c => c.type === 'vocabulary').length || 0})
+                          </TabsTrigger>
+                          <TabsTrigger value="structure" className="text-xs">
+                            🟢 구조 ({result.structure_improvements?.length || result.corrections.filter(c => c.type === 'structure').length || 0})
+                          </TabsTrigger>
+                        </TabsList>
+
+                        {/* Grammar Tab */}
+                        <TabsContent value="grammar" className="mt-3">
+                          <div className="space-y-2 max-h-[250px] overflow-y-auto">
+                            {result.corrections
+                              .filter(c => c.type === 'grammar' || c.type === 'spelling' || !['vocabulary', 'structure'].includes(c.type))
+                              .map((c, i) => (
+                              <div key={i} className="p-2.5 bg-red-500/5 border border-red-500/20 rounded-lg">
+                                <div className="flex flex-wrap gap-1.5 items-start mb-1.5">
+                                  <span className="text-destructive line-through text-sm">{c.original}</span>
+                                  <span className="text-muted-foreground">→</span>
+                                  <span className="text-green-600 dark:text-green-400 font-medium text-sm">{c.corrected}</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground">{c.explanation}</p>
+                              </div>
+                            ))}
+                            {result.corrections.filter(c => c.type === 'grammar' || c.type === 'spelling' || !['vocabulary', 'structure'].includes(c.type)).length === 0 && (
+                              <p className="text-sm text-muted-foreground text-center py-4">문법 오류 없음 ✨</p>
+                            )}
                           </div>
-                        ))}
-                      </div>
+                        </TabsContent>
+
+                        {/* Vocabulary Tab */}
+                        <TabsContent value="vocabulary" className="mt-3">
+                          <div className="space-y-2 max-h-[250px] overflow-y-auto">
+                            {result.vocabulary_upgrades?.map((v, i) => (
+                              <div key={i} className="p-2.5 bg-yellow-500/5 border border-yellow-500/20 rounded-lg">
+                                <div className="flex flex-wrap gap-1.5 items-start mb-1.5">
+                                  <span className="text-muted-foreground text-sm">😐 {v.basic}</span>
+                                  <span className="text-muted-foreground">→</span>
+                                  <span className="text-yellow-600 dark:text-yellow-400 font-medium text-sm">⭐ {v.advanced}</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground">{v.difference}</p>
+                              </div>
+                            ))}
+                            {result.corrections.filter(c => c.type === 'vocabulary').map((c, i) => (
+                              <div key={`vocab-${i}`} className="p-2.5 bg-yellow-500/5 border border-yellow-500/20 rounded-lg">
+                                <div className="flex flex-wrap gap-1.5 items-start mb-1.5">
+                                  <span className="text-muted-foreground text-sm">😐 {c.original}</span>
+                                  <span className="text-muted-foreground">→</span>
+                                  <span className="text-yellow-600 dark:text-yellow-400 font-medium text-sm">⭐ {c.corrected}</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground">{c.explanation}</p>
+                              </div>
+                            ))}
+                            {!result.vocabulary_upgrades?.length && result.corrections.filter(c => c.type === 'vocabulary').length === 0 && (
+                              <p className="text-sm text-muted-foreground text-center py-4">어휘 개선 제안 없음</p>
+                            )}
+                          </div>
+                        </TabsContent>
+
+                        {/* Structure Tab */}
+                        <TabsContent value="structure" className="mt-3">
+                          <div className="space-y-2 max-h-[250px] overflow-y-auto">
+                            {result.structure_improvements?.map((s, i) => (
+                              <div key={i} className="p-2.5 bg-green-500/5 border border-green-500/20 rounded-lg">
+                                <div className="mb-1.5">
+                                  <p className="text-xs text-muted-foreground mb-1">현재:</p>
+                                  <p className="text-sm text-foreground">{s.current}</p>
+                                </div>
+                                <div className="mb-1.5">
+                                  <p className="text-xs text-green-600 dark:text-green-400 mb-1">개선안:</p>
+                                  <p className="text-sm font-medium text-green-600 dark:text-green-400">{s.improved}</p>
+                                </div>
+                                <p className="text-xs text-muted-foreground">{s.reason}</p>
+                              </div>
+                            ))}
+                            {result.corrections.filter(c => c.type === 'structure').map((c, i) => (
+                              <div key={`struct-${i}`} className="p-2.5 bg-green-500/5 border border-green-500/20 rounded-lg">
+                                <div className="flex flex-wrap gap-1.5 items-start mb-1.5">
+                                  <span className="text-muted-foreground text-sm">{c.original}</span>
+                                  <span className="text-muted-foreground">→</span>
+                                  <span className="text-green-600 dark:text-green-400 font-medium text-sm">{c.corrected}</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground">{c.explanation}</p>
+                              </div>
+                            ))}
+                            {!result.structure_improvements?.length && result.corrections.filter(c => c.type === 'structure').length === 0 && (
+                              <p className="text-sm text-muted-foreground text-center py-4">구조 개선 제안 없음</p>
+                            )}
+                          </div>
+                        </TabsContent>
+                      </Tabs>
                     </Card>
                   )}
 
