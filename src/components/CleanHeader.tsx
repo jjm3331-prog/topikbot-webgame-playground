@@ -103,10 +103,8 @@ export const CleanHeader = ({ isLoggedIn, username }: CleanHeaderProps) => {
             aria-label="Go to home"
           >
             <span className="text-lg sm:text-xl">🇰🇷</span>
-            <div className="leading-tight">
-              <span className="font-heading font-bold text-base sm:text-lg text-foreground">LUKATO AI</span>
-              <span className="hidden sm:block text-xs text-muted-foreground -mt-0.5">Học tiếng Hàn #1 VN</span>
-            </div>
+            <span className="font-heading font-bold text-base sm:text-lg text-foreground whitespace-nowrap">LUKATO AI</span>
+            <span className="hidden sm:block text-xs text-muted-foreground">Học tiếng Hàn #1 VN</span>
           </div>
 
           {/* Actions */}
@@ -138,9 +136,9 @@ export const CleanHeader = ({ isLoggedIn, username }: CleanHeaderProps) => {
                 </Button>
               </>
             ) : (
-              <Button onClick={() => navigate("/auth")} className="h-10 rounded-full">
-                <LogIn className="w-4 h-4" />
-                <span className="ml-2">Đăng nhập</span>
+              <Button onClick={() => navigate("/auth")} className="h-8 sm:h-10 rounded-full text-xs sm:text-sm px-3 sm:px-4">
+                <LogIn className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="ml-1 sm:ml-2">Đăng nhập</span>
               </Button>
             )}
 
