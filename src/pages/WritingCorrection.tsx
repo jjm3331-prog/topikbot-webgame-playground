@@ -549,11 +549,11 @@ ${prioritySection}
     <div className="min-h-screen bg-background flex flex-col">
       <CleanHeader />
       
-      <main className="flex-1 pb-8 px-4 max-w-6xl mx-auto">
+      <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-6"
+          className="space-y-8"
         >
           {/* Premium Preview Banner */}
           {!isPremium && <PremiumPreviewBanner featureName="chấm bài viết AI" />}
@@ -843,32 +843,33 @@ ${prioritySection}
             </div>
 
             {/* Result Section */}
-            <div>
+            <div className="lg:sticky lg:top-4">
               {result ? (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="space-y-4"
+                  className="space-y-5"
                 >
                   {/* Score Card */}
-                  <Card className="p-6 bg-gradient-to-br from-primary/10 to-korean-purple/10 border-primary/20">
+                  <Card className="p-6 bg-gradient-to-br from-primary/10 via-korean-purple/10 to-korean-pink/10 border-primary/20 shadow-lg">
                     <div className="text-center mb-6">
-                      <div className="text-6xl font-bold text-primary mb-2">
+                      <div className="text-7xl font-bold text-primary mb-2 drop-shadow-sm">
                         {result.overall_score}
                       </div>
-                      <p className="text-muted-foreground">/ 100 điểm</p>
+                      <p className="text-muted-foreground text-sm">/ 100 điểm</p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                       {[
-                        { label: "Ngữ pháp", score: result.grammar_score },
-                        { label: "Từ vựng", score: result.vocabulary_score },
-                        { label: "Cấu trúc", score: result.structure_score },
-                        { label: "Nội dung", score: result.content_score },
+                        { label: "Ngữ pháp", labelKr: "문법", score: result.grammar_score, color: "from-red-500/20 to-red-500/5" },
+                        { label: "Từ vựng", labelKr: "어휘", score: result.vocabulary_score, color: "from-yellow-500/20 to-yellow-500/5" },
+                        { label: "Cấu trúc", labelKr: "구조", score: result.structure_score, color: "from-green-500/20 to-green-500/5" },
+                        { label: "Nội dung", labelKr: "내용", score: result.content_score, color: "from-blue-500/20 to-blue-500/5" },
                       ].map((item) => (
-                        <div key={item.label} className="bg-background/50 rounded-lg p-3">
-                          <p className="text-sm text-muted-foreground">{item.label}</p>
-                          <p className="text-xl font-bold text-foreground">{item.score}/25</p>
+                        <div key={item.label} className={`bg-gradient-to-br ${item.color} rounded-xl p-4 border border-border/50`}>
+                          <p className="text-xs text-muted-foreground">{item.label}</p>
+                          <p className="text-[10px] text-muted-foreground/70">{item.labelKr}</p>
+                          <p className="text-2xl font-bold text-foreground mt-1">{item.score}<span className="text-sm font-normal text-muted-foreground">/25</span></p>
                         </div>
                       ))}
                     </div>
@@ -876,11 +877,11 @@ ${prioritySection}
 
                   {/* SWOT Analysis - Accordion */}
                   {result.swot_analysis && (
-                    <Card className="p-4 bg-card border-border">
-                      <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <Card className="p-5 bg-card border-border shadow-sm">
+                      <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 text-base">
                         📊 SWOT 분석
                       </h4>
-                      <Accordion type="multiple" defaultValue={["strengths"]} className="space-y-2">
+                      <Accordion type="multiple" defaultValue={["strengths"]} className="space-y-3">
                         {/* Strengths */}
                         <AccordionItem value="strengths" className="border rounded-lg bg-green-500/10 border-green-500/30 px-3">
                           <AccordionTrigger className="text-sm font-medium text-green-600 dark:text-green-400 hover:no-underline py-3">
@@ -995,12 +996,12 @@ ${prioritySection}
 
                   {/* First Aid - Tabbed */}
                   {(result.corrections.length > 0 || result.vocabulary_upgrades?.length || result.structure_improvements?.length) && (
-                    <Card className="p-4 bg-card border-border">
-                      <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <Card className="p-5 bg-card border-border shadow-sm">
+                      <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 text-base">
                         🚑 First Aid (응급 처치)
                       </h4>
                       <Tabs defaultValue="grammar" className="w-full">
-                        <TabsList className="grid w-full grid-cols-3 h-9">
+                        <TabsList className="grid w-full grid-cols-3 h-10 mb-2">
                           <TabsTrigger value="grammar" className="text-xs">
                             🔴 문법 ({result.corrections.filter(c => c.type === 'grammar' || c.type === 'spelling').length || result.corrections.length})
                           </TabsTrigger>
@@ -1099,8 +1100,8 @@ ${prioritySection}
 
                   {/* Next Priority */}
                   {result.next_priority && result.next_priority.length > 0 && (
-                    <Card className="p-4 bg-gradient-to-r from-primary/10 to-korean-purple/10 border-primary/20">
-                      <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <Card className="p-5 bg-gradient-to-r from-primary/10 via-korean-purple/10 to-korean-pink/10 border-primary/20 shadow-sm">
+                      <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 text-base">
                         🎯 다음 과제 (Next Priority)
                       </h4>
                       <div className="space-y-2">
@@ -1118,12 +1119,30 @@ ${prioritySection}
                     </Card>
                   )}
 
+                  {/* Detailed Feedback */}
+                  {result.detailed_feedback && (
+                    <Card className="p-5 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5 border-primary/20">
+                      <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 text-base">
+                        💬 상세 피드백 (Chi tiết đánh giá)
+                      </h4>
+                      <div className="prose prose-sm dark:prose-invert max-w-none">
+                        <p className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed">
+                          {result.detailed_feedback}
+                        </p>
+                      </div>
+                    </Card>
+                  )}
+
                   {/* Model Answer */}
-                  <Card className="p-4 bg-card border-border">
-                    <h4 className="font-semibold text-foreground mb-3">✨ Bài mẫu tham khảo</h4>
-                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                      {result.model_answer}
-                    </p>
+                  <Card className="p-5 bg-card border-border">
+                    <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 text-base">
+                      ✨ Bài mẫu tham khảo (모범 답안)
+                    </h4>
+                    <div className="bg-muted/30 rounded-lg p-4">
+                      <p className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed">
+                        {result.model_answer}
+                      </p>
+                    </div>
                   </Card>
 
                   {/* Action Buttons */}
