@@ -16,7 +16,8 @@ import {
   Image as ImageIcon,
   Lock,
   Edit3,
-  Clock
+  Clock,
+  Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -492,17 +493,18 @@ const WritingCorrection = () => {
           )}
           
           {/* Header */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div className="text-center flex-1">
-              <h1 className="text-3xl font-heading font-bold text-foreground">
+              <h1 className="text-xl sm:text-2xl font-heading font-bold text-foreground">
                 ✍️ Chấm Writing TOPIK II (51~54)
               </h1>
-              <p className="text-muted-foreground mt-2">
+              <p className="text-sm text-muted-foreground mt-1">
                 AI chấm điểm và phân tích chi tiết bài viết của bạn
               </p>
             </div>
             <Button
               variant="outline"
+              size="sm"
               onClick={() => setShowHistory(!showHistory)}
               className="shrink-0"
             >
@@ -510,6 +512,28 @@ const WritingCorrection = () => {
               Lịch sử ({savedCorrections.length})
             </Button>
           </div>
+
+          {/* Daily Free Usage Info */}
+          {user && (
+            <Card className="p-3 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-primary/20">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  {canUseFreeToday ? (
+                    <p className="text-sm font-medium text-primary">
+                      🎁 Bạn có 1 lượt chấm miễn phí hôm nay!
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      ⏰ Lượt miễn phí tiếp theo: {nextFreeTime ? formatTimeRemaining(nextFreeTime) : 'N/A'}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </Card>
+          )}
 
           {/* Warning */}
           <Card className="p-4 bg-yellow-500/10 border-yellow-500/30">
