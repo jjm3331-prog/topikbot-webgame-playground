@@ -1,30 +1,16 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { 
-  GraduationCap, 
   Briefcase, 
-  FileText, 
-  MessageSquare, 
-  Plane,
-  Search,
-  Loader2,
-  Send,
-  Sparkles,
-  ExternalLink,
+  Search, 
+  Mic,
   ChevronRight,
   Building2,
-  BookOpen,
   Users,
-  Lock
+  Crown,
+  Sparkles
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { PremiumPreviewBanner } from "@/components/PremiumPreviewBanner";
@@ -32,520 +18,255 @@ import { useSubscription } from "@/hooks/useSubscription";
 
 const KoreaCareer = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { isPremium } = useSubscription();
-  const [activeTab, setActiveTab] = useState("search");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searching, setSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState<string | null>(null);
-  
-  // Resume correction states
-  const [resumeText, setResumeText] = useState("");
-  const [correcting, setCorrecting] = useState(false);
-  const [correctionResult, setCorrectionResult] = useState<string | null>(null);
-  
-  // Interview simulation states
-  const [interviewType, setInterviewType] = useState<"company" | "visa" | null>(null);
-  const [interviewMessages, setInterviewMessages] = useState<Array<{role: string; content: string}>>([]);
-  const [interviewInput, setInterviewInput] = useState("");
-  const [simulating, setSimulating] = useState(false);
 
-  const features = [
+  const services = [
     {
+      id: "headhunting",
+      icon: Briefcase,
+      title: "헤드헌팅 신청",
+      titleVi: "Đăng ký Headhunting",
+      description: "전문 헤드헌터가 한국 기업 취업을 지원합니다",
+      descriptionVi: "Headhunter chuyên nghiệp hỗ trợ xin việc tại công ty Hàn Quốc",
+      features: ["1:1 맞춤 컨설팅", "이력서 검토", "면접 코칭", "연봉 협상"],
+      featuresVi: ["Tư vấn 1:1", "Kiểm tra CV", "Coaching phỏng vấn", "Đàm phán lương"],
+      gradient: "from-blue-500 to-cyan-500",
+      bgGradient: "from-blue-500/10 to-cyan-500/10",
+      path: "/headhunting",
+      status: "active"
+    },
+    {
+      id: "company-report",
       icon: Search,
-      title: "Tìm kiếm thông tin",
-      description: "Du học, visa, việc làm tại Hàn Quốc",
-      tab: "search",
-      color: "from-korean-blue to-korean-cyan"
+      title: "기업 심층 리포트",
+      titleVi: "Báo cáo Doanh nghiệp",
+      description: "AI 웹검색으로 한국 기업 정보를 심층 분석합니다",
+      descriptionVi: "Phân tích sâu thông tin công ty Hàn Quốc bằng AI",
+      features: ["연봉 정보", "기업 문화", "면접 후기", "최신 뉴스"],
+      featuresVi: ["Thông tin lương", "Văn hóa công ty", "Review phỏng vấn", "Tin tức mới"],
+      gradient: "from-purple-500 to-pink-500",
+      bgGradient: "from-purple-500/10 to-pink-500/10",
+      path: "/company-report",
+      status: "coming"
     },
     {
-      icon: FileText,
-      title: "Chỉnh sửa CV/자기소개서",
-      description: "AI chấm và sửa hồ sơ xin việc",
-      tab: "resume",
-      color: "from-korean-orange to-korean-pink"
-    },
-    {
-      icon: MessageSquare,
-      title: "Phỏng vấn giả lập",
-      description: "Luyện phỏng vấn công ty & đại sứ quán",
-      tab: "interview",
-      color: "from-korean-purple to-korean-pink"
+      id: "interview-sim",
+      icon: Mic,
+      title: "면접 시뮬레이션",
+      titleVi: "Phỏng vấn Mô phỏng",
+      description: "AI 면접관과 실전 같은 면접 연습을 합니다",
+      descriptionVi: "Luyện phỏng vấn thực tế với AI Interviewer",
+      features: ["음성 대화", "실시간 피드백", "점수 분석", "맞춤 질문"],
+      featuresVi: ["Đàm thoại", "Feedback real-time", "Phân tích điểm", "Câu hỏi tùy chỉnh"],
+      gradient: "from-orange-500 to-red-500",
+      bgGradient: "from-orange-500/10 to-red-500/10",
+      path: "/interview-simulation",
+      status: "coming"
     }
   ];
 
-  const quickSearches = [
-    "Học bổng chính phủ Hàn Quốc 2025",
-    "Visa D-4-1 du học Hàn Quốc",
-    "Việc làm IT tại Hàn Quốc cho người Việt",
-    "Visa E-7 lao động chuyên môn",
-    "Top 10 trường đại học Hàn Quốc",
-    "Cách viết 자기소개서 xin việc"
-  ];
-
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
-    
-    setSearching(true);
-    setSearchResults(null);
-    
-    try {
-      const { data, error } = await supabase.functions.invoke("korea-career-search", {
-        body: { query: searchQuery, type: "search" }
-      });
-      
-      if (error) throw error;
-      setSearchResults(data.result);
-    } catch (error: any) {
-      console.error("Search error:", error);
-      toast({
-        title: "Lỗi tìm kiếm",
-        description: "Không thể tìm kiếm. Vui lòng thử lại sau.",
-        variant: "destructive"
-      });
-    } finally {
-      setSearching(false);
-    }
-  };
-
-  const handleResumeCorrection = async () => {
-    if (!resumeText.trim()) {
-      toast({
-        title: "Vui lòng nhập nội dung",
-        description: "Hãy dán CV hoặc 자기소개서 của bạn vào ô bên trên.",
-        variant: "destructive"
-      });
+  const handleServiceClick = (service: typeof services[0]) => {
+    if (service.status === "coming") {
       return;
     }
-    
-    setCorrecting(true);
-    setCorrectionResult(null);
-    
-    try {
-      const { data, error } = await supabase.functions.invoke("korea-career-search", {
-        body: { query: resumeText, type: "resume" }
-      });
-      
-      if (error) throw error;
-      setCorrectionResult(data.result);
-    } catch (error: any) {
-      console.error("Correction error:", error);
-      toast({
-        title: "Lỗi",
-        description: "Không thể chỉnh sửa CV. Vui lòng thử lại sau.",
-        variant: "destructive"
-      });
-    } finally {
-      setCorrecting(false);
-    }
-  };
-
-  const startInterview = async (type: "company" | "visa") => {
-    setInterviewType(type);
-    setInterviewMessages([]);
-    setSimulating(true);
-    
-    try {
-      const { data, error } = await supabase.functions.invoke("korea-career-search", {
-        body: { 
-          query: type === "company" 
-            ? "Bắt đầu phỏng vấn công ty Hàn Quốc" 
-            : "Bắt đầu phỏng vấn visa đại sứ quán Hàn Quốc",
-          type: "interview",
-          interviewType: type,
-          messages: []
-        }
-      });
-      
-      if (error) throw error;
-      setInterviewMessages([{ role: "assistant", content: data.result }]);
-    } catch (error: any) {
-      console.error("Interview error:", error);
-      toast({
-        title: "Lỗi",
-        description: "Không thể bắt đầu phỏng vấn. Vui lòng thử lại sau.",
-        variant: "destructive"
-      });
-    } finally {
-      setSimulating(false);
-    }
-  };
-
-  const sendInterviewMessage = async () => {
-    if (!interviewInput.trim() || simulating) return;
-    
-    const userMessage = interviewInput.trim();
-    setInterviewInput("");
-    setInterviewMessages(prev => [...prev, { role: "user", content: userMessage }]);
-    setSimulating(true);
-    
-    try {
-      const { data, error } = await supabase.functions.invoke("korea-career-search", {
-        body: { 
-          query: userMessage,
-          type: "interview",
-          interviewType: interviewType,
-          messages: [...interviewMessages, { role: "user", content: userMessage }]
-        }
-      });
-      
-      if (error) throw error;
-      setInterviewMessages(prev => [...prev, { role: "assistant", content: data.result }]);
-    } catch (error: any) {
-      console.error("Interview error:", error);
-      toast({
-        title: "Lỗi",
-        description: "Không thể tiếp tục phỏng vấn. Vui lòng thử lại sau.",
-        variant: "destructive"
-      });
-    } finally {
-      setSimulating(false);
-    }
+    navigate(service.path);
   };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <CleanHeader />
 
-      <main className="flex-1 pt-8 pb-12 px-4 max-w-6xl mx-auto">
+      <main className="flex-1 pt-8 pb-12 px-4 max-w-6xl mx-auto w-full">
         <motion.div
-
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="space-y-8"
         >
           {/* Premium Preview Banner */}
-          {!isPremium && <PremiumPreviewBanner featureName="dịch vụ tìm việc" />}
+          {!isPremium && <PremiumPreviewBanner featureName="한국 취업 서비스" />}
 
           {/* Header */}
           <div className="text-center space-y-4">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-korean-blue/20 to-korean-cyan/20 text-korean-blue">
-              <Plane className="w-4 h-4" />
-              <span className="text-sm font-medium">Du học & Việc làm Hàn Quốc</span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-heading font-bold text-foreground">
-              🇰🇷 Thông tin Du học & Việc làm
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30"
+            >
+              <Building2 className="w-4 h-4 text-blue-500" />
+              <span className="text-sm font-medium text-foreground">한국 취업 올인원 서비스</span>
+            </motion.div>
+            
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold">
+              <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                Korea Career
+              </span>
+              <span className="text-foreground"> Hub</span>
             </h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Tìm kiếm thông tin visa, học bổng, việc làm. Chỉnh sửa CV tiếng Hàn. Luyện phỏng vấn với AI.
+            
+            <p className="text-muted-foreground max-w-2xl mx-auto text-base sm:text-lg">
+              베트남인을 위한 한국 기업 취업 올인원 플랫폼<br />
+              <span className="text-sm">Nền tảng All-in-One cho người Việt tìm việc tại Hàn Quốc</span>
             </p>
           </div>
 
-          {/* Feature Cards */}
-          <div className="grid sm:grid-cols-3 gap-4">
-            {features.map((feature, idx) => (
+          {/* Service Cards */}
+          <div className="grid gap-6 md:grid-cols-3">
+            {services.map((service, idx) => (
               <motion.div
-                key={feature.tab}
-                initial={{ opacity: 0, y: 20 }}
+                key={service.id}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
+                transition={{ delay: 0.2 + idx * 0.1 }}
               >
-                <Card 
-                  className={`p-6 cursor-pointer transition-all hover:scale-[1.02] ${
-                    activeTab === feature.tab ? "ring-2 ring-primary" : ""
-                  }`}
-                  onClick={() => setActiveTab(feature.tab)}
+                <Card
+                  onClick={() => handleServiceClick(service)}
+                  className={`relative overflow-hidden p-6 h-full transition-all duration-300 ${
+                    service.status === "coming" 
+                      ? "opacity-70 cursor-not-allowed" 
+                      : "cursor-pointer hover:scale-[1.02] hover:shadow-xl"
+                  } bg-gradient-to-br ${service.bgGradient} border-2 border-transparent hover:border-primary/30`}
                 >
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4`}>
-                    <feature.icon className="w-6 h-6 text-white" />
+                  {/* Status Badge */}
+                  {service.status === "coming" && (
+                    <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-yellow-500/20 border border-yellow-500/50">
+                      <span className="text-xs font-medium text-yellow-600 dark:text-yellow-400">Coming Soon</span>
+                    </div>
+                  )}
+                  
+                  {service.status === "active" && (
+                    <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-green-500/20 border border-green-500/50">
+                      <span className="text-xs font-medium text-green-600 dark:text-green-400">Available</span>
+                    </div>
+                  )}
+
+                  {/* Icon */}
+                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${service.gradient} flex items-center justify-center mb-4 shadow-lg`}>
+                    <service.icon className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="font-semibold text-foreground mb-1">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground">{feature.description}</p>
+
+                  {/* Title */}
+                  <h3 className="text-xl font-bold text-foreground mb-1">{service.title}</h3>
+                  <p className="text-sm text-muted-foreground mb-3">{service.titleVi}</p>
+
+                  {/* Description */}
+                  <p className="text-sm text-foreground/80 mb-1">{service.description}</p>
+                  <p className="text-xs text-muted-foreground mb-4">{service.descriptionVi}</p>
+
+                  {/* Features */}
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap gap-1.5">
+                      {service.features.map((feature, i) => (
+                        <span
+                          key={i}
+                          className="px-2 py-0.5 text-xs rounded-full bg-background/50 text-foreground/70 border border-border/50"
+                        >
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* CTA */}
+                  {service.status === "active" && (
+                    <div className="mt-4 flex items-center gap-2 text-primary font-medium text-sm">
+                      <span>시작하기</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </div>
+                  )}
                 </Card>
               </motion.div>
             ))}
           </div>
 
-          {/* Tabs Content */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-6">
-              <TabsTrigger value="search" className="gap-2">
-                <Search className="w-4 h-4" />
-                <span className="hidden sm:inline">Tìm kiếm</span>
-              </TabsTrigger>
-              <TabsTrigger value="resume" className="gap-2">
-                <FileText className="w-4 h-4" />
-                <span className="hidden sm:inline">Chỉnh sửa CV</span>
-              </TabsTrigger>
-              <TabsTrigger value="interview" className="gap-2">
-                <MessageSquare className="w-4 h-4" />
-                <span className="hidden sm:inline">Phỏng vấn</span>
-              </TabsTrigger>
-            </TabsList>
-
-            {/* Search Tab */}
-            <TabsContent value="search" className="space-y-6">
-              <Card className="p-6">
-                <div className="flex gap-3">
-                  <Input
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Nhập câu hỏi về du học, visa, việc làm tại Hàn Quốc..."
-                    className="flex-1"
-                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  />
-                  <Button 
-                    onClick={isPremium ? handleSearch : () => navigate("/pricing")} 
-                    disabled={searching || (!isPremium && false) || !searchQuery.trim()}
-                    className={isPremium ? "btn-primary" : "bg-gradient-to-r from-korean-orange to-korean-pink text-white"}
-                  >
-                    {!isPremium ? <Lock className="w-4 h-4" /> : searching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                  </Button>
+          {/* Stats Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <Card className="p-6 bg-gradient-to-r from-primary/5 to-purple-500/5 border-primary/20">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div>
+                  <div className="text-2xl sm:text-3xl font-bold text-primary">500+</div>
+                  <div className="text-sm text-muted-foreground">파트너 기업</div>
                 </div>
-
-                {/* Quick Searches */}
-                <div className="mt-4">
-                  <p className="text-sm text-muted-foreground mb-2">Tìm kiếm nhanh:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {quickSearches.map((query, idx) => (
-                      <Button
-                        key={idx}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setSearchQuery(query);
-                          handleSearch();
-                        }}
-                        className="text-xs"
-                      >
-                        {query}
-                      </Button>
-                    ))}
-                  </div>
+                <div>
+                  <div className="text-2xl sm:text-3xl font-bold text-purple-500">1,000+</div>
+                  <div className="text-sm text-muted-foreground">취업 성공</div>
                 </div>
-              </Card>
-
-              {/* Search Results */}
-              {searchResults && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  <Card className="p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Sparkles className="w-5 h-5 text-primary" />
-                      <h3 className="font-semibold text-foreground">Kết quả tìm kiếm</h3>
-                    </div>
-                    <div className="prose prose-sm dark:prose-invert max-w-none">
-                      <div className="whitespace-pre-wrap text-foreground">{searchResults}</div>
-                    </div>
-                  </Card>
-                </motion.div>
-              )}
-
-              {/* Info Cards */}
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <Card className="p-4 hover:bg-muted/50 transition-colors cursor-pointer">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-korean-blue/20 flex items-center justify-center shrink-0">
-                      <GraduationCap className="w-5 h-5 text-korean-blue" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-foreground">Du học Hàn Quốc</h4>
-                      <p className="text-sm text-muted-foreground">Học bổng, trường đại học, visa D-4</p>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground ml-auto" />
-                  </div>
-                </Card>
-                <Card className="p-4 hover:bg-muted/50 transition-colors cursor-pointer">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-korean-orange/20 flex items-center justify-center shrink-0">
-                      <Building2 className="w-5 h-5 text-korean-orange" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-foreground">Việc làm tại Hàn</h4>
-                      <p className="text-sm text-muted-foreground">Visa E-7, tuyển dụng, lương thưởng</p>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground ml-auto" />
-                  </div>
-                </Card>
-                <Card className="p-4 hover:bg-muted/50 transition-colors cursor-pointer">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-korean-purple/20 flex items-center justify-center shrink-0">
-                      <Plane className="w-5 h-5 text-korean-purple" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-foreground">Thông tin Visa</h4>
-                      <p className="text-sm text-muted-foreground">Thủ tục, hồ sơ, phỏng vấn đại sứ quán</p>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground ml-auto" />
-                  </div>
-                </Card>
+                <div>
+                  <div className="text-2xl sm:text-3xl font-bold text-pink-500">98%</div>
+                  <div className="text-sm text-muted-foreground">만족도</div>
+                </div>
+                <div>
+                  <div className="text-2xl sm:text-3xl font-bold text-orange-500">24/7</div>
+                  <div className="text-sm text-muted-foreground">AI 지원</div>
+                </div>
               </div>
-            </TabsContent>
+            </Card>
+          </motion.div>
 
-            {/* Resume Tab */}
-            <TabsContent value="resume" className="space-y-6">
-              <Card className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <FileText className="w-5 h-5 text-primary" />
-                  <h3 className="font-semibold text-foreground">Chỉnh sửa CV / 자기소개서</h3>
-                </div>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Dán CV tiếng Hàn hoặc 자기소개서 của bạn vào đây. AI sẽ chấm điểm và đề xuất cách cải thiện.
-                </p>
-                <Textarea
-                  value={resumeText}
-                  onChange={(e) => setResumeText(e.target.value)}
-                  placeholder="Dán nội dung CV hoặc 자기소개서 của bạn tại đây..."
-                  className="min-h-[200px] mb-4"
-                />
-                <Button 
-                  onClick={isPremium ? handleResumeCorrection : () => navigate("/pricing")}
-                  disabled={correcting || !resumeText.trim()}
-                  className={`w-full ${isPremium ? "btn-primary" : "bg-gradient-to-r from-korean-orange to-korean-pink text-white"}`}
-                >
-                  {!isPremium ? (
-                    <>
-                      <Lock className="w-4 h-4 mr-2" />
-                      Nâng cấp Premium
-                    </>
-                  ) : correcting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Đang phân tích...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Chấm và sửa CV
-                    </>
-                  )}
-                </Button>
-              </Card>
-
-              {/* Correction Result */}
-              {correctionResult && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  <Card className="p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Sparkles className="w-5 h-5 text-korean-orange" />
-                      <h3 className="font-semibold text-foreground">Kết quả chấm điểm</h3>
+          {/* Premium CTA */}
+          {!isPremium && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              <Card 
+                className="p-6 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-yellow-500/30 cursor-pointer hover:shadow-lg transition-all"
+                onClick={() => navigate("/pricing")}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center">
+                      <Crown className="w-6 h-6 text-white" />
                     </div>
-                    <div className="prose prose-sm dark:prose-invert max-w-none">
-                      <div className="whitespace-pre-wrap text-foreground">{correctionResult}</div>
-                    </div>
-                  </Card>
-                </motion.div>
-              )}
-            </TabsContent>
-
-            {/* Interview Tab */}
-            <TabsContent value="interview" className="space-y-6">
-              {!interviewType ? (
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <Card 
-                    className="p-6 cursor-pointer hover:ring-2 hover:ring-primary transition-all"
-                    onClick={() => startInterview("company")}
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-korean-blue to-korean-cyan flex items-center justify-center mb-4">
-                      <Building2 className="w-6 h-6 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-foreground mb-2">Phỏng vấn công ty</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Luyện tập phỏng vấn xin việc tại công ty Hàn Quốc. AI sẽ đóng vai HR và đặt câu hỏi bằng tiếng Hàn.
-                    </p>
-                    <Button 
-                      className="w-full"
-                      onClick={() => isPremium ? startInterview("company") : navigate("/pricing")}
-                    >
-                      {isPremium ? "Bắt đầu phỏng vấn" : <><Lock className="w-4 h-4 mr-2" />Premium</>}
-                      <ChevronRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </Card>
-
-                  <Card 
-                    className="p-6 cursor-pointer hover:ring-2 hover:ring-primary transition-all"
-                    onClick={() => isPremium ? startInterview("visa") : navigate("/pricing")}
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-korean-purple to-korean-pink flex items-center justify-center mb-4">
-                      <Plane className="w-6 h-6 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-foreground mb-2">Phỏng vấn visa đại sứ quán</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Chuẩn bị cho buổi phỏng vấn visa tại Đại sứ quán Hàn Quốc. AI sẽ hỏi các câu hỏi thường gặp.
-                    </p>
-                    <Button className="w-full">
-                      {isPremium ? "Bắt đầu phỏng vấn" : <><Lock className="w-4 h-4 mr-2" />Premium</>}
-                      <ChevronRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </Card>
-                </div>
-              ) : (
-                <Card className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      {interviewType === "company" ? (
-                        <Building2 className="w-5 h-5 text-korean-blue" />
-                      ) : (
-                        <Plane className="w-5 h-5 text-korean-purple" />
-                      )}
-                      <h3 className="font-semibold text-foreground">
-                        {interviewType === "company" ? "Phỏng vấn công ty" : "Phỏng vấn visa"}
+                    <div>
+                      <h3 className="font-bold text-foreground flex items-center gap-2">
+                        Premium으로 업그레이드
+                        <Sparkles className="w-4 h-4 text-yellow-500" />
                       </h3>
+                      <p className="text-sm text-muted-foreground">모든 취업 서비스를 무제한으로 이용하세요</p>
                     </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => {
-                        setInterviewType(null);
-                        setInterviewMessages([]);
-                      }}
-                    >
-                      Kết thúc
-                    </Button>
                   </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                </div>
+              </Card>
+            </motion.div>
+          )}
 
-                  {/* Interview Messages */}
-                  <div className="space-y-4 max-h-[400px] overflow-y-auto mb-4 p-4 bg-muted/30 rounded-xl">
-                    {interviewMessages.map((msg, idx) => (
-                      <motion.div
-                        key={idx}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                      >
-                        <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                          msg.role === "user" 
-                            ? "bg-primary text-primary-foreground" 
-                            : "bg-card border border-border text-foreground"
-                        }`}>
-                          <p className="whitespace-pre-wrap">{msg.content}</p>
-                        </div>
-                      </motion.div>
-                    ))}
-                    {simulating && (
-                      <div className="flex justify-start">
-                        <div className="bg-card border border-border rounded-2xl px-4 py-3">
-                          <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Interview Input */}
-                  <div className="flex gap-3">
-                    <Input
-                      value={interviewInput}
-                      onChange={(e) => setInterviewInput(e.target.value)}
-                      placeholder="Nhập câu trả lời của bạn..."
-                      onKeyDown={(e) => e.key === "Enter" && sendInterviewMessage()}
-                      disabled={simulating}
-                    />
-                    <Button 
-                      onClick={sendInterviewMessage}
-                      disabled={simulating || !interviewInput.trim()}
-                    >
-                      <Send className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </Card>
-              )}
-            </TabsContent>
-          </Tabs>
+          {/* Additional Info */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="grid sm:grid-cols-2 gap-4"
+          >
+            <Card className="p-4 bg-muted/30">
+              <div className="flex items-start gap-3">
+                <Users className="w-5 h-5 text-primary mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-foreground">전문 헤드헌터 팀</h4>
+                  <p className="text-sm text-muted-foreground">
+                    삼성, LG, 현대 등 대기업부터 유망 스타트업까지 폭넓은 네트워크
+                  </p>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-4 bg-muted/30">
+              <div className="flex items-start gap-3">
+                <Sparkles className="w-5 h-5 text-purple-500 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-foreground">AI 기반 맞춤 서비스</h4>
+                  <p className="text-sm text-muted-foreground">
+                    최신 AI 기술로 기업 분석, 면접 연습, 이력서 최적화 지원
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
         </motion.div>
       </main>
 

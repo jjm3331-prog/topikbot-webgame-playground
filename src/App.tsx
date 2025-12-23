@@ -35,6 +35,8 @@ import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 import KoreaCareer from "./pages/KoreaCareer";
 import Headhunting from "./pages/Headhunting";
+import CompanyReport from "./pages/CompanyReport";
+import InterviewSimulation from "./pages/InterviewSimulation";
 import QuestionVariant from "./pages/QuestionVariant";
 import RoleplaySpeaking from "./pages/RoleplaySpeaking";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
@@ -121,6 +123,8 @@ const App = () => {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/korea-career" element={<KoreaCareer />} />
               <Route path="/headhunting" element={<Headhunting />} />
+              <Route path="/company-report" element={<CompanyReport />} />
+              <Route path="/interview-simulation" element={<InterviewSimulation />} />
               <Route path="/writing-correction" element={<WritingCorrection />} />
 
               {/* Free Routes */}
