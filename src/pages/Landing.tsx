@@ -917,39 +917,21 @@ const Landing = () => {
             </h2>
           </motion.div>
 
-          <div className="grid grid-cols-3 gap-3 sm:gap-4 max-w-2xl mx-auto items-stretch">
+          <div className="grid grid-cols-2 gap-4 sm:gap-6 max-w-xl mx-auto items-stretch">
             {/* Free */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="premium-card p-3 sm:p-5 text-center flex flex-col justify-between min-h-[160px] sm:min-h-[180px]"
+              className="premium-card p-4 sm:p-6 text-center flex flex-col justify-between min-h-[180px] sm:min-h-[200px]"
             >
               <div>
-                <h3 className="font-bold text-sm sm:text-base text-foreground">Miễn phí</h3>
-                <div className="text-xl sm:text-2xl font-black text-foreground my-1">0₫</div>
-                <p className="text-muted-foreground text-[10px] sm:text-xs mb-3">Mãi mãi</p>
+                <h3 className="font-bold text-base sm:text-lg text-foreground">Miễn phí</h3>
+                <div className="text-2xl sm:text-3xl font-black text-foreground my-2">0₫</div>
+                <p className="text-muted-foreground text-xs sm:text-sm mb-4">Mãi mãi</p>
               </div>
-              <Button variant="outline" size="sm" className="w-full text-xs rounded-lg" onClick={() => navigate("/auth")}>
+              <Button variant="outline" size="sm" className="w-full text-sm rounded-lg" onClick={() => navigate("/auth")}>
                 Bắt đầu
-              </Button>
-            </motion.div>
-
-            {/* Plus */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="premium-card p-3 sm:p-5 text-center flex flex-col justify-between min-h-[160px] sm:min-h-[180px]"
-            >
-              <div>
-                <h3 className="font-bold text-sm sm:text-base text-foreground">Plus</h3>
-                <div className="text-xl sm:text-2xl font-black text-foreground my-1">200K</div>
-                <p className="text-muted-foreground text-[10px] sm:text-xs mb-3">/tháng</p>
-              </div>
-              <Button variant="secondary" size="sm" className="w-full text-xs rounded-lg" onClick={() => navigate("/pricing")}>
-                Chi tiết
               </Button>
             </motion.div>
 
@@ -958,18 +940,18 @@ const Landing = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="premium-card p-3 sm:p-5 text-center border-2 border-primary/50 relative overflow-visible flex flex-col justify-between min-h-[160px] sm:min-h-[180px]"
+              transition={{ delay: 0.1 }}
+              className="premium-card p-4 sm:p-6 text-center border-2 border-primary/50 relative overflow-visible flex flex-col justify-between min-h-[180px] sm:min-h-[200px]"
             >
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full whitespace-nowrap z-10">
                 HOT
               </div>
               <div className="pt-2">
-                <h3 className="font-bold text-sm sm:text-base text-foreground">Premium</h3>
-                <div className="text-xl sm:text-2xl font-black text-foreground my-1">500K</div>
-                <p className="text-muted-foreground text-[10px] sm:text-xs mb-3">/tháng</p>
+                <h3 className="font-bold text-base sm:text-lg text-foreground">Premium</h3>
+                <div className="text-2xl sm:text-3xl font-black text-gradient-primary my-2">299K</div>
+                <p className="text-muted-foreground text-xs sm:text-sm mb-4">/tháng</p>
               </div>
-              <Button size="sm" className="w-full text-xs rounded-lg btn-primary text-primary-foreground" onClick={() => navigate("/pricing")}>
+              <Button size="sm" className="w-full text-sm rounded-lg btn-primary text-primary-foreground" onClick={() => navigate("/pricing")}>
                 Nâng cấp
               </Button>
             </motion.div>
