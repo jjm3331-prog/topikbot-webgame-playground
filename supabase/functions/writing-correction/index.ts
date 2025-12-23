@@ -52,11 +52,86 @@ serve(async (req) => {
   }
 
   try {
-    const { questionImageUrl, answerImageUrl, answerText } = await req.json();
+    const { questionImageUrl, answerImageUrl, answerText, ocrOnly } = await req.json();
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 
     if (!GEMINI_API_KEY) {
       throw new Error("GEMINI_API_KEY is not configured");
+    }
+
+    // OCR-only mode: extract text from answer image
+    if (ocrOnly && answerImageUrl) {
+      console.log("OCR-only mode: extracting text from image");
+      
+      let imageData = answerImageUrl;
+      let mimeType = "image/jpeg";
+      
+      // Handle base64 data URL
+      if (answerImageUrl.startsWith("data:")) {
+        const matches = answerImageUrl.match(/^data:([^;]+);base64,(.+)$/);
+        if (matches) {
+          mimeType = matches[1];
+          imageData = matches[2];
+        }
+      } else {
+        // Fetch image from URL
+        try {
+          const imgResponse = await fetch(answerImageUrl);
+          const arrayBuffer = await imgResponse.arrayBuffer();
+          imageData = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+          mimeType = imgResponse.headers.get("content-type") || "image/png";
+        } catch (e) {
+          console.error("Failed to fetch image for OCR:", e);
+          return new Response(
+            JSON.stringify({ extractedText: "" }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      }
+
+      const ocrResponse = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{
+              role: "user",
+              parts: [
+                { text: "이 이미지에서 한국어 텍스트를 추출해주세요. 손글씨나 타이핑된 텍스트 모두 포함합니다. 텍스트만 출력하고 다른 설명은 하지 마세요. 텍스트가 없으면 빈 문자열을 반환하세요." },
+                {
+                  inline_data: {
+                    mime_type: mimeType,
+                    data: imageData
+                  }
+                }
+              ]
+            }],
+            generationConfig: {
+              temperature: 0.1,
+              maxOutputTokens: 4096
+            }
+          }),
+        }
+      );
+
+      if (!ocrResponse.ok) {
+        console.error("OCR API error:", await ocrResponse.text());
+        return new Response(
+          JSON.stringify({ extractedText: "" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const ocrData = await ocrResponse.json();
+      const extractedText = ocrData.candidates?.[0]?.content?.parts?.[0]?.text || "";
+      
+      console.log("OCR extracted text length:", extractedText.length);
+      
+      return new Response(
+        JSON.stringify({ extractedText: extractedText.trim() }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     // Build the content parts for Gemini
