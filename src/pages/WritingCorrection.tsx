@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import jsPDF from "jspdf";
 import { 
   PenTool, 
   Upload, 
@@ -410,121 +411,176 @@ const WritingCorrection = () => {
     }
   };
 
+  // Helper function to clean markdown (remove ** marks)
+  const cleanMarkdown = (text: string): string => {
+    if (!text) return '';
+    return text
+      .replace(/\*\*/g, '') // Remove **
+      .replace(/\*/g, '')   // Remove single *
+      .replace(/##/g, '')   // Remove ##
+      .replace(/#/g, '')    // Remove #
+      .replace(/`/g, '')    // Remove backticks
+      .trim();
+  };
+
   const handleExportPDF = () => {
     if (!result) return;
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 15;
+    const contentWidth = pageWidth - margin * 2;
+    let yPos = 20;
     
-    // Build SWOT section
-    let swotSection = '';
-    if (result.swot_analysis) {
-      swotSection = `
-      SWOT Analysis:
-      ---------------
-      
-      ✅ STRENGTHS (강점):
-      ${result.swot_analysis.strengths?.map(s => `• ${s.title}${s.evidence ? ` - "${s.evidence}"` : ''}`).join('\n') || 'N/A'}
-      
-      ⚠️ WEAKNESSES (약점):
-      ${result.swot_analysis.weaknesses?.map(w => `• ${w.title}${w.impact ? ` - Impact: ${w.impact}` : ''}`).join('\n') || 'N/A'}
-      
-      🌟 OPPORTUNITIES (기회):
-      ${result.swot_analysis.opportunities?.map(o => `• ${o.title}${o.action ? ` - Action: ${o.action}` : ''}`).join('\n') || 'N/A'}
-      
-      🚧 THREATS (위협):
-      ${result.swot_analysis.threats?.map(t => `• ${t.title}${t.risk_level ? ` (Risk: ${t.risk_level})` : ''}${t.prevention ? ` - Prevention: ${t.prevention}` : ''}`).join('\n') || 'N/A'}
-      `;
-    }
+    // Helper function to add text with word wrap
+    const addText = (text: string, x: number, y: number, maxWidth: number, fontSize: number = 10) => {
+      doc.setFontSize(fontSize);
+      const lines = doc.splitTextToSize(cleanMarkdown(text), maxWidth);
+      doc.text(lines, x, y);
+      return y + (lines.length * fontSize * 0.4);
+    };
 
-    // Build vocabulary upgrades section
-    let vocabSection = '';
-    if (result.vocabulary_upgrades?.length) {
-      vocabSection = `
-      Vocabulary Upgrades (어휘 개선):
-      --------------------------------
-      ${result.vocabulary_upgrades.map(v => `• ${v.basic} → ${v.advanced}\n  ${v.difference}`).join('\n')}
-      `;
-    }
+    // Helper to check and add new page
+    const checkNewPage = (requiredSpace: number) => {
+      if (yPos + requiredSpace > 280) {
+        doc.addPage();
+        yPos = 20;
+      }
+    };
 
-    // Build structure improvements section
-    let structSection = '';
-    if (result.structure_improvements?.length) {
-      structSection = `
-      Structure Improvements (구조 개선):
-      ------------------------------------
-      ${result.structure_improvements.map(s => `• Current: ${s.current}\n  Improved: ${s.improved}\n  Reason: ${s.reason}`).join('\n')}
-      `;
-    }
-
-    // Build next priority section
-    let prioritySection = '';
-    if (result.next_priority?.length) {
-      prioritySection = `
-      Next Priority (다음 과제):
-      ---------------------------
-      ${result.next_priority.map((p, i) => `${i + 1}. ${p}`).join('\n')}
-      `;
-    }
+    // Title
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text("TOPIK Writing Correction Report", pageWidth / 2, yPos, { align: "center" });
+    yPos += 8;
     
-    const content = `
-═══════════════════════════════════════════════════════════════
-              TOPIK Writing Correction Report
-                    LUKATO AI - topikbot.kr
-═══════════════════════════════════════════════════════════════
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("LUKATO AI - topikbot.kr", pageWidth / 2, yPos, { align: "center" });
+    yPos += 15;
 
-📊 Overall Score: ${result.overall_score}/100
+    // Score Section
+    doc.setDrawColor(200, 200, 200);
+    doc.rect(margin, yPos, contentWidth, 45);
+    
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Overall Score: ${result.overall_score}/100`, pageWidth / 2, yPos + 12, { align: "center" });
+    
+    yPos += 22;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    
+    // Score table
+    const scores = [
+      { label: "Grammar", score: result.grammar_score },
+      { label: "Vocabulary", score: result.vocabulary_score },
+      { label: "Structure", score: result.structure_score },
+      { label: "Content", score: result.content_score },
+    ];
+    
+    const colWidth = contentWidth / 4;
+    scores.forEach((s, i) => {
+      const x = margin + (i * colWidth) + colWidth / 2;
+      doc.text(s.label, x, yPos, { align: "center" });
+      doc.setFont("helvetica", "bold");
+      doc.text(`${s.score}/25`, x, yPos + 6, { align: "center" });
+      doc.setFont("helvetica", "normal");
+    });
+    
+    yPos += 30;
 
-📈 Score Breakdown:
-   ├─ Grammar (문법):     ${result.grammar_score}/25
-   ├─ Vocabulary (어휘):  ${result.vocabulary_score}/25
-   ├─ Structure (구조):   ${result.structure_score}/25
-   └─ Content (내용):     ${result.content_score}/25
+    // Strengths
+    checkNewPage(40);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Strengths", margin, yPos);
+    yPos += 8;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    result.strengths.forEach(s => {
+      checkNewPage(10);
+      yPos = addText(`- ${s}`, margin + 5, yPos, contentWidth - 10, 10);
+      yPos += 2;
+    });
+    yPos += 5;
 
-═══════════════════════════════════════════════════════════════
-${swotSection}
-═══════════════════════════════════════════════════════════════
+    // Improvements
+    checkNewPage(40);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Areas for Improvement", margin, yPos);
+    yPos += 8;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    result.improvements.forEach(i => {
+      checkNewPage(10);
+      yPos = addText(`- ${i}`, margin + 5, yPos, contentWidth - 10, 10);
+      yPos += 2;
+    });
+    yPos += 10;
 
-✅ Strengths (강점):
-${result.strengths.map(s => `   • ${s}`).join('\n')}
+    // Corrections
+    if (result.corrections.length > 0) {
+      checkNewPage(40);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("Corrections", margin, yPos);
+      yPos += 8;
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "normal");
+      result.corrections.slice(0, 10).forEach(c => {
+        checkNewPage(20);
+        doc.setTextColor(200, 0, 0);
+        yPos = addText(`Original: ${c.original}`, margin + 5, yPos, contentWidth - 10, 9);
+        doc.setTextColor(0, 150, 0);
+        yPos = addText(`Corrected: ${c.corrected}`, margin + 5, yPos + 2, contentWidth - 10, 9);
+        doc.setTextColor(100, 100, 100);
+        yPos = addText(`${c.explanation}`, margin + 5, yPos + 2, contentWidth - 10, 8);
+        doc.setTextColor(0, 0, 0);
+        yPos += 5;
+      });
+      yPos += 5;
+    }
 
-⚠️ Areas for Improvement (개선점):
-${result.improvements.map(i => `   • ${i}`).join('\n')}
+    // Model Answer
+    checkNewPage(50);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Model Answer", margin, yPos);
+    yPos += 8;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    yPos = addText(result.model_answer, margin + 5, yPos, contentWidth - 10, 10);
+    yPos += 10;
 
-═══════════════════════════════════════════════════════════════
+    // Detailed Feedback
+    if (result.detailed_feedback) {
+      checkNewPage(50);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("Detailed Feedback", margin, yPos);
+      yPos += 8;
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      yPos = addText(result.detailed_feedback, margin + 5, yPos, contentWidth - 10, 10);
+    }
 
-🚑 FIRST AID - Corrections (수정 사항):
-${result.corrections.map(c => `
-   ❌ Original: ${c.original}
-   ✅ Corrected: ${c.corrected}
-   📝 Explanation: ${c.explanation}
-   Type: ${c.type}
-`).join('\n')}
-${vocabSection}
-${structSection}
-═══════════════════════════════════════════════════════════════
+    // Footer
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text(`Generated by LUKATO AI | Page ${i} of ${pageCount}`, pageWidth / 2, 290, { align: "center" });
+      doc.setTextColor(0, 0, 0);
+    }
 
-✨ Model Answer (모범 답안):
-${result.model_answer}
-
-═══════════════════════════════════════════════════════════════
-
-📝 Detailed Feedback (상세 피드백):
-${result.detailed_feedback}
-${prioritySection}
-═══════════════════════════════════════════════════════════════
-                    Generated by LUKATO AI
-═══════════════════════════════════════════════════════════════
-    `;
-
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `TOPIK_Writing_Report_${Date.now()}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+    doc.save(`TOPIK_Writing_Report_${Date.now()}.pdf`);
 
     toast({
-      title: "Đã xuất báo cáo!",
-      description: "File đã được tải xuống"
+      title: "PDF 다운로드 완료!",
+      description: "파일이 다운로드되었습니다"
     });
   };
 
@@ -1053,14 +1109,26 @@ ${prioritySection}
                             ✅ Strengths (강점) ({result.swot_analysis.strengths?.length || 0})
                           </AccordionTrigger>
                           <AccordionContent className="pb-3">
-                            <div className="space-y-2">
-                              {result.swot_analysis.strengths?.map((s, i) => (
-                                <div key={i} className="text-xs p-2 bg-background/50 rounded">
-                                  <p className="font-medium text-foreground">{s.title}</p>
-                                  {s.evidence && <p className="text-muted-foreground italic mt-1">"{s.evidence}"</p>}
-                                  {s.analysis && <p className="text-muted-foreground mt-1">{s.analysis}</p>}
-                                </div>
-                              ))}
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-xs border-collapse">
+                                <thead>
+                                  <tr className="bg-green-500/20">
+                                    <th className="py-2 px-2 text-left font-medium text-green-700 dark:text-green-300 border-b border-green-500/30">💡 포인트</th>
+                                    <th className="py-2 px-2 text-left font-medium text-green-700 dark:text-green-300 border-b border-green-500/30">📝 근거/분석</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {result.swot_analysis.strengths?.map((s, i) => (
+                                    <tr key={i} className={i % 2 === 0 ? 'bg-background/50' : 'bg-background/30'}>
+                                      <td className="py-2 px-2 font-medium text-foreground border-r border-green-500/20">{cleanMarkdown(s.title)}</td>
+                                      <td className="py-2 px-2 text-muted-foreground">
+                                        {s.evidence && <span className="italic">"{cleanMarkdown(s.evidence)}"</span>}
+                                        {s.analysis && <span className="block mt-1">{cleanMarkdown(s.analysis)}</span>}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
                             </div>
                           </AccordionContent>
                         </AccordionItem>
@@ -1071,14 +1139,26 @@ ${prioritySection}
                             ⚠️ Weaknesses (약점) ({result.swot_analysis.weaknesses?.length || 0})
                           </AccordionTrigger>
                           <AccordionContent className="pb-3">
-                            <div className="space-y-2">
-                              {result.swot_analysis.weaknesses?.map((w, i) => (
-                                <div key={i} className="text-xs p-2 bg-background/50 rounded">
-                                  <p className="font-medium text-foreground">{w.title}</p>
-                                  {w.issue && <p className="text-muted-foreground mt-1">{w.issue}</p>}
-                                  {w.impact && <p className="text-muted-foreground mt-1">영향: {w.impact}</p>}
-                                </div>
-                              ))}
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-xs border-collapse">
+                                <thead>
+                                  <tr className="bg-red-500/20">
+                                    <th className="py-2 px-2 text-left font-medium text-red-700 dark:text-red-300 border-b border-red-500/30">❌ 문제점</th>
+                                    <th className="py-2 px-2 text-left font-medium text-red-700 dark:text-red-300 border-b border-red-500/30">⚡ 영향</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {result.swot_analysis.weaknesses?.map((w, i) => (
+                                    <tr key={i} className={i % 2 === 0 ? 'bg-background/50' : 'bg-background/30'}>
+                                      <td className="py-2 px-2 font-medium text-foreground border-r border-red-500/20">
+                                        {cleanMarkdown(w.title)}
+                                        {w.issue && <span className="block text-muted-foreground mt-1">{cleanMarkdown(w.issue)}</span>}
+                                      </td>
+                                      <td className="py-2 px-2 text-muted-foreground">{w.impact && cleanMarkdown(w.impact)}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
                             </div>
                           </AccordionContent>
                         </AccordionItem>
@@ -1089,14 +1169,25 @@ ${prioritySection}
                             🌟 Opportunities (기회) ({result.swot_analysis.opportunities?.length || 0})
                           </AccordionTrigger>
                           <AccordionContent className="pb-3">
-                            <div className="space-y-2">
-                              {result.swot_analysis.opportunities?.map((o, i) => (
-                                <div key={i} className="text-xs p-2 bg-background/50 rounded">
-                                  <p className="font-medium text-foreground">{o.title}</p>
-                                  {o.action && <p className="text-muted-foreground mt-1">방법: {o.action}</p>}
-                                  {o.benefit && <p className="text-green-600 dark:text-green-400 mt-1">효과: {o.benefit}</p>}
-                                </div>
-                              ))}
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-xs border-collapse">
+                                <thead>
+                                  <tr className="bg-blue-500/20">
+                                    <th className="py-2 px-2 text-left font-medium text-blue-700 dark:text-blue-300 border-b border-blue-500/30">🎯 기회</th>
+                                    <th className="py-2 px-2 text-left font-medium text-blue-700 dark:text-blue-300 border-b border-blue-500/30">🚀 방법</th>
+                                    <th className="py-2 px-2 text-left font-medium text-blue-700 dark:text-blue-300 border-b border-blue-500/30">✨ 효과</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {result.swot_analysis.opportunities?.map((o, i) => (
+                                    <tr key={i} className={i % 2 === 0 ? 'bg-background/50' : 'bg-background/30'}>
+                                      <td className="py-2 px-2 font-medium text-foreground border-r border-blue-500/20">{cleanMarkdown(o.title)}</td>
+                                      <td className="py-2 px-2 text-muted-foreground border-r border-blue-500/20">{o.action && cleanMarkdown(o.action)}</td>
+                                      <td className="py-2 px-2 text-green-600 dark:text-green-400">{o.benefit && cleanMarkdown(o.benefit)}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
                             </div>
                           </AccordionContent>
                         </AccordionItem>
@@ -1107,22 +1198,35 @@ ${prioritySection}
                             🚧 Threats (위협) ({result.swot_analysis.threats?.length || 0})
                           </AccordionTrigger>
                           <AccordionContent className="pb-3">
-                            <div className="space-y-2">
-                              {result.swot_analysis.threats?.map((t, i) => (
-                                <div key={i} className="text-xs p-2 bg-background/50 rounded">
-                                  <p className="font-medium text-foreground">{t.title}</p>
-                                  {t.risk_level && (
-                                    <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium mt-1 ${
-                                      t.risk_level === '상' ? 'bg-red-500/20 text-red-600' :
-                                      t.risk_level === '중' ? 'bg-orange-500/20 text-orange-600' :
-                                      'bg-green-500/20 text-green-600'
-                                    }`}>
-                                      위험도: {t.risk_level}
-                                    </span>
-                                  )}
-                                  {t.prevention && <p className="text-muted-foreground mt-1">예방: {t.prevention}</p>}
-                                </div>
-                              ))}
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-xs border-collapse">
+                                <thead>
+                                  <tr className="bg-orange-500/20">
+                                    <th className="py-2 px-2 text-left font-medium text-orange-700 dark:text-orange-300 border-b border-orange-500/30">⚠️ 위협</th>
+                                    <th className="py-2 px-2 text-left font-medium text-orange-700 dark:text-orange-300 border-b border-orange-500/30 w-20">🔥 위험도</th>
+                                    <th className="py-2 px-2 text-left font-medium text-orange-700 dark:text-orange-300 border-b border-orange-500/30">🛡️ 예방법</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {result.swot_analysis.threats?.map((t, i) => (
+                                    <tr key={i} className={i % 2 === 0 ? 'bg-background/50' : 'bg-background/30'}>
+                                      <td className="py-2 px-2 font-medium text-foreground border-r border-orange-500/20">{cleanMarkdown(t.title)}</td>
+                                      <td className="py-2 px-2 border-r border-orange-500/20">
+                                        {t.risk_level && (
+                                          <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                                            t.risk_level === '상' ? 'bg-red-500/20 text-red-600' :
+                                            t.risk_level === '중' ? 'bg-orange-500/20 text-orange-600' :
+                                            'bg-green-500/20 text-green-600'
+                                          }`}>
+                                            {t.risk_level}
+                                          </span>
+                                        )}
+                                      </td>
+                                      <td className="py-2 px-2 text-muted-foreground">{t.prevention && cleanMarkdown(t.prevention)}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
                             </div>
                           </AccordionContent>
                         </AccordionItem>
@@ -1284,16 +1388,51 @@ ${prioritySection}
                     </Card>
                   )}
 
-                  {/* Detailed Feedback */}
+                  {/* Detailed Feedback - Table Format */}
                   {result.detailed_feedback && (
                     <Card className="p-5 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5 border-primary/20">
                       <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 text-base">
                         💬 상세 피드백 (Chi tiết đánh giá)
                       </h4>
-                      <div className="prose prose-sm dark:prose-invert max-w-none">
-                        <p className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed">
-                          {result.detailed_feedback}
-                        </p>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm border-collapse">
+                          <tbody>
+                            {cleanMarkdown(result.detailed_feedback)
+                              .split('\n')
+                              .filter(line => line.trim())
+                              .map((line, i) => {
+                                // Check if line looks like a header/category
+                                const isHeader = line.includes(':') && line.indexOf(':') < 30;
+                                const parts = isHeader ? line.split(':') : [null, line];
+                                
+                                return (
+                                  <tr key={i} className={i % 2 === 0 ? 'bg-background/30' : 'bg-background/10'}>
+                                    {isHeader && parts[0] ? (
+                                      <>
+                                        <td className="py-2 px-3 font-medium text-primary whitespace-nowrap border-r border-border/30 w-1/4">
+                                          {i === 0 && '📌 '}{parts[0].trim()}
+                                        </td>
+                                        <td className="py-2 px-3 text-foreground/90">
+                                          {parts.slice(1).join(':').trim()}
+                                        </td>
+                                      </>
+                                    ) : (
+                                      <td colSpan={2} className="py-2 px-3 text-foreground/90">
+                                        {line.startsWith('•') || line.startsWith('-') ? (
+                                          <span className="flex items-start gap-2">
+                                            <span className="text-primary">✦</span>
+                                            {line.replace(/^[•\-]\s*/, '')}
+                                          </span>
+                                        ) : (
+                                          line
+                                        )}
+                                      </td>
+                                    )}
+                                  </tr>
+                                );
+                              })}
+                          </tbody>
+                        </table>
                       </div>
                     </Card>
                   )}
@@ -1303,10 +1442,18 @@ ${prioritySection}
                     <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 text-base">
                       ✨ Bài mẫu tham khảo (모범 답안)
                     </h4>
-                    <div className="bg-muted/30 rounded-lg p-4">
-                      <p className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed">
-                        {result.model_answer}
-                      </p>
+                    <div className="bg-muted/30 rounded-lg p-4 border border-border/50">
+                      <div className="space-y-3">
+                        {cleanMarkdown(result.model_answer)
+                          .split('\n\n')
+                          .filter(para => para.trim())
+                          .map((paragraph, i) => (
+                            <p key={i} className="text-sm text-foreground/90 leading-relaxed">
+                              {i === 0 && <span className="text-primary font-medium">📝 </span>}
+                              {paragraph.trim()}
+                            </p>
+                          ))}
+                      </div>
                     </div>
                   </Card>
 
