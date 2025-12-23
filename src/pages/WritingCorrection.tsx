@@ -89,12 +89,14 @@ const WritingCorrection = () => {
   const [processing, setProcessing] = useState(false);
   const [saving, setSaving] = useState(false);
   
-  const [questionImage, setQuestionImage] = useState<File | null>(null);
-  const [questionImagePreview, setQuestionImagePreview] = useState<string | null>(null);
+  const [questionImages, setQuestionImages] = useState<File[]>([]);
+  const [questionImagePreviews, setQuestionImagePreviews] = useState<string[]>([]);
   const [answerMethod, setAnswerMethod] = useState<"image" | "text">("text");
-  const [answerImage, setAnswerImage] = useState<File | null>(null);
-  const [answerImagePreview, setAnswerImagePreview] = useState<string | null>(null);
+  const [answerImages, setAnswerImages] = useState<File[]>([]);
+  const [answerImagePreviews, setAnswerImagePreviews] = useState<string[]>([]);
   const [answerText, setAnswerText] = useState("");
+  
+  const MAX_IMAGES = 10;
   
   const [result, setResult] = useState<CorrectionResult | null>(null);
   const [savedCorrections, setSavedCorrections] = useState<SavedCorrection[]>([]);
@@ -222,24 +224,54 @@ const WritingCorrection = () => {
     e: React.ChangeEvent<HTMLInputElement>,
     type: "question" | "answer"
   ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const preview = e.target?.result as string;
-      if (type === "question") {
-        setQuestionImage(file);
-        setQuestionImagePreview(preview);
-      } else {
-        setAnswerImage(file);
-        setAnswerImagePreview(preview);
-        // When answer image is uploaded, offer OCR editing
-        setOcrEditingType("answer");
-        performOCR(preview, "answer");
-      }
-    };
-    reader.readAsDataURL(file);
+    const currentCount = type === "question" ? questionImages.length : answerImages.length;
+    const remainingSlots = MAX_IMAGES - currentCount;
+    const filesToProcess = Array.from(files).slice(0, remainingSlots);
+
+    if (filesToProcess.length === 0) {
+      toast({
+        title: "Đã đạt giới hạn",
+        description: `Tối đa ${MAX_IMAGES} ảnh có thể upload`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    filesToProcess.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const preview = event.target?.result as string;
+        if (type === "question") {
+          setQuestionImages(prev => [...prev, file]);
+          setQuestionImagePreviews(prev => [...prev, preview]);
+        } else {
+          setAnswerImages(prev => [...prev, file]);
+          setAnswerImagePreviews(prev => [...prev, preview]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Show toast if some files were skipped
+    if (files.length > remainingSlots) {
+      toast({
+        title: "Một số ảnh bị bỏ qua",
+        description: `Chỉ ${filesToProcess.length} ảnh được thêm (tối đa ${MAX_IMAGES} ảnh)`,
+      });
+    }
+  };
+
+  const removeImage = (type: "question" | "answer", index: number) => {
+    if (type === "question") {
+      setQuestionImages(prev => prev.filter((_, i) => i !== index));
+      setQuestionImagePreviews(prev => prev.filter((_, i) => i !== index));
+    } else {
+      setAnswerImages(prev => prev.filter((_, i) => i !== index));
+      setAnswerImagePreviews(prev => prev.filter((_, i) => i !== index));
+    }
   };
 
   const performOCR = async (imageBase64: string, type: "question" | "answer") => {
@@ -300,7 +332,7 @@ const WritingCorrection = () => {
   };
 
   const handleSubmit = async () => {
-    if (!questionImage) {
+    if (questionImages.length === 0) {
       toast({
         title: "Thiếu thông tin",
         description: "Vui lòng upload hình ảnh đề bài",
@@ -309,7 +341,7 @@ const WritingCorrection = () => {
       return;
     }
 
-    if (answerMethod === "image" && !answerImage) {
+    if (answerMethod === "image" && answerImages.length === 0) {
       toast({
         title: "Thiếu thông tin",
         description: "Vui lòng upload hình ảnh bài làm",
@@ -332,17 +364,30 @@ const WritingCorrection = () => {
 
     try {
       const timestamp = Date.now();
-      const questionImageUrl = await uploadImage(
-        questionImage,
-        `${user.id}/question-${timestamp}.jpg`
-      );
-
-      let answerImageUrl: string | null = null;
-      if (answerMethod === "image" && answerImage) {
-        answerImageUrl = await uploadImage(
-          answerImage,
-          `${user.id}/answer-${timestamp}.jpg`
+      
+      // Upload all question images
+      const questionImageUrls: string[] = [];
+      for (let i = 0; i < questionImages.length; i++) {
+        const url = await uploadImage(
+          questionImages[i],
+          `${user.id}/question-${timestamp}-${i}.jpg`
         );
+        if (url) questionImageUrls.push(url);
+      }
+      const questionImageUrl = questionImageUrls[0] || null;
+
+      // Upload all answer images
+      let answerImageUrl: string | null = null;
+      const answerImageUrls: string[] = [];
+      if (answerMethod === "image" && answerImages.length > 0) {
+        for (let i = 0; i < answerImages.length; i++) {
+          const url = await uploadImage(
+            answerImages[i],
+            `${user.id}/answer-${timestamp}-${i}.jpg`
+          );
+          if (url) answerImageUrls.push(url);
+        }
+        answerImageUrl = answerImageUrls[0] || null;
       }
 
       const response = await supabase.functions.invoke("writing-correction", {
@@ -385,8 +430,8 @@ const WritingCorrection = () => {
     try {
       const { error } = await supabase.from("writing_corrections").insert([{
         user_id: user.id,
-        question_image_url: questionImagePreview,
-        answer_image_url: answerImagePreview,
+        question_image_url: questionImagePreviews[0] || null,
+        answer_image_url: answerImagePreviews[0] || null,
         answer_text: answerText || null,
         correction_report: JSON.parse(JSON.stringify(result)),
         score: result.overall_score
@@ -716,6 +761,7 @@ const WritingCorrection = () => {
                   ref={questionInputRef}
                   type="file"
                   accept="image/*"
+                  multiple
                   onChange={(e) => handleImageUpload(e, "question")}
                   className="hidden"
                 />
@@ -729,43 +775,79 @@ const WritingCorrection = () => {
                   className="hidden"
                 />
 
-                {questionImagePreview ? (
-                  <div className="relative">
-                    <img 
-                      src={questionImagePreview} 
-                      alt="Question" 
-                      className="w-full rounded-lg border border-border"
-                    />
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-2 right-2"
-                      onClick={() => {
-                        setQuestionImage(null);
-                        setQuestionImagePreview(null);
-                      }}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
+                {questionImagePreviews.length > 0 ? (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {questionImagePreviews.map((preview, index) => (
+                        <div key={index} className="relative aspect-square">
+                          <img 
+                            src={preview} 
+                            alt={`Question ${index + 1}`} 
+                            className="w-full h-full object-cover rounded-lg border border-border"
+                          />
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-1 right-1 h-6 w-6"
+                            onClick={() => removeImage("question", index)}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                          <span className="absolute bottom-1 left-1 bg-background/80 text-xs px-1.5 py-0.5 rounded">
+                            {index + 1}/{questionImagePreviews.length}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    {questionImagePreviews.length < MAX_IMAGES && (
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => questionInputRef.current?.click()}
+                        >
+                          <Upload className="w-4 h-4 mr-2" />
+                          Thêm ảnh ({questionImagePreviews.length}/{MAX_IMAGES})
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setQuestionImages([]);
+                            setQuestionImagePreviews([]);
+                          }}
+                        >
+                          Xóa tất cả
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 ) : (
-                  <div className="flex gap-3">
-                    <Button
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() => questionInputRef.current?.click()}
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload ảnh
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() => questionCameraRef.current?.click()}
-                    >
-                      <Camera className="w-4 h-4 mr-2" />
-                      Chụp ảnh
-                    </Button>
+                  <div className="space-y-3">
+                    <div className="border-2 border-dashed border-border rounded-lg p-6 text-center bg-muted/20">
+                      <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                      <p className="text-sm font-medium text-foreground">📷 Tối đa {MAX_IMAGES} ảnh đề bài</p>
+                      <p className="text-xs text-muted-foreground mt-1">Hỗ trợ upload nhiều ảnh cùng lúc</p>
+                    </div>
+                    <div className="flex gap-3">
+                      <Button
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => questionInputRef.current?.click()}
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload ảnh
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => questionCameraRef.current?.click()}
+                      >
+                        <Camera className="w-4 h-4 mr-2" />
+                        Chụp ảnh
+                      </Button>
+                    </div>
                   </div>
                 )}
               </Card>
@@ -807,6 +889,7 @@ const WritingCorrection = () => {
                       ref={answerInputRef}
                       type="file"
                       accept="image/*"
+                      multiple
                       onChange={(e) => handleImageUpload(e, "answer")}
                       className="hidden"
                     />
@@ -820,51 +903,87 @@ const WritingCorrection = () => {
                       className="hidden"
                     />
 
-                    {answerImagePreview ? (
-                      <div className="relative">
-                        <img 
-                          src={answerImagePreview} 
-                          alt="Answer" 
-                          className="w-full rounded-lg border border-border"
-                        />
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          className="absolute top-2 right-2"
-                          onClick={() => {
-                            setAnswerImage(null);
-                            setAnswerImagePreview(null);
-                          }}
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                        {ocrProcessing && (
-                          <div className="absolute inset-0 bg-background/80 flex items-center justify-center rounded-lg">
-                            <div className="text-center">
-                              <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
-                              <p className="text-sm">Đang nhận dạng văn bản...</p>
+                    {answerImagePreviews.length > 0 ? (
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {answerImagePreviews.map((preview, index) => (
+                            <div key={index} className="relative aspect-square">
+                              <img 
+                                src={preview} 
+                                alt={`Answer ${index + 1}`} 
+                                className="w-full h-full object-cover rounded-lg border border-border"
+                              />
+                              <Button
+                                variant="destructive"
+                                size="icon"
+                                className="absolute top-1 right-1 h-6 w-6"
+                                onClick={() => removeImage("answer", index)}
+                              >
+                                <X className="w-3 h-3" />
+                              </Button>
+                              <span className="absolute bottom-1 left-1 bg-background/80 text-xs px-1.5 py-0.5 rounded">
+                                {index + 1}/{answerImagePreviews.length}
+                              </span>
+                              {ocrProcessing && index === answerImagePreviews.length - 1 && (
+                                <div className="absolute inset-0 bg-background/80 flex items-center justify-center rounded-lg">
+                                  <div className="text-center">
+                                    <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
+                                    <p className="text-xs">OCR...</p>
+                                  </div>
+                                </div>
+                              )}
                             </div>
+                          ))}
+                        </div>
+                        {answerImagePreviews.length < MAX_IMAGES && (
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1"
+                              onClick={() => answerInputRef.current?.click()}
+                            >
+                              <Upload className="w-4 h-4 mr-2" />
+                              Thêm ảnh ({answerImagePreviews.length}/{MAX_IMAGES})
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setAnswerImages([]);
+                                setAnswerImagePreviews([]);
+                              }}
+                            >
+                              Xóa tất cả
+                            </Button>
                           </div>
                         )}
                       </div>
                     ) : (
-                      <div className="flex gap-3">
-                        <Button
-                          variant="outline"
-                          className="flex-1"
-                          onClick={() => answerInputRef.current?.click()}
-                        >
-                          <Upload className="w-4 h-4 mr-2" />
-                          Upload ảnh
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className="flex-1"
-                          onClick={() => answerCameraRef.current?.click()}
-                        >
-                          <Camera className="w-4 h-4 mr-2" />
-                          Chụp ảnh
-                        </Button>
+                      <div className="space-y-3">
+                        <div className="border-2 border-dashed border-border rounded-lg p-6 text-center bg-muted/20">
+                          <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                          <p className="text-sm font-medium text-foreground">📷 Tối đa {MAX_IMAGES} ảnh bài làm</p>
+                          <p className="text-xs text-muted-foreground mt-1">Hỗ trợ upload nhiều ảnh cùng lúc</p>
+                        </div>
+                        <div className="flex gap-3">
+                          <Button
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => answerInputRef.current?.click()}
+                          >
+                            <Upload className="w-4 h-4 mr-2" />
+                            Upload ảnh
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => answerCameraRef.current?.click()}
+                          >
+                            <Camera className="w-4 h-4 mr-2" />
+                            Chụp ảnh
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </TabsContent>
@@ -875,7 +994,7 @@ const WritingCorrection = () => {
               {canSubmit ? (
                 <Button
                   onClick={handleSubmit}
-                  disabled={processing || !questionImage}
+                  disabled={processing || questionImages.length === 0}
                   className="w-full btn-primary text-primary-foreground h-14 text-lg"
                 >
                   {processing ? (
