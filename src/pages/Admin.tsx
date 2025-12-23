@@ -23,6 +23,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 
 interface StatCard {
@@ -128,6 +136,12 @@ const Admin = () => {
     target_user_id: string | null;
     created_at: string;
   }>>([]);
+  
+  // Quick notification for selected user
+  const [quickNotificationOpen, setQuickNotificationOpen] = useState(false);
+  const [quickNotificationTitle, setQuickNotificationTitle] = useState("");
+  const [quickNotificationMessage, setQuickNotificationMessage] = useState("");
+  const [quickNotificationType, setQuickNotificationType] = useState<"info" | "success" | "warning" | "error">("info");
   const [loadingNotifications, setLoadingNotifications] = useState(false);
 
   useEffect(() => {
@@ -357,6 +371,58 @@ const Admin = () => {
         description: "알림을 삭제하는 중 오류가 발생했습니다.",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleQuickNotification = async () => {
+    if (!selectedUser) return;
+    
+    if (!quickNotificationTitle.trim() || !quickNotificationMessage.trim()) {
+      toast({
+        title: "입력 오류",
+        description: "제목과 내용을 모두 입력해주세요.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSendingNotification(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const { error } = await supabase.from("notifications").insert({
+        title: quickNotificationTitle.trim(),
+        message: quickNotificationMessage.trim(),
+        type: quickNotificationType,
+        is_global: false,
+        target_user_id: selectedUser.id,
+        created_by: user?.id,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "알림 발송 완료",
+        description: `${selectedUser.username}님에게 알림이 발송되었습니다.`,
+      });
+
+      // Reset form and close dialog
+      setQuickNotificationTitle("");
+      setQuickNotificationMessage("");
+      setQuickNotificationType("info");
+      setQuickNotificationOpen(false);
+
+      // Reload notifications
+      await loadNotifications();
+    } catch (error) {
+      console.error("Send quick notification error:", error);
+      toast({
+        title: "알림 발송 실패",
+        description: "알림을 발송하는 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    } finally {
+      setSendingNotification(false);
     }
   };
 
@@ -1181,6 +1247,22 @@ const Admin = () => {
                             </Button>
                           </div>
                         </div>
+                        
+                        {/* Quick Notification Button */}
+                        <div className="pt-4 border-t space-y-2">
+                          <p className="text-muted-foreground text-xs mb-2 flex items-center gap-1">
+                            <Bell className="w-3 h-3" /> 알림 발송
+                          </p>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => setQuickNotificationOpen(true)}
+                          >
+                            <Send className="w-3 h-3 mr-2" />
+                            이 사용자에게 알림 보내기
+                          </Button>
+                        </div>
                       </div>
                     ) : (
                       <p className="text-muted-foreground text-sm text-center py-8">
@@ -1192,6 +1274,92 @@ const Admin = () => {
               </div>
             </div>
           </TabsContent>
+
+          {/* Quick Notification Dialog */}
+          <Dialog open={quickNotificationOpen} onOpenChange={setQuickNotificationOpen}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Bell className="w-5 h-5" />
+                  알림 발송
+                </DialogTitle>
+                <DialogDescription>
+                  {selectedUser?.username}님에게 알림을 보냅니다.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label>알림 유형</Label>
+                  <Select
+                    value={quickNotificationType}
+                    onValueChange={(v) => setQuickNotificationType(v as typeof quickNotificationType)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="info">
+                        <span className="flex items-center gap-2">
+                          <Info className="w-4 h-4 text-blue-500" /> 정보
+                        </span>
+                      </SelectItem>
+                      <SelectItem value="success">
+                        <span className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-500" /> 성공
+                        </span>
+                      </SelectItem>
+                      <SelectItem value="warning">
+                        <span className="flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4 text-yellow-500" /> 경고
+                        </span>
+                      </SelectItem>
+                      <SelectItem value="error">
+                        <span className="flex items-center gap-2">
+                          <XCircle className="w-4 h-4 text-red-500" /> 오류
+                        </span>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>제목</Label>
+                  <Input
+                    placeholder="알림 제목을 입력하세요"
+                    value={quickNotificationTitle}
+                    onChange={(e) => setQuickNotificationTitle(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>내용</Label>
+                  <Textarea
+                    placeholder="알림 내용을 입력하세요"
+                    value={quickNotificationMessage}
+                    onChange={(e) => setQuickNotificationMessage(e.target.value)}
+                    className="min-h-[100px]"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setQuickNotificationOpen(false)}
+                >
+                  취소
+                </Button>
+                <Button
+                  onClick={handleQuickNotification}
+                  disabled={sendingNotification || !quickNotificationTitle.trim() || !quickNotificationMessage.trim()}
+                >
+                  {sendingNotification ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4 mr-2" />
+                  )}
+                  발송
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           {/* Documents Tab */}
           <TabsContent value="documents">
