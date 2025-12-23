@@ -75,12 +75,11 @@ Hãy tập trung vào thông tin thực sự hữu ích cho người Việt Nam 
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'sonar-pro',
+        model: 'sonar-reasoning-pro',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
-        temperature: 0.3,
         max_tokens: 4000,
       }),
     });
