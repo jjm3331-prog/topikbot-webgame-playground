@@ -31,42 +31,42 @@ serve(async (req) => {
 
     console.log(`Generating deep report for: ${companyName}`);
 
-    const systemPrompt = `You are an expert Korean corporate researcher specializing in providing comprehensive company analysis for Vietnamese job seekers looking to work in Korea.
+    const systemPrompt = `Bạn là chuyên gia nghiên cứu doanh nghiệp Hàn Quốc, chuyên cung cấp phân tích công ty toàn diện cho người Việt Nam muốn làm việc tại Hàn Quốc.
 
-Your task is to provide a detailed, accurate, and helpful report about Korean companies.
+Nhiệm vụ của bạn là cung cấp báo cáo chi tiết, chính xác và hữu ích về các công ty Hàn Quốc.
 
-Always respond in Korean with Vietnamese translations for key sections.
-Format your response in Markdown with clear sections.`;
+QUAN TRỌNG: Luôn trả lời bằng TIẾNG VIỆT. Chỉ giữ lại tên công ty, thuật ngữ chuyên ngành bằng tiếng Hàn/Anh khi cần thiết.
+Định dạng phản hồi bằng Markdown với các phần rõ ràng.`;
 
-    const userPrompt = `${companyName}에 대한 심층 기업 리포트를 작성해주세요.
+    const userPrompt = `Hãy viết báo cáo chuyên sâu về công ty ${companyName}.
 
-다음 섹션을 포함해주세요:
+Bao gồm các phần sau:
 
-## 1. 기업 개요 (Tổng quan công ty)
-- 설립년도, 본사 위치, 주요 사업 영역
-- 최근 매출/직원 수 등 기본 정보
+## 1. Tổng Quan Công Ty (회사 개요)
+- Năm thành lập, địa điểm trụ sở chính, lĩnh vực kinh doanh chính
+- Doanh thu gần đây, số lượng nhân viên và thông tin cơ bản khác
 
-## 2. 연봉 정보 (Thông tin lương)
-- 신입/경력별 예상 연봉 범위
-- 성과급, 보너스 구조
-- 복리후생 (기숙사, 식대, 교통비 등)
+## 2. Thông Tin Lương (연봉 정보)
+- Mức lương dự kiến cho nhân viên mới/có kinh nghiệm
+- Cơ cấu thưởng hiệu suất, bonus
+- Phúc lợi (ký túc xá, phụ cấp ăn, phí đi lại, v.v.)
 
-## 3. 기업 문화 (Văn hóa công ty)
-- 근무 환경 및 분위기
-- 워라밸 (Work-Life Balance) 평가
-- 외국인 직원에 대한 태도
+## 3. Văn Hóa Công Ty (기업 문화)
+- Môi trường và không khí làm việc
+- Đánh giá Work-Life Balance
+- Thái độ đối với nhân viên người nước ngoài
 
-## 4. 면접 후기 (Review phỏng vấn)
-- 일반적인 면접 프로세스
-- 자주 나오는 면접 질문
-- 면접 팁
+## 4. Review Phỏng Vấn (면접 후기)
+- Quy trình phỏng vấn thông thường
+- Các câu hỏi phỏng vấn thường gặp
+- Mẹo phỏng vấn
 
-## 5. 최신 뉴스 및 동향 (Tin tức & Xu hướng)
-- 최근 중요한 기업 뉴스
-- 채용 동향
-- 향후 전망
+## 5. Tin Tức & Xu Hướng Mới Nhất (최신 뉴스)
+- Tin tức quan trọng gần đây của công ty
+- Xu hướng tuyển dụng
+- Triển vọng tương lai
 
-베트남인 취업 희망자에게 실질적으로 도움이 되는 정보를 중심으로 작성해주세요.`;
+Hãy tập trung vào thông tin thực sự hữu ích cho người Việt Nam muốn xin việc tại công ty này.`;
 
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',

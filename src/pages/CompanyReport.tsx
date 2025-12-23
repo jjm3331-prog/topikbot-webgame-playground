@@ -36,22 +36,22 @@ const CompanyReport = () => {
   const [citations, setCitations] = useState<string[]>([]);
 
   const quickSearches = [
-    "삼성전자",
-    "LG전자", 
-    "현대자동차",
-    "네이버",
-    "카카오",
-    "SK하이닉스",
-    "쿠팡",
-    "배달의민족"
+    "Samsung Electronics",
+    "LG Electronics", 
+    "Hyundai Motor",
+    "Naver",
+    "Kakao",
+    "SK Hynix",
+    "Coupang",
+    "Baemin (Woowa Brothers)"
   ];
 
   const handleSearch = async (query?: string) => {
     const searchQuery = query || companyName;
     if (!searchQuery.trim()) {
       toast({
-        title: "기업명을 입력해주세요",
-        description: "검색할 한국 기업명을 입력하세요.",
+        title: "Vui lòng nhập tên công ty",
+        description: "Hãy nhập tên công ty Hàn Quốc bạn muốn tìm kiếm.",
         variant: "destructive"
       });
       return;
@@ -73,8 +73,8 @@ const CompanyReport = () => {
     } catch (error: any) {
       console.error("Search error:", error);
       toast({
-        title: "검색 오류",
-        description: "기업 정보를 가져오는데 실패했습니다. 다시 시도해주세요.",
+        title: "Lỗi tìm kiếm",
+        description: "Không thể lấy thông tin công ty. Vui lòng thử lại.",
         variant: "destructive"
       });
     } finally {
@@ -83,11 +83,11 @@ const CompanyReport = () => {
   };
 
   const reportSections = [
-    { icon: Building2, label: "기업 개요", color: "text-blue-500" },
-    { icon: DollarSign, label: "연봉 정보", color: "text-green-500" },
-    { icon: Users, label: "기업 문화", color: "text-purple-500" },
-    { icon: MessageSquare, label: "면접 후기", color: "text-orange-500" },
-    { icon: Newspaper, label: "최신 뉴스", color: "text-pink-500" }
+    { icon: Building2, label: "Tổng quan công ty", color: "text-blue-500" },
+    { icon: DollarSign, label: "Thông tin lương", color: "text-green-500" },
+    { icon: Users, label: "Văn hóa công ty", color: "text-purple-500" },
+    { icon: MessageSquare, label: "Review phỏng vấn", color: "text-orange-500" },
+    { icon: Newspaper, label: "Tin tức mới nhất", color: "text-pink-500" }
   ];
 
   return (
@@ -112,22 +112,22 @@ const CompanyReport = () => {
           </Button>
 
           {/* Premium Banner */}
-          {!isPremium && <PremiumPreviewBanner featureName="기업 심층 리포트" />}
+          {!isPremium && <PremiumPreviewBanner featureName="Báo cáo chuyên sâu công ty" />}
 
           {/* Header */}
           <div className="text-center space-y-3">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30">
               <Search className="w-4 h-4 text-purple-500" />
-              <span className="text-sm font-medium">AI 웹검색 기반</span>
+              <span className="text-sm font-medium">Dựa trên AI Web Search</span>
             </div>
             
             <h1 className="text-2xl sm:text-3xl font-bold">
               <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-                기업 심층 리포트
+                Báo Cáo Chuyên Sâu Công Ty
               </span>
             </h1>
             <p className="text-muted-foreground text-sm">
-              Perplexity Deep Research로 한국 기업의 숨겨진 정보를 분석합니다
+              Phân tích thông tin ẩn của các công ty Hàn Quốc với Perplexity Deep Research
             </p>
           </div>
 
@@ -138,7 +138,7 @@ const CompanyReport = () => {
                 <Input
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
-                  placeholder="한국 기업명을 입력하세요 (예: 삼성전자, 네이버...)"
+                  placeholder="Nhập tên công ty Hàn Quốc (VD: Samsung, Hyundai...)"
                   className="flex-1"
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 />
@@ -157,7 +157,7 @@ const CompanyReport = () => {
 
               {/* Quick Search */}
               <div>
-                <p className="text-sm text-muted-foreground mb-2">빠른 검색:</p>
+                <p className="text-sm text-muted-foreground mb-2">Tìm kiếm nhanh:</p>
                 <div className="flex flex-wrap gap-2">
                   {quickSearches.map((company) => (
                     <Button
@@ -179,7 +179,7 @@ const CompanyReport = () => {
 
               {/* What you'll get */}
               <div className="pt-4 border-t">
-                <p className="text-sm font-medium mb-3">리포트에 포함되는 내용:</p>
+                <p className="text-sm font-medium mb-3">Nội dung báo cáo bao gồm:</p>
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                   {reportSections.map((section) => (
                     <div key={section.label} className="flex items-center gap-2 text-sm">
@@ -201,8 +201,8 @@ const CompanyReport = () => {
                   <Loader2 className="w-8 h-8 text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-spin" />
                 </div>
                 <div className="text-center">
-                  <p className="font-medium text-foreground">AI가 웹을 검색하고 있습니다...</p>
-                  <p className="text-sm text-muted-foreground">연봉, 문화, 면접 후기 등을 분석 중</p>
+                  <p className="font-medium text-foreground">AI đang tìm kiếm trên web...</p>
+                  <p className="text-sm text-muted-foreground">Đang phân tích lương, văn hóa, review phỏng vấn...</p>
                 </div>
               </div>
             </Card>
@@ -218,7 +218,7 @@ const CompanyReport = () => {
               <Card className="p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <Sparkles className="w-5 h-5 text-purple-500" />
-                  <h2 className="font-bold text-lg">{companyName} 심층 리포트</h2>
+                  <h2 className="font-bold text-lg">Báo cáo chuyên sâu: {companyName}</h2>
                 </div>
                 
                 <div className="prose prose-sm dark:prose-invert max-w-none">
@@ -233,7 +233,7 @@ const CompanyReport = () => {
                 <Card className="p-4">
                   <h3 className="font-medium text-sm mb-3 flex items-center gap-2">
                     <ExternalLink className="w-4 h-4" />
-                    참고 자료 ({citations.length})
+                    Tài liệu tham khảo ({citations.length})
                   </h3>
                   <div className="space-y-2">
                     {citations.map((url, idx) => (
