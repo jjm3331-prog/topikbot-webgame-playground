@@ -52,7 +52,7 @@ const KoreaCareer = () => {
       bgGradient: "from-purple-500/10 to-pink-500/10",
       shadowColor: "shadow-purple-500/20",
       path: "/company-report",
-      status: "coming",
+      status: "active",
       emoji: "🔍"
     },
     {
