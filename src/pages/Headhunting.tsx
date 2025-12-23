@@ -52,7 +52,8 @@ const Headhunting = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [existingApplication, setExistingApplication] = useState<any>(null);
+  const [applications, setApplications] = useState<any[]>([]);
+  const [showForm, setShowForm] = useState(false);
   
   const resumeInputRef = useRef<HTMLInputElement>(null);
   const coverLetterInputRef = useRef<HTMLInputElement>(null);
@@ -100,16 +101,67 @@ const Headhunting = () => {
     setUser(session.user);
     setFormData(prev => ({ ...prev, email: session.user.email || "" }));
     
-    // Check for existing application
+    // Fetch all applications for this user
     const { data } = await supabase
       .from("headhunting_applications")
       .select("*")
       .eq("user_id", session.user.id)
-      .single();
+      .order("created_at", { ascending: false });
     
-    if (data) {
-      setExistingApplication(data);
+    if (data && data.length > 0) {
+      setApplications(data);
+    } else {
+      setShowForm(true); // No applications, show form directly
     }
+  };
+
+  const getStatusInfo = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return { label: 'Đang chờ xét duyệt', color: 'bg-yellow-500/20 text-yellow-600 border-yellow-500/50', icon: '⏳' };
+      case 'reviewing':
+        return { label: 'Đang xem xét', color: 'bg-blue-500/20 text-blue-600 border-blue-500/50', icon: '🔍' };
+      case 'matched':
+        return { label: 'Đã kết nối công ty', color: 'bg-green-500/20 text-green-600 border-green-500/50', icon: '🤝' };
+      case 'rejected':
+        return { label: 'Không phù hợp', color: 'bg-red-500/20 text-red-600 border-red-500/50', icon: '❌' };
+      case 'hired':
+        return { label: 'Đã được tuyển dụng', color: 'bg-purple-500/20 text-purple-600 border-purple-500/50', icon: '🎉' };
+      default:
+        return { label: status, color: 'bg-muted text-muted-foreground border-border', icon: '📋' };
+    }
+  };
+
+  const handleNewApplication = () => {
+    setShowForm(true);
+    setSubmitted(false);
+    // Reset form
+    setFormData({
+      full_name: "",
+      email: user?.email || "",
+      phone: "",
+      birth_year: "",
+      education_level: "",
+      university_name: "",
+      major: "",
+      graduation_year: "",
+      topik_level: "",
+      work_experience_years: "",
+      current_job_title: "",
+      current_company: "",
+      work_experience_details: "",
+      desired_job_type: "",
+      desired_industry: "",
+      desired_location: "",
+      desired_salary_range: "",
+      introduction: "",
+      strengths: "",
+      career_goals: "",
+      additional_skills: "",
+    });
+    setResumeUpload({ file: null, uploading: false, url: null, error: null });
+    setCoverLetterUpload({ file: null, uploading: false, url: null, error: null });
+    setPortfolioUpload({ file: null, uploading: false, url: null, error: null });
   };
 
   const uploadFile = async (
@@ -238,13 +290,134 @@ const Headhunting = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  if (submitted || existingApplication) {
+  // Show application history if user has applications and not showing form
+  if (applications.length > 0 && !showForm) {
+    return (
+      <div className="min-h-[100dvh] bg-background flex flex-col">
+        <CleanHeader />
+        <main className="flex-1 pt-24 pb-20 px-4 sm:px-6">
+          <div className="max-w-4xl mx-auto">
+            {/* Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center mb-8"
+            >
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary to-korean-purple flex items-center justify-center">
+                <Briefcase className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="font-heading font-bold text-2xl sm:text-3xl text-foreground mb-2">
+                Lịch sử đăng ký Headhunting
+              </h1>
+              <p className="text-muted-foreground">
+                Bạn đã gửi {applications.length} đơn đăng ký
+              </p>
+            </motion.div>
+
+            {/* Applications List */}
+            <div className="space-y-4 mb-8">
+              {applications.map((app, idx) => {
+                const statusInfo = getStatusInfo(app.status);
+                return (
+                  <motion.div
+                    key={app.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.1 }}
+                  >
+                    <Card className="p-5 hover:shadow-lg transition-shadow">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <span className="text-2xl">{statusInfo.icon}</span>
+                            <div>
+                              <h3 className="font-semibold text-foreground">{app.full_name}</h3>
+                              <p className="text-xs text-muted-foreground">
+                                {new Date(app.created_at).toLocaleDateString('vi-VN', {
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                            {app.desired_job_type && (
+                              <span className="px-2 py-0.5 bg-muted rounded-full">{app.desired_job_type}</span>
+                            )}
+                            {app.desired_industry && (
+                              <span className="px-2 py-0.5 bg-muted rounded-full">{app.desired_industry}</span>
+                            )}
+                            {app.topik_level && (
+                              <span className="px-2 py-0.5 bg-muted rounded-full">TOPIK {app.topik_level}</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className={`px-3 py-1.5 rounded-full text-xs font-medium border ${statusInfo.color}`}>
+                            {statusInfo.label}
+                          </span>
+                        </div>
+                      </div>
+                      {app.admin_notes && (
+                        <div className="mt-4 p-3 bg-muted/50 rounded-lg border border-border/50">
+                          <p className="text-xs text-muted-foreground font-medium mb-1">💬 Phản hồi từ Headhunter:</p>
+                          <p className="text-sm text-foreground">{app.admin_notes}</p>
+                        </div>
+                      )}
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Action Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="flex flex-col sm:flex-row gap-3 justify-center"
+            >
+              <Button 
+                onClick={handleNewApplication}
+                className="btn-primary text-primary-foreground gap-2"
+              >
+                <Rocket className="w-4 h-4" />
+                Tạo đơn đăng ký mới
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => navigate("/dashboard")}
+              >
+                Quay về Dashboard
+              </Button>
+            </motion.div>
+
+            {/* Info Note */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="text-center text-xs text-muted-foreground mt-6"
+            >
+              💡 Bạn có thể gửi nhiều đơn đăng ký với các vị trí hoặc ngành nghề khác nhau
+            </motion.p>
+          </div>
+        </main>
+        <AppFooter />
+      </div>
+    );
+  }
+
+  // Show success message after submission
+  if (submitted) {
     return (
       <div className="min-h-[100dvh] bg-background flex flex-col">
         <CleanHeader />
         <main className="flex-1 pt-24 pb-20 px-4 sm:px-6">
           <div className="max-w-2xl mx-auto text-center">
-
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -254,17 +427,30 @@ const Headhunting = () => {
               <CheckCircle2 className="w-10 h-10 text-white" />
             </motion.div>
             <h1 className="font-heading font-bold text-3xl sm:text-4xl text-foreground mb-4">
-              {existingApplication && !submitted ? "Bạn đã đăng ký rồi" : "Đăng ký thành công!"}
+              🎉 Đăng ký thành công!
             </h1>
             <p className="text-muted-foreground text-lg mb-8">
-              {existingApplication && !submitted 
-                ? `Trạng thái hiện tại: ${existingApplication.status === 'pending' ? 'Đang chờ xét duyệt' : existingApplication.status === 'reviewing' ? 'Đang xem xét' : existingApplication.status === 'matched' ? 'Đang kết nối' : existingApplication.status}`
-                : "Đội ngũ Headhunter sẽ liên hệ với bạn sớm. Bạn sẽ nhận được phản hồi trong 3-5 ngày."
-              }
+              Đội ngũ Headhunter sẽ liên hệ với bạn sớm.<br />
+              Bạn sẽ nhận được phản hồi trong 3-5 ngày làm việc.
             </p>
-            <Button onClick={() => navigate("/dashboard")} className="btn-primary text-primary-foreground">
-              Quay về Dashboard
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button 
+                onClick={() => {
+                  setSubmitted(false);
+                  setShowForm(false);
+                  checkUser(); // Refresh applications
+                }}
+                variant="outline"
+              >
+                Xem lịch sử đăng ký
+              </Button>
+              <Button 
+                onClick={() => navigate("/dashboard")} 
+                className="btn-primary text-primary-foreground"
+              >
+                Quay về Dashboard
+              </Button>
+            </div>
           </div>
         </main>
         <AppFooter />
