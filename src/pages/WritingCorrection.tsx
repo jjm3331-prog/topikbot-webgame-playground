@@ -110,6 +110,9 @@ const WritingCorrection = () => {
   const [ocrEditingType, setOcrEditingType] = useState<"question" | "answer" | null>(null);
   const [ocrProcessing, setOcrProcessing] = useState(false);
   
+  // Score detail view state
+  const [selectedScoreArea, setSelectedScoreArea] = useState<"grammar" | "vocabulary" | "structure" | "content" | null>(null);
+
   const questionInputRef = useRef<HTMLInputElement>(null);
   const questionCameraRef = useRef<HTMLInputElement>(null);
   const answerInputRef = useRef<HTMLInputElement>(null);
@@ -861,18 +864,180 @@ ${prioritySection}
 
                     <div className="grid grid-cols-2 gap-3">
                       {[
-                        { label: "Ngữ pháp", labelKr: "문법", score: result.grammar_score, color: "from-red-500/20 to-red-500/5" },
-                        { label: "Từ vựng", labelKr: "어휘", score: result.vocabulary_score, color: "from-yellow-500/20 to-yellow-500/5" },
-                        { label: "Cấu trúc", labelKr: "구조", score: result.structure_score, color: "from-green-500/20 to-green-500/5" },
-                        { label: "Nội dung", labelKr: "내용", score: result.content_score, color: "from-blue-500/20 to-blue-500/5" },
+                        { key: "grammar" as const, label: "Ngữ pháp", labelKr: "문법", score: result.grammar_score, color: "from-red-500/20 to-red-500/5", activeColor: "ring-red-500", icon: "🔴" },
+                        { key: "vocabulary" as const, label: "Từ vựng", labelKr: "어휘", score: result.vocabulary_score, color: "from-yellow-500/20 to-yellow-500/5", activeColor: "ring-yellow-500", icon: "🟡" },
+                        { key: "structure" as const, label: "Cấu trúc", labelKr: "구조", score: result.structure_score, color: "from-green-500/20 to-green-500/5", activeColor: "ring-green-500", icon: "🟢" },
+                        { key: "content" as const, label: "Nội dung", labelKr: "내용", score: result.content_score, color: "from-blue-500/20 to-blue-500/5", activeColor: "ring-blue-500", icon: "🔵" },
                       ].map((item) => (
-                        <div key={item.label} className={`bg-gradient-to-br ${item.color} rounded-xl p-4 border border-border/50`}>
-                          <p className="text-xs text-muted-foreground">{item.label}</p>
-                          <p className="text-[10px] text-muted-foreground/70">{item.labelKr}</p>
+                        <div 
+                          key={item.key} 
+                          className={`bg-gradient-to-br ${item.color} rounded-xl p-4 border border-border/50 cursor-pointer transition-all hover:scale-[1.02] hover:shadow-md ${selectedScoreArea === item.key ? `ring-2 ${item.activeColor} shadow-lg` : ''}`}
+                          onClick={() => setSelectedScoreArea(selectedScoreArea === item.key ? null : item.key)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-xs text-muted-foreground">{item.label}</p>
+                              <p className="text-[10px] text-muted-foreground/70">{item.labelKr}</p>
+                            </div>
+                            <span className="text-lg">{item.icon}</span>
+                          </div>
                           <p className="text-2xl font-bold text-foreground mt-1">{item.score}<span className="text-sm font-normal text-muted-foreground">/25</span></p>
+                          <p className="text-[10px] text-muted-foreground mt-1">클릭하여 상세 보기</p>
                         </div>
                       ))}
                     </div>
+
+                    {/* Score Detail Panel */}
+                    {selectedScoreArea && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mt-4 p-4 bg-background/60 rounded-xl border border-border"
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <h5 className="font-semibold text-foreground flex items-center gap-2">
+                            {selectedScoreArea === "grammar" && "🔴 문법 (Ngữ pháp) 상세 분석"}
+                            {selectedScoreArea === "vocabulary" && "🟡 어휘 (Từ vựng) 상세 분석"}
+                            {selectedScoreArea === "structure" && "🟢 구조 (Cấu trúc) 상세 분석"}
+                            {selectedScoreArea === "content" && "🔵 내용 (Nội dung) 상세 분석"}
+                          </h5>
+                          <Button variant="ghost" size="sm" onClick={() => setSelectedScoreArea(null)}>
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        
+                        {/* Grammar Detail */}
+                        {selectedScoreArea === "grammar" && (
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-sm">
+                              <span className="font-medium text-foreground">점수:</span>
+                              <span className={`font-bold ${result.grammar_score >= 20 ? 'text-green-500' : result.grammar_score >= 15 ? 'text-yellow-500' : 'text-red-500'}`}>
+                                {result.grammar_score}/25
+                              </span>
+                              <span className="text-muted-foreground">
+                                ({result.grammar_score >= 20 ? '우수' : result.grammar_score >= 15 ? '보통' : '개선 필요'})
+                              </span>
+                            </div>
+                            <div className="space-y-2">
+                              <p className="text-xs font-medium text-muted-foreground">발견된 문법 오류:</p>
+                              {result.corrections.filter(c => c.type === 'grammar' || c.type === 'spelling').length > 0 ? (
+                                result.corrections.filter(c => c.type === 'grammar' || c.type === 'spelling').slice(0, 3).map((c, i) => (
+                                  <div key={i} className="text-xs p-2 bg-red-500/10 rounded-lg border border-red-500/20">
+                                    <div className="flex gap-2 flex-wrap">
+                                      <span className="line-through text-red-500">{c.original}</span>
+                                      <span className="text-muted-foreground">→</span>
+                                      <span className="text-green-500 font-medium">{c.corrected}</span>
+                                    </div>
+                                    <p className="text-muted-foreground mt-1">{c.explanation}</p>
+                                  </div>
+                                ))
+                              ) : (
+                                <p className="text-xs text-green-500">문법 오류가 발견되지 않았습니다! ✨</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Vocabulary Detail */}
+                        {selectedScoreArea === "vocabulary" && (
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-sm">
+                              <span className="font-medium text-foreground">점수:</span>
+                              <span className={`font-bold ${result.vocabulary_score >= 20 ? 'text-green-500' : result.vocabulary_score >= 15 ? 'text-yellow-500' : 'text-red-500'}`}>
+                                {result.vocabulary_score}/25
+                              </span>
+                              <span className="text-muted-foreground">
+                                ({result.vocabulary_score >= 20 ? '우수' : result.vocabulary_score >= 15 ? '보통' : '개선 필요'})
+                              </span>
+                            </div>
+                            <div className="space-y-2">
+                              <p className="text-xs font-medium text-muted-foreground">어휘 개선 제안:</p>
+                              {result.vocabulary_upgrades && result.vocabulary_upgrades.length > 0 ? (
+                                result.vocabulary_upgrades.slice(0, 3).map((v, i) => (
+                                  <div key={i} className="text-xs p-2 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+                                    <div className="flex gap-2 flex-wrap">
+                                      <span className="text-muted-foreground">😐 {v.basic}</span>
+                                      <span className="text-muted-foreground">→</span>
+                                      <span className="text-yellow-500 font-medium">⭐ {v.advanced}</span>
+                                    </div>
+                                    <p className="text-muted-foreground mt-1">{v.difference}</p>
+                                  </div>
+                                ))
+                              ) : (
+                                <p className="text-xs text-green-500">어휘 사용이 적절합니다! ✨</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Structure Detail */}
+                        {selectedScoreArea === "structure" && (
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-sm">
+                              <span className="font-medium text-foreground">점수:</span>
+                              <span className={`font-bold ${result.structure_score >= 20 ? 'text-green-500' : result.structure_score >= 15 ? 'text-yellow-500' : 'text-red-500'}`}>
+                                {result.structure_score}/25
+                              </span>
+                              <span className="text-muted-foreground">
+                                ({result.structure_score >= 20 ? '우수' : result.structure_score >= 15 ? '보통' : '개선 필요'})
+                              </span>
+                            </div>
+                            <div className="space-y-2">
+                              <p className="text-xs font-medium text-muted-foreground">구조 개선 제안:</p>
+                              {result.structure_improvements && result.structure_improvements.length > 0 ? (
+                                result.structure_improvements.slice(0, 2).map((s, i) => (
+                                  <div key={i} className="text-xs p-2 bg-green-500/10 rounded-lg border border-green-500/20">
+                                    <p className="text-muted-foreground mb-1">현재: {s.current}</p>
+                                    <p className="text-green-500 font-medium">개선: {s.improved}</p>
+                                    <p className="text-muted-foreground mt-1 italic">{s.reason}</p>
+                                  </div>
+                                ))
+                              ) : (
+                                <p className="text-xs text-green-500">글의 구조가 잘 짜여져 있습니다! ✨</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Content Detail */}
+                        {selectedScoreArea === "content" && (
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-sm">
+                              <span className="font-medium text-foreground">점수:</span>
+                              <span className={`font-bold ${result.content_score >= 20 ? 'text-green-500' : result.content_score >= 15 ? 'text-yellow-500' : 'text-red-500'}`}>
+                                {result.content_score}/25
+                              </span>
+                              <span className="text-muted-foreground">
+                                ({result.content_score >= 20 ? '우수' : result.content_score >= 15 ? '보통' : '개선 필요'})
+                              </span>
+                            </div>
+                            <div className="space-y-2">
+                              <p className="text-xs font-medium text-muted-foreground">내용 분석:</p>
+                              {result.swot_analysis?.strengths && result.swot_analysis.strengths.length > 0 && (
+                                <div className="text-xs p-2 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                                  <p className="font-medium text-blue-500 mb-1">✅ 잘된 점:</p>
+                                  {result.swot_analysis.strengths.slice(0, 2).map((s, i) => (
+                                    <p key={i} className="text-muted-foreground">• {s.title}</p>
+                                  ))}
+                                </div>
+                              )}
+                              {result.swot_analysis?.weaknesses && result.swot_analysis.weaknesses.length > 0 && (
+                                <div className="text-xs p-2 bg-orange-500/10 rounded-lg border border-orange-500/20">
+                                  <p className="font-medium text-orange-500 mb-1">⚠️ 개선할 점:</p>
+                                  {result.swot_analysis.weaknesses.slice(0, 2).map((w, i) => (
+                                    <p key={i} className="text-muted-foreground">• {w.title}</p>
+                                  ))}
+                                </div>
+                              )}
+                              {!result.swot_analysis?.strengths?.length && !result.swot_analysis?.weaknesses?.length && (
+                                <p className="text-xs text-muted-foreground">상세 피드백을 참고해 주세요.</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </motion.div>
+                    )}
                   </Card>
 
                   {/* SWOT Analysis - Accordion */}
