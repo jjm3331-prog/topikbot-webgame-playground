@@ -68,7 +68,13 @@ const CompanyReport = () => {
       
       if (error) throw error;
       
-      setReport(data.report);
+      // Filter out any <think> tags that might have slipped through
+      let cleanReport = data.report || '';
+      cleanReport = cleanReport.replace(/<think>[\s\S]*?<\/think>/gi, '');
+      cleanReport = cleanReport.replace(/<\/?think>/gi, '');
+      cleanReport = cleanReport.replace(/^\s*\n\s*\n/gm, '\n\n').trim();
+      
+      setReport(cleanReport);
       setCitations(data.citations || []);
     } catch (error: any) {
       console.error("Search error:", error);
