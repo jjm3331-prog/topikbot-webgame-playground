@@ -10,10 +10,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 const usageExamples = [
-  { subject: "Toán", example: "Chụp bài toán hàm số → AI tạo bài tương tự với số khác" },
-  { subject: "Lý", example: "Chụp bài động lực học → AI tạo bài với giá trị khác, thêm/bớt điều kiện" },
-  { subject: "Hóa", example: "Chụp bài cân bằng phương trình → AI tạo phương trình mới cùng dạng" },
-  { subject: "Anh", example: "Chụp bài điền từ → AI tạo đoạn văn khác với cấu trúc ngữ pháp tương tự" },
+  { subject: "Đọc hiểu", example: "Chụp đề đọc hiểu TOPIK → AI tạo bài đọc mới với chủ đề và độ khó tương tự" },
+  { subject: "Ngữ pháp", example: "Chụp bài ngữ pháp → AI tạo câu hỏi mới với cấu trúc ngữ pháp tương tự" },
+  { subject: "Từ vựng", example: "Chụp bài từ vựng → AI tạo bài tập mới với từ cùng cấp độ TOPIK" },
+  { subject: "Nghe", example: "Chụp đề nghe TOPIK → AI tạo kịch bản hội thoại mới cùng dạng câu hỏi" },
 ];
 
 interface ParsedResult {
