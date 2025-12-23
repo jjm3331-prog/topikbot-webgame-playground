@@ -410,39 +410,108 @@ const WritingCorrection = () => {
   const handleExportPDF = () => {
     if (!result) return;
     
+    // Build SWOT section
+    let swotSection = '';
+    if (result.swot_analysis) {
+      swotSection = `
+      SWOT Analysis:
+      ---------------
+      
+      ✅ STRENGTHS (강점):
+      ${result.swot_analysis.strengths?.map(s => `• ${s.title}${s.evidence ? ` - "${s.evidence}"` : ''}`).join('\n') || 'N/A'}
+      
+      ⚠️ WEAKNESSES (약점):
+      ${result.swot_analysis.weaknesses?.map(w => `• ${w.title}${w.impact ? ` - Impact: ${w.impact}` : ''}`).join('\n') || 'N/A'}
+      
+      🌟 OPPORTUNITIES (기회):
+      ${result.swot_analysis.opportunities?.map(o => `• ${o.title}${o.action ? ` - Action: ${o.action}` : ''}`).join('\n') || 'N/A'}
+      
+      🚧 THREATS (위협):
+      ${result.swot_analysis.threats?.map(t => `• ${t.title}${t.risk_level ? ` (Risk: ${t.risk_level})` : ''}${t.prevention ? ` - Prevention: ${t.prevention}` : ''}`).join('\n') || 'N/A'}
+      `;
+    }
+
+    // Build vocabulary upgrades section
+    let vocabSection = '';
+    if (result.vocabulary_upgrades?.length) {
+      vocabSection = `
+      Vocabulary Upgrades (어휘 개선):
+      --------------------------------
+      ${result.vocabulary_upgrades.map(v => `• ${v.basic} → ${v.advanced}\n  ${v.difference}`).join('\n')}
+      `;
+    }
+
+    // Build structure improvements section
+    let structSection = '';
+    if (result.structure_improvements?.length) {
+      structSection = `
+      Structure Improvements (구조 개선):
+      ------------------------------------
+      ${result.structure_improvements.map(s => `• Current: ${s.current}\n  Improved: ${s.improved}\n  Reason: ${s.reason}`).join('\n')}
+      `;
+    }
+
+    // Build next priority section
+    let prioritySection = '';
+    if (result.next_priority?.length) {
+      prioritySection = `
+      Next Priority (다음 과제):
+      ---------------------------
+      ${result.next_priority.map((p, i) => `${i + 1}. ${p}`).join('\n')}
+      `;
+    }
+    
     const content = `
-      TOPIK Writing Correction Report
-      ================================
-      
-      Overall Score: ${result.overall_score}/100
-      
-      Score Breakdown:
-      - Grammar: ${result.grammar_score}/25
-      - Vocabulary: ${result.vocabulary_score}/25
-      - Structure: ${result.structure_score}/25
-      - Content: ${result.content_score}/25
-      
-      Strengths:
-      ${result.strengths.map(s => `• ${s}`).join('\n')}
-      
-      Areas for Improvement:
-      ${result.improvements.map(i => `• ${i}`).join('\n')}
-      
-      Corrections:
-      ${result.corrections.map(c => `
-      Original: ${c.original}
-      Corrected: ${c.corrected}
-      Explanation: ${c.explanation}
-      `).join('\n')}
-      
-      Model Answer:
-      ${result.model_answer}
-      
-      Detailed Feedback:
-      ${result.detailed_feedback}
+═══════════════════════════════════════════════════════════════
+              TOPIK Writing Correction Report
+                    LUKATO AI - topikbot.kr
+═══════════════════════════════════════════════════════════════
+
+📊 Overall Score: ${result.overall_score}/100
+
+📈 Score Breakdown:
+   ├─ Grammar (문법):     ${result.grammar_score}/25
+   ├─ Vocabulary (어휘):  ${result.vocabulary_score}/25
+   ├─ Structure (구조):   ${result.structure_score}/25
+   └─ Content (내용):     ${result.content_score}/25
+
+═══════════════════════════════════════════════════════════════
+${swotSection}
+═══════════════════════════════════════════════════════════════
+
+✅ Strengths (강점):
+${result.strengths.map(s => `   • ${s}`).join('\n')}
+
+⚠️ Areas for Improvement (개선점):
+${result.improvements.map(i => `   • ${i}`).join('\n')}
+
+═══════════════════════════════════════════════════════════════
+
+🚑 FIRST AID - Corrections (수정 사항):
+${result.corrections.map(c => `
+   ❌ Original: ${c.original}
+   ✅ Corrected: ${c.corrected}
+   📝 Explanation: ${c.explanation}
+   Type: ${c.type}
+`).join('\n')}
+${vocabSection}
+${structSection}
+═══════════════════════════════════════════════════════════════
+
+✨ Model Answer (모범 답안):
+${result.model_answer}
+
+═══════════════════════════════════════════════════════════════
+
+📝 Detailed Feedback (상세 피드백):
+${result.detailed_feedback}
+${prioritySection}
+═══════════════════════════════════════════════════════════════
+                    Generated by LUKATO AI
+═══════════════════════════════════════════════════════════════
     `;
 
-    const blob = new Blob([content], { type: 'text/plain' });
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -1025,6 +1094,27 @@ const WritingCorrection = () => {
                           </div>
                         </TabsContent>
                       </Tabs>
+                    </Card>
+                  )}
+
+                  {/* Next Priority */}
+                  {result.next_priority && result.next_priority.length > 0 && (
+                    <Card className="p-4 bg-gradient-to-r from-primary/10 to-korean-purple/10 border-primary/20">
+                      <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                        🎯 다음 과제 (Next Priority)
+                      </h4>
+                      <div className="space-y-2">
+                        {result.next_priority.map((priority, i) => (
+                          <div key={i} className="flex items-start gap-3 p-2 bg-background/50 rounded-lg">
+                            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                              i === 0 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                            }`}>
+                              {i + 1}
+                            </span>
+                            <p className="text-sm text-foreground">{priority}</p>
+                          </div>
+                        ))}
+                      </div>
                     </Card>
                   )}
 
