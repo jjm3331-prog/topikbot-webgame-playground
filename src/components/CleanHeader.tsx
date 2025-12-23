@@ -136,9 +136,9 @@ export const CleanHeader = ({ isLoggedIn, username }: CleanHeaderProps) => {
                 </Button>
               </>
             ) : (
-              <Button onClick={() => navigate("/auth")} className="h-8 sm:h-10 rounded-full text-xs sm:text-sm px-3 sm:px-4">
+              <Button onClick={() => navigate("/auth")} size="sm" className="h-7 sm:h-10 rounded-full text-[11px] sm:text-sm px-2 sm:px-4">
                 <LogIn className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="ml-1 sm:ml-2">Đăng nhập</span>
+                <span className="ml-1">Đăng nhập</span>
               </Button>
             )}
 
