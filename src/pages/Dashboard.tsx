@@ -130,30 +130,60 @@ const Dashboard = () => {
             </div>
           </motion.div>
 
-          {/* Headhunting Promo Banner */}
+          {/* Korea Career Hub Banner */}
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            onClick={() => navigate("/headhunting")}
+            onClick={() => navigate("/korea-career")}
             className="relative overflow-hidden rounded-2xl cursor-pointer group"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-korean-green via-korean-cyan to-korean-blue" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(255,255,255,0.1),transparent)]" />
-            <div className="relative z-10 p-5 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                  <Briefcase className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white font-bold">Premium</span>
+            {/* Premium gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/20" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,255,0.15),transparent_40%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(147,51,234,0.3),transparent_40%)]" />
+            
+            {/* Animated shimmer effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+            
+            <div className="relative z-10 p-6 flex items-center justify-between">
+              <div className="flex items-center gap-5">
+                {/* Icon cluster */}
+                <div className="relative">
+                  <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-lg">
+                    <Briefcase className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="font-bold text-white">Headhunting doanh nghiệp Hàn Quốc</h3>
-                  <p className="text-white/70 text-sm">Đội ngũ headhunter hỗ trợ xin việc MIỄN PHÍ!</p>
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-korean-green flex items-center justify-center border-2 border-white/50">
+                    <span className="text-[10px]">🇰🇷</span>
+                  </div>
+                </div>
+                
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold shadow-md">
+                      ⭐ All-in-One
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white font-medium backdrop-blur-sm">
+                      한국 취업
+                    </span>
+                  </div>
+                  <h3 className="font-bold text-white text-lg tracking-tight">Korea Career Hub</h3>
+                  <p className="text-white/80 text-sm">
+                    Headhunting • Báo cáo DN • Phỏng vấn AI - Tất cả trong một!
+                  </p>
                 </div>
               </div>
-              <ChevronRight className="w-5 h-5 text-white/70 group-hover:translate-x-1 transition-transform" />
+              
+              <div className="flex items-center gap-2">
+                <div className="hidden sm:flex flex-col items-end mr-2">
+                  <span className="text-[10px] text-white/60">1,000+ 취업 성공</span>
+                  <span className="text-[10px] text-white/60">98% 만족도</span>
+                </div>
+                <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                  <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </div>
             </div>
           </motion.div>
 
