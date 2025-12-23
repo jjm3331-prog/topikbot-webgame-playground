@@ -104,7 +104,7 @@ const AIChat = () => {
     {
       icon: GraduationCap,
       title: "Chuyên biệt cho TOPIK",
-      description: "Khác với ChatGPT thông thường, hệ thống RAG được thiết kế riêng cho kỳ thi TOPIK."
+      description: "Khác với AI thông thường, hệ thống RAG được thiết kế riêng cho kỳ thi TOPIK."
     }
   ];
 

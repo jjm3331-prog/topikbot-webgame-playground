@@ -466,7 +466,7 @@ const InterviewSimulation = () => {
           <div className="text-center space-y-3">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30">
               <Mic className="w-4 h-4 text-orange-500" />
-              <span className="text-sm font-medium">AI 음성 면접관 · Gemini 2.5 Flash Thinking</span>
+              <span className="text-sm font-medium">LUKATO RAG AI · Mô phỏng phỏng vấn</span>
             </div>
             
             <h1 className="text-2xl sm:text-3xl font-bold">

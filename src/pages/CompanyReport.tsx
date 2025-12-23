@@ -127,7 +127,7 @@ const CompanyReport = () => {
               </span>
             </h1>
             <p className="text-muted-foreground text-sm">
-              Phân tích thông tin ẩn của các công ty Hàn Quốc với Perplexity Deep Research
+              Phân tích thông tin ẩn của các công ty Hàn Quốc với LUKATO RAG AI
             </p>
           </div>
 
