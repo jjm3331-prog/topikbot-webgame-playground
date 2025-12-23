@@ -30,6 +30,25 @@ import AppFooter from "@/components/AppFooter";
 import { PremiumPreviewBanner } from "@/components/PremiumPreviewBanner";
 import { useSubscription } from "@/hooks/useSubscription";
 
+interface SwotItem {
+  title: string;
+  evidence?: string;
+  analysis?: string;
+  issue?: string;
+  impact?: string;
+  action?: string;
+  benefit?: string;
+  risk_level?: string;
+  prevention?: string;
+}
+
+interface SwotAnalysis {
+  strengths?: SwotItem[];
+  weaknesses?: SwotItem[];
+  opportunities?: SwotItem[];
+  threats?: SwotItem[];
+}
+
 interface CorrectionResult {
   overall_score: number;
   grammar_score: number;
@@ -46,6 +65,10 @@ interface CorrectionResult {
   improvements: string[];
   model_answer: string;
   detailed_feedback: string;
+  swot_analysis?: SwotAnalysis;
+  vocabulary_upgrades?: { basic: string; advanced: string; difference: string }[];
+  structure_improvements?: { current: string; improved: string; reason: string }[];
+  next_priority?: string[];
 }
 
 interface SavedCorrection {
@@ -781,32 +804,112 @@ const WritingCorrection = () => {
                     </div>
                   </Card>
 
-                  {/* Strengths & Improvements */}
-                  <div className="grid gap-4">
-                    <Card className="p-4 bg-green-500/10 border-green-500/30">
-                      <h4 className="font-semibold text-green-600 dark:text-green-400 mb-2 flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4" />
-                        Điểm mạnh
+                  {/* SWOT Analysis */}
+                  {result.swot_analysis && (
+                    <Card className="p-4 bg-card border-border">
+                      <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                        📊 SWOT 분석
                       </h4>
-                      <ul className="space-y-1">
-                        {result.strengths.map((s, i) => (
-                          <li key={i} className="text-sm text-foreground">• {s}</li>
-                        ))}
-                      </ul>
-                    </Card>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {/* Strengths */}
+                        <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/30">
+                          <h5 className="font-medium text-green-600 dark:text-green-400 mb-2 flex items-center gap-1.5 text-sm">
+                            ✅ Strengths (강점)
+                          </h5>
+                          <div className="space-y-2">
+                            {result.swot_analysis.strengths?.map((s: any, i: number) => (
+                              <div key={i} className="text-xs">
+                                <p className="font-medium text-foreground">{s.title}</p>
+                                {s.evidence && <p className="text-muted-foreground italic">"{s.evidence}"</p>}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
 
-                    <Card className="p-4 bg-orange-500/10 border-orange-500/30">
-                      <h4 className="font-semibold text-orange-600 dark:text-orange-400 mb-2 flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4" />
-                        Cần cải thiện
-                      </h4>
-                      <ul className="space-y-1">
-                        {result.improvements.map((s, i) => (
-                          <li key={i} className="text-sm text-foreground">• {s}</li>
-                        ))}
-                      </ul>
+                        {/* Weaknesses */}
+                        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30">
+                          <h5 className="font-medium text-red-600 dark:text-red-400 mb-2 flex items-center gap-1.5 text-sm">
+                            ⚠️ Weaknesses (약점)
+                          </h5>
+                          <div className="space-y-2">
+                            {result.swot_analysis.weaknesses?.map((w: any, i: number) => (
+                              <div key={i} className="text-xs">
+                                <p className="font-medium text-foreground">{w.title}</p>
+                                {w.impact && <p className="text-muted-foreground">{w.impact}</p>}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Opportunities */}
+                        <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/30">
+                          <h5 className="font-medium text-blue-600 dark:text-blue-400 mb-2 flex items-center gap-1.5 text-sm">
+                            🌟 Opportunities (기회)
+                          </h5>
+                          <div className="space-y-2">
+                            {result.swot_analysis.opportunities?.map((o: any, i: number) => (
+                              <div key={i} className="text-xs">
+                                <p className="font-medium text-foreground">{o.title}</p>
+                                {o.action && <p className="text-muted-foreground">{o.action}</p>}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Threats */}
+                        <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/30">
+                          <h5 className="font-medium text-orange-600 dark:text-orange-400 mb-2 flex items-center gap-1.5 text-sm">
+                            🚧 Threats (위협)
+                          </h5>
+                          <div className="space-y-2">
+                            {result.swot_analysis.threats?.map((t: any, i: number) => (
+                              <div key={i} className="text-xs">
+                                <p className="font-medium text-foreground">{t.title}</p>
+                                {t.risk_level && (
+                                  <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                                    t.risk_level === '상' ? 'bg-red-500/20 text-red-600' :
+                                    t.risk_level === '중' ? 'bg-orange-500/20 text-orange-600' :
+                                    'bg-green-500/20 text-green-600'
+                                  }`}>
+                                    위험도: {t.risk_level}
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
                     </Card>
-                  </div>
+                  )}
+
+                  {/* Strengths & Improvements (Fallback) */}
+                  {!result.swot_analysis && (
+                    <div className="grid gap-4">
+                      <Card className="p-4 bg-green-500/10 border-green-500/30">
+                        <h4 className="font-semibold text-green-600 dark:text-green-400 mb-2 flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4" />
+                          Điểm mạnh
+                        </h4>
+                        <ul className="space-y-1">
+                          {result.strengths.map((s: string, i: number) => (
+                            <li key={i} className="text-sm text-foreground">• {s}</li>
+                          ))}
+                        </ul>
+                      </Card>
+
+                      <Card className="p-4 bg-orange-500/10 border-orange-500/30">
+                        <h4 className="font-semibold text-orange-600 dark:text-orange-400 mb-2 flex items-center gap-2">
+                          <AlertCircle className="w-4 h-4" />
+                          Cần cải thiện
+                        </h4>
+                        <ul className="space-y-1">
+                          {result.improvements.map((s: string, i: number) => (
+                            <li key={i} className="text-sm text-foreground">• {s}</li>
+                          ))}
+                        </ul>
+                      </Card>
+                    </div>
+                  )}
 
                   {/* Corrections */}
                   {result.corrections.length > 0 && (
