@@ -61,7 +61,7 @@ const KoreaCareer = () => {
       gradient: "from-orange-500 to-red-500",
       bgGradient: "from-orange-500/10 to-red-500/10",
       path: "/interview-simulation",
-      status: "coming"
+      status: "active"
     }
   ];
 
