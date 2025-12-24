@@ -11,7 +11,6 @@ import {
   Clapperboard,
   Languages,
   PenTool,
-  Headphones,
   Sparkles,
   X,
   User,
@@ -23,7 +22,6 @@ import {
   Lock,
   Search,
   Mic,
-  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -59,10 +57,7 @@ const baseMenuCategories: MenuCategory[] = [
     title: "HỌC TOPIK",
     emoji: "📚",
     items: [
-      { icon: PenTool, label: "Luyện viết tay", href: "/handwriting" },
-      { icon: Headphones, label: "Luyện nghe", href: "/listening" },
-      { icon: BookOpen, label: "Đọc hiểu A", href: "/reading-a" },
-      { icon: BookOpen, label: "Đọc hiểu B", href: "/reading-b" },
+      { icon: Sparkles, label: "Trung tâm học TOPIK", href: "/learning-hub", isHighlight: true },
     ]
   },
   {
