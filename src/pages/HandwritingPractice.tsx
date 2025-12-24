@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import CleanHeader from "@/components/CleanHeader";
@@ -14,18 +14,18 @@ import {
   FileText,
   Sparkles,
   RotateCcw,
-  ChevronLeft,
-  ChevronRight,
   Check,
   Star,
   BookOpen,
-  Trophy
+  Trophy,
+  RefreshCw,
+  Loader2
 } from "lucide-react";
 import HangulTracing from "@/components/learning/HangulTracing";
 
 type TabType = "consonants" | "words" | "sentences";
 
-// Sample data for practice
+// Static data for consonants/vowels (these don't need RAG)
 const consonantsData = {
   basic: ["ㄱ", "ㄴ", "ㄷ", "ㄹ", "ㅁ", "ㅂ", "ㅅ", "ㅇ", "ㅈ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"],
   double: ["ㄲ", "ㄸ", "ㅃ", "ㅆ", "ㅉ"],
@@ -33,15 +33,14 @@ const consonantsData = {
   compound: ["ㅐ", "ㅒ", "ㅔ", "ㅖ", "ㅘ", "ㅙ", "ㅚ", "ㅝ", "ㅞ", "ㅟ", "ㅢ"],
 };
 
-const wordsData = ["사랑", "감사", "한국", "친구", "행복", "가족", "음식", "학교", "서울", "안녕"];
+// Fallback data
+const fallbackWords = ["사랑", "감사", "한국", "친구", "행복", "가족", "음식", "학교", "서울", "안녕"];
+const fallbackSentences = ["안녕하세요", "감사합니다", "사랑해요", "만나서 반가워요", "한국어를 공부해요"];
 
-const sentencesData = [
-  "안녕하세요",
-  "감사합니다", 
-  "사랑해요",
-  "만나서 반가워요",
-  "한국어를 공부해요",
-];
+interface RagContent {
+  korean: string;
+  vietnamese: string;
+}
 
 const HandwritingPractice = () => {
   const navigate = useNavigate();
@@ -49,6 +48,14 @@ const HandwritingPractice = () => {
   const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<TabType>("consonants");
   const [completedTabs, setCompletedTabs] = useState<TabType[]>([]);
+  
+  // RAG-powered content states
+  const [wordsData, setWordsData] = useState<string[]>(fallbackWords);
+  const [sentencesData, setSentencesData] = useState<string[]>(fallbackSentences);
+  const [isLoadingWords, setIsLoadingWords] = useState(false);
+  const [isLoadingSentences, setIsLoadingSentences] = useState(false);
+  const [usedWords, setUsedWords] = useState<string[]>([]);
+  const [usedSentences, setUsedSentences] = useState<string[]>([]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -57,6 +64,75 @@ const HandwritingPractice = () => {
     };
     checkAuth();
   }, []);
+
+  // Fetch RAG content for words/sentences
+  const fetchRagContent = useCallback(async (type: 'words' | 'sentences', exclude: string[] = []) => {
+    const setLoading = type === 'words' ? setIsLoadingWords : setIsLoadingSentences;
+    const setData = type === 'words' ? setWordsData : setSentencesData;
+    const setUsed = type === 'words' ? setUsedWords : setUsedSentences;
+    const fallback = type === 'words' ? fallbackWords : fallbackSentences;
+    
+    setLoading(true);
+    
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/handwriting-content`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            type, 
+            count: type === 'words' ? 10 : 5,
+            exclude 
+          }),
+        }
+      );
+      
+      if (!response.ok) throw new Error('Failed to fetch content');
+      
+      const data = await response.json();
+      
+      if (data.success && data.content?.length > 0) {
+        const koreanContent = data.content.map((item: RagContent) => item.korean);
+        setData(koreanContent);
+        
+        // Track used content
+        setUsed(prev => [...new Set([...prev, ...koreanContent])]);
+        
+        if (data.source === 'rag') {
+          toast({
+            title: type === 'words' ? "새 단어 로드 완료! 📚" : "새 문장 로드 완료! 📝",
+            description: `AI가 ${koreanContent.length}개의 새로운 콘텐츠를 생성했습니다`,
+          });
+        }
+      } else {
+        setData(fallback);
+      }
+    } catch (error) {
+      console.error('Error fetching RAG content:', error);
+      setData(fallback);
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  // Load initial content when tab changes
+  useEffect(() => {
+    if (activeTab === 'words' && wordsData === fallbackWords) {
+      fetchRagContent('words', usedWords);
+    } else if (activeTab === 'sentences' && sentencesData === fallbackSentences) {
+      fetchRagContent('sentences', usedSentences);
+    }
+  }, [activeTab]);
+
+  // Refresh content with new items
+  const handleRefreshContent = () => {
+    if (activeTab === 'words') {
+      fetchRagContent('words', usedWords);
+    } else if (activeTab === 'sentences') {
+      fetchRagContent('sentences', usedSentences);
+    }
+  };
 
   const getCurrentCharacters = () => {
     switch (activeTab) {
@@ -82,7 +158,16 @@ const HandwritingPractice = () => {
       title: "Hoàn thành! 🎉",
       description: `Điểm trung bình: ${avg} điểm`,
     });
+
+    // Auto-refresh content after completion for words/sentences
+    if (activeTab === 'words' || activeTab === 'sentences') {
+      setTimeout(() => {
+        fetchRagContent(activeTab, activeTab === 'words' ? usedWords : usedSentences);
+      }, 2000);
+    }
   };
+
+  const isLoading = (activeTab === 'words' && isLoadingWords) || (activeTab === 'sentences' && isLoadingSentences);
 
   const tabConfig = [
     { 
@@ -99,7 +184,8 @@ const HandwritingPractice = () => {
       sublabel: "Từ vựng",
       icon: BookOpen,
       count: wordsData.length,
-      color: "from-blue-500 to-cyan-500"
+      color: "from-blue-500 to-cyan-500",
+      isRag: true
     },
     { 
       id: "sentences" as TabType, 
@@ -107,7 +193,8 @@ const HandwritingPractice = () => {
       sublabel: "Câu",
       icon: FileText,
       count: sentencesData.length,
-      color: "from-emerald-500 to-teal-500"
+      color: "from-emerald-500 to-teal-500",
+      isRag: true
     },
   ];
 
@@ -179,7 +266,7 @@ const HandwritingPractice = () => {
                 </div>
                 <div className="flex items-center gap-2 text-white/90">
                   <Star className="w-5 h-5" />
-                  <span className="text-sm">Nội dung Premium</span>
+                  <span className="text-sm">AI-Powered RAG</span>
                 </div>
               </motion.div>
             </div>
@@ -248,6 +335,13 @@ const HandwritingPractice = () => {
                             {tab.count}개
                           </span>
                           
+                          {/* RAG badge */}
+                          {'isRag' in tab && tab.isRag && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-medium">
+                              AI
+                            </span>
+                          )}
+                          
                           {isCompleted && (
                             <span className="flex items-center gap-1 text-xs text-green-500">
                               <Check className="w-3 h-3" />
@@ -301,12 +395,40 @@ const HandwritingPractice = () => {
                               </p>
                             </div>
                           </div>
+                          
+                          {/* Refresh button for RAG content */}
+                          {(activeTab === 'words' || activeTab === 'sentences') && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleRefreshContent}
+                              disabled={isLoading}
+                              className="gap-2"
+                            >
+                              {isLoading ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <RefreshCw className="w-4 h-4" />
+                              )}
+                              <span className="hidden sm:inline">
+                                {isLoading ? "Đang tải..." : "Nội dung mới"}
+                              </span>
+                            </Button>
+                          )}
                         </div>
 
-                        <HangulTracing
-                          characters={getCurrentCharacters()}
-                          onComplete={handleTabComplete}
-                        />
+                        {/* Loading state */}
+                        {isLoading ? (
+                          <div className="flex flex-col items-center justify-center py-20 gap-4">
+                            <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                            <p className="text-muted-foreground">AI đang tạo nội dung mới...</p>
+                          </div>
+                        ) : (
+                          <HangulTracing
+                            characters={getCurrentCharacters()}
+                            onComplete={handleTabComplete}
+                          />
+                        )}
                       </div>
                     </div>
                   </TabsContent>
