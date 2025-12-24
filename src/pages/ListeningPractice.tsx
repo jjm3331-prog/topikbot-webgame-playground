@@ -152,8 +152,8 @@ const ListeningPractice = () => {
       setIsPlaying(false);
       setCurrentPlayingLine(null);
       toast({
-        title: "음성 재생 실패",
-        description: "다시 시도해주세요",
+        title: "Lỗi phát âm thanh",
+        description: "Vui lòng thử lại",
         variant: "destructive",
       });
     }
@@ -183,7 +183,7 @@ const ListeningPractice = () => {
   const handleSubmit = () => {
     if (selectedAnswer === null) {
       toast({
-        title: "답을 선택해주세요",
+        title: "Vui lòng chọn đáp án",
         variant: "destructive",
       });
       return;
@@ -232,11 +232,11 @@ const ListeningPractice = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate("/lesson-menu")}
+              onClick={() => navigate("/dashboard")}
               className="mb-6 hover:bg-primary/10"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              레슨 메뉴
+              Quay lại
             </Button>
 
             {/* Hero Section */}
@@ -260,7 +260,7 @@ const ListeningPractice = () => {
                     className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-medium mb-2"
                   >
                     <Sparkles className="w-3 h-3" />
-                    TOPIK 스타일
+                    Phong cách TOPIK
                   </motion.div>
                   <motion.h1 
                     initial={{ opacity: 0, x: -20 }}
@@ -276,7 +276,7 @@ const ListeningPractice = () => {
                     transition={{ delay: 0.5 }}
                     className="text-white/80"
                   >
-                    AI TTS 대화형 듣기
+                    Luyện nghe với AI TTS
                   </motion.p>
                 </div>
               </div>
@@ -303,15 +303,15 @@ const ListeningPractice = () => {
                 </motion.div>
 
                 <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-                  퀴즈 완료!
+                  Hoàn thành! 🎉
                 </h2>
                 <p className="text-muted-foreground mb-8 text-lg">
-                  총 {listeningQuestions.length}문제 중 <span className="text-primary font-bold">{score}문제</span> 정답
+                  Tổng {listeningQuestions.length} câu, đúng <span className="text-primary font-bold">{score} câu</span>
                 </p>
 
                 <div className="w-full max-w-sm mx-auto mb-8">
                   <div className="flex justify-between text-sm text-muted-foreground mb-3">
-                    <span>정답률</span>
+                    <span>Tỷ lệ đúng</span>
                     <span className="font-bold text-foreground text-lg">
                       {Math.round((score / listeningQuestions.length) * 100)}%
                     </span>
@@ -334,14 +334,14 @@ const ListeningPractice = () => {
                     className="gap-2"
                   >
                     <RotateCcw className="w-5 h-5" />
-                    다시 풀기
+                    Làm lại
                   </Button>
                   <Button
-                    onClick={() => navigate("/lesson-menu")}
+                    onClick={() => navigate("/dashboard")}
                     size="lg"
                     className="gap-2 bg-gradient-to-r from-primary to-blue-500 hover:opacity-90 text-white"
                   >
-                    레슨 메뉴로
+                    Quay lại
                     <ChevronRight className="w-5 h-5" />
                   </Button>
                 </div>
@@ -358,10 +358,10 @@ const ListeningPractice = () => {
                 <div className="mb-6 p-4 rounded-2xl bg-card border border-border">
                   <div className="flex justify-between items-center mb-3">
                     <span className="text-sm font-medium text-foreground">
-                      문제 {currentQuestionIndex + 1} / {listeningQuestions.length}
+                      Câu {currentQuestionIndex + 1} / {listeningQuestions.length}
                     </span>
                     <span className="text-sm font-bold text-primary">
-                      점수: {score}점
+                      Điểm: {score}
                     </span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-2.5">
@@ -389,12 +389,12 @@ const ListeningPractice = () => {
                         {currentQuestion.type === "dialogue" ? (
                           <>
                             <Users className="w-4 h-4" />
-                            <span>대화 듣기</span>
+                            <span>대화 듣기 / Nghe hội thoại</span>
                           </>
                         ) : (
                           <>
                             <Volume2 className="w-4 h-4" />
-                            <span>내용 듣기</span>
+                            <span>내용 듣기 / Nghe nội dung</span>
                           </>
                         )}
                       </div>
@@ -425,7 +425,7 @@ const ListeningPractice = () => {
                                 <MessageCircle className="w-5 h-5 text-white" />
                               </div>
                               <div className="flex-1">
-                                <p className="text-xs text-muted-foreground mb-1">남자</p>
+                                <p className="text-xs text-muted-foreground mb-1">남자 / Nam</p>
                                 <p className="text-lg font-medium text-foreground">
                                   {currentQuestion.speaker1Text}
                                 </p>
@@ -459,7 +459,7 @@ const ListeningPractice = () => {
                                 <MessageCircle className="w-5 h-5 text-white" />
                               </div>
                               <div className="flex-1">
-                                <p className="text-xs text-muted-foreground mb-1">여자</p>
+                                <p className="text-xs text-muted-foreground mb-1">여자 / Nữ</p>
                                 <p className="text-lg font-medium text-foreground">
                                   {currentQuestion.speaker2Text}
                                 </p>
@@ -498,7 +498,7 @@ const ListeningPractice = () => {
                               )}
                             </div>
                             <div className="flex-1">
-                              <p className="text-xs text-muted-foreground mb-2">클릭하여 듣기</p>
+                              <p className="text-xs text-muted-foreground mb-2">Nhấn để nghe</p>
                               <p className="text-lg font-medium text-foreground leading-relaxed">
                                 {currentQuestion.singleText}
                               </p>
@@ -521,7 +521,7 @@ const ListeningPractice = () => {
                         ) : (
                           <Play className="w-5 h-5" />
                         )}
-                        {isPlaying ? "재생 중..." : playedAudio ? "전체 다시 듣기" : "전체 듣기"}
+                        {isPlaying ? "Đang phát..." : playedAudio ? "Nghe lại toàn bộ" : "Nghe toàn bộ"}
                       </Button>
                     </div>
 
@@ -594,7 +594,7 @@ const ListeningPractice = () => {
                               <Sparkles className="w-5 h-5 text-white" />
                             </div>
                             <div>
-                              <p className="font-bold text-foreground mb-1">해설</p>
+                              <p className="font-bold text-foreground mb-1">해설 / Giải thích</p>
                               <p className="text-muted-foreground">{currentQuestion.explanation}</p>
                             </div>
                           </div>
@@ -611,7 +611,7 @@ const ListeningPractice = () => {
                           className="flex-1 h-14 text-lg gap-2 bg-gradient-to-r from-primary to-blue-500 hover:opacity-90 text-white rounded-xl"
                         >
                           <CheckCircle2 className="w-5 h-5" />
-                          정답 확인
+                          Kiểm tra đáp án
                         </Button>
                       ) : (
                         <Button
@@ -620,12 +620,12 @@ const ListeningPractice = () => {
                         >
                           {currentQuestionIndex < listeningQuestions.length - 1 ? (
                             <>
-                              다음 문제
+                              Câu tiếp theo
                               <ChevronRight className="w-5 h-5" />
                             </>
                           ) : (
                             <>
-                              결과 보기
+                              Xem kết quả
                               <Trophy className="w-5 h-5" />
                             </>
                           )}

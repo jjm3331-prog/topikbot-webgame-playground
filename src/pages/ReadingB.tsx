@@ -30,6 +30,7 @@ interface Question {
 const tabCategories = {
   arrangement: {
     label: "문장배열",
+    sublabel: "Sắp xếp câu",
     emoji: "🔢",
     questions: [
       {
@@ -76,6 +77,7 @@ const tabCategories = {
   },
   inference: {
     label: "빈칸추론",
+    sublabel: "Suy luận điền chỗ trống",
     emoji: "🧠",
     questions: [
       {
@@ -122,6 +124,7 @@ const tabCategories = {
   },
   paired: {
     label: "연계문제",
+    sublabel: "Câu hỏi liên kết",
     emoji: "🔗",
     questions: [
       {
@@ -168,6 +171,7 @@ const tabCategories = {
   },
   comprehensive: {
     label: "종합 독해",
+    sublabel: "Đọc hiểu tổng hợp",
     emoji: "📖",
     questions: [
       {
@@ -256,7 +260,7 @@ const ReadingB = () => {
   const handleSubmit = () => {
     if (selectedAnswer === null) {
       toast({
-        title: "답을 선택해주세요",
+        title: "Vui lòng chọn đáp án",
         variant: "destructive",
       });
       return;
@@ -307,7 +311,7 @@ const ReadingB = () => {
               className="mb-6 hover:bg-primary/10"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              대시보드
+              Quay lại
             </Button>
 
             {/* Hero Section */}
@@ -331,7 +335,7 @@ const ReadingB = () => {
                     className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-medium mb-2"
                   >
                     <Sparkles className="w-3 h-3" />
-                    TOPIK 읽기
+                    Phong cách TOPIK
                   </motion.div>
                   <motion.h1 
                     initial={{ opacity: 0, x: -20 }}
@@ -347,7 +351,7 @@ const ReadingB = () => {
                     transition={{ delay: 0.5 }}
                     className="text-white/80"
                   >
-                    배열 · 추론 · 연계 · 종합
+                    Đọc hiểu nâng cao
                   </motion.p>
                 </div>
               </div>
@@ -392,15 +396,15 @@ const ReadingB = () => {
                 </motion.div>
 
                 <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-                  {currentCategory.label} 완료!
+                  {currentCategory.label} Hoàn thành!
                 </h2>
                 <p className="text-muted-foreground mb-8 text-lg">
-                  총 {currentQuestions.length}문제 중 <span className="text-primary font-bold">{score}문제</span> 정답
+                  Tổng {currentQuestions.length} câu, đúng <span className="text-primary font-bold">{score} câu</span>
                 </p>
 
                 <div className="w-full max-w-sm mx-auto mb-8">
                   <div className="flex justify-between text-sm text-muted-foreground mb-3">
-                    <span>정답률</span>
+                    <span>Tỷ lệ đúng</span>
                     <span className="font-bold text-foreground text-lg">
                       {Math.round((score / currentQuestions.length) * 100)}%
                     </span>
@@ -423,14 +427,14 @@ const ReadingB = () => {
                     className="gap-2"
                   >
                     <RotateCcw className="w-5 h-5" />
-                    다시 풀기
+                    Làm lại
                   </Button>
                   <Button
                     onClick={() => navigate("/dashboard")}
                     size="lg"
                     className="gap-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:opacity-90 text-white"
                   >
-                    대시보드로
+                    Quay lại
                     <ChevronRight className="w-5 h-5" />
                   </Button>
                 </div>
@@ -447,10 +451,10 @@ const ReadingB = () => {
                 <div className="mb-6 p-4 rounded-2xl bg-card border border-border">
                   <div className="flex justify-between items-center mb-3">
                     <span className="text-sm font-medium text-foreground">
-                      {currentCategory.emoji} {currentCategory.label} - 문제 {currentQuestionIndex + 1} / {currentQuestions.length}
+                      {currentCategory.emoji} {currentCategory.label} - Câu {currentQuestionIndex + 1} / {currentQuestions.length}
                     </span>
                     <span className="text-sm font-bold text-primary">
-                      점수: {score}점
+                      Điểm: {score}
                     </span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-2.5">
@@ -541,7 +545,7 @@ const ReadingB = () => {
                           className="mb-6 p-5 rounded-2xl bg-blue-500/10 border border-blue-500/30"
                         >
                           <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">
-                            💡 해설
+                            💡 해설 / Giải thích
                           </p>
                           <p className="text-foreground">
                             {currentQuestion.explanation}
@@ -558,14 +562,14 @@ const ReadingB = () => {
                           disabled={selectedAnswer === null}
                           className="flex-1 h-14 text-lg bg-gradient-to-r from-orange-500 to-amber-500 hover:opacity-90 text-white"
                         >
-                          정답 확인
+                          Kiểm tra đáp án
                         </Button>
                       ) : (
                         <Button
                           onClick={handleNext}
                           className="flex-1 h-14 text-lg bg-gradient-to-r from-orange-500 to-amber-500 hover:opacity-90 text-white"
                         >
-                          {currentQuestionIndex < currentQuestions.length - 1 ? "다음 문제" : "결과 보기"}
+                          {currentQuestionIndex < currentQuestions.length - 1 ? "Câu tiếp theo" : "Xem kết quả"}
                           <ChevronRight className="w-5 h-5 ml-2" />
                         </Button>
                       )}
