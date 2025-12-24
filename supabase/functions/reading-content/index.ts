@@ -234,7 +234,7 @@ ${typePrompts[type]?.[tabType] || "읽기 이해 문제"}
 반드시 JSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하세요.`;
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${geminiApiKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -242,7 +242,7 @@ ${typePrompts[type]?.[tabType] || "읽기 이해 문제"}
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
           temperature: 0.8,
-          maxOutputTokens: 8192,
+          maxOutputTokens: 4096,
         },
       }),
     }
