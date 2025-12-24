@@ -6,6 +6,7 @@ import AppFooter from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Slider } from "@/components/ui/slider";
 import { 
   ArrowLeft, 
   Headphones,
@@ -21,7 +22,8 @@ import {
   ChevronRight,
   MessageCircle,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  Gauge
 } from "lucide-react";
 
 interface Question {
@@ -108,6 +110,9 @@ const ListeningPractice = () => {
   const [playedAudio, setPlayedAudio] = useState(false);
   const [currentPlayingLine, setCurrentPlayingLine] = useState<number | null>(null);
   
+  // TTS Speed control (0.7 ~ 1.0)
+  const [ttsSpeed, setTtsSpeed] = useState(0.8);
+  
   // RAG-powered questions
   const [listeningQuestions, setListeningQuestions] = useState<Question[]>(fallbackQuestions);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
@@ -168,52 +173,63 @@ const ListeningPractice = () => {
 
   const currentQuestion = listeningQuestions[currentQuestionIndex];
 
-  const playTTS = async (text: string, lineIndex?: number) => {
-    try {
-      setIsLoading(true);
-      if (lineIndex !== undefined) setCurrentPlayingLine(lineIndex);
-      
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/korean-tts`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({ text }),
+  const playTTS = async (text: string, lineIndex?: number): Promise<void> => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        setIsLoading(true);
+        if (lineIndex !== undefined) setCurrentPlayingLine(lineIndex);
+        
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/korean-tts`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            },
+            body: JSON.stringify({ text, speed: ttsSpeed }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("TTS 요청 실패");
         }
-      );
 
-      if (!response.ok) {
-        throw new Error("TTS 요청 실패");
-      }
-
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
-      
-      setIsLoading(false);
-      setIsPlaying(true);
-      
-      audio.onended = () => {
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        
+        setIsLoading(false);
+        setIsPlaying(true);
+        
+        audio.onended = () => {
+          setIsPlaying(false);
+          setCurrentPlayingLine(null);
+          URL.revokeObjectURL(audioUrl);
+          resolve();
+        };
+        
+        audio.onerror = () => {
+          setIsPlaying(false);
+          setCurrentPlayingLine(null);
+          URL.revokeObjectURL(audioUrl);
+          reject(new Error("Audio playback failed"));
+        };
+        
+        await audio.play();
+      } catch (error) {
+        console.error("TTS error:", error);
+        setIsLoading(false);
         setIsPlaying(false);
         setCurrentPlayingLine(null);
-        URL.revokeObjectURL(audioUrl);
-      };
-      
-      await audio.play();
-    } catch (error) {
-      console.error("TTS error:", error);
-      setIsLoading(false);
-      setIsPlaying(false);
-      setCurrentPlayingLine(null);
-      toast({
-        title: "Lỗi phát âm thanh",
-        description: "Vui lòng thử lại",
-        variant: "destructive",
-      });
-    }
+        toast({
+          title: "Lỗi phát âm thanh",
+          description: "Vui lòng thử lại",
+          variant: "destructive",
+        });
+        reject(error);
+      }
+    });
   };
 
   const playFullAudio = async () => {
@@ -222,7 +238,8 @@ const ListeningPractice = () => {
     if (currentQuestion.type === "dialogue") {
       if (currentQuestion.speaker1Text) {
         await playTTS(currentQuestion.speaker1Text, 0);
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // 1초 대기 (대화자 간 자연스러운 텀)
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
       if (currentQuestion.speaker2Text) {
         await playTTS(currentQuestion.speaker2Text, 1);
@@ -230,6 +247,14 @@ const ListeningPractice = () => {
     } else if (currentQuestion.singleText) {
       await playTTS(currentQuestion.singleText, 0);
     }
+  };
+
+  // Speed labels for display
+  const getSpeedLabel = (speed: number) => {
+    if (speed >= 1.0) return "1.0x (일반)";
+    if (speed >= 0.9) return "0.9x";
+    if (speed >= 0.8) return "0.8x";
+    return "0.7x (천천히)";
   };
 
   const handleAnswerSelect = (answerIndex: number) => {
@@ -343,6 +368,38 @@ const ListeningPractice = () => {
                 </div>
               </div>
             </div>
+
+            {/* Speed Control Slider */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="mb-6 p-4 rounded-2xl bg-card border border-border"
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Gauge className="w-5 h-5" />
+                  <span className="text-sm font-medium">속도 조절</span>
+                </div>
+                <div className="flex-1">
+                  <Slider
+                    value={[ttsSpeed]}
+                    onValueChange={(value) => setTtsSpeed(value[0])}
+                    min={0.7}
+                    max={1.0}
+                    step={0.1}
+                    className="w-full"
+                    disabled={isPlaying || isLoading}
+                  />
+                </div>
+                <span className="text-sm font-bold text-primary min-w-[90px] text-right">
+                  {getSpeedLabel(ttsSpeed)}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                느린 속도로 더 정확하게 들을 수 있습니다
+              </p>
+            </motion.div>
           </motion.div>
 
           <AnimatePresence mode="wait">
