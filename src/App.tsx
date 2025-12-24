@@ -23,8 +23,6 @@ import Manager from "./pages/Manager";
 import AITutor from "./pages/AITutor";
 import AIChat from "./pages/AIChat";
 import WritingCorrection from "./pages/WritingCorrection";
-import TopikI from "./pages/TopikI";
-import TopikII from "./pages/TopikII";
 import Lesson from "./pages/Lesson";
 import LessonMenu from "./pages/LessonMenu";
 import HandwritingPractice from "./pages/HandwritingPractice";
@@ -146,8 +144,6 @@ const App = () => {
               <Route path="/manager" element={<Manager />} />
               <Route path="/ai-tutor" element={<AITutor />} />
               <Route path="/ai-chat" element={<AIChat />} />
-              <Route path="/topik-1" element={<TopikI />} />
-              <Route path="/topik-2" element={<TopikII />} />
               <Route path="/lesson/:lessonId" element={<Lesson />} />
               <Route path="/lesson-menu" element={<LessonMenu />} />
               <Route path="/handwriting" element={<HandwritingPractice />} />
