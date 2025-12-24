@@ -13,64 +13,17 @@ import {
   Type,
   FileText,
   Sparkles,
-  Keyboard,
-  ChevronRight,
   RotateCcw,
-  CheckCircle2,
-  Lightbulb
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  Star,
+  BookOpen,
+  Trophy
 } from "lucide-react";
 import HangulTracing from "@/components/learning/HangulTracing";
 
-type PracticeMode = "handwriting" | "keyboard";
 type TabType = "consonants" | "words" | "sentences";
-
-interface PracticeModeCardProps {
-  icon: React.ElementType;
-  title: string;
-  description: string;
-  isActive: boolean;
-  onClick: () => void;
-}
-
-const PracticeModeCard = ({ icon: Icon, title, description, isActive, onClick }: PracticeModeCardProps) => (
-  <motion.button
-    onClick={onClick}
-    whileHover={{ scale: 1.02 }}
-    whileTap={{ scale: 0.98 }}
-    className={`relative flex-1 p-4 sm:p-6 rounded-2xl border-2 transition-all duration-300 text-left ${
-      isActive 
-        ? "border-primary bg-primary/5 shadow-lg" 
-        : "border-border bg-card hover:border-primary/50"
-    }`}
-  >
-    {isActive && (
-      <motion.div
-        layoutId="activeModeIndicator"
-        className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10"
-        initial={false}
-        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-      />
-    )}
-    <div className="relative z-10">
-      <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 ${
-        isActive 
-          ? "bg-gradient-to-br from-primary to-secondary text-white" 
-          : "bg-muted text-muted-foreground"
-      }`}>
-        <Icon className="w-6 h-6" />
-      </div>
-      <h3 className={`font-bold text-lg mb-1 ${isActive ? "text-primary" : "text-foreground"}`}>
-        {title}
-      </h3>
-      <p className="text-sm text-muted-foreground">{description}</p>
-    </div>
-    {isActive && (
-      <div className="absolute top-3 right-3">
-        <CheckCircle2 className="w-5 h-5 text-primary" />
-      </div>
-    )}
-  </motion.button>
-);
 
 // Sample data for practice
 const consonantsData = {
@@ -90,24 +43,12 @@ const sentencesData = [
   "한국어를 공부해요",
 ];
 
-// Spelling quiz data (confusing pairs)
-const spellingQuizData = [
-  { question: "사과를 먹__요", options: ["어", "여"], answer: "어", hint: "ㅓ 모음 뒤에는 '어'" },
-  { question: "학교에 __요", options: ["가", "까"], answer: "가", hint: "기본 자음 ㄱ" },
-  { question: "__기 싫어요", options: ["되", "돼"], answer: "되", hint: "'되다'의 어간" },
-  { question: "밥을 __요", options: ["먹어", "먹여"], answer: "먹어", hint: "먹다 + 어요" },
-  { question: "날씨가 __요", options: ["좋아", "조아"], answer: "좋아", hint: "'좋다'의 활용" },
-];
-
 const HandwritingPractice = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<TabType>("consonants");
-  const [practiceMode, setPracticeMode] = useState<PracticeMode>("handwriting");
-  const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
-  const [quizScore, setQuizScore] = useState(0);
-  const [showQuiz, setShowQuiz] = useState(false);
+  const [completedTabs, setCompletedTabs] = useState<TabType[]>([]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -130,39 +71,44 @@ const HandwritingPractice = () => {
     }
   };
 
-  const handleQuizAnswer = (selectedAnswer: string) => {
-    const currentQuiz = spellingQuizData[currentQuizIndex];
-    if (selectedAnswer === currentQuiz.answer) {
-      setQuizScore(prev => prev + 1);
-      toast({
-        title: "정답! 🎉",
-        description: currentQuiz.hint,
-      });
-    } else {
-      toast({
-        title: "틀렸어요 😢",
-        description: `정답: ${currentQuiz.answer} - ${currentQuiz.hint}`,
-        variant: "destructive",
-      });
+  const handleTabComplete = (scores: number[]) => {
+    const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+    
+    if (!completedTabs.includes(activeTab)) {
+      setCompletedTabs(prev => [...prev, activeTab]);
     }
     
-    if (currentQuizIndex < spellingQuizData.length - 1) {
-      setCurrentQuizIndex(prev => prev + 1);
-    } else {
-      toast({
-        title: "퀴즈 완료!",
-        description: `총 ${quizScore + (selectedAnswer === currentQuiz.answer ? 1 : 0)}/${spellingQuizData.length} 정답`,
-      });
-      setShowQuiz(false);
-      setCurrentQuizIndex(0);
-      setQuizScore(0);
-    }
+    toast({
+      title: "연습 완료! 🎉",
+      description: `평균 점수: ${avg}점`,
+    });
   };
 
   const tabConfig = [
-    { id: "consonants" as TabType, label: "자음·모음", icon: Type },
-    { id: "words" as TabType, label: "단어", icon: PenTool },
-    { id: "sentences" as TabType, label: "문장", icon: FileText },
+    { 
+      id: "consonants" as TabType, 
+      label: "자음·모음", 
+      sublabel: "Consonants & Vowels",
+      icon: Type,
+      count: consonantsData.basic.length + consonantsData.vowels.length,
+      color: "from-violet-500 to-purple-600"
+    },
+    { 
+      id: "words" as TabType, 
+      label: "단어", 
+      sublabel: "Words",
+      icon: BookOpen,
+      count: wordsData.length,
+      color: "from-blue-500 to-cyan-500"
+    },
+    { 
+      id: "sentences" as TabType, 
+      label: "문장", 
+      sublabel: "Sentences",
+      icon: FileText,
+      count: sentencesData.length,
+      color: "from-emerald-500 to-teal-500"
+    },
   ];
 
   return (
@@ -170,8 +116,8 @@ const HandwritingPractice = () => {
       <CleanHeader />
       
       <main className="flex-1 pb-24">
-        <div className="container mx-auto px-4 max-w-4xl">
-          {/* Header */}
+        <div className="container mx-auto px-4 max-w-5xl">
+          {/* Premium Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -181,185 +127,190 @@ const HandwritingPractice = () => {
               variant="ghost"
               size="sm"
               onClick={() => navigate("/lesson-menu")}
-              className="mb-4"
+              className="mb-6 hover:bg-primary/10"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               레슨 메뉴
             </Button>
 
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-korean-purple to-korean-pink flex items-center justify-center shadow-lg">
-                <PenTool className="w-7 h-7 text-white" />
+            {/* Hero Section */}
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 p-8 mb-8">
+              <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIiBzdHJva2Utd2lkdGg9IjIiLz48L2c+PC9zdmc+')] opacity-30" />
+              
+              <div className="relative z-10 flex items-center gap-6">
+                <motion.div 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", delay: 0.2 }}
+                  className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-2xl border border-white/30"
+                >
+                  <PenTool className="w-10 h-10 text-white" />
+                </motion.div>
+                <div>
+                  <motion.h1 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-3xl sm:text-4xl font-bold text-white mb-2"
+                  >
+                    손글씨 연습
+                  </motion.h1>
+                  <motion.p 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="text-white/80 text-lg"
+                  >
+                    Handwriting Practice
+                  </motion.p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-foreground">손글씨 연습</h1>
-                <p className="text-muted-foreground text-sm">Handwriting Practice</p>
-              </div>
+
+              {/* Stats */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="relative z-10 mt-6 flex gap-6"
+              >
+                <div className="flex items-center gap-2 text-white/90">
+                  <Trophy className="w-5 h-5" />
+                  <span className="text-sm">{completedTabs.length}/3 완료</span>
+                </div>
+                <div className="flex items-center gap-2 text-white/90">
+                  <Star className="w-5 h-5" />
+                  <span className="text-sm">프리미엄 콘텐츠</span>
+                </div>
+              </motion.div>
             </div>
           </motion.div>
 
-          {/* Practice Mode Selection */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mb-8"
-          >
-            <h2 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
-              <Sparkles className="w-4 h-4" />
-              연습 모드 선택
-            </h2>
-            <div className="flex gap-4">
-              <PracticeModeCard
-                icon={PenTool}
-                title="손글씨"
-                description="캔버스에 직접 써보기"
-                isActive={practiceMode === "handwriting"}
-                onClick={() => setPracticeMode("handwriting")}
-              />
-              <PracticeModeCard
-                icon={Keyboard}
-                title="키보드"
-                description="빈칸 채우기 퀴즈"
-                isActive={practiceMode === "keyboard"}
-                onClick={() => {
-                  setPracticeMode("keyboard");
-                  setShowQuiz(true);
-                }}
-              />
-            </div>
-          </motion.div>
-
-          {/* Tabs */}
+          {/* Premium Tabs */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabType)} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-6 h-14 p-1.5 bg-muted/50 rounded-2xl">
-                {tabConfig.map((tab) => (
-                  <TabsTrigger
-                    key={tab.id}
-                    value={tab.id}
-                    className="flex items-center gap-2 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-md transition-all duration-300 h-full"
-                  >
-                    <tab.icon className="w-4 h-4" />
-                    <span className="font-medium">{tab.label}</span>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
+              {/* Custom Tab Cards */}
+              <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-8">
+                {tabConfig.map((tab, index) => {
+                  const isActive = activeTab === tab.id;
+                  const isCompleted = completedTabs.includes(tab.id);
+                  
+                  return (
+                    <motion.button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 * index }}
+                      whileHover={{ scale: 1.02, y: -4 }}
+                      whileTap={{ scale: 0.98 }}
+                      className={`relative p-4 sm:p-6 rounded-2xl border-2 transition-all duration-300 text-left overflow-hidden ${
+                        isActive 
+                          ? "border-primary bg-primary/5 shadow-xl shadow-primary/20" 
+                          : "border-border bg-card hover:border-primary/50 hover:shadow-lg"
+                      }`}
+                    >
+                      {/* Gradient overlay for active */}
+                      {isActive && (
+                        <motion.div
+                          layoutId="activeTabBg"
+                          className={`absolute inset-0 bg-gradient-to-br ${tab.color} opacity-5`}
+                          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                        />
+                      )}
+
+                      <div className="relative z-10">
+                        {/* Icon */}
+                        <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center mb-3 transition-all duration-300 ${
+                          isActive 
+                            ? `bg-gradient-to-br ${tab.color} shadow-lg` 
+                            : "bg-muted"
+                        }`}>
+                          <tab.icon className={`w-6 h-6 sm:w-7 sm:h-7 ${isActive ? "text-white" : "text-muted-foreground"}`} />
+                        </div>
+
+                        {/* Label */}
+                        <h3 className={`font-bold text-base sm:text-lg mb-0.5 ${isActive ? "text-foreground" : "text-foreground/80"}`}>
+                          {tab.label}
+                        </h3>
+                        <p className="text-xs text-muted-foreground hidden sm:block">{tab.sublabel}</p>
+
+                        {/* Count badge */}
+                        <div className="mt-2 flex items-center gap-2">
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${
+                            isActive 
+                              ? "bg-primary/20 text-primary" 
+                              : "bg-muted text-muted-foreground"
+                          }`}>
+                            {tab.count}개
+                          </span>
+                          
+                          {isCompleted && (
+                            <span className="flex items-center gap-1 text-xs text-green-500">
+                              <Check className="w-3 h-3" />
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Completed indicator */}
+                      {isCompleted && (
+                        <div className="absolute top-3 right-3">
+                          <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                            <Check className="w-4 h-4 text-white" />
+                          </div>
+                        </div>
+                      )}
+                    </motion.button>
+                  );
+                })}
+              </div>
 
               <AnimatePresence mode="wait">
-                {practiceMode === "handwriting" ? (
-                  <motion.div
-                    key="handwriting"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <TabsContent value={activeTab} className="mt-0">
-                      <div className="glass-card p-6">
-                        <HangulTracing
-                          characters={getCurrentCharacters()}
-                          onComplete={(scores) => {
-                            const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-                            toast({
-                              title: "연습 완료! 🎉",
-                              description: `평균 점수: ${avg}점`,
-                            });
-                          }}
-                        />
-                      </div>
-                    </TabsContent>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="keyboard"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    {/* Keyboard Quiz Mode */}
-                    <div className="glass-card p-6 sm:p-8">
-                      <div className="text-center mb-8">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-korean-yellow/10 text-korean-yellow text-sm font-semibold mb-4">
-                          <Lightbulb className="w-4 h-4" />
-                          <span>맞춤법 퀴즈</span>
-                        </div>
-                        <p className="text-muted-foreground text-sm">
-                          헷갈리는 자음·모음을 구분해보세요!
-                        </p>
-                      </div>
-
-                      {/* Quiz Content */}
-                      <div className="max-w-md mx-auto">
-                        <div className="text-center mb-8">
-                          <span className="text-xs text-muted-foreground">
-                            문제 {currentQuizIndex + 1} / {spellingQuizData.length}
-                          </span>
-                          <div className="w-full bg-muted rounded-full h-2 mt-2">
-                            <motion.div
-                              className="bg-gradient-to-r from-primary to-secondary h-2 rounded-full"
-                              initial={{ width: 0 }}
-                              animate={{ width: `${((currentQuizIndex + 1) / spellingQuizData.length) * 100}%` }}
-                              transition={{ duration: 0.3 }}
-                            />
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <TabsContent value={activeTab} className="mt-0">
+                    {/* Practice Card */}
+                    <div className="relative rounded-3xl bg-gradient-to-b from-card to-card/50 border border-border/50 shadow-2xl overflow-hidden">
+                      {/* Top accent */}
+                      <div className={`h-1.5 bg-gradient-to-r ${tabConfig.find(t => t.id === activeTab)?.color}`} />
+                      
+                      <div className="p-6 sm:p-8">
+                        {/* Info bar */}
+                        <div className="flex items-center justify-between mb-6 pb-4 border-b border-border/50">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${tabConfig.find(t => t.id === activeTab)?.color} flex items-center justify-center`}>
+                              <Sparkles className="w-5 h-5 text-white" />
+                            </div>
+                            <div>
+                              <h2 className="font-bold text-foreground">
+                                {activeTab === "consonants" && "자음·모음 따라쓰기"}
+                                {activeTab === "words" && "단어 따라쓰기"}
+                                {activeTab === "sentences" && "문장 따라쓰기"}
+                              </h2>
+                              <p className="text-sm text-muted-foreground">
+                                캔버스에 직접 써보세요
+                              </p>
+                            </div>
                           </div>
                         </div>
 
-                        <motion.div
-                          key={currentQuizIndex}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-center mb-8"
-                        >
-                          <p className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-                            {spellingQuizData[currentQuizIndex].question.split("__")[0]}
-                            <span className="inline-block w-12 h-12 mx-1 border-b-4 border-primary align-bottom" />
-                            {spellingQuizData[currentQuizIndex].question.split("__")[1]}
-                          </p>
-                        </motion.div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                          {spellingQuizData[currentQuizIndex].options.map((option, idx) => (
-                            <motion.button
-                              key={option}
-                              initial={{ opacity: 0, y: 20 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: idx * 0.1 }}
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => handleQuizAnswer(option)}
-                              className="p-6 rounded-2xl border-2 border-border bg-card hover:border-primary hover:bg-primary/5 transition-all duration-300 text-center group"
-                            >
-                              <span className="text-3xl font-bold text-foreground group-hover:text-primary transition-colors">
-                                {option}
-                              </span>
-                            </motion.button>
-                          ))}
-                        </div>
-
-                        <div className="mt-6 text-center">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setCurrentQuizIndex(0);
-                              setQuizScore(0);
-                            }}
-                            className="gap-2"
-                          >
-                            <RotateCcw className="w-4 h-4" />
-                            처음부터
-                          </Button>
-                        </div>
+                        <HangulTracing
+                          characters={getCurrentCharacters()}
+                          onComplete={handleTabComplete}
+                        />
                       </div>
                     </div>
-                  </motion.div>
-                )}
+                  </TabsContent>
+                </motion.div>
               </AnimatePresence>
             </Tabs>
           </motion.div>
