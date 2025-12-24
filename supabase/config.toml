@@ -90,5 +90,8 @@ verify_jwt = false
 [functions.lesson-content]
 verify_jwt = false
 
+[functions.listening-content]
+verify_jwt = false
+
 [functions.handwriting-content]
 verify_jwt = false
