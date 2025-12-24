@@ -23,6 +23,7 @@ import {
   Lock,
   Search,
   Mic,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -60,6 +61,8 @@ const baseMenuCategories: MenuCategory[] = [
     items: [
       { icon: PenTool, label: "손글씨 연습", href: "/handwriting" },
       { icon: Headphones, label: "듣기 연습", href: "/listening" },
+      { icon: BookOpen, label: "읽기A", href: "/reading-a" },
+      { icon: BookOpen, label: "읽기B", href: "/reading-b" },
     ]
   },
   {
