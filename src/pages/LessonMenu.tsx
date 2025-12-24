@@ -3,17 +3,15 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { 
-  ArrowLeft, 
-  PenTool, 
-  Headphones, 
+import {
+  PenTool,
+  Headphones,
   Sparkles,
   ChevronRight,
   BookOpen,
   Trophy,
-  Zap
+  Zap,
 } from "lucide-react";
 
 interface LessonMenuItemProps {
@@ -22,22 +20,20 @@ interface LessonMenuItemProps {
   titleKo: string;
   description: string;
   gradient: string;
-  shadowColor: string;
   badge?: string;
   onClick: () => void;
   index: number;
 }
 
-const LessonMenuItem = ({ 
-  icon: Icon, 
-  title, 
-  titleKo, 
-  description, 
-  gradient, 
-  shadowColor,
+const LessonMenuItem = ({
+  icon: Icon,
+  title,
+  titleKo,
+  description,
+  gradient,
   badge,
   onClick,
-  index 
+  index,
 }: LessonMenuItemProps) => {
   return (
     <motion.button
@@ -45,14 +41,10 @@ const LessonMenuItem = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.15, ease: [0.4, 0, 0.2, 1] }}
       onClick={onClick}
-      className="group relative w-full overflow-hidden rounded-3xl bg-card border border-border/50 p-6 sm:p-8 text-left transition-all duration-500 hover:border-transparent"
-      style={{
-        boxShadow: `0 4px 20px -5px ${shadowColor}20`,
-      }}
-      whileHover={{ 
-        y: -8, 
+      className="group relative w-full overflow-hidden rounded-3xl bg-card border border-border/50 p-6 sm:p-8 text-left transition-all duration-500 hover:border-transparent shadow-lg"
+      whileHover={{
+        y: -8,
         scale: 1.02,
-        boxShadow: `0 20px 40px -10px ${shadowColor}40`,
       }}
       whileTap={{ scale: 0.98 }}
     >
@@ -68,7 +60,7 @@ const LessonMenuItem = ({
       <div className="relative z-10 flex items-start gap-5">
         {/* Icon */}
         <div className={`relative shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-500`}>
-          <Icon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+          <Icon className="w-8 h-8 sm:w-10 sm:h-10 text-primary-foreground" />
           
           {/* Sparkle effect */}
           <motion.div
@@ -87,7 +79,7 @@ const LessonMenuItem = ({
               {titleKo}
             </h3>
             {badge && (
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r from-korean-yellow to-korean-orange text-white">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r from-korean-yellow to-korean-orange text-primary-foreground">
                 {badge}
               </span>
             )}
@@ -142,18 +134,18 @@ const LessonMenu = () => {
       icon: PenTool,
       title: "Handwriting Practice",
       titleKo: "손글씨 연습",
-      description: "자음·모음 기초부터 단어, 문장까지 손글씨로 직접 써보며 한글을 익히세요. AI가 맞춤법 퀴즈도 생성해드려요.",
+      description:
+        "자음·모음 기초부터 단어, 문장까지 손글씨로 직접 써보며 한글을 익히세요. AI가 맞춤법 퀴즈도 생성해드려요.",
       gradient: "from-korean-purple to-korean-pink",
-      shadowColor: "#a855f7",
       badge: "추천",
     },
     {
       icon: Headphones,
       title: "Listening Practice",
       titleKo: "듣기 연습",
-      description: "실제 TOPIK 듣기 시험처럼 4지선다 문제를 풀어보세요. AI TTS로 2명의 화자가 대화하는 문제도 준비되어 있어요.",
+      description:
+        "실제 TOPIK 듣기 시험처럼 4지선다 문제를 풀어보세요. AI TTS로 2명의 화자가 대화하는 문제도 준비되어 있어요.",
       gradient: "from-korean-blue to-korean-cyan",
-      shadowColor: "#3b82f6",
       badge: "NEW",
     },
   ];
@@ -171,15 +163,6 @@ const LessonMenu = () => {
             transition={{ duration: 0.5 }}
             className="py-6 sm:py-10"
           >
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/")}
-              className="mb-6 hover:bg-muted/50"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              돌아가기
-            </Button>
 
             <div className="text-center mb-10 sm:mb-14">
               {/* Badge */}
@@ -233,17 +216,6 @@ const LessonMenu = () => {
             ))}
           </div>
 
-          {/* Coming Soon Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="mt-12 text-center"
-          >
-            <p className="text-muted-foreground text-sm">
-              🚀 더 많은 레슨이 곧 추가됩니다!
-            </p>
-          </motion.div>
         </div>
       </main>
 
