@@ -96,6 +96,15 @@ const fallbackQuestions: Question[] = [
   },
 ];
 
+// TOPIK 급수 레벨
+const topikLevels = {
+  "1-2": { label: "TOPIK I (1-2급)", sublabel: "Sơ cấp", color: "from-green-500 to-emerald-500" },
+  "3-4": { label: "TOPIK II (3-4급)", sublabel: "Trung cấp", color: "from-blue-500 to-cyan-500" },
+  "5-6": { label: "TOPIK II (5-6급)", sublabel: "Cao cấp", color: "from-purple-500 to-pink-500" },
+};
+
+type TopikLevel = keyof typeof topikLevels;
+
 const ListeningPractice = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -113,12 +122,15 @@ const ListeningPractice = () => {
   // TTS Speed control (0.7 ~ 1.0)
   const [ttsSpeed, setTtsSpeed] = useState(0.8);
   
+  // TOPIK Level
+  const [topikLevel, setTopikLevel] = useState<TopikLevel>("1-2");
+  
   // RAG-powered questions
   const [listeningQuestions, setListeningQuestions] = useState<Question[]>(fallbackQuestions);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
   // Fetch RAG-powered listening questions
-  const fetchListeningQuestions = useCallback(async () => {
+  const fetchListeningQuestions = useCallback(async (level: TopikLevel) => {
     setIsLoadingQuestions(true);
     
     try {
@@ -127,7 +139,7 @@ const ListeningPractice = () => {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ count: 5 }),
+          body: JSON.stringify({ count: 5, topikLevel: level }),
         }
       );
       
@@ -142,13 +154,7 @@ const ListeningPractice = () => {
           id: idx + 1,
         }));
         setListeningQuestions(questionsWithIds);
-        
-        if (data.source === 'rag') {
-          toast({
-            title: "새 문제 로드 완료! 🎧",
-            description: `AI가 ${questionsWithIds.length}개의 새로운 듣기 문제를 생성했습니다`,
-          });
-        }
+        console.log(`✅ Loaded ${questionsWithIds.length} listening questions for TOPIK ${level}`);
       } else {
         setListeningQuestions(fallbackQuestions);
       }
@@ -158,7 +164,7 @@ const ListeningPractice = () => {
     } finally {
       setIsLoadingQuestions(false);
     }
-  }, [toast]);
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -166,10 +172,12 @@ const ListeningPractice = () => {
       setUser(user);
     };
     checkAuth();
-    
-    // Load initial questions
-    fetchListeningQuestions();
   }, []);
+
+  // Load questions when level changes
+  useEffect(() => {
+    fetchListeningQuestions(topikLevel);
+  }, [topikLevel, fetchListeningQuestions]);
 
   const currentQuestion = listeningQuestions[currentQuestionIndex];
 
@@ -297,8 +305,18 @@ const ListeningPractice = () => {
     setPlayedAudio(false);
   };
 
+  const handleLevelChange = (level: TopikLevel) => {
+    setTopikLevel(level);
+    setCurrentQuestionIndex(0);
+    setSelectedAnswer(null);
+    setShowResult(false);
+    setScore(0);
+    setIsQuizComplete(false);
+    setPlayedAudio(false);
+  };
+
   const handleNewQuestions = async () => {
-    await fetchListeningQuestions();
+    await fetchListeningQuestions(topikLevel);
     handleRestart();
   };
 
@@ -369,6 +387,23 @@ const ListeningPractice = () => {
               </div>
             </div>
 
+            {/* TOPIK Level Selection */}
+            <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
+              {(Object.keys(topikLevels) as TopikLevel[]).map((level) => (
+                <button
+                  key={level}
+                  onClick={() => handleLevelChange(level)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap transition-all font-medium ${
+                    topikLevel === level
+                      ? `bg-gradient-to-r ${topikLevels[level].color} text-white shadow-lg`
+                      : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                  }`}
+                >
+                  <span className="text-sm font-bold">{level}급</span>
+                  <span className="text-xs opacity-80">{topikLevels[level].sublabel}</span>
+                </button>
+              ))}
+            </div>
             {/* Speed Control Slider */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
