@@ -305,58 +305,6 @@ const Dashboard = () => {
             </div>
           </motion.div>
 
-          {/* Game Section */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <Gamepad2 className="w-5 h-5 text-korean-orange" />
-              <h2 className="font-semibold text-foreground">Game học tiếng Hàn</h2>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { icon: "🎮", label: "AI Sinh tồn", desc: "Seoul", path: "/chat" },
-                { icon: "💕", label: "Hẹn hò", desc: "Korean Dating", path: "/dating" },
-                { icon: "👑", label: "Manager", desc: "K-POP Idol", path: "/manager" },
-                { icon: "🎵", label: "K-POP Quiz", desc: "Music", path: "/kpop" },
-              ].map((game, idx) => (
-                <div 
-                  key={idx}
-                  onClick={() => navigate(game.path)}
-                  className="glass-card p-4 rounded-xl text-center cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-all group"
-                >
-                  <span className="text-3xl block mb-2 group-hover:scale-110 transition-transform">{game.icon}</span>
-                  <p className="text-sm font-medium text-foreground">{game.label}</p>
-                  <p className="text-xs text-muted-foreground">{game.desc}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* More Games */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="grid grid-cols-3 gap-3"
-          >
-            {[
-              { icon: "🎬", label: "K-Drama", path: "/kdrama" },
-              { icon: "🔗", label: "Nối từ", path: "/wordchain" },
-              { icon: "💼", label: "Làm thêm", path: "/parttime" },
-            ].map((game, idx) => (
-              <div 
-                key={idx}
-                onClick={() => navigate(game.path)}
-                className="glass-card p-3 rounded-xl text-center cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-all group"
-              >
-                <span className="text-2xl block mb-1 group-hover:scale-110 transition-transform">{game.icon}</span>
-                <p className="text-sm font-medium text-foreground">{game.label}</p>
-              </div>
-            ))}
-          </motion.div>
 
         </div>
 
