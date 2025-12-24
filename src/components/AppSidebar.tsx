@@ -98,6 +98,7 @@ const menuSections: MenuSection[] = [
       { icon: Trophy, label: "Bảng xếp hạng", href: "/ranking" },
       { icon: Notebook, label: "Điều khoản", href: "/terms" },
       { icon: HelpCircle, label: "Chính sách", href: "/privacy" },
+      { icon: Headphones, label: "Trung tâm Hỗ trợ", href: "/help-center" },
     ],
     defaultOpen: false
   },
