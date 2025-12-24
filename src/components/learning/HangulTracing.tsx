@@ -5,8 +5,13 @@ import { toast } from "sonner";
 import { RotateCcw, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+export interface CharacterItem {
+  korean: string;
+  vietnamese?: string;
+}
+
 interface HangulTracingProps {
-  characters: string[]; // Array of characters to practice
+  characters: CharacterItem[]; // Array of characters to practice
   onComplete?: (scores: number[]) => void;
   className?: string;
 }
@@ -38,7 +43,8 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
   const [isComplete, setIsComplete] = useState(false);
   const [canvasSize, setCanvasSize] = useState(300);
 
-  const currentChar = characters[currentIndex];
+  const currentItem = characters[currentIndex];
+  const currentChar = currentItem.korean;
 
   // Calculate responsive canvas size
   useEffect(() => {
@@ -281,7 +287,7 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
 
   // Calculate display font size for the character preview above canvas
   const getDisplayFontSize = () => {
-    const charCount = currentChar.length;
+    const charCount = currentChar?.length || 1;
     if (charCount === 1) return "text-4xl sm:text-5xl";
     if (charCount <= 4) return "text-2xl sm:text-3xl";
     if (charCount <= 8) return "text-xl sm:text-2xl";
@@ -295,8 +301,8 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
         <h2 className="text-xl sm:text-2xl font-bold">Hoàn thành! 🎉</h2>
         <div className="text-4xl sm:text-5xl font-bold text-primary">{avgScore} điểm</div>
         <div className="flex flex-wrap gap-2 justify-center max-w-full">
-          {characters.map((char, idx) => {
-            const charLen = char.length;
+          {characters.map((item, idx) => {
+            const charLen = item.korean.length;
             const sizeClass = charLen === 1 
               ? "w-10 h-10 sm:w-12 sm:h-12 text-base sm:text-lg" 
               : charLen <= 4 
@@ -316,7 +322,7 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
                     : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
                 )}
               >
-                {char}
+                {item.korean}
               </div>
             );
           })}
@@ -339,8 +345,16 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
       </div>
 
       {/* Character display - responsive sizing */}
-      <div className={cn("font-bold mb-2 text-center break-all px-4 max-w-full", getDisplayFontSize())}>
-        {currentChar}
+      <div className="text-center mb-2 px-4 max-w-full">
+        <div className={cn("font-bold break-all", getDisplayFontSize())}>
+          {currentChar}
+        </div>
+        {/* Vietnamese translation */}
+        {currentItem.vietnamese && (
+          <div className="text-sm sm:text-base text-muted-foreground mt-1">
+            {currentItem.vietnamese}
+          </div>
+        )}
       </div>
 
       {/* Canvas container - responsive */}
