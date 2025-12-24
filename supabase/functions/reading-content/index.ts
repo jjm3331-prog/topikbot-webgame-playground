@@ -144,13 +144,91 @@ async function rerankResults(
   }));
 }
 
+// TOPIK 급수별 어휘/문법 가이드라인
+const TOPIK_LEVEL_GUIDELINES: Record<string, string> = {
+  "1-2": `[TOPIK 1-2급 난이도 가이드라인]
+어휘:
+- 기초 어휘 800~1500개 범위
+- 일상생활 필수 단어 (가족, 음식, 날씨, 시간, 장소 등)
+- 기본 동사/형용사: 가다, 오다, 먹다, 마시다, 좋다, 크다 등
+
+문법:
+- 기본 조사: 이/가, 을/를, 은/는, 에, 에서, 와/과
+- 기본 어미: -습니다/-ㅂ니다, -아요/-어요, -고
+- 간단한 연결어미: -고, -아서/-어서
+- 시제: 현재, 과거 (-았/었-)
+- 문장: 단문 위주, 짧고 간단한 문장
+
+주제:
+- 자기소개, 인사, 날씨, 쇼핑, 음식 주문
+- 길 묻기, 약속 정하기, 취미
+
+예시 문장:
+- "저는 학생입니다."
+- "오늘 날씨가 좋습니다."
+- "친구와 같이 영화를 봤습니다."`,
+
+  "3-4": `[TOPIK 3-4급 난이도 가이드라인]
+어휘:
+- 중급 어휘 3000~5000개 범위
+- 사회생활 관련 어휘 (직장, 교육, 건강, 환경 등)
+- 한자어 및 관용 표현 포함
+- 추상적 개념 어휘: 문화, 사회, 경제, 환경
+
+문법:
+- 복합 조사: 에게, 한테, 께, 에서부터, 까지
+- 연결어미: -으니까, -지만, -으면서, -다가, -느라고
+- 보조용언: -어 있다, -고 있다, -어 보다, -어 주다
+- 추측/의도 표현: -을 것 같다, -으려고 하다
+- 간접 인용: -다고 하다, -냐고 하다, -자고 하다
+- 피동/사동 표현
+
+주제:
+- 사회 문제, 문화 비교, 직장 생활
+- 뉴스 이해, 설명문, 논설문
+- 한국 문화와 관습
+
+예시 문장:
+- "요즘 1인 가구가 증가하고 있다고 합니다."
+- "환경 문제를 해결하려면 모두가 노력해야 합니다."
+- "이 책을 읽고 나서 생각이 많이 바뀌었습니다."`,
+
+  "5-6": `[TOPIK 5-6급 난이도 가이드라인]
+어휘:
+- 고급 어휘 6000개 이상
+- 전문 용어 및 학술 어휘
+- 고급 한자어: 인식, 본질, 핵심, 현상, 관점
+- 관용어, 속담, 사자성어
+- 비유적/추상적 표현
+
+문법:
+- 고급 연결어미: -는 바람에, -은 나머지, -거니와, -건대
+- 문어체 표현: -노라, -도다, -으리라, -건마는
+- 복합 표현: -다시피 하다, -는 셈이다, -기 마련이다
+- 고급 종결어미: -ㄴ/는다네, -다니까요, -거든요
+- 높임법 전환, 격식체/비격식체 구분
+- 담화 표지어: 그러니까, 아무튼, 어쨌든, 결국
+
+주제:
+- 학술 논문, 사설, 비평문
+- 철학적/추상적 논의
+- 심층 사회 분석, 정책 토론
+- 문학 작품 분석
+
+예시 문장:
+- "이러한 현상의 본질을 파악하기 위해서는 다각적인 분석이 필요하다."
+- "그의 주장이 일리가 있다고 하더라도 현실적인 한계를 간과해서는 안 된다."
+- "전통 문화가 현대 사회에서 갖는 의의를 재조명할 필요가 있다."`,
+};
+
 // Gemini를 사용하여 TOPIK 스타일 문제 생성
 async function generateQuestions(
   type: string,
   tabType: string,
   ragContent: string,
   count: number,
-  geminiApiKey: string
+  geminiApiKey: string,
+  topikLevel: string = "1-2"
 ): Promise<any[]> {
   // 탭별 문제 유형 정의
   const typePrompts: Record<string, Record<string, string>> = {
@@ -199,6 +277,8 @@ async function generateQuestions(
     },
   };
 
+  const levelGuideline = TOPIK_LEVEL_GUIDELINES[topikLevel] || TOPIK_LEVEL_GUIDELINES["1-2"];
+
   const prompt = `당신은 TOPIK(한국어능력시험) 전문 출제위원입니다.
 
 다음 참고 자료를 바탕으로 ${count}개의 고품질 문제를 생성하세요:
@@ -208,6 +288,13 @@ ${ragContent}
 
 [문제 유형]
 ${typePrompts[type]?.[tabType] || "읽기 이해 문제"}
+
+${levelGuideline}
+
+⚠️ 중요: 반드시 위의 TOPIK ${topikLevel}급 가이드라인에 맞는 어휘와 문법만 사용하세요!
+- ${topikLevel}급 학습자가 이해할 수 있는 수준으로 작성
+- 해당 급수의 문법 패턴과 어휘 범위 내에서 출제
+- 지문 길이와 복잡도도 급수에 맞게 조절
 
 [필수 요구사항]
 1. 각 문제는 반드시 다음 JSON 형식:
@@ -229,7 +316,7 @@ ${typePrompts[type]?.[tabType] || "읽기 이해 문제"}
 
 3. 베트남어 해설은 한국어 해설을 정확히 번역하되, 베트남 학습자에게 도움되는 추가 설명 포함
 
-4. 각 문제는 실제 TOPIK 시험과 유사한 난이도와 형식
+4. 각 문제는 TOPIK ${topikLevel}급 난이도에 정확히 맞출 것
 
 반드시 JSON 배열만 반환하세요. 다른 텍스트 없이 순수 JSON만 출력하세요.`;
 
@@ -274,9 +361,9 @@ serve(async (req) => {
   }
 
   try {
-    const { type = 'readingA', tabType = 'grammar', count = 5, skipCache = false } = await req.json();
+    const { type = 'readingA', tabType = 'grammar', topikLevel = '1-2', count = 5, skipCache = false } = await req.json();
     
-    console.log(`📚 Reading Content: type=${type}, tab=${tabType}, count=${count}`);
+    console.log(`📚 Reading Content: type=${type}, tab=${tabType}, level=${topikLevel}, count=${count}`);
 
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     const cohereApiKey = Deno.env.get('COHERE_API_KEY');
@@ -297,8 +384,8 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 캐시 키 생성
-    const cacheKey = `reading_${type}_${tabType}_${count}`;
+    // 캐시 키 생성 (topikLevel 포함)
+    const cacheKey = `reading_${type}_${tabType}_${topikLevel}_${count}`;
     
     // 캐시 확인 (skipCache가 false일 때만)
     if (!skipCache) {
@@ -372,7 +459,7 @@ serve(async (req) => {
     }
 
     // 4. Gemini로 문제 생성
-    const questions = await generateQuestions(type, tabType, ragContent, count, geminiApiKey);
+    const questions = await generateQuestions(type, tabType, ragContent, count, geminiApiKey, topikLevel);
 
     console.log(`✨ Generated ${questions.length} questions`);
 
@@ -382,17 +469,18 @@ serve(async (req) => {
       cache_key: cacheKey,
       function_name: 'reading-content',
       response: questions,
-      request_params: { type, tabType, count },
+      request_params: { type, tabType, topikLevel, count },
       expires_at: expiresAt,
       hit_count: 0,
     }, { onConflict: 'cache_key' });
-    console.log(`💾 Cached result for ${cacheKey}`);
+    console.log(`💾 Cached result for ${cacheKey} (TOPIK ${topikLevel})`);
 
     return new Response(JSON.stringify({
       success: true,
       questions,
       type,
       tabType,
+      topikLevel,
       query: randomQuery,
       source: 'generated',
     }), {

@@ -103,11 +103,21 @@ const fallbackQuestions: Record<string, Question[]> = {
 
 type TabKey = keyof typeof tabCategories;
 
+// TOPIK 급수 레벨
+const topikLevels = {
+  "1-2": { label: "TOPIK I (1-2급)", sublabel: "Sơ cấp", color: "from-green-500 to-emerald-500" },
+  "3-4": { label: "TOPIK II (3-4급)", sublabel: "Trung cấp", color: "from-blue-500 to-cyan-500" },
+  "5-6": { label: "TOPIK II (5-6급)", sublabel: "Cao cấp", color: "from-purple-500 to-pink-500" },
+};
+
+type TopikLevel = keyof typeof topikLevels;
+
 const ReadingB = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<TabKey>("arrangement");
+  const [topikLevel, setTopikLevel] = useState<TopikLevel>("3-4");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -116,15 +126,16 @@ const ReadingB = () => {
   const [questions, setQuestions] = useState<Question[]>(fallbackQuestions.arrangement);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchQuestions = useCallback(async (tabType: string) => {
+  const fetchQuestions = useCallback(async (tabType: string, level: TopikLevel) => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('reading-content', {
-        body: { type: 'readingB', tabType, count: 5 }
+        body: { type: 'readingB', tabType, topikLevel: level, count: 5 }
       });
       if (error) throw error;
       if (data?.questions && data.questions.length > 0) {
         setQuestions(data.questions);
+        console.log(`✅ Loaded ${data.questions.length} questions for TOPIK ${level}`);
       } else {
         setQuestions(fallbackQuestions[tabType] || fallbackQuestions.arrangement);
       }
@@ -145,14 +156,23 @@ const ReadingB = () => {
   }, []);
 
   useEffect(() => {
-    fetchQuestions(activeTab);
-  }, [activeTab, fetchQuestions]);
+    fetchQuestions(activeTab, topikLevel);
+  }, [activeTab, topikLevel, fetchQuestions]);
 
   const currentCategory = tabCategories[activeTab];
   const currentQuestion = questions[currentQuestionIndex];
 
   const handleTabChange = (tab: TabKey) => {
     setActiveTab(tab);
+    setCurrentQuestionIndex(0);
+    setSelectedAnswer(null);
+    setShowResult(false);
+    setScore(0);
+    setIsQuizComplete(false);
+  };
+
+  const handleLevelChange = (level: TopikLevel) => {
+    setTopikLevel(level);
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);
     setShowResult(false);
@@ -187,7 +207,7 @@ const ReadingB = () => {
   };
 
   const handleRestart = () => {
-    fetchQuestions(activeTab);
+    fetchQuestions(activeTab, topikLevel);
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);
     setShowResult(false);
@@ -262,6 +282,24 @@ const ReadingB = () => {
               </div>
             </div>
 
+            {/* TOPIK Level Selection */}
+            <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
+              {(Object.keys(topikLevels) as TopikLevel[]).map((level) => (
+                <button
+                  key={level}
+                  onClick={() => handleLevelChange(level)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap transition-all font-medium ${
+                    topikLevel === level
+                      ? `bg-gradient-to-r ${topikLevels[level].color} text-white shadow-lg`
+                      : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                  }`}
+                >
+                  <span className="text-sm font-bold">{level}급</span>
+                  <span className="text-xs opacity-80">{topikLevels[level].sublabel}</span>
+                </button>
+              ))}
+            </div>
+
             {/* Tab Navigation */}
             <div className="flex gap-2 overflow-x-auto pb-2 mb-6 scrollbar-hide">
               {(Object.keys(tabCategories) as TabKey[]).map((tab) => (
@@ -303,7 +341,7 @@ const ReadingB = () => {
                 className="rounded-3xl bg-card border border-border p-12 text-center"
               >
                 <p className="text-muted-foreground mb-4">Không có câu hỏi</p>
-                <Button onClick={() => fetchQuestions(activeTab)}>
+                <Button onClick={() => fetchQuestions(activeTab, topikLevel)}>
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Tải lại
                 </Button>
