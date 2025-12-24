@@ -85,6 +85,75 @@ async function rerankResults(
   }));
 }
 
+// TOPIK 급수별 어휘/문법 가이드라인
+const TOPIK_LEVEL_GUIDELINES: Record<string, string> = {
+  "1-2": `[TOPIK 1-2급 듣기 가이드라인]
+어휘:
+- 기초 어휘 800~1500개 범위
+- 일상생활 필수 단어 (가족, 음식, 날씨, 시간, 장소 등)
+- 기본 동사/형용사: 가다, 오다, 먹다, 마시다, 좋다 등
+
+문법:
+- 기본 조사: 이/가, 을/를, 은/는, 에, 에서
+- 기본 어미: -습니다/-ㅂ니다, -아요/-어요
+- 간단한 연결어미: -고, -아서/-어서
+- 시제: 현재, 과거 (-았/었-)
+
+대화 스타일:
+- 2-3문장의 짧은 대화
+- 단순 질문-대답 형식
+- 일상 인사, 물건 구매, 장소 묻기
+- 천천히, 명확한 발음
+
+예시:
+- "안녕하세요. 학교에 가요?"
+- "네, 학교에 가요."`,
+
+  "3-4": `[TOPIK 3-4급 듣기 가이드라인]
+어휘:
+- 중급 어휘 3000~5000개 범위
+- 사회생활 관련 어휘 (직장, 교육, 건강, 환경)
+- 한자어 및 관용 표현
+
+문법:
+- 복합 조사: 에게, 한테, 께
+- 연결어미: -으니까, -지만, -으면서, -다가
+- 간접 인용: -다고 하다
+- 피동/사동 표현
+
+대화 스타일:
+- 3-4문장의 대화
+- 의견 제시, 설명, 권유
+- 직장, 학교, 공공장소 상황
+- 자연스러운 속도
+
+예시:
+- "요즘 운동을 시작했다고 들었는데, 어떤 운동 하세요?"
+- "네, 수영을 배우고 있어요. 건강에도 좋고 스트레스도 풀려요."`,
+
+  "5-6": `[TOPIK 5-6급 듣기 가이드라인]
+어휘:
+- 고급 어휘 6000개 이상
+- 전문 용어 및 학술 어휘
+- 관용어, 속담, 사자성어
+
+문법:
+- 고급 연결어미: -는 바람에, -은 나머지, -거니와
+- 문어체 표현: -노라, -도다, -으리라
+- 복합 표현: -다시피 하다, -는 셈이다
+- 담화 표지어: 그러니까, 어쨌든, 결국
+
+대화 스타일:
+- 4-6문장의 복잡한 대화
+- 논쟁, 토론, 분석적 대화
+- 뉴스, 강연, 인터뷰 스타일
+- 빠른 속도, 자연스러운 축약
+
+예시:
+- "이 문제에 대해 전문가들 사이에서도 의견이 분분한데요, 교수님께서는 어떻게 보십니까?"
+- "글쎄요, 일리가 있다고 하더라도 현실적인 한계를 간과할 수는 없을 것 같습니다."`,
+};
+
 interface Question {
   type: "single" | "dialogue";
   speaker1Text?: string;
@@ -101,8 +170,10 @@ interface Question {
 async function generateListeningQuestions(
   ragContent: string,
   count: number,
-  geminiApiKey: string
+  geminiApiKey: string,
+  topikLevel: string = "1-2"
 ): Promise<Question[]> {
+  const levelGuideline = TOPIK_LEVEL_GUIDELINES[topikLevel] || TOPIK_LEVEL_GUIDELINES["1-2"];
   const systemPrompt = `당신은 TOPIK 스타일의 한국어 듣기 문제 생성기입니다.
 주어진 텍스트를 참고하여 한국어 학습자를 위한 듣기 문제를 생성합니다.
 
@@ -112,10 +183,13 @@ async function generateListeningQuestions(
 
 ## 생성 규칙
 - 문제는 실생활에서 자주 접하는 상황
-- 대화/내용은 2-3문장으로 짧게
 - 질문은 내용 이해도를 측정
 - 선택지는 4개, 정답은 하나
 - 해설은 한국어와 베트남어로 제공
+
+${levelGuideline}
+
+⚠️ 중요: 반드시 위의 TOPIK ${topikLevel}급 가이드라인에 맞는 어휘, 문법, 대화 스타일로 작성하세요!
 
 ## 응답 형식 (JSON 배열만)
 [
@@ -126,30 +200,14 @@ async function generateListeningQuestions(
     "question": "질문",
     "options": ["선택지1", "선택지2", "선택지3", "선택지4"],
     "answer": 0,
-    "explanation": "한국어 해설",
-    "explanationVi": "Giải thích tiếng Việt"
-  },
-  {
-    "type": "single",
-    "singleText": "단일 발화 내용",
-    "question": "질문",
-    "options": ["선택지1", "선택지2", "선택지3", "선택지4"],
-    "answer": 0,
-    "explanation": "한국어 해설",
+    "explanation": "한국어 해설 (정답: ① 선택지명으로 시작)",
     "explanationVi": "Giải thích tiếng Việt"
   }
-]
+]`;
 
-## 주제 다양성 (골고루 포함)
-- 일상생활 (쇼핑, 식당, 교통)
-- 학교/직장
-- 날씨/시간
-- 약속/계획
-- 장소 안내
-- 감정/의견 표현`;
-
-  const userPrompt = `다음 텍스트를 참고하여 ${count}개의 TOPIK 스타일 듣기 문제를 생성해주세요.
+  const userPrompt = `다음 텍스트를 참고하여 TOPIK ${topikLevel}급 수준의 ${count}개 듣기 문제를 생성해주세요.
 대화형(dialogue)과 단일형(single)을 적절히 섞어주세요.
+반드시 ${topikLevel}급에 맞는 어휘와 문법만 사용하세요.
 
 참고 텍스트:
 ${ragContent}`;
@@ -240,8 +298,10 @@ serve(async (req) => {
   try {
     const body = await req.json();
     const count: number = body.count ?? 5;
+    const topikLevel: string = body.topikLevel ?? "1-2";
     const skipCache: boolean = body.skipCache ?? false;
     
+    console.log(`🎧 Listening Content: level=${topikLevel}, count=${count}`);
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     const cohereApiKey = Deno.env.get('COHERE_API_KEY');
     const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
@@ -261,8 +321,8 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 캐시 키 생성
-    const cacheKey = `listening_${count}`;
+    // 캐시 키 생성 (topikLevel 포함)
+    const cacheKey = `listening_${topikLevel}_${count}`;
     
     // 캐시 확인 (skipCache가 false일 때만)
     if (!skipCache) {
@@ -290,7 +350,7 @@ serve(async (req) => {
       console.log(`💨 Cache MISS for ${cacheKey}`);
     }
 
-    console.log(`📝 Generating ${count} listening questions`);
+    console.log(`📝 Generating ${count} listening questions for TOPIK ${topikLevel}`);
 
     // 1. 랜덤 검색 쿼리 선택
     const randomQuery = SEARCH_QUERIES[Math.floor(Math.random() * SEARCH_QUERIES.length)];
@@ -351,15 +411,16 @@ serve(async (req) => {
       cache_key: cacheKey,
       function_name: 'listening-content',
       response: finalQuestions.slice(0, count),
-      request_params: { count },
+      request_params: { count, topikLevel },
       expires_at: expiresAt,
       hit_count: 0,
     }, { onConflict: 'cache_key' });
-    console.log(`💾 Cached result for ${cacheKey}`);
+    console.log(`💾 Cached result for ${cacheKey} (TOPIK ${topikLevel})`);
 
     return new Response(JSON.stringify({ 
       success: true, 
       questions: finalQuestions.slice(0, count),
+      topikLevel,
       source: 'rag',
       query: randomQuery,
     }), {
