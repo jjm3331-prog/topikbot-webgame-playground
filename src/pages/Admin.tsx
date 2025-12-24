@@ -415,7 +415,6 @@ const Admin = () => {
   };
 
   // Document upload/delete handlers are now in separate components
-  };
 
   const handleUpdateApplicationStatus = async (appId: string, newStatus: string) => {
     try {
