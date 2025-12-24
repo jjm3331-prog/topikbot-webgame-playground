@@ -59,10 +59,10 @@ const baseMenuCategories: MenuCategory[] = [
     title: "HỌC TOPIK",
     emoji: "📚",
     items: [
-      { icon: PenTool, label: "손글씨 연습", href: "/handwriting" },
-      { icon: Headphones, label: "듣기 연습", href: "/listening" },
-      { icon: BookOpen, label: "읽기A", href: "/reading-a" },
-      { icon: BookOpen, label: "읽기B", href: "/reading-b" },
+      { icon: PenTool, label: "Luyện viết tay", href: "/handwriting" },
+      { icon: Headphones, label: "Luyện nghe", href: "/listening" },
+      { icon: BookOpen, label: "Đọc hiểu A", href: "/reading-a" },
+      { icon: BookOpen, label: "Đọc hiểu B", href: "/reading-b" },
     ]
   },
   {
