@@ -7,7 +7,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Generate query embedding using OpenAI
+// Generate query embedding using OpenAI text-embedding-3-large (1536 dimensions)
 async function generateEmbedding(text: string, apiKey: string): Promise<number[]> {
   const response = await fetch('https://api.openai.com/v1/embeddings', {
     method: 'POST',
@@ -16,8 +16,9 @@ async function generateEmbedding(text: string, apiKey: string): Promise<number[]
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'text-embedding-3-small',
+      model: 'text-embedding-3-large',
       input: text,
+      dimensions: 1536, // Reduced from 3072 for compatibility
     }),
   });
 
