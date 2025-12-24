@@ -98,3 +98,9 @@ verify_jwt = false
 
 [functions.reading-content]
 verify_jwt = false
+
+[functions.vocabulary-content]
+verify_jwt = false
+
+[functions.grammar-content]
+verify_jwt = false
