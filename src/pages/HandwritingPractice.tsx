@@ -21,7 +21,7 @@ import {
   RefreshCw,
   Loader2
 } from "lucide-react";
-import HangulTracing from "@/components/learning/HangulTracing";
+import HangulTracing, { type CharacterItem } from "@/components/learning/HangulTracing";
 
 type TabType = "consonants" | "words" | "sentences";
 
@@ -33,14 +33,27 @@ const consonantsData = {
   compound: ["ㅐ", "ㅒ", "ㅔ", "ㅖ", "ㅘ", "ㅙ", "ㅚ", "ㅝ", "ㅞ", "ㅟ", "ㅢ"],
 };
 
-// Fallback data
-const fallbackWords = ["사랑", "감사", "한국", "친구", "행복", "가족", "음식", "학교", "서울", "안녕"];
-const fallbackSentences = ["안녕하세요", "감사합니다", "사랑해요", "만나서 반가워요", "한국어를 공부해요"];
+// Fallback data with translations
+const fallbackWords: CharacterItem[] = [
+  { korean: "사랑", vietnamese: "Tình yêu" },
+  { korean: "감사", vietnamese: "Cảm ơn" },
+  { korean: "한국", vietnamese: "Hàn Quốc" },
+  { korean: "친구", vietnamese: "Bạn bè" },
+  { korean: "행복", vietnamese: "Hạnh phúc" },
+  { korean: "가족", vietnamese: "Gia đình" },
+  { korean: "음식", vietnamese: "Đồ ăn" },
+  { korean: "학교", vietnamese: "Trường học" },
+  { korean: "서울", vietnamese: "Seoul" },
+  { korean: "안녕", vietnamese: "Xin chào" },
+];
 
-interface RagContent {
-  korean: string;
-  vietnamese: string;
-}
+const fallbackSentences: CharacterItem[] = [
+  { korean: "안녕하세요", vietnamese: "Xin chào" },
+  { korean: "감사합니다", vietnamese: "Cảm ơn" },
+  { korean: "사랑해요", vietnamese: "Yêu bạn" },
+  { korean: "만나서 반가워요", vietnamese: "Rất vui được gặp bạn" },
+  { korean: "한국어를 공부해요", vietnamese: "Tôi học tiếng Hàn" },
+];
 
 const HandwritingPractice = () => {
   const navigate = useNavigate();
@@ -50,8 +63,8 @@ const HandwritingPractice = () => {
   const [completedTabs, setCompletedTabs] = useState<TabType[]>([]);
   
   // RAG-powered content states
-  const [wordsData, setWordsData] = useState<string[]>(fallbackWords);
-  const [sentencesData, setSentencesData] = useState<string[]>(fallbackSentences);
+  const [wordsData, setWordsData] = useState<CharacterItem[]>(fallbackWords);
+  const [sentencesData, setSentencesData] = useState<CharacterItem[]>(fallbackSentences);
   const [isLoadingWords, setIsLoadingWords] = useState(false);
   const [isLoadingSentences, setIsLoadingSentences] = useState(false);
   const [usedWords, setUsedWords] = useState<string[]>([]);
@@ -93,16 +106,20 @@ const HandwritingPractice = () => {
       const data = await response.json();
       
       if (data.success && data.content?.length > 0) {
-        const koreanContent = data.content.map((item: RagContent) => item.korean);
-        setData(koreanContent);
+        const contentItems: CharacterItem[] = data.content.map((item: { korean: string; vietnamese: string }) => ({
+          korean: item.korean,
+          vietnamese: item.vietnamese,
+        }));
+        setData(contentItems);
         
         // Track used content
+        const koreanContent = contentItems.map(item => item.korean);
         setUsed(prev => [...new Set([...prev, ...koreanContent])]);
         
         if (data.source === 'rag') {
           toast({
             title: type === 'words' ? "새 단어 로드 완료! 📚" : "새 문장 로드 완료! 📝",
-            description: `AI가 ${koreanContent.length}개의 새로운 콘텐츠를 생성했습니다`,
+            description: `AI가 ${contentItems.length}개의 새로운 콘텐츠를 생성했습니다`,
           });
         }
       } else {
@@ -134,16 +151,20 @@ const HandwritingPractice = () => {
     }
   };
 
-  const getCurrentCharacters = () => {
+  const getCurrentCharacters = (): CharacterItem[] => {
     switch (activeTab) {
       case "consonants":
-        return [...consonantsData.basic, ...consonantsData.vowels];
+        // Convert consonants to CharacterItem format
+        return [...consonantsData.basic, ...consonantsData.vowels].map(char => ({
+          korean: char,
+          vietnamese: undefined,
+        }));
       case "words":
         return wordsData;
       case "sentences":
         return sentencesData;
       default:
-        return consonantsData.basic;
+        return consonantsData.basic.map(char => ({ korean: char }));
     }
   };
 
