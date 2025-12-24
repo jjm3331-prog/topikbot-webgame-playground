@@ -68,6 +68,7 @@ const menuSections: MenuSection[] = [
     items: [
       { icon: BookOpen, label: "TOPIK I (1-2급)", href: "/topik-1" },
       { icon: GraduationCap, label: "TOPIK II (3-6급)", href: "/topik-2" },
+      { icon: Languages, label: "Từ vựng", href: "/vocabulary" },
       { icon: PenTool, label: "Luyện viết tay", href: "/handwriting" },
       { icon: Headphones, label: "Luyện nghe", href: "/listening" },
       { icon: BookOpen, label: "Đọc hiểu A", href: "/reading-a" },

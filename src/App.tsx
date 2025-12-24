@@ -29,6 +29,7 @@ import HandwritingPractice from "./pages/HandwritingPractice";
 import ListeningPractice from "./pages/ListeningPractice";
 import ReadingA from "./pages/ReadingA";
 import ReadingB from "./pages/ReadingB";
+import Vocabulary from "./pages/Vocabulary";
 import Pricing from "./pages/Pricing";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
@@ -152,6 +153,7 @@ const App = () => {
               <Route path="/listening" element={<ListeningPractice />} />
               <Route path="/reading-a" element={<ReadingA />} />
               <Route path="/reading-b" element={<ReadingB />} />
+              <Route path="/vocabulary" element={<Vocabulary />} />
               <Route path="/question-variant" element={<QuestionVariant />} />
               <Route path="/roleplay-speaking" element={<RoleplaySpeaking />} />
               <Route path="/pricing" element={<Pricing />} />
