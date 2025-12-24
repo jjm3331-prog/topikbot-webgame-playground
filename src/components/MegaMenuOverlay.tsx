@@ -64,13 +64,7 @@ const baseMenuCategories: MenuCategory[] = [
     title: "GAME",
     emoji: "🎮",
     items: [
-      { icon: Crown, label: "Manager", href: "/manager" },
-      { icon: Gamepad2, label: "AI Sinh tồn", href: "/chat" },
-      { icon: Heart, label: "Hẹn hò", href: "/dating" },
-      { icon: MessageSquare, label: "Nối từ", href: "/wordchain" },
-      { icon: Music, label: "K-POP Quiz", href: "/kpop" },
-      { icon: Clapperboard, label: "K-Drama", href: "/kdrama" },
-      { icon: Briefcase, label: "Làm thêm", href: "/parttime" },
+      { icon: Gamepad2, label: "Trung tâm Game", href: "/game-hub", isHighlight: true },
     ]
   },
   {

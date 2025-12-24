@@ -82,19 +82,12 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
 
   // TOPIK 학습 허브
   const topikItems = [
-    { path: "/learning-hub", icon: Sparkles, labelVi: "TOPIK 학습 허브", isHighlight: true },
+    { path: "/learning-hub", icon: Sparkles, labelVi: "Trung tâm học TOPIK", isHighlight: true },
   ];
 
   // Game items
   const gameItems = [
-    { path: "/manager", icon: Crown, labelVi: "LUKATO Manager" },
-    { path: "/chat", icon: Dice6, labelVi: "AI Sinh tồn Seoul" },
-    { path: "/dating", icon: Heart, labelVi: "Hẹn hò Hàn Quốc" },
-    { path: "/wordchain", icon: Link2, labelVi: "Nối từ tiếng Hàn" },
-    { path: "/kpop", icon: Music, labelVi: "K-POP Quiz" },
-    { path: "/kdrama", icon: Film, labelVi: "K-Drama Lồng tiếng" },
-    { path: "/parttime", icon: Briefcase, labelVi: "Làm thêm tại Hàn" },
-    { path: "/tutorial", icon: HelpCircle, labelVi: "Hướng dẫn Game" },
+    { path: "/game-hub", icon: Dice6, labelVi: "Trung tâm Game", isHighlight: true },
   ];
 
   const menuContent = (
