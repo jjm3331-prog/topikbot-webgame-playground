@@ -226,16 +226,16 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
     setScores(newScores);
 
     if (score >= 70) {
-      toast.success(`잘했어요! ${score}점`, {
-        description: "훌륭한 필체입니다! 👏",
+      toast.success(`Tuyệt vời! ${score} điểm`, {
+        description: "Chữ viết rất đẹp! 👏",
       });
     } else if (score >= 40) {
-      toast.info(`괜찮아요! ${score}점`, {
-        description: "조금만 더 연습해봐요!",
+      toast.info(`Khá tốt! ${score} điểm`, {
+        description: "Hãy luyện thêm một chút nữa!",
       });
     } else {
-      toast.warning(`다시 해봐요! ${score}점`, {
-        description: "가이드 글자를 따라 써보세요.",
+      toast.warning(`Thử lại nhé! ${score} điểm`, {
+        description: "Hãy viết theo chữ mẫu.",
       });
     }
 
@@ -292,8 +292,8 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
     const avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
     return (
       <div className={cn("flex flex-col items-center gap-6 p-4 sm:p-6", className)}>
-        <h2 className="text-xl sm:text-2xl font-bold">연습 완료! 🎉</h2>
-        <div className="text-4xl sm:text-5xl font-bold text-primary">{avgScore}점</div>
+        <h2 className="text-xl sm:text-2xl font-bold">Hoàn thành! 🎉</h2>
+        <div className="text-4xl sm:text-5xl font-bold text-primary">{avgScore} điểm</div>
         <div className="flex flex-wrap gap-2 justify-center max-w-full">
           {characters.map((char, idx) => {
             const charLen = char.length;
@@ -323,7 +323,7 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
         </div>
         <Button onClick={handleRestart} className="gap-2">
           <RotateCcw className="w-4 h-4" />
-          다시 연습하기
+          Luyện lại
         </Button>
       </div>
     );
@@ -376,12 +376,12 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
 
         <Button variant="outline" onClick={handleClear} className="gap-2 text-sm px-3 sm:px-4">
           <RotateCcw className="w-4 h-4" />
-          지우기
+          Xóa
         </Button>
 
         <Button onClick={handleCheck} className="gap-2 text-sm px-3 sm:px-4">
           <Check className="w-4 h-4" />
-          확인
+          Kiểm tra
         </Button>
 
         <Button
@@ -397,7 +397,7 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
 
       {/* Hint */}
       <p className="text-xs sm:text-sm text-muted-foreground text-center px-4">
-        가이드 글자 위에 손가락이나 마우스로 따라 써보세요
+        Hãy dùng ngón tay hoặc chuột viết theo chữ mẫu
       </p>
     </div>
   );

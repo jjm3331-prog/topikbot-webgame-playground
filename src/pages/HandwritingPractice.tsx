@@ -79,8 +79,8 @@ const HandwritingPractice = () => {
     }
     
     toast({
-      title: "연습 완료! 🎉",
-      description: `평균 점수: ${avg}점`,
+      title: "Hoàn thành! 🎉",
+      description: `Điểm trung bình: ${avg} điểm`,
     });
   };
 
@@ -88,7 +88,7 @@ const HandwritingPractice = () => {
     { 
       id: "consonants" as TabType, 
       label: "자음·모음", 
-      sublabel: "Consonants & Vowels",
+      sublabel: "Phụ âm & Nguyên âm",
       icon: Type,
       count: consonantsData.basic.length + consonantsData.vowels.length,
       color: "from-violet-500 to-purple-600"
@@ -96,7 +96,7 @@ const HandwritingPractice = () => {
     { 
       id: "words" as TabType, 
       label: "단어", 
-      sublabel: "Words",
+      sublabel: "Từ vựng",
       icon: BookOpen,
       count: wordsData.length,
       color: "from-blue-500 to-cyan-500"
@@ -104,7 +104,7 @@ const HandwritingPractice = () => {
     { 
       id: "sentences" as TabType, 
       label: "문장", 
-      sublabel: "Sentences",
+      sublabel: "Câu",
       icon: FileText,
       count: sentencesData.length,
       color: "from-emerald-500 to-teal-500"
@@ -126,11 +126,11 @@ const HandwritingPractice = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate("/lesson-menu")}
+              onClick={() => navigate("/dashboard")}
               className="mb-6 hover:bg-primary/10"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              레슨 메뉴
+              Quay lại
             </Button>
 
             {/* Hero Section */}
@@ -161,7 +161,7 @@ const HandwritingPractice = () => {
                     transition={{ delay: 0.4 }}
                     className="text-white/80 text-lg"
                   >
-                    Handwriting Practice
+                    Luyện viết tay chữ Hàn
                   </motion.p>
                 </div>
               </div>
@@ -175,11 +175,11 @@ const HandwritingPractice = () => {
               >
                 <div className="flex items-center gap-2 text-white/90">
                   <Trophy className="w-5 h-5" />
-                  <span className="text-sm">{completedTabs.length}/3 완료</span>
+                  <span className="text-sm">{completedTabs.length}/3 Hoàn thành</span>
                 </div>
                 <div className="flex items-center gap-2 text-white/90">
                   <Star className="w-5 h-5" />
-                  <span className="text-sm">프리미엄 콘텐츠</span>
+                  <span className="text-sm">Nội dung Premium</span>
                 </div>
               </motion.div>
             </div>
@@ -292,12 +292,12 @@ const HandwritingPractice = () => {
                             </div>
                             <div>
                               <h2 className="font-bold text-foreground">
-                                {activeTab === "consonants" && "자음·모음 따라쓰기"}
-                                {activeTab === "words" && "단어 따라쓰기"}
-                                {activeTab === "sentences" && "문장 따라쓰기"}
+                                {activeTab === "consonants" && "자음·모음 따라쓰기 / Viết theo phụ âm·nguyên âm"}
+                                {activeTab === "words" && "단어 따라쓰기 / Viết theo từ vựng"}
+                                {activeTab === "sentences" && "문장 따라쓰기 / Viết theo câu"}
                               </h2>
                               <p className="text-sm text-muted-foreground">
-                                캔버스에 직접 써보세요
+                                Hãy viết trực tiếp trên canvas
                               </p>
                             </div>
                           </div>
