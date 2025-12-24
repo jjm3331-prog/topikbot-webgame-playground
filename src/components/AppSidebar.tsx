@@ -95,6 +95,9 @@ const menuSections: MenuSection[] = [
     items: [
       { icon: Sparkles, label: "Tiến độ học tập", href: "/dashboard", isPremium: true, isHighlight: true },
       { icon: User, label: "Hồ sơ của tôi", href: "/profile" },
+      { icon: Trophy, label: "Bảng xếp hạng", href: "/ranking" },
+      { icon: Notebook, label: "Điều khoản", href: "/terms" },
+      { icon: HelpCircle, label: "Chính sách", href: "/privacy" },
     ],
     defaultOpen: false
   },
