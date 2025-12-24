@@ -282,7 +282,33 @@ const ReadingB = () => {
           </motion.div>
 
           <AnimatePresence mode="wait">
-            {isQuizComplete ? (
+            {isLoading ? (
+              /* Loading Screen */
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="rounded-3xl bg-gradient-to-b from-card to-card/50 border border-border/50 shadow-2xl p-12 text-center"
+              >
+                <Loader2 className="w-16 h-16 animate-spin text-primary mx-auto mb-6" />
+                <h3 className="text-xl font-bold text-foreground mb-2">Đang tạo câu hỏi...</h3>
+                <p className="text-muted-foreground">AI đang tạo câu hỏi TOPIK nâng cao</p>
+              </motion.div>
+            ) : !currentQuestion ? (
+              <motion.div
+                key="no-questions"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="rounded-3xl bg-card border border-border p-12 text-center"
+              >
+                <p className="text-muted-foreground mb-4">Không có câu hỏi</p>
+                <Button onClick={() => fetchQuestions(activeTab)}>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Tải lại
+                </Button>
+              </motion.div>
+            ) : isQuizComplete ? (
               /* Quiz Complete Screen */
               <motion.div
                 key="complete"
@@ -304,21 +330,21 @@ const ReadingB = () => {
                   {currentCategory.label} Hoàn thành!
                 </h2>
                 <p className="text-muted-foreground mb-8 text-lg">
-                  Tổng {currentQuestions.length} câu, đúng <span className="text-primary font-bold">{score} câu</span>
+                  Tổng {questions.length} câu, đúng <span className="text-primary font-bold">{score} câu</span>
                 </p>
 
                 <div className="w-full max-w-sm mx-auto mb-8">
                   <div className="flex justify-between text-sm text-muted-foreground mb-3">
                     <span>Tỷ lệ đúng</span>
                     <span className="font-bold text-foreground text-lg">
-                      {Math.round((score / currentQuestions.length) * 100)}%
+                      {Math.round((score / questions.length) * 100)}%
                     </span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-4 overflow-hidden">
                     <motion.div
                       className="bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 h-full rounded-full"
                       initial={{ width: 0 }}
-                      animate={{ width: `${(score / currentQuestions.length) * 100}%` }}
+                      animate={{ width: `${(score / questions.length) * 100}%` }}
                       transition={{ duration: 1, delay: 0.3 }}
                     />
                   </div>
@@ -356,7 +382,7 @@ const ReadingB = () => {
                 <div className="mb-6 p-4 rounded-2xl bg-card border border-border">
                   <div className="flex justify-between items-center mb-3">
                     <span className="text-sm font-medium text-foreground">
-                      {currentCategory.emoji} {currentCategory.label} - Câu {currentQuestionIndex + 1} / {currentQuestions.length}
+                      {currentCategory.emoji} {currentCategory.label} - Câu {currentQuestionIndex + 1} / {questions.length}
                     </span>
                     <span className="text-sm font-bold text-primary">
                       Điểm: {score}
@@ -366,7 +392,7 @@ const ReadingB = () => {
                     <motion.div
                       className="bg-gradient-to-r from-orange-500 to-yellow-500 h-2.5 rounded-full"
                       initial={{ width: 0 }}
-                      animate={{ width: `${((currentQuestionIndex + 1) / currentQuestions.length) * 100}%` }}
+                      animate={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
                       transition={{ duration: 0.3 }}
                     />
                   </div>
@@ -496,7 +522,7 @@ const ReadingB = () => {
                           onClick={handleNext}
                           className="flex-1 h-14 text-lg bg-gradient-to-r from-orange-500 to-amber-500 hover:opacity-90 text-white"
                         >
-                          {currentQuestionIndex < currentQuestions.length - 1 ? "Câu tiếp theo" : "Xem kết quả"}
+                          {currentQuestionIndex < questions.length - 1 ? "Câu tiếp theo" : "Xem kết quả"}
                           <ChevronRight className="w-5 h-5 ml-2" />
                         </Button>
                       )}
