@@ -32,6 +32,7 @@ import ReadingB from "./pages/ReadingB";
 import Vocabulary from "./pages/Vocabulary";
 import Grammar from "./pages/Grammar";
 import LearningHub from "./pages/LearningHub";
+import GameHub from "./pages/GameHub";
 import Pricing from "./pages/Pricing";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
@@ -158,6 +159,7 @@ const App = () => {
               <Route path="/vocabulary" element={<Vocabulary />} />
               <Route path="/grammar" element={<Grammar />} />
               <Route path="/learning-hub" element={<LearningHub />} />
+              <Route path="/game-hub" element={<GameHub />} />
               <Route path="/question-variant" element={<QuestionVariant />} />
               <Route path="/roleplay-speaking" element={<RoleplaySpeaking />} />
               <Route path="/pricing" element={<Pricing />} />

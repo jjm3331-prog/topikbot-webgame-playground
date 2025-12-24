@@ -140,17 +140,79 @@ const Dashboard = () => {
                       NEW
                     </span>
                   </div>
-                  <h3 className="font-bold text-white text-xl tracking-tight">TOPIK 학습 허브</h3>
+                  <h3 className="font-bold text-white text-xl tracking-tight">Trung tâm học TOPIK</h3>
                   <p className="text-white/85 text-sm">
-                    Từ vựng • Ngữ pháp • Nghe • Đọc • Viết + 7 Game học tập
+                    Từ vựng • Ngữ pháp • Nghe • Đọc • Viết
                   </p>
                 </div>
               </div>
               
               <div className="flex items-center gap-3">
                 <div className="hidden sm:flex flex-col items-end mr-2">
-                  <span className="text-[11px] text-white/80 font-medium">13 bài học</span>
+                  <span className="text-[11px] text-white/80 font-medium">6 bài học</span>
                   <span className="text-[10px] text-white/60">Học cùng AI</span>
+                </div>
+                <div className="w-11 h-11 rounded-full bg-white/25 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/35 transition-colors shadow-lg">
+                  <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Game Hub Banner - NEW */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.18 }}
+            onClick={() => navigate("/game-hub")}
+            className="relative overflow-hidden rounded-2xl cursor-pointer group"
+          >
+            {/* Elegant gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-korean-orange via-pink-500 to-purple-600" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-black/20" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_20%,rgba(255,255,255,0.2),transparent_30%)]" />
+            
+            {/* Animated particles */}
+            <div className="absolute inset-0 overflow-hidden">
+              <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-white/30 rounded-full animate-pulse" />
+              <div className="absolute top-1/2 right-1/3 w-1.5 h-1.5 bg-white/40 rounded-full animate-pulse" style={{ animationDelay: '0.3s' }} />
+            </div>
+            
+            {/* Shimmer effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+            
+            <div className="relative z-10 p-6 flex items-center justify-between">
+              <div className="flex items-center gap-5">
+                {/* Icon cluster */}
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-lg group-hover:scale-105 transition-transform">
+                    <Gamepad2 className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center border-2 border-white/50 shadow-md">
+                    <Sparkles className="w-3.5 h-3.5 text-white" />
+                  </div>
+                </div>
+                
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-white/25 text-white font-bold backdrop-blur-sm">
+                      🎮 Game
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold shadow-sm">
+                      HOT
+                    </span>
+                  </div>
+                  <h3 className="font-bold text-white text-xl tracking-tight">Trung tâm Game</h3>
+                  <p className="text-white/85 text-sm">
+                    7 trò chơi học tiếng Hàn thú vị
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <div className="hidden sm:flex flex-col items-end mr-2">
+                  <span className="text-[11px] text-white/80 font-medium">7 games</span>
+                  <span className="text-[10px] text-white/60">Học mà chơi</span>
                 </div>
                 <div className="w-11 h-11 rounded-full bg-white/25 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/35 transition-colors shadow-lg">
                   <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-0.5 transition-transform" />

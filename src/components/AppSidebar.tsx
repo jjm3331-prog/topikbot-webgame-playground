@@ -66,22 +66,15 @@ const menuSections: MenuSection[] = [
     title: "HỌC TOPIK",
     emoji: "📚",
     items: [
-      { icon: Sparkles, label: "TOPIK 학습 허브", href: "/learning-hub", isHighlight: true },
+      { icon: Sparkles, label: "Trung tâm học TOPIK", href: "/learning-hub", isHighlight: true },
     ],
     defaultOpen: true
   },
   {
-    title: "GAME HỌC",
+    title: "GAME",
     emoji: "🎮",
     items: [
-      { icon: Crown, label: "LUKATO Manager", href: "/manager" },
-      { icon: Gamepad2, label: "AI Sinh tồn Seoul", href: "/chat" },
-      { icon: Heart, label: "Hẹn hò Hàn Quốc", href: "/dating" },
-      { icon: MessageSquare, label: "Nối từ tiếng Hàn", href: "/wordchain" },
-      { icon: Music, label: "K-POP Quiz", href: "/kpop" },
-      { icon: Clapperboard, label: "K-Drama Lồng tiếng", href: "/kdrama" },
-      { icon: Briefcase, label: "Làm thêm Hàn Quốc", href: "/parttime" },
-      { icon: HelpCircle, label: "Hướng dẫn sử dụng Game", href: "/tutorial" },
+      { icon: Gamepad2, label: "Trung tâm Game", href: "/game-hub", isHighlight: true },
     ],
     defaultOpen: true
   },
