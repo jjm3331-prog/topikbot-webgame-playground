@@ -196,6 +196,7 @@ serve(async (req) => {
     const type: ContentType = body.type === 'sentences' ? 'sentences' : 'words';
     const count: number = body.count ?? 10;
     const exclude: string[] = body.exclude ?? [];
+    const skipCache: boolean = body.skipCache ?? false;
     
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     const cohereApiKey = Deno.env.get('COHERE_API_KEY');
@@ -217,6 +218,35 @@ serve(async (req) => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // 캐시 키 생성
+    const cacheKey = `handwriting_${type}_${count}`;
+    
+    // 캐시 확인 (skipCache가 false이고 exclude가 비어있을 때만)
+    if (!skipCache && exclude.length === 0) {
+      const { data: cached } = await supabase
+        .from('ai_response_cache')
+        .select('*')
+        .eq('cache_key', cacheKey)
+        .eq('function_name', 'handwriting-content')
+        .gt('expires_at', new Date().toISOString())
+        .limit(1)
+        .maybeSingle();
+
+      if (cached) {
+        console.log(`⚡ Cache HIT for ${cacheKey}`);
+        await supabase.rpc('increment_cache_hit', { p_id: cached.id });
+        
+        return new Response(JSON.stringify({
+          success: true,
+          content: cached.response,
+          source: 'cache',
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      console.log(`💨 Cache MISS for ${cacheKey}`);
+    }
 
     console.log(`📝 Generating ${count} ${type} for handwriting practice`);
 
@@ -281,6 +311,20 @@ serve(async (req) => {
         .filter(item => !exclude.includes(item.korean) && !finalContent.some(c => c.korean === item.korean))
         .slice(0, count - finalContent.length);
       finalContent.push(...additional);
+    }
+
+    // 6. 캐시에 저장 (1시간 유효, exclude가 비어있을 때만)
+    if (exclude.length === 0) {
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+      await supabase.from('ai_response_cache').upsert({
+        cache_key: cacheKey,
+        function_name: 'handwriting-content',
+        response: finalContent,
+        request_params: { type, count },
+        expires_at: expiresAt,
+        hit_count: 0,
+      }, { onConflict: 'cache_key' });
+      console.log(`💾 Cached result for ${cacheKey}`);
     }
 
     return new Response(JSON.stringify({ 

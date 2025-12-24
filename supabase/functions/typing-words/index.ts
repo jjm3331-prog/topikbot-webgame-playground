@@ -86,6 +86,8 @@ serve(async (req) => {
   try {
     const body = await req.json().catch(() => ({}));
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
     if (!GEMINI_API_KEY) {
       throw new Error('GEMINI_API_KEY is not configured');
@@ -95,6 +97,36 @@ serve(async (req) => {
     const difficulty = validateDifficulty(body.difficulty);
     const count = validateNumber(body.count, 1, 20);
     const exclude = validateExcludeList(body.exclude);
+    const skipCache: boolean = body.skipCache ?? false;
+
+    // Supabase 클라이언트 생성
+    const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // 캐시 키 생성
+    const cacheKey = `typing_${difficulty}_${count}`;
+    
+    // 캐시 확인 (skipCache가 false이고 exclude가 비어있을 때만)
+    if (!skipCache && exclude.length === 0) {
+      const { data: cached } = await supabase
+        .from('ai_response_cache')
+        .select('*')
+        .eq('cache_key', cacheKey)
+        .eq('function_name', 'typing-words')
+        .gt('expires_at', new Date().toISOString())
+        .limit(1)
+        .maybeSingle();
+
+      if (cached) {
+        console.log(`⚡ Cache HIT for ${cacheKey}`);
+        await supabase.rpc('increment_cache_hit', { p_id: cached.id });
+        
+        return new Response(JSON.stringify({ words: cached.response }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      console.log(`💨 Cache MISS for ${cacheKey}`);
+    }
     
     console.log(`Generating ${count} words for difficulty: ${difficulty}`);
 
@@ -153,6 +185,20 @@ ${excludeText}
         { korean: "공부", vietnamese: "Học tập", points: 50 },
         { korean: "게임", vietnamese: "Trò chơi", points: 50 },
       ];
+    }
+
+    // 캐시에 저장 (1시간 유효, exclude가 비어있을 때만)
+    if (exclude.length === 0) {
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+      await supabase.from('ai_response_cache').upsert({
+        cache_key: cacheKey,
+        function_name: 'typing-words',
+        response: parsedResponse,
+        request_params: { difficulty, count },
+        expires_at: expiresAt,
+        hit_count: 0,
+      }, { onConflict: 'cache_key' });
+      console.log(`💾 Cached result for ${cacheKey}`);
     }
 
     return new Response(JSON.stringify({ words: parsedResponse }), {

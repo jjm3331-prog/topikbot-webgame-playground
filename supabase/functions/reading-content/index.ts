@@ -274,7 +274,7 @@ serve(async (req) => {
   }
 
   try {
-    const { type = 'readingA', tabType = 'grammar', count = 5 } = await req.json();
+    const { type = 'readingA', tabType = 'grammar', count = 5, skipCache = false } = await req.json();
     
     console.log(`📚 Reading Content: type=${type}, tab=${tabType}, count=${count}`);
 
@@ -296,6 +296,38 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // 캐시 키 생성
+    const cacheKey = `reading_${type}_${tabType}_${count}`;
+    
+    // 캐시 확인 (skipCache가 false일 때만)
+    if (!skipCache) {
+      const { data: cached } = await supabase
+        .from('ai_response_cache')
+        .select('*')
+        .eq('cache_key', cacheKey)
+        .eq('function_name', 'reading-content')
+        .gt('expires_at', new Date().toISOString())
+        .limit(1)
+        .maybeSingle();
+
+      if (cached) {
+        console.log(`⚡ Cache HIT for ${cacheKey}`);
+        // 캐시 히트 카운트 증가
+        await supabase.rpc('increment_cache_hit', { p_id: cached.id });
+        
+        return new Response(JSON.stringify({
+          success: true,
+          questions: cached.response,
+          type,
+          tabType,
+          source: 'cache',
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      console.log(`💨 Cache MISS for ${cacheKey}`);
+    }
 
     // 탭에 맞는 쿼리 선택
     const queries = TAB_QUERIES[type]?.[tabType] || TAB_QUERIES.readingA.grammar;
@@ -344,12 +376,25 @@ serve(async (req) => {
 
     console.log(`✨ Generated ${questions.length} questions`);
 
+    // 5. 캐시에 저장 (1시간 유효)
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+    await supabase.from('ai_response_cache').upsert({
+      cache_key: cacheKey,
+      function_name: 'reading-content',
+      response: questions,
+      request_params: { type, tabType, count },
+      expires_at: expiresAt,
+      hit_count: 0,
+    }, { onConflict: 'cache_key' });
+    console.log(`💾 Cached result for ${cacheKey}`);
+
     return new Response(JSON.stringify({
       success: true,
       questions,
       type,
       tabType,
       query: randomQuery,
+      source: 'generated',
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

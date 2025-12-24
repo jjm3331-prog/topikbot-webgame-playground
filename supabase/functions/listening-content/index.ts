@@ -240,6 +240,7 @@ serve(async (req) => {
   try {
     const body = await req.json();
     const count: number = body.count ?? 5;
+    const skipCache: boolean = body.skipCache ?? false;
     
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
     const cohereApiKey = Deno.env.get('COHERE_API_KEY');
@@ -259,6 +260,35 @@ serve(async (req) => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // 캐시 키 생성
+    const cacheKey = `listening_${count}`;
+    
+    // 캐시 확인 (skipCache가 false일 때만)
+    if (!skipCache) {
+      const { data: cached } = await supabase
+        .from('ai_response_cache')
+        .select('*')
+        .eq('cache_key', cacheKey)
+        .eq('function_name', 'listening-content')
+        .gt('expires_at', new Date().toISOString())
+        .limit(1)
+        .maybeSingle();
+
+      if (cached) {
+        console.log(`⚡ Cache HIT for ${cacheKey}`);
+        await supabase.rpc('increment_cache_hit', { p_id: cached.id });
+        
+        return new Response(JSON.stringify({
+          success: true,
+          questions: cached.response,
+          source: 'cache',
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      console.log(`💨 Cache MISS for ${cacheKey}`);
+    }
 
     console.log(`📝 Generating ${count} listening questions`);
 
@@ -314,6 +344,18 @@ serve(async (req) => {
       const additional = FALLBACK_QUESTIONS.slice(0, count - finalQuestions.length);
       finalQuestions = [...finalQuestions, ...additional];
     }
+
+    // 6. 캐시에 저장 (1시간 유효)
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+    await supabase.from('ai_response_cache').upsert({
+      cache_key: cacheKey,
+      function_name: 'listening-content',
+      response: finalQuestions.slice(0, count),
+      request_params: { count },
+      expires_at: expiresAt,
+      hit_count: 0,
+    }, { onConflict: 'cache_key' });
+    console.log(`💾 Cached result for ${cacheKey}`);
 
     return new Response(JSON.stringify({ 
       success: true, 
