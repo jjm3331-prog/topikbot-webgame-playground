@@ -236,7 +236,7 @@ export default function LearningHub() {
               className="mb-4 -ml-2"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Dashboard
+              Quay lại
             </Button>
             
             <div className="flex items-center gap-4 mb-4">
@@ -253,15 +253,15 @@ export default function LearningHub() {
             <div className="flex flex-wrap gap-3 mt-4">
               <Badge variant="outline" className="gap-1.5 py-1.5 px-3">
                 <Target className="w-4 h-4 text-korean-purple" />
-                <span>6개 TOPIK 학습</span>
+                <span>6 bài học TOPIK</span>
               </Badge>
               <Badge variant="outline" className="gap-1.5 py-1.5 px-3">
                 <Gamepad2 className="w-4 h-4 text-korean-orange" />
-                <span>7개 게임 학습</span>
+                <span>7 trò chơi học tập</span>
               </Badge>
               <Badge variant="outline" className="gap-1.5 py-1.5 px-3">
                 <Zap className="w-4 h-4 text-korean-green" />
-                <span>AI 기반 학습</span>
+                <span>Học với AI</span>
               </Badge>
             </div>
           </motion.div>
@@ -277,8 +277,8 @@ export default function LearningHub() {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-korean-purple to-korean-pink flex items-center justify-center">
                 <BookOpen className="w-4 h-4 text-white" />
               </div>
-              <h2 className="text-xl font-bold text-foreground">📚 TOPIK 학습</h2>
-              <span className="text-sm text-muted-foreground ml-2">Học TOPIK có hệ thống</span>
+              <h2 className="text-xl font-bold text-foreground">📚 Học TOPIK</h2>
+              <span className="text-sm text-muted-foreground ml-2">Học có hệ thống</span>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -349,8 +349,8 @@ export default function LearningHub() {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-korean-orange to-korean-pink flex items-center justify-center">
                 <Gamepad2 className="w-4 h-4 text-white" />
               </div>
-              <h2 className="text-xl font-bold text-foreground">🎮 게임으로 배우기</h2>
-              <span className="text-sm text-muted-foreground ml-2">Học qua Game thú vị</span>
+              <h2 className="text-xl font-bold text-foreground">🎮 Học qua Game</h2>
+              <span className="text-sm text-muted-foreground ml-2">Học vui vẻ và hiệu quả</span>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -410,7 +410,7 @@ export default function LearningHub() {
             <Card className="p-6 bg-gradient-to-br from-korean-purple/10 via-korean-pink/10 to-korean-orange/10 border-korean-purple/20">
               <Trophy className="w-12 h-12 mx-auto mb-4 text-korean-orange" />
               <h3 className="text-xl font-bold text-foreground mb-2">
-                TOPIK 합격을 향해 도전하세요!
+                Chinh phục TOPIK ngay hôm nay!
               </h3>
               <p className="text-muted-foreground mb-4">
                 Hãy thử thách bản thân để đạt chứng chỉ TOPIK!
@@ -420,7 +420,7 @@ export default function LearningHub() {
                 className="bg-gradient-to-r from-korean-purple to-korean-pink hover:opacity-90"
               >
                 <Star className="w-4 h-4 mr-2" />
-                대시보드로 돌아가기
+                Quay lại Dashboard
               </Button>
             </Card>
           </motion.div>
