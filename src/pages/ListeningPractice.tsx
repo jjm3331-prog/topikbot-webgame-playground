@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import CleanHeader from "@/components/CleanHeader";
@@ -20,11 +20,12 @@ import {
   Sparkles,
   ChevronRight,
   MessageCircle,
-  Loader2
+  Loader2,
+  RefreshCw
 } from "lucide-react";
 
 interface Question {
-  id: number;
+  id?: number;
   type: "single" | "dialogue";
   speaker1Text?: string;
   speaker2Text?: string;
@@ -33,10 +34,11 @@ interface Question {
   options: string[];
   answer: number;
   explanation: string;
+  explanationVi?: string;
 }
 
-// TOPIK style questions
-const listeningQuestions: Question[] = [
+// Fallback TOPIK style questions
+const fallbackQuestions: Question[] = [
   {
     id: 1,
     type: "dialogue",
@@ -46,6 +48,7 @@ const listeningQuestions: Question[] = [
     options: ["집", "학교", "병원", "회사"],
     answer: 1,
     explanation: "남자가 '학교에 가요'라고 말했습니다.",
+    explanationVi: "Người nam nói 'Tôi đi học'.",
   },
   {
     id: 2,
@@ -56,6 +59,7 @@ const listeningQuestions: Question[] = [
     options: ["맑아요", "흐려요", "비가 와요", "눈이 와요"],
     answer: 2,
     explanation: "여자가 '비가 와요'라고 말했습니다.",
+    explanationVi: "Người nữ nói 'Trời mưa'.",
   },
   {
     id: 3,
@@ -65,6 +69,7 @@ const listeningQuestions: Question[] = [
     options: ["친구를 만날 거예요", "선물을 살 거예요", "생일 파티를 할 거예요", "집에 있을 거예요"],
     answer: 1,
     explanation: "'선물을 사야 해요'라고 말했으므로 선물을 살 예정입니다.",
+    explanationVi: "Họ nói 'Tôi phải mua quà' nên sẽ mua quà.",
   },
   {
     id: 4,
@@ -75,6 +80,7 @@ const listeningQuestions: Question[] = [
     options: ["단 음식", "짠 음식", "매운 음식", "신 음식"],
     answer: 2,
     explanation: "여자가 '매운 음식을 좋아해요'라고 말했습니다.",
+    explanationVi: "Người nữ nói 'Tôi thích đồ ăn cay'.",
   },
   {
     id: 5,
@@ -84,6 +90,7 @@ const listeningQuestions: Question[] = [
     options: ["3분", "5분", "10분", "15분"],
     answer: 1,
     explanation: "'5분 정도 걸어요'라고 안내했습니다.",
+    explanationVi: "Họ nói 'Đi bộ khoảng 5 phút'.",
   },
 ];
 
@@ -100,6 +107,53 @@ const ListeningPractice = () => {
   const [isQuizComplete, setIsQuizComplete] = useState(false);
   const [playedAudio, setPlayedAudio] = useState(false);
   const [currentPlayingLine, setCurrentPlayingLine] = useState<number | null>(null);
+  
+  // RAG-powered questions
+  const [listeningQuestions, setListeningQuestions] = useState<Question[]>(fallbackQuestions);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
+
+  // Fetch RAG-powered listening questions
+  const fetchListeningQuestions = useCallback(async () => {
+    setIsLoadingQuestions(true);
+    
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/listening-content`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ count: 5 }),
+        }
+      );
+      
+      if (!response.ok) throw new Error('Failed to fetch questions');
+      
+      const data = await response.json();
+      
+      if (data.success && data.questions?.length > 0) {
+        // Add IDs to questions
+        const questionsWithIds = data.questions.map((q: Question, idx: number) => ({
+          ...q,
+          id: idx + 1,
+        }));
+        setListeningQuestions(questionsWithIds);
+        
+        if (data.source === 'rag') {
+          toast({
+            title: "새 문제 로드 완료! 🎧",
+            description: `AI가 ${questionsWithIds.length}개의 새로운 듣기 문제를 생성했습니다`,
+          });
+        }
+      } else {
+        setListeningQuestions(fallbackQuestions);
+      }
+    } catch (error) {
+      console.error('Error fetching listening questions:', error);
+      setListeningQuestions(fallbackQuestions);
+    } finally {
+      setIsLoadingQuestions(false);
+    }
+  }, [toast]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -107,6 +161,9 @@ const ListeningPractice = () => {
       setUser(user);
     };
     checkAuth();
+    
+    // Load initial questions
+    fetchListeningQuestions();
   }, []);
 
   const currentQuestion = listeningQuestions[currentQuestionIndex];
@@ -215,6 +272,11 @@ const ListeningPractice = () => {
     setPlayedAudio(false);
   };
 
+  const handleNewQuestions = async () => {
+    await fetchListeningQuestions();
+    handleRestart();
+  };
+
   const optionLabels = ["①", "②", "③", "④"];
 
   return (
@@ -284,7 +346,20 @@ const ListeningPractice = () => {
           </motion.div>
 
           <AnimatePresence mode="wait">
-            {isQuizComplete ? (
+            {isLoadingQuestions ? (
+              /* Loading Questions Screen */
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="rounded-3xl bg-gradient-to-b from-card to-card/50 border border-border/50 shadow-2xl p-12 text-center"
+              >
+                <Loader2 className="w-16 h-16 animate-spin text-primary mx-auto mb-6" />
+                <h2 className="text-xl font-bold text-foreground mb-2">AI đang tạo câu hỏi mới...</h2>
+                <p className="text-muted-foreground">Vui lòng đợi trong giây lát</p>
+              </motion.div>
+            ) : isQuizComplete ? (
               /* Quiz Complete Screen */
               <motion.div
                 key="complete"
@@ -335,6 +410,20 @@ const ListeningPractice = () => {
                   >
                     <RotateCcw className="w-5 h-5" />
                     Làm lại
+                  </Button>
+                  <Button
+                    onClick={handleNewQuestions}
+                    variant="outline"
+                    size="lg"
+                    className="gap-2"
+                    disabled={isLoadingQuestions}
+                  >
+                    {isLoadingQuestions ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <RefreshCw className="w-5 h-5" />
+                    )}
+                    Câu hỏi mới
                   </Button>
                   <Button
                     onClick={() => navigate("/dashboard")}
