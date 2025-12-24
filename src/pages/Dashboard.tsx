@@ -7,7 +7,8 @@ import {
   ChevronRight,
   Crown,
   Briefcase,
-  BookOpen,
+  PenTool,
+  Headphones,
   Gamepad2,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -90,7 +91,7 @@ const Dashboard = () => {
             </div>
           </motion.div>
 
-          {/* Main CTA - Korean Learning */}
+          {/* Main CTA - Learning Lessons */}
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -98,34 +99,34 @@ const Dashboard = () => {
             className="grid sm:grid-cols-2 gap-4"
           >
             <div
-              onClick={() => navigate("/topik-1")}
-              className="relative overflow-hidden rounded-2xl cursor-pointer group p-5 bg-gradient-to-br from-korean-blue/20 to-korean-cyan/10 border border-korean-blue/20 hover:border-korean-blue/40 transition-all"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl bg-korean-blue/20 flex items-center justify-center shrink-0">
-                  <BookOpen className="w-7 h-7 text-korean-blue" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-foreground text-lg">TOPIK I (1-2급)</h3>
-                  <p className="text-sm text-muted-foreground">Ngữ pháp • Từ vựng • Đọc hiểu</p>
-                </div>
-                <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-korean-blue group-hover:translate-x-1 transition-all" />
-              </div>
-            </div>
-
-            <div
-              onClick={() => navigate("/topik-2")}
+              onClick={() => navigate("/handwriting")}
               className="relative overflow-hidden rounded-2xl cursor-pointer group p-5 bg-gradient-to-br from-korean-purple/20 to-korean-pink/10 border border-korean-purple/20 hover:border-korean-purple/40 transition-all"
             >
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-xl bg-korean-purple/20 flex items-center justify-center shrink-0">
-                  <BookOpen className="w-7 h-7 text-korean-purple" />
+                  <PenTool className="w-7 h-7 text-korean-purple" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-foreground text-lg">TOPIK II (3-6급)</h3>
-                  <p className="text-sm text-muted-foreground">Ngữ pháp • Từ vựng • Viết</p>
+                  <h3 className="font-bold text-foreground text-lg">손글씨 연습</h3>
+                  <p className="text-sm text-muted-foreground">Luyện viết tay tiếng Hàn</p>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-korean-purple group-hover:translate-x-1 transition-all" />
+              </div>
+            </div>
+
+            <div
+              onClick={() => navigate("/listening")}
+              className="relative overflow-hidden rounded-2xl cursor-pointer group p-5 bg-gradient-to-br from-korean-blue/20 to-korean-cyan/10 border border-korean-blue/20 hover:border-korean-blue/40 transition-all"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-xl bg-korean-blue/20 flex items-center justify-center shrink-0">
+                  <Headphones className="w-7 h-7 text-korean-blue" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-foreground text-lg">듣기 연습</h3>
+                  <p className="text-sm text-muted-foreground">Luyện nghe tiếng Hàn</p>
+                </div>
+                <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-korean-blue group-hover:translate-x-1 transition-all" />
               </div>
             </div>
           </motion.div>

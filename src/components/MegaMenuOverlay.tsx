@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  BookOpen,
   Gamepad2,
   Briefcase,
   Crown,
@@ -12,7 +11,7 @@ import {
   Clapperboard,
   Languages,
   PenTool,
-  GraduationCap,
+  Headphones,
   Sparkles,
   X,
   User,
@@ -59,8 +58,8 @@ const baseMenuCategories: MenuCategory[] = [
     title: "HỌC TOPIK",
     emoji: "📚",
     items: [
-      { icon: BookOpen, label: "TOPIK I (1-2급)", href: "/topik-1" },
-      { icon: GraduationCap, label: "TOPIK II (3-6급)", href: "/topik-2" },
+      { icon: PenTool, label: "손글씨 연습", href: "/handwriting" },
+      { icon: Headphones, label: "듣기 연습", href: "/listening" },
     ]
   },
   {
