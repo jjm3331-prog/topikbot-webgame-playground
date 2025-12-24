@@ -7,8 +7,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Semantic chunking - split by meaning boundaries
-function semanticChunk(text: string, maxTokens: number = 500): string[] {
+// Semantic chunking with overlap - split by meaning boundaries
+function semanticChunk(text: string, maxTokens: number = 1024, overlapTokens: number = 120): string[] {
   const chunks: string[] = [];
   
   // Split by paragraphs first (double newlines)
@@ -16,14 +16,21 @@ function semanticChunk(text: string, maxTokens: number = 500): string[] {
   
   let currentChunk = '';
   let currentTokens = 0;
+  let previousChunkEnd = ''; // Store end of previous chunk for overlap
   
   for (const paragraph of paragraphs) {
     const paragraphTokens = Math.ceil(paragraph.length / 4); // Rough token estimate
     
     if (currentTokens + paragraphTokens > maxTokens && currentChunk) {
       chunks.push(currentChunk.trim());
-      currentChunk = '';
-      currentTokens = 0;
+      
+      // Calculate overlap: get last ~overlapTokens worth of content
+      const overlapChars = overlapTokens * 4;
+      previousChunkEnd = currentChunk.slice(-overlapChars);
+      
+      // Start new chunk with overlap from previous
+      currentChunk = previousChunkEnd + '\n\n';
+      currentTokens = overlapTokens;
     }
     
     // If single paragraph is too large, split by sentences
@@ -33,8 +40,12 @@ function semanticChunk(text: string, maxTokens: number = 500): string[] {
         const sentenceTokens = Math.ceil(sentence.length / 4);
         if (currentTokens + sentenceTokens > maxTokens && currentChunk) {
           chunks.push(currentChunk.trim());
-          currentChunk = '';
-          currentTokens = 0;
+          
+          // Apply overlap
+          const overlapChars = overlapTokens * 4;
+          previousChunkEnd = currentChunk.slice(-overlapChars);
+          currentChunk = previousChunkEnd + ' ';
+          currentTokens = overlapTokens;
         }
         currentChunk += sentence + ' ';
         currentTokens += sentenceTokens;
