@@ -11,16 +11,50 @@ interface HangulTracingProps {
   className?: string;
 }
 
+// Calculate optimal font size based on text length and canvas size
+const calculateFontSize = (text: string, canvasSize: number): number => {
+  const charCount = text.length;
+  
+  // Base size for single character
+  if (charCount === 1) return Math.floor(canvasSize * 0.65);
+  
+  // For words (2-4 chars)
+  if (charCount <= 4) return Math.floor(canvasSize * 0.35);
+  
+  // For longer words/sentences (5-8 chars)
+  if (charCount <= 8) return Math.floor(canvasSize * 0.22);
+  
+  // For very long sentences (9+ chars)
+  return Math.floor(canvasSize * 0.15);
+};
+
 const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const guideCanvasRef = useRef<HTMLCanvasElement>(null);
   const [fabricCanvas, setFabricCanvas] = useState<FabricCanvas | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scores, setScores] = useState<number[]>([]);
   const [isComplete, setIsComplete] = useState(false);
+  const [canvasSize, setCanvasSize] = useState(300);
 
   const currentChar = characters[currentIndex];
-  const canvasSize = 300;
+
+  // Calculate responsive canvas size
+  useEffect(() => {
+    const updateCanvasSize = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.offsetWidth;
+        // Max size 400px, min 260px, responsive to container
+        const newSize = Math.min(400, Math.max(260, containerWidth - 32));
+        setCanvasSize(newSize);
+      }
+    };
+
+    updateCanvasSize();
+    window.addEventListener("resize", updateCanvasSize);
+    return () => window.removeEventListener("resize", updateCanvasSize);
+  }, []);
 
   // Initialize fabric canvas
   useEffect(() => {
@@ -33,10 +67,10 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
       isDrawingMode: true,
     });
 
-    // Configure brush
+    // Configure brush - scale brush width with canvas size
     const brush = new PencilBrush(canvas);
     brush.color = "#3B82F6"; // Blue for user strokes
-    brush.width = 8;
+    brush.width = Math.max(4, Math.floor(canvasSize / 40));
     canvas.freeDrawingBrush = brush;
 
     setFabricCanvas(canvas);
@@ -44,9 +78,9 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
     return () => {
       canvas.dispose();
     };
-  }, []);
+  }, [canvasSize]);
 
-  // Draw guide character
+  // Draw guide character - with dynamic font sizing
   useEffect(() => {
     if (!guideCanvasRef.current) return;
 
@@ -75,13 +109,28 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
 
     ctx.setLineDash([]);
 
+    // Calculate dynamic font size based on text length
+    const fontSize = calculateFontSize(currentChar, canvasSize);
+
     // Draw the guide character
-    ctx.font = "200px 'Noto Sans KR', sans-serif";
+    ctx.font = `${fontSize}px 'Noto Sans KR', sans-serif`;
     ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(currentChar, canvasSize / 2, canvasSize / 2 + 10);
-  }, [currentChar]);
+    
+    // For very long text, we may need to wrap or adjust positioning
+    const textWidth = ctx.measureText(currentChar).width;
+    const maxWidth = canvasSize * 0.9;
+    
+    if (textWidth > maxWidth && currentChar.length > 1) {
+      // If text is too wide, reduce font size further
+      const scaleFactor = maxWidth / textWidth;
+      const adjustedFontSize = Math.floor(fontSize * scaleFactor);
+      ctx.font = `${adjustedFontSize}px 'Noto Sans KR', sans-serif`;
+    }
+    
+    ctx.fillText(currentChar, canvasSize / 2, canvasSize / 2 + fontSize * 0.05);
+  }, [currentChar, canvasSize]);
 
   // Calculate similarity score
   const calculateScore = useCallback((): number => {
@@ -106,11 +155,24 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
     const tempCtx = tempCanvas.getContext("2d");
     if (!tempCtx) return 0;
 
-    tempCtx.font = "200px 'Noto Sans KR', sans-serif";
+    // Use the same dynamic font size calculation
+    const fontSize = calculateFontSize(currentChar, canvasSize);
+    tempCtx.font = `${fontSize}px 'Noto Sans KR', sans-serif`;
     tempCtx.fillStyle = "rgba(0, 0, 0, 1)";
     tempCtx.textAlign = "center";
     tempCtx.textBaseline = "middle";
-    tempCtx.fillText(currentChar, canvasSize / 2, canvasSize / 2 + 10);
+    
+    // Check if we need to scale down
+    const textWidth = tempCtx.measureText(currentChar).width;
+    const maxWidth = canvasSize * 0.9;
+    
+    if (textWidth > maxWidth && currentChar.length > 1) {
+      const scaleFactor = maxWidth / textWidth;
+      const adjustedFontSize = Math.floor(fontSize * scaleFactor);
+      tempCtx.font = `${adjustedFontSize}px 'Noto Sans KR', sans-serif`;
+    }
+    
+    tempCtx.fillText(currentChar, canvasSize / 2, canvasSize / 2 + fontSize * 0.05);
 
     const guideImageData = tempCtx.getImageData(0, 0, canvasSize, canvasSize);
     const guideData = guideImageData.data;
@@ -155,7 +217,7 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
     const score = Math.round((coverage * 0.6 + precision * 0.4) * 100);
 
     return Math.min(100, Math.max(0, score));
-  }, [fabricCanvas, currentChar]);
+  }, [fabricCanvas, currentChar, canvasSize]);
 
   // Handle check
   const handleCheck = useCallback(() => {
@@ -217,28 +279,47 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
     fabricCanvas?.clear();
   };
 
+  // Calculate display font size for the character preview above canvas
+  const getDisplayFontSize = () => {
+    const charCount = currentChar.length;
+    if (charCount === 1) return "text-4xl sm:text-5xl";
+    if (charCount <= 4) return "text-2xl sm:text-3xl";
+    if (charCount <= 8) return "text-xl sm:text-2xl";
+    return "text-lg sm:text-xl";
+  };
+
   if (isComplete) {
     const avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
     return (
-      <div className={cn("flex flex-col items-center gap-6 p-6", className)}>
-        <h2 className="text-2xl font-bold">연습 완료! 🎉</h2>
-        <div className="text-5xl font-bold text-primary">{avgScore}점</div>
-        <div className="flex flex-wrap gap-2 justify-center">
-          {characters.map((char, idx) => (
-            <div
-              key={idx}
-              className={cn(
-                "w-12 h-12 flex items-center justify-center rounded-lg text-lg font-bold",
-                scores[idx] >= 70
-                  ? "bg-green-100 text-green-700"
-                  : scores[idx] >= 40
-                  ? "bg-yellow-100 text-yellow-700"
-                  : "bg-red-100 text-red-700"
-              )}
-            >
-              {char}
-            </div>
-          ))}
+      <div className={cn("flex flex-col items-center gap-6 p-4 sm:p-6", className)}>
+        <h2 className="text-xl sm:text-2xl font-bold">연습 완료! 🎉</h2>
+        <div className="text-4xl sm:text-5xl font-bold text-primary">{avgScore}점</div>
+        <div className="flex flex-wrap gap-2 justify-center max-w-full">
+          {characters.map((char, idx) => {
+            const charLen = char.length;
+            const sizeClass = charLen === 1 
+              ? "w-10 h-10 sm:w-12 sm:h-12 text-base sm:text-lg" 
+              : charLen <= 4 
+                ? "px-2 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm min-w-[40px]" 
+                : "px-2 py-1 sm:px-3 sm:py-2 text-[10px] sm:text-xs min-w-[60px]";
+            
+            return (
+              <div
+                key={idx}
+                className={cn(
+                  "flex items-center justify-center rounded-lg font-bold truncate",
+                  sizeClass,
+                  scores[idx] >= 70
+                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                    : scores[idx] >= 40
+                    ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+                    : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                )}
+              >
+                {char}
+              </div>
+            );
+          })}
         </div>
         <Button onClick={handleRestart} className="gap-2">
           <RotateCcw className="w-4 h-4" />
@@ -249,7 +330,7 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
   }
 
   return (
-    <div className={cn("flex flex-col items-center gap-4", className)}>
+    <div ref={containerRef} className={cn("flex flex-col items-center gap-4 w-full", className)}>
       {/* Progress */}
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <span>{currentIndex + 1}</span>
@@ -257,11 +338,16 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
         <span>{characters.length}</span>
       </div>
 
-      {/* Character display */}
-      <div className="text-4xl font-bold mb-2">{currentChar}</div>
+      {/* Character display - responsive sizing */}
+      <div className={cn("font-bold mb-2 text-center break-all px-4 max-w-full", getDisplayFontSize())}>
+        {currentChar}
+      </div>
 
-      {/* Canvas container */}
-      <div className="relative border-2 border-dashed border-muted-foreground/30 rounded-xl bg-white">
+      {/* Canvas container - responsive */}
+      <div 
+        className="relative border-2 border-dashed border-muted-foreground/30 rounded-xl bg-white flex-shrink-0"
+        style={{ width: canvasSize, height: canvasSize }}
+      >
         {/* Guide canvas (background) */}
         <canvas
           ref={guideCanvasRef}
@@ -276,23 +362,24 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
         />
       </div>
 
-      {/* Controls */}
-      <div className="flex items-center gap-3">
+      {/* Controls - responsive */}
+      <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center">
         <Button
           variant="outline"
           size="icon"
           onClick={handlePrev}
           disabled={currentIndex === 0}
+          className="w-9 h-9 sm:w-10 sm:h-10"
         >
           <ChevronLeft className="w-4 h-4" />
         </Button>
 
-        <Button variant="outline" onClick={handleClear} className="gap-2">
+        <Button variant="outline" onClick={handleClear} className="gap-2 text-sm px-3 sm:px-4">
           <RotateCcw className="w-4 h-4" />
           지우기
         </Button>
 
-        <Button onClick={handleCheck} className="gap-2">
+        <Button onClick={handleCheck} className="gap-2 text-sm px-3 sm:px-4">
           <Check className="w-4 h-4" />
           확인
         </Button>
@@ -302,13 +389,14 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
           size="icon"
           onClick={handleNext}
           disabled={currentIndex === characters.length - 1}
+          className="w-9 h-9 sm:w-10 sm:h-10"
         >
           <ChevronRight className="w-4 h-4" />
         </Button>
       </div>
 
       {/* Hint */}
-      <p className="text-sm text-muted-foreground text-center">
+      <p className="text-xs sm:text-sm text-muted-foreground text-center px-4">
         가이드 글자 위에 손가락이나 마우스로 따라 써보세요
       </p>
     </div>
