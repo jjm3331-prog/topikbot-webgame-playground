@@ -40,6 +40,7 @@ import Admin from "./pages/Admin";
 import AdminLogin from "./pages/AdminLogin";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import HelpCenter from "./pages/HelpCenter";
 import NotFound from "./pages/NotFound";
 import KoreaCareer from "./pages/KoreaCareer";
 import Headhunting from "./pages/Headhunting";
@@ -170,6 +171,7 @@ const App = () => {
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
+              <Route path="/help-center" element={<HelpCenter />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
