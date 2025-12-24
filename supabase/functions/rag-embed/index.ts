@@ -148,6 +148,25 @@ serve(async (req) => {
 
     console.log(`Processing document: ${title}`);
 
+    // Check for duplicate document by title
+    const { data: existingDoc } = await supabase
+      .from('knowledge_documents')
+      .select('id, title')
+      .eq('title', title)
+      .maybeSingle();
+
+    if (existingDoc) {
+      console.log(`Duplicate document found: ${title} (ID: ${existingDoc.id})`);
+      return new Response(JSON.stringify({ 
+        error: 'Duplicate document',
+        message: `Document with title "${title}" already exists`,
+        existing_document_id: existingDoc.id
+      }), {
+        status: 409, // Conflict
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // 1. Insert document
     const { data: document, error: docError } = await supabase
       .from('knowledge_documents')
