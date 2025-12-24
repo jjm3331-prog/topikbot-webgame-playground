@@ -131,27 +131,42 @@ const TOPIK_LEVEL_GUIDELINES: Record<string, string> = {
 - "요즘 운동을 시작했다고 들었는데, 어떤 운동 하세요?"
 - "네, 수영을 배우고 있어요. 건강에도 좋고 스트레스도 풀려요."`,
 
-  "5-6": `[TOPIK 5-6급 듣기 가이드라인]
-어휘:
-- 고급 어휘 6000개 이상
-- 전문 용어 및 학술 어휘
-- 관용어, 속담, 사자성어
+  "5-6": `[TOPIK 5-6급 듣기 가이드라인 - 고급 수준 필수]
 
-문법:
-- 고급 연결어미: -는 바람에, -은 나머지, -거니와
-- 문어체 표현: -노라, -도다, -으리라
-- 복합 표현: -다시피 하다, -는 셈이다
-- 담화 표지어: 그러니까, 어쨌든, 결국
+⚠️ 반드시 아래 고급 요소들을 포함해야 합니다!
 
-대화 스타일:
-- 4-6문장의 복잡한 대화
-- 논쟁, 토론, 분석적 대화
-- 뉴스, 강연, 인터뷰 스타일
-- 빠른 속도, 자연스러운 축약
+어휘 (필수 사용):
+- 고급 어휘 6000개 이상 수준
+- 학술/전문 용어: 지속가능성, 패러다임, 인프라, 메커니즘, 양극화, 담론
+- 추상적 개념: 본질, 함의, 맥락, 전제, 귀결, 타당성
+- 관용 표현: 물의를 일으키다, 난항을 겪다, 시사하는 바가 크다, 귀추가 주목되다
+- 한자 성어: 전화위복, 이심전심, 고진감래, 사면초가
+- 속담: 빈 수레가 요란하다, 우물 안 개구리, 소 잃고 외양간 고치다
 
-예시:
-- "이 문제에 대해 전문가들 사이에서도 의견이 분분한데요, 교수님께서는 어떻게 보십니까?"
-- "글쎄요, 일리가 있다고 하더라도 현실적인 한계를 간과할 수는 없을 것 같습니다."`,
+문법 (반드시 2개 이상 사용):
+- 고급 연결어미: -는 바람에, -은/는 나머지, -거니와, -건대, -더니만
+- 추측/양보: -을지언정, -을망정, -기로서니
+- 인용/전달: -다는 점에서, -다고는 하나, -느니만큼
+- 복합 표현: -다시피 하다, -는 셈이다, -기 마련이다, -ㄹ 수밖에 없다
+- 담화 표지어: 그러니까요, 어쨌거나, 결론적으로, 달리 말하면, 이와 관련하여
+
+대화 스타일 (필수):
+- 최소 5-7문장의 심층 대화
+- 토론/논쟁/분석적 대화 (단순 정보 교환 금지!)
+- 반박, 양보, 조건부 동의 표현 포함
+- 뉴스 앵커, 학술 강연, 전문가 인터뷰 스타일
+- 자연스러운 축약형, 격식체/비격식체 혼용
+
+주제 (고급 주제만):
+- 사회 이슈: 환경 정책, 세대 갈등, 디지털 격차, 고령화 사회
+- 경제/산업: 고용 시장, 기업 윤리, 경제 전망
+- 문화/학술: 한류 산업, 교육 정책, 연구 동향, 미디어 비평
+
+예시 대화:
+A: "최근 발표된 보고서에 따르면 청년 실업률이 사상 최고치를 기록했다고 하는데요, 이에 대해 어떻게 분석하십니까?"
+B: "글쎄요, 수치 자체만 놓고 보면 심각해 보일 수 있지만, 이면에는 청년층의 눈높이 상향이라는 구조적 요인도 무시할 수 없죠."
+A: "그렇다 하더라도 양질의 일자리가 부족한 건 엄연한 사실 아닙니까?"
+B: "물론이죠. 다만 단기적 처방보다는 산업 구조 재편이라는 중장기적 관점에서 접근해야 한다고 봅니다."`,
 };
 
 interface Question {
@@ -174,6 +189,28 @@ async function generateListeningQuestions(
   topikLevel: string = "1-2"
 ): Promise<Question[]> {
   const levelGuideline = TOPIK_LEVEL_GUIDELINES[topikLevel] || TOPIK_LEVEL_GUIDELINES["1-2"];
+  
+  // 5-6급일 때 더 강력한 지시
+  const levelEnforcement = topikLevel === "5-6" 
+    ? `
+🚨 [필수 준수 사항 - TOPIK 5-6급]
+1. 절대 기초 어휘(가다, 오다, 먹다 등) 중심의 대화 금지!
+2. 반드시 학술적/전문적 주제로 대화 구성 (예: 사회 문제, 경제 이슈, 정책 토론)
+3. 최소 5문장 이상의 심층 대화
+4. 고급 문법 표현 2개 이상 필수 포함
+5. 반박, 양보, 조건부 동의 표현 포함
+6. "안녕하세요", "어디 가세요?" 같은 단순 인사 대화 금지!
+
+잘못된 예시 (이렇게 생성하면 안 됨):
+- "안녕하세요. 어디에 가세요?" (❌ 1-2급 수준)
+- "네, 도서관에 가요." (❌ 너무 단순)
+
+올바른 예시 (이렇게 생성해야 함):
+- "최근 환경 정책에 대한 논란이 일고 있는데, 어떻게 보십니까?" (✅ 5-6급 수준)
+- "일리가 있다고는 하나, 현실적 한계를 간과할 수 없다고 봅니다." (✅ 고급 표현)
+`
+    : "";
+  
   const systemPrompt = `당신은 TOPIK 스타일의 한국어 듣기 문제 생성기입니다.
 주어진 텍스트를 참고하여 한국어 학습자를 위한 듣기 문제를 생성합니다.
 
@@ -188,6 +225,8 @@ async function generateListeningQuestions(
 - 해설은 한국어와 베트남어로 제공
 
 ${levelGuideline}
+
+${levelEnforcement}
 
 ⚠️ 중요: 반드시 위의 TOPIK ${topikLevel}급 가이드라인에 맞는 어휘, 문법, 대화 스타일로 작성하세요!
 
@@ -205,7 +244,36 @@ ${levelGuideline}
   }
 ]`;
 
-  const userPrompt = `다음 텍스트를 참고하여 TOPIK ${topikLevel}급 수준의 ${count}개 듣기 문제를 생성해주세요.
+  const userPrompt = topikLevel === "5-6" 
+    ? `🚨 절대 주의: 반드시 TOPIK 5-6급 수준의 고급 문제만 생성하세요!
+
+아래 참고 텍스트는 무시하고, 다음 고급 주제 중 하나를 선택해서 ${count}개 듣기 문제를 생성하세요:
+
+[필수 선택 주제 - 반드시 이 중에서 선택]
+1. 청년 실업률과 고용 정책에 대한 전문가 토론
+2. 환경 보호와 경제 개발의 균형에 대한 학술 토론
+3. 디지털 격차와 정보 접근성 문제에 대한 뉴스 인터뷰
+4. 고령화 사회와 복지 정책에 대한 패널 토론
+5. 한류 산업의 경제적 파급 효과에 대한 분석
+6. AI 기술 발전과 일자리 변화에 대한 전망
+
+[대화 예시 - 이 수준으로 생성]
+A: "최근 발표된 보고서에 따르면 청년 실업률이 사상 최고치를 기록했다고 하는데요, 이에 대해 어떻게 분석하십니까?"
+B: "글쎄요, 수치 자체만 놓고 보면 심각해 보일 수 있지만, 이면에는 청년층의 눈높이 상향이라는 구조적 요인도 무시할 수 없죠."
+A: "그렇다 하더라도 양질의 일자리가 부족한 건 엄연한 사실 아닙니까?"
+B: "물론이죠. 다만 단기적 처방보다는 산업 구조 재편이라는 중장기적 관점에서 접근해야 한다고 봅니다."
+
+[금지 사항]
+❌ "안녕하세요, 어디 가세요?" - 이런 초급 대화 절대 금지
+❌ "생일 선물 사러 가요" - 이런 일상 대화 절대 금지
+❌ 단순한 정보 교환 대화 금지
+
+[필수 포함]
+✅ 고급 어휘: 양극화, 패러다임, 지속가능성, 함의, 귀추, 논란 등
+✅ 고급 문법: -다고는 하나, -을지언정, -기 마련이다, -는 바람에 등
+✅ 반박/양보/조건부 동의 표현
+✅ 최소 4-5문장의 심층 대화`
+    : `다음 텍스트를 참고하여 TOPIK ${topikLevel}급 수준의 ${count}개 듣기 문제를 생성해주세요.
 대화형(dialogue)과 단일형(single)을 적절히 섞어주세요.
 반드시 ${topikLevel}급에 맞는 어휘와 문법만 사용하세요.
 
@@ -218,7 +286,7 @@ ${ragContent}`;
     body: JSON.stringify({
       contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
       systemInstruction: { parts: [{ text: systemPrompt }] },
-      generationConfig: { temperature: 0.9, maxOutputTokens: 4096 },
+      generationConfig: { temperature: topikLevel === "5-6" ? 0.7 : 0.9, maxOutputTokens: 4096 },
     }),
   });
 
@@ -352,50 +420,59 @@ serve(async (req) => {
 
     console.log(`📝 Generating ${count} listening questions for TOPIK ${topikLevel}`);
 
-    // 1. 랜덤 검색 쿼리 선택
-    const randomQuery = SEARCH_QUERIES[Math.floor(Math.random() * SEARCH_QUERIES.length)];
-    console.log(`🔍 Search query: "${randomQuery}"`);
+    let ragContent = "";
+    let randomQuery = "";
 
-    // 2. 임베딩 생성 및 RAG 검색
-    const embedding = await generateEmbedding(randomQuery, openAIApiKey);
-    
-    const { data: searchResults, error: searchError } = await supabase.rpc(
-      'search_knowledge',
-      {
-        query_embedding: `[${embedding.join(',')}]`,
-        match_threshold: RAG_CONFIG.MATCH_THRESHOLD,
-        match_count: RAG_CONFIG.MATCH_COUNT,
-      }
-    );
-
-    if (searchError || !searchResults || searchResults.length === 0) {
-      console.log('⚠️ No RAG results, using fallback');
-      return new Response(JSON.stringify({ 
-        success: true, 
-        questions: FALLBACK_QUESTIONS.slice(0, count),
-        source: 'fallback'
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    console.log(`📚 Found ${searchResults.length} candidates`);
-
-    // 3. Cohere Rerank (선택적)
-    let rankedResults = searchResults;
-    if (cohereApiKey) {
-      rankedResults = await rerankResults(randomQuery, searchResults, cohereApiKey, RAG_CONFIG.TOP_N);
-      console.log(`🔄 Reranked to ${rankedResults.length} results`);
+    // 5-6급은 RAG 없이 직접 고급 주제로 생성
+    if (topikLevel === "5-6") {
+      console.log(`🎯 TOPIK 5-6: Skipping RAG, using advanced topics directly`);
+      ragContent = ""; // RAG 없이 프롬프트의 고급 주제 사용
     } else {
-      rankedResults = searchResults.slice(0, RAG_CONFIG.TOP_N);
+      // 1-2급, 3-4급은 RAG 사용
+      randomQuery = SEARCH_QUERIES[Math.floor(Math.random() * SEARCH_QUERIES.length)];
+      console.log(`🔍 Search query: "${randomQuery}"`);
+
+      // 임베딩 생성 및 RAG 검색
+      const embedding = await generateEmbedding(randomQuery, openAIApiKey);
+      
+      const { data: searchResults, error: searchError } = await supabase.rpc(
+        'search_knowledge',
+        {
+          query_embedding: `[${embedding.join(',')}]`,
+          match_threshold: RAG_CONFIG.MATCH_THRESHOLD,
+          match_count: RAG_CONFIG.MATCH_COUNT,
+        }
+      );
+
+      if (searchError || !searchResults || searchResults.length === 0) {
+        console.log('⚠️ No RAG results, using fallback');
+        return new Response(JSON.stringify({ 
+          success: true, 
+          questions: FALLBACK_QUESTIONS.slice(0, count),
+          source: 'fallback'
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      console.log(`📚 Found ${searchResults.length} candidates`);
+
+      // Cohere Rerank (선택적)
+      let rankedResults = searchResults;
+      if (cohereApiKey) {
+        rankedResults = await rerankResults(randomQuery, searchResults, cohereApiKey, RAG_CONFIG.TOP_N);
+        console.log(`🔄 Reranked to ${rankedResults.length} results`);
+      } else {
+        rankedResults = searchResults.slice(0, RAG_CONFIG.TOP_N);
+      }
+
+      // RAG 콘텐츠 결합
+      ragContent = rankedResults.map((r: any) => r.content).join('\n\n');
+      console.log(`📖 Combined content: ${ragContent.length} chars`);
     }
 
-    // 4. RAG 콘텐츠 결합
-    const ragContent = rankedResults.map((r: any) => r.content).join('\n\n');
-    console.log(`📖 Combined content: ${ragContent.length} chars`);
-
-    // 5. AI로 듣기 문제 생성
-    const generatedQuestions = await generateListeningQuestions(ragContent, count, geminiApiKey);
+    // AI로 듣기 문제 생성
+    const generatedQuestions = await generateListeningQuestions(ragContent, count, geminiApiKey, topikLevel);
     console.log(`✅ Generated ${generatedQuestions.length} questions`);
 
     // 부족하면 폴백 추가
@@ -405,7 +482,7 @@ serve(async (req) => {
       finalQuestions = [...finalQuestions, ...additional];
     }
 
-    // 6. 캐시에 저장 (1시간 유효)
+    // 캐시에 저장 (1시간 유효)
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
     await supabase.from('ai_response_cache').upsert({
       cache_key: cacheKey,
@@ -421,7 +498,7 @@ serve(async (req) => {
       success: true, 
       questions: finalQuestions.slice(0, count),
       topikLevel,
-      source: 'rag',
+      source: topikLevel === "5-6" ? 'direct' : 'rag',
       query: randomQuery,
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
