@@ -14,6 +14,8 @@ import {
   Briefcase, Eye, CheckCircle, XCircle, Clock, Download, FileDown,
   Crown, UserCheck, ChevronRight, Shield, Send, Globe, User, AlertTriangle, Info
 } from "lucide-react";
+import DocumentUploader from "@/components/admin/DocumentUploader";
+import DocumentList from "@/components/admin/DocumentList";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -41,13 +43,7 @@ interface StatCard {
   color: string;
 }
 
-interface Document {
-  id: string;
-  title: string;
-  content: string;
-  created_at: string;
-  file_type: string;
-}
+// Document interface moved to DocumentList component
 
 interface UserProfile {
   id: string;
@@ -108,10 +104,7 @@ const Admin = () => {
   const [updatingSubscription, setUpdatingSubscription] = useState(false);
   
   // Documents
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [newDocTitle, setNewDocTitle] = useState("");
-  const [newDocContent, setNewDocContent] = useState("");
-  const [uploadingDoc, setUploadingDoc] = useState(false);
+  const [documentRefreshTrigger, setDocumentRefreshTrigger] = useState(0);
   
   // Headhunting
   const [headhuntingApplications, setHeadhuntingApplications] = useState<HeadhuntingApplication[]>([]);
@@ -242,12 +235,7 @@ const Admin = () => {
         console.error("Load users error:", error);
       }
 
-      // Load documents
-      const { data: docsData } = await supabase
-        .from("knowledge_documents")
-        .select("id, title, content, created_at, file_type")
-        .order("created_at", { ascending: false });
-      setDocuments(docsData || []);
+      // Documents are now handled by DocumentList component
 
       // Load headhunting applications
       const { data: headhuntingData } = await supabase
@@ -426,99 +414,7 @@ const Admin = () => {
     }
   };
 
-  const handleUploadDocument = async () => {
-    if (!newDocTitle.trim() || !newDocContent.trim()) {
-      toast({
-        title: "입력 오류",
-        description: "제목과 내용을 모두 입력해주세요.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setUploadingDoc(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/rag-embed`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${session?.access_token}`,
-          },
-          body: JSON.stringify({
-            title: newDocTitle,
-            content: newDocContent,
-            file_type: "text",
-          }),
-        }
-      );
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Upload failed");
-      }
-
-      toast({
-        title: "업로드 성공",
-        description: `"${newDocTitle}" 문서가 ${result.chunks_created}개의 청크로 임베딩되었습니다.`,
-      });
-
-      setNewDocTitle("");
-      setNewDocContent("");
-      await loadDashboardData();
-    } catch (error: any) {
-      console.error("Upload error:", error);
-      toast({
-        title: "업로드 실패",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setUploadingDoc(false);
-    }
-  };
-
-  const handleDeleteDocument = async (docId: string, title: string) => {
-    if (!confirm(`"${title}" 문서를 삭제하시겠습니까?`)) return;
-
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/rag-delete`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${session?.access_token}`,
-          },
-          body: JSON.stringify({ document_id: docId }),
-        }
-      );
-
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.error || "Delete failed");
-      }
-
-      toast({
-        title: "삭제 완료",
-        description: `"${title}" 문서가 삭제되었습니다.`,
-      });
-
-      await loadDashboardData();
-    } catch (error: any) {
-      console.error("Delete error:", error);
-      toast({
-        title: "삭제 실패",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
+  // Document upload/delete handlers are now in separate components
   };
 
   const handleUpdateApplicationStatus = async (appId: string, newStatus: string) => {
@@ -802,19 +698,9 @@ const Admin = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
-                    {documents.slice(0, 5).map((doc) => (
-                      <div key={doc.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                        <span className="text-sm font-medium truncate max-w-[200px]">{doc.title}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(doc.created_at).toLocaleDateString("ko-KR")}
-                        </span>
-                      </div>
-                    ))}
-                    {documents.length === 0 && (
-                      <p className="text-muted-foreground text-sm">등록된 문서가 없습니다.</p>
-                    )}
-                  </div>
+                  <p className="text-muted-foreground text-sm">
+                    문서 관리는 "지식문서" 탭에서 확인하세요.
+                  </p>
                 </CardContent>
               </Card>
             </div>
@@ -1364,94 +1250,8 @@ const Admin = () => {
           {/* Documents Tab */}
           <TabsContent value="documents">
             <div className="grid lg:grid-cols-2 gap-8">
-              {/* Upload Form */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Upload className="w-5 h-5" />
-                    지식문서 업로드
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">문서 제목</label>
-                    <Input
-                      placeholder="예: TOPIK II 문법 총정리"
-                      value={newDocTitle}
-                      onChange={(e) => setNewDocTitle(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">문서 내용</label>
-                    <Textarea
-                      placeholder="문서 내용을 입력하세요. 자동으로 의미 기반 청킹 및 임베딩이 수행됩니다."
-                      value={newDocContent}
-                      onChange={(e) => setNewDocContent(e.target.value)}
-                      rows={10}
-                    />
-                  </div>
-                  <Button
-                    onClick={handleUploadDocument}
-                    disabled={uploadingDoc}
-                    className="w-full"
-                  >
-                    {uploadingDoc ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        임베딩 처리 중...
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-4 h-4 mr-2" />
-                        업로드 및 임베딩
-                      </>
-                    )}
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Documents List */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="w-5 h-5" />
-                    등록된 문서 ({documents.length})
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3 max-h-[500px] overflow-y-auto">
-                    {documents.map((doc) => (
-                      <div
-                        key={doc.id}
-                        className="p-4 bg-muted/50 rounded-lg flex items-start justify-between gap-4"
-                      >
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium truncate">{doc.title}</h4>
-                          <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
-                            {doc.content.substring(0, 100)}...
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-2">
-                            {new Date(doc.created_at).toLocaleString("ko-KR")}
-                          </p>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                          onClick={() => handleDeleteDocument(doc.id, doc.title)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ))}
-                    {documents.length === 0 && (
-                      <p className="text-center py-8 text-muted-foreground">
-                        등록된 문서가 없습니다. 첫 번째 지식문서를 업로드해보세요!
-                      </p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+              <DocumentUploader onUploadComplete={() => setDocumentRefreshTrigger(t => t + 1)} />
+              <DocumentList refreshTrigger={documentRefreshTrigger} />
             </div>
           </TabsContent>
 
