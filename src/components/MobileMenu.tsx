@@ -74,29 +74,27 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
     navigate(path);
   };
 
-  // Du học & Việc làm section (priority)
+  // Việc làm section
   const careerItems = [
-    { path: "/korea-career", icon: Briefcase, labelKo: "한국 취업", labelVi: "Việc làm Hàn Quốc" },
-    { path: "/korea-career#study", icon: GraduationCap, labelKo: "한국 유학", labelVi: "Du học Hàn Quốc" },
+    { path: "/korea-career", icon: Briefcase, labelVi: "Tìm việc tại Hàn Quốc" },
+    { path: "/headhunting", icon: GraduationCap, labelVi: "Headhunting" },
   ];
 
-  // Premium AI feature
-  const premiumItems = [
-    { path: "/question-variant", icon: Wand2, labelKo: "문제 변형 생성기", labelVi: "Biến thể đề thi", isPremium: true },
+  // TOPIK 학습 허브
+  const topikItems = [
+    { path: "/learning-hub", icon: Sparkles, labelVi: "TOPIK 학습 허브", isHighlight: true },
   ];
 
-  const menuItems = [
-    { path: "/dashboard", icon: Home, labelKo: "대시보드", labelVi: "Dashboard" },
-    { path: "/manager", icon: Sparkles, labelKo: "루카토 매니저", labelVi: "LUKATO Manager" },
-    { path: "/chat", icon: Dice6, labelKo: "서울 생존", labelVi: "Sinh tồn Seoul" },
-    { path: "/dating", icon: Heart, labelKo: "Seoul Love Signal", labelVi: "Tín hiệu tình yêu" },
-    { path: "/bankruptcy", icon: Zap, labelKo: "파산 복구", labelVi: "Phục hồi phá sản" },
-    { path: "/parttime", icon: Briefcase, labelKo: "아르바이트", labelVi: "Làm thêm" },
-    { path: "/wordchain", icon: Link2, labelKo: "끝말잇기", labelVi: "Nối từ" },
-    { path: "/quiz", icon: MessageSquare, labelKo: "관용어 퀴즈", labelVi: "Quiz thành ngữ" },
-    { path: "/kdrama", icon: Film, labelKo: "K-Drama 더빙", labelVi: "Lồng tiếng" },
-    { path: "/kpop", icon: Music, labelKo: "K-POP 가사", labelVi: "Lời bài hát" },
-    { path: "/tutorial", icon: HelpCircle, labelKo: "게임 튜토리얼", labelVi: "Hướng dẫn Game" },
+  // Game items
+  const gameItems = [
+    { path: "/manager", icon: Crown, labelVi: "LUKATO Manager" },
+    { path: "/chat", icon: Dice6, labelVi: "AI Sinh tồn Seoul" },
+    { path: "/dating", icon: Heart, labelVi: "Hẹn hò Hàn Quốc" },
+    { path: "/wordchain", icon: Link2, labelVi: "Nối từ tiếng Hàn" },
+    { path: "/kpop", icon: Music, labelVi: "K-POP Quiz" },
+    { path: "/kdrama", icon: Film, labelVi: "K-Drama Lồng tiếng" },
+    { path: "/parttime", icon: Briefcase, labelVi: "Làm thêm tại Hàn" },
+    { path: "/tutorial", icon: HelpCircle, labelVi: "Hướng dẫn Game" },
   ];
 
   const menuContent = (
@@ -213,11 +211,11 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
               padding: '16px 12px',
               backgroundColor: '#0a0a14',
             }}>
-              {/* Du học & Việc làm Section - Priority */}
+              {/* VIỆC LÀM Section */}
               <div style={{ marginBottom: '16px' }}>
                 <div style={{ padding: '0 8px', marginBottom: '8px' }}>
                   <span style={{ fontSize: '12px', fontWeight: 600, color: '#facc15', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    🎓 Du học & Việc làm
+                    💼 VIỆC LÀM
                   </span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -242,11 +240,8 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
                         }}
                       >
                         <IconComponent style={{ width: '20px', height: '20px', color: '#facc15' }} />
-                        <div>
-                          <div style={{ fontSize: '14px', fontWeight: 500, color: isActive ? 'white' : 'rgba(255,255,255,0.8)' }}>
-                            {item.labelKo}
-                          </div>
-                          <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>{item.labelVi}</div>
+                        <div style={{ fontSize: '14px', fontWeight: 500, color: isActive ? 'white' : 'rgba(255,255,255,0.8)' }}>
+                          {item.labelVi}
                         </div>
                       </button>
                     );
@@ -254,15 +249,15 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
                 </div>
               </div>
 
-              {/* Premium AI Section */}
+              {/* HỌC TOPIK Section */}
               <div style={{ marginBottom: '16px' }}>
                 <div style={{ padding: '0 8px', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    ✨ AI Premium
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#a855f7', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    📚 HỌC TOPIK
                   </span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  {premiumItems.map((item) => {
+                  {topikItems.map((item) => {
                     const isActive = location.pathname === item.path;
                     const IconComponent = item.icon;
                     return (
@@ -276,19 +271,15 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
                           gap: '12px',
                           padding: '12px',
                           borderRadius: '12px',
-                          border: '1px solid rgba(249,115,22,0.15)',
-                          background: isActive ? 'linear-gradient(to right, rgba(249,115,22,0.2), rgba(234,88,12,0.2))' : 'rgba(249,115,22,0.05)',
+                          border: isActive ? '1px solid rgba(168,85,247,0.3)' : '1px solid rgba(168,85,247,0.15)',
+                          background: isActive ? 'linear-gradient(to right, rgba(168,85,247,0.2), rgba(236,72,153,0.2))' : 'rgba(168,85,247,0.05)',
                           cursor: 'pointer',
                           textAlign: 'left',
                         }}
                       >
-                        <IconComponent style={{ width: '20px', height: '20px', color: '#f97316' }} />
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            {item.labelKo}
-                            <Crown style={{ width: '12px', height: '12px', color: '#f97316' }} />
-                          </div>
-                          <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>{item.labelVi}</div>
+                        <IconComponent style={{ width: '20px', height: '20px', color: '#a855f7' }} />
+                        <div style={{ fontSize: '14px', fontWeight: 500, color: isActive ? 'white' : 'rgba(255,255,255,0.8)' }}>
+                          {item.labelVi}
                         </div>
                       </button>
                     );
@@ -296,45 +287,49 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
                 </div>
               </div>
 
-              {/* Regular Menu Items */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                {menuItems.map((item) => {
-                  const isActive = location.pathname === item.path;
-                  const IconComponent = item.icon;
-                  return (
-                    <button
-                      key={item.path}
-                      onClick={() => handleNavigate(item.path)}
-                      style={{
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        padding: '12px',
-                        borderRadius: '12px',
-                        border: isActive ? '1px solid rgba(255,107,157,0.3)' : 'none',
-                        background: isActive ? 'linear-gradient(to right, rgba(255,107,157,0.2), rgba(168,85,247,0.2))' : 'transparent',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                      }}
-                    >
-                      <IconComponent style={{ width: '20px', height: '20px', color: isActive ? '#00d4ff' : 'rgba(255,255,255,0.6)' }} />
-                      <div>
+              {/* GAME Section */}
+              <div style={{ marginBottom: '16px' }}>
+                <div style={{ padding: '0 8px', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#ec4899', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    🎮 GAME
+                  </span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  {gameItems.map((item) => {
+                    const isActive = location.pathname === item.path;
+                    const IconComponent = item.icon;
+                    return (
+                      <button
+                        key={item.path}
+                        onClick={() => handleNavigate(item.path)}
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          padding: '12px',
+                          borderRadius: '12px',
+                          border: isActive ? '1px solid rgba(236,72,153,0.3)' : 'none',
+                          background: isActive ? 'linear-gradient(to right, rgba(236,72,153,0.2), rgba(168,85,247,0.2))' : 'transparent',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                        }}
+                      >
+                        <IconComponent style={{ width: '20px', height: '20px', color: isActive ? '#00d4ff' : 'rgba(255,255,255,0.6)' }} />
                         <div style={{ fontSize: '14px', fontWeight: 500, color: isActive ? 'white' : 'rgba(255,255,255,0.8)' }}>
-                          {item.labelKo}
+                          {item.labelVi}
                         </div>
-                        <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>{item.labelVi}</div>
-                      </div>
-                    </button>
-                  );
-                })}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* PWA Section */}
               <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                 <div style={{ padding: '0 8px', marginBottom: '8px' }}>
                   <span style={{ fontSize: '12px', fontWeight: 600, color: '#00d4ff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    앱 설치 / Cài đặt app
+                    📲 Cài đặt App
                   </span>
                 </div>
 
@@ -355,9 +350,8 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <Smartphone style={{ width: '20px', height: '20px', color: '#4ade80' }} />
-                    <div style={{ textAlign: 'left' }}>
-                      <div style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255,255,255,0.8)' }}>Android 설치</div>
-                      <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>Cài đặt trên Android</div>
+                    <div style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255,255,255,0.8)' }}>
+                      Cài đặt trên Android
                     </div>
                   </div>
                   <ChevronDown style={{ width: '16px', height: '16px', color: 'rgba(255,255,255,0.4)', transform: showAndroidGuide ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
@@ -391,9 +385,8 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <Apple style={{ width: '20px', height: '20px', color: 'rgba(255,255,255,0.8)' }} />
-                    <div style={{ textAlign: 'left' }}>
-                      <div style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255,255,255,0.8)' }}>iOS 설치</div>
-                      <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>Cài đặt trên iPhone</div>
+                    <div style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255,255,255,0.8)' }}>
+                      Cài đặt trên iPhone
                     </div>
                   </div>
                   <ChevronDown style={{ width: '16px', height: '16px', color: 'rgba(255,255,255,0.4)', transform: showIOSGuide ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />

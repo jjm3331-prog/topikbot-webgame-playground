@@ -142,15 +142,15 @@ const Dashboard = () => {
                   </div>
                   <h3 className="font-bold text-white text-xl tracking-tight">TOPIK 학습 허브</h3>
                   <p className="text-white/85 text-sm">
-                    어휘 • 문법 • 듣기 • 읽기 • 쓰기 + 7개 게임 학습
+                    Từ vựng • Ngữ pháp • Nghe • Đọc • Viết + 7 Game học tập
                   </p>
                 </div>
               </div>
               
               <div className="flex items-center gap-3">
                 <div className="hidden sm:flex flex-col items-end mr-2">
-                  <span className="text-[11px] text-white/80 font-medium">13개 학습 메뉴</span>
-                  <span className="text-[10px] text-white/60">AI 기반 맞춤 학습</span>
+                  <span className="text-[11px] text-white/80 font-medium">13 bài học</span>
+                  <span className="text-[10px] text-white/60">Học cùng AI</span>
                 </div>
                 <div className="w-11 h-11 rounded-full bg-white/25 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/35 transition-colors shadow-lg">
                   <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-0.5 transition-transform" />
