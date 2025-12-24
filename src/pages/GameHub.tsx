@@ -168,64 +168,58 @@ export default function GameHub() {
             </div>
           </motion.div>
 
-          {/* Game Cards Grid */}
+          {/* Game Cards Grid - Unified Style */}
           <motion.section
             variants={containerVariants}
             initial="hidden"
             animate="visible"
           >
-            {/* Top 4 games - larger cards */}
-            <div className="grid sm:grid-cols-2 gap-4 mb-4">
-              {gameMenus.slice(0, 4).map((menu) => (
-                <motion.div key={menu.id} variants={itemVariants}>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {gameMenus.map((menu, index) => (
+                <motion.div 
+                  key={menu.id} 
+                  variants={itemVariants}
+                  className={index < 4 ? "col-span-1" : "col-span-1"}
+                >
                   <Card
                     onClick={() => navigate(menu.path)}
-                    className={`relative overflow-hidden cursor-pointer group p-6 border ${menu.borderColor} hover:shadow-lg hover:scale-[1.02] transition-all duration-300`}
+                    className={`relative overflow-hidden cursor-pointer group h-full border ${menu.borderColor} hover:shadow-xl hover:scale-[1.03] transition-all duration-300`}
                   >
+                    {/* Gradient overlay on hover */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${menu.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+                    
                     {/* Hot badge */}
                     {menu.isHot && (
-                      <div className="absolute top-3 right-3">
-                        <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white text-[10px] px-2">
+                      <div className="absolute top-2 right-2 z-20">
+                        <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white text-[9px] px-1.5 py-0.5">
                           🔥 HOT
                         </Badge>
                       </div>
                     )}
 
-                    <div className="relative z-10 flex flex-col items-center text-center">
-                      {/* Emoji */}
-                      <span className="text-5xl mb-4 group-hover:scale-110 transition-transform">{menu.emoji}</span>
+                    <div className="relative z-10 p-5 flex flex-col items-center text-center h-full">
+                      {/* Emoji with glow effect */}
+                      <div className="relative mb-3">
+                        <span className="text-4xl group-hover:scale-125 transition-transform duration-300 block">{menu.emoji}</span>
+                        <div className={`absolute inset-0 blur-xl opacity-0 group-hover:opacity-50 transition-opacity bg-gradient-to-br ${menu.color}`} />
+                      </div>
                       
                       {/* Title */}
-                      <h3 className="font-bold text-foreground text-lg mb-1">{menu.title}</h3>
-                      <p className="text-sm text-muted-foreground mb-3">{menu.subtitle}</p>
+                      <h3 className="font-bold text-foreground text-base mb-0.5">{menu.title}</h3>
+                      <p className="text-[11px] text-muted-foreground mb-2">{menu.subtitle}</p>
 
-                      {/* Description */}
-                      <p className="text-xs text-muted-foreground line-clamp-2">{menu.description}</p>
-                    </div>
-
-                    {/* Arrow */}
-                    <div className="absolute bottom-4 right-4">
-                      <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                    </div>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Bottom 3 games - smaller cards */}
-            <div className="grid grid-cols-3 gap-4">
-              {gameMenus.slice(4).map((menu) => (
-                <motion.div key={menu.id} variants={itemVariants}>
-                  <Card
-                    onClick={() => navigate(menu.path)}
-                    className={`relative overflow-hidden cursor-pointer group p-4 border ${menu.borderColor} hover:shadow-lg hover:scale-[1.02] transition-all duration-300`}
-                  >
-                    <div className="relative z-10 flex flex-col items-center text-center">
-                      {/* Emoji */}
-                      <span className="text-3xl mb-2 group-hover:scale-110 transition-transform">{menu.emoji}</span>
+                      {/* Description - hidden on mobile for cleaner look */}
+                      <p className="text-[10px] text-muted-foreground/80 line-clamp-2 hidden sm:block flex-1">
+                        {menu.description}
+                      </p>
                       
-                      {/* Title */}
-                      <h3 className="font-bold text-foreground text-sm">{menu.title}</h3>
+                      {/* Play button indicator */}
+                      <div className="mt-3 w-full">
+                        <div className={`flex items-center justify-center gap-1 py-1.5 rounded-full bg-gradient-to-r ${menu.color} opacity-0 group-hover:opacity-100 transition-all duration-300`}>
+                          <span className="text-white text-[10px] font-semibold">Chơi ngay</span>
+                          <ChevronRight className="w-3 h-3 text-white" />
+                        </div>
+                      </div>
                     </div>
                   </Card>
                 </motion.div>
