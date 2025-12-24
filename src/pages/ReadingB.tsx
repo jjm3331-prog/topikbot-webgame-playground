@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import CleanHeader from "@/components/CleanHeader";
@@ -15,6 +15,8 @@ import {
   Trophy,
   Sparkles,
   ChevronRight,
+  Loader2,
+  RefreshCw
 } from "lucide-react";
 
 interface Question {
@@ -27,216 +29,76 @@ interface Question {
   explanationVi: string;
 }
 
-// Tab categories with their questions - PDF 레퍼런스 수준의 고품질 한-베 병기 해설
+// Tab categories - 정적 데이터는 fallback용
 const tabCategories = {
   arrangement: {
     label: "문장배열",
     sublabel: "Sắp xếp câu",
     emoji: "🔢",
-    questions: [
-      {
-        id: 1,
-        passage: "(가) 그래서 우산을 가져갔습니다.\n(나) 아침에 일어났습니다.\n(다) 밖에 비가 오고 있었습니다.\n(라) 회사에 갈 준비를 했습니다.",
-        question: "순서대로 배열하세요.",
-        options: ["(나)-(라)-(다)-(가)", "(나)-(다)-(가)-(라)", "(다)-(나)-(라)-(가)", "(라)-(나)-(다)-(가)"],
-        answer: 0,
-        explanationKo: "정답: ① (나)-(라)-(다)-(가)\n\n문장 배열의 핵심은 '시간 순서'와 '인과관계'입니다.\n\n(나) 아침에 일어났습니다 → 하루의 시작\n(라) 회사에 갈 준비를 했습니다 → 일어난 후 준비\n(다) 밖에 비가 오고 있었습니다 → 준비 중 발견한 상황\n(가) 그래서 우산을 가져갔습니다 → '그래서'가 앞 문장의 결과를 나타냄\n\n'그래서'는 원인-결과를 연결하는 접속부사이므로, 비가 오는 상황(다) 뒤에 우산을 가져감(가)이 와야 합니다.",
-        explanationVi: "Đáp án: ① (나)-(라)-(다)-(가)\n\nĐiểm chính của sắp xếp câu là 'trình tự thời gian' và 'quan hệ nhân quả'.\n\n(나) 아침에 일어났습니다 → Bắt đầu ngày mới\n(라) 회사에 갈 준비를 했습니다 → Chuẩn bị sau khi thức dậy\n(다) 밖에 비가 오고 있었습니다 → Phát hiện tình huống khi chuẩn bị\n(가) 그래서 우산을 가져갔습니다 → '그래서' (vì vậy) chỉ kết quả của câu trước\n\n'그래서' là trạng từ liên kết nguyên nhân-kết quả, nên sau tình huống trời mưa (다) phải là việc mang ô (가).",
-      },
-      {
-        id: 2,
-        passage: "(가) 맛있게 먹었습니다.\n(나) 식당에 도착했습니다.\n(다) 친구와 약속을 했습니다.\n(라) 비빔밥을 주문했습니다.",
-        question: "순서대로 배열하세요.",
-        options: ["(다)-(나)-(라)-(가)", "(나)-(다)-(가)-(라)", "(다)-(가)-(나)-(라)", "(라)-(다)-(나)-(가)"],
-        answer: 0,
-        explanationKo: "정답: ① (다)-(나)-(라)-(가)\n\n식당에서 식사하는 과정의 자연스러운 시간 순서입니다.\n\n(다) 친구와 약속을 했습니다 → 가장 먼저 일어나는 사건 (약속)\n(나) 식당에 도착했습니다 → 약속 장소 도착\n(라) 비빔밥을 주문했습니다 → 도착 후 주문\n(가) 맛있게 먹었습니다 → 최종 행동\n\n식당 이용 순서: 약속 → 도착 → 주문 → 식사",
-        explanationVi: "Đáp án: ① (다)-(나)-(라)-(가)\n\nĐây là trình tự thời gian tự nhiên của quá trình dùng bữa tại nhà hàng.\n\n(다) 친구와 약속을 했습니다 → Sự kiện xảy ra đầu tiên (hẹn)\n(나) 식당에 도착했습니다 → Đến địa điểm hẹn\n(라) 비빔밥을 주문했습니다 → Gọi món sau khi đến\n(가) 맛있게 먹었습니다 → Hành động cuối cùng\n\nTrình tự sử dụng nhà hàng: Hẹn → Đến → Gọi món → Ăn",
-      },
-      {
-        id: 3,
-        passage: "(가) 그래서 커피를 마셨습니다.\n(나) 오늘 아침 일찍 일어났습니다.\n(다) 피곤해서 졸렸습니다.\n(라) 학교에 가서 수업을 들었습니다.",
-        question: "순서대로 배열하세요.",
-        options: ["(나)-(라)-(다)-(가)", "(나)-(다)-(가)-(라)", "(다)-(나)-(라)-(가)", "(라)-(나)-(다)-(가)"],
-        answer: 0,
-        explanationKo: "정답: ① (나)-(라)-(다)-(가)\n\n시간 순서와 인과관계를 함께 고려해야 합니다.\n\n(나) 오늘 아침 일찍 일어났습니다 → 하루 시작\n(라) 학교에 가서 수업을 들었습니다 → 일과 진행\n(다) 피곤해서 졸렸습니다 → 일찍 일어난 결과로 피곤함\n(가) 그래서 커피를 마셨습니다 → 졸림에 대한 해결책\n\n'그래서'가 (다)의 '졸렸습니다'에 대한 결과를 나타냅니다.",
-        explanationVi: "Đáp án: ① (나)-(라)-(다)-(가)\n\nCần xem xét cả trình tự thời gian và quan hệ nhân quả.\n\n(나) 오늘 아침 일찍 일어났습니다 → Bắt đầu ngày\n(라) 학교에 가서 수업을 들었습니다 → Tiến hành công việc\n(다) 피곤해서 졸렸습니다 → Mệt mỏi do dậy sớm\n(가) 그래서 커피를 마셨습니다 → Giải pháp cho cơn buồn ngủ\n\n'그래서' chỉ kết quả của '졸렸습니다' (buồn ngủ) ở câu (다).",
-      },
-      {
-        id: 4,
-        passage: "(가) 그래서 병원에 갔습니다.\n(나) 약을 먹고 쉬었습니다.\n(다) 어제부터 머리가 아팠습니다.\n(라) 의사에게 진찰을 받았습니다.",
-        question: "순서대로 배열하세요.",
-        options: ["(다)-(가)-(라)-(나)", "(가)-(다)-(나)-(라)", "(나)-(다)-(가)-(라)", "(라)-(가)-(다)-(나)"],
-        answer: 0,
-        explanationKo: "정답: ① (다)-(가)-(라)-(나)\n\n병원 방문 과정의 자연스러운 순서입니다.\n\n(다) 어제부터 머리가 아팠습니다 → 원인/배경 설명\n(가) 그래서 병원에 갔습니다 → '그래서'로 인과관계 연결\n(라) 의사에게 진찰을 받았습니다 → 병원에서의 행동\n(나) 약을 먹고 쉬었습니다 → 진찰 후 조치\n\n병원 이용 순서: 증상 → 방문 → 진찰 → 약 복용",
-        explanationVi: "Đáp án: ① (다)-(가)-(라)-(나)\n\nĐây là trình tự tự nhiên của quá trình đi khám bệnh.\n\n(다) 어제부터 머리가 아팠습니다 → Giải thích nguyên nhân/bối cảnh\n(가) 그래서 병원에 갔습니다 → Kết nối nhân quả bằng '그래서'\n(라) 의사에게 진찰을 받았습니다 → Hành động tại bệnh viện\n(나) 약을 먹고 쉬었습니다 → Biện pháp sau khám\n\nTrình tự đi bệnh viện: Triệu chứng → Đến → Khám → Uống thuốc",
-      },
-      {
-        id: 5,
-        passage: "(가) 선물을 사러 백화점에 갔습니다.\n(나) 다음 주가 어머니 생신입니다.\n(다) 예쁜 가방을 골랐습니다.\n(라) 포장을 해서 집에 가져왔습니다.",
-        question: "순서대로 배열하세요.",
-        options: ["(나)-(가)-(다)-(라)", "(가)-(나)-(다)-(라)", "(다)-(나)-(가)-(라)", "(라)-(가)-(나)-(다)"],
-        answer: 0,
-        explanationKo: "정답: ① (나)-(가)-(다)-(라)\n\n선물 구매 과정의 논리적 순서입니다.\n\n(나) 다음 주가 어머니 생신입니다 → 배경/이유 설명\n(가) 선물을 사러 백화점에 갔습니다 → 목적과 장소\n(다) 예쁜 가방을 골랐습니다 → 구매 행위\n(라) 포장을 해서 집에 가져왔습니다 → 최종 완료\n\n쇼핑 순서: 이유 → 방문 → 선택 → 구매/포장",
-        explanationVi: "Đáp án: ① (나)-(가)-(다)-(라)\n\nĐây là trình tự logic của quá trình mua quà.\n\n(나) 다음 주가 어머니 생신입니다 → Giải thích bối cảnh/lý do\n(가) 선물을 사러 백화점에 갔습니다 → Mục đích và địa điểm\n(다) 예쁜 가방을 골랐습니다 → Hành động mua\n(라) 포장을 해서 집에 가져왔습니다 → Hoàn thành cuối cùng\n\nTrình tự mua sắm: Lý do → Đến → Chọn → Mua/Đóng gói",
-      },
-    ],
   },
   inference: {
     label: "빈칸추론",
     sublabel: "Suy luận điền chỗ trống",
     emoji: "🧠",
-    questions: [
-      {
-        id: 1,
-        passage: "한국에서는 설날에 떡국을 먹습니다. 떡국을 먹으면 한 살을 더 먹는다고 합니다. 그래서 아이들은 설날이 되면 ( ).",
-        question: "빈칸에 들어갈 알맞은 것을 고르세요.",
-        options: ["떡국을 먹고 싶어합니다", "떡국을 싫어합니다", "학교에 갑니다", "친구를 만납니다"],
-        answer: 0,
-        explanationKo: "정답: ① 떡국을 먹고 싶어합니다\n\n추론의 핵심은 문맥에서 논리적 결론을 도출하는 것입니다.\n\n전제 1: 떡국을 먹으면 한 살을 더 먹는다\n전제 2: 아이들은 빨리 어른이 되고 싶어한다 (일반적 상식)\n결론: 아이들은 나이를 먹기 위해 떡국을 먹고 싶어한다\n\n오답 분석:\n② 싫어합니다: 문맥과 반대\n③ 학교에 갑니다: 설날과 관련 없음\n④ 친구를 만납니다: 떡국과 관련 없음",
-        explanationVi: "Đáp án: ① 떡국을 먹고 싶어합니다 (Muốn ăn canh bánh gạo)\n\nĐiểm chính của suy luận là rút ra kết luận logic từ ngữ cảnh.\n\nTiền đề 1: Ăn canh bánh gạo thì thêm một tuổi\nTiền đề 2: Trẻ em muốn nhanh lớn (kiến thức chung)\nKết luận: Trẻ em muốn ăn canh bánh gạo để thêm tuổi\n\nPhân tích đáp án sai:\n② 싫어합니다: Ngược với ngữ cảnh\n③ 학교에 갑니다: Không liên quan đến Tết\n④ 친구를 만납니다: Không liên quan đến canh bánh gạo",
-      },
-      {
-        id: 2,
-        passage: "요즘 사람들은 건강을 위해 운동을 많이 합니다. 특히 아침에 공원에서 달리기를 하는 사람이 많습니다. 왜냐하면 ( ).",
-        question: "빈칸에 들어갈 알맞은 것을 고르세요.",
-        options: ["아침 공기가 상쾌하기 때문입니다", "공원이 멀기 때문입니다", "운동을 싫어하기 때문입니다", "밤에 일하기 때문입니다"],
-        answer: 0,
-        explanationKo: "정답: ① 아침 공기가 상쾌하기 때문입니다\n\n'왜냐하면'은 이유를 설명하는 표현입니다. 아침에 운동하는 긍정적 이유를 찾아야 합니다.\n\n아침 운동의 장점: 공기가 맑고 상쾌함, 하루를 활기차게 시작\n\n오답 분석:\n② 공원이 멀기 때문입니다: 운동하지 않을 이유\n③ 운동을 싫어하기 때문입니다: 문맥과 완전히 반대\n④ 밤에 일하기 때문입니다: 논리적 연결 없음",
-        explanationVi: "Đáp án: ① 아침 공기가 상쾌하기 때문입니다 (Vì không khí buổi sáng trong lành)\n\n'왜냐하면' là biểu hiện giải thích lý do. Cần tìm lý do tích cực để tập thể dục buổi sáng.\n\nƯu điểm tập buổi sáng: Không khí trong lành, bắt đầu ngày mới tràn đầy năng lượng\n\nPhân tích đáp án sai:\n② 공원이 멀기 때문입니다: Lý do không tập thể dục\n③ 운동을 싫어하기 때문입니다: Hoàn toàn ngược với ngữ cảnh\n④ 밤에 일하기 때문입니다: Không có liên kết logic",
-      },
-      {
-        id: 3,
-        passage: "최근 온라인 쇼핑이 인기입니다. 집에서 편하게 물건을 주문할 수 있습니다. 하지만 직접 보지 않고 사기 때문에 ( ).",
-        question: "빈칸에 들어갈 알맞은 것을 고르세요.",
-        options: ["실패할 수도 있습니다", "항상 성공합니다", "가격이 비쌉니다", "배송이 빠릅니다"],
-        answer: 0,
-        explanationKo: "정답: ① 실패할 수도 있습니다\n\n'하지만'은 역접(대조)을 나타냅니다. 온라인 쇼핑의 장점 후에 단점이 와야 합니다.\n\n장점: 집에서 편하게 주문 가능\n단점: 직접 보지 않으므로 예상과 다를 수 있음 → 실패 가능성\n\n오답 분석:\n② 항상 성공합니다: 단점이 아닌 장점\n③ 가격이 비쌉니다: '직접 보지 않고'와 관련 없음\n④ 배송이 빠릅니다: 단점이 아닌 장점",
-        explanationVi: "Đáp án: ① 실패할 수도 있습니다 (Có thể thất bại)\n\n'하지만' (nhưng) chỉ sự đối lập. Sau ưu điểm của mua sắm trực tuyến phải là nhược điểm.\n\nƯu điểm: Có thể đặt hàng thoải mái tại nhà\nNhược điểm: Không nhìn trực tiếp nên có thể khác với mong đợi → Khả năng thất bại\n\nPhân tích đáp án sai:\n② 항상 성공합니다: Ưu điểm, không phải nhược điểm\n③ 가격이 비쌉니다: Không liên quan đến 'không nhìn trực tiếp'\n④ 배송이 빠릅니다: Ưu điểm, không phải nhược điểm",
-      },
-      {
-        id: 4,
-        passage: "한국어를 배우는 외국인이 많아졌습니다. 한국 드라마와 K-POP이 인기이기 때문입니다. 이들은 한국 문화를 더 잘 이해하기 위해 ( ).",
-        question: "빈칸에 들어갈 알맞은 것을 고르세요.",
-        options: ["한국어 공부를 합니다", "영어를 배웁니다", "일본에 갑니다", "음악을 듣지 않습니다"],
-        answer: 0,
-        explanationKo: "정답: ① 한국어 공부를 합니다\n\n문맥의 흐름을 따라가야 합니다.\n\n현상: 한국어를 배우는 외국인 증가\n이유: K-POP, 한국 드라마 인기\n목적: 한국 문화를 더 잘 이해하기 위해\n행동: 한국어 공부 (문맥과 일치)\n\n오답 분석:\n② 영어를 배웁니다: 한국 문화 이해와 관련 없음\n③ 일본에 갑니다: 한국과 관련 없음\n④ 음악을 듣지 않습니다: K-POP 인기와 모순",
-        explanationVi: "Đáp án: ① 한국어 공부를 합니다 (Học tiếng Hàn)\n\nCần theo dòng chảy của ngữ cảnh.\n\nHiện tượng: Tăng số người nước ngoài học tiếng Hàn\nLý do: K-POP, phim Hàn nổi tiếng\nMục đích: Để hiểu văn hóa Hàn Quốc tốt hơn\nHành động: Học tiếng Hàn (phù hợp ngữ cảnh)\n\nPhân tích đáp án sai:\n② 영어를 배웁니다: Không liên quan đến hiểu văn hóa Hàn\n③ 일본에 갑니다: Không liên quan đến Hàn Quốc\n④ 음악을 듣지 않습니다: Mâu thuẫn với K-POP nổi tiếng",
-      },
-      {
-        id: 5,
-        passage: "환경 보호가 중요해지면서 많은 회사들이 변화하고 있습니다. 플라스틱 대신 종이를 사용하고 있습니다. 이런 노력은 ( ).",
-        question: "빈칸에 들어갈 알맞은 것을 고르세요.",
-        options: ["지구를 지키는 데 도움이 됩니다", "돈을 낭비합니다", "환경을 오염시킵니다", "플라스틱을 늘립니다"],
-        answer: 0,
-        explanationKo: "정답: ① 지구를 지키는 데 도움이 됩니다\n\n문맥의 논리적 결론을 찾아야 합니다.\n\n배경: 환경 보호가 중요해짐\n행동: 플라스틱 대신 종이 사용\n결과: 환경 보호에 기여 → 지구를 지키는 데 도움\n\n오답 분석:\n② 돈을 낭비합니다: 긍정적 맥락에 맞지 않음\n③ 환경을 오염시킵니다: 환경 보호와 완전히 반대\n④ 플라스틱을 늘립니다: 플라스틱 대신 종이라고 함",
-        explanationVi: "Đáp án: ① 지구를 지키는 데 도움이 됩니다 (Giúp bảo vệ Trái Đất)\n\nCần tìm kết luận logic của ngữ cảnh.\n\nBối cảnh: Bảo vệ môi trường trở nên quan trọng\nHành động: Dùng giấy thay vì nhựa\nKết quả: Đóng góp bảo vệ môi trường → Giúp bảo vệ Trái Đất\n\nPhân tích đáp án sai:\n② 돈을 낭비합니다: Không phù hợp ngữ cảnh tích cực\n③ 환경을 오염시킵니다: Hoàn toàn ngược với bảo vệ môi trường\n④ 플라스틱을 늘립니다: Bài nói dùng giấy thay nhựa",
-      },
-    ],
   },
   paired: {
     label: "연계문제",
     sublabel: "Câu hỏi liên kết",
     emoji: "🔗",
-    questions: [
-      {
-        id: 1,
-        passage: "다음은 도서관 이용 안내입니다.\n\n📚 서울시립도서관\n• 운영시간: 평일 09:00-21:00, 주말 10:00-18:00\n• 휴관일: 매주 월요일, 공휴일\n• 대출: 1인 5권, 2주간\n• 반납 연체 시 연체일수만큼 대출 불가",
-        question: "이 도서관에 대한 설명으로 맞는 것은?",
-        options: ["월요일에는 이용할 수 없습니다", "주말에 더 오래 운영합니다", "책을 10권까지 빌릴 수 있습니다", "책을 1달간 빌릴 수 있습니다"],
-        answer: 0,
-        explanationKo: "정답: ① 월요일에는 이용할 수 없습니다\n\n안내문의 '휴관일: 매주 월요일, 공휴일'에서 월요일은 쉬는 날임을 확인할 수 있습니다.\n\n오답 분석:\n② 주말에 더 오래 운영합니다 → 평일 09:00-21:00 (12시간), 주말 10:00-18:00 (8시간)으로 평일이 더 김\n③ 책을 10권까지 빌릴 수 있습니다 → 1인 5권까지\n④ 책을 1달간 빌릴 수 있습니다 → 2주간",
-        explanationVi: "Đáp án: ① 월요일에는 이용할 수 없습니다 (Không thể sử dụng vào thứ Hai)\n\nTừ '휴관일: 매주 월요일, 공휴일' (Ngày nghỉ: Thứ Hai hàng tuần, ngày lễ) có thể xác nhận thứ Hai là ngày nghỉ.\n\nPhân tích đáp án sai:\n② 주말에 더 오래 운영합니다 → Ngày thường 09:00-21:00 (12 tiếng), cuối tuần 10:00-18:00 (8 tiếng), ngày thường dài hơn\n③ 책을 10권까지 빌릴 수 있습니다 → Tối đa 5 quyển/người\n④ 책을 1달간 빌릴 수 있습니다 → 2 tuần",
-      },
-      {
-        id: 2,
-        passage: "다음은 수영장 이용 규칙입니다.\n\n🏊 한강수영장\n• 수영모 착용 필수\n• 음식물 반입 금지\n• 샤워 후 입수\n• 이용시간: 50분 수영 / 10분 휴식",
-        question: "이 수영장을 이용하려면?",
-        options: ["수영모를 써야 합니다", "음식을 먹을 수 있습니다", "샤워하지 않아도 됩니다", "1시간 동안 계속 수영합니다"],
-        answer: 0,
-        explanationKo: "정답: ① 수영모를 써야 합니다\n\n안내문의 '수영모 착용 필수'에서 수영모가 필수임을 확인할 수 있습니다.\n\n오답 분석:\n② 음식을 먹을 수 있습니다 → '음식물 반입 금지'\n③ 샤워하지 않아도 됩니다 → '샤워 후 입수'\n④ 1시간 동안 계속 수영합니다 → 50분 수영 후 10분 휴식",
-        explanationVi: "Đáp án: ① 수영모를 써야 합니다 (Phải đội mũ bơi)\n\nTừ '수영모 착용 필수' (Bắt buộc đội mũ bơi) có thể xác nhận mũ bơi là bắt buộc.\n\nPhân tích đáp án sai:\n② 음식을 먹을 수 있습니다 → '음식물 반입 금지' (Cấm mang đồ ăn)\n③ 샤워하지 않아도 됩니다 → '샤워 후 입수' (Tắm trước khi xuống nước)\n④ 1시간 동안 계속 수영합니다 → Bơi 50 phút, nghỉ 10 phút",
-      },
-      {
-        id: 3,
-        passage: "다음은 전시회 안내문입니다.\n\n🎨 한국 현대미술전\n• 장소: 국립현대미술관\n• 기간: 2024.1.15 - 3.15\n• 입장료: 성인 5,000원, 학생 3,000원\n• 매주 수요일 무료 입장",
-        question: "이 전시회에 대한 설명으로 맞는 것은?",
-        options: ["수요일에 무료로 볼 수 있습니다", "입장료가 모두 같습니다", "1년 동안 합니다", "토요일에 무료입니다"],
-        answer: 0,
-        explanationKo: "정답: ① 수요일에 무료로 볼 수 있습니다\n\n안내문의 '매주 수요일 무료 입장'에서 수요일 무료임을 확인할 수 있습니다.\n\n오답 분석:\n② 입장료가 모두 같습니다 → 성인 5,000원, 학생 3,000원으로 다름\n③ 1년 동안 합니다 → 1.15-3.15로 약 2개월\n④ 토요일에 무료입니다 → 수요일에 무료",
-        explanationVi: "Đáp án: ① 수요일에 무료로 볼 수 있습니다 (Có thể xem miễn phí vào thứ Tư)\n\nTừ '매주 수요일 무료 입장' (Vào cửa miễn phí thứ Tư hàng tuần) có thể xác nhận thứ Tư miễn phí.\n\nPhân tích đáp án sai:\n② 입장료가 모두 같습니다 → Người lớn 5,000 won, học sinh 3,000 won - khác nhau\n③ 1년 동안 합니다 → 1.15-3.15 khoảng 2 tháng\n④ 토요일에 무료입니다 → Miễn phí thứ Tư, không phải thứ Bảy",
-      },
-      {
-        id: 4,
-        passage: "다음은 식당 메뉴판입니다.\n\n🍜 한식당 '맛나'\n• 비빔밥 8,000원\n• 된장찌개 7,000원\n• 불고기 15,000원\n• 공기밥 추가 1,000원\n※ 런치세트(11:00-14:00) 모든 메뉴 1,000원 할인",
-        question: "이 식당에 대한 설명으로 맞는 것은?",
-        options: ["점심시간에 할인을 받을 수 있습니다", "저녁에 할인됩니다", "비빔밥이 가장 비쌉니다", "밥을 무료로 추가합니다"],
-        answer: 0,
-        explanationKo: "정답: ① 점심시간에 할인을 받을 수 있습니다\n\n안내문의 '런치세트(11:00-14:00) 모든 메뉴 1,000원 할인'에서 점심시간 할인을 확인할 수 있습니다.\n\n오답 분석:\n② 저녁에 할인됩니다 → 런치세트(점심)만 할인\n③ 비빔밥이 가장 비쌉니다 → 불고기 15,000원이 가장 비쌈\n④ 밥을 무료로 추가합니다 → 공기밥 추가 1,000원",
-        explanationVi: "Đáp án: ① 점심시간에 할인을 받을 수 있습니다 (Có thể được giảm giá vào giờ trưa)\n\nTừ '런치세트(11:00-14:00) 모든 메뉴 1,000원 할인' (Set trưa giảm 1,000 won cho tất cả món) có thể xác nhận giảm giá giờ trưa.\n\nPhân tích đáp án sai:\n② 저녁에 할인됩니다 → Chỉ set trưa được giảm giá\n③ 비빔밥이 가장 비쌉니다 → Bulgogi 15,000 won là đắt nhất\n④ 밥을 무료로 추가합니다 → Thêm cơm 1,000 won",
-      },
-      {
-        id: 5,
-        passage: "다음은 영화관 상영 시간표입니다.\n\n🎬 CGV 강남\n'한국의 봄' (드라마, 120분)\n• 10:30 / 13:00 / 15:30 / 18:00 / 20:30\n※ 조조할인(첫 회) 2,000원 할인\n※ 화요일 전 회차 50% 할인",
-        question: "이 영화관에 대한 설명으로 맞는 것은?",
-        options: ["화요일에 반값으로 볼 수 있습니다", "영화가 2시간 30분입니다", "저녁에만 상영합니다", "모든 요일 조조할인입니다"],
-        answer: 0,
-        explanationKo: "정답: ① 화요일에 반값으로 볼 수 있습니다\n\n안내문의 '화요일 전 회차 50% 할인'에서 화요일 반값 할인을 확인할 수 있습니다. 50% = 반값\n\n오답 분석:\n② 영화가 2시간 30분입니다 → 120분 = 2시간\n③ 저녁에만 상영합니다 → 10:30부터 상영\n④ 모든 요일 조조할인입니다 → 조조할인은 첫 회(10:30)만, 요일 언급 없음",
-        explanationVi: "Đáp án: ① 화요일에 반값으로 볼 수 있습니다 (Có thể xem nửa giá vào thứ Ba)\n\nTừ '화요일 전 회차 50% 할인' (Thứ Ba giảm 50% tất cả suất) có thể xác nhận giảm nửa giá thứ Ba. 50% = nửa giá\n\nPhân tích đáp án sai:\n② 영화가 2시간 30분입니다 → 120 phút = 2 tiếng\n③ 저녁에만 상영합니다 → Chiếu từ 10:30\n④ 모든 요일 조조할인입니다 → Giảm giá buổi sớm chỉ suất đầu (10:30), không đề cập ngày",
-      },
-    ],
   },
-  comprehensive: {
-    label: "종합 독해",
-    sublabel: "Đọc hiểu tổng hợp",
+  long: {
+    label: "장문독해",
+    sublabel: "Đọc hiểu dài",
     emoji: "📖",
-    questions: [
-      {
-        id: 1,
-        passage: "한국의 전통 음식 중 하나인 김치는 발효 식품입니다. 배추나 무에 고춧가루, 마늘, 젓갈 등을 넣어 만듭니다. 김치는 비타민과 유산균이 풍부해서 건강에 좋습니다. 한국 사람들은 거의 매끼 김치를 먹습니다. 최근에는 외국에서도 김치를 먹는 사람이 많아졌습니다.",
-        question: "이 글을 읽고 알 수 있는 것은?",
-        options: ["김치는 건강에 좋은 음식입니다", "한국 사람은 김치를 싫어합니다", "김치에 설탕이 많이 들어갑니다", "외국 사람은 김치를 먹지 않습니다"],
-        answer: 0,
-        explanationKo: "정답: ① 김치는 건강에 좋은 음식입니다\n\n글에서 '김치는 비타민과 유산균이 풍부해서 건강에 좋습니다'라고 직접 언급하고 있습니다.\n\n오답 분석:\n② 한국 사람은 김치를 싫어합니다 → '거의 매끼 김치를 먹습니다'로 반대\n③ 김치에 설탕이 많이 들어갑니다 → 재료로 고춧가루, 마늘, 젓갈 언급\n④ 외국 사람은 김치를 먹지 않습니다 → '외국에서도 김치를 먹는 사람이 많아졌습니다'로 반대",
-        explanationVi: "Đáp án: ① 김치는 건강에 좋은 음식입니다 (Kim chi là thực phẩm tốt cho sức khỏe)\n\nTrong bài trực tiếp đề cập '김치는 비타민과 유산균이 풍부해서 건강에 좋습니다' (Kim chi giàu vitamin và lợi khuẩn nên tốt cho sức khỏe).\n\nPhân tích đáp án sai:\n② 한국 사람은 김치를 싫어합니다 → Ngược lại với 'ăn kim chi gần như mỗi bữa'\n③ 김치에 설탕이 많이 들어갑니다 → Nguyên liệu được đề cập là ớt bột, tỏi, mắm\n④ 외국 사람은 김치를 먹지 않습니다 → Ngược lại với 'người nước ngoài ăn kim chi ngày càng nhiều'",
-      },
-      {
-        id: 2,
-        passage: "서울은 한국의 수도이고 인구가 가장 많은 도시입니다. 서울에는 경복궁, 남산타워, 한강 등 관광지가 많습니다. 대중교통이 발달해서 지하철과 버스로 어디든 갈 수 있습니다. 서울은 전통과 현대가 함께 있는 도시입니다.",
-        question: "서울에 대한 설명으로 맞는 것은?",
-        options: ["대중교통이 편리합니다", "인구가 가장 적습니다", "관광지가 없습니다", "전통만 있는 도시입니다"],
-        answer: 0,
-        explanationKo: "정답: ① 대중교통이 편리합니다\n\n글에서 '대중교통이 발달해서 지하철과 버스로 어디든 갈 수 있습니다'라고 설명하고 있습니다. '발달했다' = '편리하다'\n\n오답 분석:\n② 인구가 가장 적습니다 → '인구가 가장 많은 도시'\n③ 관광지가 없습니다 → 경복궁, 남산타워, 한강 등 언급\n④ 전통만 있는 도시입니다 → '전통과 현대가 함께 있는 도시'",
-        explanationVi: "Đáp án: ① 대중교통이 편리합니다 (Giao thông công cộng tiện lợi)\n\nTrong bài giải thích '대중교통이 발달해서 지하철과 버스로 어디든 갈 수 있습니다' (Giao thông công cộng phát triển nên có thể đi bất cứ đâu bằng tàu điện ngầm và xe buýt). '발달했다' = '편리하다' (tiện lợi)\n\nPhân tích đáp án sai:\n② 인구가 가장 적습니다 → 'Thành phố đông dân nhất'\n③ 관광지가 없습니다 → Đề cập Gyeongbokgung, tháp Namsan, sông Hàn\n④ 전통만 있는 도시입니다 → 'Thành phố có cả truyền thống và hiện đại'",
-      },
-      {
-        id: 3,
-        passage: "한국에서는 설날과 추석이 가장 큰 명절입니다. 설날에는 떡국을 먹고 세배를 합니다. 추석에는 송편을 만들고 성묘를 합니다. 명절에는 가족들이 모여 함께 시간을 보냅니다. 요즘은 해외여행을 가는 사람도 많아졌습니다.",
-        question: "한국의 명절에 대한 설명으로 맞는 것은?",
-        options: ["가족이 함께 모입니다", "혼자 보내는 날입니다", "설날에 송편을 먹습니다", "추석에 세배를 합니다"],
-        answer: 0,
-        explanationKo: "정답: ① 가족이 함께 모입니다\n\n글에서 '명절에는 가족들이 모여 함께 시간을 보냅니다'라고 직접 언급하고 있습니다.\n\n오답 분석:\n② 혼자 보내는 날입니다 → '가족들이 모여'로 반대\n③ 설날에 송편을 먹습니다 → 설날은 떡국, 송편은 추석\n④ 추석에 세배를 합니다 → 세배는 설날, 추석은 성묘",
-        explanationVi: "Đáp án: ① 가족이 함께 모입니다 (Gia đình tụ họp cùng nhau)\n\nTrong bài trực tiếp đề cập '명절에는 가족들이 모여 함께 시간을 보냅니다' (Ngày lễ gia đình tụ họp và dành thời gian cùng nhau).\n\nPhân tích đáp án sai:\n② 혼자 보내는 날입니다 → Ngược lại với 'gia đình tụ họp'\n③ 설날에 송편을 먹습니다 → Tết ăn canh bánh gạo, Songpyeon là Chuseok\n④ 추석에 세배를 합니다 → Sebae là Tết, Chuseok là viếng mộ",
-      },
-      {
-        id: 4,
-        passage: "한국어를 배우는 외국인이 매년 증가하고 있습니다. K-POP과 한국 드라마가 세계적으로 인기를 얻으면서 한국 문화에 대한 관심도 높아졌습니다. 많은 사람들이 자막 없이 드라마를 보고 싶어서 한국어를 공부합니다. 한국어 시험인 TOPIK 응시자도 급증했습니다.",
-        question: "이 글의 주요 내용은?",
-        options: ["한국어 학습자가 증가하는 이유", "K-POP 가수 소개", "한국 드라마 추천", "TOPIK 시험 일정"],
-        answer: 0,
-        explanationKo: "정답: ① 한국어 학습자가 증가하는 이유\n\n글의 구조: 현상(한국어 학습자 증가) → 이유(K-POP, 드라마 인기) → 목적(자막 없이 보기) → 결과(TOPIK 응시자 급증)\n\n전체 흐름이 '왜 한국어를 배우는 사람이 늘었는가'를 설명하고 있습니다.\n\n오답 분석:\n② K-POP 가수 소개 → 가수에 대한 구체적 언급 없음\n③ 한국 드라마 추천 → 추천이 아닌 인기의 영향 설명\n④ TOPIK 시험 일정 → 일정에 대한 언급 없음",
-        explanationVi: "Đáp án: ① 한국어 학습자가 증가하는 이유 (Lý do người học tiếng Hàn tăng)\n\nCấu trúc bài: Hiện tượng (người học tiếng Hàn tăng) → Lý do (K-POP, phim Hàn nổi tiếng) → Mục đích (xem phim không phụ đề) → Kết quả (thí sinh TOPIK tăng vọt)\n\nToàn bộ dòng chảy giải thích 'tại sao người học tiếng Hàn tăng'.\n\nPhân tích đáp án sai:\n② K-POP 가수 소개 → Không đề cập cụ thể về ca sĩ\n③ 한국 드라마 추천 → Giải thích ảnh hưởng của sự nổi tiếng, không phải gợi ý\n④ TOPIK 시험 일정 → Không đề cập lịch thi",
-      },
-      {
-        id: 5,
-        passage: "최근 재택근무를 하는 회사가 늘어나고 있습니다. 코로나19 이후 많은 회사들이 재택근무 시스템을 도입했습니다. 재택근무를 하면 출퇴근 시간을 절약할 수 있습니다. 하지만 업무와 휴식의 구분이 어렵다는 단점도 있습니다. 앞으로 재택근무와 출근을 함께 하는 하이브리드 근무가 늘어날 것입니다.",
-        question: "재택근무에 대한 설명으로 맞지 않는 것은?",
-        options: ["단점이 전혀 없습니다", "출퇴근 시간을 줄일 수 있습니다", "코로나19 이후 많아졌습니다", "하이브리드 근무가 늘어날 것입니다"],
-        answer: 0,
-        explanationKo: "정답: ① 단점이 전혀 없습니다 (맞지 않는 것)\n\n이 문제는 '맞지 않는 것'을 고르는 문제입니다.\n\n글에서 '업무와 휴식의 구분이 어렵다는 단점도 있습니다'라고 단점을 언급했으므로, '단점이 전혀 없다'는 글의 내용과 다릅니다.\n\n다른 선택지 분석 (모두 글 내용과 일치):\n② 출퇴근 시간을 줄일 수 있습니다 ✓\n③ 코로나19 이후 많아졌습니다 ✓\n④ 하이브리드 근무가 늘어날 것입니다 ✓",
-        explanationVi: "Đáp án: ① 단점이 전혀 없습니다 (Hoàn toàn không có nhược điểm) - đây là đáp án KHÔNG ĐÚNG\n\nĐây là câu hỏi chọn đáp án 'không đúng'.\n\nTrong bài đề cập '업무와 휴식의 구분이 어렵다는 단점도 있습니다' (Có nhược điểm là khó phân biệt công việc và nghỉ ngơi), nên 'hoàn toàn không có nhược điểm' khác với nội dung bài.\n\nPhân tích các đáp án khác (đều khớp với nội dung bài):\n② 출퇴근 시간을 줄일 수 있습니다 ✓\n③ 코로나19 이후 많아졌습니다 ✓\n④ 하이브리드 근무가 늘어날 것입니다 ✓",
-      },
-    ],
   },
+};
+
+// Fallback questions
+const fallbackQuestions: Record<string, Question[]> = {
+  arrangement: [
+    {
+      id: 1,
+      passage: "(가) 그래서 우산을 가져갔습니다.\n(나) 아침에 일어났습니다.\n(다) 밖에 비가 오고 있었습니다.\n(라) 회사에 갈 준비를 했습니다.",
+      question: "순서대로 배열하세요.",
+      options: ["(나)-(라)-(다)-(가)", "(나)-(다)-(가)-(라)", "(다)-(나)-(라)-(가)", "(라)-(나)-(다)-(가)"],
+      answer: 0,
+      explanationKo: "정답: ① (나)-(라)-(다)-(가)\n\n시간 순서와 인과관계를 따릅니다.",
+      explanationVi: "Đáp án: ① (나)-(라)-(다)-(가)\n\nTheo trình tự thời gian và quan hệ nhân quả.",
+    },
+  ],
+  inference: [
+    {
+      id: 1,
+      passage: "한국에서는 설날에 떡국을 먹습니다. 떡국을 먹으면 한 살을 더 먹는다고 합니다. 그래서 아이들은 설날이 되면 ( ).",
+      question: "빈칸에 들어갈 알맞은 것을 고르세요.",
+      options: ["떡국을 먹고 싶어합니다", "떡국을 싫어합니다", "학교에 갑니다", "친구를 만납니다"],
+      answer: 0,
+      explanationKo: "정답: ① 떡국을 먹고 싶어합니다\n\n아이들은 나이를 먹기 위해 떡국을 먹고 싶어합니다.",
+      explanationVi: "Đáp án: ① 떡국을 먹고 싶어합니다\n\nTrẻ em muốn ăn canh bánh gạo để thêm tuổi.",
+    },
+  ],
+  paired: [
+    {
+      id: 1,
+      passage: "📚 서울시립도서관\n• 운영시간: 평일 09:00-21:00\n• 휴관일: 매주 월요일",
+      question: "이 도서관에 대한 설명으로 맞는 것은?",
+      options: ["월요일에는 이용할 수 없습니다", "주말에만 운영합니다", "24시간 운영합니다", "화요일에 쉽니다"],
+      answer: 0,
+      explanationKo: "정답: ① 월요일에는 이용할 수 없습니다\n\n휴관일이 매주 월요일입니다.",
+      explanationVi: "Đáp án: ① 월요일에는 이용할 수 없습니다\n\nNgày nghỉ là thứ Hai hàng tuần.",
+    },
+  ],
+  long: [
+    {
+      id: 1,
+      passage: "최근 한국에서는 1인 가구가 빠르게 증가하고 있습니다. 특히 젊은 층에서 혼자 사는 것을 선호하는 경향이 나타나고 있습니다.",
+      question: "이 글의 내용과 일치하는 것은?",
+      options: ["1인 가구가 늘어나고 있습니다", "가족과 함께 사는 것이 유행입니다", "노년층이 혼자 살기를 원합니다", "1인 가구가 줄어들고 있습니다"],
+      answer: 0,
+      explanationKo: "정답: ① 1인 가구가 늘어나고 있습니다\n\n글에서 1인 가구가 빠르게 증가한다고 했습니다.",
+      explanationVi: "Đáp án: ① 1인 가구가 늘어나고 있습니다\n\nBài viết nói rằng hộ gia đình 1 người đang tăng nhanh.",
+    },
+  ],
 };
 
 type TabKey = keyof typeof tabCategories;
@@ -251,6 +113,28 @@ const ReadingB = () => {
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [isQuizComplete, setIsQuizComplete] = useState(false);
+  const [questions, setQuestions] = useState<Question[]>(fallbackQuestions.arrangement);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchQuestions = useCallback(async (tabType: string) => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('reading-content', {
+        body: { type: 'readingB', tabType, count: 5 }
+      });
+      if (error) throw error;
+      if (data?.questions && data.questions.length > 0) {
+        setQuestions(data.questions);
+      } else {
+        setQuestions(fallbackQuestions[tabType] || fallbackQuestions.arrangement);
+      }
+    } catch (error) {
+      console.error('Error fetching questions:', error);
+      setQuestions(fallbackQuestions[tabType] || fallbackQuestions.arrangement);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -260,9 +144,12 @@ const ReadingB = () => {
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    fetchQuestions(activeTab);
+  }, [activeTab, fetchQuestions]);
+
   const currentCategory = tabCategories[activeTab];
-  const currentQuestions = currentCategory.questions;
-  const currentQuestion = currentQuestions[currentQuestionIndex];
+  const currentQuestion = questions[currentQuestionIndex];
 
   const handleTabChange = (tab: TabKey) => {
     setActiveTab(tab);
@@ -280,21 +167,17 @@ const ReadingB = () => {
 
   const handleSubmit = () => {
     if (selectedAnswer === null) {
-      toast({
-        title: "Vui lòng chọn đáp án",
-        variant: "destructive",
-      });
+      toast({ title: "Vui lòng chọn đáp án", variant: "destructive" });
       return;
     }
-
     setShowResult(true);
-    if (selectedAnswer === currentQuestion.answer) {
+    if (currentQuestion && selectedAnswer === currentQuestion.answer) {
       setScore(prev => prev + 1);
     }
   };
 
   const handleNext = () => {
-    if (currentQuestionIndex < currentQuestions.length - 1) {
+    if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
       setSelectedAnswer(null);
       setShowResult(false);
@@ -304,6 +187,7 @@ const ReadingB = () => {
   };
 
   const handleRestart = () => {
+    fetchQuestions(activeTab);
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);
     setShowResult(false);

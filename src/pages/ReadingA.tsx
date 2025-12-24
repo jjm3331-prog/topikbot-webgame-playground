@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import CleanHeader from "@/components/CleanHeader";
@@ -15,7 +15,8 @@ import {
   Trophy,
   Sparkles,
   ChevronRight,
-  Loader2
+  Loader2,
+  RefreshCw
 } from "lucide-react";
 
 interface Question {
@@ -28,268 +29,76 @@ interface Question {
   explanationVi: string;
 }
 
-// Tab categories with their questions - PDF 레퍼런스 수준의 고품질 한-베 병기 해설
+// Tab categories - 정적 데이터는 fallback용
 const tabCategories = {
   grammar: {
     label: "빈칸 문법",
     sublabel: "Ngữ pháp điền chỗ trống",
     emoji: "📝",
-    questions: [
-      {
-        id: 1,
-        passage: "저는 매일 아침 7시에 일어나서 운동( ) 합니다.",
-        question: "빈칸에 들어갈 알맞은 것을 고르세요.",
-        options: ["을", "를", "이", "가"],
-        answer: 0,
-        explanationKo: "정답: ① 을\n\n'운동'은 받침이 있는 명사이므로 목적격 조사 '을'이 맞습니다. 목적격 조사 '을/를'은 동작의 대상을 나타내며, 받침이 있는 명사 뒤에는 '을', 받침이 없는 명사 뒤에는 '를'을 사용합니다.\n\n오답 분석:\n② 를: 받침이 없는 명사 뒤에 사용 (예: 노래를)\n③ 이: 주격 조사로 받침 있는 명사 뒤에 사용\n④ 가: 주격 조사로 받침 없는 명사 뒤에 사용",
-        explanationVi: "Đáp án: ① 을\n\n'운동' (vận động) là danh từ có patchim nên phải dùng trợ từ tân ngữ '을'. Trợ từ tân ngữ '을/를' chỉ đối tượng của hành động: danh từ có patchim dùng '을', danh từ không có patchim dùng '를'.\n\nPhân tích đáp án sai:\n② 를: Dùng sau danh từ không có patchim (VD: 노래를)\n③ 이: Trợ từ chủ ngữ, dùng sau danh từ có patchim\n④ 가: Trợ từ chủ ngữ, dùng sau danh từ không có patchim",
-      },
-      {
-        id: 2,
-        passage: "내일 친구( ) 같이 영화를 볼 거예요.",
-        question: "빈칸에 들어갈 알맞은 것을 고르세요.",
-        options: ["와", "과", "하고", "랑"],
-        answer: 0,
-        explanationKo: "정답: ① 와\n\n'친구'는 모음 'ㅜ'로 끝나는 명사이므로 공동격 조사 '와'가 맞습니다. '와/과'는 '~와 함께'의 의미로 동반을 나타내며, 모음으로 끝나면 '와', 자음으로 끝나면 '과'를 사용합니다.\n\n오답 분석:\n② 과: 받침이 있는 명사 뒤에 사용 (예: 선생님과)\n③ 하고: 문법적으로 맞지만 구어체에서 주로 사용\n④ 랑: 구어체 표현으로 문어체에는 부적합",
-        explanationVi: "Đáp án: ① 와\n\n'친구' (bạn) kết thúc bằng nguyên âm 'ㅜ' nên dùng trợ từ đồng hành '와'. '와/과' mang nghĩa 'cùng với': sau nguyên âm dùng '와', sau phụ âm dùng '과'.\n\nPhân tích đáp án sai:\n② 과: Dùng sau danh từ có patchim (VD: 선생님과)\n③ 하고: Đúng ngữ pháp nhưng thường dùng trong khẩu ngữ\n④ 랑: Biểu hiện khẩu ngữ, không phù hợp văn viết",
-      },
-      {
-        id: 3,
-        passage: "이 음식은 맛( ) 좋고 가격도 싸요.",
-        question: "빈칸에 들어갈 알맞은 것을 고르세요.",
-        options: ["이", "가", "도", "만"],
-        answer: 2,
-        explanationKo: "정답: ③ 도\n\n문맥상 '맛도 좋고 가격도 싸요'에서 보조사 '도'는 '역시, 또한'의 의미로 두 가지 장점을 나열하고 있습니다. '도'는 추가나 포함을 나타내는 보조사입니다.\n\n오답 분석:\n① 이: 주격 조사이나 '가격도'와의 병렬 구조에 맞지 않음\n② 가: 주격 조사이나 문맥상 '도'와의 호응이 필요\n④ 만: '오직'의 의미로 제한을 나타내어 문맥에 부적합",
-        explanationVi: "Đáp án: ③ 도\n\nTrong ngữ cảnh '맛도 좋고 가격도 싸요' (vị ngon và giá cũng rẻ), trợ từ bổ trợ '도' mang nghĩa 'cũng, thêm vào đó', liệt kê hai ưu điểm. '도' là trợ từ bổ trợ chỉ sự bổ sung hoặc bao gồm.\n\nPhân tích đáp án sai:\n① 이: Trợ từ chủ ngữ, không phù hợp cấu trúc song song với '가격도'\n② 가: Trợ từ chủ ngữ, cần hô ứng với '도' trong ngữ cảnh\n④ 만: Nghĩa 'chỉ', chỉ sự hạn chế, không phù hợp ngữ cảnh",
-      },
-      {
-        id: 4,
-        passage: "한국어를 배우( ) 한국 문화도 함께 배워요.",
-        question: "빈칸에 들어갈 알맞은 것을 고르세요.",
-        options: ["면서", "고", "지만", "거나"],
-        answer: 0,
-        explanationKo: "정답: ① 면서\n\n연결어미 '-면서'는 두 동작이 동시에 일어남을 나타냅니다. '한국어를 배우는 동시에 한국 문화도 배운다'는 의미로, 두 행위의 동시 진행을 표현합니다.\n\n오답 분석:\n② 고: 단순 나열로 동시성을 강조하지 않음\n③ 지만: 대조/역접의 의미로 문맥에 맞지 않음\n④ 거나: 선택의 의미로 '또는'에 해당하여 부적합",
-        explanationVi: "Đáp án: ① 면서\n\nVĩ tố liên kết '-면서' diễn tả hai hành động xảy ra đồng thời. Nghĩa là 'vừa học tiếng Hàn vừa học văn hóa Hàn Quốc', biểu thị sự tiến hành song song của hai hành động.\n\nPhân tích đáp án sai:\n② 고: Chỉ liệt kê đơn thuần, không nhấn mạnh tính đồng thời\n③ 지만: Nghĩa đối lập/nhượng bộ, không phù hợp ngữ cảnh\n④ 거나: Nghĩa lựa chọn 'hoặc', không phù hợp",
-      },
-      {
-        id: 5,
-        passage: "시간이 없( ) 택시를 탔어요.",
-        question: "빈칸에 들어갈 알맞은 것을 고르세요.",
-        options: ["어서", "으니까", "지만", "고"],
-        answer: 0,
-        explanationKo: "정답: ① 어서\n\n연결어미 '-어서/아서'는 원인과 결과를 자연스럽게 연결합니다. '시간이 없다'는 원인이 '택시를 타다'라는 결과로 이어지는 인과관계를 나타냅니다.\n\n오답 분석:\n② 으니까: 원인을 나타내지만 주로 명령/청유문에 사용\n③ 지만: 대조/역접의 의미로 인과관계에 부적합\n④ 고: 단순 나열로 인과관계를 표현하지 못함",
-        explanationVi: "Đáp án: ① 어서\n\nVĩ tố liên kết '-어서/아서' kết nối nguyên nhân và kết quả một cách tự nhiên. 'Không có thời gian' là nguyên nhân dẫn đến kết quả 'đi taxi', thể hiện quan hệ nhân quả.\n\nPhân tích đáp án sai:\n② 으니까: Chỉ nguyên nhân nhưng thường dùng với câu mệnh lệnh/đề nghị\n③ 지만: Nghĩa đối lập, không phù hợp quan hệ nhân quả\n④ 고: Chỉ liệt kê đơn thuần, không thể hiện quan hệ nhân quả",
-      },
-    ],
   },
   vocabulary: {
     label: "유의어/의미",
     sublabel: "Từ đồng nghĩa / Nghĩa",
     emoji: "📚",
-    questions: [
-      {
-        id: 1,
-        passage: "오늘 날씨가 매우 춥습니다.",
-        question: "'매우'와 의미가 비슷한 것을 고르세요.",
-        options: ["아주", "조금", "별로", "전혀"],
-        answer: 0,
-        explanationKo: "정답: ① 아주\n\n'매우'와 '아주'는 모두 정도가 심함을 나타내는 부사로, '대단히, 몹시'의 의미입니다. 형용사나 동사 앞에서 강조의 역할을 합니다.\n\n오답 분석:\n② 조금: '약간, 다소'의 의미로 반대 개념\n③ 별로: 부정문에서 '그다지'의 의미\n④ 전혀: 부정문에서 '완전히 ~않다'의 의미",
-        explanationVi: "Đáp án: ① 아주\n\n'매우' và '아주' đều là trạng từ chỉ mức độ cao, nghĩa là 'rất, vô cùng'. Chúng đóng vai trò nhấn mạnh trước tính từ hoặc động từ.\n\nPhân tích đáp án sai:\n② 조금: Nghĩa 'một chút, hơi', khái niệm ngược lại\n③ 별로: Trong câu phủ định nghĩa 'không... lắm'\n④ 전혀: Trong câu phủ định nghĩa 'hoàn toàn không'",
-      },
-      {
-        id: 2,
-        passage: "그 식당은 항상 손님이 많습니다.",
-        question: "'항상'과 의미가 비슷한 것을 고르세요.",
-        options: ["언제나", "가끔", "보통", "절대"],
-        answer: 0,
-        explanationKo: "정답: ① 언제나\n\n'항상'과 '언제나'는 모두 '늘, 어느 때든지'의 의미로 빈도가 100%임을 나타내는 부사입니다.\n\n오답 분석:\n② 가끔: '때때로, 이따금'으로 낮은 빈도\n③ 보통: '일반적으로, 대개'의 의미\n④ 절대: '결코'의 강조 표현으로 주로 부정문에 사용",
-        explanationVi: "Đáp án: ① 언제나\n\n'항상' và '언제나' đều là trạng từ nghĩa 'luôn luôn, bất cứ khi nào', chỉ tần suất 100%.\n\nPhân tích đáp án sai:\n② 가끔: 'Thỉnh thoảng, đôi khi' - tần suất thấp\n③ 보통: Nghĩa 'thông thường, thường thì'\n④ 절대: Biểu hiện nhấn mạnh 'tuyệt đối', thường dùng trong câu phủ định",
-      },
-      {
-        id: 3,
-        passage: "이 문제는 정말 어렵습니다.",
-        question: "'어렵다'와 반대 의미인 것을 고르세요.",
-        options: ["쉽다", "크다", "작다", "길다"],
-        answer: 0,
-        explanationKo: "정답: ① 쉽다\n\n'어렵다'의 반의어는 '쉽다'입니다. '어렵다'는 '힘들다, 복잡하다'의 의미이고, '쉽다'는 '간단하다, 수월하다'의 의미입니다.\n\n오답 분석:\n② 크다: 크기에 관한 형용사\n③ 작다: 크기에 관한 형용사\n④ 길다: 길이에 관한 형용사",
-        explanationVi: "Đáp án: ① 쉽다\n\nTừ trái nghĩa của '어렵다' (khó) là '쉽다' (dễ). '어렵다' nghĩa là 'vất vả, phức tạp', còn '쉽다' nghĩa là 'đơn giản, thuận lợi'.\n\nPhân tích đáp án sai:\n② 크다: Tính từ chỉ kích thước (to)\n③ 작다: Tính từ chỉ kích thước (nhỏ)\n④ 길다: Tính từ chỉ chiều dài (dài)",
-      },
-      {
-        id: 4,
-        passage: "그는 빠르게 걸었습니다.",
-        question: "'빠르게'와 반대 의미인 것을 고르세요.",
-        options: ["천천히", "조용히", "크게", "작게"],
-        answer: 0,
-        explanationKo: "정답: ① 천천히\n\n'빠르게'의 반의어는 '천천히'입니다. '빠르게'는 속도가 빠름을, '천천히'는 속도가 느림을 나타내는 부사입니다.\n\n오답 분석:\n② 조용히: 소리의 정도를 나타냄\n③ 크게: 크기나 소리의 정도를 나타냄\n④ 작게: 크기나 소리의 정도를 나타냄",
-        explanationVi: "Đáp án: ① 천천히\n\nTừ trái nghĩa của '빠르게' (nhanh) là '천천히' (chậm). '빠르게' chỉ tốc độ nhanh, '천천히' chỉ tốc độ chậm.\n\nPhân tích đáp án sai:\n② 조용히: Chỉ mức độ âm thanh (yên lặng)\n③ 크게: Chỉ kích thước hoặc âm thanh (to)\n④ 작게: Chỉ kích thước hoặc âm thanh (nhỏ)",
-      },
-      {
-        id: 5,
-        passage: "오늘 기분이 좋습니다.",
-        question: "'기분이 좋다'와 비슷한 표현을 고르세요.",
-        options: ["행복하다", "슬프다", "화나다", "피곤하다"],
-        answer: 0,
-        explanationKo: "정답: ① 행복하다\n\n'기분이 좋다'는 긍정적인 감정 상태를 나타내며, '행복하다'도 기쁘고 만족스러운 상태를 의미합니다. 두 표현 모두 긍정적 감정을 표현합니다.\n\n오답 분석:\n② 슬프다: 부정적 감정 (슬픔)\n③ 화나다: 부정적 감정 (분노)\n④ 피곤하다: 신체 상태를 나타냄",
-        explanationVi: "Đáp án: ① 행복하다\n\n'기분이 좋다' (tâm trạng tốt) thể hiện trạng thái cảm xúc tích cực, '행복하다' (hạnh phúc) cũng có nghĩa là vui vẻ và hài lòng. Cả hai biểu hiện đều diễn tả cảm xúc tích cực.\n\nPhân tích đáp án sai:\n② 슬프다: Cảm xúc tiêu cực (buồn)\n③ 화나다: Cảm xúc tiêu cực (tức giận)\n④ 피곤하다: Chỉ trạng thái thể chất (mệt mỏi)",
-      },
-    ],
   },
   topic: {
     label: "주제파악",
     sublabel: "Xác định chủ đề",
     emoji: "🎯",
-    questions: [
-      {
-        id: 1,
-        passage: "서울에는 많은 박물관이 있습니다. 국립중앙박물관에서는 한국의 역사를 배울 수 있습니다. 전쟁기념관에서는 한국 전쟁에 대해 알 수 있습니다.",
-        question: "이 글의 주제는 무엇입니까?",
-        options: ["서울의 박물관", "한국의 역사", "한국 전쟁", "서울 여행"],
-        answer: 0,
-        explanationKo: "정답: ① 서울의 박물관\n\n글은 서울에 있는 다양한 박물관(국립중앙박물관, 전쟁기념관)을 소개하고 각각에서 무엇을 배울 수 있는지 설명하고 있습니다. 중심 소재는 '서울의 박물관'입니다.\n\n오답 분석:\n② 한국의 역사: 박물관에서 배울 수 있는 내용 중 하나\n③ 한국 전쟁: 전쟁기념관의 주제일 뿐\n④ 서울 여행: 글에서 여행에 대한 언급 없음",
-        explanationVi: "Đáp án: ① 서울의 박물관 (Bảo tàng ở Seoul)\n\nBài viết giới thiệu các bảo tàng khác nhau ở Seoul (Bảo tàng Quốc gia Trung ương, Đài tưởng niệm Chiến tranh) và giải thích có thể học được gì ở mỗi nơi. Chủ đề chính là 'Bảo tàng ở Seoul'.\n\nPhân tích đáp án sai:\n② 한국의 역사: Chỉ là một trong những nội dung học được ở bảo tàng\n③ 한국 전쟁: Chỉ là chủ đề của Đài tưởng niệm Chiến tranh\n④ 서울 여행: Không có đề cập về du lịch trong bài",
-      },
-      {
-        id: 2,
-        passage: "한국에서는 밥을 먹을 때 숟가락과 젓가락을 사용합니다. 국을 먹을 때는 숟가락을 쓰고, 반찬을 먹을 때는 젓가락을 씁니다.",
-        question: "이 글의 주제는 무엇입니까?",
-        options: ["한국의 식사 예절", "한국 음식 종류", "숟가락 만들기", "반찬 만들기"],
-        answer: 0,
-        explanationKo: "정답: ① 한국의 식사 예절\n\n글은 한국에서 식사할 때 숟가락과 젓가락을 어떻게 사용하는지에 대한 방법/규칙을 설명하고 있습니다. 이는 식사 예절에 해당합니다.\n\n오답 분석:\n② 한국 음식 종류: 음식 종류에 대한 설명 없음\n③ 숟가락 만들기: 제작 과정에 대한 언급 없음\n④ 반찬 만들기: 조리법에 대한 언급 없음",
-        explanationVi: "Đáp án: ① 한국의 식사 예절 (Phép tắc ăn uống Hàn Quốc)\n\nBài viết giải thích cách sử dụng thìa và đũa khi ăn ở Hàn Quốc. Đây thuộc về phép tắc ăn uống.\n\nPhân tích đáp án sai:\n② 한국 음식 종류: Không có giải thích về loại món ăn\n③ 숟가락 만들기: Không đề cập quá trình sản xuất\n④ 반찬 만들기: Không đề cập công thức nấu ăn",
-      },
-      {
-        id: 3,
-        passage: "요즘 많은 사람들이 환경을 위해 텀블러를 사용합니다. 일회용 컵 대신 텀블러를 사용하면 쓰레기를 줄일 수 있습니다.",
-        question: "이 글의 주제는 무엇입니까?",
-        options: ["환경 보호", "텀블러 구매", "컵 디자인", "쓰레기 분리"],
-        answer: 0,
-        explanationKo: "정답: ① 환경 보호\n\n글의 핵심 메시지는 '환경을 위해' 텀블러를 사용하여 쓰레기를 줄이자는 것입니다. 텀블러는 환경 보호의 수단으로 언급되었습니다.\n\n오답 분석:\n② 텀블러 구매: 구매에 대한 언급 없음\n③ 컵 디자인: 디자인에 대한 언급 없음\n④ 쓰레기 분리: 분리수거가 아닌 쓰레기 감소가 주제",
-        explanationVi: "Đáp án: ① 환경 보호 (Bảo vệ môi trường)\n\nThông điệp chính của bài là 'vì môi trường' nên dùng bình giữ nhiệt để giảm rác. Bình giữ nhiệt được đề cập như phương tiện bảo vệ môi trường.\n\nPhân tích đáp án sai:\n② 텀블러 구매: Không đề cập việc mua\n③ 컵 디자인: Không đề cập thiết kế\n④ 쓰레기 분리: Chủ đề là giảm rác, không phải phân loại rác",
-      },
-      {
-        id: 4,
-        passage: "한국의 사계절은 봄, 여름, 가을, 겨울입니다. 봄에는 꽃이 피고, 여름에는 덥고, 가을에는 단풍이 들고, 겨울에는 눈이 옵니다.",
-        question: "이 글의 주제는 무엇입니까?",
-        options: ["한국의 계절", "봄 날씨", "겨울 여행", "단풍 구경"],
-        answer: 0,
-        explanationKo: "정답: ① 한국의 계절\n\n글은 한국의 네 계절(봄, 여름, 가을, 겨울)과 각 계절의 특징을 전체적으로 설명하고 있습니다.\n\n오답 분석:\n② 봄 날씨: 봄은 네 계절 중 하나일 뿐\n③ 겨울 여행: 여행에 대한 언급 없음\n④ 단풍 구경: 가을 특징 중 하나일 뿐",
-        explanationVi: "Đáp án: ① 한국의 계절 (Các mùa ở Hàn Quốc)\n\nBài viết giải thích tổng quan về bốn mùa của Hàn Quốc (xuân, hạ, thu, đông) và đặc điểm của từng mùa.\n\nPhân tích đáp án sai:\n② 봄 날씨: Mùa xuân chỉ là một trong bốn mùa\n③ 겨울 여행: Không đề cập về du lịch\n④ 단풍 구경: Chỉ là một đặc điểm của mùa thu",
-      },
-      {
-        id: 5,
-        passage: "건강을 위해서는 규칙적인 운동이 중요합니다. 매일 30분씩 걷거나 수영을 하면 건강해집니다.",
-        question: "이 글의 주제는 무엇입니까?",
-        options: ["운동의 중요성", "수영 방법", "걷기 코스", "건강 검진"],
-        answer: 0,
-        explanationKo: "정답: ① 운동의 중요성\n\n글은 건강을 위해 규칙적인 운동이 중요하다는 점을 강조하고, 걷기와 수영을 예로 들고 있습니다. 핵심은 '운동의 중요성'입니다.\n\n오답 분석:\n② 수영 방법: 수영하는 방법에 대한 설명 없음\n③ 걷기 코스: 걷기 장소에 대한 언급 없음\n④ 건강 검진: 검진에 대한 언급 없음",
-        explanationVi: "Đáp án: ① 운동의 중요성 (Tầm quan trọng của tập thể dục)\n\nBài viết nhấn mạnh tập thể dục đều đặn quan trọng cho sức khỏe, lấy đi bộ và bơi làm ví dụ. Điểm chính là 'tầm quan trọng của tập thể dục'.\n\nPhân tích đáp án sai:\n② 수영 방법: Không giải thích cách bơi\n③ 걷기 코스: Không đề cập địa điểm đi bộ\n④ 건강 검진: Không đề cập khám sức khỏe",
-      },
-    ],
   },
-  content: {
-    label: "내용일치",
-    sublabel: "Nội dung phù hợp",
-    emoji: "✅",
-    questions: [
-      {
-        id: 1,
-        passage: "김민수 씨는 서울에서 태어났습니다. 지금은 부산에서 일하고 있습니다. 주말에는 서울에 있는 가족을 만나러 갑니다.",
-        question: "이 글의 내용과 같은 것을 고르세요.",
-        options: ["김민수 씨는 주말에 서울에 갑니다.", "김민수 씨는 부산에서 태어났습니다.", "김민수 씨의 가족은 부산에 있습니다.", "김민수 씨는 서울에서 일합니다."],
-        answer: 0,
-        explanationKo: "정답: ① 김민수 씨는 주말에 서울에 갑니다.\n\n글에서 '주말에는 서울에 있는 가족을 만나러 갑니다'라고 명시되어 있습니다.\n\n오답 분석:\n② 부산에서 태어났습니다 → 서울에서 태어남\n③ 가족은 부산에 있습니다 → 가족은 서울에 있음\n④ 서울에서 일합니다 → 부산에서 일함",
-        explanationVi: "Đáp án: ① 김민수 씨는 주말에 서울에 갑니다. (Anh Kim Minsu đi Seoul vào cuối tuần)\n\nTrong bài viết rõ ràng ghi '주말에는 서울에 있는 가족을 만나러 갑니다' (Cuối tuần đi gặp gia đình ở Seoul).\n\nPhân tích đáp án sai:\n② 부산에서 태어났습니다 → Sinh ở Seoul, không phải Busan\n③ 가족은 부산에 있습니다 → Gia đình ở Seoul\n④ 서울에서 일합니다 → Làm việc ở Busan",
-      },
-      {
-        id: 2,
-        passage: "이 카페는 오전 10시에 열고 오후 10시에 닫습니다. 월요일은 휴무입니다. 커피와 케이크가 맛있습니다.",
-        question: "이 글의 내용과 같은 것을 고르세요.",
-        options: ["이 카페는 월요일에 쉽니다.", "이 카페는 아침 9시에 엽니다.", "이 카페는 밤 12시에 닫습니다.", "이 카페는 일요일에 쉽니다."],
-        answer: 0,
-        explanationKo: "정답: ① 이 카페는 월요일에 쉽니다.\n\n글에서 '월요일은 휴무입니다'라고 명시되어 있습니다.\n\n오답 분석:\n② 아침 9시에 엽니다 → 오전 10시에 엶\n③ 밤 12시에 닫습니다 → 오후 10시에 닫음\n④ 일요일에 쉽니다 → 월요일에 휴무",
-        explanationVi: "Đáp án: ① 이 카페는 월요일에 쉽니다. (Quán cà phê này nghỉ thứ Hai)\n\nTrong bài viết rõ ràng ghi '월요일은 휴무입니다' (Thứ Hai nghỉ).\n\nPhân tích đáp án sai:\n② 아침 9시에 엽니다 → Mở lúc 10 giờ sáng, không phải 9 giờ\n③ 밤 12시에 닫습니다 → Đóng lúc 10 giờ tối, không phải 12 giờ\n④ 일요일에 쉽니다 → Nghỉ thứ Hai, không phải Chủ nhật",
-      },
-      {
-        id: 3,
-        passage: "박지영 씨는 대학교에서 한국어를 가르칩니다. 학생들에게 한국 문화도 소개합니다. 수업은 오전에만 있습니다.",
-        question: "이 글의 내용과 같은 것을 고르세요.",
-        options: ["박지영 씨는 오전에 수업합니다.", "박지영 씨는 고등학교 선생님입니다.", "박지영 씨는 영어를 가르칩니다.", "박지영 씨는 오후에 수업합니다."],
-        answer: 0,
-        explanationKo: "정답: ① 박지영 씨는 오전에 수업합니다.\n\n글에서 '수업은 오전에만 있습니다'라고 명시되어 있습니다.\n\n오답 분석:\n② 고등학교 선생님입니다 → 대학교에서 가르침\n③ 영어를 가르칩니다 → 한국어를 가르침\n④ 오후에 수업합니다 → 오전에만 수업함",
-        explanationVi: "Đáp án: ① 박지영 씨는 오전에 수업합니다. (Cô Park Jiyoung dạy buổi sáng)\n\nTrong bài viết rõ ràng ghi '수업은 오전에만 있습니다' (Chỉ có lớp buổi sáng).\n\nPhân tích đáp án sai:\n② 고등학교 선생님입니다 → Dạy ở đại học, không phải trường cấp 3\n③ 영어를 가르칩니다 → Dạy tiếng Hàn, không phải tiếng Anh\n④ 오후에 수업합니다 → Chỉ có lớp buổi sáng",
-      },
-      {
-        id: 4,
-        passage: "이 영화관은 금요일과 토요일에 가장 바쁩니다. 평일 오전에는 손님이 적습니다. 팝콘은 무료로 제공됩니다.",
-        question: "이 글의 내용과 같은 것을 고르세요.",
-        options: ["팝콘을 무료로 받을 수 있습니다.", "일요일이 가장 바쁩니다.", "평일 오후에 손님이 적습니다.", "팝콘을 사야 합니다."],
-        answer: 0,
-        explanationKo: "정답: ① 팝콘을 무료로 받을 수 있습니다.\n\n글에서 '팝콘은 무료로 제공됩니다'라고 명시되어 있습니다.\n\n오답 분석:\n② 일요일이 가장 바쁩니다 → 금요일과 토요일이 가장 바쁨\n③ 평일 오후에 손님이 적습니다 → 평일 오전에 손님이 적음\n④ 팝콘을 사야 합니다 → 무료로 제공됨",
-        explanationVi: "Đáp án: ① 팝콘을 무료로 받을 수 있습니다. (Có thể nhận bỏng ngô miễn phí)\n\nTrong bài viết rõ ràng ghi '팝콘은 무료로 제공됩니다' (Bỏng ngô được cung cấp miễn phí).\n\nPhân tích đáp án sai:\n② 일요일이 가장 바쁩니다 → Thứ Sáu và Thứ Bảy đông nhất\n③ 평일 오후에 손님이 적습니다 → Buổi sáng ngày thường ít khách\n④ 팝콘을 사야 합니다 → Được cung cấp miễn phí",
-      },
-      {
-        id: 5,
-        passage: "서울 지하철은 아침 5시 30분에 운행을 시작합니다. 밤 12시까지 운행합니다. 요금은 거리에 따라 다릅니다.",
-        question: "이 글의 내용과 같은 것을 고르세요.",
-        options: ["지하철 요금은 거리마다 다릅니다.", "지하철은 아침 6시에 시작합니다.", "지하철 요금은 모두 같습니다.", "지하철은 24시간 운행합니다."],
-        answer: 0,
-        explanationKo: "정답: ① 지하철 요금은 거리마다 다릅니다.\n\n글에서 '요금은 거리에 따라 다릅니다'라고 명시되어 있습니다.\n\n오답 분석:\n② 아침 6시에 시작합니다 → 5시 30분에 시작함\n③ 요금은 모두 같습니다 → 거리에 따라 다름\n④ 24시간 운행합니다 → 밤 12시까지만 운행",
-        explanationVi: "Đáp án: ① 지하철 요금은 거리마다 다릅니다. (Giá vé tàu điện ngầm khác nhau theo khoảng cách)\n\nTrong bài viết rõ ràng ghi '요금은 거리에 따라 다릅니다' (Giá vé khác nhau theo khoảng cách).\n\nPhân tích đáp án sai:\n② 아침 6시에 시작합니다 → Bắt đầu lúc 5:30, không phải 6 giờ\n③ 요금은 모두 같습니다 → Giá vé khác nhau theo khoảng cách\n④ 24시간 운행합니다 → Chỉ chạy đến 12 giờ đêm",
-      },
-    ],
-  },
-  headline: {
-    label: "신문기사제목",
-    sublabel: "Tiêu đề báo chí",
+  advertisement: {
+    label: "광고/안내문",
+    sublabel: "Quảng cáo / Thông báo",
     emoji: "📰",
-    questions: [
-      {
-        id: 1,
-        passage: "한국 영화 '기생충'이 미국 아카데미 시상식에서 작품상을 받았습니다. 한국 영화 역사상 처음입니다.",
-        question: "이 기사의 제목으로 알맞은 것을 고르세요.",
-        options: ["한국 영화, 아카데미 작품상 첫 수상", "한국 영화 제작 증가", "아카데미 시상식 일정 발표", "영화 제작비 상승"],
-        answer: 0,
-        explanationKo: "정답: ① 한국 영화, 아카데미 작품상 첫 수상\n\n기사의 핵심 내용은 한국 영화가 아카데미에서 작품상을 받은 것이 '처음'이라는 역사적 사실입니다. 제목은 핵심 내용을 간결하게 요약해야 합니다.\n\n오답 분석:\n② 제작 증가: 제작에 대한 언급 없음\n③ 일정 발표: 일정에 대한 언급 없음\n④ 제작비 상승: 제작비에 대한 언급 없음",
-        explanationVi: "Đáp án: ① 한국 영화, 아카데미 작품상 첫 수상 (Phim Hàn Quốc lần đầu đoạt giải Oscar)\n\nNội dung chính của bài là sự kiện lịch sử phim Hàn Quốc 'lần đầu tiên' đoạt giải Phim hay nhất tại Oscar. Tiêu đề phải tóm tắt ngắn gọn nội dung chính.\n\nPhân tích đáp án sai:\n② 제작 증가: Không đề cập việc sản xuất\n③ 일정 발표: Không đề cập lịch trình\n④ 제작비 상승: Không đề cập chi phí sản xuất",
-      },
-      {
-        id: 2,
-        passage: "최근 서울의 아파트 가격이 많이 올랐습니다. 특히 강남 지역의 가격 상승이 눈에 띕니다.",
-        question: "이 기사의 제목으로 알맞은 것을 고르세요.",
-        options: ["서울 아파트 가격 상승", "강남 신도시 개발", "아파트 건설 시작", "서울 인구 감소"],
-        answer: 0,
-        explanationKo: "정답: ① 서울 아파트 가격 상승\n\n기사의 핵심은 서울 아파트 가격이 올랐다는 것입니다. 강남은 특히 눈에 띄는 지역으로 언급되었을 뿐입니다.\n\n오답 분석:\n② 신도시 개발: 개발에 대한 언급 없음\n③ 건설 시작: 건설에 대한 언급 없음\n④ 인구 감소: 인구에 대한 언급 없음",
-        explanationVi: "Đáp án: ① 서울 아파트 가격 상승 (Giá chung cư Seoul tăng)\n\nNội dung chính của bài là giá chung cư Seoul đã tăng. Gangnam chỉ được đề cập như khu vực nổi bật.\n\nPhân tích đáp án sai:\n② 신도시 개발: Không đề cập phát triển\n③ 건설 시작: Không đề cập xây dựng\n④ 인구 감소: Không đề cập dân số",
-      },
-      {
-        id: 3,
-        passage: "올해 한국을 방문한 외국인 관광객이 1,500만 명을 넘었습니다. 작년보다 20% 증가했습니다.",
-        question: "이 기사의 제목으로 알맞은 것을 고르세요.",
-        options: ["외국인 관광객 1,500만 명 돌파", "한국 관광지 소개", "외국인 비자 발급 중단", "관광객 감소 우려"],
-        answer: 0,
-        explanationKo: "정답: ① 외국인 관광객 1,500만 명 돌파\n\n기사의 핵심은 외국인 관광객이 1,500만 명을 '넘었다'(돌파)는 수치적 사실입니다.\n\n오답 분석:\n② 관광지 소개: 관광지에 대한 언급 없음\n③ 비자 발급 중단: 비자에 대한 언급 없음\n④ 감소 우려: 증가했다고 함 (반대 내용)",
-        explanationVi: "Đáp án: ① 외국인 관광객 1,500만 명 돌파 (Du khách nước ngoài vượt 15 triệu người)\n\nNội dung chính của bài là con số du khách nước ngoài 'vượt quá' 15 triệu người.\n\nPhân tích đáp án sai:\n② 관광지 소개: Không đề cập điểm du lịch\n③ 비자 발급 중단: Không đề cập visa\n④ 감소 우려: Đã tăng, không phải giảm (nội dung ngược lại)",
-      },
-      {
-        id: 4,
-        passage: "정부가 내년부터 환경 보호를 위해 일회용품 사용을 제한하기로 했습니다. 벌금도 부과됩니다.",
-        question: "이 기사의 제목으로 알맞은 것을 고르세요.",
-        options: ["내년부터 일회용품 사용 제한", "환경부 장관 임명", "플라스틱 공장 증가", "일회용품 할인 행사"],
-        answer: 0,
-        explanationKo: "정답: ① 내년부터 일회용품 사용 제한\n\n기사의 핵심은 정부가 내년부터 일회용품 사용을 제한한다는 정책 발표입니다.\n\n오답 분석:\n② 장관 임명: 인사에 대한 언급 없음\n③ 공장 증가: 공장에 대한 언급 없음\n④ 할인 행사: 제한이지 할인이 아님 (반대 내용)",
-        explanationVi: "Đáp án: ① 내년부터 일회용품 사용 제한 (Hạn chế sử dụng đồ dùng một lần từ năm sau)\n\nNội dung chính là chính phủ công bố chính sách hạn chế sử dụng đồ dùng một lần từ năm sau.\n\nPhân tích đáp án sai:\n② 장관 임명: Không đề cập bổ nhiệm\n③ 공장 증가: Không đề cập nhà máy\n④ 할인 행사: Là hạn chế, không phải giảm giá (nội dung ngược lại)",
-      },
-      {
-        id: 5,
-        passage: "한국 경제가 올해 3% 성장할 것으로 예상됩니다. 수출 증가가 주요 원인입니다.",
-        question: "이 기사의 제목으로 알맞은 것을 고르세요.",
-        options: ["올해 경제성장률 3% 전망", "수출 기업 감소", "경제 위기 경고", "정부 예산 삭감"],
-        answer: 0,
-        explanationKo: "정답: ① 올해 경제성장률 3% 전망\n\n기사의 핵심은 올해 경제가 3% 성장할 것으로 '예상'(전망)된다는 것입니다.\n\n오답 분석:\n② 기업 감소: 수출이 증가했다고 함\n③ 위기 경고: 성장 전망이므로 긍정적 내용\n④ 예산 삭감: 예산에 대한 언급 없음",
-        explanationVi: "Đáp án: ① 올해 경제성장률 3% 전망 (Dự báo tăng trưởng kinh tế 3% năm nay)\n\nNội dung chính là 'dự báo' kinh tế năm nay sẽ tăng trưởng 3%.\n\nPhân tích đáp án sai:\n② 기업 감소: Xuất khẩu tăng, không giảm\n③ 위기 경고: Dự báo tăng trưởng là nội dung tích cực\n④ 예산 삭감: Không đề cập ngân sách",
-      },
-    ],
   },
+};
+
+// Fallback questions
+const fallbackQuestions: Record<string, Question[]> = {
+  grammar: [
+    {
+      id: 1,
+      passage: "저는 매일 아침 7시에 일어나서 운동( ) 합니다.",
+      question: "빈칸에 들어갈 알맞은 것을 고르세요.",
+      options: ["을", "를", "이", "가"],
+      answer: 0,
+      explanationKo: "정답: ① 을\n\n'운동'은 받침이 있는 명사이므로 목적격 조사 '을'이 맞습니다.",
+      explanationVi: "Đáp án: ① 을\n\n'운동' là danh từ có patchim nên phải dùng trợ từ tân ngữ '을'.",
+    },
+  ],
+  vocabulary: [
+    {
+      id: 1,
+      passage: "오늘 날씨가 매우 춥습니다.",
+      question: "'매우'와 의미가 비슷한 것을 고르세요.",
+      options: ["아주", "조금", "별로", "전혀"],
+      answer: 0,
+      explanationKo: "정답: ① 아주\n\n'매우'와 '아주'는 모두 '대단히'의 의미입니다.",
+      explanationVi: "Đáp án: ① 아주\n\n'매우' và '아주' đều có nghĩa 'rất'.",
+    },
+  ],
+  topic: [
+    {
+      id: 1,
+      passage: "서울에는 많은 박물관이 있습니다. 국립중앙박물관에서는 한국의 역사를 배울 수 있습니다.",
+      question: "이 글의 주제는 무엇입니까?",
+      options: ["서울의 박물관", "한국의 역사", "한국 전쟁", "서울 여행"],
+      answer: 0,
+      explanationKo: "정답: ① 서울의 박물관\n\n글은 서울에 있는 박물관을 소개하고 있습니다.",
+      explanationVi: "Đáp án: ① 서울의 박물관\n\nBài viết giới thiệu các bảo tàng ở Seoul.",
+    },
+  ],
+  advertisement: [
+    {
+      id: 1,
+      passage: "📚 서울도서관\n운영: 09:00-21:00\n휴관: 매주 월요일",
+      question: "이 안내문에 대한 설명으로 맞는 것은?",
+      options: ["월요일에 쉽니다", "24시간 운영합니다", "화요일에 쉽니다", "주말에만 운영합니다"],
+      answer: 0,
+      explanationKo: "정답: ① 월요일에 쉽니다\n\n휴관일이 '매주 월요일'입니다.",
+      explanationVi: "Đáp án: ① 월요일에 쉽니다\n\nNgày nghỉ là 'thứ Hai hàng tuần'.",
+    },
+  ],
 };
 
 type TabKey = keyof typeof tabCategories;
@@ -304,6 +113,36 @@ const ReadingA = () => {
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [isQuizComplete, setIsQuizComplete] = useState(false);
+  const [questions, setQuestions] = useState<Question[]>(fallbackQuestions.grammar);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // RAG에서 문제 가져오기
+  const fetchQuestions = useCallback(async (tabType: string) => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('reading-content', {
+        body: { type: 'readingA', tabType, count: 5 }
+      });
+
+      if (error) throw error;
+
+      if (data?.questions && data.questions.length > 0) {
+        setQuestions(data.questions);
+        console.log(`✅ Loaded ${data.questions.length} questions from RAG`);
+      } else {
+        setQuestions(fallbackQuestions[tabType] || fallbackQuestions.grammar);
+      }
+    } catch (error) {
+      console.error('Error fetching questions:', error);
+      setQuestions(fallbackQuestions[tabType] || fallbackQuestions.grammar);
+      toast({
+        title: "Đang sử dụng câu hỏi mẫu",
+        description: "Không thể tải câu hỏi mới",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -313,9 +152,13 @@ const ReadingA = () => {
     checkAuth();
   }, []);
 
+  // 탭 변경 또는 초기 로드 시 문제 가져오기
+  useEffect(() => {
+    fetchQuestions(activeTab);
+  }, [activeTab, fetchQuestions]);
+
   const currentCategory = tabCategories[activeTab];
-  const currentQuestions = currentCategory.questions;
-  const currentQuestion = currentQuestions[currentQuestionIndex];
+  const currentQuestion = questions[currentQuestionIndex];
 
   const handleTabChange = (tab: TabKey) => {
     setActiveTab(tab);
@@ -341,13 +184,13 @@ const ReadingA = () => {
     }
 
     setShowResult(true);
-    if (selectedAnswer === currentQuestion.answer) {
+    if (currentQuestion && selectedAnswer === currentQuestion.answer) {
       setScore(prev => prev + 1);
     }
   };
 
   const handleNext = () => {
-    if (currentQuestionIndex < currentQuestions.length - 1) {
+    if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
       setSelectedAnswer(null);
       setShowResult(false);
@@ -357,6 +200,7 @@ const ReadingA = () => {
   };
 
   const handleRestart = () => {
+    fetchQuestions(activeTab);
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);
     setShowResult(false);
@@ -451,7 +295,33 @@ const ReadingA = () => {
           </motion.div>
 
           <AnimatePresence mode="wait">
-            {isQuizComplete ? (
+            {isLoading ? (
+              /* Loading Screen */
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="rounded-3xl bg-gradient-to-b from-card to-card/50 border border-border/50 shadow-2xl p-12 text-center"
+              >
+                <Loader2 className="w-16 h-16 animate-spin text-primary mx-auto mb-6" />
+                <h3 className="text-xl font-bold text-foreground mb-2">Đang tạo câu hỏi...</h3>
+                <p className="text-muted-foreground">AI đang tạo câu hỏi TOPIK phù hợp</p>
+              </motion.div>
+            ) : !currentQuestion ? (
+              <motion.div
+                key="no-questions"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="rounded-3xl bg-card border border-border p-12 text-center"
+              >
+                <p className="text-muted-foreground mb-4">Không có câu hỏi</p>
+                <Button onClick={() => fetchQuestions(activeTab)}>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Tải lại
+                </Button>
+              </motion.div>
+            ) : isQuizComplete ? (
               /* Quiz Complete Screen */
               <motion.div
                 key="complete"
@@ -473,21 +343,21 @@ const ReadingA = () => {
                   {currentCategory.label} Hoàn thành!
                 </h2>
                 <p className="text-muted-foreground mb-8 text-lg">
-                  Tổng {currentQuestions.length} câu, đúng <span className="text-primary font-bold">{score} câu</span>
+                  Tổng {questions.length} câu, đúng <span className="text-primary font-bold">{score} câu</span>
                 </p>
 
                 <div className="w-full max-w-sm mx-auto mb-8">
                   <div className="flex justify-between text-sm text-muted-foreground mb-3">
                     <span>Tỷ lệ đúng</span>
                     <span className="font-bold text-foreground text-lg">
-                      {Math.round((score / currentQuestions.length) * 100)}%
+                      {Math.round((score / questions.length) * 100)}%
                     </span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-4 overflow-hidden">
                     <motion.div
                       className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 h-full rounded-full"
                       initial={{ width: 0 }}
-                      animate={{ width: `${(score / currentQuestions.length) * 100}%` }}
+                      animate={{ width: `${(score / questions.length) * 100}%` }}
                       transition={{ duration: 1, delay: 0.3 }}
                     />
                   </div>
@@ -525,7 +395,7 @@ const ReadingA = () => {
                 <div className="mb-6 p-4 rounded-2xl bg-card border border-border">
                   <div className="flex justify-between items-center mb-3">
                     <span className="text-sm font-medium text-foreground">
-                      {currentCategory.emoji} {currentCategory.label} - Câu {currentQuestionIndex + 1} / {currentQuestions.length}
+                      {currentCategory.emoji} {currentCategory.label} - Câu {currentQuestionIndex + 1} / {questions.length}
                     </span>
                     <span className="text-sm font-bold text-primary">
                       Điểm: {score}
@@ -535,7 +405,7 @@ const ReadingA = () => {
                     <motion.div
                       className="bg-gradient-to-r from-emerald-500 to-cyan-500 h-2.5 rounded-full"
                       initial={{ width: 0 }}
-                      animate={{ width: `${((currentQuestionIndex + 1) / currentQuestions.length) * 100}%` }}
+                      animate={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
                       transition={{ duration: 0.3 }}
                     />
                   </div>
@@ -665,7 +535,7 @@ const ReadingA = () => {
                           onClick={handleNext}
                           className="flex-1 h-14 text-lg bg-gradient-to-r from-emerald-500 to-teal-500 hover:opacity-90 text-white"
                         >
-                          {currentQuestionIndex < currentQuestions.length - 1 ? "Câu tiếp theo" : "Xem kết quả"}
+                          {currentQuestionIndex < questions.length - 1 ? "Câu tiếp theo" : "Xem kết quả"}
                           <ChevronRight className="w-5 h-5 ml-2" />
                         </Button>
                       )}
