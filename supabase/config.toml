@@ -95,3 +95,6 @@ verify_jwt = false
 
 [functions.handwriting-content]
 verify_jwt = false
+
+[functions.reading-content]
+verify_jwt = false
