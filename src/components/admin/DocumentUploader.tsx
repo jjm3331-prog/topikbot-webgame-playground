@@ -1,13 +1,22 @@
 import { useState, useCallback } from "react";
-import { Upload, FileText, Loader2, X } from "lucide-react";
+import { Upload, FileText, Loader2, X, CheckCircle2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Progress } from "@/components/ui/progress";
 import mammoth from "mammoth";
 
 interface DocumentUploaderProps {
   onUploadComplete: () => void;
+}
+
+interface FileUploadStatus {
+  file: File;
+  status: "pending" | "processing" | "success" | "error";
+  progress: number;
+  message?: string;
+  chunksCreated?: number;
 }
 
 const SUPPORTED_EXTENSIONS = [".md", ".txt", ".docx", ".doc", ".html", ".json", ".csv", ".xml", ".rtf", ".odt"];
@@ -16,8 +25,8 @@ const DocumentUploader = ({ onUploadComplete }: DocumentUploaderProps) => {
   const { toast } = useToast();
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [processingStatus, setProcessingStatus] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploadStatuses, setUploadStatuses] = useState<FileUploadStatus[]>([]);
 
   const extractTextFromFile = async (file: File): Promise<string> => {
     const extension = file.name.toLowerCase().substring(file.name.lastIndexOf("."));
@@ -53,39 +62,35 @@ const DocumentUploader = ({ onUploadComplete }: DocumentUploaderProps) => {
   };
 
   const getTitleFromFilename = (filename: string): string => {
-    // Remove extension and clean up
     const nameWithoutExt = filename.substring(0, filename.lastIndexOf("."));
-    // Replace underscores and hyphens with spaces
     return nameWithoutExt.replace(/[_-]/g, " ").trim();
   };
 
-  const handleUpload = async () => {
-    if (!selectedFile) return;
+  const updateFileStatus = (index: number, updates: Partial<FileUploadStatus>) => {
+    setUploadStatuses(prev => 
+      prev.map((status, i) => i === index ? { ...status, ...updates } : status)
+    );
+  };
 
-    setUploading(true);
-    setProcessingStatus("파일 읽는 중...");
-
+  const processFile = async (
+    file: File, 
+    index: number, 
+    session: { access_token: string }
+  ): Promise<boolean> => {
     try {
-      // Extract text content
-      const content = await extractTextFromFile(selectedFile);
+      updateFileStatus(index, { status: "processing", progress: 10, message: "파일 읽는 중..." });
+
+      const content = await extractTextFromFile(file);
       
       if (!content.trim()) {
         throw new Error("파일 내용이 비어있습니다.");
       }
 
-      const title = getTitleFromFilename(selectedFile.name);
-      const extension = selectedFile.name.toLowerCase().substring(selectedFile.name.lastIndexOf("."));
+      updateFileStatus(index, { progress: 30, message: "임베딩 처리 중..." });
 
-      setProcessingStatus("임베딩 처리 중...");
+      const title = getTitleFromFilename(file.name);
+      const extension = file.name.toLowerCase().substring(file.name.lastIndexOf("."));
 
-      // Get session
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        throw new Error("로그인이 필요합니다.");
-      }
-
-      // Upload to RAG embed endpoint
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/rag-embed`,
         {
@@ -102,19 +107,85 @@ const DocumentUploader = ({ onUploadComplete }: DocumentUploaderProps) => {
         }
       );
 
+      updateFileStatus(index, { progress: 80 });
+
       const result = await response.json();
 
       if (!response.ok) {
         throw new Error(result.error || "업로드 실패");
       }
 
-      toast({
-        title: "업로드 성공",
-        description: `"${title}" 문서가 ${result.chunks_created}개의 청크로 임베딩되었습니다.`,
+      updateFileStatus(index, { 
+        status: "success", 
+        progress: 100, 
+        message: `${result.chunks_created}개 청크 생성`,
+        chunksCreated: result.chunks_created 
       });
 
-      setSelectedFile(null);
-      onUploadComplete();
+      return true;
+    } catch (error: any) {
+      console.error(`Upload error for ${file.name}:`, error);
+      updateFileStatus(index, { 
+        status: "error", 
+        progress: 0, 
+        message: error.message 
+      });
+      return false;
+    }
+  };
+
+  const handleUpload = async () => {
+    if (selectedFiles.length === 0) return;
+
+    setUploading(true);
+
+    // Initialize statuses
+    const initialStatuses: FileUploadStatus[] = selectedFiles.map(file => ({
+      file,
+      status: "pending",
+      progress: 0,
+    }));
+    setUploadStatuses(initialStatuses);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("로그인이 필요합니다.");
+      }
+
+      // Process all files concurrently
+      const results = await Promise.all(
+        selectedFiles.map((file, index) => processFile(file, index, session))
+      );
+
+      const successCount = results.filter(Boolean).length;
+      const failCount = results.length - successCount;
+
+      if (successCount > 0) {
+        toast({
+          title: "업로드 완료",
+          description: failCount > 0 
+            ? `${successCount}개 성공, ${failCount}개 실패` 
+            : `${successCount}개 문서가 성공적으로 임베딩되었습니다.`,
+        });
+        onUploadComplete();
+      }
+
+      if (failCount > 0 && successCount === 0) {
+        toast({
+          title: "업로드 실패",
+          description: "모든 파일 업로드에 실패했습니다.",
+          variant: "destructive",
+        });
+      }
+
+      // Clear successful files after 2 seconds
+      setTimeout(() => {
+        setSelectedFiles([]);
+        setUploadStatuses([]);
+      }, 2000);
+
     } catch (error: any) {
       console.error("Upload error:", error);
       toast({
@@ -124,7 +195,6 @@ const DocumentUploader = ({ onUploadComplete }: DocumentUploaderProps) => {
       });
     } finally {
       setUploading(false);
-      setProcessingStatus("");
     }
   };
 
@@ -142,42 +212,72 @@ const DocumentUploader = ({ onUploadComplete }: DocumentUploaderProps) => {
     e.preventDefault();
     setIsDragging(false);
 
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      validateAndSetFile(file);
-    }
+    const files = Array.from(e.dataTransfer.files);
+    validateAndAddFiles(files);
   }, []);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      validateAndSetFile(file);
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    validateAndAddFiles(files);
+    // Reset input value so same files can be selected again
+    e.target.value = "";
+  };
+
+  const validateAndAddFiles = (files: File[]) => {
+    const validFiles: File[] = [];
+    const errors: string[] = [];
+
+    for (const file of files) {
+      const extension = file.name.toLowerCase().substring(file.name.lastIndexOf("."));
+      
+      if (!SUPPORTED_EXTENSIONS.includes(extension)) {
+        errors.push(`${file.name}: 지원하지 않는 형식`);
+        continue;
+      }
+
+      if (file.size > 10 * 1024 * 1024) {
+        errors.push(`${file.name}: 파일 크기 초과 (최대 10MB)`);
+        continue;
+      }
+
+      // Check for duplicates
+      if (selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+        errors.push(`${file.name}: 이미 추가됨`);
+        continue;
+      }
+
+      validFiles.push(file);
+    }
+
+    if (errors.length > 0) {
+      toast({
+        title: "일부 파일 제외됨",
+        description: errors.slice(0, 3).join("\n") + (errors.length > 3 ? `\n외 ${errors.length - 3}개` : ""),
+        variant: "destructive",
+      });
+    }
+
+    if (validFiles.length > 0) {
+      setSelectedFiles(prev => [...prev, ...validFiles]);
     }
   };
 
-  const validateAndSetFile = (file: File) => {
-    const extension = file.name.toLowerCase().substring(file.name.lastIndexOf("."));
-    
-    if (!SUPPORTED_EXTENSIONS.includes(extension)) {
-      toast({
-        title: "지원하지 않는 형식",
-        description: `지원 형식: ${SUPPORTED_EXTENSIONS.join(", ")}`,
-        variant: "destructive",
-      });
-      return;
-    }
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setUploadStatuses(prev => prev.filter((_, i) => i !== index));
+  };
 
-    // Check file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      toast({
-        title: "파일 크기 초과",
-        description: "최대 10MB까지 업로드 가능합니다.",
-        variant: "destructive",
-      });
-      return;
+  const getStatusIcon = (status: FileUploadStatus["status"]) => {
+    switch (status) {
+      case "success":
+        return <CheckCircle2 className="w-5 h-5 text-green-500" />;
+      case "error":
+        return <AlertCircle className="w-5 h-5 text-destructive" />;
+      case "processing":
+        return <Loader2 className="w-5 h-5 animate-spin text-primary" />;
+      default:
+        return <FileText className="w-5 h-5 text-muted-foreground" />;
     }
-
-    setSelectedFile(file);
   };
 
   return (
@@ -188,7 +288,7 @@ const DocumentUploader = ({ onUploadComplete }: DocumentUploaderProps) => {
           문서 업로드
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          파일을 드래그하거나 선택하세요. 파일명이 자동으로 제목이 됩니다.
+          여러 파일을 드래그하거나 선택하세요. 파일명이 자동으로 제목이 됩니다.
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -212,6 +312,7 @@ const DocumentUploader = ({ onUploadComplete }: DocumentUploaderProps) => {
             accept={SUPPORTED_EXTENSIONS.join(",")}
             onChange={handleFileSelect}
             className="hidden"
+            multiple
           />
           
           <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
@@ -223,46 +324,80 @@ const DocumentUploader = ({ onUploadComplete }: DocumentUploaderProps) => {
           <p className="text-sm text-muted-foreground">
             지원 형식: {SUPPORTED_EXTENSIONS.join(", ")} (PDF 제외)
           </p>
+
+          <p className="text-xs text-muted-foreground mt-2">
+            여러 파일 동시 선택 가능
+          </p>
         </div>
 
-        {/* Selected File */}
-        {selectedFile && (
-          <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-            <div className="flex items-center gap-3">
-              <FileText className="w-8 h-8 text-primary" />
-              <div>
-                <p className="font-medium">{selectedFile.name}</p>
-                <p className="text-sm text-muted-foreground">
-                  {(selectedFile.size / 1024).toFixed(1)} KB
-                </p>
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSelectedFile(null)}
-              disabled={uploading}
-            >
-              <X className="w-4 h-4" />
-            </Button>
+        {/* Selected Files List */}
+        {selectedFiles.length > 0 && (
+          <div className="space-y-2 max-h-60 overflow-y-auto">
+            <p className="text-sm font-medium text-muted-foreground">
+              선택된 파일: {selectedFiles.length}개
+            </p>
+            {selectedFiles.map((file, index) => {
+              const status = uploadStatuses[index];
+              return (
+                <div 
+                  key={`${file.name}-${index}`}
+                  className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg"
+                >
+                  {status ? getStatusIcon(status.status) : <FileText className="w-5 h-5 text-primary" />}
+                  
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm truncate">{file.name}</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">
+                        {(file.size / 1024).toFixed(1)} KB
+                      </span>
+                      {status?.message && (
+                        <span className={`text-xs ${status.status === "error" ? "text-destructive" : "text-muted-foreground"}`}>
+                          • {status.message}
+                        </span>
+                      )}
+                    </div>
+                    {status?.status === "processing" && (
+                      <Progress value={status.progress} className="h-1 mt-1" />
+                    )}
+                  </div>
+                  
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 shrink-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeFile(index);
+                    }}
+                    disabled={uploading}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              );
+            })}
           </div>
         )}
 
         {/* Upload Button */}
         <Button
           onClick={handleUpload}
-          disabled={!selectedFile || uploading}
+          disabled={selectedFiles.length === 0 || uploading}
           className="w-full"
         >
           {uploading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              {processingStatus || "처리 중..."}
+              {selectedFiles.length}개 파일 처리 중...
             </>
           ) : (
             <>
               <Upload className="w-4 h-4 mr-2" />
-              파일 업로드 및 임베딩
+              {selectedFiles.length > 0 
+                ? `${selectedFiles.length}개 파일 업로드 및 임베딩`
+                : "파일 업로드 및 임베딩"
+              }
             </>
           )}
         </Button>
