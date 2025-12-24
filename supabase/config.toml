@@ -86,3 +86,6 @@ verify_jwt = false
 
 [functions.interview-simulation]
 verify_jwt = false
+
+[functions.lesson-content]
+verify_jwt = false

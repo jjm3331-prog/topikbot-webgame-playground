@@ -202,6 +202,48 @@ const Lesson = () => {
   const [quizComplete, setQuizComplete] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [saving, setSaving] = useState(false);
+  const [loadingQuestions, setLoadingQuestions] = useState(false);
+  const [ragGenerated, setRagGenerated] = useState(false);
+  
+  // Fetch RAG-powered questions from edge function
+  const fetchRagQuestions = async (lessonIdParam: string, categoryParam: string, levelParam: number) => {
+    try {
+      setLoadingQuestions(true);
+      
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/lesson-content`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          lessonId: lessonIdParam,
+          category: categoryParam,
+          level: levelParam,
+          title: lessonIdParam, // Use lessonId as title hint
+        }),
+      });
+      
+      if (!response.ok) {
+        console.error('Failed to fetch RAG questions:', response.status);
+        return null;
+      }
+      
+      const data = await response.json();
+      
+      if (data.success && data.questions && Array.isArray(data.questions)) {
+        console.log(`RAG questions loaded (hasContext: ${data.hasRagContext}, results: ${data.ragResultCount})`);
+        setRagGenerated(data.hasRagContext);
+        return data.questions;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error fetching RAG questions:', error);
+      return null;
+    } finally {
+      setLoadingQuestions(false);
+    }
+  };
   
   useEffect(() => {
     const checkAuth = async () => {
@@ -213,13 +255,20 @@ const Lesson = () => {
       setUser(user);
       setStartTime(new Date());
       
-      // Load questions for this lesson
-      const lessonQuestionData = lessonQuestions[lessonId || ""] || generateDefaultQuestions(lessonId || "", category);
-      setQuestions(lessonQuestionData);
+      // First try to get RAG-generated questions
+      const ragQuestions = await fetchRagQuestions(lessonId || "", category, level);
+      
+      if (ragQuestions && ragQuestions.length > 0) {
+        setQuestions(ragQuestions);
+      } else {
+        // Fallback to static questions
+        const lessonQuestionData = lessonQuestions[lessonId || ""] || generateDefaultQuestions(lessonId || "", category);
+        setQuestions(lessonQuestionData);
+      }
     };
     
     checkAuth();
-  }, [lessonId, category, navigate]);
+  }, [lessonId, category, level, navigate]);
   
   const currentQuestion = questions[currentQuestionIndex];
   const correctCount = Object.values(answers).filter(a => a.correct).length;
@@ -402,6 +451,16 @@ const Lesson = () => {
       setSaving(false);
     }
   }, [user, lessonId, level, category, startTime, saving, toast]);
+  
+  // Loading state for RAG questions
+  if (loadingQuestions) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <p className="text-muted-foreground">AI가 학습 콘텐츠를 생성하고 있습니다...</p>
+      </div>
+    );
+  }
   
   if (!isListeningCategory && !currentQuestion && !quizComplete) {
     return (
