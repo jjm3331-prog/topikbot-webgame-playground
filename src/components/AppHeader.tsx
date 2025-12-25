@@ -14,6 +14,7 @@ interface UserStats {
 
 interface AppHeaderProps {
   username?: string;
+  avatarUrl?: string | null;
   showBack?: boolean;
   showLogout?: boolean;
   showMenu?: boolean;
@@ -24,6 +25,7 @@ interface AppHeaderProps {
 
 const AppHeader = ({ 
   username, 
+  avatarUrl,
   showBack = true, 
   showLogout = true,
   showMenu = true,
@@ -91,7 +93,11 @@ const AppHeader = ({
         <div className="flex items-center gap-1 shrink-0">
           {username && (
             <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-white/5 border border-white/10">
-              <User className="w-3 h-3 text-neon-cyan" />
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={username} className="w-4 h-4 rounded-full object-cover" />
+              ) : (
+                <User className="w-3 h-3 text-neon-cyan" />
+              )}
               <span className="text-white text-[10px] font-medium max-w-[60px] truncate">{username}</span>
             </div>
           )}
@@ -109,7 +115,7 @@ const AppHeader = ({
 
           {/* Mobile Hamburger Menu */}
           {showMenu && (
-            <MobileMenu username={username} isLoggedIn={!!username} userStats={userStats} />
+            <MobileMenu username={username} avatarUrl={avatarUrl} isLoggedIn={!!username} userStats={userStats} />
           )}
         </div>
       </div>

@@ -17,6 +17,7 @@ interface AppLayoutProps {
 export const AppLayout = ({ children }: AppLayoutProps) => {
   const navigate = useNavigate();
   const [username, setUsername] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -26,11 +27,12 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       if (session) {
         const { data } = await supabase
           .from("profiles")
-          .select("username")
+          .select("username, avatar_url")
           .eq("id", session.user.id)
           .single();
         if (data) {
           setUsername(data.username);
+          setAvatarUrl(data.avatar_url);
         }
       }
     };
@@ -51,6 +53,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       {/* Sidebar */}
       <AppSidebar 
         username={username}
+        avatarUrl={avatarUrl}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
         isCollapsed={isCollapsed}
@@ -89,7 +92,11 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
             
             {username && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted border border-border">
-                <User className="w-4 h-4 text-primary" />
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt={username} className="w-6 h-6 rounded-full object-cover" />
+                ) : (
+                  <User className="w-4 h-4 text-primary" />
+                )}
                 <span className="text-sm font-medium text-foreground max-w-[100px] truncate">
                   {username}
                 </span>

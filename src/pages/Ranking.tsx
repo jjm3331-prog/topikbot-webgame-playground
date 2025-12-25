@@ -12,6 +12,7 @@ interface RankingUser {
   username: string;
   points: number;
   current_streak: number;
+  avatar_url: string | null;
 }
 
 // TOPIK 기반 레벨 시스템 (6급 = 100만점)
@@ -61,7 +62,7 @@ const Ranking = () => {
       
       const { data: allUsers, error } = await supabase
         .from("profiles")
-        .select("id, username, points, current_streak")
+        .select("id, username, points, current_streak, avatar_url")
         .order("points", { ascending: false })
         .limit(100);
 
@@ -193,10 +194,18 @@ const Ranking = () => {
             
             <div className="relative p-6">
               <div className="flex items-center gap-5">
-                {/* Avatar */}
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${getAvatarGradient(currentUser.id)} flex items-center justify-center text-white font-bold text-2xl shadow-lg`}>
-                  {getInitial(currentUser.username)}
-                </div>
+              {/* Avatar */}
+                {currentUser.avatar_url ? (
+                  <img 
+                    src={currentUser.avatar_url} 
+                    alt={currentUser.username}
+                    className="w-16 h-16 rounded-2xl object-cover shadow-lg"
+                  />
+                ) : (
+                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${getAvatarGradient(currentUser.id)} flex items-center justify-center text-white font-bold text-2xl shadow-lg`}>
+                    {getInitial(currentUser.username)}
+                  </div>
+                )}
                 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
@@ -276,9 +285,17 @@ const Ranking = () => {
             {/* 2nd Place */}
             <div className="flex flex-col items-center w-28">
               <div className="relative">
-                <div className={`w-18 h-18 rounded-2xl bg-gradient-to-br ${getAvatarGradient(topThree[1].id)} flex items-center justify-center text-white font-bold text-xl ring-4 ring-gray-400/50 shadow-xl`}>
-                  {getInitial(topThree[1].username)}
-                </div>
+                {topThree[1].avatar_url ? (
+                  <img 
+                    src={topThree[1].avatar_url} 
+                    alt={topThree[1].username}
+                    className="w-18 h-18 rounded-2xl object-cover ring-4 ring-gray-400/50 shadow-xl"
+                  />
+                ) : (
+                  <div className={`w-18 h-18 rounded-2xl bg-gradient-to-br ${getAvatarGradient(topThree[1].id)} flex items-center justify-center text-white font-bold text-xl ring-4 ring-gray-400/50 shadow-xl`}>
+                    {getInitial(topThree[1].username)}
+                  </div>
+                )}
                 <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center shadow-lg">
                   <span className="text-white font-bold text-sm">2</span>
                 </div>
@@ -295,9 +312,17 @@ const Ranking = () => {
             <div className="flex flex-col items-center w-32 -mt-8">
               <div className="relative">
                 <Crown className="w-10 h-10 mx-auto text-yellow-400 mb-2 drop-shadow-lg" />
-                <div className={`w-22 h-22 rounded-2xl bg-gradient-to-br ${getAvatarGradient(topThree[0].id)} flex items-center justify-center text-white font-bold text-2xl ring-4 ring-yellow-400/50 shadow-2xl shadow-yellow-500/30`}>
-                  {getInitial(topThree[0].username)}
-                </div>
+                {topThree[0].avatar_url ? (
+                  <img 
+                    src={topThree[0].avatar_url} 
+                    alt={topThree[0].username}
+                    className="w-22 h-22 rounded-2xl object-cover ring-4 ring-yellow-400/50 shadow-2xl shadow-yellow-500/30"
+                  />
+                ) : (
+                  <div className={`w-22 h-22 rounded-2xl bg-gradient-to-br ${getAvatarGradient(topThree[0].id)} flex items-center justify-center text-white font-bold text-2xl ring-4 ring-yellow-400/50 shadow-2xl shadow-yellow-500/30`}>
+                    {getInitial(topThree[0].username)}
+                  </div>
+                )}
                 <div className="absolute -bottom-2 -right-2 w-9 h-9 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center shadow-lg shadow-yellow-500/40">
                   <span className="text-white font-bold">1</span>
                 </div>
@@ -313,9 +338,17 @@ const Ranking = () => {
             {/* 3rd Place */}
             <div className="flex flex-col items-center w-28">
               <div className="relative">
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${getAvatarGradient(topThree[2].id)} flex items-center justify-center text-white font-bold text-lg ring-4 ring-amber-600/50 shadow-xl`}>
-                  {getInitial(topThree[2].username)}
-                </div>
+                {topThree[2].avatar_url ? (
+                  <img 
+                    src={topThree[2].avatar_url} 
+                    alt={topThree[2].username}
+                    className="w-16 h-16 rounded-2xl object-cover ring-4 ring-amber-600/50 shadow-xl"
+                  />
+                ) : (
+                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${getAvatarGradient(topThree[2].id)} flex items-center justify-center text-white font-bold text-lg ring-4 ring-amber-600/50 shadow-xl`}>
+                    {getInitial(topThree[2].username)}
+                  </div>
+                )}
                 <div className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center shadow-lg">
                   <span className="text-white font-bold text-xs">3</span>
                 </div>
@@ -353,9 +386,17 @@ const Ranking = () => {
                 >
                   {getRankBadge(rank)}
                   
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${getAvatarGradient(user.id)} flex items-center justify-center text-white font-bold text-lg shadow-md`}>
-                    {getInitial(user.username)}
-                  </div>
+                  {user.avatar_url ? (
+                    <img 
+                      src={user.avatar_url} 
+                      alt={user.username}
+                      className="w-12 h-12 rounded-xl object-cover shadow-md"
+                    />
+                  ) : (
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${getAvatarGradient(user.id)} flex items-center justify-center text-white font-bold text-lg shadow-md`}>
+                      {getInitial(user.username)}
+                    </div>
+                  )}
                   
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-base text-foreground truncate">{user.username}</p>

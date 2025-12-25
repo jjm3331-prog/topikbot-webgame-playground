@@ -39,11 +39,12 @@ interface UserStats {
 
 interface MobileMenuProps {
   username?: string;
+  avatarUrl?: string | null;
   isLoggedIn?: boolean;
   userStats?: UserStats | null;
 }
 
-const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
+const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showAndroidGuide, setShowAndroidGuide] = useState(false);
   const [showIOSGuide, setShowIOSGuide] = useState(false);
@@ -151,7 +152,11 @@ const MobileMenu = ({ username, isLoggedIn, userStats }: MobileMenuProps) => {
                     </div>
                     {username && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
-                        <User style={{ width: '12px', height: '12px', color: '#00d4ff' }} />
+                        {avatarUrl ? (
+                          <img src={avatarUrl} alt={username} style={{ width: '14px', height: '14px', borderRadius: '50%', objectFit: 'cover' }} />
+                        ) : (
+                          <User style={{ width: '12px', height: '12px', color: '#00d4ff' }} />
+                        )}
                         <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>{username}</span>
                       </div>
                     )}
