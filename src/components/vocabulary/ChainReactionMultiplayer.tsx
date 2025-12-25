@@ -544,9 +544,19 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
           <Users className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-primary" />
           <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">방 참가하기</h2>
           <p className="text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">
-            친구에게 받은 코드를 입력하세요
+            닉네임과 방 코드를 입력하세요 / Nhập tên và mã phòng
           </p>
 
+          {/* 닉네임 입력 */}
+          <Input
+            value={playerName}
+            onChange={(e) => setPlayerName(e.target.value)}
+            placeholder="닉네임 입력... / Nhập tên..."
+            className="text-center text-base sm:text-lg mb-3"
+            maxLength={20}
+          />
+
+          {/* 방 코드 입력 */}
           <Input
             value={roomCodeInput}
             onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
@@ -561,7 +571,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             </Button>
             <Button 
               onClick={joinRoom}
-              disabled={roomCodeInput.length !== 6}
+              disabled={roomCodeInput.length !== 6 || !playerName.trim()}
               className="bg-gradient-to-r from-purple-500 to-pink-500"
             >
               <Users className="w-4 h-4 mr-2" />
