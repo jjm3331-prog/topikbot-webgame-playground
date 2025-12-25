@@ -329,64 +329,64 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative"
+        className="relative w-full max-w-md mx-auto"
       >
         <div className="absolute inset-0 -z-10 overflow-hidden rounded-2xl">
-          <div className="absolute top-0 left-1/4 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-green-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
+          <div className="absolute top-0 left-1/4 w-32 sm:w-64 h-32 sm:h-64 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-0 right-1/4 w-32 sm:w-64 h-32 sm:h-64 bg-green-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
         </div>
         
-        <Card className="p-8 text-center backdrop-blur-sm bg-background/80 border-primary/30">
+        <Card className="p-4 sm:p-8 text-center backdrop-blur-sm bg-background/80 border-primary/30">
           <motion.div
             initial={{ y: -20 }}
             animate={{ y: 0 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
-            <div className="text-7xl mb-4">🏎️</div>
-            <h2 className="text-3xl font-black mb-2 bg-gradient-to-r from-blue-500 via-cyan-500 to-green-500 bg-clip-text text-transparent">
+            <div className="text-5xl sm:text-7xl mb-3 sm:mb-4">🏎️</div>
+            <h2 className="text-2xl sm:text-3xl font-black mb-1 sm:mb-2 bg-gradient-to-r from-blue-500 via-cyan-500 to-green-500 bg-clip-text text-transparent">
               Word Racing
             </h2>
-            <p className="text-muted-foreground mb-6 text-lg">
+            <p className="text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-lg">
               단어 레이싱 / Đua xe từ vựng
             </p>
           </motion.div>
           
-          <div className="text-left bg-gradient-to-br from-muted/50 to-muted/30 rounded-xl p-5 mb-6 border border-border/50">
-            <p className="font-bold mb-3 flex items-center gap-2 text-lg">
-              <Sparkles className="w-5 h-5 text-primary" />
+          <div className="text-left bg-gradient-to-br from-muted/50 to-muted/30 rounded-xl p-3 sm:p-5 mb-4 sm:mb-6 border border-border/50">
+            <p className="font-bold mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-lg">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
               Cách chơi / 게임 방법
             </p>
-            <ul className="space-y-2 text-muted-foreground">
+            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-base text-muted-foreground">
               <li className="flex items-center gap-2">
-                <span className="bg-primary/20 px-2 py-0.5 rounded text-xs font-mono">← →</span>
+                <span className="bg-primary/20 px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-mono">1-5</span>
                 Di chuyển xe / 차량 이동
               </li>
               <li className="flex items-center gap-2">
-                <span className="bg-green-500/20 px-2 py-0.5 rounded text-xs text-green-600">✓</span>
+                <span className="bg-green-500/20 px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs text-green-600">✓</span>
                 Thu thập đúng chữ = +điểm
               </li>
               <li className="flex items-center gap-2">
-                <span className="bg-red-500/20 px-2 py-0.5 rounded text-xs text-red-600">✗</span>
+                <span className="bg-red-500/20 px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs text-red-600">✗</span>
                 Chữ sai = giảm tốc
               </li>
-              <li className="mt-3 text-foreground font-medium flex items-center gap-2">
-                <Zap className="w-4 h-4 text-yellow-500" />
+              <li className="mt-2 sm:mt-3 text-foreground font-medium flex items-center gap-2">
+                <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500" />
                 Hoàn thành từ = BOOST! 🚀
               </li>
             </ul>
           </div>
 
           {/* Speed selector */}
-          <div className="mb-6">
-            <p className="text-sm text-muted-foreground mb-3">🏎️ Tốc độ / 속도</p>
-            <div className="flex flex-wrap justify-center gap-2">
+          <div className="mb-4 sm:mb-6">
+            <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3">🏎️ Tốc độ / 속도</p>
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
               {(Object.keys(speedSettings) as Array<keyof typeof speedSettings>).map((key) => (
                 <Button
                   key={key}
                   variant={selectedSpeed === key ? "default" : "outline"}
                   onClick={() => setSelectedSpeed(key)}
                   size="sm"
-                  className={`text-xs sm:text-sm px-3 sm:px-4 py-2 ${
+                  className={`text-[10px] sm:text-sm px-2 sm:px-4 py-2 h-auto ${
                     selectedSpeed === key 
                       ? `bg-gradient-to-r ${speedSettings[key].color} border-0` 
                       : ""
@@ -399,8 +399,8 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
           </div>
 
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button onClick={startGame} size="lg" className={`gap-2 text-lg px-8 py-6 bg-gradient-to-r ${speedSettings[selectedSpeed].color} hover:opacity-90`}>
-              <Play className="w-6 h-6" />
+            <Button onClick={startGame} size="lg" className={`gap-2 text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 w-full sm:w-auto bg-gradient-to-r ${speedSettings[selectedSpeed].color} hover:opacity-90`}>
+              <Play className="w-5 h-5 sm:w-6 sm:h-6" />
               Bắt đầu / 시작
             </Button>
           </motion.div>
@@ -415,10 +415,11 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
+        className="w-full max-w-md mx-auto"
       >
-        <Card className="p-8 text-center relative overflow-hidden">
+        <Card className="p-4 sm:p-8 text-center relative overflow-hidden">
           <div className="absolute inset-0 -z-10">
-            <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-yellow-500/20 rounded-full blur-2xl animate-pulse" />
+            <div className="absolute top-1/4 left-1/4 w-24 sm:w-32 h-24 sm:h-32 bg-yellow-500/20 rounded-full blur-2xl animate-pulse" />
           </div>
           
           <motion.div
@@ -426,21 +427,21 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
             animate={{ rotate: 0, scale: 1 }}
             transition={{ type: "spring", stiffness: 200 }}
           >
-            <Trophy className="w-20 h-20 mx-auto mb-4 text-yellow-500 drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]" />
+            <Trophy className="w-14 h-14 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 text-yellow-500 drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]" />
           </motion.div>
-          <h2 className="text-3xl font-black mb-4 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+          <h2 className="text-2xl sm:text-3xl font-black mb-3 sm:mb-4 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
             레이스 완료!
           </h2>
-          <div className="space-y-3 mb-6">
+          <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
             <motion.p 
-              className="text-5xl font-black text-primary"
+              className="text-4xl sm:text-5xl font-black text-primary"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.3, type: "spring" }}
             >
               {score}점
             </motion.p>
-            <div className="flex justify-center gap-4 text-muted-foreground">
+            <div className="flex justify-center gap-4 text-sm sm:text-base text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Car className="w-4 h-4 text-blue-400" />
                 <span>{wordsCompleted} từ / 단어</span>
@@ -448,8 +449,8 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
             </div>
           </div>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button onClick={() => { onComplete(score, wordsCompleted); }} size="lg" className="gap-2 text-lg px-8">
-              <RotateCcw className="w-5 h-5" />
+            <Button onClick={() => { onComplete(score, wordsCompleted); }} size="lg" className="gap-2 text-base sm:text-lg px-6 sm:px-8 w-full sm:w-auto">
+              <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
               완료 / Hoàn thành
             </Button>
           </motion.div>
@@ -459,12 +460,12 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-2 sm:gap-4 w-full max-w-md mx-auto px-2 sm:px-0">
       {/* Stats */}
-      <div className="w-full max-w-[320px] flex justify-between items-center mb-2">
-        <div className="flex items-center gap-2 bg-gradient-to-r from-amber-500/20 to-orange-500/20 px-4 py-2 rounded-xl border border-amber-500/30">
-          <Trophy className="w-5 h-5 text-amber-400" />
-          <span className="font-bold text-xl text-amber-400">{score}</span>
+      <div className="w-full max-w-[320px] flex justify-between items-center mb-1 sm:mb-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-amber-500/20 to-orange-500/20 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border border-amber-500/30">
+          <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
+          <span className="font-bold text-lg sm:text-xl text-amber-400">{score}</span>
         </div>
         
         <div className="flex items-center gap-2">
@@ -472,10 +473,10 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="flex items-center gap-1 bg-gradient-to-r from-orange-500/20 to-red-500/20 px-3 py-2 rounded-xl border border-orange-500/30"
+              className="flex items-center gap-1 bg-gradient-to-r from-orange-500/20 to-red-500/20 px-2 sm:px-3 py-1 sm:py-2 rounded-lg sm:rounded-xl border border-orange-500/30"
             >
-              <Flame className="w-4 h-4 text-orange-400" />
-              <span className="font-bold text-orange-400">{combo}x</span>
+              <Flame className="w-3 h-3 sm:w-4 sm:h-4 text-orange-400" />
+              <span className="font-bold text-sm sm:text-base text-orange-400">{combo}x</span>
             </motion.div>
           )}
         </div>
@@ -484,9 +485,9 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
           variant="outline"
           size="icon"
           onClick={() => setGameState(gameState === "paused" ? "playing" : "paused")}
-          className="border-primary/30"
+          className="border-primary/30 w-8 h-8 sm:w-10 sm:h-10"
         >
-          {gameState === "paused" ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
+          {gameState === "paused" ? <Play className="w-3 h-3 sm:w-4 sm:h-4" /> : <Pause className="w-3 h-3 sm:w-4 sm:h-4" />}
         </Button>
       </div>
 
@@ -497,15 +498,15 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-[320px]"
         >
-          <Card className={`p-4 text-center transition-all ${boosting ? 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-yellow-500/50' : 'bg-card'}`}>
-            <p className="text-sm text-muted-foreground mb-1">목표 단어 / Từ mục tiêu</p>
-            <div className="flex justify-center gap-1 text-2xl font-bold">
+          <Card className={`p-2.5 sm:p-4 text-center transition-all ${boosting ? 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-yellow-500/50' : 'bg-card'}`}>
+            <p className="text-[10px] sm:text-sm text-muted-foreground mb-1">목표 단어 / Từ mục tiêu</p>
+            <div className="flex justify-center gap-0.5 sm:gap-1 text-lg sm:text-2xl font-bold">
               {targetWord.letters.map((letter, idx) => (
                 <motion.span
                   key={idx}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className={`w-10 h-10 flex items-center justify-center rounded-lg ${
+                  className={`w-7 h-7 sm:w-10 sm:h-10 flex items-center justify-center rounded-md sm:rounded-lg text-sm sm:text-base ${
                     idx < targetWord.collectedLetters.length
                       ? "bg-green-500 text-white"
                       : "bg-muted text-muted-foreground"
@@ -515,7 +516,7 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
                 </motion.span>
               ))}
             </div>
-            <p className="text-sm text-muted-foreground mt-2">{targetWord.meaning}</p>
+            <p className="text-[10px] sm:text-sm text-muted-foreground mt-1 sm:mt-2 line-clamp-1">{targetWord.meaning}</p>
           </Card>
         </motion.div>
       )}
@@ -689,15 +690,15 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
       </div>
 
       {/* Lane Touch Controls */}
-      <div className="flex gap-1 w-full max-w-[320px]">
+      <div className="flex gap-1 w-full max-w-[320px] mt-1 sm:mt-2">
         {Array.from({ length: LANE_COUNT }).map((_, lane) => (
           <motion.button
             key={lane}
-            whileTap={{ scale: 0.95 }}
+            whileTap={{ scale: 0.9, backgroundColor: "hsl(var(--primary))" }}
             onClick={() => handleTouchMove(lane)}
-            className={`flex-1 py-4 rounded-xl font-bold transition-all ${
+            className={`flex-1 py-3 sm:py-4 rounded-lg sm:rounded-xl font-bold text-sm sm:text-base transition-all active:scale-95 ${
               carLane === lane
-                ? "bg-primary text-primary-foreground shadow-lg"
+                ? "bg-primary text-primary-foreground shadow-lg scale-105"
                 : "bg-muted hover:bg-muted/80"
             }`}
           >
