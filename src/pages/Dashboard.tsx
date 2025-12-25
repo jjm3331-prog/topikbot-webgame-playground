@@ -14,19 +14,37 @@ import {
   FileText,
   Sparkles,
   GraduationCap,
+  Trophy,
+  Flame,
+  Gift,
+  Star,
+  Calendar,
+  CheckCircle,
+  Zap,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
+import { toast } from "@/hooks/use-toast";
+import { getLevelFromPoints, POINTS_CONFIG } from "@/lib/pointsPolicy";
+import { Progress } from "@/components/ui/progress";
 
 interface Profile {
   id: string;
   username: string;
+  points: number;
+  current_streak: number;
+  longest_streak: number;
+  last_daily_bonus: string | null;
 }
 
 const Dashboard = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [checkingIn, setCheckingIn] = useState(false);
+  const [canCheckIn, setCanCheckIn] = useState(false);
+  const [showCheckInSuccess, setShowCheckInSuccess] = useState(false);
+  const [bonusPoints, setBonusPoints] = useState(0);
   const navigate = useNavigate();
   
 
@@ -40,7 +58,7 @@ const Dashboard = () => {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, username")
+        .select("id, username, points, current_streak, longest_streak, last_daily_bonus")
         .eq("id", session.user.id)
         .single();
 
@@ -48,6 +66,9 @@ const Dashboard = () => {
         console.error("Error fetching profile:", error);
       } else {
         setProfile(data);
+        // Check if user can check in today
+        const canCheck = checkCanCheckIn(data.last_daily_bonus);
+        setCanCheckIn(canCheck);
       }
       setLoading(false);
     };
@@ -63,12 +84,104 @@ const Dashboard = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
+  const checkCanCheckIn = (lastBonus: string | null): boolean => {
+    if (!lastBonus) return true;
+    
+    const lastDate = new Date(lastBonus);
+    const today = new Date();
+    
+    // Reset time to compare dates only
+    lastDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    
+    return lastDate.getTime() < today.getTime();
+  };
+
+  const handleDailyCheckIn = async () => {
+    if (!profile || checkingIn || !canCheckIn) return;
+    
+    setCheckingIn(true);
+    
+    try {
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      yesterday.setHours(0, 0, 0, 0);
+      
+      let newStreak = 1;
+      let bonusAmount = POINTS_CONFIG.DAILY_CHECKIN;
+      
+      // Check if streak continues
+      if (profile.last_daily_bonus) {
+        const lastDate = new Date(profile.last_daily_bonus);
+        lastDate.setHours(0, 0, 0, 0);
+        
+        if (lastDate.getTime() === yesterday.getTime()) {
+          newStreak = profile.current_streak + 1;
+        }
+      }
+      
+      // 7-day streak bonus
+      if (newStreak % 7 === 0) {
+        bonusAmount += POINTS_CONFIG.WEEKLY_STREAK_BONUS;
+      }
+      
+      const newPoints = profile.points + bonusAmount;
+      const newLongestStreak = Math.max(profile.longest_streak, newStreak);
+      
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          points: newPoints,
+          current_streak: newStreak,
+          longest_streak: newLongestStreak,
+          last_daily_bonus: today.toISOString(),
+        })
+        .eq("id", profile.id);
+      
+      if (error) throw error;
+      
+      // Update local state
+      setProfile({
+        ...profile,
+        points: newPoints,
+        current_streak: newStreak,
+        longest_streak: newLongestStreak,
+        last_daily_bonus: today.toISOString(),
+      });
+      
+      setBonusPoints(bonusAmount);
+      setShowCheckInSuccess(true);
+      setCanCheckIn(false);
+      
+      // Hide success animation after 3 seconds
+      setTimeout(() => setShowCheckInSuccess(false), 3000);
+      
+      toast({
+        title: "Điểm danh thành công! 🎉",
+        description: `+${bonusAmount} điểm! Streak: ${newStreak} ngày`,
+      });
+      
+    } catch (error) {
+      console.error("Error checking in:", error);
+      toast({
+        title: "Lỗi",
+        description: "Không thể điểm danh. Vui lòng thử lại.",
+        variant: "destructive",
+      });
+    } finally {
+      setCheckingIn(false);
+    }
+  };
+
+  const levelInfo = profile ? getLevelFromPoints(profile.points) : null;
+
   if (loading) {
     return (
       <div className="min-h-[100dvh] bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <img src="/favicon.png" alt="LUKATO" className="w-16 h-16 rounded-full animate-pulse" />
-          <div className="text-muted-foreground text-sm">로딩중... / Đang tải...</div>
+          <div className="text-muted-foreground text-sm">Đang tải...</div>
         </div>
       </div>
     );
@@ -91,6 +204,158 @@ const Dashboard = () => {
                   Xin chào, {profile?.username || 'User'}!
                 </h1>
                 <p className="text-body text-muted-foreground mt-1">Hôm nay bạn muốn học gì?</p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Points & Level Widget + Daily Check-in */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="grid gap-4 sm:grid-cols-2"
+          >
+            {/* Points & Level Card */}
+            <div 
+              onClick={() => navigate("/points-system")}
+              className="glass-card rounded-2xl p-5 cursor-pointer hover:shadow-lg transition-all group"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-korean-orange to-korean-pink flex items-center justify-center">
+                    <Star className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-card-caption text-muted-foreground">Điểm tích lũy</p>
+                    <p className="text-2xl font-bold text-foreground">{profile?.points?.toLocaleString() || 0}</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+              </div>
+              
+              {levelInfo && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className={`text-card-body font-semibold ${levelInfo.color}`}>
+                      {levelInfo.name}
+                    </span>
+                    {levelInfo.level < 6 && (
+                      <span className="text-card-caption text-muted-foreground">
+                        {profile?.points?.toLocaleString()}/{levelInfo.nextLevelPoints.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                  <Progress 
+                    value={levelInfo.progress} 
+                    className="h-2"
+                  />
+                  {levelInfo.level < 6 && (
+                    <p className="text-badge text-muted-foreground">
+                      Còn {(levelInfo.nextLevelPoints - (profile?.points || 0)).toLocaleString()} điểm để lên level tiếp
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Daily Check-in Card */}
+            <div className="relative overflow-hidden rounded-2xl">
+              {/* Success Animation Overlay */}
+              <AnimatePresence>
+                {showCheckInSuccess && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 z-20 bg-gradient-to-br from-korean-green/90 to-korean-cyan/90 flex flex-col items-center justify-center"
+                  >
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: [0, 1.2, 1] }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <CheckCircle className="w-16 h-16 text-white mb-3" />
+                    </motion.div>
+                    <motion.p
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="text-2xl font-bold text-white"
+                    >
+                      +{bonusPoints} điểm!
+                    </motion.p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <div className={`glass-card p-5 h-full ${canCheckIn ? 'bg-gradient-to-br from-korean-green/10 to-korean-cyan/10 border-korean-green/30' : ''}`}>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                      canCheckIn 
+                        ? 'bg-gradient-to-br from-korean-green to-korean-cyan' 
+                        : 'bg-muted'
+                    }`}>
+                      <Calendar className={`w-6 h-6 ${canCheckIn ? 'text-white' : 'text-muted-foreground'}`} />
+                    </div>
+                    <div>
+                      <p className="text-card-caption text-muted-foreground">Điểm danh hàng ngày</p>
+                      <div className="flex items-center gap-2">
+                        <Flame className="w-4 h-4 text-korean-orange" />
+                        <span className="text-lg font-bold text-foreground">{profile?.current_streak || 0} ngày</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Trophy className="w-4 h-4 text-korean-orange" />
+                    <span className="text-card-caption text-muted-foreground">
+                      Kỷ lục: {profile?.longest_streak || 0} ngày
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Gift className="w-4 h-4 text-korean-purple" />
+                    <span className="text-card-caption text-muted-foreground">
+                      +{POINTS_CONFIG.DAILY_CHECKIN}/ngày
+                    </span>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={handleDailyCheckIn}
+                  disabled={!canCheckIn || checkingIn}
+                  className={`w-full ${
+                    canCheckIn 
+                      ? 'bg-gradient-to-r from-korean-green to-korean-cyan hover:from-korean-green/90 hover:to-korean-cyan/90 text-white' 
+                      : 'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  {checkingIn ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Đang xử lý...
+                    </div>
+                  ) : canCheckIn ? (
+                    <div className="flex items-center gap-2">
+                      <Zap className="w-4 h-4" />
+                      Điểm danh ngay!
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4" />
+                      Đã điểm danh hôm nay
+                    </div>
+                  )}
+                </Button>
+
+                {/* 7-day streak bonus hint */}
+                {canCheckIn && profile && (profile.current_streak + 1) % 7 === 0 && (
+                  <p className="text-center text-badge text-korean-green mt-2">
+                    🎁 Điểm danh hôm nay để nhận thưởng 7 ngày liên tiếp!
+                  </p>
+                )}
               </div>
             </div>
           </motion.div>
