@@ -160,7 +160,7 @@ ${excludeList}
   }
 
   const primaryModel = 'grok-4-1-fast-reasoning';
-  const fallbackModel = 'grok-4.1-fast-reasoning';
+  const fallbackModel = 'grok-3-mini';
 
   let response = await fetch('https://api.x.ai/v1/chat/completions', {
     method: 'POST',

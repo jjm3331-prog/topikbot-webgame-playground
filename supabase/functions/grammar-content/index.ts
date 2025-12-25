@@ -236,7 +236,7 @@ ${TOPIK_GRAMMAR_GUIDELINES[safeLevel]}
 ${ragContent ? ragContent : "(참고자료 없음 - 내부 지식으로 생성하되, 품질 규칙을 더 엄격히 지킬 것)"}`;
 
     const primaryModel = "grok-4-1-fast-reasoning";
-    const fallbackModel = "grok-4.1-fast-reasoning";
+    const fallbackModel = "grok-3-mini";
 
     let resp = await fetch("https://api.x.ai/v1/chat/completions", {
       method: "POST",
