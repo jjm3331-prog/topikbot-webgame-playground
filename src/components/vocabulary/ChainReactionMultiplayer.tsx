@@ -397,7 +397,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   // Copy room URL (전체 URL 복사)
   const copyRoomUrl = () => {
     if (room?.room_code) {
-      const url = `${window.location.origin}/vocabulary?mode=multiplayer&room=${room.room_code}`;
+      const url = `https://game.topikbot.kr/vocabulary?mode=multiplayer&room=${room.room_code}`;
       navigator.clipboard.writeText(url);
       setCopied(true);
       toast({
@@ -412,7 +412,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   const shareRoom = async () => {
     if (!room?.room_code) return;
     
-    const url = `${window.location.origin}/vocabulary?mode=multiplayer&room=${room.room_code}`;
+    const url = `https://game.topikbot.kr/vocabulary?mode=multiplayer&room=${room.room_code}`;
     const shareData = {
       title: "LUKATO 단어 대결",
       text: `🎮 나와 단어 대결해! 방 코드: ${room.room_code}`,
