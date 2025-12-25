@@ -62,6 +62,7 @@ const baseMenuCategories: MenuCategory[] = [
     emoji: "📚",
     items: [
       { icon: Sparkles, label: "Trung tâm học TOPIK", href: "/learning-hub", isHighlight: true },
+      { icon: MessageSquare, label: "Cộng đồng", href: "/board-hub", isHighlight: true },
     ]
   },
   {

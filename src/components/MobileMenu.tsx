@@ -84,6 +84,7 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
   // TOPIK 학습 허브
   const topikItems = [
     { path: "/learning-hub", icon: Sparkles, labelVi: "Trung tâm học TOPIK", isHighlight: true },
+    { path: "/board-hub", icon: MessageSquare, labelVi: "Cộng đồng", isHighlight: true },
   ];
 
   // Game items
