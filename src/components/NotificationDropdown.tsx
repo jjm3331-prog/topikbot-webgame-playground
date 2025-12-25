@@ -150,7 +150,7 @@ export const NotificationDropdown = ({ userId }: NotificationDropdownProps) => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute right-0 mt-2 w-80 sm:w-96 bg-popover border border-border rounded-xl shadow-lg z-50 overflow-hidden"
+              className="absolute right-0 mt-2 w-[340px] sm:w-[420px] max-w-[calc(100vw-2rem)] bg-popover border border-border rounded-xl shadow-2xl z-50 overflow-hidden"
             >
               {/* Header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/50">
@@ -172,7 +172,7 @@ export const NotificationDropdown = ({ userId }: NotificationDropdownProps) => {
               </div>
 
               {/* Notification List */}
-              <div className="max-h-[400px] overflow-y-auto">
+              <div className="max-h-[480px] overflow-y-auto">
                 {notifications.length === 0 ? (
                   <div className="py-12 text-center">
                     <Bell className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
@@ -188,29 +188,29 @@ export const NotificationDropdown = ({ userId }: NotificationDropdownProps) => {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           onClick={() => markAsRead(notification.id)}
-                          className={`px-4 py-3 cursor-pointer transition-colors hover:bg-muted/50 ${
+                          className={`px-4 py-4 cursor-pointer transition-colors hover:bg-muted/50 ${
                             !isRead ? "bg-primary/5" : ""
                           }`}
                         >
                           <div className="flex gap-3">
-                            <div className="mt-0.5">
+                            <div className="mt-0.5 flex-shrink-0">
                               {getTypeIcon(notification.type)}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                <h4 className={`text-sm font-medium truncate ${
+                              <div className="flex items-start gap-2">
+                                <h4 className={`text-sm font-medium leading-snug ${
                                   !isRead ? "text-foreground" : "text-muted-foreground"
                                 }`}>
                                   {notification.title}
                                 </h4>
                                 {!isRead && (
-                                  <span className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />
+                                  <span className="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-1.5" />
                                 )}
                               </div>
-                              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                              <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed whitespace-pre-wrap break-words">
                                 {notification.message}
                               </p>
-                              <p className="text-[10px] text-muted-foreground/70 mt-1">
+                              <p className="text-xs text-muted-foreground/70 mt-2">
                                 {formatTime(notification.created_at)}
                               </p>
                             </div>
@@ -224,7 +224,7 @@ export const NotificationDropdown = ({ userId }: NotificationDropdownProps) => {
 
               {/* Footer */}
               {notifications.length > 0 && (
-                <div className="px-4 py-2 border-t border-border bg-muted/30">
+                <div className="px-4 py-2.5 border-t border-border bg-muted/30">
                   <p className="text-xs text-center text-muted-foreground">
                     Hiển thị {notifications.length} thông báo gần nhất
                   </p>
