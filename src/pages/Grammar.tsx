@@ -26,12 +26,31 @@ import AppLayout from "@/components/AppLayout";
 
 type TopikLevel = "1-2" | "3-4" | "5-6";
 
+type Bilingual = { vi: string; ko: string };
+
+function BilingualText({
+  vi,
+  ko,
+  className,
+}: {
+  vi: string;
+  ko: string;
+  className?: string;
+}) {
+  return (
+    <div className={className}>
+      <div className="font-medium">{vi}</div>
+      <div className="text-xs text-muted-foreground">{ko}</div>
+    </div>
+  );
+}
+
 // Custom Level Selector for Grammar
 function GrammarLevelSelector({ value, onChange }: { value: TopikLevel; onChange: (v: TopikLevel) => void }) {
-  const levels: { id: TopikLevel; label: string; color: string }[] = [
-    { id: "1-2", label: "1-2급 (초급)", color: "from-green-400 to-emerald-500" },
-    { id: "3-4", label: "3-4급 (중급)", color: "from-blue-400 to-cyan-500" },
-    { id: "5-6", label: "5-6급 (고급)", color: "from-purple-400 to-pink-500" },
+  const levels: { id: TopikLevel; label_vi: string; label_ko: string; color: string }[] = [
+    { id: "1-2", label_vi: "Cấp 1–2 (Sơ cấp)", label_ko: "1-2급 (초급)", color: "from-green-400 to-emerald-500" },
+    { id: "3-4", label_vi: "Cấp 3–4 (Trung cấp)", label_ko: "3-4급 (중급)", color: "from-blue-400 to-cyan-500" },
+    { id: "5-6", label_vi: "Cấp 5–6 (Cao cấp)", label_ko: "5-6급 (고급)", color: "from-purple-400 to-pink-500" },
   ];
 
   return (
@@ -43,7 +62,8 @@ function GrammarLevelSelector({ value, onChange }: { value: TopikLevel; onChange
           onClick={() => onChange(level.id)}
           className={value === level.id ? `bg-gradient-to-r ${level.color} text-white border-0` : ""}
         >
-          {level.label}
+          <span className="mr-2">{level.label_vi}</span>
+          <span className="text-xs opacity-80">{level.label_ko}</span>
         </Button>
       ))}
     </div>
@@ -53,15 +73,48 @@ function GrammarLevelSelector({ value, onChange }: { value: TopikLevel; onChange
 interface GrammarQuestion {
   id: string;
   type: "assembly" | "correction" | "battle";
-  question: string;
+  prompt: Bilingual; // question/instruction
+  sentence?: Bilingual; // for correction
   parts?: string[];
-  correctOrder?: number[];
   errorPart?: string;
   correctPart?: string;
   options?: string[];
   answer: string;
-  explanation: string;
-  grammarPoint: string;
+  explanation: Bilingual;
+  grammarPoint: Bilingual;
+}
+
+type ApiGrammarQuestion = any;
+
+function normalizeGrammarQuestions(input: ApiGrammarQuestion[]): GrammarQuestion[] {
+  return (input ?? []).map((q: any) => {
+    // New API shape (grammar-content)
+    const promptVi = q.question_vi ?? q.sentence_vi ?? q.question ?? "";
+    const promptKo = q.question_ko ?? q.sentence_ko ?? q.question ?? "";
+
+    const sentenceVi = q.sentence_vi ?? "";
+    const sentenceKo = q.sentence_ko ?? q.question ?? "";
+
+    const explanationVi = q.explanation_vi ?? "";
+    const explanationKo = q.explanation_ko ?? q.explanation ?? "";
+
+    const grammarPointVi = q.grammarPoint_vi ?? "";
+    const grammarPointKo = q.grammarPoint_ko ?? q.grammarPoint ?? "";
+
+    return {
+      id: String(q.id ?? crypto.randomUUID()),
+      type: q.type,
+      prompt: { vi: promptVi, ko: promptKo },
+      sentence: q.type === "correction" ? { vi: sentenceVi, ko: sentenceKo } : undefined,
+      parts: q.parts,
+      errorPart: q.errorPart,
+      correctPart: q.correctPart,
+      options: q.options,
+      answer: q.answer,
+      explanation: { vi: explanationVi, ko: explanationKo },
+      grammarPoint: { vi: grammarPointVi, ko: grammarPointKo },
+    } satisfies GrammarQuestion;
+  });
 }
 
 // ==================== 문장 조립 퍼즐 ====================
@@ -85,8 +138,9 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
       if (error) throw error;
       
       if (data?.questions?.length > 0) {
-        setQuestions(data.questions);
-        resetGame(data.questions[0]);
+        const normalized = normalizeGrammarQuestions(data.questions);
+        setQuestions(normalized);
+        resetGame(normalized[0]);
       }
     } catch (error) {
       console.error('Error fetching grammar questions:', error);
@@ -130,10 +184,10 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
       const comboBonus = Math.min(combo, 5) * 5;
       setScore(prev => prev + 10 + comboBonus);
       setCombo(prev => prev + 1);
-      toast.success(`정답! +${10 + comboBonus}점`);
+      toast.success(`Đúng! +${10 + comboBonus} / 정답! +${10 + comboBonus}`);
     } else {
       setCombo(0);
-      toast.error("다시 시도해보세요!");
+      toast.error("Sai rồi, thử lại nhé! / 다시 시도해보세요!");
     }
   };
 
@@ -142,7 +196,7 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
       setCurrentIndex(prev => prev + 1);
       resetGame(questions[currentIndex + 1]);
     } else {
-      toast.success(`게임 완료! 총 ${score}점`);
+      toast.success(`Hoàn thành! Tổng ${score} điểm / 게임 완료! 총 ${score}점`);
       setCurrentIndex(0);
       fetchQuestions();
     }
@@ -184,21 +238,28 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
       <Card className="p-4 bg-primary/5 border-primary/20">
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-primary" />
-          <span className="font-medium">문법 포인트:</span>
-          <span className="text-muted-foreground">{current.grammarPoint}</span>
+          <span className="font-medium">Điểm ngữ pháp</span>
+          <BilingualText vi={current.grammarPoint.vi} ko={current.grammarPoint.ko} />
         </div>
       </Card>
 
       {/* Question */}
       <Card className="p-6">
-        <h3 className="text-lg font-medium mb-2">다음 어절들을 올바른 순서로 조립하세요:</h3>
-        <p className="text-muted-foreground text-sm mb-4">{current.question}</p>
+        <BilingualText
+          className="mb-4"
+          vi="Hãy sắp xếp các từ theo đúng thứ tự:"
+          ko="다음 어절들을 올바른 순서로 조립하세요:"
+        />
+        <BilingualText vi={current.prompt.vi} ko={current.prompt.ko} />
 
         {/* Selected Parts (Answer Area) */}
         <div className="min-h-16 p-4 bg-muted/30 rounded-lg border-2 border-dashed border-muted-foreground/30 mb-4">
           <div className="flex flex-wrap gap-2">
             {selectedParts.length === 0 ? (
-              <span className="text-muted-foreground">여기에 어절을 순서대로 배치하세요</span>
+              <BilingualText
+                vi="Kéo/nhấn để đặt các từ vào đây theo thứ tự"
+                ko="여기에 어절을 순서대로 배치하세요"
+              />
             ) : (
               selectedParts.map((part, index) => (
                 <motion.button
@@ -250,14 +311,17 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
                 ) : (
                   <X className="w-5 h-5 text-red-500" />
                 )}
-                <span className="font-medium">{isCorrect ? '정답입니다!' : '틀렸습니다'}</span>
+                <span className="font-medium">
+                  {isCorrect ? "Đúng! / 정답입니다!" : "Sai rồi / 틀렸습니다"}
+                </span>
               </div>
               <p className="text-sm text-muted-foreground">
-                <strong>정답:</strong> {current.answer}
+                <strong>Đáp án / 정답:</strong> {current.answer}
               </p>
-              <p className="text-sm text-muted-foreground mt-1">
-                <strong>설명:</strong> {current.explanation}
-              </p>
+              <div className="mt-2 space-y-2">
+                <div className="text-sm font-medium">💡 Giải thích / 해설</div>
+                <BilingualText vi={current.explanation.vi} ko={current.explanation.ko} />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -271,11 +335,11 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
               className="flex-1"
             >
               <Check className="w-4 h-4 mr-2" />
-              확인하기
+              <BilingualText vi="Kiểm tra" ko="확인하기" />
             </Button>
           ) : (
             <Button onClick={handleNext} className="flex-1">
-              {currentIndex < questions.length - 1 ? '다음 문제' : '다시 시작'}
+              {currentIndex < questions.length - 1 ? "Tiếp theo / 다음 문제" : "Chơi lại / 다시 시작"}
             </Button>
           )}
           <Button variant="outline" onClick={() => resetGame(current)} disabled={isCorrect !== null}>
@@ -307,7 +371,7 @@ function CorrectionGame({ level }: { level: TopikLevel }) {
       if (error) throw error;
       
       if (data?.questions?.length > 0) {
-        setQuestions(data.questions);
+        setQuestions(normalizeGrammarQuestions(data.questions));
       }
     } catch (error) {
       console.error('Error fetching grammar questions:', error);
@@ -328,7 +392,7 @@ function CorrectionGame({ level }: { level: TopikLevel }) {
       setSelectedError(word);
       setShowOptions(true);
     } else {
-      toast.error("틀린 부분을 다시 찾아보세요!");
+      toast.error("Chọn đúng phần sai nhé! / 틀린 부분을 다시 찾아보세요!");
     }
   };
 
@@ -340,9 +404,9 @@ function CorrectionGame({ level }: { level: TopikLevel }) {
     
     if (correct) {
       setScore(prev => prev + 10);
-      toast.success("정답! +10점");
+      toast.success("Đúng! +10 / 정답! +10");
     } else {
-      toast.error("다시 생각해보세요!");
+      toast.error("Sai rồi, nghĩ lại nhé! / 다시 생각해보세요!");
     }
   };
 
@@ -353,7 +417,7 @@ function CorrectionGame({ level }: { level: TopikLevel }) {
       setShowOptions(false);
       setIsCorrect(null);
     } else {
-      toast.success(`게임 완료! 총 ${score}점`);
+      toast.success(`Hoàn thành! Tổng ${score} điểm / 게임 완료! 총 ${score}점`);
       setCurrentIndex(0);
       setSelectedError(null);
       setShowOptions(false);
@@ -373,7 +437,7 @@ function CorrectionGame({ level }: { level: TopikLevel }) {
   const current = questions[currentIndex];
   if (!current) return null;
 
-  const words = current.question.split(' ');
+  const words = (current.sentence?.ko || current.prompt.ko).split(' ');
 
   return (
     <div className="space-y-6">
@@ -392,15 +456,19 @@ function CorrectionGame({ level }: { level: TopikLevel }) {
       <Card className="p-4 bg-primary/5 border-primary/20">
         <div className="flex items-center gap-2">
           <AlertCircle className="w-5 h-5 text-primary" />
-          <span className="font-medium">오류 유형:</span>
-          <span className="text-muted-foreground">{current.grammarPoint}</span>
+          <span className="font-medium">Loại lỗi</span>
+          <BilingualText vi={current.grammarPoint.vi} ko={current.grammarPoint.ko} />
         </div>
       </Card>
 
       {/* Sentence */}
       <Card className="p-6">
-        <h3 className="text-lg font-medium mb-4">문장에서 틀린 부분을 찾아 터치하세요:</h3>
-        
+        <BilingualText
+          className="mb-4"
+          vi="Chạm vào phần sai trong câu:"
+          ko="문장에서 틀린 부분을 찾아 터치하세요:"
+        />
+
         <div className="flex flex-wrap gap-2 mb-6">
           {words.map((word, index) => (
             <motion.button
@@ -409,8 +477,8 @@ function CorrectionGame({ level }: { level: TopikLevel }) {
               whileTap={{ scale: 0.95 }}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 selectedError === word
-                  ? 'bg-red-500 text-white'
-                  : 'bg-muted hover:bg-muted/80'
+                  ? "bg-red-500 text-white"
+                  : "bg-muted hover:bg-muted/80"
               }`}
               onClick={() => handleSelectError(word)}
               disabled={showOptions}
@@ -422,20 +490,16 @@ function CorrectionGame({ level }: { level: TopikLevel }) {
 
         {/* Correction Options */}
         <AnimatePresence>
-          {showOptions && !isCorrect && (
+          {showOptions && isCorrect === null && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="space-y-3 mb-6"
             >
-              <p className="text-sm font-medium">올바른 표현을 선택하세요:</p>
+              <p className="text-sm font-medium">Chọn cách đúng / 올바른 표현을 선택하세요:</p>
               <div className="flex flex-wrap gap-2">
                 {current.options?.map((option, index) => (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    onClick={() => handleSelectCorrection(option)}
-                  >
+                  <Button key={index} variant="outline" onClick={() => handleSelectCorrection(option)}>
                     {option}
                   </Button>
                 ))}
@@ -452,7 +516,7 @@ function CorrectionGame({ level }: { level: TopikLevel }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               className={`p-4 rounded-lg mb-4 ${
-                isCorrect ? 'bg-green-500/10 border border-green-500/30' : 'bg-red-500/10 border border-red-500/30'
+                isCorrect ? "bg-green-500/10 border border-green-500/30" : "bg-red-500/10 border border-red-500/30"
               }`}
             >
               <div className="flex items-center gap-2 mb-2">
@@ -461,14 +525,15 @@ function CorrectionGame({ level }: { level: TopikLevel }) {
                 ) : (
                   <X className="w-5 h-5 text-red-500" />
                 )}
-                <span className="font-medium">{isCorrect ? '정답입니다!' : '틀렸습니다'}</span>
+                <span className="font-medium">{isCorrect ? "Đúng! / 정답입니다!" : "Sai rồi / 틀렸습니다"}</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                <strong>정답:</strong> {current.errorPart} → {current.correctPart}
+                <strong>Đáp án / 정답:</strong> {current.errorPart} → {current.correctPart}
               </p>
-              <p className="text-sm text-muted-foreground mt-1">
-                <strong>설명:</strong> {current.explanation}
-              </p>
+              <div className="mt-2 space-y-2">
+                <div className="text-sm font-medium">💡 Giải thích / 해설</div>
+                <BilingualText vi={current.explanation.vi} ko={current.explanation.ko} />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -476,7 +541,7 @@ function CorrectionGame({ level }: { level: TopikLevel }) {
         {/* Next Button */}
         {isCorrect !== null && (
           <Button onClick={handleNext} className="w-full">
-            {currentIndex < questions.length - 1 ? '다음 문제' : '다시 시작'}
+            {currentIndex < questions.length - 1 ? "Tiếp theo / 다음 문제" : "Chơi lại / 다시 시작"}
           </Button>
         )}
       </Card>
@@ -504,7 +569,7 @@ function BattleGame({ level }: { level: TopikLevel }) {
       if (error) throw error;
       
       if (data?.questions?.length > 0) {
-        setQuestions(data.questions);
+        setQuestions(normalizeGrammarQuestions(data.questions));
       }
     } catch (error) {
       console.error('Error fetching grammar questions:', error);
@@ -575,14 +640,15 @@ function BattleGame({ level }: { level: TopikLevel }) {
     return (
       <Card className="p-8 text-center">
         <Zap className="w-16 h-16 mx-auto mb-4 text-yellow-500" />
-        <h2 className="text-2xl font-bold mb-2">문법 배틀</h2>
-        <p className="text-muted-foreground mb-6">
-          60초 안에 최대한 많은 문법 문제를 풀어보세요!<br />
-          연속 정답 시 콤보 보너스!
-        </p>
+        <h2 className="text-2xl font-bold mb-2">Grammar Battle</h2>
+        <BilingualText
+          className="mb-6"
+          vi="Trong 60 giây, hãy giải càng nhiều câu hỏi ngữ pháp càng tốt!\nĐúng liên tiếp sẽ có thưởng combo."
+          ko="60초 안에 최대한 많은 문법 문제를 풀어보세요!\n연속 정답 시 콤보 보너스!"
+        />
         <Button onClick={startGame} size="lg" className="gap-2">
           <Timer className="w-5 h-5" />
-          시작하기
+          Bắt đầu / 시작하기
         </Button>
       </Card>
     );
@@ -593,14 +659,12 @@ function BattleGame({ level }: { level: TopikLevel }) {
     return (
       <Card className="p-8 text-center">
         <Trophy className="w-16 h-16 mx-auto mb-4 text-yellow-500" />
-        <h2 className="text-2xl font-bold mb-2">게임 종료!</h2>
+        <h2 className="text-2xl font-bold mb-2">Hết giờ! / 게임 종료!</h2>
         <p className="text-4xl font-bold text-primary mb-2">{score}점</p>
-        <p className="text-muted-foreground mb-6">
-          {currentIndex}문제 도전
-        </p>
+        <p className="text-muted-foreground mb-6">{currentIndex} câu / {currentIndex}문제</p>
         <Button onClick={() => { fetchQuestions(); startGame(); }} size="lg" className="gap-2">
           <RefreshCw className="w-5 h-5" />
-          다시 도전
+          Thử lại / 다시 도전
         </Button>
       </Card>
     );
@@ -637,10 +701,8 @@ function BattleGame({ level }: { level: TopikLevel }) {
 
       {/* Question */}
       <Card className="p-6">
-        <div className="text-sm text-muted-foreground mb-2">
-          {current.grammarPoint}
-        </div>
-        <h3 className="text-xl font-medium mb-6">{current.question}</h3>
+        <BilingualText vi={current.grammarPoint.vi} ko={current.grammarPoint.ko} className="mb-2" />
+        <BilingualText vi={current.prompt.vi} ko={current.prompt.ko} className="mb-6" />
         
         <div className="grid grid-cols-2 gap-3">
           {current.options?.map((option, index) => (
@@ -665,49 +727,64 @@ function getFallbackQuestions(level: TopikLevel, type: string): GrammarQuestion[
   const questions: Record<TopikLevel, Record<string, GrammarQuestion[]>> = {
     "1-2": {
       assembly: [
-        { id: "1", type: "assembly", question: "주어 + 목적어 + 동사 순서로 배열하세요", parts: ["저는", "밥을", "먹어요"], correctOrder: [0, 1, 2], answer: "저는 밥을 먹어요", explanation: "한국어는 주어-목적어-동사 순서입니다", grammarPoint: "기본 어순 (SOV)" },
-        { id: "2", type: "assembly", question: "장소와 동사를 연결하세요", parts: ["학교에", "가요", "저는"], correctOrder: [2, 0, 1], answer: "저는 학교에 가요", explanation: "장소를 나타낼 때 '에'를 사용합니다", grammarPoint: "조사 -에 (장소)" },
+        {
+          id: "1",
+          type: "assembly",
+          prompt: {
+            vi: "Sắp xếp theo thứ tự: Chủ ngữ + Tân ngữ + Động từ",
+            ko: "주어 + 목적어 + 동사 순서로 배열하세요",
+          },
+          parts: ["저는", "밥을", "먹어요"],
+          answer: "저는 밥을 먹어요",
+          explanation: { vi: "Tiếng Hàn thường theo trật tự S-O-V.", ko: "한국어는 주어-목적어-동사 순서입니다" },
+          grammarPoint: { vi: "Trật tự câu cơ bản (SOV)", ko: "기본 어순 (SOV)" },
+        },
       ],
       correction: [
-        { id: "1", type: "correction", question: "저는 학교를 가요", errorPart: "학교를", correctPart: "학교에", options: ["학교에", "학교가", "학교는"], answer: "학교에", explanation: "이동의 목적지는 '-에'를 사용합니다", grammarPoint: "조사 -에/-를" },
-        { id: "2", type: "correction", question: "어제 영화를 봤다", errorPart: "봤다", correctPart: "봤어요", options: ["봤어요", "봐요", "볼 거예요"], answer: "봤어요", explanation: "존댓말로 '-았/었어요'를 사용합니다", grammarPoint: "과거 시제" },
+        {
+          id: "1",
+          type: "correction",
+          prompt: { vi: "Chạm vào phần sai trong câu", ko: "문장에서 틀린 부분을 찾아 터치하세요" },
+          sentence: { vi: "Tôi đi đến trường", ko: "저는 학교를 가요" },
+          errorPart: "학교를",
+          correctPart: "학교에",
+          options: ["학교에", "학교가", "학교는"],
+          answer: "학교에",
+          explanation: {
+            vi: "Đích đến khi di chuyển dùng '-에'.",
+            ko: "이동의 목적지는 '-에'를 사용합니다",
+          },
+          grammarPoint: { vi: "-에 vs -을/를", ko: "조사 -에/-를" },
+        },
       ],
       battle: [
-        { id: "1", type: "battle", question: "저는 밥___ 먹어요", options: ["을", "를", "이", "가"], answer: "을", explanation: "받침 있는 명사 뒤에는 '을'", grammarPoint: "목적격 조사" },
-        { id: "2", type: "battle", question: "친구___ 만나요", options: ["를", "을", "에", "가"], answer: "를", explanation: "받침 없는 명사 뒤에는 '를'", grammarPoint: "목적격 조사" },
-      ]
+        {
+          id: "1",
+          type: "battle",
+          prompt: { vi: "저는 밥___ 먹어요", ko: "저는 밥___ 먹어요" },
+          options: ["을", "를", "이", "가"],
+          answer: "을",
+          explanation: {
+            vi: "Danh từ có 받침 dùng '을'.",
+            ko: "받침 있는 명사 뒤에는 '을'",
+          },
+          grammarPoint: { vi: "Trợ từ tân ngữ", ko: "목적격 조사" },
+        },
+      ],
     },
     "3-4": {
-      assembly: [
-        { id: "1", type: "assembly", question: "조건문을 완성하세요", parts: ["비가", "오면", "우산을", "가져가세요"], correctOrder: [0, 1, 2, 3], answer: "비가 오면 우산을 가져가세요", explanation: "'-으면'은 조건을 나타냅니다", grammarPoint: "조건 -으면" },
-        { id: "2", type: "assembly", question: "이유를 나타내는 문장을 만드세요", parts: ["피곤해서", "일찍", "잤어요", "어제"], correctOrder: [3, 0, 1, 2], answer: "어제 피곤해서 일찍 잤어요", explanation: "'-아서/어서'는 이유를 나타냅니다", grammarPoint: "이유 -아서/어서" },
-      ],
-      correction: [
-        { id: "1", type: "correction", question: "공부를 열심히 하면서 성적이 좋아졌어요", errorPart: "하면서", correctPart: "해서", options: ["해서", "하니까", "하면"], answer: "해서", explanation: "결과의 이유를 나타낼 때 '-아서/어서' 사용", grammarPoint: "-면서 vs -아서" },
-        { id: "2", type: "correction", question: "내일 비가 와서 우산을 가져가세요", errorPart: "와서", correctPart: "오면", options: ["오면", "오니까", "왔으니까"], answer: "오면", explanation: "미래 조건은 '-으면' 사용", grammarPoint: "시제와 조건" },
-      ],
-      battle: [
-        { id: "1", type: "battle", question: "시간이 없___ 택시를 탔어요", options: ["어서", "으면", "지만", "고"], answer: "어서", explanation: "이유를 나타내는 연결어미", grammarPoint: "이유 -아서/어서" },
-        { id: "2", type: "battle", question: "열심히 공부하___ 시험에 떨어졌어요", options: ["지만", "아서", "면", "고"], answer: "지만", explanation: "대조를 나타내는 연결어미", grammarPoint: "대조 -지만" },
-      ]
+      assembly: [],
+      correction: [],
+      battle: [],
     },
     "5-6": {
-      assembly: [
-        { id: "1", type: "assembly", question: "피동문을 완성하세요", parts: ["그", "소식이", "전국에", "알려졌다"], correctOrder: [0, 1, 2, 3], answer: "그 소식이 전국에 알려졌다", explanation: "피동 표현은 주어가 영향을 받음을 나타냅니다", grammarPoint: "피동 표현" },
-        { id: "2", type: "assembly", question: "사동문을 완성하세요", parts: ["선생님이", "학생들에게", "책을", "읽혔다"], correctOrder: [0, 1, 2, 3], answer: "선생님이 학생들에게 책을 읽혔다", explanation: "사동 표현은 다른 사람에게 행동을 시킴", grammarPoint: "사동 표현" },
-      ],
-      correction: [
-        { id: "1", type: "correction", question: "그 정책은 경제에 영향을 끼치는 바가 크다", errorPart: "끼치는 바가", correctPart: "끼치는 바", options: ["끼치는 바", "끼친 바", "끼칠 바가"], answer: "끼치는 바", explanation: "'-는 바'는 사실/상황을 나타내며 조사 없이 사용", grammarPoint: "-는 바" },
-        { id: "2", type: "correction", question: "연구 결과에 의하면 효과가 있는 것 같다", errorPart: "것 같다", correctPart: "것으로 나타났다", options: ["것으로 나타났다", "것이다", "것 같았다"], answer: "것으로 나타났다", explanation: "학술적 문체에서는 객관적 표현 사용", grammarPoint: "학술적 문체" },
-      ],
-      battle: [
-        { id: "1", type: "battle", question: "이 연구는 기존 이론___ 달리 새로운 관점을 제시한다", options: ["과", "에", "와", "으로"], answer: "과", explanation: "'~와/과 달리'는 대조 표현", grammarPoint: "-와/과 달리" },
-        { id: "2", type: "battle", question: "정부의 정책 변화___ 인해 시장이 요동쳤다", options: ["로", "에", "으로", "에게"], answer: "로", explanation: "'~(으)로 인해'는 원인 표현", grammarPoint: "-(으)로 인해" },
-      ]
-    }
+      assembly: [],
+      correction: [],
+      battle: [],
+    },
   };
 
-  return questions[level][type] || questions["1-2"][type];
+  return questions[level][type] || questions["1-2"][type] || [];
 }
 
 // ==================== Main Component ====================
@@ -724,8 +801,8 @@ export default function Grammar() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">문법 학습</h1>
-            <p className="text-muted-foreground">재미있는 게임으로 한국어 문법 마스터!</p>
+            <h1 className="text-2xl font-bold">Ngữ pháp / 문법</h1>
+            <p className="text-muted-foreground">Học ngữ pháp tiếng Hàn qua mini-game (VN ưu tiên) / 재미있는 게임으로 한국어 문법 마스터!</p>
           </div>
         </div>
 
@@ -737,18 +814,18 @@ export default function Grammar() {
           <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="assembly" className="gap-2">
               <Puzzle className="w-4 h-4" />
-              <span className="hidden sm:inline">문장 조립</span>
-              <span className="sm:hidden">조립</span>
+              <span className="hidden sm:inline">Ghép câu / 문장 조립</span>
+              <span className="sm:hidden">Ghép / 조립</span>
             </TabsTrigger>
             <TabsTrigger value="correction" className="gap-2">
               <PenTool className="w-4 h-4" />
-              <span className="hidden sm:inline">오류 수정</span>
-              <span className="sm:hidden">수정</span>
+              <span className="hidden sm:inline">Sửa lỗi / 오류 수정</span>
+              <span className="sm:hidden">Sửa / 수정</span>
             </TabsTrigger>
             <TabsTrigger value="battle" className="gap-2">
               <Zap className="w-4 h-4" />
-              <span className="hidden sm:inline">문법 배틀</span>
-              <span className="sm:hidden">배틀</span>
+              <span className="hidden sm:inline">Battle / 문법 배틀</span>
+              <span className="sm:hidden">Battle / 배틀</span>
             </TabsTrigger>
           </TabsList>
 
