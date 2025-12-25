@@ -22,6 +22,7 @@ import {
   CheckCircle,
   Zap,
 } from "lucide-react";
+import { Swords } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
@@ -356,6 +357,71 @@ const Dashboard = () => {
                     🎁 Điểm danh hôm nay để nhận thưởng 7 ngày liên tiếp!
                   </p>
                 )}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Battle Arena Banner - HOT */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.12 }}
+            onClick={() => navigate("/battle")}
+            className="relative overflow-hidden rounded-2xl cursor-pointer group"
+          >
+            {/* Dark intense gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-600 via-orange-500 to-red-600" />
+            <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-transparent to-black/40" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,0,0.3),transparent_40%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(255,50,50,0.3),transparent_40%)]" />
+            
+            {/* Fire particles */}
+            <div className="absolute inset-0 overflow-hidden">
+              <div className="absolute top-1/4 left-1/5 w-2 h-2 bg-yellow-400/50 rounded-full animate-pulse" />
+              <div className="absolute top-1/3 right-1/4 w-1.5 h-1.5 bg-orange-400/60 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
+              <div className="absolute bottom-1/4 left-1/3 w-1 h-1 bg-red-400/50 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
+              <div className="absolute top-1/2 right-1/5 w-2 h-2 bg-yellow-300/40 rounded-full animate-pulse" style={{ animationDelay: '0.6s' }} />
+            </div>
+            
+            {/* Shimmer effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+            
+            <div className="relative z-10 p-5 sm:p-6 flex items-center justify-between">
+              <div className="flex items-center gap-4 sm:gap-5">
+                {/* Icon with heartbeat */}
+                <div className="relative">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-lg animate-heartbeat">
+                    <Swords className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center border-2 border-white/50 shadow-md animate-heartbeat" style={{ animationDelay: '0.15s' }}>
+                    <Flame className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
+                  </div>
+                </div>
+                
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1.5 sm:mb-2 flex-wrap">
+                    <span className="text-badge px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white/25 text-white font-bold backdrop-blur-sm">
+                      ⚔️ 1:1 Real-time
+                    </span>
+                    <span className="text-badge px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold shadow-sm animate-pulse">
+                      HOT
+                    </span>
+                  </div>
+                  <h3 className="font-bold text-white text-lg sm:text-xl lg:text-2xl tracking-tight">Đấu trường 1:1</h3>
+                  <p className="text-white/85 text-sm sm:text-base mt-0.5 sm:mt-1">
+                    Nối từ • Đấu nghĩa • Thắng = +1,000đ!
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="hidden sm:flex flex-col items-end mr-2">
+                  <span className="text-card-caption text-white/80 font-medium">2 trò chơi</span>
+                  <span className="text-badge text-yellow-300 font-semibold">Thắng lấy điểm!</span>
+                </div>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/25 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/35 transition-colors shadow-lg">
+                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:translate-x-0.5 transition-transform" />
+                </div>
               </div>
             </div>
           </motion.div>
