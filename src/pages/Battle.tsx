@@ -80,12 +80,27 @@ export default function Battle() {
   const [loadingRoom, setLoadingRoom] = useState(false);
   const [roomError, setRoomError] = useState<string | null>(null);
 
-  // Check URL params for room code
+  // Check URL params for room code + sessionStorage fallback for OAuth callbacks
   useEffect(() => {
-    const roomCode = searchParams.get("room");
-    const game = searchParams.get("game");
+    let roomCode = searchParams.get("room");
+    let game = searchParams.get("game");
+
+    // If no URL params, try sessionStorage (OAuth callback may lose query string)
+    if (!roomCode) {
+      const storedInvite = sessionStorage.getItem("battle_invite");
+      if (storedInvite) {
+        try {
+          const parsed = JSON.parse(storedInvite);
+          roomCode = parsed.room;
+          game = parsed.game;
+        } catch {}
+      }
+    }
 
     if (!roomCode) return;
+
+    // Store invite info for potential OAuth callback
+    sessionStorage.setItem("battle_invite", JSON.stringify({ room: roomCode.toUpperCase(), game: game || "word-chain" }));
 
     setInitialRoomCode(roomCode.toUpperCase());
     setInviteGame(game === "semantic" ? "semantic" : "word-chain");
@@ -163,6 +178,8 @@ export default function Battle() {
   const handleJoinFromInvite = () => {
     setJoiningRoom(true);
     setShowInviteModal(false);
+    // Clear the stored invite after joining
+    sessionStorage.removeItem("battle_invite");
     setSelectedGame(inviteGame || "word-chain");
   };
 
@@ -172,6 +189,8 @@ export default function Battle() {
     setInviteGame(null);
     setRoomInfo(null);
     setRoomError(null);
+    // Clear stored invite
+    sessionStorage.removeItem("battle_invite");
     // Clear URL params
     navigate("/battle", { replace: true });
   };
