@@ -375,11 +375,29 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     channelRef.current = channel;
   };
 
-  // Start game (host only)
+  // Toggle ready status
+  const toggleReady = async () => {
+    if (!room) return;
+    const field = isHost ? "host_ready" : "guest_ready";
+    const currentValue = isHost ? room.host_ready : room.guest_ready;
+
+    try {
+      await supabase
+        .from("chain_reaction_rooms")
+        .update({ [field]: !currentValue })
+        .eq("id", room.id);
+    } catch (err) {
+      console.error("Failed to toggle ready:", err);
+    }
+  };
+
+  // Start game (host only, both must be ready)
   const startGame = async () => {
     if (!room || !isHost) return;
-
-    const startWord = words[Math.floor(Math.random() * words.length)];
+    if (!room.host_ready || !room.guest_ready) {
+      toast({ title: "양쪽 모두 준비 완료해야 시작할 수 있습니다", variant: "destructive" });
+      return;
+    }
 
     try {
       await supabase
@@ -813,23 +831,49 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             Sẵn sàng đối đầu! / 모든 플레이어가 참가했습니다
           </p>
 
-          {/* Players */}
+          {/* Players with ready status */}
           <div className="bg-muted/50 rounded-xl p-4 mb-6">
             <div className="flex items-center justify-center gap-6">
+              {/* Host */}
               <div className="text-center">
-                <div className="w-14 h-14 rounded-full bg-purple-500/20 flex items-center justify-center mx-auto mb-1">
-                  <Crown className="w-7 h-7 text-purple-500" />
+                <div className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-1 transition-all ${
+                  room?.host_ready 
+                    ? "bg-green-500/30 ring-2 ring-green-500" 
+                    : "bg-purple-500/20"
+                }`}>
+                  {room?.host_ready ? (
+                    <Check className="w-7 h-7 text-green-500" />
+                  ) : (
+                    <Crown className="w-7 h-7 text-purple-500" />
+                  )}
                 </div>
                 <div className="font-bold">{room?.host_name}</div>
-                {isHost && <div className="text-xs text-primary">나</div>}
+                <div className={`text-xs ${room?.host_ready ? "text-green-500 font-medium" : "text-muted-foreground"}`}>
+                  {room?.host_ready ? "준비 완료 ✓" : "대기중..."}
+                </div>
+                {isHost && <div className="text-xs text-primary mt-0.5">나</div>}
               </div>
+
               <div className="text-2xl">⚡</div>
+
+              {/* Guest */}
               <div className="text-center">
-                <div className="w-14 h-14 rounded-full bg-pink-500/20 flex items-center justify-center mx-auto mb-1">
-                  <Users className="w-7 h-7 text-pink-500" />
+                <div className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-1 transition-all ${
+                  room?.guest_ready 
+                    ? "bg-green-500/30 ring-2 ring-green-500" 
+                    : "bg-pink-500/20"
+                }`}>
+                  {room?.guest_ready ? (
+                    <Check className="w-7 h-7 text-green-500" />
+                  ) : (
+                    <Users className="w-7 h-7 text-pink-500" />
+                  )}
                 </div>
                 <div className="font-bold">{room?.guest_name}</div>
-                {!isHost && <div className="text-xs text-primary">나</div>}
+                <div className={`text-xs ${room?.guest_ready ? "text-green-500 font-medium" : "text-muted-foreground"}`}>
+                  {room?.guest_ready ? "준비 완료 ✓" : "대기중..."}
+                </div>
+                {!isHost && <div className="text-xs text-primary mt-0.5">나</div>}
               </div>
             </div>
           </div>
@@ -852,29 +896,69 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
               게임 규칙 / Luật chơi
             </div>
             <ul className="space-y-1 text-muted-foreground">
-              <li>⏱️ 30초 타임어택</li>
+              <li>⏱️ 60초 타임어택</li>
               <li>⛓️ 체인이 길수록 점수 기하급수 증가 (10→20→40→80...)</li>
               <li>🏆 시간 종료 시 높은 점수가 승리!</li>
             </ul>
           </div>
 
-          {isHost ? (
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button 
-                onClick={startGame}
+          {/* Ready button for everyone */}
+          <div className="space-y-3">
+            {/* My ready toggle */}
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                onClick={toggleReady}
                 size="lg"
-                className="gap-2 text-lg px-8 bg-gradient-to-r from-green-500 to-emerald-500 hover:opacity-90"
+                variant={(isHost ? room?.host_ready : room?.guest_ready) ? "outline" : "default"}
+                className={`w-full gap-2 text-lg ${
+                  (isHost ? room?.host_ready : room?.guest_ready)
+                    ? "border-green-500 text-green-500 hover:bg-green-500/10"
+                    : "bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90"
+                }`}
               >
-                <Play className="w-6 h-6" />
-                게임 시작! / Bắt đầu!
+                {(isHost ? room?.host_ready : room?.guest_ready) ? (
+                  <>
+                    <Check className="w-5 h-5" />
+                    준비 완료! (클릭하면 취소)
+                  </>
+                ) : (
+                  <>
+                    <Zap className="w-5 h-5" />
+                    준비 완료 / Sẵn sàng
+                  </>
+                )}
               </Button>
             </motion.div>
-          ) : (
-            <div className="flex items-center justify-center gap-2 text-muted-foreground">
-              <Loader2 className="w-5 h-5 animate-spin" />
-              호스트가 시작하기를 기다리는 중...
-            </div>
-          )}
+
+            {/* Start button (host only, enabled when both ready) */}
+            {isHost && (
+              <motion.div whileHover={{ scale: room?.host_ready && room?.guest_ready ? 1.02 : 1 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  onClick={startGame}
+                  size="lg"
+                  disabled={!room?.host_ready || !room?.guest_ready}
+                  className={`w-full gap-2 text-lg ${
+                    room?.host_ready && room?.guest_ready
+                      ? "bg-gradient-to-r from-green-500 to-emerald-500 hover:opacity-90"
+                      : "bg-muted text-muted-foreground cursor-not-allowed"
+                  }`}
+                >
+                  <Play className="w-6 h-6" />
+                  {room?.host_ready && room?.guest_ready
+                    ? "게임 시작! / Bắt đầu!"
+                    : "양쪽 모두 준비해야 시작 가능"}
+                </Button>
+              </motion.div>
+            )}
+
+            {/* Guest waiting message */}
+            {!isHost && room?.host_ready && room?.guest_ready && (
+              <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                호스트가 시작 버튼을 누르기를 기다리는 중...
+              </div>
+            )}
+          </div>
         </Card>
       </motion.div>
     );
