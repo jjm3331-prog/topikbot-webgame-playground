@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { 
   Puzzle, 
-  PenTool, 
+  Gamepad2, 
   Zap, 
   RefreshCw, 
   Check, 
@@ -23,6 +23,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AppLayout from "@/components/AppLayout";
+import GrammarTetris from "@/components/grammar/GrammarTetris";
 
 type TopikLevel = "1-2" | "3-4" | "5-6";
 
@@ -370,203 +371,7 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
   );
 }
 
-// ==================== 틀린 문장 고치기 ====================
-function CorrectionGame({ level }: { level: TopikLevel }) {
-  const [questions, setQuestions] = useState<GrammarQuestion[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedError, setSelectedError] = useState<string | null>(null);
-  const [showOptions, setShowOptions] = useState(false);
-  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
-  const [score, setScore] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchQuestions = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('grammar-content', {
-        body: { level, type: 'correction', count: 10 }
-      });
-      
-      if (error) throw error;
-      
-      if (data?.questions?.length > 0) {
-        setQuestions(normalizeGrammarQuestions(data.questions));
-      }
-    } catch (error) {
-      console.error('Error fetching grammar questions:', error);
-      const fallback = getFallbackQuestions(level, 'correction');
-      setQuestions(fallback);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [level]);
-
-  useEffect(() => {
-    fetchQuestions();
-  }, [level]);
-
-  const handleSelectError = (word: string) => {
-    const current = questions[currentIndex];
-    if (word === current.errorPart) {
-      setSelectedError(word);
-      setShowOptions(true);
-    } else {
-      toast.error("Chọn đúng phần sai nhé! / 틀린 부분을 다시 찾아보세요!");
-    }
-  };
-
-  const handleSelectCorrection = (option: string) => {
-    const current = questions[currentIndex];
-    const correct = option === current.correctPart;
-    
-    setIsCorrect(correct);
-    
-    if (correct) {
-      setScore(prev => prev + 10);
-      toast.success("Đúng! +10 / 정답! +10");
-    } else {
-      toast.error("Sai rồi, nghĩ lại nhé! / 다시 생각해보세요!");
-    }
-  };
-
-  const handleNext = () => {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex(prev => prev + 1);
-      setSelectedError(null);
-      setShowOptions(false);
-      setIsCorrect(null);
-    } else {
-      toast.success(`Hoàn thành! Tổng ${score} điểm / 게임 완료! 총 ${score}점`);
-      setCurrentIndex(0);
-      setSelectedError(null);
-      setShowOptions(false);
-      setIsCorrect(null);
-      fetchQuestions();
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  const current = questions[currentIndex];
-  if (!current) return null;
-
-  const words = (current.sentence?.ko || current.prompt.ko).split(' ');
-
-  return (
-    <div className="space-y-6">
-      {/* Stats */}
-      <div className="flex items-center justify-between">
-        <Badge variant="outline" className="text-lg px-4 py-2">
-          <Trophy className="w-4 h-4 mr-2" />
-          {score}점
-        </Badge>
-        <Badge variant="secondary">
-          {currentIndex + 1} / {questions.length}
-        </Badge>
-      </div>
-
-      {/* Grammar Point */}
-      <Card className="p-4 bg-primary/5 border-primary/20">
-        <div className="flex items-center gap-2">
-          <AlertCircle className="w-5 h-5 text-primary" />
-          <span className="font-medium">Loại lỗi</span>
-          <BilingualText vi={current.grammarPoint.vi} ko={current.grammarPoint.ko} />
-        </div>
-      </Card>
-
-      {/* Sentence */}
-      <Card className="p-6">
-        <BilingualText
-          className="mb-4"
-          vi="Chạm vào phần sai trong câu:"
-          ko="문장에서 틀린 부분을 찾아 터치하세요:"
-        />
-
-        <div className="flex flex-wrap gap-2 mb-6">
-          {words.map((word, index) => (
-            <motion.button
-              key={index}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                selectedError === word
-                  ? "bg-red-500 text-white"
-                  : "bg-muted hover:bg-muted/80"
-              }`}
-              onClick={() => handleSelectError(word)}
-              disabled={showOptions}
-            >
-              {word}
-            </motion.button>
-          ))}
-        </div>
-
-        {/* Correction Options */}
-        <AnimatePresence>
-          {showOptions && isCorrect === null && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-3 mb-6"
-            >
-              <p className="text-sm font-medium">Chọn cách đúng / 올바른 표현을 선택하세요:</p>
-              <div className="flex flex-wrap gap-2">
-                {current.options?.map((option, index) => (
-                  <Button key={index} variant="outline" onClick={() => handleSelectCorrection(option)}>
-                    {option}
-                  </Button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Result */}
-        <AnimatePresence>
-          {isCorrect !== null && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className={`p-4 rounded-lg mb-4 ${
-                isCorrect ? "bg-green-500/10 border border-green-500/30" : "bg-red-500/10 border border-red-500/30"
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-2">
-                {isCorrect ? (
-                  <Check className="w-5 h-5 text-green-500" />
-                ) : (
-                  <X className="w-5 h-5 text-red-500" />
-                )}
-                <span className="font-medium">{isCorrect ? "Đúng! / 정답입니다!" : "Sai rồi / 틀렸습니다"}</span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                <strong>Đáp án / 정답:</strong> {current.errorPart} → {current.correctPart}
-              </p>
-              <div className="mt-2 space-y-2">
-                <div className="text-sm font-medium">💡 Giải thích / 해설</div>
-                <BilingualText vi={current.explanation.vi} ko={current.explanation.ko} />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Next Button */}
-        {isCorrect !== null && (
-          <Button onClick={handleNext} className="w-full">
-            {currentIndex < questions.length - 1 ? "Tiếp theo / 다음 문제" : "Chơi lại / 다시 시작"}
-          </Button>
-        )}
-      </Card>
-    </div>
-  );
-}
+// ==================== CorrectionGame 삭제 - GrammarTetris로 대체 ====================
 
 // ==================== 문법 배틀 (60초) ====================
 function BattleGame({ level }: { level: TopikLevel }) {
@@ -836,10 +641,10 @@ export default function Grammar() {
               <span className="hidden sm:inline">Ghép câu / 문장 조립</span>
               <span className="sm:hidden">Ghép / 조립</span>
             </TabsTrigger>
-            <TabsTrigger value="correction" className="gap-2">
-              <PenTool className="w-4 h-4" />
-              <span className="hidden sm:inline">Sửa lỗi / 오류 수정</span>
-              <span className="sm:hidden">Sửa / 수정</span>
+            <TabsTrigger value="tetris" className="gap-2">
+              <Gamepad2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Tetris / 테트리스</span>
+              <span className="sm:hidden">Tetris</span>
             </TabsTrigger>
             <TabsTrigger value="battle" className="gap-2">
               <Zap className="w-4 h-4" />
@@ -852,8 +657,8 @@ export default function Grammar() {
             <AssemblyGame level={level} />
           </TabsContent>
           
-          <TabsContent value="correction">
-            <CorrectionGame level={level} />
+          <TabsContent value="tetris">
+            <GrammarTetris level={level} />
           </TabsContent>
           
           <TabsContent value="battle">
