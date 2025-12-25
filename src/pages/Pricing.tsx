@@ -25,6 +25,7 @@ import {
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { supabase } from "@/integrations/supabase/client";
+import zaloPayLogo from "@/assets/zalopay-logo.png";
 
 type BillingPeriod = "1-month" | "6-months" | "12-months";
 
@@ -484,7 +485,11 @@ const Pricing = () => {
               Thanh toán an toàn qua ZaloPay
             </p>
             <div className="flex justify-center">
-              <img src="https://zalopay.vn/images/logo.svg" alt="ZaloPay" className="h-8 opacity-70" />
+              <img 
+                src={zaloPayLogo} 
+                alt="ZaloPay" 
+                className="h-6 sm:h-8 md:h-10 w-auto object-contain" 
+              />
             </div>
           </motion.div>
         </div>
