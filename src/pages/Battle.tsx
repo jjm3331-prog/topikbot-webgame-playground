@@ -61,6 +61,12 @@ const battleGames: BattleGame[] = [
   },
 ];
 
+interface RoomInfo {
+  host_name: string;
+  status: string;
+  guest_id: string | null;
+}
+
 export default function Battle() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -70,6 +76,9 @@ export default function Battle() {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteGame, setInviteGame] = useState<string | null>(null);
   const [joiningRoom, setJoiningRoom] = useState(false);
+  const [roomInfo, setRoomInfo] = useState<RoomInfo | null>(null);
+  const [loadingRoom, setLoadingRoom] = useState(false);
+  const [roomError, setRoomError] = useState<string | null>(null);
 
   // Check URL params for room code
   useEffect(() => {
@@ -78,7 +87,7 @@ export default function Battle() {
 
     if (!roomCode) return;
 
-    setInitialRoomCode(roomCode);
+    setInitialRoomCode(roomCode.toUpperCase());
     setInviteGame(game === "semantic" ? "semantic" : "word-chain");
   }, [searchParams]);
 
@@ -96,6 +105,44 @@ export default function Battle() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Fetch room info when we have a room code
+  useEffect(() => {
+    if (!initialRoomCode) return;
+
+    const fetchRoomInfo = async () => {
+      setLoadingRoom(true);
+      setRoomError(null);
+
+      try {
+        const connectionMode = inviteGame === "semantic" ? "semantic" : "phonetic";
+        const { data, error } = await supabase
+          .from("chain_reaction_rooms")
+          .select("host_name, status, guest_id")
+          .eq("room_code", initialRoomCode)
+          .eq("connection_mode", connectionMode)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (!data) {
+          setRoomError("Phòng không tồn tại");
+        } else if (data.status === "playing" || data.status === "finished") {
+          setRoomError("Phòng đã bắt đầu hoặc kết thúc");
+        } else if (data.guest_id) {
+          setRoomError("Phòng đã đầy");
+        } else {
+          setRoomInfo(data);
+        }
+      } catch (err) {
+        setRoomError("Không thể tải thông tin phòng");
+      } finally {
+        setLoadingRoom(false);
+      }
+    };
+
+    fetchRoomInfo();
+  }, [initialRoomCode, inviteGame]);
 
   // Handle invite flow: redirect to auth if not logged in, show modal if logged in
   useEffect(() => {
@@ -123,6 +170,8 @@ export default function Battle() {
     setShowInviteModal(false);
     setInitialRoomCode(undefined);
     setInviteGame(null);
+    setRoomInfo(null);
+    setRoomError(null);
     // Clear URL params
     navigate("/battle", { replace: true });
   };
@@ -215,42 +264,84 @@ export default function Battle() {
               {/* Header with gradient */}
               <div className={`bg-gradient-to-r ${inviteGame === "semantic" ? "from-purple-500 to-pink-500" : "from-yellow-400 to-orange-500"} p-6 text-center`}>
                 <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Swords className="w-8 h-8 text-white" />
+                  {inviteGame === "semantic" ? (
+                    <Brain className="w-8 h-8 text-white" />
+                  ) : (
+                    <Link2 className="w-8 h-8 text-white" />
+                  )}
                 </div>
                 <h2 className="text-xl font-bold text-white">
                   {inviteGame === "semantic" ? "Đấu Nghĩa 1:1" : "Nối từ 1:1"}
                 </h2>
-                <p className="text-white/80 text-sm mt-1">
-                  Bạn được mời tham gia trận đấu!
+                <p className="text-white/70 text-xs mt-1">
+                  {inviteGame === "semantic" ? "의미 연결 대결" : "끝말잇기 대결"}
                 </p>
               </div>
 
-              {/* Room code display */}
+              {/* Content */}
               <div className="p-6 text-center">
-                <p className="text-sm text-muted-foreground mb-2">Mã phòng</p>
-                <p className="text-3xl font-mono font-bold text-primary tracking-widest mb-6">
-                  {initialRoomCode}
-                </p>
+                {loadingRoom ? (
+                  <div className="py-8">
+                    <Loader2 className="w-10 h-10 animate-spin text-muted-foreground mx-auto mb-3" />
+                    <p className="text-sm text-muted-foreground">Đang tải thông tin phòng...</p>
+                  </div>
+                ) : roomError ? (
+                  <div className="py-6">
+                    <div className="w-14 h-14 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <X className="w-7 h-7 text-destructive" />
+                    </div>
+                    <p className="text-destructive font-semibold mb-2">{roomError}</p>
+                    <p className="text-sm text-muted-foreground mb-6">
+                      Phòng này không còn khả dụng.
+                    </p>
+                    <Button
+                      onClick={handleCloseInviteModal}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      Đóng
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    {/* Host info */}
+                    {roomInfo && (
+                      <div className="mb-4 p-3 bg-muted/50 rounded-xl">
+                        <p className="text-xs text-muted-foreground mb-1">Đang chờ bạn</p>
+                        <div className="flex items-center justify-center gap-2">
+                          <Crown className="w-5 h-5 text-yellow-500" />
+                          <span className="font-bold text-lg">{roomInfo.host_name}</span>
+                        </div>
+                      </div>
+                    )}
 
-                {/* Join button */}
-                <Button
-                  onClick={handleJoinFromInvite}
-                  disabled={joiningRoom}
-                  className={`w-full h-14 text-lg font-bold rounded-xl bg-gradient-to-r ${inviteGame === "semantic" ? "from-purple-500 to-pink-500" : "from-yellow-400 to-orange-500"} hover:opacity-90 text-white`}
-                >
-                  {joiningRoom ? (
-                    <Loader2 className="w-6 h-6 animate-spin" />
-                  ) : (
-                    <>
-                      <Play className="w-6 h-6 mr-2" />
-                      Tham gia ngay!
-                    </>
-                  )}
-                </Button>
+                    {/* Room code */}
+                    <p className="text-xs text-muted-foreground mb-1">Mã phòng</p>
+                    <p className="text-3xl font-mono font-bold text-primary tracking-widest mb-5">
+                      {initialRoomCode}
+                    </p>
 
-                <p className="text-xs text-muted-foreground mt-4">
-                  12 giây mỗi lượt • 2 cảnh báo = thua
-                </p>
+                    {/* Join button */}
+                    <Button
+                      onClick={handleJoinFromInvite}
+                      disabled={joiningRoom || !roomInfo}
+                      className={`w-full h-14 text-lg font-bold rounded-xl bg-gradient-to-r ${inviteGame === "semantic" ? "from-purple-500 to-pink-500" : "from-yellow-400 to-orange-500"} hover:opacity-90 text-white`}
+                    >
+                      {joiningRoom ? (
+                        <Loader2 className="w-6 h-6 animate-spin" />
+                      ) : (
+                        <>
+                          <Play className="w-6 h-6 mr-2" />
+                          Tham gia ngay!
+                        </>
+                      )}
+                    </Button>
+
+                    <p className="text-xs text-muted-foreground mt-4">
+                      12 giây mỗi lượt • 2 cảnh báo = thua
+                    </p>
+                  </>
+                )}
               </div>
             </motion.div>
           </motion.div>
