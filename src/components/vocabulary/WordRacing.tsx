@@ -54,8 +54,9 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
   const [gameState, setGameState] = useState<"ready" | "playing" | "paused" | "finished">("ready");
   const [carX, setCarX] = useState(TRACK_WIDTH / 2 - CAR_SIZE / 2);
   const [carLane, setCarLane] = useState(2);
-  const [speed, setSpeed] = useState(3);
-  const [baseSpeed, setBaseSpeed] = useState(3);
+  const [speed, setSpeed] = useState(2);
+  const [baseSpeed, setBaseSpeed] = useState(2);
+  const [selectedSpeed, setSelectedSpeed] = useState<"slow" | "normal" | "fast">("normal");
   const [boosting, setBoosting] = useState(false);
   const [score, setScore] = useState(0);
   const [distance, setDistance] = useState(0);
@@ -71,6 +72,14 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
   const lastSpawnRef = useRef(0);
   const wordIndexRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Speed settings
+  const speedSettings = {
+    slow: { base: 1.5, label: "느림 / Chậm", color: "from-green-500 to-emerald-500" },
+    normal: { base: 2.5, label: "보통 / Bình thường", color: "from-blue-500 to-cyan-500" },
+    fast: { base: 4, label: "빠름 / Nhanh", color: "from-orange-500 to-red-500" },
+  };
+  
 
   // Get next target word
   const getNextWord = useCallback(() => {
@@ -299,11 +308,12 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
   }, [gameState]);
 
   const startGame = () => {
+    const initialSpeed = speedSettings[selectedSpeed].base;
     setGameState("playing");
     setScore(0);
     setDistance(0);
-    setSpeed(3);
-    setBaseSpeed(3);
+    setSpeed(initialSpeed);
+    setBaseSpeed(initialSpeed);
     setWordsCompleted(0);
     setCombo(0);
     setLetters([]);
@@ -366,8 +376,29 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
             </ul>
           </div>
 
+          {/* Speed selector */}
+          <div className="mb-6">
+            <p className="text-sm text-muted-foreground mb-3">🏎️ Tốc độ / 속도</p>
+            <div className="flex justify-center gap-2">
+              {(Object.keys(speedSettings) as Array<keyof typeof speedSettings>).map((key) => (
+                <Button
+                  key={key}
+                  variant={selectedSpeed === key ? "default" : "outline"}
+                  onClick={() => setSelectedSpeed(key)}
+                  className={`text-sm px-4 py-2 ${
+                    selectedSpeed === key 
+                      ? `bg-gradient-to-r ${speedSettings[key].color} border-0` 
+                      : ""
+                  }`}
+                >
+                  {speedSettings[key].label}
+                </Button>
+              ))}
+            </div>
+          </div>
+
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button onClick={startGame} size="lg" className="gap-2 text-lg px-8 py-6 bg-gradient-to-r from-blue-500 to-cyan-500 hover:opacity-90">
+            <Button onClick={startGame} size="lg" className={`gap-2 text-lg px-8 py-6 bg-gradient-to-r ${speedSettings[selectedSpeed].color} hover:opacity-90`}>
               <Play className="w-6 h-6" />
               Bắt đầu / 시작
             </Button>
