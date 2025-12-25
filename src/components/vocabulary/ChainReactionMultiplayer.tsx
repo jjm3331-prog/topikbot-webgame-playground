@@ -57,6 +57,18 @@ interface ChainWord {
   connectionType: "semantic" | "phonetic" | "start";
 }
 
+interface MoveRow {
+  id: string;
+  room_id: string;
+  player_id: string;
+  player_name: string;
+  word: string;
+  connection_mode: string;
+  chain_length: number;
+  score_delta: number;
+  created_at: string;
+}
+
 type GamePhase = "menu" | "creating" | "joining" | "waiting" | "ready" | "countdown" | "playing" | "finished";
 
 export default function ChainReactionMultiplayer({ words, onBack, initialRoomCode }: ChainReactionMultiplayerProps) {
@@ -69,6 +81,11 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   const [roomCodeInput, setRoomCodeInput] = useState(initialRoomCode || "");
   const [copied, setCopied] = useState(false);
   const [connectionMode, setConnectionMode] = useState<"semantic" | "phonetic">("semantic");
+
+  // Realtime moves (actual words sync)
+  const [moves, setMoves] = useState<MoveRow[]>([]);
+  const moveIdsRef = useRef<Set<string>>(new Set());
+  const movesChannelRef = useRef<any>(null);
 
   // Game state
   const [timeLeft, setTimeLeft] = useState(60);
@@ -512,6 +529,8 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     setTimeLeft(60);
     setScore(0);
     setChain([]);
+    setMoves([]);
+    moveIdsRef.current = new Set();
     setCurrentInput("");
     setError(null);
     setConnectionMode(roomData.connection_mode as "semantic" | "phonetic");
@@ -530,7 +549,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     const newWord = currentInput.trim();
     setError(null);
 
-    if (chain.some(c => c.word === newWord)) {
+    if (chain.some((c) => c.word === newWord)) {
       setError("이미 사용한 단어예요!");
       return;
     }
@@ -546,35 +565,67 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     const isValid = await validateConnection(newWord, previousWord, connectionMode);
     setIsValidating(false);
 
-    if (isValid) {
-      const newChainLength = chain.length + 1;
-      const pointsEarned = calculateScore(newChainLength);
-
-      setChain(prev => [...prev, { word: newWord, connectionType: connectionMode }]);
-      setScore(prev => prev + pointsEarned);
-      setCurrentInput("");
-
-      // Update room with new score
-      const updateField = isHost ? "host_score" : "guest_score";
-      const chainField = isHost ? "host_chain_length" : "guest_chain_length";
-      
-      await supabase
-        .from("chain_reaction_rooms")
-        .update({
-          [updateField]: score + pointsEarned,
-          [chainField]: newChainLength
-        })
-        .eq("id", room.id);
-
-      if (newChainLength >= 5) {
-        confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 } });
-      }
-    } else {
+    if (!isValid) {
       if (connectionMode === "phonetic") {
         const lastChar = previousWord.charAt(previousWord.length - 1);
         setError(`'${lastChar}'로 시작해야 해요!`);
       } else {
         setError("의미적으로 연결되지 않아요!");
+      }
+      inputRef.current?.focus();
+      return;
+    }
+
+    const newChainLength = chain.length + 1;
+    const pointsEarned = calculateScore(newChainLength);
+
+    // 1) Persist scores to room (so the scoreboard stays accurate)
+    const updateField = isHost ? "host_score" : "guest_score";
+    const chainField = isHost ? "host_chain_length" : "guest_chain_length";
+
+    await supabase
+      .from("chain_reaction_rooms")
+      .update({
+        [updateField]: score + pointsEarned,
+        [chainField]: newChainLength,
+      })
+      .eq("id", room.id);
+
+    // 2) Insert move for realtime word sync (this is what the opponent sees)
+    const { data: moveRow, error: moveErr } = await (supabase as any)
+      .from("chain_reaction_moves")
+      .insert({
+        room_id: room.id,
+        player_id: playerId,
+        player_name: playerName || (isHost ? room.host_name : room.guest_name || "Player"),
+        word: newWord,
+        connection_mode: connectionMode,
+        chain_length: newChainLength,
+        score_delta: pointsEarned,
+      })
+      .select()
+      .single();
+
+    if (moveErr) {
+      console.error("Failed to insert move:", moveErr);
+      toast({
+        title: "단어 전송 실패",
+        description: "상대에게 전송되지 않았을 수 있어요. 잠시 후 다시 시도해주세요.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Apply locally (avoid duplicates with move id)
+    if (moveRow?.id && !moveIdsRef.current.has(moveRow.id)) {
+      moveIdsRef.current.add(moveRow.id);
+      setMoves((prev) => [...prev, moveRow as MoveRow]);
+      setChain((prev) => [...prev, { word: newWord, connectionType: connectionMode }]);
+      setScore((prev) => prev + pointsEarned);
+      setCurrentInput("");
+
+      if (newChainLength >= 5) {
+        confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 } });
       }
     }
 
@@ -589,7 +640,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     }
 
     timerRef.current = setInterval(() => {
-      setTimeLeft(prev => {
+      setTimeLeft((prev) => {
         if (prev <= 1) {
           finishGame();
           return 0;
@@ -602,6 +653,86 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [gamePhase]);
+
+  // Moves realtime sync (words)
+  useEffect(() => {
+    const roomId = room?.id;
+    if (!roomId || gamePhase !== "playing") return;
+
+    let cancelled = false;
+
+    const loadAndSubscribe = async () => {
+      console.log("[ChainMoves] init for room:", roomId);
+
+      const { data, error } = await (supabase as any)
+        .from("chain_reaction_moves")
+        .select("*")
+        .eq("room_id", roomId)
+        .order("created_at", { ascending: true });
+
+      if (cancelled) return;
+
+      if (error) {
+        console.error("[ChainMoves] load error:", error);
+        return;
+      }
+
+      const rows = (data || []) as MoveRow[];
+      moveIdsRef.current = new Set(rows.map((r) => r.id));
+      setMoves(rows);
+
+      // Merge into chain view (start word + moves timeline)
+      setChain((prev) => {
+        const start = prev.length && prev[0]?.connectionType === "start" ? [prev[0]] : [];
+        const timeline = rows.map((r) => ({
+          word: r.word,
+          connectionType: (r.connection_mode as "semantic" | "phonetic") || "semantic",
+        }));
+        return [...start, ...timeline];
+      });
+
+      if (movesChannelRef.current) {
+        supabase.removeChannel(movesChannelRef.current);
+      }
+
+      const ch = supabase
+        .channel(`moves-${roomId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "chain_reaction_moves",
+            filter: `room_id=eq.${roomId}`,
+          },
+          (payload) => {
+            console.log("[ChainMoves] insert:", payload);
+            const row = payload.new as MoveRow;
+            if (!row?.id) return;
+            if (moveIdsRef.current.has(row.id)) return;
+
+            moveIdsRef.current.add(row.id);
+            setMoves((prevMoves) => [...prevMoves, row]);
+            setChain((prevChain) => [...prevChain, { word: row.word, connectionType: (row.connection_mode as any) || "semantic" }]);
+          }
+        )
+        .subscribe((status) => {
+          console.log("[ChainMoves] subscribe status:", status);
+        });
+
+      movesChannelRef.current = ch;
+    };
+
+    void loadAndSubscribe();
+
+    return () => {
+      cancelled = true;
+      if (movesChannelRef.current) {
+        supabase.removeChannel(movesChannelRef.current);
+        movesChannelRef.current = null;
+      }
+    };
+  }, [room?.id, gamePhase]);
 
   // Finish game
   const finishGame = async () => {
@@ -671,6 +802,9 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     return () => {
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
+      }
+      if (movesChannelRef.current) {
+        supabase.removeChannel(movesChannelRef.current);
       }
     };
   }, []);
