@@ -44,27 +44,35 @@ interface Monster {
   hp: number; // 보스용
 }
 
-type GameState = "menu" | "tutorial" | "playing" | "gameover" | "victory";
+type GameState = "menu" | "stageSelect" | "tutorial" | "playing" | "gameover" | "victory";
+type StageType = "particle" | "tense" | "mixed";
+
+// 스테이지 정의
+const STAGES: { id: StageType; nameVi: string; nameKo: string; icon: string; desc: string }[] = [
+  { id: "particle", nameVi: "Trợ từ", nameKo: "조사", icon: "📝", desc: "을/를, 이/가, 에/에서" },
+  { id: "tense", nameVi: "Thì", nameKo: "시제", icon: "⏰", desc: "과거, 현재, 미래" },
+  { id: "mixed", nameVi: "Tổng hợp", nameKo: "혼합", icon: "🎯", desc: "Tất cả loại lỗi" },
+];
 
 // 스테이지별 설정 - 속도 느리게 조정
 const STAGE_CONFIG = {
   "1-2": {
     name: { vi: "Sơ cấp", ko: "초급" },
-    monsterSpeed: 8, // 느린 속도 (초당 %)
-    timePerMonster: 8, // 초
-    totalQuestions: 10,
+    monsterSpeed: 8,
+    timePerMonster: 8,
+    totalQuestions: 5,
   },
   "3-4": {
     name: { vi: "Trung cấp", ko: "중급" },
     monsterSpeed: 10,
     timePerMonster: 6,
-    totalQuestions: 10,
+    totalQuestions: 5,
   },
   "5-6": {
     name: { vi: "Cao cấp", ko: "고급" },
     monsterSpeed: 12,
     timePerMonster: 5,
-    totalQuestions: 10,
+    totalQuestions: 5,
   },
 };
 
@@ -74,47 +82,30 @@ const TUTORIAL_STEPS = [
     icon: "👾",
     titleVi: "Quái vật xuất hiện!",
     titleKo: "몬스터 등장!",
-    descVi: "Câu có lỗi ngữ pháp sẽ xuất hiện và di chuyển về phía tháp của bạn.",
-    descKo: "문법 오류가 있는 문장이 나타나 기지로 다가옵니다.",
+    descVi: "Câu có lỗi ngữ pháp sẽ di chuyển về phía tháp.",
+    descKo: "문법 오류 문장이 기지로 다가옵니다.",
   },
   {
     icon: "🎯",
     titleVi: "Chọn đáp án đúng",
     titleKo: "정답 선택",
-    descVi: "Nhấn vào đáp án đúng để tiêu diệt quái vật trước khi nó đến tháp!",
-    descKo: "정답을 터치해서 몬스터가 기지에 도달하기 전에 격파하세요!",
+    descVi: "Nhấn đáp án đúng để tiêu diệt trước khi đến tháp!",
+    descKo: "정답 터치로 몬스터 격파!",
   },
   {
     icon: "❤️",
     titleVi: "Bảo vệ HP",
     titleKo: "HP 보호",
-    descVi: "Bạn có 3 HP. Nếu quái vật đến tháp hoặc bạn chọn sai, mất 1 HP!",
-    descKo: "HP는 3개입니다. 몬스터가 도착하거나 오답 시 HP -1!",
-  },
-  {
-    icon: "⭐",
-    titleVi: "Nhận sao thưởng",
-    titleKo: "별 획득",
-    descVi: "Hoàn thành 10 câu để chiến thắng! Không mất HP = 3 sao!",
-    descKo: "10문제를 클리어하면 승리! 노데미지 = 3스타!",
+    descVi: "HP 3개. Sai hoặc quái đến = mất 1 HP!",
+    descKo: "HP 3개. 오답/도착 시 HP -1!",
   },
 ];
 
-// Fallback 문제들
-const FALLBACK_QUESTIONS: Record<TopikLevel, TowerQuestion[]> = {
-  "1-2": [
+// Fallback 문제들 - 스테이지별
+const STAGE_QUESTIONS: Record<StageType, TowerQuestion[]> = {
+  particle: [
     {
-      id: "1",
-      wrongSentence: "나는 어제 학교에 갑니다",
-      wrongSentenceVi: "Tôi đi đến trường hôm qua (sai thì)",
-      errorType: "시제 오류",
-      options: ["갔습니다", "갈 겁니다", "가고 있습니다", "간다"],
-      answer: "갔습니다",
-      explanationVi: "Vì có '어제' (hôm qua) nên phải dùng thì quá khứ '-았/었습니다'",
-      explanationKo: "'어제'가 있으므로 과거 시제 '-았/었습니다'를 사용해야 합니다",
-    },
-    {
-      id: "2",
+      id: "p1",
       wrongSentence: "사과가 먹어요",
       wrongSentenceVi: "Quả táo ăn (sai trợ từ)",
       errorType: "조사 오류",
@@ -124,7 +115,7 @@ const FALLBACK_QUESTIONS: Record<TopikLevel, TowerQuestion[]> = {
       explanationKo: "사과는 목적어이므로 목적격 조사 '-를'을 사용해야 합니다",
     },
     {
-      id: "3",
+      id: "p2",
       wrongSentence: "저는 물이 마셔요",
       wrongSentenceVi: "Tôi nước uống (sai trợ từ)",
       errorType: "조사 오류",
@@ -134,7 +125,7 @@ const FALLBACK_QUESTIONS: Record<TopikLevel, TowerQuestion[]> = {
       explanationKo: "물은 목적어이고 받침이 있으므로 '-을'을 사용합니다",
     },
     {
-      id: "4",
+      id: "p3",
       wrongSentence: "친구가 집을 왔어요",
       wrongSentenceVi: "Bạn đã đến nhà (sai trợ từ)",
       errorType: "조사 오류",
@@ -144,7 +135,7 @@ const FALLBACK_QUESTIONS: Record<TopikLevel, TowerQuestion[]> = {
       explanationKo: "이동의 목적지에는 '-에'를 사용합니다",
     },
     {
-      id: "5",
+      id: "p4",
       wrongSentence: "저는 한국어가 공부해요",
       wrongSentenceVi: "Tôi tiếng Hàn học (sai trợ từ)",
       errorType: "조사 오류",
@@ -154,7 +145,29 @@ const FALLBACK_QUESTIONS: Record<TopikLevel, TowerQuestion[]> = {
       explanationKo: "한국어는 '공부하다'의 목적어이므로 '-를'을 사용합니다",
     },
     {
-      id: "6",
+      id: "p5",
+      wrongSentence: "저는 커피는 좋아해요",
+      wrongSentenceVi: "Tôi thì cà phê thì thích (trùng trợ từ)",
+      errorType: "조사 오류",
+      options: ["커피를", "커피가", "커피에", "커피도"],
+      answer: "커피를",
+      explanationVi: "Cà phê là tân ngữ, dùng '-를'. '는' đã dùng cho '저'",
+      explanationKo: "'저는'에서 이미 '-는'을 사용했으므로 목적어는 '-를'",
+    },
+  ],
+  tense: [
+    {
+      id: "t1",
+      wrongSentence: "나는 어제 학교에 갑니다",
+      wrongSentenceVi: "Tôi đi đến trường hôm qua (sai thì)",
+      errorType: "시제 오류",
+      options: ["갔습니다", "갈 겁니다", "가고 있습니다", "간다"],
+      answer: "갔습니다",
+      explanationVi: "Vì có '어제' (hôm qua) nên phải dùng thì quá khứ '-았/었습니다'",
+      explanationKo: "'어제'가 있으므로 과거 시제 '-았/었습니다'를 사용해야 합니다",
+    },
+    {
+      id: "t2",
       wrongSentence: "내일 비가 왔어요",
       wrongSentenceVi: "Ngày mai trời mưa đã (sai thì)",
       errorType: "시제 오류",
@@ -164,27 +177,7 @@ const FALLBACK_QUESTIONS: Record<TopikLevel, TowerQuestion[]> = {
       explanationKo: "'내일'은 미래이므로 '-ㄹ 거예요'를 사용합니다",
     },
     {
-      id: "7",
-      wrongSentence: "저는 커피는 좋아해요",
-      wrongSentenceVi: "Tôi thì cà phê thì thích (trùng trợ từ)",
-      errorType: "조사 오류",
-      options: ["커피를", "커피가", "커피에", "커피도"],
-      answer: "커피를",
-      explanationVi: "Cà phê là tân ngữ, dùng '-를'. '는' đã dùng cho '저'",
-      explanationKo: "'저는'에서 이미 '-는'을 사용했으므로 목적어는 '-를'",
-    },
-    {
-      id: "8",
-      wrongSentence: "학교에서 도서관을 갔어요",
-      wrongSentenceVi: "Từ trường đã đi thư viện (sai trợ từ)",
-      errorType: "조사 오류",
-      options: ["도서관에", "도서관을", "도서관이", "도서관은"],
-      answer: "도서관에",
-      explanationVi: "Điểm đến khi di chuyển dùng '-에'",
-      explanationKo: "이동의 목적지에는 '-에'를 사용합니다",
-    },
-    {
-      id: "9",
+      id: "t3",
       wrongSentence: "지금 밥을 먹었어요",
       wrongSentenceVi: "Bây giờ đã ăn cơm (sai thì)",
       errorType: "시제 오류",
@@ -194,218 +187,76 @@ const FALLBACK_QUESTIONS: Record<TopikLevel, TowerQuestion[]> = {
       explanationKo: "'지금'은 현재이므로 현재 시제 '-어요'를 사용합니다",
     },
     {
-      id: "10",
-      wrongSentence: "동생이 케이크가 만들었어요",
-      wrongSentenceVi: "Em đã làm bánh (sai trợ từ)",
+      id: "t4",
+      wrongSentence: "작년에 한국에 갈 거예요",
+      wrongSentenceVi: "Năm ngoái sẽ đi Hàn (sai thì)",
+      errorType: "시제 오류",
+      options: ["갔어요", "갈 거예요", "가요", "가겠어요"],
+      answer: "갔어요",
+      explanationVi: "'Năm ngoái' là quá khứ, dùng '-았/었어요'",
+      explanationKo: "'작년'은 과거이므로 '-았/었어요'를 사용합니다",
+    },
+    {
+      id: "t5",
+      wrongSentence: "다음 주에 친구를 만났어요",
+      wrongSentenceVi: "Tuần sau đã gặp bạn (sai thì)",
+      errorType: "시제 오류",
+      options: ["만날 거예요", "만났어요", "만나요", "만나겠어요"],
+      answer: "만날 거예요",
+      explanationVi: "'Tuần sau' là tương lai, dùng '-ㄹ 거예요'",
+      explanationKo: "'다음 주'는 미래이므로 '-ㄹ 거예요'를 사용합니다",
+    },
+  ],
+  mixed: [
+    {
+      id: "m1",
+      wrongSentence: "어제 친구가 집을 왔어요",
+      wrongSentenceVi: "Hôm qua bạn đến nhà (sai trợ từ)",
       errorType: "조사 오류",
-      options: ["케이크를", "케이크가", "케이크에", "케이크는"],
-      answer: "케이크를",
-      explanationVi: "Bánh là tân ngữ (được làm), dùng '-를'",
-      explanationKo: "케이크는 만들다의 목적어이므로 '-를'을 사용합니다",
-    },
-  ],
-  "3-4": [
-    {
-      id: "1",
-      wrongSentence: "비가 오지만 우산이 없어서 집에 있어요",
-      wrongSentenceVi: "Trời mưa nhưng vì không có ô nên ở nhà (sai logic)",
-      errorType: "연결어미 오류",
-      options: ["오니까", "오지만", "오면", "오고"],
-      answer: "오니까",
-      explanationVi: "Vì trời mưa → nên ở nhà. Dùng '-니까' (lý do)",
-      explanationKo: "비가 오는 것이 이유이므로 '-니까'를 사용합니다",
+      options: ["집에", "집을", "집이", "집는"],
+      answer: "집에",
+      explanationVi: "Địa điểm đến dùng '-에'",
+      explanationKo: "이동의 목적지에는 '-에'를 사용합니다",
     },
     {
-      id: "2",
-      wrongSentence: "선생님, 제가 도와드릴게요 (학생이 선생님에게)",
-      wrongSentenceVi: "Thầy ơi, em sẽ giúp thầy (học sinh nói với thầy)",
-      errorType: "높임법 오류",
-      options: ["도와드릴까요?", "도와줄게요", "도와드릴게요", "도와요"],
-      answer: "도와드릴까요?",
-      explanationVi: "Với người trên, nên hỏi ý kiến '-ㄹ까요?' thay vì tự quyết",
-      explanationKo: "윗사람에게는 의향을 묻는 '-ㄹ까요?'가 더 적절합니다",
+      id: "m2",
+      wrongSentence: "내일 영화가 봤어요",
+      wrongSentenceVi: "Ngày mai đã xem phim (sai thì + trợ từ)",
+      errorType: "시제 + 조사",
+      options: ["영화를 볼 거예요", "영화가 봤어요", "영화를 봤어요", "영화에 볼 거예요"],
+      answer: "영화를 볼 거예요",
+      explanationVi: "Phim là tân ngữ (-를) + ngày mai là tương lai (-ㄹ 거예요)",
+      explanationKo: "영화는 목적어(-를) + 내일은 미래(-ㄹ 거예요)입니다",
     },
     {
-      id: "3",
-      wrongSentence: "시간이 있어서 영화를 못 봤어요",
-      wrongSentenceVi: "Vì có thời gian nên không xem được phim (sai logic)",
-      errorType: "연결어미 오류",
-      options: ["없어서", "있어서", "있으니까", "있지만"],
-      answer: "없어서",
-      explanationVi: "'Không xem được' → vì 'không có' thời gian mới hợp lý",
-      explanationKo: "'못 봤다'의 이유는 시간이 '없어서'입니다",
+      id: "m3",
+      wrongSentence: "지금 학교를 갑니다",
+      wrongSentenceVi: "Bây giờ đến trường (sai trợ từ)",
+      errorType: "조사 오류",
+      options: ["학교에", "학교를", "학교가", "학교는"],
+      answer: "학교에",
+      explanationVi: "Điểm đến dùng '-에' không phải '-를'",
+      explanationKo: "이동의 목적지는 '-에'를 사용합니다",
     },
     {
-      id: "4",
-      wrongSentence: "배가 부르면 더 먹어요",
-      wrongSentenceVi: "Nếu no thì ăn thêm (sai logic)",
-      errorType: "연결어미 오류",
-      options: ["고프면", "부르면", "불러서", "부르니까"],
-      answer: "고프면",
-      explanationVi: "Logic đúng: nếu đói → ăn thêm",
-      explanationKo: "배가 '고프면' 더 먹는 것이 논리적입니다",
+      id: "m4",
+      wrongSentence: "작년에 한국에서 살 거예요",
+      wrongSentenceVi: "Năm ngoái sẽ sống ở Hàn (sai thì)",
+      errorType: "시제 오류",
+      options: ["살았어요", "살 거예요", "살아요", "삽니다"],
+      answer: "살았어요",
+      explanationVi: "'Năm ngoái' là quá khứ",
+      explanationKo: "'작년'은 과거이므로 '-았어요'를 사용합니다",
     },
     {
-      id: "5",
-      wrongSentence: "할머니께 전화를 했어요",
-      wrongSentenceVi: "Đã gọi điện cho bà (thiếu kính ngữ)",
-      errorType: "높임법 오류",
-      options: ["드렸어요", "했어요", "줬어요", "받았어요"],
-      answer: "드렸어요",
-      explanationVi: "Với người lớn tuổi, dùng '드리다' thay vì '하다'",
-      explanationKo: "어른께는 '전화(를) 드리다'가 적절합니다",
-    },
-    {
-      id: "6",
-      wrongSentence: "피곤하지만 쉬고 싶어요",
-      wrongSentenceVi: "Mệt nhưng muốn nghỉ (sai logic)",
-      errorType: "연결어미 오류",
-      options: ["피곤해서", "피곤하지만", "피곤하면", "피곤하고"],
-      answer: "피곤해서",
-      explanationVi: "Mệt (lý do) → muốn nghỉ. Dùng '-아서'",
-      explanationKo: "피곤한 것이 이유이므로 '-아서'가 맞습니다",
-    },
-    {
-      id: "7",
-      wrongSentence: "부장님, 커피 마셔요",
-      wrongSentenceVi: "Sếp ơi, uống cà phê đi (thiếu kính ngữ)",
-      errorType: "높임법 오류",
-      options: ["드세요", "마셔요", "마시겠어요", "마실래요"],
-      answer: "드세요",
-      explanationVi: "Mời người trên uống → '드세요' (kính ngữ của 마시다)",
-      explanationKo: "윗사람에게는 '드시다'의 명령형 '드세요'를 씁니다",
-    },
-    {
-      id: "8",
-      wrongSentence: "날씨가 좋으니까 집에 있을 거예요",
-      wrongSentenceVi: "Vì thời tiết đẹp nên sẽ ở nhà (sai logic)",
-      errorType: "연결어미 오류",
-      options: ["나쁘니까", "좋으니까", "좋아서", "좋지만"],
-      answer: "나쁘니까",
-      explanationVi: "Ở nhà thường vì thời tiết xấu, không phải đẹp",
-      explanationKo: "날씨가 '나쁘니까' 집에 있는 것이 자연스럽습니다",
-    },
-    {
-      id: "9",
-      wrongSentence: "아버지, 이거 먹어",
-      wrongSentenceVi: "Bố ơi, ăn cái này đi (thiếu kính ngữ)",
-      errorType: "높임법 오류",
-      options: ["드세요", "먹어", "먹어요", "먹을래요"],
-      answer: "드세요",
-      explanationVi: "Với bố (người trên), dùng kính ngữ '드세요'",
-      explanationKo: "아버지께는 높임말 '드세요'를 사용합니다",
-    },
-    {
-      id: "10",
-      wrongSentence: "돈이 많아서 아르바이트를 해요",
-      wrongSentenceVi: "Vì có nhiều tiền nên làm thêm (sai logic)",
-      errorType: "연결어미 오류",
-      options: ["없어서", "많아서", "있으니까", "많으면"],
-      answer: "없어서",
-      explanationVi: "Làm thêm vì thiếu tiền mới hợp lý",
-      explanationKo: "돈이 '없어서' 아르바이트를 하는 것이 맞습니다",
-    },
-  ],
-  "5-6": [
-    {
-      id: "1",
-      wrongSentence: "그가 온다고 말했다더라",
-      wrongSentenceVi: "Nghe nói anh ấy nói là sẽ đến (sai gián tiếp)",
-      errorType: "간접화법 오류",
-      options: ["온다더라", "온다고 했다", "올 거라더라", "왔다더라"],
-      answer: "온다더라",
-      explanationVi: "'-다더라' đã bao gồm ý 'nghe nói', không cần thêm '말했다'",
-      explanationKo: "'-다더라'에 이미 전달의 의미가 있어 '말했다'가 불필요합니다",
-    },
-    {
-      id: "2",
-      wrongSentence: "그 책을 읽으면 감동적이에요",
-      wrongSentenceVi: "Nếu đọc cuốn sách đó thì cảm động (sai biểu hiện)",
-      errorType: "뉘앙스 오류",
-      options: ["읽어 보면", "읽으면", "읽어서", "읽고"],
-      answer: "읽어 보면",
-      explanationVi: "'-어 보다' thể hiện việc thử nghiệm, đánh giá sau khi thử",
-      explanationKo: "경험 후 평가를 나타낼 때는 '-어 보면'이 적절합니다",
-    },
-    {
-      id: "3",
-      wrongSentence: "비가 오는 바람에 소풍을 갈 수 있었어요",
-      wrongSentenceVi: "Vì mưa nên đã có thể đi picnic (sai logic)",
-      errorType: "뉘앙스 오류",
-      options: ["갈 수 없었어요", "갈 수 있었어요", "가게 됐어요", "갔어요"],
-      answer: "갈 수 없었어요",
-      explanationVi: "'-는 바람에' dùng cho kết quả tiêu cực, không phải tích cực",
-      explanationKo: "'-는 바람에'는 부정적인 결과에 사용합니다",
-    },
-    {
-      id: "4",
-      wrongSentence: "선배님이 저한테 가라고 하셨어요",
-      wrongSentenceVi: "Anh chị đã bảo tôi đi (sai kính ngữ)",
-      errorType: "간접화법 + 높임 오류",
-      options: ["가라고 하셨어요", "가시라고 했어요", "가시래요", "가자고 하셨어요"],
-      answer: "가라고 하셨어요",
-      explanationVi: "Đây là câu đúng. Người nói nhường mình thấp hơn.",
-      explanationKo: "이 문장은 올바릅니다. 화자가 자신을 낮추고 있습니다",
-    },
-    {
-      id: "5",
-      wrongSentence: "그 영화를 보고 나서야 감독이 누군지 알았어요",
-      wrongSentenceVi: "Sau khi xem phim mới biết đạo diễn là ai",
-      errorType: "정상 문장",
-      options: ["보고 나서야", "보기 전에", "보면서", "보려고"],
-      answer: "보고 나서야",
-      explanationVi: "Đúng rồi! '-고 나서야' = chỉ sau khi... mới...",
-      explanationKo: "'-고 나서야'는 '~한 후에야 비로소'의 의미입니다",
-    },
-    {
-      id: "6",
-      wrongSentence: "아무리 바빠서 건강을 챙겨야 해요",
-      wrongSentenceVi: "Dù bận đến đâu cũng phải chăm sóc sức khỏe",
-      errorType: "연결어미 오류",
-      options: ["바빠도", "바빠서", "바쁘면", "바쁘니까"],
-      answer: "바빠도",
-      explanationVi: "'아무리' đi với '-아/어도' (dù... cũng)",
-      explanationKo: "'아무리'는 양보의 '-아/어도'와 함께 씁니다",
-    },
-    {
-      id: "7",
-      wrongSentence: "그녀가 예쁘기는 예쁘지만 성격이 안 좋다",
-      wrongSentenceVi: "Cô ấy đẹp thì có đẹp nhưng tính cách không tốt",
-      errorType: "정상 문장",
-      options: ["예쁘기는 예쁘지만", "예뻐서", "예쁘니까", "예쁘면"],
-      answer: "예쁘기는 예쁘지만",
-      explanationVi: "Đúng! '-기는 -지만' thể hiện sự thừa nhận nhưng có điều kiện",
-      explanationKo: "'-기는 -지만'은 인정하면서 반박할 때 씁니다",
-    },
-    {
-      id: "8",
-      wrongSentence: "시험에 떨어질까 봐 열심히 공부 안 했어요",
-      wrongSentenceVi: "Sợ trượt kỳ thi nên không học chăm",
-      errorType: "뉘앙스 오류",
-      options: ["공부했어요", "공부 안 했어요", "공부할 거예요", "공부하고 있어요"],
-      answer: "공부했어요",
-      explanationVi: "Sợ trượt → học chăm mới hợp lý",
-      explanationKo: "시험에 떨어질까 봐 걱정되면 열심히 '공부합니다'",
-    },
-    {
-      id: "9",
-      wrongSentence: "일이 많은 김에 쉬세요",
-      wrongSentenceVi: "Nhân tiện có nhiều việc thì nghỉ đi",
-      errorType: "뉘앙스 오류",
-      options: ["없는 김에", "많은 김에", "있으니까", "많아서"],
-      answer: "없는 김에",
-      explanationVi: "'-는 김에' = nhân tiện. Nghỉ khi không có việc mới hợp lý",
-      explanationKo: "'일이 없는 김에 쉬다'가 자연스럽습니다",
-    },
-    {
-      id: "10",
-      wrongSentence: "그가 성공할 리가 있어요",
-      wrongSentenceVi: "Anh ấy có lý do thành công",
-      errorType: "뉘앙스 오류",
-      options: ["성공할 리가 없어요", "성공할 리가 있어요", "성공하겠어요", "성공했어요"],
-      answer: "성공할 리가 없어요",
-      explanationVi: "'-ㄹ 리가 없다' = không có lý do, không thể nào",
-      explanationKo: "'-ㄹ 리가 없다'는 불가능하다는 의미입니다",
+      id: "m5",
+      wrongSentence: "매일 아침이 커피가 마셔요",
+      wrongSentenceVi: "Mỗi sáng cà phê uống (sai trợ từ)",
+      errorType: "조사 오류",
+      options: ["아침에 커피를", "아침이 커피가", "아침을 커피에", "아침에 커피에"],
+      answer: "아침에 커피를",
+      explanationVi: "Thời gian dùng '-에', tân ngữ dùng '-를'",
+      explanationKo: "시간은 '-에', 목적어는 '-를'을 사용합니다",
     },
   ],
 };
@@ -421,6 +272,7 @@ const MONSTER_EMOJI: Record<Monster["type"], string> = {
 
 export default function TowerDefenseGame({ level }: { level: TopikLevel }) {
   const [gameState, setGameState] = useState<GameState>("menu");
+  const [currentStage, setCurrentStage] = useState<StageType>("particle");
   const [tutorialStep, setTutorialStep] = useState(0);
   const [hp, setHp] = useState(3);
   const [gold, setGold] = useState(0);
@@ -434,14 +286,30 @@ export default function TowerDefenseGame({ level }: { level: TopikLevel }) {
   const [stars, setStars] = useState(0);
   const [noDamage, setNoDamage] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [stageStars, setStageStars] = useState<Record<StageType, number>>({ particle: 0, tense: 0, mixed: 0 });
   
   const animationRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
 
   const config = STAGE_CONFIG[level];
 
+  // 스테이지 클리어 기록 로드
+  useEffect(() => {
+    const saved = localStorage.getItem(`tower_stage_stars_${level}`);
+    if (saved) {
+      setStageStars(JSON.parse(saved));
+    }
+  }, [level]);
+
+  // 스테이지 클리어 저장
+  const saveStageStars = (stage: StageType, starCount: number) => {
+    const updated = { ...stageStars, [stage]: Math.max(stageStars[stage], starCount) };
+    setStageStars(updated);
+    localStorage.setItem(`tower_stage_stars_${level}`, JSON.stringify(updated));
+  };
+
   // 튜토리얼 완료 여부 확인
-  const hasSenTutorial = () => {
+  const hasSeenTutorial = () => {
     return localStorage.getItem("tower_defense_tutorial_done") === "true";
   };
 
@@ -449,10 +317,11 @@ export default function TowerDefenseGame({ level }: { level: TopikLevel }) {
     localStorage.setItem("tower_defense_tutorial_done", "true");
   };
 
-  // 시작 버튼 클릭
-  const handleStartClick = () => {
-    if (hasSenTutorial()) {
-      startGame();
+  // 스테이지 선택
+  const handleStageSelect = (stage: StageType) => {
+    setCurrentStage(stage);
+    if (hasSeenTutorial()) {
+      startGame(stage);
     } else {
       setTutorialStep(0);
       setGameState("tutorial");
@@ -465,57 +334,20 @@ export default function TowerDefenseGame({ level }: { level: TopikLevel }) {
       setTutorialStep((prev) => prev + 1);
     } else {
       markTutorialDone();
-      startGame();
+      startGame(currentStage);
     }
   };
 
   // 튜토리얼 스킵
   const handleTutorialSkip = () => {
     markTutorialDone();
-    startGame();
+    startGame(currentStage);
   };
 
-  // Fetch questions from API or use fallback
-  const fetchQuestions = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("grammar-content", {
-        body: { level, type: "tower-defense", count: 10 },
-      });
-
-      if (error) throw error;
-
-      if (data?.questions?.length > 0) {
-        // Transform API response
-        const transformed: TowerQuestion[] = data.questions.map((q: any, idx: number) => ({
-          id: q.id || String(idx),
-          wrongSentence: q.wrongSentence || q.question_ko || "",
-          wrongSentenceVi: q.wrongSentenceVi || q.question_vi || "",
-          errorType: q.errorType || "문법 오류",
-          options: q.options || [],
-          answer: q.answer || "",
-          explanationVi: q.explanation_vi || q.explanationVi || "",
-          explanationKo: q.explanation_ko || q.explanationKo || "",
-        }));
-        setQuestions(transformed);
-      } else {
-        throw new Error("No questions returned");
-      }
-    } catch (error) {
-      console.error("Error fetching tower defense questions:", error);
-      // Use fallback
-      setQuestions([...FALLBACK_QUESTIONS[level]]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [level]);
-
-  useEffect(() => {
-    fetchQuestions();
-  }, [level]);
-
   // 게임 시작
-  const startGame = () => {
+  const startGame = (stage: StageType) => {
+    setCurrentStage(stage);
+    setQuestions([...STAGE_QUESTIONS[stage]]);
     setGameState("playing");
     setHp(3);
     setGold(0);
@@ -524,19 +356,22 @@ export default function TowerDefenseGame({ level }: { level: TopikLevel }) {
     setNoDamage(true);
     setSelectedAnswer(null);
     setShowResult(false);
-    spawnMonster(0);
+    setTimeout(() => spawnMonster(0), 100);
   };
 
   // 몬스터 생성
   const spawnMonster = (index: number) => {
-    if (index >= questions.length) {
+    const qs = questions.length > 0 ? questions : STAGE_QUESTIONS[currentStage];
+    if (index >= qs.length) {
       // 승리!
-      calculateStars();
+      const starCount = noDamage ? 3 : hp >= 2 ? 2 : 1;
+      setStars(starCount);
+      saveStageStars(currentStage, starCount);
       setGameState("victory");
       return;
     }
 
-    const q = questions[index];
+    const q = qs[index];
     const monster: Monster = {
       id: `monster-${index}`,
       question: q,
@@ -655,17 +490,6 @@ export default function TowerDefenseGame({ level }: { level: TopikLevel }) {
     }, 1500);
   };
 
-  // 별 계산
-  const calculateStars = () => {
-    if (noDamage) {
-      setStars(3);
-    } else if (hp >= 2) {
-      setStars(2);
-    } else {
-      setStars(1);
-    }
-  };
-
   // Cleanup
   useEffect(() => {
     return () => {
@@ -686,23 +510,62 @@ export default function TowerDefenseGame({ level }: { level: TopikLevel }) {
     );
   }
 
-  // Menu
+  // Menu - Stage Selection
   if (gameState === "menu") {
     return (
-      <Card className="p-6 text-center">
-        <Shield className="w-14 h-14 mx-auto mb-3 text-primary" />
-        <h2 className="text-xl font-bold mb-2">Bảo vệ tháp / 타워 디펜스</h2>
-        <p className="text-muted-foreground mb-2 text-sm">
-          {config.name.vi} ({config.name.ko})
-        </p>
-        <div className="text-xs text-muted-foreground mb-4 space-y-1">
-          <p>🎯 Câu sai tiến về tháp → Chọn đáp án đúng để tiêu diệt!</p>
-          <p>❤️ HP: 3 | 💰 Đúng: +10G | ⭐ No damage = 3 sao</p>
+      <Card className="p-4">
+        <div className="text-center mb-4">
+          <Shield className="w-12 h-12 mx-auto mb-2 text-primary" />
+          <h2 className="text-lg font-bold">Bảo vệ tháp / 타워 디펜스</h2>
+          <p className="text-muted-foreground text-xs">
+            {config.name.vi} ({config.name.ko}) - Chọn stage / 스테이지 선택
+          </p>
         </div>
-        <Button onClick={handleStartClick} size="lg" className="gap-2">
-          <Target className="w-5 h-5" />
-          Bắt đầu / 시작하기
-        </Button>
+
+        {/* Stage Selection */}
+        <div className="space-y-2">
+          {STAGES.map((stage, idx) => {
+            const isLocked = idx > 0 && stageStars[STAGES[idx - 1].id] === 0;
+            const starCount = stageStars[stage.id];
+            
+            return (
+              <motion.div key={stage.id} whileTap={{ scale: isLocked ? 1 : 0.98 }}>
+                <Button
+                  variant={isLocked ? "ghost" : "outline"}
+                  className={`w-full h-auto py-3 justify-between ${isLocked ? "opacity-50" : ""}`}
+                  onClick={() => !isLocked && handleStageSelect(stage.id)}
+                  disabled={isLocked}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{stage.icon}</span>
+                    <div className="text-left">
+                      <div className="font-bold text-sm">
+                        Stage {idx + 1}: {stage.nameVi}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {stage.nameKo} - {stage.desc}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-0.5">
+                    {[1, 2, 3].map((i) => (
+                      <Star
+                        key={i}
+                        className={`w-4 h-4 ${
+                          i <= starCount ? "text-yellow-400 fill-yellow-400" : "text-muted-foreground/30"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </Button>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        <p className="text-center text-xs text-muted-foreground mt-3">
+          🔓 Hoàn thành stage trước để mở khóa stage tiếp theo
+        </p>
       </Card>
     );
   }
@@ -756,76 +619,104 @@ export default function TowerDefenseGame({ level }: { level: TopikLevel }) {
 
   // Game Over
   if (gameState === "gameover") {
+    const currentStageName = STAGES.find(s => s.id === currentStage);
     return (
-      <Card className="p-8 text-center">
-        <Skull className="w-16 h-16 mx-auto mb-4 text-red-500" />
-        <h2 className="text-2xl font-bold mb-2 text-red-500">Game Over!</h2>
-        <p className="text-muted-foreground mb-2">Tháp đã bị phá hủy / 기지가 파괴되었습니다</p>
-        <div className="flex justify-center gap-4 mb-6">
-          <Badge variant="outline" className="text-lg px-4 py-2">
-            <Coins className="w-4 h-4 mr-2" />
+      <Card className="p-6 text-center">
+        <Skull className="w-14 h-14 mx-auto mb-3 text-red-500" />
+        <h2 className="text-xl font-bold mb-1 text-red-500">Game Over!</h2>
+        <p className="text-muted-foreground text-sm mb-4">
+          Stage: {currentStageName?.icon} {currentStageName?.nameVi}
+        </p>
+        <div className="flex justify-center gap-3 mb-4">
+          <Badge variant="outline" className="px-3 py-1">
+            <Coins className="w-4 h-4 mr-1" />
             {gold}G
           </Badge>
-          <Badge variant="outline" className="text-lg px-4 py-2">
-            <Target className="w-4 h-4 mr-2" />
-            {questionIndex}/{questions.length}
+          <Badge variant="outline" className="px-3 py-1">
+            <Target className="w-4 h-4 mr-1" />
+            {questionIndex}/{questions.length || 5}
           </Badge>
         </div>
-        <Button onClick={startGame} size="lg" className="gap-2">
-          <RefreshCw className="w-5 h-5" />
-          Thử lại / 다시 도전
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setGameState("menu")} className="flex-1">
+            Chọn stage
+          </Button>
+          <Button onClick={() => startGame(currentStage)} className="flex-1 gap-1">
+            <RefreshCw className="w-4 h-4" />
+            Thử lại
+          </Button>
+        </div>
       </Card>
     );
   }
 
   // Victory
   if (gameState === "victory") {
+    const currentStageName = STAGES.find(s => s.id === currentStage);
+    const currentStageIdx = STAGES.findIndex(s => s.id === currentStage);
+    const nextStage = currentStageIdx < STAGES.length - 1 ? STAGES[currentStageIdx + 1] : null;
+
     return (
-      <Card className="p-8 text-center">
-        <Trophy className="w-16 h-16 mx-auto mb-4 text-yellow-500" />
-        <h2 className="text-2xl font-bold mb-2">Chiến thắng! / 승리!</h2>
+      <Card className="p-6 text-center">
+        <Trophy className="w-14 h-14 mx-auto mb-2 text-yellow-500" />
+        <h2 className="text-xl font-bold mb-1">Chiến thắng! / 승리!</h2>
+        <p className="text-muted-foreground text-sm mb-2">
+          Stage: {currentStageName?.icon} {currentStageName?.nameVi}
+        </p>
         
         {/* Stars */}
-        <div className="flex justify-center gap-2 mb-4">
+        <div className="flex justify-center gap-1 mb-3">
           {[1, 2, 3].map((i) => (
             <motion.div
               key={i}
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: i * 0.2 }}
+              transition={{ delay: i * 0.15 }}
             >
               <Star
-                className={`w-10 h-10 ${
-                  i <= stars ? "text-yellow-400 fill-yellow-400" : "text-muted-foreground"
+                className={`w-8 h-8 ${
+                  i <= stars ? "text-yellow-400 fill-yellow-400" : "text-muted-foreground/30"
                 }`}
               />
             </motion.div>
           ))}
         </div>
 
-        <div className="flex justify-center gap-4 mb-6">
-          <Badge variant="outline" className="text-lg px-4 py-2">
-            <Coins className="w-4 h-4 mr-2" />
+        <div className="flex justify-center gap-3 mb-3">
+          <Badge variant="outline" className="px-3 py-1">
+            <Coins className="w-4 h-4 mr-1" />
             {gold}G
           </Badge>
-          <Badge variant="outline" className="text-lg px-4 py-2">
-            <Heart className="w-4 h-4 mr-2 text-red-500" />
+          <Badge variant="outline" className="px-3 py-1">
+            <Heart className="w-4 h-4 mr-1 text-red-500" />
             {hp}/3 HP
           </Badge>
         </div>
 
         {noDamage && (
-          <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white mb-4">
-            <Sparkles className="w-4 h-4 mr-2" />
-            Perfect! Không mất HP / 노데미지 클리어!
+          <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white mb-3">
+            <Sparkles className="w-4 h-4 mr-1" />
+            Perfect!
           </Badge>
         )}
 
-        <Button onClick={startGame} size="lg" className="gap-2">
-          <RefreshCw className="w-5 h-5" />
-          Chơi lại / 다시 플레이
-        </Button>
+        <div className="flex flex-col gap-2">
+          {nextStage && (
+            <Button onClick={() => startGame(nextStage.id)} className="w-full gap-2">
+              <Target className="w-4 h-4" />
+              {nextStage.icon} Stage tiếp: {nextStage.nameVi}
+            </Button>
+          )}
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setGameState("menu")} className="flex-1">
+              Chọn stage
+            </Button>
+            <Button variant="ghost" onClick={() => startGame(currentStage)} className="flex-1 gap-1">
+              <RefreshCw className="w-4 h-4" />
+              Chơi lại
+            </Button>
+          </div>
+        </div>
       </Card>
     );
   }
