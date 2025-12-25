@@ -385,10 +385,10 @@ const Headhunting = () => {
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary to-korean-purple flex items-center justify-center">
                 <Briefcase className="w-8 h-8 text-white" />
               </div>
-              <h1 className="font-heading font-bold text-2xl sm:text-3xl text-foreground mb-2">
+              <h1 className="text-title text-foreground mb-2">
                 Lịch sử đăng ký Headhunting
               </h1>
-              <p className="text-muted-foreground">
+              <p className="text-body text-muted-foreground">
                 Bạn đã gửi {applications.length} đơn đăng ký
               </p>
             </motion.div>
@@ -414,8 +414,8 @@ const Headhunting = () => {
                             <div className="flex items-center gap-3 mb-2">
                               <span className="text-2xl">{statusInfo.icon}</span>
                               <div>
-                                <h3 className="font-semibold text-foreground">{app.full_name}</h3>
-                                <p className="text-xs text-muted-foreground">
+                                <h3 className="text-card-title-lg text-foreground">{app.full_name}</h3>
+                                <p className="text-card-caption text-muted-foreground">
                                   {new Date(app.created_at).toLocaleDateString('vi-VN', {
                                     year: 'numeric',
                                     month: 'long',
@@ -562,10 +562,10 @@ const Headhunting = () => {
             >
               <CheckCircle2 className="w-10 h-10 text-white" />
             </motion.div>
-            <h1 className="font-heading font-bold text-3xl sm:text-4xl text-foreground mb-4">
+            <h1 className="text-headline text-foreground mb-4">
               🎉 Đăng ký thành công!
             </h1>
-            <p className="text-muted-foreground text-lg mb-8">
+            <p className="text-body text-muted-foreground mb-8">
               Đội ngũ Headhunter sẽ liên hệ với bạn sớm.<br />
               Bạn sẽ nhận được phản hồi trong 3-5 ngày làm việc.
             </p>
@@ -633,7 +633,7 @@ const Headhunting = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="font-heading font-black text-3xl sm:text-4xl md:text-5xl text-foreground mb-4"
+            className="text-headline text-foreground mb-4"
           >
             {editingApplication ? (
               <>Chỉnh sửa <span className="text-gradient-primary">đơn đăng ký</span></>
@@ -646,7 +646,7 @@ const Headhunting = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto mb-8"
+            className="text-body text-muted-foreground max-w-2xl mx-auto mb-8"
           >
             Đội ngũ Headhunter chuyên nghiệp của LUKATO hỗ trợ bạn xin việc tại doanh nghiệp Hàn Quốc.
             <br />
@@ -663,8 +663,8 @@ const Headhunting = () => {
             {benefits.map((benefit, i) => (
               <div key={benefit.title} className="p-4 rounded-xl bg-card/80 border border-border/50">
                 <benefit.icon className="w-6 h-6 mx-auto mb-2 text-primary" />
-                <h3 className="font-bold text-sm text-foreground">{benefit.title}</h3>
-                <p className="text-xs text-muted-foreground">{benefit.desc}</p>
+                <h3 className="text-card-title text-foreground">{benefit.title}</h3>
+                <p className="text-card-caption text-muted-foreground">{benefit.desc}</p>
               </div>
             ))}
           </motion.div>
