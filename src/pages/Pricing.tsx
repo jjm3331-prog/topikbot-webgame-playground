@@ -142,14 +142,14 @@ const Pricing = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8 pt-6"
+            className="text-center mb-10 pt-8"
           >
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-heading font-bold mb-3">
+            <h1 className="text-title font-heading font-bold mb-4">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-korean-green via-korean-cyan to-korean-blue">
                 Chọn gói phù hợp
               </span>
             </h1>
-            <p className="text-muted-foreground text-sm sm:text-base">
+            <p className="text-body text-muted-foreground">
               Bắt đầu miễn phí, nâng cấp khi cần thiết
             </p>
           </motion.div>
@@ -161,10 +161,10 @@ const Pricing = () => {
             transition={{ delay: 0.1 }}
             className="flex justify-center mb-8"
           >
-            <div className="inline-flex items-center p-1 rounded-full bg-muted border border-border">
+            <div className="inline-flex items-center p-1.5 rounded-full bg-muted border border-border">
               <button
                 onClick={() => setBillingPeriod("1-month")}
-                className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all ${
+                className={`px-4 sm:px-5 py-2.5 rounded-full text-card-caption sm:text-card-body font-medium transition-all ${
                   billingPeriod === "1-month"
                     ? "bg-background text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
@@ -174,27 +174,27 @@ const Pricing = () => {
               </button>
               <button
                 onClick={() => setBillingPeriod("6-months")}
-                className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all relative ${
+                className={`px-4 sm:px-5 py-2.5 rounded-full text-card-caption sm:text-card-body font-medium transition-all relative ${
                   billingPeriod === "6-months"
                     ? "bg-background text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 6 tháng
-                <span className="absolute -top-2 -right-2 px-1.5 py-0.5 rounded text-[10px] font-bold bg-korean-orange text-white">
+                <span className="absolute -top-2.5 -right-2.5 px-2 py-0.5 rounded text-badge font-bold bg-korean-orange text-white">
                   -20%
                 </span>
               </button>
               <button
                 onClick={() => setBillingPeriod("12-months")}
-                className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all relative ${
+                className={`px-4 sm:px-5 py-2.5 rounded-full text-card-caption sm:text-card-body font-medium transition-all relative ${
                   billingPeriod === "12-months"
                     ? "bg-background text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 12 tháng
-                <span className="absolute -top-2 -right-2 px-1.5 py-0.5 rounded text-[10px] font-bold bg-korean-green text-white">
+                <span className="absolute -top-2.5 -right-2.5 px-2 py-0.5 rounded text-badge font-bold bg-korean-green text-white">
                   BEST
                 </span>
               </button>
@@ -209,38 +209,38 @@ const Pricing = () => {
             className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto mb-12"
           >
             {/* Free Plan */}
-            <div className="relative rounded-2xl p-6 border bg-card border-border hover:border-primary/30 transition-all">
-              <span className="absolute -top-3 left-6 px-3 py-1 rounded-full bg-muted text-foreground text-xs font-bold border border-border">
+            <div className="relative rounded-2xl p-7 border bg-card border-border hover:border-primary/30 transition-all">
+              <span className="absolute -top-3.5 left-6 px-4 py-1.5 rounded-full bg-muted text-foreground text-badge font-bold border border-border">
                 Miễn phí
               </span>
 
-              <div className="flex justify-center mb-4 pt-4">
-                <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center">
-                  <Zap className="w-7 h-7 text-muted-foreground" />
+              <div className="flex justify-center mb-5 pt-5">
+                <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center">
+                  <Zap className="w-8 h-8 text-muted-foreground" />
                 </div>
               </div>
 
-              <h3 className="text-center text-xl font-bold text-foreground mb-2">
+              <h3 className="text-center text-card-title-lg font-bold text-foreground mb-3">
                 Free
               </h3>
 
-              <div className="text-center mb-6">
-                <div className="text-4xl font-bold text-foreground">
+              <div className="text-center mb-7">
+                <div className="text-4xl sm:text-5xl font-bold text-foreground">
                   0đ
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-card-caption text-muted-foreground mt-2">
                   Miễn phí mãi mãi
                 </p>
               </div>
 
-              <ul className="space-y-3 mb-6">
+              <ul className="space-y-4 mb-7">
                 {[
                   "Game học TOPIK (tất cả)",
                   "TOPIK I & II học tập",
                   "Roleplay Speaking",
                 ].map((feature) => (
-                  <li key={feature} className="flex items-start gap-3 text-sm">
-                    <Check className="w-4 h-4 shrink-0 mt-0.5 text-korean-green" />
+                  <li key={feature} className="flex items-start gap-3 text-card-body">
+                    <Check className="w-5 h-5 shrink-0 mt-0.5 text-korean-green" />
                     <span className="text-muted-foreground">{feature}</span>
                   </li>
                 ))}
@@ -249,53 +249,53 @@ const Pricing = () => {
               <Button
                 onClick={() => navigate(isLoggedIn ? "/dashboard" : "/auth")}
                 variant="outline"
-                className="w-full"
+                className="w-full text-button-lg py-3"
               >
                 {isLoggedIn ? "Đang sử dụng" : "Bắt đầu miễn phí"}
               </Button>
             </div>
 
             {/* Premium Plan */}
-            <div className="relative rounded-2xl p-6 border bg-gradient-to-b from-korean-green/10 to-background border-korean-green/50 shadow-lg shadow-korean-green/10">
-              <span className="absolute -top-3 left-6 px-3 py-1 rounded-full bg-korean-orange text-white text-xs font-bold">
+            <div className="relative rounded-2xl p-7 border bg-gradient-to-b from-korean-green/10 to-background border-korean-green/50 shadow-lg shadow-korean-green/10">
+              <span className="absolute -top-3.5 left-6 px-4 py-1.5 rounded-full bg-korean-orange text-white text-badge font-bold">
                 Phổ biến nhất
               </span>
 
-              <div className="flex justify-center mb-4 pt-4">
-                <div className="w-14 h-14 rounded-xl bg-korean-green/20 flex items-center justify-center">
-                  <Crown className="w-7 h-7 text-korean-green" />
+              <div className="flex justify-center mb-5 pt-5">
+                <div className="w-16 h-16 rounded-xl bg-korean-green/20 flex items-center justify-center">
+                  <Crown className="w-8 h-8 text-korean-green" />
                 </div>
               </div>
 
-              <h3 className="text-center text-xl font-bold text-foreground mb-2">
+              <h3 className="text-center text-card-title-lg font-bold text-foreground mb-3">
                 Premium
               </h3>
 
-              <div className="text-center mb-6">
-                <div className="text-4xl font-bold text-korean-green">
+              <div className="text-center mb-7">
+                <div className="text-4xl sm:text-5xl font-bold text-korean-green">
                   {formatPrice(premiumPrice.price)}đ
                 </div>
                 {billingPeriod !== "1-month" && (
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-card-caption text-muted-foreground mt-2">
                     ~{formatPrice(premiumPrice.perMonth)}đ/tháng
                   </p>
                 )}
                 {premiumPrice.savings > 0 && (
-                  <p className="text-sm text-korean-green mt-1">
+                  <p className="text-card-caption text-korean-green mt-1">
                     Tiết kiệm {formatPrice(premiumPrice.savings)}đ
                   </p>
                 )}
               </div>
 
-              <ul className="space-y-3 mb-6">
+              <ul className="space-y-4 mb-7">
                 {[
                   "✅ Tất cả tính năng Miễn phí",
                   "👔 Headhunting 1:1",
                   "✍️ Chấm Writing TOPIK AI",
                   "🎯 Biến thể đề thi AI",
                 ].map((feature) => (
-                  <li key={feature} className="flex items-start gap-3 text-sm">
-                    <Check className="w-4 h-4 shrink-0 mt-0.5 text-korean-green" />
+                  <li key={feature} className="flex items-start gap-3 text-card-body">
+                    <Check className="w-5 h-5 shrink-0 mt-0.5 text-korean-green" />
                     <span className="text-muted-foreground">{feature}</span>
                   </li>
                 ))}
@@ -303,7 +303,7 @@ const Pricing = () => {
 
               <Button
                 onClick={() => navigate("/auth")}
-                className="w-full bg-korean-green hover:bg-korean-green/90 text-white"
+                className="w-full bg-korean-green hover:bg-korean-green/90 text-white text-button-lg py-3"
               >
                 Nâng cấp Premium
               </Button>
@@ -315,22 +315,22 @@ const Pricing = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="mb-12"
+            className="mb-14"
           >
-            <h2 className="text-xl font-bold text-center text-foreground mb-6">
+            <h2 className="text-headline font-bold text-center text-foreground mb-8">
               So sánh chi tiết
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full max-w-2xl mx-auto">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left py-3 px-3 text-sm font-medium text-muted-foreground">
+                    <th className="text-left py-4 px-4 text-card-caption font-medium text-muted-foreground">
                       Tính năng
                     </th>
-                    <th className="text-center py-3 px-3 text-sm font-medium text-muted-foreground w-24">
+                    <th className="text-center py-4 px-4 text-card-caption font-medium text-muted-foreground w-28">
                       Free
                     </th>
-                    <th className="text-center py-3 px-3 text-sm font-medium text-korean-green w-24">
+                    <th className="text-center py-4 px-4 text-card-caption font-medium text-korean-green w-28">
                       Premium
                     </th>
                   </tr>
@@ -338,23 +338,23 @@ const Pricing = () => {
                 <tbody>
                   {comparisonFeatures.map((feature) => (
                     <tr key={feature.name} className="border-b border-border/50">
-                      <td className="py-3 px-3">
-                        <div className="flex items-center gap-2">
-                          <feature.icon className="w-4 h-4 text-muted-foreground shrink-0" />
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-3">
+                          <feature.icon className="w-5 h-5 text-muted-foreground shrink-0" />
                           <div>
-                            <span className="text-sm text-foreground block">{feature.name}</span>
-                            <span className="text-xs text-muted-foreground hidden sm:block">{feature.description}</span>
+                            <span className="text-card-body text-foreground block">{feature.name}</span>
+                            <span className="text-card-caption text-muted-foreground hidden sm:block">{feature.description}</span>
                           </div>
                         </div>
                       </td>
-                      <td className="text-center py-3 px-3">
+                      <td className="text-center py-4 px-4">
                         {feature.free ? (
                           <Check className="w-5 h-5 text-korean-green mx-auto" />
                         ) : (
                           <X className="w-5 h-5 text-muted-foreground/50 mx-auto" />
                         )}
                       </td>
-                      <td className="text-center py-3 px-3">
+                      <td className="text-center py-4 px-4">
                         {feature.premium ? (
                           <Check className="w-5 h-5 text-korean-green mx-auto" />
                         ) : (
@@ -373,16 +373,16 @@ const Pricing = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="mb-12"
+            className="mb-14"
           >
-            <h2 className="text-xl font-bold text-center text-foreground mb-2">
+            <h2 className="text-headline font-bold text-center text-foreground mb-3">
               Quy trình thanh toán
             </h2>
-            <p className="text-center text-muted-foreground text-sm mb-6">
+            <p className="text-center text-body text-muted-foreground mb-8">
               Đơn giản, nhanh chóng, an toàn
             </p>
 
-            <div className="grid sm:grid-cols-3 gap-6 max-w-2xl mx-auto">
+            <div className="grid sm:grid-cols-3 gap-8 max-w-2xl mx-auto">
               {[
                 {
                   step: 1,
@@ -404,16 +404,16 @@ const Pricing = () => {
                 }
               ].map((item) => (
                 <div key={item.step} className="text-center">
-                  <div className="relative inline-block mb-3">
-                    <div className="w-14 h-14 rounded-xl bg-muted border border-border flex items-center justify-center">
-                      <item.icon className="w-6 h-6 text-foreground" />
+                  <div className="relative inline-block mb-4">
+                    <div className="w-16 h-16 rounded-xl bg-muted border border-border flex items-center justify-center">
+                      <item.icon className="w-7 h-7 text-foreground" />
                     </div>
-                    <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-korean-cyan text-white text-xs font-bold flex items-center justify-center">
+                    <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-korean-cyan text-white text-badge font-bold flex items-center justify-center">
                       {item.step}
                     </span>
                   </div>
-                  <h3 className="font-semibold text-foreground text-sm mb-1">{item.title}</h3>
-                  <p className="text-xs text-muted-foreground">{item.description}</p>
+                  <h3 className="font-semibold text-foreground text-card-body mb-1.5">{item.title}</h3>
+                  <p className="text-card-caption text-muted-foreground">{item.description}</p>
                 </div>
               ))}
             </div>
@@ -424,15 +424,15 @@ const Pricing = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="max-w-xl mx-auto mb-12"
+            className="max-w-xl mx-auto mb-14"
           >
-            <div className="flex items-start gap-3 p-4 rounded-xl bg-korean-green/10 border border-korean-green/20">
-              <Shield className="w-5 h-5 text-korean-green shrink-0 mt-0.5" />
+            <div className="flex items-start gap-4 p-5 rounded-xl bg-korean-green/10 border border-korean-green/20">
+              <Shield className="w-6 h-6 text-korean-green shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-semibold text-foreground text-sm mb-1">
+                <h3 className="font-semibold text-foreground text-card-body mb-1.5">
                   Thanh toán an toàn 100%
                 </h3>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-card-caption text-muted-foreground">
                   Mã hóa SSL • Bảo mật PCI-DSS • Hoàn tiền 7 ngày
                 </p>
               </div>
@@ -444,29 +444,29 @@ const Pricing = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="max-w-2xl mx-auto mb-12"
+            className="max-w-2xl mx-auto mb-14"
           >
-            <h2 className="text-xl font-bold text-center text-foreground mb-2">
+            <h2 className="text-headline font-bold text-center text-foreground mb-3">
               Câu hỏi thường gặp
             </h2>
-            <p className="text-center text-muted-foreground text-sm mb-6">
+            <p className="text-center text-body text-muted-foreground mb-8">
               Giải đáp thắc mắc về gói dịch vụ
             </p>
 
-            <Accordion type="single" collapsible className="space-y-2">
+            <Accordion type="single" collapsible className="space-y-3">
               {faqItems.map((item, index) => (
                 <AccordionItem
                   key={index}
                   value={`item-${index}`}
-                  className="border border-border rounded-xl px-4 data-[state=open]:bg-muted/50"
+                  className="border border-border rounded-xl px-5 data-[state=open]:bg-muted/50"
                 >
-                  <AccordionTrigger className="text-sm font-medium text-foreground hover:no-underline py-3">
-                    <div className="flex items-center gap-2">
-                      <HelpCircle className="w-4 h-4 text-muted-foreground" />
+                  <AccordionTrigger className="text-card-body font-medium text-foreground hover:no-underline py-4">
+                    <div className="flex items-center gap-3">
+                      <HelpCircle className="w-5 h-5 text-muted-foreground" />
                       {item.question}
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground pb-3">
+                  <AccordionContent className="text-card-body text-muted-foreground pb-4">
                     {item.answer}
                   </AccordionContent>
                 </AccordionItem>
@@ -481,14 +481,14 @@ const Pricing = () => {
             transition={{ delay: 0.7 }}
             className="text-center"
           >
-            <p className="text-muted-foreground text-sm mb-4">
+            <p className="text-body text-muted-foreground mb-5">
               Thanh toán an toàn qua ZaloPay
             </p>
             <div className="flex justify-center">
               <img 
                 src={zaloPayLogo} 
                 alt="ZaloPay" 
-                className="h-6 sm:h-8 md:h-10 w-auto object-contain" 
+                className="h-8 sm:h-10 md:h-12 w-auto object-contain" 
               />
             </div>
           </motion.div>
