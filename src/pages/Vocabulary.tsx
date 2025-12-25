@@ -6,7 +6,6 @@ import AppFooter from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import ChainReactionMultiplayer from "@/components/vocabulary/ChainReactionMultiplayer";
 import { 
   ArrowLeft, 
   BookOpen,
@@ -17,12 +16,10 @@ import {
   RotateCcw,
   Trophy,
   Flame,
-  Car,
-  Link2
+  Car
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import WordRacing from "@/components/vocabulary/WordRacing";
-import WordChainReaction from "@/components/vocabulary/WordChainReaction";
 
 // Word interface
 interface Word {
@@ -46,11 +43,10 @@ type TopikLevel = keyof typeof topikLevels;
 // Tab types
 const tabs = [
   { id: "racing", label: "단어 레이싱", icon: Car, description: "Đua xe từ vựng" },
-  { id: "chain", label: "체인 리액션", icon: Link2, description: "Chuỗi phản ứng" },
   { id: "sprint", label: "60초 스프린트", icon: Timer, description: "Chạy đua 60 giây" },
 ];
 
-type TabType = "racing" | "chain" | "sprint";
+type TabType = "racing" | "sprint";
 
 
 
@@ -230,7 +226,6 @@ const Vocabulary = () => {
   // URL 파라미터에서 멀티플레이어 모드 및 방 코드 확인
   const urlMode = searchParams.get("mode");
   const urlRoomCode = searchParams.get("room");
-  const [showMultiplayer, setShowMultiplayer] = useState(urlMode === "multiplayer");
   
   // 이전에 학습한 단어들을 추적 (세션 동안 유지)
   const [learnedWords, setLearnedWords] = useState<Record<TopikLevel, string[]>>({
@@ -371,13 +366,13 @@ const Vocabulary = () => {
     checkAuth();
   }, []);
 
-  // URL 파라미터로 멀티플레이어 모드 접속 시 자동으로 chain 탭으로 이동
+  // URL 파라미터 처리 제거 (체인리액션은 배틀 페이지로 이동)
   useEffect(() => {
-    if (urlMode === "multiplayer") {
-      setActiveTab("chain");
-      setShowMultiplayer(true);
+    if (urlMode === "multiplayer" && urlRoomCode) {
+      // 배틀 페이지로 리다이렉트
+      navigate(`/battle?game=word-chain&room=${urlRoomCode}`);
     }
-  }, [urlMode]);
+  }, [urlMode, urlRoomCode, navigate]);
 
   useEffect(() => {
     fetchWords(topikLevel);
@@ -422,13 +417,6 @@ const Vocabulary = () => {
     }
   };
 
-  const handleChainComplete = (score: number, chainLength: number) => {
-    setGameComplete(true);
-    setGameResult({ type: "chain", score, chainLength });
-    if (chainLength >= 5) {
-      confetti({ particleCount: 100, spread: 70 });
-    }
-  };
 
   const handleSprintComplete = (score: number) => {
     setGameComplete(true);
@@ -620,23 +608,6 @@ const Vocabulary = () => {
                     words={words} 
                     onComplete={handleRacingComplete}
                   />
-                )}
-                {activeTab === "chain" && (
-                  showMultiplayer ? (
-                    <ChainReactionMultiplayer 
-                      words={words} 
-                      onBack={() => {
-                        setShowMultiplayer(false);
-                        setSearchParams({});
-                      }}
-                      initialRoomCode={urlRoomCode || undefined}
-                    />
-                  ) : (
-                    <WordChainReaction 
-                      words={words} 
-                      onComplete={handleChainComplete}
-                    />
-                  )
                 )}
                 {activeTab === "sprint" && (
                   <SprintGame 

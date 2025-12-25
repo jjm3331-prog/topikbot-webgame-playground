@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Swords, Link2, ArrowLeft, Users, Trophy, Zap, Crown, Lock } from "lucide-react";
+import { Swords, Link2, Brain, Users, Trophy, Zap, Crown, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import CleanHeader from "@/components/CleanHeader";
 import CommonFooter from "@/components/CommonFooter";
 import ChainReactionMultiplayer from "@/components/vocabulary/ChainReactionMultiplayer";
+import SemanticBattle from "@/components/battle/SemanticBattle";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -18,6 +19,7 @@ interface BattleGame {
   icon: React.ElementType;
   available: boolean;
   comingSoon?: boolean;
+  gradient?: string;
 }
 
 const battleGames: BattleGame[] = [
@@ -25,9 +27,19 @@ const battleGames: BattleGame[] = [
     id: "word-chain",
     name: "Nối từ 1:1",
     nameKo: "끝말잇기 대결",
-    description: "Ai nối được nhiều từ hơn sẽ thắng! 12 giây mỗi lượt.",
+    description: "Nối từ theo âm tiết cuối! 12 giây mỗi lượt.",
     icon: Link2,
     available: true,
+    gradient: "from-yellow-400 to-orange-500",
+  },
+  {
+    id: "semantic",
+    name: "Đấu Nghĩa 1:1",
+    nameKo: "의미 연결 대결",
+    description: "Nối từ theo ý nghĩa! AI chấm điểm liên quan.",
+    icon: Brain,
+    available: true,
+    gradient: "from-purple-500 to-pink-500",
   },
   {
     id: "speed-quiz",
@@ -61,9 +73,11 @@ export default function Battle() {
     const roomCode = searchParams.get("room");
     const game = searchParams.get("game");
     
-    if (roomCode && game === "word-chain") {
+    if (roomCode) {
       setInitialRoomCode(roomCode);
-      setSelectedGame("word-chain");
+      if (game === "word-chain" || game === "semantic") {
+        setSelectedGame(game);
+      }
     }
   }, [searchParams]);
 
@@ -110,6 +124,23 @@ export default function Battle() {
         <main className="container mx-auto px-4 py-6 pt-20">
           <ChainReactionMultiplayer
             words={[]}
+            onBack={() => {
+              setSelectedGame(null);
+              setInitialRoomCode(undefined);
+            }}
+            initialRoomCode={initialRoomCode}
+          />
+        </main>
+      </div>
+    );
+  }
+
+  if (selectedGame === "semantic") {
+    return (
+      <div className="min-h-screen bg-background">
+        <CleanHeader />
+        <main className="container mx-auto px-4 py-6 pt-20">
+          <SemanticBattle
             onBack={() => {
               setSelectedGame(null);
               setInitialRoomCode(undefined);
@@ -188,7 +219,7 @@ export default function Battle() {
         )}
 
         {/* Game Cards */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2">
           {battleGames.map((game, index) => (
             <motion.div
               key={game.id}
@@ -199,7 +230,7 @@ export default function Battle() {
               <Card
                 className={`relative overflow-hidden p-6 cursor-pointer transition-all duration-300 ${
                   game.available
-                    ? "hover:scale-[1.02] hover:shadow-xl hover:border-yellow-500/50"
+                    ? "hover:scale-[1.02] hover:shadow-xl hover:border-primary/50"
                     : "opacity-60"
                 }`}
                 onClick={() => handleSelectGame(game)}
@@ -207,7 +238,7 @@ export default function Battle() {
                 {/* Glow effect for available games */}
                 {game.available && (
                   <div className="absolute inset-0 -z-10">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/20 rounded-full blur-3xl" />
+                    <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${game.gradient || "from-yellow-500/20 to-orange-500/20"} rounded-full blur-3xl opacity-50`} />
                   </div>
                 )}
 
@@ -223,7 +254,7 @@ export default function Battle() {
                 <div className="flex items-start gap-4">
                   <div className={`p-3 rounded-xl ${
                     game.available
-                      ? "bg-gradient-to-br from-yellow-400 to-orange-500"
+                      ? `bg-gradient-to-br ${game.gradient || "from-yellow-400 to-orange-500"}`
                       : "bg-muted"
                   }`}>
                     {game.available ? (
@@ -246,7 +277,7 @@ export default function Battle() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <Button className="w-full gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600">
+                    <Button className={`w-full gap-2 bg-gradient-to-r ${game.gradient || "from-yellow-500 to-orange-500"} hover:opacity-90`}>
                       <Swords className="w-4 h-4" />
                       대결하기
                     </Button>
@@ -280,7 +311,7 @@ export default function Battle() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-yellow-500">•</span>
-                1 lần cảnh báo được phép, lần thứ 2 = thua
+                2 lần cảnh báo = thua (1 lần được phép)
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-yellow-500">•</span>
