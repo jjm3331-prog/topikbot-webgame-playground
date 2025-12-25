@@ -57,7 +57,7 @@ interface ChainWord {
   connectionType: "semantic" | "phonetic" | "start";
 }
 
-type GamePhase = "menu" | "creating" | "joining" | "waiting" | "ready" | "playing" | "finished";
+type GamePhase = "menu" | "creating" | "joining" | "waiting" | "ready" | "countdown" | "playing" | "finished";
 
 export default function ChainReactionMultiplayer({ words, onBack, initialRoomCode }: ChainReactionMultiplayerProps) {
   const { toast } = useToast();
@@ -76,12 +76,64 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   const [score, setScore] = useState(0);
   const [isValidating, setIsValidating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState(3);
   
   const inputRef = useRef<HTMLInputElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const channelRef = useRef<any>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
 
   const isHost = room?.host_id === playerId;
+
+  // 효과음 재생 함수 (Web Audio API)
+  const playBeep = (frequency: number = 440, duration: number = 150, type: OscillatorType = "sine") => {
+    try {
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      const ctx = audioContextRef.current;
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
+      gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration / 1000);
+      
+      oscillator.start(ctx.currentTime);
+      oscillator.stop(ctx.currentTime + duration / 1000);
+    } catch (e) {
+      console.log("Audio not supported");
+    }
+  };
+
+  // 진동 피드백
+  const vibrate = (pattern: number | number[] = 100) => {
+    if (navigator.vibrate) {
+      navigator.vibrate(pattern);
+    }
+  };
+
+  // 준비 완료 피드백
+  const playReadyFeedback = () => {
+    playBeep(880, 100, "sine"); // 높은 톤
+    vibrate(50);
+  };
+
+  // 카운트다운 피드백
+  const playCountdownBeep = (num: number) => {
+    if (num > 0) {
+      playBeep(600, 100, "square");
+      vibrate(30);
+    } else {
+      // 시작! - 더 화려한 사운드
+      playBeep(880, 200, "sawtooth");
+      vibrate([50, 50, 100]);
+    }
+  };
 
   // 랜덤 닉네임 생성 함수
   const generateRandomNickname = () => {
@@ -359,8 +411,9 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             if (newRoom.guest_id && (gamePhase === "waiting" || gamePhase === "creating" || gamePhase === "joining")) {
               setGamePhase("ready");
             }
-            if (newRoom.status === "playing" && gamePhase !== "playing") {
-              startGameLocal(newRoom);
+            // 게임 시작 시 카운트다운 실행
+            if (newRoom.status === "playing" && gamePhase !== "playing" && gamePhase !== "countdown") {
+              startCountdown(newRoom);
             }
             if (newRoom.status === "finished" && gamePhase !== "finished") {
               setGamePhase("finished");
@@ -386,6 +439,11 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
         .from("chain_reaction_rooms")
         .update({ [field]: !currentValue })
         .eq("id", room.id);
+      
+      // 준비 완료 시 피드백
+      if (!currentValue) {
+        playReadyFeedback();
+      }
     } catch (err) {
       console.error("Failed to toggle ready:", err);
     }
@@ -408,10 +466,33 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
         })
         .eq("id", room.id);
 
-      startGameLocal(room);
+      startCountdown(room);
     } catch (err) {
       console.error("Failed to start game:", err);
     }
+  };
+
+  // 카운트다운 시작
+  const startCountdown = (roomData: Room) => {
+    setGamePhase("countdown");
+    setCountdown(3);
+    
+    let count = 3;
+    playCountdownBeep(count);
+    
+    const countdownInterval = setInterval(() => {
+      count--;
+      setCountdown(count);
+      playCountdownBeep(count);
+      
+      if (count <= 0) {
+        clearInterval(countdownInterval);
+        // 카운트다운 끝나면 실제 게임 시작
+        setTimeout(() => {
+          startGameLocal(roomData);
+        }, 500);
+      }
+    }, 1000);
   };
 
   // Local game start
@@ -960,6 +1041,65 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             )}
           </div>
         </Card>
+      </motion.div>
+    );
+  }
+
+  // Countdown
+  if (gamePhase === "countdown") {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm"
+      >
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={countdown}
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 1.5, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="text-center"
+          >
+            {countdown > 0 ? (
+              <div className="relative">
+                <motion.div
+                  className="text-9xl font-black bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 bg-clip-text text-transparent"
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 0.5 }}
+                >
+                  {countdown}
+                </motion.div>
+                <motion.div
+                  className="absolute inset-0 text-9xl font-black text-primary/20 blur-2xl"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 0.5 }}
+                >
+                  {countdown}
+                </motion.div>
+              </div>
+            ) : (
+              <motion.div
+                initial={{ scale: 0, rotate: -10 }}
+                animate={{ scale: 1, rotate: 0 }}
+                className="relative"
+              >
+                <div className="text-6xl sm:text-8xl font-black bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500 bg-clip-text text-transparent">
+                  시작! 🎮
+                </div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-xl text-muted-foreground mt-4"
+                >
+                  Bắt đầu!
+                </motion.div>
+              </motion.div>
+            )}
+          </motion.div>
+        </AnimatePresence>
       </motion.div>
     );
   }
