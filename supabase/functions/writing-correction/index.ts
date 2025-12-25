@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -116,18 +117,44 @@ Bạn là **TOPIK Writing Coach Pro** - chuyên gia AI chấm bài TOPIK II Writ
 - 모범 답안은 TOPIK 6급 수준
 - JSON만 반환 (설명 텍스트 없이)`;
 
+// 텍스트 정규화 함수 (캐시 비교용)
+function normalizeText(text: string): string {
+  if (!text) return "";
+  return text
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .replace(/\n+/g, "\n")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+// SHA-256 해시 생성 함수
+async function generateHash(content: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(content);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { questionImageUrl, answerImageUrl, answerText, ocrOnly } = await req.json();
+    const { questionImageUrl, answerImageUrl, answerText, ocrOnly, userId } = await req.json();
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
     if (!GEMINI_API_KEY) {
       throw new Error("GEMINI_API_KEY is not configured");
     }
+
+    // Supabase 클라이언트 생성 (캐싱용)
+    const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
 
     // OCR-only mode: extract text from answer image
     if (ocrOnly && answerImageUrl) {
@@ -203,6 +230,46 @@ serve(async (req) => {
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // ========== 캐싱 로직 시작 ==========
+    
+    // 콘텐츠 해시 생성 (문제 URL + 답안 텍스트 조합)
+    const normalizedAnswer = normalizeText(answerText || "");
+    const contentForHash = `q:${questionImageUrl || ""}|a:${normalizedAnswer}`;
+    const contentHash = await generateHash(contentForHash);
+    
+    console.log("Generated content hash:", contentHash.substring(0, 16) + "...");
+
+    // 캐시 확인 (동일 사용자 + 동일 콘텐츠)
+    if (userId) {
+      const { data: cachedResult, error: cacheError } = await supabase
+        .from("writing_corrections")
+        .select("correction_report, score")
+        .eq("user_id", userId)
+        .eq("content_hash", contentHash)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!cacheError && cachedResult && cachedResult.correction_report) {
+        console.log("✅ CACHE HIT! Returning cached result for user:", userId);
+        
+        const cachedReport = cachedResult.correction_report as any;
+        
+        return new Response(
+          JSON.stringify({
+            ...cachedReport,
+            is_cached: true,
+            cache_message: "Kết quả này được lấy từ lịch sử chấm điểm trước đó. Điểm số và nhận xét nhất quán với lần chấm trước."
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      console.log("❌ CACHE MISS - Calling AI for fresh grading");
+    }
+
+    // ========== 캐싱 로직 끝 ==========
 
     // Build the content parts for Gemini
     const contentParts: any[] = [
@@ -339,8 +406,40 @@ serve(async (req) => {
       improvements: result.improvements || [],
       model_answer: result.model_answer || "",
       detailed_feedback: result.detailed_feedback || "",
-      model: "gemini-2.5-flash-thinking"
+      character_count: result.character_count || null,
+      swot_analysis: result.swot_analysis || null,
+      vocabulary_upgrades: result.vocabulary_upgrades || [],
+      structure_improvements: result.structure_improvements || [],
+      next_priority: result.next_priority || [],
+      model: "gemini-2.5-flash-thinking",
+      is_cached: false
     };
+
+    // ========== 결과 저장 (캐싱용) ==========
+    if (userId) {
+      try {
+        const { error: insertError } = await supabase
+          .from("writing_corrections")
+          .insert({
+            user_id: userId,
+            question_image_url: questionImageUrl || null,
+            answer_image_url: answerImageUrl || null,
+            answer_text: answerText || null,
+            score: validatedResult.overall_score,
+            correction_report: validatedResult,
+            content_hash: contentHash,
+            is_cached: false
+          });
+
+        if (insertError) {
+          console.error("Failed to save correction for caching:", insertError);
+        } else {
+          console.log("✅ Correction saved with hash for future caching:", contentHash.substring(0, 16) + "...");
+        }
+      } catch (saveError) {
+        console.error("Error saving correction:", saveError);
+      }
+    }
 
     return new Response(
       JSON.stringify(validatedResult),

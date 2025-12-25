@@ -672,10 +672,13 @@ export type Database = {
         Row: {
           answer_image_url: string | null
           answer_text: string | null
+          content_hash: string | null
           correction_report: Json
           created_at: string
           id: string
+          is_cached: boolean | null
           question_image_url: string | null
+          question_text: string | null
           score: number | null
           updated_at: string
           user_id: string
@@ -683,10 +686,13 @@ export type Database = {
         Insert: {
           answer_image_url?: string | null
           answer_text?: string | null
+          content_hash?: string | null
           correction_report?: Json
           created_at?: string
           id?: string
+          is_cached?: boolean | null
           question_image_url?: string | null
+          question_text?: string | null
           score?: number | null
           updated_at?: string
           user_id: string
@@ -694,10 +700,13 @@ export type Database = {
         Update: {
           answer_image_url?: string | null
           answer_text?: string | null
+          content_hash?: string | null
           correction_report?: Json
           created_at?: string
           id?: string
+          is_cached?: boolean | null
           question_image_url?: string | null
+          question_text?: string | null
           score?: number | null
           updated_at?: string
           user_id?: string

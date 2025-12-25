@@ -72,6 +72,8 @@ interface CorrectionResult {
   vocabulary_upgrades?: { basic: string; advanced: string; difference: string }[];
   structure_improvements?: { current: string; improved: string; reason: string }[];
   next_priority?: string[];
+  is_cached?: boolean;
+  cache_message?: string;
 }
 
 interface SavedCorrection {
@@ -396,7 +398,8 @@ const WritingCorrection = () => {
         body: {
           questionImageUrl,
           answerImageUrl,
-          answerText: answerMethod === "text" ? answerText : null
+          answerText: answerMethod === "text" ? answerText : null,
+          userId: user.id // 캐싱을 위한 사용자 ID 전달
         }
       });
 
@@ -404,15 +407,23 @@ const WritingCorrection = () => {
 
       setResult(response.data);
       
-      // If using free usage, record it
-      if (!isPremium && canUseFreeToday) {
+      // If using free usage, record it (only for non-cached results)
+      if (!isPremium && canUseFreeToday && !response.data.is_cached) {
         await recordFreeUsage(user.id);
       }
       
-      toast({
-        title: "Chấm điểm hoàn tất!",
-        description: `Điểm số: ${response.data.overall_score}/100`
-      });
+      // 캐시 히트 여부에 따른 토스트 메시지
+      if (response.data.is_cached) {
+        toast({
+          title: "📋 Kết quả từ lịch sử",
+          description: `Điểm: ${response.data.overall_score}/100 - Bài viết này đã được chấm trước đó với cùng nội dung.`
+        });
+      } else {
+        toast({
+          title: "✅ Chấm điểm hoàn tất!",
+          description: `Điểm số: ${response.data.overall_score}/100`
+        });
+      }
     } catch (error: any) {
       console.error("Error:", error);
       toast({
