@@ -279,7 +279,7 @@ export default function Battle() {
                   >
                     <Button className={`w-full gap-2 bg-gradient-to-r ${game.gradient || "from-yellow-500 to-orange-500"} hover:opacity-90`}>
                       <Swords className="w-4 h-4" />
-                      대결하기
+                      Đấu ngay
                     </Button>
                   </motion.div>
                 )}
