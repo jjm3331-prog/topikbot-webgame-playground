@@ -86,57 +86,57 @@ const InterviewSimulation = () => {
   const [isEvaluating, setIsEvaluating] = useState(false);
 
   const companies = [
-    { name: "삼성전자", type: "대기업", color: "from-blue-600 to-blue-700", emoji: "🏢" },
-    { name: "LG전자", type: "대기업", color: "from-red-600 to-red-700", emoji: "🏭" },
-    { name: "현대자동차", type: "대기업", color: "from-slate-600 to-slate-700", emoji: "🚗" },
-    { name: "네이버", type: "IT", color: "from-green-600 to-green-700", emoji: "🌐" },
-    { name: "카카오", type: "IT", color: "from-yellow-500 to-yellow-600", emoji: "💬" },
-    { name: "쿠팡", type: "이커머스", color: "from-amber-600 to-amber-700", emoji: "📦" },
-    { name: "SK하이닉스", type: "반도체", color: "from-orange-600 to-orange-700", emoji: "💾" },
-    { name: "기타 (직접 입력)", type: "custom", color: "from-purple-600 to-purple-700", emoji: "✏️" }
+    { name: "삼성전자", nameVi: "Samsung Electronics", type: "Tập đoàn lớn", color: "from-blue-600 to-blue-700", emoji: "🏢" },
+    { name: "LG전자", nameVi: "LG Electronics", type: "Tập đoàn lớn", color: "from-red-600 to-red-700", emoji: "🏭" },
+    { name: "현대자동차", nameVi: "Hyundai Motor", type: "Tập đoàn lớn", color: "from-slate-600 to-slate-700", emoji: "🚗" },
+    { name: "네이버", nameVi: "Naver", type: "Công nghệ", color: "from-green-600 to-green-700", emoji: "🌐" },
+    { name: "카카오", nameVi: "Kakao", type: "Công nghệ", color: "from-yellow-500 to-yellow-600", emoji: "💬" },
+    { name: "쿠팡", nameVi: "Coupang", type: "Thương mại điện tử", color: "from-amber-600 to-amber-700", emoji: "📦" },
+    { name: "SK하이닉스", nameVi: "SK Hynix", type: "Bán dẫn", color: "from-orange-600 to-orange-700", emoji: "💾" },
+    { name: "기타", nameVi: "Khác", type: "Tự nhập", color: "from-purple-600 to-purple-700", emoji: "✏️" }
   ];
 
   const positions = [
-    { name: "소프트웨어 개발", icon: "💻" },
-    { name: "마케팅/홍보", icon: "📢" },
-    { name: "영업/세일즈", icon: "🤝" },
-    { name: "인사/HR", icon: "👥" },
-    { name: "디자인/UX", icon: "🎨" },
-    { name: "재무/회계", icon: "📊" },
-    { name: "생산/제조", icon: "🏭" },
-    { name: "일반 사무", icon: "📋" }
+    { name: "소프트웨어 개발", nameVi: "Phát triển phần mềm", icon: "💻" },
+    { name: "마케팅/홍보", nameVi: "Marketing / PR", icon: "📢" },
+    { name: "영업/세일즈", nameVi: "Kinh doanh / Sales", icon: "🤝" },
+    { name: "인사/HR", nameVi: "Nhân sự / HR", icon: "👥" },
+    { name: "디자인/UX", nameVi: "Thiết kế / UX", icon: "🎨" },
+    { name: "재무/회계", nameVi: "Tài chính / Kế toán", icon: "📊" },
+    { name: "생산/제조", nameVi: "Sản xuất / Chế tạo", icon: "🏭" },
+    { name: "일반 사무", nameVi: "Hành chính văn phòng", icon: "📋" }
   ];
 
   const interviewerTypes = [
     { 
       id: "friendly", 
       name: "친절한 면접관", 
-      nameVi: "Người phỏng vấn thân thiện",
-      description: "편안한 분위기, 격려하는 스타일", 
+      nameVi: "Thân thiện",
+      description: "Không khí thoải mái, động viên, khuyến khích", 
       emoji: "😊",
       color: "from-green-500 to-emerald-500"
     },
     { 
       id: "strict", 
       name: "엄격한 면접관", 
-      nameVi: "Người phỏng vấn nghiêm khắc",
-      description: "논리적, 구체적인 답변 요구", 
+      nameVi: "Nghiêm khắc",
+      description: "Yêu cầu logic, câu trả lời cụ thể", 
       emoji: "🧐",
       color: "from-blue-500 to-indigo-500"
     },
     { 
       id: "pressure", 
       name: "압박 면접관", 
-      nameVi: "Phỏng vấn áp lực",
-      description: "스트레스 테스트, 도전적 질문", 
+      nameVi: "Áp lực cao",
+      description: "Stress test, câu hỏi thách thức", 
       emoji: "😤",
       color: "from-red-500 to-rose-500"
     },
     { 
       id: "technical", 
       name: "기술 면접관", 
-      nameVi: "Phỏng vấn kỹ thuật",
-      description: "직무 관련 심층 질문", 
+      nameVi: "Kỹ thuật",
+      description: "Câu hỏi chuyên môn, kỹ năng chuyên sâu", 
       emoji: "🔧",
       color: "from-purple-500 to-violet-500"
     }
@@ -151,7 +151,7 @@ const InterviewSimulation = () => {
   }, [messages, scrollToBottom]);
 
   const getCompanyName = () => {
-    if (selectedCompany === "기타 (직접 입력)") {
+    if (selectedCompany === "기타") {
       return customCompany || "기업";
     }
     return selectedCompany || "기업";
@@ -173,7 +173,7 @@ const InterviewSimulation = () => {
           },
           body: JSON.stringify({ 
             text: text.slice(0, 800),
-            voiceId: "onwK4e9ZLuTAKqWW03F9" // Daniel - Korean professional male
+            voiceId: "onwK4e9ZLuTAKqWW03F9"
           })
         }
       );
@@ -218,8 +218,8 @@ const InterviewSimulation = () => {
     } catch (error) {
       console.error("Recording error:", error);
       toast({
-        title: "마이크 접근 오류",
-        description: "마이크 권한을 허용해주세요.",
+        title: "Lỗi truy cập micro",
+        description: "Vui lòng cho phép quyền sử dụng micro.",
         variant: "destructive"
       });
     }
@@ -235,7 +235,6 @@ const InterviewSimulation = () => {
   const transcribeAudio = async (audioBlob: Blob) => {
     setIsLoading(true);
     try {
-      // Convert to base64
       const reader = new FileReader();
       const base64Promise = new Promise<string>((resolve) => {
         reader.onloadend = () => {
@@ -246,7 +245,6 @@ const InterviewSimulation = () => {
       reader.readAsDataURL(audioBlob);
       const base64Audio = await base64Promise;
 
-      // Send to Korean STT
       const { data, error } = await supabase.functions.invoke("korean-stt", {
         body: { audio: base64Audio }
       });
@@ -255,20 +253,19 @@ const InterviewSimulation = () => {
 
       if (data.text) {
         setInputText(data.text);
-        // Auto-send the transcribed text
         await sendMessageWithText(data.text);
       } else {
         toast({
-          title: "음성 인식 실패",
-          description: "다시 말씀해 주세요.",
+          title: "Không nhận dạng được giọng nói",
+          description: "Vui lòng thử lại.",
           variant: "destructive"
         });
       }
     } catch (error) {
       console.error("Transcription error:", error);
       toast({
-        title: "음성 인식 오류",
-        description: "다시 시도해 주세요.",
+        title: "Lỗi nhận dạng giọng nói",
+        description: "Vui lòng thử lại.",
         variant: "destructive"
       });
     } finally {
@@ -280,8 +277,8 @@ const InterviewSimulation = () => {
     const companyName = getCompanyName();
     if (!companyName || !selectedPosition || !selectedInterviewer) {
       toast({
-        title: "선택이 필요합니다",
-        description: "기업, 직무, 면접관 유형을 모두 선택해주세요.",
+        title: "Vui lòng chọn đầy đủ",
+        description: "Chọn công ty, vị trí và loại người phỏng vấn.",
         variant: "destructive"
       });
       return;
@@ -313,8 +310,8 @@ const InterviewSimulation = () => {
     } catch (error: any) {
       console.error("Interview start error:", error);
       toast({
-        title: "오류 발생",
-        description: "면접을 시작할 수 없습니다. 다시 시도해주세요.",
+        title: "Đã xảy ra lỗi",
+        description: "Không thể bắt đầu phỏng vấn. Vui lòng thử lại.",
         variant: "destructive"
       });
       setInterviewStarted(false);
@@ -353,7 +350,6 @@ const InterviewSimulation = () => {
         
         if (data.ended) {
           setInterviewEnded(true);
-          // Request evaluation
           await requestEvaluation([...messages, { role: "user", content: userMessage }, { role: "assistant", content: data.message }]);
         } else {
           await speakText(data.message);
@@ -364,8 +360,8 @@ const InterviewSimulation = () => {
     } catch (error: any) {
       console.error("Interview error:", error);
       toast({
-        title: "오류 발생",
-        description: "응답을 받을 수 없습니다.",
+        title: "Đã xảy ra lỗi",
+        description: "Không nhận được phản hồi.",
         variant: "destructive"
       });
     } finally {
@@ -442,55 +438,68 @@ const InterviewSimulation = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <CleanHeader />
 
-      <main className="flex-1 pt-8 pb-12 px-4 max-w-4xl mx-auto w-full">
+      <main className="flex-1 pt-10 pb-16 px-4 sm:px-6 max-w-4xl mx-auto w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-6"
+          className="space-y-8"
         >
           {/* Back Button */}
           <Button
             variant="ghost"
             size="sm"
             onClick={() => navigate("/korea-career")}
-            className="gap-2"
+            className="gap-2 text-card-body text-muted-foreground hover:text-foreground transition-colors -ml-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            Korea Career Hub
+            <span>Korea Career Hub</span>
           </Button>
 
           {/* Premium Banner */}
-          {!isPremium && <PremiumPreviewBanner featureName="면접 시뮬레이션" />}
+          {!isPremium && <PremiumPreviewBanner featureName="Mô phỏng phỏng vấn" />}
 
           {/* Header */}
-          <div className="text-center space-y-3">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30">
+          <header className="text-center space-y-4">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1 }}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-orange-500/15 to-red-500/15 border border-orange-500/25"
+            >
               <Mic className="w-4 h-4 text-orange-500" />
-              <span className="text-sm font-medium">LUKATO RAG AI · Mô phỏng phỏng vấn</span>
-            </div>
+              <span className="text-card-caption font-medium tracking-wide text-foreground/90">
+                LUKATO RAG AI · Mô phỏng phỏng vấn
+              </span>
+            </motion.div>
             
-            <h1 className="text-2xl sm:text-3xl font-bold">
-              <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                면접 시뮬레이션
+            <h1 className="text-headline font-bold tracking-tight">
+              <span className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 bg-clip-text text-transparent">
+                Luyện Phỏng Vấn
               </span>
             </h1>
-            <p className="text-muted-foreground text-sm">
-              실제 한국 기업 면접과 똑같이 연습하세요 · 음성 & 텍스트 지원
+            <p className="text-body text-muted-foreground max-w-lg mx-auto leading-relaxed">
+              Thực hành phỏng vấn với các công ty Hàn Quốc hàng đầu
+              <span className="block text-card-caption text-muted-foreground/70 mt-1">
+                Hỗ trợ giọng nói & văn bản
+              </span>
             </p>
-          </div>
+          </header>
 
           {/* Selection Phase */}
           {!interviewStarted && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
               className="space-y-6"
             >
               {/* Company Selection */}
-              <Card className="p-6">
-                <h3 className="font-bold mb-4 flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-blue-500" />
-                  1. 면접 기업 선택
+              <Card className="p-6 sm:p-8 border-border/50 bg-card/50 backdrop-blur-sm">
+                <h3 className="text-card-title-lg font-bold mb-5 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                    <Building2 className="w-4 h-4 text-blue-500" />
+                  </div>
+                  <span>Chọn Công Ty Phỏng Vấn</span>
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {companies.map((company) => (
@@ -498,40 +507,42 @@ const InterviewSimulation = () => {
                       key={company.name}
                       variant={selectedCompany === company.name ? "default" : "outline"}
                       onClick={() => setSelectedCompany(company.name)}
-                      className={`h-auto py-3 flex-col gap-1 ${
+                      className={`h-auto py-4 px-3 flex-col gap-2 transition-all duration-200 ${
                         selectedCompany === company.name 
-                          ? `bg-gradient-to-r ${company.color} text-white border-0`
-                          : ""
+                          ? `bg-gradient-to-br ${company.color} text-white border-0 shadow-lg scale-[1.02]`
+                          : "hover:border-primary/50 hover:bg-muted/50"
                       }`}
                     >
-                      <span className="text-lg">{company.emoji}</span>
-                      <span className="font-medium text-sm">{company.name.replace(" (직접 입력)", "")}</span>
-                      <span className="text-xs opacity-70">{company.type}</span>
+                      <span className="text-2xl">{company.emoji}</span>
+                      <span className="text-card-body font-semibold">{company.nameVi}</span>
+                      <span className="text-card-caption opacity-70">{company.type}</span>
                     </Button>
                   ))}
                 </div>
                 
-                {selectedCompany === "기타 (직접 입력)" && (
+                {selectedCompany === "기타" && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
-                    className="mt-4"
+                    className="mt-5"
                   >
                     <Input
                       value={customCompany}
                       onChange={(e) => setCustomCompany(e.target.value)}
-                      placeholder="기업명을 입력하세요"
-                      className="max-w-sm"
+                      placeholder="Nhập tên công ty..."
+                      className="max-w-sm text-body h-12"
                     />
                   </motion.div>
                 )}
               </Card>
 
               {/* Position Selection */}
-              <Card className="p-6">
-                <h3 className="font-bold mb-4 flex items-center gap-2">
-                  <User className="w-5 h-5 text-green-500" />
-                  2. 지원 직무 선택
+              <Card className="p-6 sm:p-8 border-border/50 bg-card/50 backdrop-blur-sm">
+                <h3 className="text-card-title-lg font-bold mb-5 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center">
+                    <User className="w-4 h-4 text-green-500" />
+                  </div>
+                  <span>Chọn Vị Trí Ứng Tuyển</span>
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {positions.map((position) => (
@@ -539,20 +550,26 @@ const InterviewSimulation = () => {
                       key={position.name}
                       variant={selectedPosition === position.name ? "default" : "outline"}
                       onClick={() => setSelectedPosition(position.name)}
-                      className="h-auto py-3 flex-col gap-1"
+                      className={`h-auto py-4 px-3 flex-col gap-2 transition-all duration-200 ${
+                        selectedPosition === position.name 
+                          ? "bg-primary text-primary-foreground shadow-lg scale-[1.02]"
+                          : "hover:border-primary/50 hover:bg-muted/50"
+                      }`}
                     >
-                      <span className="text-lg">{position.icon}</span>
-                      <span className="font-medium text-sm">{position.name}</span>
+                      <span className="text-2xl">{position.icon}</span>
+                      <span className="text-card-body font-semibold text-center leading-tight">{position.nameVi}</span>
                     </Button>
                   ))}
                 </div>
               </Card>
 
               {/* Interviewer Selection */}
-              <Card className="p-6">
-                <h3 className="font-bold mb-4 flex items-center gap-2">
-                  <MessageSquare className="w-5 h-5 text-purple-500" />
-                  3. 면접관 유형 선택
+              <Card className="p-6 sm:p-8 border-border/50 bg-card/50 backdrop-blur-sm">
+                <h3 className="text-card-title-lg font-bold mb-5 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                    <MessageSquare className="w-4 h-4 text-purple-500" />
+                  </div>
+                  <span>Chọn Phong Cách Phỏng Vấn</span>
                 </h3>
                 <div className="grid sm:grid-cols-2 gap-4">
                   {interviewerTypes.map((interviewer) => (
@@ -560,17 +577,17 @@ const InterviewSimulation = () => {
                       key={interviewer.id}
                       variant="outline"
                       onClick={() => setSelectedInterviewer(interviewer.id)}
-                      className={`h-auto p-4 flex items-start gap-3 justify-start text-left ${
+                      className={`h-auto p-5 flex items-start gap-4 justify-start text-left transition-all duration-200 ${
                         selectedInterviewer === interviewer.id 
-                          ? `ring-2 ring-primary bg-gradient-to-r ${interviewer.color} text-white`
-                          : ""
+                          ? `ring-2 ring-primary bg-gradient-to-br ${interviewer.color} text-white shadow-lg scale-[1.01]`
+                          : "hover:border-primary/50 hover:bg-muted/50"
                       }`}
                     >
-                      <span className="text-2xl">{interviewer.emoji}</span>
-                      <div>
-                        <p className="font-bold">{interviewer.name}</p>
-                        <p className="text-xs opacity-80">{interviewer.nameVi}</p>
-                        <p className={`text-xs mt-1 ${selectedInterviewer === interviewer.id ? 'opacity-90' : 'text-muted-foreground'}`}>
+                      <span className="text-3xl">{interviewer.emoji}</span>
+                      <div className="space-y-1">
+                        <p className="text-card-title font-bold">{interviewer.nameVi}</p>
+                        <p className="text-badge opacity-60">{interviewer.name}</p>
+                        <p className={`text-card-caption mt-1.5 leading-relaxed ${selectedInterviewer === interviewer.id ? 'opacity-90' : 'text-muted-foreground'}`}>
                           {interviewer.description}
                         </p>
                       </div>
@@ -583,22 +600,22 @@ const InterviewSimulation = () => {
               <Button
                 onClick={startInterview}
                 disabled={
-                  (!selectedCompany || (selectedCompany === "기타 (직접 입력)" && !customCompany)) || 
+                  (!selectedCompany || (selectedCompany === "기타" && !customCompany)) || 
                   !selectedPosition || 
                   !selectedInterviewer || 
                   isLoading
                 }
-                className="w-full h-16 text-lg bg-gradient-to-r from-orange-500 to-red-500 text-white hover:opacity-90"
+                className="w-full h-16 text-button-lg bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50"
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    면접 준비 중...
+                    <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                    Đang chuẩn bị phỏng vấn...
                   </>
                 ) : (
                   <>
-                    <Mic className="w-5 h-5 mr-2" />
-                    면접 시작하기
+                    <Mic className="w-5 h-5 mr-3" />
+                    Bắt Đầu Phỏng Vấn
                   </>
                 )}
               </Button>
@@ -610,19 +627,19 @@ const InterviewSimulation = () => {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="space-y-4"
+              className="space-y-5"
             >
               {/* Interview Header */}
-              <Card className="p-4">
+              <Card className="p-5 border-border/50 bg-card/50 backdrop-blur-sm">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center text-2xl">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-3xl shadow-lg">
                       {interviewerTypes.find(i => i.id === selectedInterviewer)?.emoji}
                     </div>
                     <div>
-                      <p className="font-bold">{getCompanyName()} 면접관</p>
-                      <p className="text-xs text-muted-foreground">
-                        {selectedPosition} · {interviewerTypes.find(i => i.id === selectedInterviewer)?.name}
+                      <p className="text-card-title font-bold">{getCompanyName()}</p>
+                      <p className="text-card-caption text-muted-foreground">
+                        {positions.find(p => p.name === selectedPosition)?.nameVi} · {interviewerTypes.find(i => i.id === selectedInterviewer)?.nameVi}
                       </p>
                     </div>
                   </div>
@@ -631,7 +648,7 @@ const InterviewSimulation = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => setTtsEnabled(!ttsEnabled)}
-                      className="gap-1"
+                      className="gap-1.5"
                     >
                       {ttsEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
                     </Button>
@@ -642,17 +659,17 @@ const InterviewSimulation = () => {
                     )}
                   </div>
                 </div>
-                <div className="mt-3">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                    <span>진행률</span>
-                    <span>{questionCount}/8 질문</span>
+                <div className="mt-4">
+                  <div className="flex items-center justify-between text-card-caption text-muted-foreground mb-2">
+                    <span>Tiến độ phỏng vấn</span>
+                    <span className="font-medium">{questionCount}/8 câu hỏi</span>
                   </div>
                   <Progress value={(questionCount / 8) * 100} className="h-2" />
                 </div>
               </Card>
 
               {/* Messages */}
-              <Card className="p-4 h-[350px] overflow-y-auto">
+              <Card className="p-5 h-[380px] overflow-y-auto border-border/50 bg-card/50 backdrop-blur-sm">
                 <div className="space-y-4">
                   <AnimatePresence>
                     {messages.map((msg, idx) => (
@@ -663,13 +680,13 @@ const InterviewSimulation = () => {
                         className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                       >
                         <div
-                          className={`max-w-[85%] rounded-2xl px-4 py-3 ${
+                          className={`max-w-[85%] rounded-2xl px-5 py-3.5 ${
                             msg.role === "user"
-                              ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white"
+                              ? "bg-gradient-to-br from-blue-500 to-indigo-500 text-white"
                               : "bg-muted"
                           }`}
                         >
-                          <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                          <p className="text-body leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                         </div>
                       </motion.div>
                     ))}
@@ -677,9 +694,9 @@ const InterviewSimulation = () => {
                   
                   {isLoading && (
                     <div className="flex justify-start">
-                      <div className="bg-muted rounded-2xl px-4 py-3 flex items-center gap-2">
+                      <div className="bg-muted rounded-2xl px-5 py-3.5 flex items-center gap-3">
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span className="text-sm text-muted-foreground">생각 중...</span>
+                        <span className="text-card-body text-muted-foreground">Đang suy nghĩ...</span>
                       </div>
                     </div>
                   )}
@@ -689,50 +706,50 @@ const InterviewSimulation = () => {
 
               {/* Input */}
               <div className="space-y-3">
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   <Input
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-                    placeholder="답변을 입력하세요..."
-                    className="flex-1"
+                    placeholder="Nhập câu trả lời của bạn..."
+                    className="flex-1 h-12 text-body"
                     disabled={isLoading || isRecording}
                   />
                   <Button
                     onClick={sendMessage}
                     disabled={isLoading || !inputText.trim() || isRecording}
-                    className="bg-gradient-to-r from-blue-500 to-indigo-500"
+                    className="h-12 px-5 bg-gradient-to-r from-blue-500 to-indigo-500"
                   >
                     <Send className="w-4 h-4" />
                   </Button>
                 </div>
                 
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   <Button
                     onClick={isRecording ? stopRecording : startRecording}
                     disabled={isLoading}
                     variant={isRecording ? "destructive" : "outline"}
-                    className="flex-1 h-12"
+                    className="flex-1 h-14 text-button"
                   >
                     {isRecording ? (
                       <>
                         <MicOff className="w-5 h-5 mr-2" />
-                        녹음 중지
+                        Dừng ghi âm
                       </>
                     ) : (
                       <>
                         <Mic className="w-5 h-5 mr-2" />
-                        음성으로 답변하기
+                        Trả lời bằng giọng nói
                       </>
                     )}
                   </Button>
                   <Button
                     onClick={endInterviewEarly}
                     variant="outline"
-                    className="h-12"
+                    className="h-14 px-6 text-button"
                     disabled={isLoading || messages.length < 2}
                   >
-                    면접 종료
+                    Kết thúc
                   </Button>
                 </div>
               </div>
@@ -747,94 +764,99 @@ const InterviewSimulation = () => {
               className="space-y-6"
             >
               {isEvaluating ? (
-                <Card className="p-8 text-center">
-                  <Loader2 className="w-16 h-16 mx-auto text-primary animate-spin mb-4" />
-                  <h2 className="text-xl font-bold mb-2">면접 결과 분석 중...</h2>
-                  <p className="text-muted-foreground">AI가 면접 내용을 종합 평가하고 있습니다</p>
+                <Card className="p-10 text-center border-border/50 bg-card/50 backdrop-blur-sm">
+                  <Loader2 className="w-16 h-16 mx-auto text-primary animate-spin mb-5" />
+                  <h2 className="text-title font-bold mb-2">Đang phân tích kết quả...</h2>
+                  <p className="text-body text-muted-foreground">AI đang đánh giá toàn diện buổi phỏng vấn của bạn</p>
                 </Card>
               ) : evaluation ? (
                 <>
                   {/* Grade Card */}
-                  <Card className="p-6 text-center overflow-hidden relative">
+                  <Card className="p-8 text-center overflow-hidden relative border-border/50">
                     <div className={`absolute inset-0 bg-gradient-to-br ${getGradeColor(evaluation.grade)} opacity-10`} />
-                    <Trophy className="w-16 h-16 mx-auto text-yellow-500 mb-4" />
-                    <h2 className="text-2xl font-bold mb-2">면접 완료!</h2>
-                    <p className="text-muted-foreground mb-6">
-                      {getCompanyName()} {selectedPosition} 모의 면접을 완료했습니다
+                    <Trophy className="w-16 h-16 mx-auto text-yellow-500 mb-5" />
+                    <h2 className="text-title font-bold mb-2">Hoàn thành phỏng vấn!</h2>
+                    <p className="text-body text-muted-foreground mb-8">
+                      Phỏng vấn mô phỏng {getCompanyName()} - {positions.find(p => p.name === selectedPosition)?.nameVi}
                     </p>
                     
                     {/* Grade Badge */}
-                    <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r ${getGradeColor(evaluation.grade)} text-white text-2xl font-bold mb-6`}>
-                      <Award className="w-6 h-6" />
-                      {evaluation.grade} 등급
+                    <div className={`inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r ${getGradeColor(evaluation.grade)} text-white text-2xl font-bold mb-8 shadow-lg`}>
+                      <Award className="w-7 h-7" />
+                      Hạng {evaluation.grade}
                     </div>
 
                     {/* Overall Score */}
-                    <div className={`text-5xl font-bold ${getScoreColor(evaluation.scores.overall)}`}>
-                      {evaluation.scores.overall}점
+                    <div className={`text-6xl font-bold ${getScoreColor(evaluation.scores.overall)}`}>
+                      {evaluation.scores.overall}
+                      <span className="text-2xl font-medium opacity-70"> điểm</span>
                     </div>
-                    <p className="text-muted-foreground mt-2">종합 점수</p>
+                    <p className="text-card-body text-muted-foreground mt-2">Điểm tổng hợp</p>
                   </Card>
 
                   {/* Detailed Scores */}
-                  <Card className="p-6">
-                    <h3 className="font-bold mb-4 flex items-center gap-2">
-                      <Target className="w-5 h-5 text-primary" />
-                      항목별 점수
+                  <Card className="p-6 sm:p-8 border-border/50 bg-card/50 backdrop-blur-sm">
+                    <h3 className="text-card-title-lg font-bold mb-5 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Target className="w-4 h-4 text-primary" />
+                      </div>
+                      <span>Điểm theo từng hạng mục</span>
                     </h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                       {[
-                        { label: "답변 내용", score: evaluation.scores.content, icon: MessageSquare },
-                        { label: "커뮤니케이션", score: evaluation.scores.communication, icon: Users },
-                        { label: "한국어 능력", score: evaluation.scores.korean, icon: Sparkles },
-                        { label: "태도 및 자세", score: evaluation.scores.attitude, icon: Heart },
-                        { label: "직무 적합성", score: evaluation.scores.jobFit, icon: Target },
+                        { label: "Nội dung", score: evaluation.scores.content, icon: MessageSquare },
+                        { label: "Giao tiếp", score: evaluation.scores.communication, icon: Users },
+                        { label: "Tiếng Hàn", score: evaluation.scores.korean, icon: Sparkles },
+                        { label: "Thái độ", score: evaluation.scores.attitude, icon: Heart },
+                        { label: "Phù hợp vị trí", score: evaluation.scores.jobFit, icon: Target },
                       ].map((item) => (
-                        <div key={item.label} className="text-center p-4 bg-muted/50 rounded-xl">
-                          <item.icon className={`w-5 h-5 mx-auto mb-2 ${getScoreColor(item.score)}`} />
+                        <div key={item.label} className="text-center p-5 bg-muted/50 rounded-xl">
+                          <item.icon className={`w-5 h-5 mx-auto mb-3 ${getScoreColor(item.score)}`} />
                           <p className={`text-2xl font-bold ${getScoreColor(item.score)}`}>{item.score}</p>
-                          <p className="text-xs text-muted-foreground">{item.label}</p>
+                          <p className="text-card-caption text-muted-foreground mt-1">{item.label}</p>
                         </div>
                       ))}
                     </div>
                   </Card>
 
                   {/* Feedback */}
-                  <Card className="p-6">
-                    <h3 className="font-bold mb-4 flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-primary" />
-                      종합 피드백
+                  <Card className="p-6 sm:p-8 border-border/50 bg-card/50 backdrop-blur-sm">
+                    <h3 className="text-card-title-lg font-bold mb-4 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <TrendingUp className="w-4 h-4 text-primary" />
+                      </div>
+                      <span>Nhận xét tổng hợp</span>
                     </h3>
-                    <p className="text-foreground/80 leading-relaxed">{evaluation.overallFeedback}</p>
+                    <p className="text-body text-foreground/80 leading-relaxed">{evaluation.overallFeedback}</p>
                   </Card>
 
                   {/* Strengths & Improvements */}
-                  <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="grid sm:grid-cols-2 gap-5">
                     <Card className="p-6 bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/30">
-                      <h3 className="font-bold mb-4 flex items-center gap-2 text-green-600 dark:text-green-400">
+                      <h3 className="text-card-title font-bold mb-4 flex items-center gap-3 text-green-600 dark:text-green-400">
                         <CheckCircle className="w-5 h-5" />
-                        강점
+                        Điểm mạnh
                       </h3>
-                      <ul className="space-y-2">
+                      <ul className="space-y-3">
                         {evaluation.strengths.map((strength, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-sm">
+                          <li key={idx} className="flex items-start gap-3 text-card-body">
                             <Sparkles className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                            <span>{strength}</span>
+                            <span className="leading-relaxed">{strength}</span>
                           </li>
                         ))}
                       </ul>
                     </Card>
 
                     <Card className="p-6 bg-gradient-to-br from-orange-500/10 to-amber-500/10 border-orange-500/30">
-                      <h3 className="font-bold mb-4 flex items-center gap-2 text-orange-600 dark:text-orange-400">
+                      <h3 className="text-card-title font-bold mb-4 flex items-center gap-3 text-orange-600 dark:text-orange-400">
                         <AlertCircle className="w-5 h-5" />
-                        개선점
+                        Cần cải thiện
                       </h3>
-                      <ul className="space-y-2">
+                      <ul className="space-y-3">
                         {evaluation.improvements.map((improvement, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-sm">
+                          <li key={idx} className="flex items-start gap-3 text-card-body">
                             <Zap className="w-4 h-4 text-orange-500 mt-0.5 shrink-0" />
-                            <span>{improvement}</span>
+                            <span className="leading-relaxed">{improvement}</span>
                           </li>
                         ))}
                       </ul>
@@ -842,18 +864,18 @@ const InterviewSimulation = () => {
                   </div>
 
                   {/* Tips */}
-                  <Card className="p-6 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border-blue-500/30">
-                    <h3 className="font-bold mb-4 flex items-center gap-2 text-blue-600 dark:text-blue-400">
+                  <Card className="p-6 sm:p-8 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border-blue-500/30">
+                    <h3 className="text-card-title-lg font-bold mb-5 flex items-center gap-3 text-blue-600 dark:text-blue-400">
                       <Lightbulb className="w-5 h-5" />
-                      다음 면접을 위한 팁
+                      Lời khuyên cho buổi phỏng vấn tiếp theo
                     </h3>
-                    <ul className="space-y-2">
+                    <ul className="space-y-3">
                       {evaluation.tips.map((tip, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <span className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center text-xs font-bold text-blue-600 shrink-0">
+                        <li key={idx} className="flex items-start gap-4 text-card-body">
+                          <span className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-badge font-bold text-blue-600 shrink-0">
                             {idx + 1}
                           </span>
-                          <span>{tip}</span>
+                          <span className="leading-relaxed">{tip}</span>
                         </li>
                       ))}
                     </ul>
@@ -862,19 +884,19 @@ const InterviewSimulation = () => {
                   {/* Restart Button */}
                   <Button
                     onClick={resetInterview}
-                    className="w-full h-14 text-lg bg-gradient-to-r from-orange-500 to-red-500"
+                    className="w-full h-16 text-button-lg bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 shadow-lg hover:opacity-90 transition-all"
                   >
-                    <RotateCcw className="w-5 h-5 mr-2" />
-                    다시 면접하기
+                    <RotateCcw className="w-5 h-5 mr-3" />
+                    Phỏng vấn lại
                   </Button>
                 </>
               ) : (
-                <Card className="p-8 text-center">
-                  <Trophy className="w-16 h-16 mx-auto text-yellow-500 mb-4" />
-                  <h2 className="text-xl font-bold mb-2">면접 완료!</h2>
-                  <Button onClick={resetInterview} className="mt-4">
+                <Card className="p-10 text-center border-border/50 bg-card/50 backdrop-blur-sm">
+                  <Trophy className="w-16 h-16 mx-auto text-yellow-500 mb-5" />
+                  <h2 className="text-title font-bold mb-2">Hoàn thành phỏng vấn!</h2>
+                  <Button onClick={resetInterview} className="mt-5">
                     <RotateCcw className="w-4 h-4 mr-2" />
-                    다시 시작
+                    Bắt đầu lại
                   </Button>
                 </Card>
               )}
