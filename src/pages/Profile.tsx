@@ -69,7 +69,7 @@ const Profile = () => {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, username, created_at")
+        .select("id, username, created_at, avatar_url")
         .eq("id", session.user.id)
         .single();
 
@@ -78,6 +78,9 @@ const Profile = () => {
       } else {
         setProfile(data);
         setNewUsername(data.username);
+        if (data.avatar_url) {
+          setAvatarUrl(data.avatar_url);
+        }
       }
       setLoading(false);
     };
@@ -163,7 +166,7 @@ const Profile = () => {
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !profile) return;
     
     // Validate file type
     if (!file.type.startsWith('image/')) {
@@ -188,9 +191,41 @@ const Profile = () => {
     setUploadingAvatar(true);
     
     try {
-      // Create a local URL for the image
-      const imageUrl = URL.createObjectURL(file);
-      setAvatarUrl(imageUrl);
+      // Create unique file name
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${profile.id}/avatar.${fileExt}`;
+      
+      // Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, { 
+          upsert: true,
+          contentType: file.type 
+        });
+      
+      if (uploadError) {
+        throw uploadError;
+      }
+      
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+      
+      // Add cache buster to URL
+      const avatarUrlWithCache = `${publicUrl}?t=${Date.now()}`;
+      
+      // Update profiles table
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: avatarUrlWithCache })
+        .eq('id', profile.id);
+      
+      if (updateError) {
+        throw updateError;
+      }
+      
+      setAvatarUrl(avatarUrlWithCache);
       
       toast({
         title: "Thành công",
