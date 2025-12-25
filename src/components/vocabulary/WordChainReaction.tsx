@@ -324,7 +324,7 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
       >
-        <Card className="p-8 text-center relative overflow-hidden">
+        <Card className="p-4 sm:p-8 text-center relative overflow-hidden">
           <div className="absolute inset-0 -z-10">
             <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-yellow-500/20 rounded-full blur-2xl animate-pulse" />
           </div>
@@ -334,21 +334,21 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
             animate={{ rotate: 0, scale: 1 }}
             transition={{ type: "spring", stiffness: 200 }}
           >
-            <Trophy className="w-20 h-20 mx-auto mb-4 text-yellow-500 drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]" />
+            <Trophy className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 text-yellow-500 drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]" />
           </motion.div>
-          <h2 className="text-3xl font-black mb-4 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+          <h2 className="text-2xl sm:text-3xl font-black mb-3 sm:mb-4 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
             체인 완료!
           </h2>
-          <div className="space-y-3 mb-6">
+          <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
             <motion.p 
-              className="text-5xl font-black text-primary"
+              className="text-4xl sm:text-5xl font-black text-primary"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.3, type: "spring" }}
             >
               {score}점
             </motion.p>
-            <div className="flex justify-center gap-4 text-muted-foreground">
+            <div className="flex justify-center gap-4 text-sm sm:text-base text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Link2 className="w-4 h-4 text-orange-400" />
                 <span>{chain.length} 체인 / chuỗi</span>
@@ -356,27 +356,45 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
             </div>
             
             {/* Show chain */}
-            <div className="mt-4 p-4 bg-muted/50 rounded-xl max-h-40 overflow-y-auto">
-              <div className="flex flex-wrap gap-2 justify-center">
+            <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-muted/50 rounded-xl max-h-32 sm:max-h-40 overflow-y-auto">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center">
                 {chain.map((item, idx) => (
-                  <span key={idx} className="flex items-center gap-1">
-                    <span className="px-2 py-1 bg-primary/20 rounded-lg text-sm font-medium">
+                  <span key={idx} className="flex items-center gap-0.5 sm:gap-1">
+                    <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-primary/20 rounded-lg text-xs sm:text-sm font-medium">
                       {item.word}
                     </span>
                     {idx < chain.length - 1 && (
-                      <span className="text-muted-foreground">→</span>
+                      <span className="text-muted-foreground text-xs sm:text-base">→</span>
                     )}
                   </span>
                 ))}
               </div>
             </div>
           </div>
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button onClick={() => onComplete(score, chain.length)} size="lg" className="gap-2 text-lg px-8">
-              <RotateCcw className="w-5 h-5" />
-              완료 / Hoàn thành
-            </Button>
-          </motion.div>
+          
+          {/* Action buttons */}
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+              <Button 
+                onClick={startGame} 
+                size="lg" 
+                className="gap-2 text-base sm:text-lg px-6 sm:px-8 w-full sm:w-auto bg-gradient-to-r from-orange-500 to-red-500 hover:opacity-90"
+              >
+                <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
+                다시하기 / Chơi lại
+              </Button>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+              <Button 
+                onClick={() => onComplete(score, chain.length)} 
+                size="lg" 
+                variant="outline"
+                className="gap-2 text-base sm:text-lg px-6 sm:px-8 w-full sm:w-auto"
+              >
+                완료 / Hoàn thành
+              </Button>
+            </motion.div>
+          </div>
         </Card>
       </motion.div>
     );

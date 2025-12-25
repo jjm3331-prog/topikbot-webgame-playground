@@ -893,22 +893,62 @@ export default function ChainReactionMultiplayer({ words, onBack }: ChainReactio
             </div>
           </div>
 
-          <div className="flex gap-3 justify-center">
-            <Button variant="outline" onClick={onBack}>
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
+            <Button variant="outline" onClick={onBack} className="w-full sm:w-auto">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              나가기
+              나가기 / Thoát
             </Button>
             <Button 
+              onClick={async () => {
+                // Reset for rematch in same room
+                if (room) {
+                  try {
+                    await supabase
+                      .from("chain_reaction_rooms")
+                      .update({
+                        status: "ready",
+                        host_score: 0,
+                        guest_score: 0,
+                        host_chain_length: 0,
+                        guest_chain_length: 0,
+                        host_ready: false,
+                        guest_ready: false,
+                        winner_id: null,
+                        started_at: null,
+                        finished_at: null
+                      })
+                      .eq("id", room.id);
+                    
+                    setGamePhase("ready");
+                    setChain([]);
+                    setScore(0);
+                    setTimeLeft(60);
+                  } catch (err) {
+                    console.error("Rematch error:", err);
+                    // Fallback to menu
+                    setGamePhase("menu");
+                    setRoom(null);
+                    setChain([]);
+                    setScore(0);
+                  }
+                }
+              }}
+              className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-pink-500"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              리매치 / Đấu lại
+            </Button>
+            <Button 
+              variant="outline"
               onClick={() => {
                 setGamePhase("menu");
                 setRoom(null);
                 setChain([]);
                 setScore(0);
               }}
-              className="bg-gradient-to-r from-purple-500 to-pink-500"
+              className="w-full sm:w-auto"
             >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              다시 대결
+              새 방 / Phòng mới
             </Button>
           </div>
         </Card>
