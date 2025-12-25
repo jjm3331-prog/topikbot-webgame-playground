@@ -379,13 +379,14 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
           {/* Speed selector */}
           <div className="mb-6">
             <p className="text-sm text-muted-foreground mb-3">🏎️ Tốc độ / 속도</p>
-            <div className="flex justify-center gap-2">
+            <div className="flex flex-wrap justify-center gap-2">
               {(Object.keys(speedSettings) as Array<keyof typeof speedSettings>).map((key) => (
                 <Button
                   key={key}
                   variant={selectedSpeed === key ? "default" : "outline"}
                   onClick={() => setSelectedSpeed(key)}
-                  className={`text-sm px-4 py-2 ${
+                  size="sm"
+                  className={`text-xs sm:text-sm px-3 sm:px-4 py-2 ${
                     selectedSpeed === key 
                       ? `bg-gradient-to-r ${speedSettings[key].color} border-0` 
                       : ""

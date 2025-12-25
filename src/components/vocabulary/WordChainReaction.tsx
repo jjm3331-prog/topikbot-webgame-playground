@@ -41,7 +41,7 @@ interface ChainWord {
 
 export default function WordChainReaction({ words, onComplete }: WordChainReactionProps) {
   const [gameState, setGameState] = useState<"ready" | "playing" | "finished" | "multiplayer">("ready");
-  const [timeLeft, setTimeLeft] = useState(30);
+  const [timeLeft, setTimeLeft] = useState(60);
   const [chain, setChain] = useState<ChainWord[]>([]);
   const [currentInput, setCurrentInput] = useState("");
   const [score, setScore] = useState(0);
@@ -194,7 +194,7 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
 
   const startGame = () => {
     setGameState("playing");
-    setTimeLeft(30);
+    setTimeLeft(60);
     setChain([]);
     setScore(0);
     setCurrentInput("");
