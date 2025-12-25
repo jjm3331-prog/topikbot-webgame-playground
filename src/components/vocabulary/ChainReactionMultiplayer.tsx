@@ -26,6 +26,7 @@ import {
 import confetti from "canvas-confetti";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import RoomCodeCollapsible from "@/components/battle/RoomCodeCollapsible";
 
 interface ChainReactionMultiplayerProps {
   words: { id: number; korean: string; meaning: string }[];
@@ -1089,34 +1090,17 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
           <h2 className="text-xl font-bold">Phòng chờ</h2>
         </div>
 
-        {/* Room Code Card */}
-        <Card className="relative overflow-hidden bg-gradient-to-br from-card via-card to-muted/30 border-border/50">
-          <div className="absolute inset-0 -z-10">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-yellow-500/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-40 h-40 bg-orange-500/10 rounded-full blur-3xl" />
-          </div>
-          
-          <div className="p-6 text-center">
-            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">Mã phòng</p>
-            <p className="text-4xl sm:text-5xl font-mono font-black tracking-[0.3em] bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-4">
-              {room.room_code}
-            </p>
-            <div className="flex justify-center gap-3">
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button onClick={copyRoomUrl} variant="outline" className="gap-2 h-11">
-                  {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-                  {copied ? "Đã copy" : "Copy link"}
-                </Button>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button onClick={shareRoom} className="gap-2 h-11 bg-gradient-to-r from-yellow-400 to-orange-500">
-                  <Share2 className="w-4 h-4" />
-                  Chia sẻ
-                </Button>
-              </motion.div>
-            </div>
-          </div>
-        </Card>
+        {/* Room Code Card - Collapsible for manual entry fallback */}
+        <RoomCodeCollapsible 
+          roomCode={room.room_code}
+          copied={copied}
+          onCopy={copyRoomUrl}
+          onShare={shareRoom}
+          gradientFrom="from-yellow-400"
+          gradientTo="to-orange-500"
+          bgGlow1="bg-yellow-500/10"
+          bgGlow2="bg-orange-500/10"
+        />
 
         {/* Players Status */}
         <Card className="p-5 bg-gradient-to-br from-card to-muted/30 border-border/50">
