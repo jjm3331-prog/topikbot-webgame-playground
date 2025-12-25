@@ -494,28 +494,28 @@ const InterviewSimulation = () => {
               className="space-y-6"
             >
               {/* Company Selection */}
-              <Card className="p-6 sm:p-8 border-border/50 bg-card/50 backdrop-blur-sm">
-                <h3 className="text-card-title-lg font-bold mb-5 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                    <Building2 className="w-4 h-4 text-blue-500" />
+              <Card className="p-4 sm:p-6 md:p-8 border-border/50 bg-card/50 backdrop-blur-sm">
+                <h3 className="text-card-title-lg font-bold mb-4 sm:mb-5 flex items-center gap-2 sm:gap-3">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
+                    <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500" />
                   </div>
-                  <span>Chọn Công Ty Phỏng Vấn</span>
+                  <span className="text-base sm:text-lg">Chọn Công Ty Phỏng Vấn</span>
                 </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4">
                   {companies.map((company) => (
                     <Button
                       key={company.name}
                       variant={selectedCompany === company.name ? "default" : "outline"}
                       onClick={() => setSelectedCompany(company.name)}
-                      className={`h-auto py-4 px-3 flex-col gap-2 transition-all duration-200 ${
+                      className={`h-auto py-3 sm:py-4 px-2 sm:px-3 flex-col gap-1 sm:gap-2 transition-all duration-200 min-h-[90px] sm:min-h-[100px] ${
                         selectedCompany === company.name 
                           ? `bg-gradient-to-br ${company.color} text-white border-0 shadow-lg scale-[1.02]`
                           : "hover:border-primary/50 hover:bg-muted/50"
                       }`}
                     >
-                      <span className="text-2xl">{company.emoji}</span>
-                      <span className="text-card-body font-semibold">{company.nameVi}</span>
-                      <span className="text-card-caption opacity-70">{company.type}</span>
+                      <span className="text-xl sm:text-2xl">{company.emoji}</span>
+                      <span className="text-xs sm:text-sm font-semibold text-center leading-tight line-clamp-2">{company.nameVi}</span>
+                      <span className="text-[10px] sm:text-xs opacity-70 text-center leading-tight line-clamp-1">{company.type}</span>
                     </Button>
                   ))}
                 </div>
@@ -537,57 +537,57 @@ const InterviewSimulation = () => {
               </Card>
 
               {/* Position Selection */}
-              <Card className="p-6 sm:p-8 border-border/50 bg-card/50 backdrop-blur-sm">
-                <h3 className="text-card-title-lg font-bold mb-5 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center">
-                    <User className="w-4 h-4 text-green-500" />
+              <Card className="p-4 sm:p-6 md:p-8 border-border/50 bg-card/50 backdrop-blur-sm">
+                <h3 className="text-card-title-lg font-bold mb-4 sm:mb-5 flex items-center gap-2 sm:gap-3">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
+                    <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-500" />
                   </div>
-                  <span>Chọn Vị Trí Ứng Tuyển</span>
+                  <span className="text-base sm:text-lg">Chọn Vị Trí Ứng Tuyển</span>
                 </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4">
                   {positions.map((position) => (
                     <Button
                       key={position.name}
                       variant={selectedPosition === position.name ? "default" : "outline"}
                       onClick={() => setSelectedPosition(position.name)}
-                      className={`h-auto py-4 px-3 flex-col gap-2 transition-all duration-200 ${
+                      className={`h-auto py-3 sm:py-4 px-2 sm:px-3 flex-col gap-1 sm:gap-2 transition-all duration-200 min-h-[80px] sm:min-h-[90px] ${
                         selectedPosition === position.name 
                           ? "bg-primary text-primary-foreground shadow-lg scale-[1.02]"
                           : "hover:border-primary/50 hover:bg-muted/50"
                       }`}
                     >
-                      <span className="text-2xl">{position.icon}</span>
-                      <span className="text-card-body font-semibold text-center leading-tight">{position.nameVi}</span>
+                      <span className="text-xl sm:text-2xl">{position.icon}</span>
+                      <span className="text-xs sm:text-sm font-semibold text-center leading-tight line-clamp-2">{position.nameVi}</span>
                     </Button>
                   ))}
                 </div>
               </Card>
 
               {/* Interviewer Selection */}
-              <Card className="p-6 sm:p-8 border-border/50 bg-card/50 backdrop-blur-sm">
-                <h3 className="text-card-title-lg font-bold mb-5 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                    <MessageSquare className="w-4 h-4 text-purple-500" />
+              <Card className="p-4 sm:p-6 md:p-8 border-border/50 bg-card/50 backdrop-blur-sm">
+                <h3 className="text-card-title-lg font-bold mb-4 sm:mb-5 flex items-center gap-2 sm:gap-3">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0">
+                    <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-500" />
                   </div>
-                  <span>Chọn Phong Cách Phỏng Vấn</span>
+                  <span className="text-base sm:text-lg">Chọn Phong Cách Phỏng Vấn</span>
                 </h3>
-                <div className="grid sm:grid-cols-2 gap-4">
+                <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
                   {interviewerTypes.map((interviewer) => (
                     <Button
                       key={interviewer.id}
                       variant="outline"
                       onClick={() => setSelectedInterviewer(interviewer.id)}
-                      className={`h-auto p-5 flex items-start gap-4 justify-start text-left transition-all duration-200 ${
+                      className={`h-auto p-3 sm:p-4 md:p-5 flex items-start gap-3 sm:gap-4 justify-start text-left transition-all duration-200 ${
                         selectedInterviewer === interviewer.id 
                           ? `ring-2 ring-primary bg-gradient-to-br ${interviewer.color} text-white shadow-lg scale-[1.01]`
                           : "hover:border-primary/50 hover:bg-muted/50"
                       }`}
                     >
-                      <span className="text-3xl">{interviewer.emoji}</span>
-                      <div className="space-y-1">
-                        <p className="text-card-title font-bold">{interviewer.nameVi}</p>
-                        <p className="text-badge opacity-60">{interviewer.name}</p>
-                        <p className={`text-card-caption mt-1.5 leading-relaxed ${selectedInterviewer === interviewer.id ? 'opacity-90' : 'text-muted-foreground'}`}>
+                      <span className="text-2xl sm:text-3xl shrink-0">{interviewer.emoji}</span>
+                      <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
+                        <p className="text-sm sm:text-base font-bold truncate">{interviewer.nameVi}</p>
+                        <p className="text-xs sm:text-sm opacity-60">{interviewer.name}</p>
+                        <p className={`text-xs sm:text-sm mt-1 leading-relaxed line-clamp-2 ${selectedInterviewer === interviewer.id ? 'opacity-90' : 'text-muted-foreground'}`}>
                           {interviewer.description}
                         </p>
                       </div>
