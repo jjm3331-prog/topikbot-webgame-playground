@@ -68,12 +68,12 @@ const PointsSystem = () => {
   ];
 
   const levels = [
-    { ...LEVEL_THRESHOLDS.TOPIK_1, level: 1, range: "0 - 499" },
-    { ...LEVEL_THRESHOLDS.TOPIK_2, level: 2, range: "500 - 1.499" },
-    { ...LEVEL_THRESHOLDS.TOPIK_3, level: 3, range: "1.500 - 2.999" },
-    { ...LEVEL_THRESHOLDS.TOPIK_4, level: 4, range: "3.000 - 4.999" },
-    { ...LEVEL_THRESHOLDS.TOPIK_5, level: 5, range: "5.000 - 7.999" },
-    { ...LEVEL_THRESHOLDS.TOPIK_6, level: 6, range: "8.000+" },
+    { ...LEVEL_THRESHOLDS.TOPIK_1, level: 1, range: "0 - 9.999" },
+    { ...LEVEL_THRESHOLDS.TOPIK_2, level: 2, range: "10.000 - 49.999" },
+    { ...LEVEL_THRESHOLDS.TOPIK_3, level: 3, range: "50.000 - 149.999" },
+    { ...LEVEL_THRESHOLDS.TOPIK_4, level: 4, range: "150.000 - 349.999" },
+    { ...LEVEL_THRESHOLDS.TOPIK_5, level: 5, range: "350.000 - 999.999" },
+    { ...LEVEL_THRESHOLDS.TOPIK_6, level: 6, range: "1.000.000+" },
   ];
 
   const levelColors = [

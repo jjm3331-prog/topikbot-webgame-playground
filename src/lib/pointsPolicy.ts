@@ -14,12 +14,12 @@
  * 
  * 2. 레벨 시스템 - TOPIK 급수 (Hệ thống cấp bậc TOPIK)
  * ---------------------------------
- * - TOPIK 1급: 0 ~ 499 điểm
- * - TOPIK 2급: 500 ~ 1,499 điểm
- * - TOPIK 3급: 1,500 ~ 2,999 điểm
- * - TOPIK 4급: 3,000 ~ 4,999 điểm
- * - TOPIK 5급: 5,000 ~ 7,999 điểm
- * - TOPIK 6급: 8,000+ điểm
+ * - TOPIK 1급: 0 ~ 9,999 điểm
+ * - TOPIK 2급: 10,000 ~ 49,999 điểm
+ * - TOPIK 3급: 50,000 ~ 149,999 điểm
+ * - TOPIK 4급: 150,000 ~ 349,999 điểm
+ * - TOPIK 5급: 350,000 ~ 999,999 điểm
+ * - TOPIK 6급: 1,000,000+ điểm (최고 등급!)
  * 
  * 3. 프리미엄 기능 (Tính năng Premium)
  * ------------------------------------
@@ -59,12 +59,12 @@ export const POINTS_CONFIG = {
 };
 
 export const LEVEL_THRESHOLDS = {
-  TOPIK_1: { min: 0, max: 499, name: "TOPIK 1급", nameKo: "TOPIK 1급", color: "text-gray-500" },
-  TOPIK_2: { min: 500, max: 1499, name: "TOPIK 2급", nameKo: "TOPIK 2급", color: "text-green-500" },
-  TOPIK_3: { min: 1500, max: 2999, name: "TOPIK 3급", nameKo: "TOPIK 3급", color: "text-blue-500" },
-  TOPIK_4: { min: 3000, max: 4999, name: "TOPIK 4급", nameKo: "TOPIK 4급", color: "text-purple-500" },
-  TOPIK_5: { min: 5000, max: 7999, name: "TOPIK 5급", nameKo: "TOPIK 5급", color: "text-orange-500" },
-  TOPIK_6: { min: 8000, max: Infinity, name: "TOPIK 6급", nameKo: "TOPIK 6급", color: "text-red-500" },
+  TOPIK_1: { min: 0, max: 9999, name: "TOPIK 1급", nameKo: "TOPIK 1급", color: "text-slate-400" },
+  TOPIK_2: { min: 10000, max: 49999, name: "TOPIK 2급", nameKo: "TOPIK 2급", color: "text-emerald-500" },
+  TOPIK_3: { min: 50000, max: 149999, name: "TOPIK 3급", nameKo: "TOPIK 3급", color: "text-blue-500" },
+  TOPIK_4: { min: 150000, max: 349999, name: "TOPIK 4급", nameKo: "TOPIK 4급", color: "text-purple-500" },
+  TOPIK_5: { min: 350000, max: 999999, name: "TOPIK 5급", nameKo: "TOPIK 5급", color: "text-orange-500" },
+  TOPIK_6: { min: 1000000, max: Infinity, name: "TOPIK 6급", nameKo: "TOPIK 6급", color: "text-red-500" },
 };
 
 export const FREE_LIMITS = {
@@ -95,66 +95,66 @@ export function getLevelFromPoints(points: number): {
       name: LEVEL_THRESHOLDS.TOPIK_6.name,
       nameKo: LEVEL_THRESHOLDS.TOPIK_6.nameKo,
       color: LEVEL_THRESHOLDS.TOPIK_6.color,
-      nextLevelPoints: 8000,
+      nextLevelPoints: 1000000,
       progress: 100,
       level: 6,
     };
   }
   
   if (points >= LEVEL_THRESHOLDS.TOPIK_5.min) {
-    const progress = ((points - 5000) / 3000) * 100;
+    const progress = ((points - 350000) / 650000) * 100;
     return {
       name: LEVEL_THRESHOLDS.TOPIK_5.name,
       nameKo: LEVEL_THRESHOLDS.TOPIK_5.nameKo,
       color: LEVEL_THRESHOLDS.TOPIK_5.color,
-      nextLevelPoints: 8000,
+      nextLevelPoints: 1000000,
       progress,
       level: 5,
     };
   }
   
   if (points >= LEVEL_THRESHOLDS.TOPIK_4.min) {
-    const progress = ((points - 3000) / 2000) * 100;
+    const progress = ((points - 150000) / 200000) * 100;
     return {
       name: LEVEL_THRESHOLDS.TOPIK_4.name,
       nameKo: LEVEL_THRESHOLDS.TOPIK_4.nameKo,
       color: LEVEL_THRESHOLDS.TOPIK_4.color,
-      nextLevelPoints: 5000,
+      nextLevelPoints: 350000,
       progress,
       level: 4,
     };
   }
   
   if (points >= LEVEL_THRESHOLDS.TOPIK_3.min) {
-    const progress = ((points - 1500) / 1500) * 100;
+    const progress = ((points - 50000) / 100000) * 100;
     return {
       name: LEVEL_THRESHOLDS.TOPIK_3.name,
       nameKo: LEVEL_THRESHOLDS.TOPIK_3.nameKo,
       color: LEVEL_THRESHOLDS.TOPIK_3.color,
-      nextLevelPoints: 3000,
+      nextLevelPoints: 150000,
       progress,
       level: 3,
     };
   }
   
   if (points >= LEVEL_THRESHOLDS.TOPIK_2.min) {
-    const progress = ((points - 500) / 1000) * 100;
+    const progress = ((points - 10000) / 40000) * 100;
     return {
       name: LEVEL_THRESHOLDS.TOPIK_2.name,
       nameKo: LEVEL_THRESHOLDS.TOPIK_2.nameKo,
       color: LEVEL_THRESHOLDS.TOPIK_2.color,
-      nextLevelPoints: 1500,
+      nextLevelPoints: 50000,
       progress,
       level: 2,
     };
   }
   
-  const progress = (points / 500) * 100;
+  const progress = (points / 10000) * 100;
   return {
     name: LEVEL_THRESHOLDS.TOPIK_1.name,
     nameKo: LEVEL_THRESHOLDS.TOPIK_1.nameKo,
     color: LEVEL_THRESHOLDS.TOPIK_1.color,
-    nextLevelPoints: 500,
+    nextLevelPoints: 10000,
     progress,
     level: 1,
   };
