@@ -91,20 +91,20 @@ export const CleanHeader = ({ isLoggedIn, username }: CleanHeaderProps) => {
 
   return (
     <>
-      <header className="sticky top-0 z-50 h-[60px] bg-background border-b border-border">
+      <header className="sticky top-0 z-50 h-[64px] bg-background border-b border-border">
         <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
           {/* Brand */}
           <div
-            className="flex items-center gap-2 cursor-pointer"
+            className="flex items-center gap-2.5 cursor-pointer"
             onClick={() => {
               setIsMenuOpen(false);
               navigate(effectiveLoggedIn ? "/dashboard" : "/");
             }}
             aria-label="Go to home"
           >
-            <span className="text-lg sm:text-xl">🇰🇷</span>
-            <span className="font-heading font-bold text-base sm:text-lg text-foreground whitespace-nowrap">LUKATO AI</span>
-            <span className="hidden sm:block text-xs text-muted-foreground">Học tiếng Hàn #1 VN</span>
+            <span className="text-xl sm:text-2xl">🇰🇷</span>
+            <span className="font-heading font-bold text-lg sm:text-xl text-foreground whitespace-nowrap">LUKATO AI</span>
+            <span className="hidden sm:block text-card-caption text-muted-foreground">Học tiếng Hàn #1 VN</span>
           </div>
 
           {/* Actions */}
@@ -119,26 +119,26 @@ export const CleanHeader = ({ isLoggedIn, username }: CleanHeaderProps) => {
                   <Button
                     variant="secondary"
                     onClick={() => navigate("/profile")}
-                    className="hidden md:flex h-10 rounded-full px-3 gap-2"
+                    className="hidden md:flex h-10 rounded-full px-4 gap-2"
                   >
                     <User className="w-4 h-4" />
-                    <span className="max-w-[140px] truncate text-sm font-medium">{displayName}</span>
+                    <span className="max-w-[140px] truncate text-card-caption font-medium">{displayName}</span>
                   </Button>
                 )}
 
                 <Button
                   variant="outline"
                   onClick={handleLogout}
-                  className="hidden sm:inline-flex h-10 rounded-full"
+                  className="hidden sm:inline-flex h-10 rounded-full text-card-caption"
                 >
                   <LogOut className="w-4 h-4" />
                   <span className="ml-2">Đăng xuất</span>
                 </Button>
               </>
             ) : (
-              <Button onClick={() => navigate("/auth")} size="sm" className="h-7 sm:h-10 rounded-full text-[11px] sm:text-sm px-2 sm:px-4">
-                <LogIn className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="ml-1">Đăng nhập</span>
+              <Button onClick={() => navigate("/auth")} size="sm" className="h-8 sm:h-10 rounded-full text-badge sm:text-card-caption px-3 sm:px-4">
+                <LogIn className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="ml-1.5">Đăng nhập</span>
               </Button>
             )}
 
