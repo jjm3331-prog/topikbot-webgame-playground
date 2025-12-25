@@ -16,6 +16,10 @@ import {
   User,
   Users,
   Star,
+  Trophy,
+  Headphones,
+  Notebook,
+  HelpCircle,
   ChevronRight,
   ChevronDown,
   LogOut,
@@ -86,7 +90,12 @@ const myMenuCategory: MenuCategory = {
   emoji: "👤",
   items: [
     { icon: User, label: "Hồ sơ", href: "/profile" },
-  ]
+    { icon: Trophy, label: "Bảng xếp hạng", href: "/ranking" },
+    { icon: Star, label: "Bảng giá", href: "/pricing" },
+    { icon: Headphones, label: "Trung tâm Hỗ trợ", href: "/help-center" },
+    { icon: Notebook, label: "Điều khoản", href: "/terms" },
+    { icon: HelpCircle, label: "Chính sách", href: "/privacy" },
+  ],
 };
 
 interface MegaMenuOverlayProps {

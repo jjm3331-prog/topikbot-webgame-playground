@@ -204,14 +204,43 @@ export const AppSidebar = ({ username, isOpen, onClose, isCollapsed, onToggleCol
 
       {/* User Profile */}
       {!isCollapsed && username && (
-        <div className="px-4 py-3 border-b border-border shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-              <User className="w-5 h-5 text-primary" />
+        <div className="border-b border-border shrink-0">
+          <div className="px-4 py-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                <User className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground truncate">{username}</p>
+                <p className="text-xs text-muted-foreground">Thành viên</p>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">{username}</p>
-              <p className="text-xs text-muted-foreground">Thành viên</p>
+          </div>
+
+          {/* Quick links under profile (mobile hamburger + desktop) */}
+          <div className="px-2 pb-3">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => handleNavigation("/profile")}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-left",
+                  isActive("/profile") ? "bg-primary/15 text-primary" : "text-foreground hover:bg-muted"
+                )}
+              >
+                <User className="w-4 h-4 shrink-0" />
+                <span className="text-sm font-medium truncate">Hồ sơ</span>
+              </button>
+
+              <button
+                onClick={() => handleNavigation("/ranking")}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-left",
+                  isActive("/ranking") ? "bg-primary/15 text-primary" : "text-foreground hover:bg-muted"
+                )}
+              >
+                <Trophy className="w-4 h-4 shrink-0" />
+                <span className="text-sm font-medium truncate">Ranking</span>
+              </button>
             </div>
           </div>
         </div>
