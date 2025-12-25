@@ -531,7 +531,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
 
   const copyRoomLink = () => {
     if (!room) return;
-    const link = `${window.location.origin}/#/battle?game=semantic&room=${room.room_code}`;
+    const link = `https://game.topikbot.kr/#/battle?game=semantic&room=${room.room_code}`;
     navigator.clipboard.writeText(link);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -540,7 +540,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
 
   const shareRoom = async () => {
     if (!room) return;
-    const link = `${window.location.origin}/#/battle?game=semantic&room=${room.room_code}`;
+    const link = `https://game.topikbot.kr/#/battle?game=semantic&room=${room.room_code}`;
     const shareData = {
       title: "🧠 Đấu Nghĩa 1:1",
       text: `Chơi đấu nghĩa với mình nhé! Mã phòng: ${room.room_code}`,
