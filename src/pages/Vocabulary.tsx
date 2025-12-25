@@ -172,20 +172,6 @@ const FlashcardGame = ({ words, onComplete, onPlayTTS }: FlashcardGameProps) => 
                 )}
               </div>
 
-              {/* TTS Button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onPlayTTS(currentWord.korean);
-                }}
-                className="mb-4"
-              >
-                <Volume2 className="w-5 h-5 mr-1" />
-                듣기
-              </Button>
-
               {/* Meaning (revealed on tap) */}
               <AnimatePresence>
                 {showMeaning && (
