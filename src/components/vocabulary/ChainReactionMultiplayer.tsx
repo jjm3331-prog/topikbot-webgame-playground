@@ -97,6 +97,11 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   const moveIdsRef = useRef<Set<string>>(new Set());
   const movesChannelRef = useRef<any>(null);
 
+  // Realtime debug
+  const [roomSubStatus, setRoomSubStatus] = useState<string>("DISCONNECTED");
+  const [movesSubStatus, setMovesSubStatus] = useState<string>("DISCONNECTED");
+  const [lastMoveAt, setLastMoveAt] = useState<string | null>(null);
+
   // Turn-based state
   const [turnTimeLeft, setTurnTimeLeft] = useState(TURN_TIME_LIMIT);
   const turnTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -417,6 +422,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       )
       .subscribe((status) => {
         console.log("[ChainRT] subscribe status:", status, "roomId:", roomId);
+        setRoomSubStatus(String(status));
       });
 
     channelRef.current = channel;
@@ -738,6 +744,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             if (moveIdsRef.current.has(row.id)) return;
 
             moveIdsRef.current.add(row.id);
+            setLastMoveAt(new Date().toISOString());
             setMoves((prev) => [...prev, row]);
             setChain((prev) => [
               ...prev,
@@ -751,6 +758,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
         )
         .subscribe((status) => {
           console.log("[ChainMoves] subscribe status:", status);
+          setMovesSubStatus(String(status));
         });
 
       movesChannelRef.current = ch;
@@ -1136,16 +1144,24 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   if (gamePhase === "playing") {
     const opponentName = isHost ? room?.guest_name : room?.host_name;
 
-    return (
-      <div className="space-y-4">
-        {/* Turn indicator */}
-        <div
-          className={`text-center py-3 rounded-xl font-bold text-lg ${
-            isMyTurn ? "bg-green-500/20 text-green-400 border border-green-500/50" : "bg-muted text-muted-foreground"
-          }`}
-        >
-          {isMyTurn ? "🎯 내 차례! 단어를 입력하세요!" : `⏳ ${opponentName}의 차례...`}
-        </div>
+      return (
+        <div className="space-y-4">
+          {/* Realtime debug */}
+          <div className="text-xs text-muted-foreground flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+            <span>room: {roomSubStatus}</span>
+            <span>moves: {movesSubStatus}</span>
+            <span>movesCount: {moves.length}</span>
+            <span>lastMove: {lastMoveAt ? new Date(lastMoveAt).toLocaleTimeString() : "-"}</span>
+          </div>
+
+          {/* Turn indicator */}
+          <div
+            className={`text-center py-3 rounded-xl font-bold text-lg ${
+              isMyTurn ? "bg-green-500/20 text-green-400 border border-green-500/50" : "bg-muted text-muted-foreground"
+            }`}
+          >
+            {isMyTurn ? "🎯 내 차례! 단어를 입력하세요!" : `⏳ ${opponentName}의 차례...`}
+          </div>
 
         {/* Timer & Warnings */}
         <div className="grid grid-cols-3 gap-2 items-center bg-card rounded-xl p-3 border">
