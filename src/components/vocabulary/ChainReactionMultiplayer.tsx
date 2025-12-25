@@ -840,7 +840,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       const url = `https://game.topikbot.kr/#/vocabulary?mode=multiplayer&room=${room.room_code}`;
       navigator.clipboard.writeText(url);
       setCopied(true);
-      toast({ title: "🔗 링크 복사 완료!" });
+      toast({ title: "🔗 Đã sao chép link!" });
       setTimeout(() => setCopied(false), 2000);
     }
   };
@@ -850,8 +850,8 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
     const url = `https://game.topikbot.kr/#/vocabulary?mode=multiplayer&room=${room.room_code}`;
     const shareData = {
-      title: "끝말잇기 대결",
-      text: `🎮 나와 끝말잇기 대결해! 방 코드: ${room.room_code}`,
+      title: "Nối từ 1:1",
+      text: `🎮 Chơi nối từ với mình nhé! Mã phòng: ${room.room_code}`,
       url,
     };
 
@@ -880,17 +880,17 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
           <div className="text-6xl mb-4">⚔️</div>
           <h2 className="text-xl sm:text-2xl font-black mb-2 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-            1:1 끝말잇기 대결
+            Nối từ 1:1
           </h2>
           <p className="text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">
-            번갈아 입력! 12초 안에 못 잇면 경고, 2번째에 패배!
+            Lần lượt nối từ! 12 giây để nhập, 2 cảnh báo = thua!
           </p>
 
           <div className="mb-4 sm:mb-6">
             <Input
               value={playerName}
               onChange={(e) => setPlayerName(e.target.value)}
-              placeholder="닉네임 입력..."
+              placeholder="Nhập tên của bạn..."
               className="text-center text-base sm:text-lg"
               maxLength={20}
             />
@@ -904,7 +904,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                 disabled={!playerName.trim()}
               >
                 <Crown className="w-6 h-6 sm:w-8 sm:h-8" />
-                <span className="text-sm sm:text-lg font-bold">방 만들기</span>
+                <span className="text-sm sm:text-lg font-bold">Tạo phòng</span>
               </Button>
             </motion.div>
 
@@ -916,14 +916,14 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                 disabled={!playerName.trim()}
               >
                 <Users className="w-6 h-6 sm:w-8 sm:h-8" />
-                <span className="text-sm sm:text-lg font-bold">참가하기</span>
+                <span className="text-sm sm:text-lg font-bold">Tham gia</span>
               </Button>
             </motion.div>
           </div>
 
           <Button variant="ghost" onClick={onBack} className="gap-2">
             <ArrowLeft className="w-4 h-4" />
-            돌아가기
+            Quay lại
           </Button>
         </Card>
       </motion.div>
@@ -936,12 +936,12 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <Card className="p-4 sm:p-6 md:p-8 text-center">
           <Users className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-primary" />
-          <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">방 참가하기</h2>
+          <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Tham gia phòng</h2>
 
           <Input
             value={playerName}
             onChange={(e) => setPlayerName(e.target.value)}
-            placeholder="닉네임 입력..."
+            placeholder="Nhập tên của bạn..."
             className="text-center text-base sm:text-lg mb-3"
             maxLength={20}
           />
@@ -949,14 +949,14 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
           <Input
             value={roomCodeInput}
             onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
-            placeholder="방 코드 6자리..."
+            placeholder="Mã phòng (6 ký tự)..."
             className="text-center text-xl sm:text-2xl tracking-widest mb-4"
             maxLength={6}
           />
 
           <div className="flex gap-3 justify-center">
             <Button variant="outline" onClick={() => setGamePhase("menu")}>
-              취소
+              Hủy
             </Button>
             <Button
               onClick={joinRoom}
@@ -964,7 +964,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
               className="bg-gradient-to-r from-purple-500 to-pink-500"
             >
               <Users className="w-4 h-4 mr-2" />
-              참가하기
+              Tham gia
             </Button>
           </div>
         </Card>
@@ -985,12 +985,12 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             <Loader2 className="w-12 h-12 sm:w-16 sm:h-16 text-primary" />
           </motion.div>
 
-          <h2 className="text-xl sm:text-2xl font-bold mb-2">상대를 기다리는 중...</h2>
-          <p className="text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">친구에게 링크를 공유하세요!</p>
+          <h2 className="text-xl sm:text-2xl font-bold mb-2">Đang chờ đối thủ...</h2>
+          <p className="text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">Chia sẻ link cho bạn bè nhé!</p>
 
           {room && (
             <div className="mb-4 sm:mb-6">
-              <div className="text-xs sm:text-sm text-muted-foreground mb-2">방 코드</div>
+              <div className="text-xs sm:text-sm text-muted-foreground mb-2">Mã phòng</div>
               <div className="text-2xl sm:text-4xl font-mono font-bold tracking-widest bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent mb-3">
                 {room.room_code}
               </div>
@@ -998,11 +998,11 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
               <div className="flex justify-center gap-2 mb-4">
                 <Button onClick={shareRoom} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90">
                   <Share2 className="w-4 h-4 mr-2" />
-                  링크 공유
+                  Chia sẻ link
                 </Button>
                 <Button variant="outline" onClick={copyRoomUrl}>
                   {copied ? <Check className="w-4 h-4 mr-2 text-green-500" /> : <Copy className="w-4 h-4 mr-2" />}
-                  {copied ? "복사됨!" : "복사"}
+                  {copied ? "Đã copy!" : "Copy"}
                 </Button>
               </div>
             </div>
@@ -1015,7 +1015,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                   <Crown className="w-6 h-6 text-primary" />
                 </div>
                 <div className="font-medium">{room?.host_name}</div>
-                <div className="text-xs text-muted-foreground">호스트</div>
+                <div className="text-xs text-muted-foreground">Chủ phòng</div>
               </div>
               <Swords className="w-6 h-6 text-muted-foreground" />
               <div className="text-center">
@@ -1023,13 +1023,13 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                   <Users className="w-6 h-6 text-muted-foreground" />
                 </div>
                 <div className="font-medium text-muted-foreground">???</div>
-                <div className="text-xs text-muted-foreground">대기중</div>
+                <div className="text-xs text-muted-foreground">Đang chờ</div>
               </div>
             </div>
           </div>
 
           <Button variant="ghost" onClick={onBack}>
-            취소하기
+            Hủy bỏ
           </Button>
         </Card>
       </motion.div>
@@ -1049,8 +1049,8 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             <Swords className="w-20 h-20 mx-auto mb-4 text-primary" />
           </motion.div>
 
-          <h2 className="text-2xl font-bold mb-2">대결 준비!</h2>
-          <p className="text-muted-foreground mb-4">번갈아 끝말잇기 • 12초 제한 • 경고 1회</p>
+          <h2 className="text-2xl font-bold mb-2">Chuẩn bị đấu!</h2>
+          <p className="text-muted-foreground mb-4">Lần lượt nối từ • 12 giây/lượt • 1 cảnh báo</p>
 
           <div className="bg-muted/50 rounded-xl p-4 mb-6">
             <div className="flex items-center justify-center gap-6">
@@ -1064,9 +1064,9 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                 </div>
                 <div className="font-bold">{room?.host_name}</div>
                 <div className={`text-xs ${room?.host_ready ? "text-green-500 font-medium" : "text-muted-foreground"}`}>
-                  {room?.host_ready ? "준비 ✓" : "대기중..."}
+                  {room?.host_ready ? "Sẵn sàng ✓" : "Đang chờ..."}
                 </div>
-                {isHost && <div className="text-xs text-primary mt-0.5">나</div>}
+                {isHost && <div className="text-xs text-primary mt-0.5">Tôi</div>}
               </div>
 
               <div className="text-2xl">⚡</div>
@@ -1081,9 +1081,9 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                 </div>
                 <div className="font-bold">{room?.guest_name}</div>
                 <div className={`text-xs ${room?.guest_ready ? "text-green-500 font-medium" : "text-muted-foreground"}`}>
-                  {room?.guest_ready ? "준비 ✓" : "대기중..."}
+                  {room?.guest_ready ? "Sẵn sàng ✓" : "Đang chờ..."}
                 </div>
-                {!isHost && <div className="text-xs text-primary mt-0.5">나</div>}
+                {!isHost && <div className="text-xs text-primary mt-0.5">Tôi</div>}
               </div>
             </div>
           </div>
@@ -1102,12 +1102,12 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                 {(isHost && room?.host_ready) || (!isHost && room?.guest_ready) ? (
                   <>
                     <Check className="w-5 h-5" />
-                    준비 완료!
+                    Đã sẵn sàng!
                   </>
                 ) : (
                   <>
                     <Zap className="w-5 h-5" />
-                    준비하기
+                    Sẵn sàng
                   </>
                 )}
               </Button>
@@ -1126,7 +1126,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                   }`}
                 >
                   <Play className="w-6 h-6" />
-                  {room?.host_ready && room?.guest_ready ? "게임 시작!" : "양쪽 모두 준비해야 시작"}
+                  {room?.host_ready && room?.guest_ready ? "Bắt đầu!" : "Cả hai cần sẵn sàng"}
                 </Button>
               </motion.div>
             )}
@@ -1134,7 +1134,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             {!isHost && room?.host_ready && room?.guest_ready && (
               <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                호스트가 시작하기를 기다리는 중...
+                Đang chờ chủ phòng bắt đầu...
               </div>
             )}
           </div>
@@ -1173,7 +1173,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             ) : (
               <motion.div initial={{ scale: 0, rotate: -10 }} animate={{ scale: 1, rotate: 0 }} className="relative">
                 <div className="text-6xl sm:text-8xl font-black bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500 bg-clip-text text-transparent">
-                  시작! 🎮
+                  BẮT ĐẦU! 🎮
                 </div>
               </motion.div>
             )}
@@ -1195,7 +1195,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
               isMyTurn ? "bg-green-500/20 text-green-400 border border-green-500/50" : "bg-muted text-muted-foreground"
             }`}
           >
-            {isMyTurn ? "🎯 내 차례! 단어를 입력하세요!" : `⏳ ${opponentName}의 차례...`}
+            {isMyTurn ? "🎯 Lượt của bạn! Hãy nhập từ!" : `⏳ Lượt của ${opponentName}...`}
           </div>
 
         {/* Timer & Warnings */}
@@ -1207,11 +1207,11 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                 <div
                   key={i}
                   className={`w-4 h-4 rounded-full ${i < myWarnings ? "bg-red-500" : "bg-muted"}`}
-                  title={i < myWarnings ? "경고" : ""}
+                  title={i < myWarnings ? "Cảnh báo" : ""}
                 />
               ))}
             </div>
-            <div className="text-xs text-muted-foreground mt-1">{myWarnings > 0 && <span className="text-red-400">경고 {myWarnings}회</span>}</div>
+            <div className="text-xs text-muted-foreground mt-1">{myWarnings > 0 && <span className="text-red-400">Cảnh báo {myWarnings}</span>}</div>
           </div>
 
           <div className="text-center">
@@ -1222,7 +1222,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             >
               {turnTimeLeft}s
             </motion.div>
-            <div className="text-xs text-muted-foreground">턴 제한</div>
+            <div className="text-xs text-muted-foreground">Giới hạn</div>
           </div>
 
           <div className="text-center">
@@ -1233,7 +1233,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
               ))}
             </div>
             <div className="text-xs text-muted-foreground mt-1">
-              {opponentWarnings > 0 && <span className="text-red-400">경고 {opponentWarnings}회</span>}
+              {opponentWarnings > 0 && <span className="text-red-400">Cảnh báo {opponentWarnings}</span>}
             </div>
           </div>
         </div>
@@ -1271,7 +1271,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
           </div>
           {chain.length > 0 && (
             <div className="mt-2 text-center text-xs text-muted-foreground">
-              다음: '{chain[chain.length - 1].word.slice(-1)}'로 시작
+              Tiếp theo: bắt đầu bằng '{chain[chain.length - 1].word.slice(-1)}'
             </div>
           )}
         </Card>
@@ -1295,10 +1295,10 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             placeholder={
               !isMyTurn
-                ? "상대 차례입니다..."
+                ? "Lượt của đối thủ..."
                 : chain.length > 0
-                  ? `'${chain[chain.length - 1].word.slice(-1)}'로 시작...`
-                  : "단어 입력..."
+                  ? `Bắt đầu bằng '${chain[chain.length - 1].word.slice(-1)}'...`
+                  : "Nhập từ..."
             }
             className={`text-lg ${!isMyTurn ? "opacity-50" : ""}`}
             disabled={isValidating || !isMyTurn}
@@ -1331,9 +1331,9 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             {isWinner ? <Trophy className="w-24 h-24 mx-auto mb-4 text-yellow-500" /> : <Flame className="w-24 h-24 mx-auto mb-4 text-gray-400" />}
           </motion.div>
 
-          <h2 className={`text-3xl font-black mb-2 ${isWinner ? "text-yellow-500" : "text-gray-400"}`}>{isWinner ? "🎉 승리!" : "😢 패배"}</h2>
+          <h2 className={`text-3xl font-black mb-2 ${isWinner ? "text-yellow-500" : "text-gray-400"}`}>{isWinner ? "🎉 Chiến thắng!" : "😢 Thua cuộc"}</h2>
 
-          <p className="text-muted-foreground mb-4">{isWinner ? `${opponentName}을(를) 이겼습니다!` : `${opponentName}에게 졌습니다...`}</p>
+          <p className="text-muted-foreground mb-4">{isWinner ? `Bạn đã thắng ${opponentName}!` : `Bạn đã thua ${opponentName}...`}</p>
 
           {isWinner && (
             <motion.div
@@ -1348,14 +1348,14 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
           )}
 
           <div className="bg-muted/50 rounded-xl p-4 mb-6">
-            <div className="text-sm text-muted-foreground mb-2">총 이어간 단어</div>
-            <div className="text-4xl font-black text-primary">{chain.length}개</div>
+            <div className="text-sm text-muted-foreground mb-2">Tổng số từ đã nối</div>
+            <div className="text-4xl font-black text-primary">{chain.length} từ</div>
           </div>
 
           <div className="flex gap-3 justify-center">
             <Button onClick={onBack} variant="outline" className="gap-2">
               <ArrowLeft className="w-4 h-4" />
-              나가기
+              Thoát
             </Button>
             <Button
               onClick={() => {
@@ -1368,7 +1368,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
               className="gap-2 bg-gradient-to-r from-purple-500 to-pink-500"
             >
               <RefreshCw className="w-4 h-4" />
-              다시 하기
+              Chơi lại
             </Button>
           </div>
         </Card>
