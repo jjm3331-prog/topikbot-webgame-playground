@@ -53,6 +53,7 @@ import BoardHub from "./pages/BoardHub";
 import Board from "./pages/Board";
 import BoardPost from "./pages/BoardPost";
 import BoardWrite from "./pages/BoardWrite";
+import Battle from "./pages/Battle";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWAWelcome from "./components/PWAWelcome";
 import SplashScreen from "./components/SplashScreen";
@@ -193,6 +194,7 @@ const App = () => {
               <Route path="/grammar" element={<Grammar />} />
               <Route path="/learning-hub" element={<LearningHub />} />
               <Route path="/game-hub" element={<GameHub />} />
+              <Route path="/battle" element={<Battle />} />
               <Route path="/question-variant" element={<QuestionVariant />} />
               <Route path="/roleplay-speaking" element={<RoleplaySpeaking />} />
               <Route path="/pricing" element={<Pricing />} />
