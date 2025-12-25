@@ -19,7 +19,8 @@ import {
   Crown,
   Swords,
   Timer,
-  RefreshCw
+  RefreshCw,
+  Share2
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,6 +29,7 @@ import { useToast } from "@/hooks/use-toast";
 interface ChainReactionMultiplayerProps {
   words: { id: number; korean: string; meaning: string }[];
   onBack: () => void;
+  initialRoomCode?: string; // URL에서 받은 방 코드
 }
 
 interface Room {
@@ -57,13 +59,13 @@ interface ChainWord {
 
 type GamePhase = "menu" | "creating" | "joining" | "waiting" | "ready" | "playing" | "finished";
 
-export default function ChainReactionMultiplayer({ words, onBack }: ChainReactionMultiplayerProps) {
+export default function ChainReactionMultiplayer({ words, onBack, initialRoomCode }: ChainReactionMultiplayerProps) {
   const { toast } = useToast();
   const [gamePhase, setGamePhase] = useState<GamePhase>("menu");
   const [room, setRoom] = useState<Room | null>(null);
   const [playerId] = useState(() => crypto.randomUUID());
   const [playerName, setPlayerName] = useState("");
-  const [roomCodeInput, setRoomCodeInput] = useState("");
+  const [roomCodeInput, setRoomCodeInput] = useState(initialRoomCode || "");
   const [copied, setCopied] = useState(false);
   const [connectionMode, setConnectionMode] = useState<"semantic" | "phonetic">("semantic");
   
@@ -80,6 +82,14 @@ export default function ChainReactionMultiplayer({ words, onBack }: ChainReactio
   const channelRef = useRef<any>(null);
 
   const isHost = room?.host_id === playerId;
+
+  // URL에서 방 코드를 받았으면 자동으로 참가 화면으로 이동
+  useEffect(() => {
+    if (initialRoomCode && initialRoomCode.length === 6) {
+      setRoomCodeInput(initialRoomCode.toUpperCase());
+      setGamePhase("joining");
+    }
+  }, [initialRoomCode]);
 
   // Generate room code
   const generateRoomCode = () => {
@@ -384,12 +394,40 @@ export default function ChainReactionMultiplayer({ words, onBack }: ChainReactio
       .eq("id", room.id);
   };
 
-  // Copy room code
-  const copyRoomCode = () => {
+  // Copy room URL (전체 URL 복사)
+  const copyRoomUrl = () => {
     if (room?.room_code) {
-      navigator.clipboard.writeText(room.room_code);
+      const url = `${window.location.origin}/vocabulary?mode=multiplayer&room=${room.room_code}`;
+      navigator.clipboard.writeText(url);
       setCopied(true);
+      toast({
+        title: "🔗 링크 복사 완료!",
+        description: "친구에게 링크를 보내세요!",
+      });
       setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  // Share using Web Share API (모바일에서 더 편리)
+  const shareRoom = async () => {
+    if (!room?.room_code) return;
+    
+    const url = `${window.location.origin}/vocabulary?mode=multiplayer&room=${room.room_code}`;
+    const shareData = {
+      title: "LUKATO 단어 대결",
+      text: `🎮 나와 단어 대결해! 방 코드: ${room.room_code}`,
+      url,
+    };
+
+    if (navigator.share && navigator.canShare?.(shareData)) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        // User cancelled or error
+        copyRoomUrl();
+      }
+    } else {
+      copyRoomUrl();
     }
   };
 
@@ -558,21 +596,33 @@ export default function ChainReactionMultiplayer({ words, onBack }: ChainReactio
                 <div className="text-2xl sm:text-4xl font-mono font-bold tracking-widest bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
                   {room.room_code}
                 </div>
-                <Button variant="ghost" size="sm" onClick={copyRoomCode}>
-                  {copied ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
+              </div>
+              
+              {/* Share buttons */}
+              <div className="flex justify-center gap-2 mb-4">
+                <Button 
+                  onClick={shareRoom}
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90"
+                >
+                  <Share2 className="w-4 h-4 mr-2" />
+                  링크 공유하기
+                </Button>
+                <Button variant="outline" onClick={copyRoomUrl}>
+                  {copied ? <Check className="w-4 h-4 mr-2 text-green-500" /> : <Copy className="w-4 h-4 mr-2" />}
+                  {copied ? "복사됨!" : "복사"}
                 </Button>
               </div>
               
               {/* Share instructions */}
               <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 text-xs sm:text-sm text-left">
-                <p className="font-medium text-primary mb-2">📤 Cách chia sẻ mã / 코드 공유 방법:</p>
+                <p className="font-medium text-primary mb-2">📤 Cách chia sẻ / 공유 방법:</p>
                 <ol className="space-y-1 text-muted-foreground list-decimal list-inside">
-                  <li>Nhấn nút <span className="text-primary font-medium">[📋 Sao chép]</span> bên trên</li>
-                  <li>Mở Zalo, KakaoTalk hoặc tin nhắn</li>
-                  <li>Dán mã và gửi cho bạn bè</li>
+                  <li>Nhấn nút <span className="text-primary font-medium">[🔗 Chia sẻ link]</span></li>
+                  <li>Gửi link cho bạn bè qua Zalo, KakaoTalk</li>
+                  <li>Bạn bè nhấn link sẽ vào phòng ngay!</li>
                 </ol>
                 <p className="mt-2 text-[10px] sm:text-xs text-muted-foreground/70">
-                  💡 Bạn bè nhập mã này vào "Tham gia phòng" để vào đấu!
+                  💡 Bạn bè chỉ cần nhấn link là vào được, không cần nhập mã!
                 </p>
               </div>
             </div>
