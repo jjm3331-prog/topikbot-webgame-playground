@@ -252,7 +252,7 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
             </p>
             <ul className="space-y-2 text-muted-foreground">
               <li className="flex items-center gap-2">
-                <span className="bg-orange-500/20 px-2 py-0.5 rounded text-xs text-orange-600">30초</span>
+                <span className="bg-orange-500/20 px-2 py-0.5 rounded text-xs text-orange-600">60초</span>
                 Thời gian giới hạn / 제한 시간
               </li>
               <li className="flex items-center gap-2">

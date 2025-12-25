@@ -554,13 +554,26 @@ export default function ChainReactionMultiplayer({ words, onBack }: ChainReactio
           {room && (
             <div className="mb-4 sm:mb-6">
               <div className="text-xs sm:text-sm text-muted-foreground mb-2">방 코드 / Mã phòng</div>
-              <div className="flex justify-center items-center gap-2">
+              <div className="flex justify-center items-center gap-2 mb-3">
                 <div className="text-2xl sm:text-4xl font-mono font-bold tracking-widest bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
                   {room.room_code}
                 </div>
                 <Button variant="ghost" size="sm" onClick={copyRoomCode}>
                   {copied ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
                 </Button>
+              </div>
+              
+              {/* Share instructions */}
+              <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 text-xs sm:text-sm text-left">
+                <p className="font-medium text-primary mb-2">📤 Cách chia sẻ mã / 코드 공유 방법:</p>
+                <ol className="space-y-1 text-muted-foreground list-decimal list-inside">
+                  <li>Nhấn nút <span className="text-primary font-medium">[📋 Sao chép]</span> bên trên</li>
+                  <li>Mở Zalo, KakaoTalk hoặc tin nhắn</li>
+                  <li>Dán mã và gửi cho bạn bè</li>
+                </ol>
+                <p className="mt-2 text-[10px] sm:text-xs text-muted-foreground/70">
+                  💡 Bạn bè nhập mã này vào "Tham gia phòng" để vào đấu!
+                </p>
               </div>
             </div>
           )}
