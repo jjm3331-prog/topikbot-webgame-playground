@@ -72,13 +72,19 @@ export default function Battle() {
   useEffect(() => {
     const roomCode = searchParams.get("room");
     const game = searchParams.get("game");
-    
-    if (roomCode) {
-      setInitialRoomCode(roomCode);
-      if (game === "word-chain" || game === "semantic") {
-        setSelectedGame(game);
-      }
+
+    if (!roomCode) return;
+
+    setInitialRoomCode(roomCode);
+
+    // If a room code is present but "game" is missing (or invalid), default to Word Chain.
+    // This makes shared links work without requiring users to manually type the code.
+    if (game === "semantic") {
+      setSelectedGame("semantic");
+      return;
     }
+
+    setSelectedGame("word-chain");
   }, [searchParams]);
 
   // Check auth
