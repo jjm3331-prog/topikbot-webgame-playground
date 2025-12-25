@@ -162,14 +162,17 @@ ${usedExpressions.slice(-200).join("\n")}
 ${ragContent || "(없음)"}
 `;
 
-  const resp = await fetch("https://api.x.ai/v1/chat/completions", {
+  const primaryModel = "grok-4-1-fast-reasoning";
+  const fallbackModel = "grok-4.1-fast-reasoning";
+
+  let resp = await fetch("https://api.x.ai/v1/chat/completions", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${X_AI_API_KEY}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "grok-4.1-fast-reasoning",
+      model: primaryModel,
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },
@@ -177,6 +180,27 @@ ${ragContent || "(없음)"}
       temperature: difficulty === "hard" ? 0.7 : 0.9,
     }),
   });
+
+  if (!resp.ok && (resp.status === 400 || resp.status === 404)) {
+    const t = await resp.text().catch(() => "");
+    console.warn("xAI model rejected, retrying with fallback model:", resp.status, t);
+
+    resp = await fetch("https://api.x.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${X_AI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: fallbackModel,
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+        temperature: difficulty === "hard" ? 0.7 : 0.9,
+      }),
+    });
+  }
 
   if (!resp.ok) {
     const t = await resp.text().catch(() => "");

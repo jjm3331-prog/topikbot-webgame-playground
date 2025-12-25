@@ -285,14 +285,17 @@ ${ragContent}`;
     throw new Error('X_AI_API_KEY not configured');
   }
 
-  const response = await fetch('https://api.x.ai/v1/chat/completions', {
+  const primaryModel = 'grok-4-1-fast-reasoning';
+  const fallbackModel = 'grok-4.1-fast-reasoning';
+
+  let response = await fetch('https://api.x.ai/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${xaiApiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'grok-4.1-fast-reasoning',
+      model: primaryModel,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
@@ -300,6 +303,27 @@ ${ragContent}`;
       temperature: topikLevel === "5-6" ? 0.7 : 0.9,
     }),
   });
+
+  if (!response.ok && (response.status === 400 || response.status === 404)) {
+    const errText = await response.text().catch(() => '');
+    console.warn('xAI model rejected, retrying with fallback model:', response.status, errText);
+
+    response = await fetch('https://api.x.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${xaiApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: fallbackModel,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: topikLevel === "5-6" ? 0.7 : 0.9,
+      }),
+    });
+  }
 
   if (!response.ok) {
     const errText = await response.text();
