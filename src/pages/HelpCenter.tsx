@@ -52,7 +52,7 @@ const HelpCenter = () => {
             <img 
               src={zaloQr} 
               alt="LUKATO AI Help Center QR Code" 
-              className="w-64 h-64 object-contain rounded-xl"
+              className="w-80 h-80 sm:w-96 sm:h-96 md:w-[28rem] md:h-[28rem] object-contain rounded-xl"
             />
             <p className="text-sm text-muted-foreground mt-4 text-center">
               Quét mã QR hoặc nhấn nút bên dưới để tham gia nhóm hỗ trợ
