@@ -564,49 +564,68 @@ const Vocabulary = () => {
     setIsLoading(true);
     setGameComplete(false);
     setGameResult(null);
-    
+
     const excludeWords = learnedWordsRef.current[level] || [];
-    
+
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 15000);
+
     try {
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/vocabulary-content`,
         {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            count: 12, 
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            count: 12,
             topikLevel: level,
             sessionId,
             excludeWords,
             forceNew: forceNew || excludeWords.length > 0,
           }),
+          signal: controller.signal,
         }
       );
-      
-      if (!response.ok) throw new Error('Failed to fetch words');
-      
+
+      if (!response.ok) {
+        const t = await response.text().catch(() => "");
+        throw new Error(`Failed to fetch words (${response.status}) ${t}`);
+      }
+
       const data = await response.json();
-      
+
       if (data.success && data.words?.length > 0) {
         setWords(data.words);
         // 새로 받은 단어들을 학습 기록에 추가
         const newKoreanWords = data.words.map((w: Word) => w.korean);
-        setLearnedWords(prev => ({
+        setLearnedWords((prev) => ({
           ...prev,
           [level]: [...prev[level], ...newKoreanWords],
         }));
-        console.log(`✅ Loaded ${data.words.length} NEW words for TOPIK ${level} (excluded ${excludeWords.length})`);
+        console.log(
+          `✅ Loaded ${data.words.length} NEW words for TOPIK ${level} (excluded ${excludeWords.length})`
+        );
       } else {
-        // Fallback words
         setWords(getFallbackWords(level));
       }
     } catch (error) {
-      console.error('Error fetching words:', error);
+      const isAbort = error instanceof DOMException && error.name === "AbortError";
+      console.error("Error fetching words:", error);
+      toast({
+        title: "단어 로딩 실패",
+        description: isAbort ? "네트워크가 느려서 시간이 초과됐어요." : "잠시 후 다시 시도해주세요.",
+        variant: "destructive",
+      });
       setWords(getFallbackWords(level));
     } finally {
+      window.clearTimeout(timeoutId);
       setIsLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, toast]);
 
   // Fallback words by level
   const getFallbackWords = (level: TopikLevel): Word[] => {
