@@ -1059,171 +1059,239 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     );
   }
 
-  // Waiting / Creating
+  // Premium Waiting / Creating Screen
   if (gamePhase === "waiting" || gamePhase === "creating") {
     return (
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <Card className="p-4 sm:p-6 md:p-8 text-center">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4"
-          >
-            <Loader2 className="w-12 h-12 sm:w-16 sm:h-16 text-primary" />
-          </motion.div>
-
-          <h2 className="text-xl sm:text-2xl font-bold mb-2">Đang chờ đối thủ...</h2>
-          <p className="text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">Chia sẻ link cho bạn bè nhé!</p>
-
-          {room && (
-            <div className="mb-4 sm:mb-6">
-              <div className="text-xs sm:text-sm text-muted-foreground mb-2">Mã phòng</div>
-              <div className="text-2xl sm:text-4xl font-mono font-bold tracking-widest bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent mb-3">
-                {room.room_code}
-              </div>
-
-              <div className="flex justify-center gap-2 mb-4">
-                <Button onClick={shareRoom} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90">
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Chia sẻ link
-                </Button>
-                <Button variant="outline" onClick={copyRoomUrl}>
-                  {copied ? <Check className="w-4 h-4 mr-2 text-green-500" /> : <Copy className="w-4 h-4 mr-2" />}
-                  {copied ? "Đã copy!" : "Copy"}
-                </Button>
-              </div>
-            </div>
-          )}
-
-          <div className="bg-muted/50 rounded-xl p-4 mb-4">
-            <div className="flex items-center justify-center gap-4">
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-1">
-                  <Crown className="w-6 h-6 text-primary" />
-                </div>
-                <div className="font-medium">{room?.host_name}</div>
-                <div className="text-xs text-muted-foreground">Chủ phòng</div>
-              </div>
-              <Swords className="w-6 h-6 text-muted-foreground" />
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-1">
-                  <Users className="w-6 h-6 text-muted-foreground" />
-                </div>
-                <div className="font-medium text-muted-foreground">???</div>
-                <div className="text-xs text-muted-foreground">Đang chờ</div>
-              </div>
-            </div>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} 
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-lg mx-auto"
+      >
+        <Card className="relative overflow-hidden bg-gradient-to-br from-card via-card to-muted/30 border-border/50">
+          {/* Background Effects */}
+          <div className="absolute inset-0 -z-10">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-yellow-500/20 to-orange-500/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-purple-500/10 to-pink-500/5 rounded-full blur-3xl" />
           </div>
 
-          <Button variant="ghost" onClick={onBack}>
-            Hủy bỏ
-          </Button>
+          <div className="p-6 sm:p-8 text-center">
+            {/* Loading Animation */}
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-xl shadow-orange-500/30"
+            >
+              <Users className="w-10 h-10 text-white" />
+            </motion.div>
+
+            <h2 className="text-2xl sm:text-3xl font-black mb-2">Đang chờ đối thủ...</h2>
+            <p className="text-muted-foreground mb-8">Chia sẻ link để mời bạn bè tham gia!</p>
+
+            {room && (
+              <>
+                {/* Room Code Display */}
+                <div className="mb-6 p-5 bg-muted/30 rounded-2xl border border-border/50">
+                  <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">Mã phòng</p>
+                  <p className="text-4xl sm:text-5xl font-mono font-black tracking-[0.3em] bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                    {room.room_code}
+                  </p>
+                </div>
+
+                {/* Share Buttons */}
+                <div className="flex gap-3 mb-8">
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1">
+                    <Button onClick={shareRoom} className="w-full h-14 text-lg font-bold gap-3 bg-gradient-to-r from-yellow-400 to-orange-500 hover:opacity-90">
+                      <Share2 className="w-5 h-5" />
+                      Chia sẻ link
+                    </Button>
+                  </motion.div>
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Button variant="outline" onClick={copyRoomUrl} className="h-14 px-6 border-2">
+                      {copied ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
+                    </Button>
+                  </motion.div>
+                </div>
+
+                {/* Players Status */}
+                <div className="bg-muted/30 rounded-2xl p-5 border border-border/50">
+                  <p className="text-xs text-muted-foreground mb-4 uppercase tracking-wider">Người chơi</p>
+                  <div className="flex items-center justify-center gap-6">
+                    <div className="text-center">
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center mx-auto mb-2 shadow-lg shadow-orange-500/20">
+                        <Crown className="w-8 h-8 text-white" />
+                      </div>
+                      <p className="font-bold text-lg">{room?.host_name}</p>
+                      <p className="text-xs text-muted-foreground">Chủ phòng</p>
+                    </div>
+                    
+                    <motion.div
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      <Swords className="w-8 h-8 text-muted-foreground" />
+                    </motion.div>
+                    
+                    <div className="text-center">
+                      <div className="w-16 h-16 rounded-2xl bg-muted/50 border-2 border-dashed border-muted-foreground/30 flex items-center justify-center mx-auto mb-2">
+                        <Users className="w-8 h-8 text-muted-foreground/50" />
+                      </div>
+                      <p className="font-bold text-lg text-muted-foreground">???</p>
+                      <p className="text-xs text-muted-foreground">Đang chờ...</p>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            <Button variant="ghost" onClick={onBack} className="mt-6">
+              Hủy bỏ
+            </Button>
+          </div>
         </Card>
       </motion.div>
     );
   }
 
-  // Ready
+  // Premium Ready Screen
   if (gamePhase === "ready") {
+    const bothReady = room?.host_ready && room?.guest_ready;
+    
     return (
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
-        <Card className="p-4 sm:p-6 md:p-8 text-center relative overflow-hidden">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }} 
+        animate={{ opacity: 1, scale: 1 }}
+        className="max-w-lg mx-auto"
+      >
+        <Card className="relative overflow-hidden bg-gradient-to-br from-card via-card to-muted/30 border-border/50">
+          {/* Background Pulse */}
           <div className="absolute inset-0 -z-10">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-green-500/20 rounded-full blur-3xl animate-pulse" />
+            <motion.div
+              animate={{ opacity: [0.2, 0.4, 0.2] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-green-500/20 rounded-full blur-3xl"
+            />
           </div>
 
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200 }}>
-            <Swords className="w-20 h-20 mx-auto mb-4 text-primary" />
-          </motion.div>
-
-          <h2 className="text-2xl font-bold mb-2">Chuẩn bị đấu!</h2>
-          <p className="text-muted-foreground mb-4">Lần lượt nối từ • 12 giây/lượt • 1 cảnh báo</p>
-
-          <div className="bg-muted/50 rounded-xl p-4 mb-6">
-            <div className="flex items-center justify-center gap-6">
-              <div className="text-center">
-                <div
-                  className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-1 transition-all ${
-                    room?.host_ready ? "bg-green-500/30 ring-2 ring-green-500" : "bg-purple-500/20"
-                  }`}
-                >
-                  {room?.host_ready ? <Check className="w-7 h-7 text-green-500" /> : <Crown className="w-7 h-7 text-purple-500" />}
-                </div>
-                <div className="font-bold">{room?.host_name}</div>
-                <div className={`text-xs ${room?.host_ready ? "text-green-500 font-medium" : "text-muted-foreground"}`}>
-                  {room?.host_ready ? "Sẵn sàng ✓" : "Đang chờ..."}
-                </div>
-                {isHost && <div className="text-xs text-primary mt-0.5">Tôi</div>}
-              </div>
-
-              <div className="text-2xl">⚡</div>
-
-              <div className="text-center">
-                <div
-                  className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-1 transition-all ${
-                    room?.guest_ready ? "bg-green-500/30 ring-2 ring-green-500" : "bg-pink-500/20"
-                  }`}
-                >
-                  {room?.guest_ready ? <Check className="w-7 h-7 text-green-500" /> : <Users className="w-7 h-7 text-pink-500" />}
-                </div>
-                <div className="font-bold">{room?.guest_name}</div>
-                <div className={`text-xs ${room?.guest_ready ? "text-green-500 font-medium" : "text-muted-foreground"}`}>
-                  {room?.guest_ready ? "Sẵn sàng ✓" : "Đang chờ..."}
-                </div>
-                {!isHost && <div className="text-xs text-primary mt-0.5">Tôi</div>}
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button
-                onClick={toggleReady}
-                size="lg"
-                className={`w-full gap-2 text-lg ${
-                  (isHost && room?.host_ready) || (!isHost && room?.guest_ready)
-                    ? "bg-green-500 hover:bg-green-600"
-                    : "bg-gradient-to-r from-purple-500 to-pink-500"
-                }`}
-              >
-                {(isHost && room?.host_ready) || (!isHost && room?.guest_ready) ? (
-                  <>
-                    <Check className="w-5 h-5" />
-                    Đã sẵn sàng!
-                  </>
-                ) : (
-                  <>
-                    <Zap className="w-5 h-5" />
-                    Sẵn sàng
-                  </>
-                )}
-              </Button>
+          <div className="p-6 sm:p-8 text-center">
+            {/* Icon */}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-xl shadow-green-500/30"
+            >
+              <Swords className="w-10 h-10 text-white" />
             </motion.div>
 
-            {isHost && (
-              <motion.div whileHover={{ scale: room?.host_ready && room?.guest_ready ? 1.02 : 1 }} whileTap={{ scale: 0.98 }}>
+            <h2 className="text-2xl sm:text-3xl font-black mb-2">Chuẩn bị đấu!</h2>
+            <p className="text-muted-foreground mb-8">Lần lượt nối từ • 12 giây/lượt • 1 cảnh báo</p>
+
+            {/* Players Ready Status */}
+            <div className="bg-muted/30 rounded-2xl p-6 mb-6 border border-border/50">
+              <div className="flex items-center justify-center gap-8">
+                {/* Host */}
+                <div className="text-center">
+                  <motion.div
+                    animate={room?.host_ready ? { scale: [1, 1.05, 1] } : {}}
+                    transition={{ duration: 0.5, repeat: room?.host_ready ? Infinity : 0, repeatDelay: 1 }}
+                    className={`w-18 h-18 rounded-2xl flex items-center justify-center mx-auto mb-3 transition-all ${
+                      room?.host_ready 
+                        ? "bg-gradient-to-br from-green-400 to-emerald-500 shadow-xl shadow-green-500/30" 
+                        : "bg-muted/50 border-2 border-dashed border-muted-foreground/30"
+                    }`}
+                    style={{ width: 72, height: 72 }}
+                  >
+                    {room?.host_ready 
+                      ? <Check className="w-9 h-9 text-white" /> 
+                      : <Crown className="w-9 h-9 text-muted-foreground" />
+                    }
+                  </motion.div>
+                  <p className="font-bold text-lg">{room?.host_name}</p>
+                  <p className={`text-sm font-medium ${room?.host_ready ? "text-green-500" : "text-muted-foreground"}`}>
+                    {room?.host_ready ? "✓ Sẵn sàng" : "Đang chờ..."}
+                  </p>
+                  {isHost && <p className="text-xs text-primary mt-1">Tôi</p>}
+                </div>
+
+                <div className="text-3xl">⚡</div>
+
+                {/* Guest */}
+                <div className="text-center">
+                  <motion.div
+                    animate={room?.guest_ready ? { scale: [1, 1.05, 1] } : {}}
+                    transition={{ duration: 0.5, repeat: room?.guest_ready ? Infinity : 0, repeatDelay: 1 }}
+                    className={`w-18 h-18 rounded-2xl flex items-center justify-center mx-auto mb-3 transition-all ${
+                      room?.guest_ready 
+                        ? "bg-gradient-to-br from-green-400 to-emerald-500 shadow-xl shadow-green-500/30" 
+                        : "bg-muted/50 border-2 border-dashed border-muted-foreground/30"
+                    }`}
+                    style={{ width: 72, height: 72 }}
+                  >
+                    {room?.guest_ready 
+                      ? <Check className="w-9 h-9 text-white" /> 
+                      : <Users className="w-9 h-9 text-muted-foreground" />
+                    }
+                  </motion.div>
+                  <p className="font-bold text-lg">{room?.guest_name}</p>
+                  <p className={`text-sm font-medium ${room?.guest_ready ? "text-green-500" : "text-muted-foreground"}`}>
+                    {room?.guest_ready ? "✓ Sẵn sàng" : "Đang chờ..."}
+                  </p>
+                  {!isHost && <p className="text-xs text-primary mt-1">Tôi</p>}
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-3">
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
-                  onClick={startGame}
+                  onClick={toggleReady}
                   size="lg"
-                  disabled={!room?.host_ready || !room?.guest_ready}
-                  className={`w-full gap-2 text-lg ${
-                    room?.host_ready && room?.guest_ready
-                      ? "bg-gradient-to-r from-green-500 to-emerald-500 hover:opacity-90"
-                      : "bg-muted text-muted-foreground cursor-not-allowed"
+                  className={`w-full h-14 text-lg font-bold gap-3 ${
+                    (isHost && room?.host_ready) || (!isHost && room?.guest_ready)
+                      ? "bg-green-500 hover:bg-green-600"
+                      : "bg-gradient-to-r from-yellow-400 to-orange-500"
                   }`}
                 >
-                  <Play className="w-6 h-6" />
-                  {room?.host_ready && room?.guest_ready ? "Bắt đầu!" : "Cả hai cần sẵn sàng"}
+                  {(isHost && room?.host_ready) || (!isHost && room?.guest_ready) ? (
+                    <>
+                      <Check className="w-6 h-6" />
+                      Đã sẵn sàng!
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-6 h-6" />
+                      Sẵn sàng
+                    </>
+                  )}
                 </Button>
               </motion.div>
-            )}
 
-            {!isHost && room?.host_ready && room?.guest_ready && (
-              <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Đang chờ chủ phòng bắt đầu...
-              </div>
-            )}
+              {isHost && (
+                <motion.div whileHover={{ scale: bothReady ? 1.02 : 1 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    onClick={startGame}
+                    size="lg"
+                    disabled={!bothReady}
+                    className={`w-full h-14 text-lg font-bold gap-3 ${
+                      bothReady
+                        ? "bg-gradient-to-r from-green-400 to-emerald-500 hover:opacity-90 shadow-xl shadow-green-500/30"
+                        : "bg-muted text-muted-foreground cursor-not-allowed"
+                    }`}
+                  >
+                    <Play className="w-6 h-6" />
+                    {bothReady ? "Bắt đầu!" : "Cả hai cần sẵn sàng"}
+                  </Button>
+                </motion.div>
+              )}
+
+              {!isHost && room?.host_ready && room?.guest_ready && (
+                <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm py-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Đang chờ chủ phòng bắt đầu...
+                </div>
+              )}
+            </div>
           </div>
         </Card>
       </motion.div>
@@ -1270,86 +1338,118 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     );
   }
 
-  // Playing
+  // Premium Playing Screen
   if (gamePhase === "playing") {
     const opponentName = isHost ? room?.guest_name : room?.host_name;
 
-      return (
-        <div className="space-y-4">
-          {/* Turn indicator */}
-          <div
-            className={`text-center py-3 rounded-xl font-bold text-lg ${
-              isMyTurn ? "bg-green-500/20 text-green-400 border border-green-500/50" : "bg-muted text-muted-foreground"
+    return (
+      <div className="max-w-2xl mx-auto space-y-4">
+        {/* Header with Timer */}
+        <div className="flex items-center justify-between p-4 bg-card rounded-2xl border border-border/50">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
+              <Link2 className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <p className="font-bold">Nối từ 1:1</p>
+              <p className="text-xs text-muted-foreground">끝말잇기</p>
+            </div>
+          </div>
+          
+          <motion.div
+            animate={turnTimeLeft <= 5 && isMyTurn ? { scale: [1, 1.1, 1] } : {}}
+            transition={{ duration: 0.5, repeat: turnTimeLeft <= 5 && isMyTurn ? Infinity : 0 }}
+            className={`px-5 py-2.5 rounded-xl font-mono font-black text-2xl ${
+              turnTimeLeft <= 5 
+                ? "bg-red-500 text-white animate-pulse" 
+                : isMyTurn 
+                  ? "bg-green-500/20 text-green-500 border border-green-500/50" 
+                  : "bg-muted text-muted-foreground"
             }`}
           >
-            {isMyTurn ? "🎯 Lượt của bạn! Hãy nhập từ!" : `⏳ Lượt của ${opponentName}...`}
-          </div>
+            {turnTimeLeft}s
+          </motion.div>
+        </div>
 
-        {/* Timer & Warnings */}
-        <div className="grid grid-cols-3 gap-2 items-center bg-card rounded-xl p-3 border">
+        {/* Turn Indicator */}
+        <motion.div
+          animate={isMyTurn ? { scale: [1, 1.01, 1] } : {}}
+          transition={{ duration: 1, repeat: isMyTurn ? Infinity : 0 }}
+          className={`text-center py-4 rounded-2xl font-bold text-xl ${
+            isMyTurn 
+              ? "bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-400 border border-green-500/50" 
+              : "bg-muted/50 text-muted-foreground"
+          }`}
+        >
+          {isMyTurn ? "🎯 Lượt của bạn! Hãy nhập từ!" : `⏳ Lượt của ${opponentName}...`}
+        </motion.div>
+
+        {/* Players Warnings */}
+        <div className="grid grid-cols-3 gap-3 items-center bg-card rounded-2xl p-4 border border-border/50">
           <div className="text-center">
-            <div className="font-bold text-sm">{isHost ? room?.host_name : room?.guest_name}</div>
-            <div className="flex items-center justify-center gap-1 mt-1">
+            <p className="font-bold text-sm mb-2">{isHost ? room?.host_name : room?.guest_name}</p>
+            <div className="flex items-center justify-center gap-1.5">
               {Array.from({ length: MAX_WARNINGS + 1 }).map((_, i) => (
                 <div
                   key={i}
-                  className={`w-4 h-4 rounded-full ${i < myWarnings ? "bg-red-500" : "bg-muted"}`}
-                  title={i < myWarnings ? "Cảnh báo" : ""}
+                  className={`w-5 h-5 rounded-full transition-all ${
+                    i < myWarnings ? "bg-red-500 shadow-lg shadow-red-500/30" : "bg-muted"
+                  }`}
                 />
               ))}
             </div>
-            <div className="text-xs text-muted-foreground mt-1">{myWarnings > 0 && <span className="text-red-400">Cảnh báo {myWarnings}</span>}</div>
+            {myWarnings > 0 && (
+              <p className="text-xs text-red-400 mt-1.5 font-medium">Cảnh báo {myWarnings}</p>
+            )}
           </div>
 
           <div className="text-center">
-            <motion.div
-              className={`text-4xl font-black ${turnTimeLeft <= 5 ? "text-red-500" : isMyTurn ? "text-green-400" : "text-muted-foreground"}`}
-              animate={turnTimeLeft <= 5 && isMyTurn ? { scale: [1, 1.1, 1] } : {}}
-              transition={{ duration: 0.5, repeat: turnTimeLeft <= 5 && isMyTurn ? Infinity : 0 }}
-            >
-              {turnTimeLeft}s
-            </motion.div>
-            <div className="text-xs text-muted-foreground">Giới hạn</div>
+            <p className="text-xs text-muted-foreground">VS</p>
           </div>
 
           <div className="text-center">
-            <div className="font-bold text-sm text-muted-foreground">{opponentName}</div>
-            <div className="flex items-center justify-center gap-1 mt-1">
+            <p className="font-bold text-sm mb-2 text-muted-foreground">{opponentName}</p>
+            <div className="flex items-center justify-center gap-1.5">
               {Array.from({ length: MAX_WARNINGS + 1 }).map((_, i) => (
-                <div key={i} className={`w-4 h-4 rounded-full ${i < opponentWarnings ? "bg-red-500" : "bg-muted"}`} />
+                <div
+                  key={i}
+                  className={`w-5 h-5 rounded-full transition-all ${
+                    i < opponentWarnings ? "bg-red-500 shadow-lg shadow-red-500/30" : "bg-muted"
+                  }`}
+                />
               ))}
             </div>
-            <div className="text-xs text-muted-foreground mt-1">
-              {opponentWarnings > 0 && <span className="text-red-400">Cảnh báo {opponentWarnings}</span>}
-            </div>
+            {opponentWarnings > 0 && (
+              <p className="text-xs text-red-400 mt-1.5 font-medium">Cảnh báo {opponentWarnings}</p>
+            )}
           </div>
         </div>
 
-        {/* Chain display */}
-        <Card className="p-4 bg-gradient-to-br from-card to-muted/30">
-          <div className="min-h-[80px] max-h-[150px] overflow-y-auto">
+        {/* Word Chain Display */}
+        <Card className="p-5 bg-gradient-to-br from-card to-muted/30 border-border/50">
+          <div className="min-h-[100px] max-h-[180px] overflow-y-auto">
             <div className="flex flex-wrap gap-2 items-center justify-center">
               {chain.map((item, idx) => (
-                <motion.div key={idx} initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex items-center gap-1">
+                <motion.div key={idx} initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex items-center gap-2">
                   <div
-                    className={`px-3 py-1.5 rounded-lg font-bold text-sm ${
+                    className={`px-4 py-2 rounded-xl font-bold text-base shadow-lg ${
                       item.connectionType === "start"
-                        ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white"
+                        ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow-green-500/20"
                         : item.player_id === playerId
-                          ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white"
-                          : "bg-gradient-to-r from-blue-500 to-cyan-500 text-white"
+                          ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-orange-500/20"
+                          : "bg-gradient-to-r from-blue-400 to-cyan-500 text-white shadow-blue-500/20"
                     }`}
                   >
                     {item.word}
                   </div>
-                  {idx < chain.length - 1 && <span className="text-lg">→</span>}
+                  {idx < chain.length - 1 && <span className="text-xl text-muted-foreground">→</span>}
                 </motion.div>
               ))}
               {chain.length > 0 && (
                 <motion.div
                   animate={{ opacity: [0.3, 0.7, 0.3] }}
                   transition={{ duration: 1, repeat: Infinity }}
-                  className="px-3 py-1.5 rounded-lg border-2 border-dashed border-primary/50 text-primary/50 font-bold text-sm"
+                  className="px-4 py-2 rounded-xl border-2 border-dashed border-primary/50 text-primary/50 font-bold"
                 >
                   ?
                 </motion.div>
@@ -1357,21 +1457,30 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             </div>
           </div>
           {chain.length > 0 && (
-            <div className="mt-2 text-center text-xs text-muted-foreground">
-              Tiếp theo: bắt đầu bằng '{chain[chain.length - 1].word.slice(-1)}'
+            <div className="mt-4 text-center">
+              <p className="text-sm text-muted-foreground">
+                Tiếp theo: bắt đầu bằng '<span className="text-primary font-bold text-lg">{chain[chain.length - 1].word.slice(-1)}</span>'
+              </p>
             </div>
           )}
         </Card>
 
         {/* Error message */}
-        {error && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center text-red-400 font-medium">
-            {error}
-          </motion.div>
-        )}
+        <AnimatePresence>
+          {error && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              exit={{ opacity: 0, y: -10 }}
+              className="text-center text-red-400 font-bold text-lg py-3 px-4 bg-red-500/10 rounded-xl border border-red-500/30"
+            >
+              {error}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Input */}
-        <div className="flex gap-2">
+        {/* Input Area */}
+        <div className="flex gap-3">
           <Input
             ref={inputRef}
             value={currentInput}
@@ -1387,25 +1496,36 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                   ? `Bắt đầu bằng '${chain[chain.length - 1].word.slice(-1)}'...`
                   : "Nhập từ..."
             }
-            className={`text-lg ${!isMyTurn ? "opacity-50" : ""}`}
+            className={`text-xl h-14 rounded-xl ${!isMyTurn ? "opacity-50" : ""}`}
             disabled={isValidating || !isMyTurn}
           />
-          <Button onClick={handleSubmit} disabled={!currentInput.trim() || isValidating || !isMyTurn} size="icon" className="h-12 w-12">
-            {isValidating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
-          </Button>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button 
+              onClick={handleSubmit} 
+              disabled={!currentInput.trim() || isValidating || !isMyTurn} 
+              className="h-14 w-14 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500"
+            >
+              {isValidating ? <Loader2 className="w-6 h-6 animate-spin" /> : <Send className="w-6 h-6" />}
+            </Button>
+          </motion.div>
         </div>
       </div>
     );
   }
 
-  // Finished
+  // Premium Finished Screen
   if (gamePhase === "finished") {
     const isWinner = room?.winner_id === playerId;
     const opponentName = isHost ? room?.guest_name : room?.host_name;
 
     return (
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
-        <Card className="p-6 sm:p-8 text-center relative overflow-hidden">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }} 
+        animate={{ opacity: 1, scale: 1 }}
+        className="max-w-lg mx-auto"
+      >
+        <Card className="relative overflow-hidden bg-gradient-to-br from-card via-card to-muted/30 border-border/50">
+          {/* Background Effect */}
           <div className="absolute inset-0 -z-10">
             <div
               className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl ${
@@ -1414,49 +1534,71 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             />
           </div>
 
-          <motion.div initial={{ scale: 0, rotate: -10 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 200 }}>
-            {isWinner ? <Trophy className="w-24 h-24 mx-auto mb-4 text-yellow-500" /> : <Flame className="w-24 h-24 mx-auto mb-4 text-gray-400" />}
-          </motion.div>
-
-          <h2 className={`text-3xl font-black mb-2 ${isWinner ? "text-yellow-500" : "text-gray-400"}`}>{isWinner ? "🎉 Chiến thắng!" : "😢 Thua cuộc"}</h2>
-
-          <p className="text-muted-foreground mb-4">{isWinner ? `Bạn đã thắng ${opponentName}!` : `Bạn đã thua ${opponentName}...`}</p>
-
-          {isWinner && (
+          <div className="p-8 sm:p-10 text-center">
+            {/* Trophy/Flame Icon */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3 }}
-              className="mb-4 inline-flex items-center gap-2 px-4 py-2 bg-yellow-500/20 border border-yellow-500/50 rounded-full"
+              initial={{ scale: 0, rotate: -10 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              className={`w-28 h-28 mx-auto mb-6 rounded-3xl flex items-center justify-center shadow-2xl ${
+                isWinner 
+                  ? "bg-gradient-to-br from-yellow-400 to-orange-500 shadow-orange-500/30" 
+                  : "bg-muted"
+              }`}
             >
-              <Trophy className="w-5 h-5 text-yellow-500" />
-              <span className="text-lg font-black text-yellow-500">+1,000 điểm!</span>
+              {isWinner 
+                ? <Trophy className="w-14 h-14 text-white" /> 
+                : <Flame className="w-14 h-14 text-muted-foreground" />
+              }
             </motion.div>
-          )}
 
-          <div className="bg-muted/50 rounded-xl p-4 mb-6">
-            <div className="text-sm text-muted-foreground mb-2">Tổng số từ đã nối</div>
-            <div className="text-4xl font-black text-primary">{chain.length} từ</div>
-          </div>
+            <h2 className={`text-4xl font-black mb-3 ${isWinner ? "text-yellow-500" : "text-muted-foreground"}`}>
+              {isWinner ? "🎉 Chiến thắng!" : "😢 Thua cuộc"}
+            </h2>
 
-          <div className="flex gap-3 justify-center">
-            <Button onClick={onBack} variant="outline" className="gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              Thoát
-            </Button>
-            <Button
-              onClick={() => {
-                setGamePhase("menu");
-                setRoom(null);
-                setChain([]);
-                setMoves([]);
-                setError(null);
-              }}
-              className="gap-2 bg-gradient-to-r from-purple-500 to-pink-500"
-            >
-              <RefreshCw className="w-4 h-4" />
-              Chơi lại
-            </Button>
+            <p className="text-lg text-muted-foreground mb-6">
+              {isWinner ? `Bạn đã thắng ${opponentName}!` : `Bạn đã thua ${opponentName}...`}
+            </p>
+
+            {isWinner && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 }}
+                className="mb-6 inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/50 rounded-2xl"
+              >
+                <Trophy className="w-6 h-6 text-yellow-500" />
+                <span className="text-2xl font-black text-yellow-500">+1,000 điểm!</span>
+              </motion.div>
+            )}
+
+            <div className="bg-muted/30 rounded-2xl p-5 mb-8 border border-border/50">
+              <p className="text-sm text-muted-foreground mb-2">Tổng số từ đã nối</p>
+              <p className="text-5xl font-black text-primary">{chain.length} từ</p>
+            </div>
+
+            <div className="flex gap-4 justify-center">
+              <Button onClick={onBack} variant="outline" size="lg" className="h-14 px-6 gap-2 text-lg">
+                <ArrowLeft className="w-5 h-5" />
+                Thoát
+              </Button>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  onClick={() => {
+                    setGamePhase("menu");
+                    setRoom(null);
+                    setChain([]);
+                    setMoves([]);
+                    setError(null);
+                  }}
+                  size="lg"
+                  className="h-14 px-6 gap-2 text-lg bg-gradient-to-r from-yellow-400 to-orange-500"
+                >
+                  <RefreshCw className="w-5 h-5" />
+                  Chơi lại
+                </Button>
+              </motion.div>
+            </div>
           </div>
         </Card>
       </motion.div>

@@ -19,6 +19,7 @@ import {
   Share2,
   AlertTriangle,
   Brain,
+  Zap,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { supabase } from "@/integrations/supabase/client";
@@ -767,82 +768,428 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
   if (gamePhase === "creating") {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <Loader2 className="w-12 h-12 animate-spin text-purple-500 mb-4" />
-        <p className="text-muted-foreground">Đang tạo phòng...</p>
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-16 h-16 rounded-full border-4 border-muted border-t-purple-500 mb-4"
+        />
+        <p className="text-muted-foreground text-lg">Đang tạo phòng...</p>
       </div>
     );
   }
 
+  // Premium Waiting/Ready Screen
   if ((gamePhase === "waiting" || gamePhase === "ready") && room) {
     const bothReady = room.host_ready && room.guest_ready;
 
     return (
-      <div className="space-y-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} 
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-lg mx-auto space-y-6"
+      >
+        {/* Header */}
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={onBack}><ArrowLeft className="w-5 h-5" /></Button>
           <h2 className="text-xl font-bold">Phòng chờ</h2>
         </div>
 
-        <Card className="p-6 text-center">
-          <p className="text-sm text-muted-foreground mb-2">Mã phòng</p>
-          <p className="text-4xl font-mono font-bold tracking-widest text-purple-500 mb-4">{room.room_code}</p>
-          <div className="flex justify-center gap-2">
-            <Button variant="outline" size="sm" onClick={copyRoomLink}>
-              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              {copied ? "Đã copy" : "Copy link"}
-            </Button>
-            <Button variant="outline" size="sm" onClick={shareRoom}>
-              <Share2 className="w-4 h-4" />
-              Chia sẻ
-            </Button>
+        {/* Room Code Card */}
+        <Card className="relative overflow-hidden bg-gradient-to-br from-card via-card to-muted/30 border-border/50">
+          <div className="absolute inset-0 -z-10">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-40 h-40 bg-pink-500/10 rounded-full blur-3xl" />
+          </div>
+          
+          <div className="p-6 text-center">
+            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">Mã phòng</p>
+            <p className="text-4xl sm:text-5xl font-mono font-black tracking-[0.3em] bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
+              {room.room_code}
+            </p>
+            <div className="flex justify-center gap-3">
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button onClick={copyRoomLink} variant="outline" className="gap-2 h-11">
+                  {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                  {copied ? "Đã copy" : "Copy link"}
+                </Button>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button onClick={shareRoom} className="gap-2 h-11 bg-gradient-to-r from-purple-500 to-pink-500">
+                  <Share2 className="w-4 h-4" />
+                  Chia sẻ
+                </Button>
+              </motion.div>
+            </div>
           </div>
         </Card>
 
-        <Card className="p-4">
+        {/* Players Status */}
+        <Card className="p-5 bg-gradient-to-br from-card to-muted/30 border-border/50">
+          <p className="text-xs text-muted-foreground mb-4 uppercase tracking-wider text-center">Người chơi</p>
           <div className="grid grid-cols-2 gap-4">
-            <div className={`p-4 rounded-xl text-center ${room.host_ready ? "bg-green-500/20 border border-green-500" : "bg-muted"}`}>
-              <Crown className="w-5 h-5 mx-auto mb-2 text-yellow-500" />
-              <p className="font-bold">{room.host_name}</p>
-              <p className="text-xs text-muted-foreground">{room.host_ready ? "✅ Sẵn sàng" : "⏳ Chờ..."}</p>
-            </div>
-            <div className={`p-4 rounded-xl text-center ${room.guest_id ? (room.guest_ready ? "bg-green-500/20 border border-green-500" : "bg-muted") : "bg-muted/50 border-dashed border-2"}`}>
-              <Users className="w-5 h-5 mx-auto mb-2 text-blue-500" />
-              <p className="font-bold">{room.guest_name || "Đang chờ..."}</p>
-              {room.guest_id && <p className="text-xs text-muted-foreground">{room.guest_ready ? "✅ Sẵn sàng" : "⏳ Chờ..."}</p>}
-            </div>
+            <motion.div 
+              animate={room.host_ready ? { scale: [1, 1.02, 1] } : {}}
+              transition={{ duration: 1, repeat: room.host_ready ? Infinity : 0, repeatDelay: 1 }}
+              className={`p-4 rounded-2xl text-center transition-all ${
+                room.host_ready 
+                  ? "bg-gradient-to-br from-green-500/20 to-emerald-500/10 border-2 border-green-500 shadow-lg shadow-green-500/10" 
+                  : "bg-muted/30 border border-border/50"
+              }`}
+            >
+              <div className={`w-12 h-12 rounded-xl mx-auto mb-2 flex items-center justify-center ${
+                room.host_ready ? "bg-gradient-to-br from-green-400 to-emerald-500" : "bg-gradient-to-br from-yellow-400 to-orange-500"
+              }`}>
+                {room.host_ready ? <Check className="w-6 h-6 text-white" /> : <Crown className="w-6 h-6 text-white" />}
+              </div>
+              <p className="font-bold text-lg">{room.host_name}</p>
+              <p className={`text-sm font-medium ${room.host_ready ? "text-green-500" : "text-muted-foreground"}`}>
+                {room.host_ready ? "✅ Sẵn sàng" : "⏳ Chờ..."}
+              </p>
+            </motion.div>
+            
+            <motion.div 
+              animate={room.guest_ready ? { scale: [1, 1.02, 1] } : {}}
+              transition={{ duration: 1, repeat: room.guest_ready ? Infinity : 0, repeatDelay: 1 }}
+              className={`p-4 rounded-2xl text-center transition-all ${
+                room.guest_id 
+                  ? room.guest_ready 
+                    ? "bg-gradient-to-br from-green-500/20 to-emerald-500/10 border-2 border-green-500 shadow-lg shadow-green-500/10" 
+                    : "bg-muted/30 border border-border/50"
+                  : "bg-muted/20 border-2 border-dashed border-muted-foreground/30"
+              }`}
+            >
+              <div className={`w-12 h-12 rounded-xl mx-auto mb-2 flex items-center justify-center ${
+                room.guest_id 
+                  ? room.guest_ready ? "bg-gradient-to-br from-green-400 to-emerald-500" : "bg-gradient-to-br from-blue-400 to-cyan-500"
+                  : "bg-muted/50"
+              }`}>
+                {room.guest_id 
+                  ? room.guest_ready ? <Check className="w-6 h-6 text-white" /> : <Users className="w-6 h-6 text-white" />
+                  : <Users className="w-6 h-6 text-muted-foreground/50" />
+                }
+              </div>
+              <p className="font-bold text-lg">{room.guest_name || "Đang chờ..."}</p>
+              {room.guest_id && (
+                <p className={`text-sm font-medium ${room.guest_ready ? "text-green-500" : "text-muted-foreground"}`}>
+                  {room.guest_ready ? "✅ Sẵn sàng" : "⏳ Chờ..."}
+                </p>
+              )}
+            </motion.div>
           </div>
         </Card>
 
+        {/* Action Buttons */}
         {room.guest_id && (
           <div className="space-y-3">
-            <Button onClick={toggleReady} variant={isHost ? (room.host_ready ? "destructive" : "default") : (room.guest_ready ? "destructive" : "default")} className="w-full">
-              {(isHost ? room.host_ready : room.guest_ready) ? "Hủy sẵn sàng" : "Sẵn sàng!"}
-            </Button>
-            {isHost && (
-              <Button onClick={startGame} disabled={!bothReady} className="w-full gap-2 bg-gradient-to-r from-purple-500 to-pink-500">
-                <Swords className="w-5 h-5" />
-                Bắt đầu!
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button 
+                onClick={toggleReady} 
+                size="lg"
+                className={`w-full h-14 text-lg font-bold gap-2 ${
+                  (isHost ? room.host_ready : room.guest_ready)
+                    ? "bg-green-500 hover:bg-green-600"
+                    : "bg-gradient-to-r from-purple-500 to-pink-500"
+                }`}
+              >
+                {(isHost ? room.host_ready : room.guest_ready) ? (
+                  <>
+                    <Check className="w-5 h-5" />
+                    Đã sẵn sàng!
+                  </>
+                ) : (
+                  <>
+                    <Zap className="w-5 h-5" />
+                    Sẵn sàng
+                  </>
+                )}
               </Button>
+            </motion.div>
+            
+            {isHost && (
+              <motion.div whileHover={{ scale: bothReady ? 1.02 : 1 }} whileTap={{ scale: 0.98 }}>
+                <Button 
+                  onClick={startGame} 
+                  disabled={!bothReady} 
+                  size="lg"
+                  className={`w-full h-14 text-lg font-bold gap-2 ${
+                    bothReady 
+                      ? "bg-gradient-to-r from-green-400 to-emerald-500 shadow-xl shadow-green-500/30" 
+                      : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  <Swords className="w-5 h-5" />
+                  {bothReady ? "Bắt đầu!" : "Cả hai cần sẵn sàng"}
+                </Button>
+              </motion.div>
             )}
           </div>
+        )}
+      </motion.div>
+    );
+  }
+
+  // Premium Countdown Screen
+  if (gamePhase === "countdown") {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm"
+      >
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={countdown}
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 1.5, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="text-center"
+          >
+            {countdown > 0 ? (
+              <motion.div
+                className="text-9xl font-black bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 bg-clip-text text-transparent"
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 0.5 }}
+              >
+                {countdown}
+              </motion.div>
+            ) : (
+              <motion.div 
+                initial={{ scale: 0, rotate: -10 }} 
+                animate={{ scale: 1, rotate: 0 }} 
+              >
+                <div className="text-6xl sm:text-8xl font-black bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500 bg-clip-text text-transparent">
+                  BẮT ĐẦU! 🧠
+                </div>
+              </motion.div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </motion.div>
+    );
+  }
+
+  // Premium Playing Screen
+  if (gamePhase === "playing" && room) {
+    return (
+      <div className="max-w-2xl mx-auto space-y-4">
+        {/* Header with Timer */}
+        <div className="flex items-center justify-between p-4 bg-card rounded-2xl border border-border/50">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+              <Brain className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <p className="font-bold">Đấu Nghĩa 1:1</p>
+              <p className="text-xs text-muted-foreground">의미 연결</p>
+            </div>
+          </div>
+          
+          <motion.div
+            animate={turnTimeLeft <= 5 && isMyTurn ? { scale: [1, 1.1, 1] } : {}}
+            transition={{ duration: 0.5, repeat: turnTimeLeft <= 5 && isMyTurn ? Infinity : 0 }}
+            className={`px-5 py-2.5 rounded-xl font-mono font-black text-2xl flex items-center gap-2 ${
+              turnTimeLeft <= 3 
+                ? "bg-red-500 text-white animate-pulse" 
+                : isMyTurn 
+                  ? "bg-green-500/20 text-green-500 border border-green-500/50" 
+                  : "bg-muted text-muted-foreground"
+            }`}
+          >
+            <Timer className="w-5 h-5" />
+            {turnTimeLeft}s
+          </motion.div>
+        </div>
+
+        {/* Scores */}
+        <div className="grid grid-cols-2 gap-4">
+          <Card className={`p-4 transition-all ${isHost ? "ring-2 ring-purple-500" : ""} ${room.current_turn_player_id === room.host_id ? "bg-gradient-to-br from-purple-500/10 to-pink-500/5" : ""}`}>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
+                <Crown className="w-4 h-4 text-white" />
+              </div>
+              <span className="font-bold truncate">{room.host_name}</span>
+            </div>
+            <p className="text-3xl font-black">{room.host_score} <span className="text-sm font-normal text-muted-foreground">điểm</span></p>
+            {room.host_warnings > 0 && (
+              <div className="flex gap-1 mt-2">
+                {Array.from({ length: room.host_warnings }).map((_, i) => (
+                  <AlertTriangle key={i} className="w-4 h-4 text-yellow-500" />
+                ))}
+              </div>
+            )}
+          </Card>
+          
+          <Card className={`p-4 transition-all ${!isHost ? "ring-2 ring-purple-500" : ""} ${room.current_turn_player_id === room.guest_id ? "bg-gradient-to-br from-purple-500/10 to-pink-500/5" : ""}`}>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center">
+                <Users className="w-4 h-4 text-white" />
+              </div>
+              <span className="font-bold truncate">{room.guest_name}</span>
+            </div>
+            <p className="text-3xl font-black">{room.guest_score} <span className="text-sm font-normal text-muted-foreground">điểm</span></p>
+            {room.guest_warnings > 0 && (
+              <div className="flex gap-1 mt-2">
+                {Array.from({ length: room.guest_warnings }).map((_, i) => (
+                  <AlertTriangle key={i} className="w-4 h-4 text-yellow-500" />
+                ))}
+              </div>
+            )}
+          </Card>
+        </div>
+
+        {/* Word chain */}
+        <Card className="p-5 max-h-48 overflow-y-auto bg-gradient-to-br from-card to-muted/30 border-border/50">
+          <div className="flex flex-wrap gap-2">
+            {moves.map((move, idx) => (
+              <motion.span
+                key={move.id}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className={`px-4 py-2 rounded-xl text-sm font-bold shadow-lg ${
+                  move.player_id === "system" 
+                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-purple-500/20" 
+                    : move.player_id === playerId 
+                      ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow-green-500/20" 
+                      : "bg-gradient-to-r from-blue-400 to-cyan-500 text-white shadow-blue-500/20"
+                }`}
+              >
+                {move.word}
+                {move.score_delta > 0 && <span className="text-xs ml-1.5 opacity-80">+{move.score_delta}</span>}
+              </motion.span>
+            ))}
+          </div>
+        </Card>
+
+        {/* Current word */}
+        {lastWord && (
+          <div className="text-center py-5 bg-gradient-to-br from-card to-muted/30 rounded-2xl border border-border/50">
+            <p className="text-sm text-muted-foreground mb-2">Từ hiện tại / 현재 단어</p>
+            <p className="text-5xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">{lastWord}</p>
+          </div>
+        )}
+
+        {/* Validation feedback */}
+        <AnimatePresence>
+          {lastValidation && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className={`p-4 rounded-2xl text-sm border ${
+                lastValidation.score >= PASS_SCORE 
+                  ? "bg-green-500/10 text-green-400 border-green-500/30" 
+                  : "bg-red-500/10 text-red-400 border-red-500/30"
+              }`}
+            >
+              <p className="font-bold text-lg mb-1">Điểm: {lastValidation.score}/100 {lastValidation.score >= PASS_SCORE ? "✅" : "❌"}</p>
+              <p>{lastValidation.reason_vi}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Input */}
+        <div className="flex gap-3">
+          <Input
+            ref={inputRef}
+            value={currentInput}
+            onChange={(e) => setCurrentInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSubmitWord()}
+            placeholder={isMyTurn ? "Nhập từ liên quan về ý nghĩa..." : "Đợi lượt của bạn..."}
+            disabled={!isMyTurn || isValidating}
+            className="flex-1 h-14 text-xl rounded-xl"
+          />
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button 
+              onClick={handleSubmitWord} 
+              disabled={!isMyTurn || !currentInput.trim() || isValidating} 
+              className="h-14 w-14 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500"
+            >
+              {isValidating ? <Loader2 className="w-6 h-6 animate-spin" /> : <Send className="w-6 h-6" />}
+            </Button>
+          </motion.div>
+        </div>
+
+        {!isMyTurn && (
+          <motion.p 
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+            className="text-center text-sm text-muted-foreground py-2"
+          >
+            Đợi đối thủ... / 상대방 차례입니다
+          </motion.p>
         )}
       </div>
     );
   }
 
-  if (gamePhase === "countdown") {
+  // Premium Finished Screen
+  if (gamePhase === "finished" && room) {
+    const isWinner = room.winner_id === playerId;
+    const winnerName = room.winner_id === room.host_id ? room.host_name : room.guest_name;
+
     return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <motion.div
-          key={countdown}
-          initial={{ scale: 2, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0, opacity: 0 }}
-          className="text-8xl font-black text-purple-500"
-        >
-          {countdown > 0 ? countdown : "GO!"}
-        </motion.div>
-      </div>
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }} 
+        animate={{ opacity: 1, scale: 1 }}
+        className="max-w-lg mx-auto"
+      >
+        <Card className="relative overflow-hidden bg-gradient-to-br from-card via-card to-muted/30 border-border/50">
+          {/* Background Effect */}
+          <div className="absolute inset-0 -z-10">
+            <div
+              className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl ${
+                isWinner ? "bg-yellow-500/30" : "bg-gray-500/20"
+              }`}
+            />
+          </div>
+
+          <div className="p-8 sm:p-10 text-center">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring" }}
+              className={`w-28 h-28 mx-auto mb-6 rounded-3xl flex items-center justify-center shadow-2xl ${
+                isWinner 
+                  ? "bg-gradient-to-br from-yellow-400 to-orange-500 shadow-orange-500/30" 
+                  : "bg-muted"
+              }`}
+            >
+              {isWinner 
+                ? <Trophy className="w-14 h-14 text-white" /> 
+                : <Swords className="w-14 h-14 text-muted-foreground" />
+              }
+            </motion.div>
+
+            <h2 className={`text-4xl font-black mb-3 ${isWinner ? "text-yellow-500" : "text-muted-foreground"}`}>
+              {isWinner ? "🎉 Chiến thắng!" : "😢 Thua cuộc"}
+            </h2>
+            <p className="text-lg text-muted-foreground mb-6">
+              {isWinner ? "Bạn đã thắng +1,000 điểm!" : `${winnerName} đã thắng!`}
+            </p>
+
+            <Card className="p-5 max-w-sm mx-auto mb-8 bg-muted/30 border-border/50">
+              <div className="grid grid-cols-2 gap-4 text-center">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">{room.host_name}</p>
+                  <p className="text-3xl font-black">{room.host_score}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">{room.guest_name}</p>
+                  <p className="text-3xl font-black">{room.guest_score}</p>
+                </div>
+              </div>
+            </Card>
+
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button onClick={onBack} size="lg" className="h-14 px-8 gap-2 text-lg bg-gradient-to-r from-purple-500 to-pink-500">
+                <ArrowLeft className="w-5 h-5" />
+                Quay lại
+              </Button>
+            </motion.div>
+          </div>
+        </Card>
+      </motion.div>
     );
   }
 
