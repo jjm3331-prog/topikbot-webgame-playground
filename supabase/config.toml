@@ -7,7 +7,7 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.idiom-quiz]
-verify_jwt = true
+verify_jwt = false
 
 [functions.parttime-job]
 verify_jwt = true
