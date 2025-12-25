@@ -118,6 +118,16 @@ function normalizeGrammarQuestions(input: ApiGrammarQuestion[]): GrammarQuestion
   });
 }
 
+// Fisher-Yates 셔플 알고리즘 (제대로 된 랜덤 셔플)
+function shuffleArray<T>(array: T[]): T[] {
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
 // ==================== 문장 조립 퍼즐 ====================
 function AssemblyGame({ level }: { level: TopikLevel }) {
   const [questions, setQuestions] = useState<GrammarQuestion[]>([]);
@@ -160,7 +170,9 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
 
   const resetGame = (question: GrammarQuestion) => {
     setSelectedParts([]);
-    setAvailableParts(question.parts ? [...question.parts].sort(() => Math.random() - 0.5) : []);
+    // Fisher-Yates 셔플로 제대로 섞기
+    const shuffled = shuffleArray(question.parts ?? []);
+    setAvailableParts(shuffled);
     setIsCorrect(null);
   };
 
