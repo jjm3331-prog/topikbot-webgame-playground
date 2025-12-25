@@ -565,112 +565,210 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
   // RENDER
   if (gamePhase === "menu") {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-3 mb-6">
-          <Button variant="ghost" size="icon" onClick={onBack}><ArrowLeft className="w-5 h-5" /></Button>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} 
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-2xl mx-auto space-y-6"
+      >
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0">
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
           <div>
-            <h2 className="text-xl font-bold flex items-center gap-2">
-              <Brain className="w-6 h-6 text-purple-500" />
-              Đấu Nghĩa 1:1
-            </h2>
-            <p className="text-sm text-muted-foreground">의미 연결 대결</p>
+            <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+              <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+                Đấu Nghĩa 1:1
+              </span>
+            </h1>
+            <p className="text-muted-foreground mt-1">의미 연결 대결</p>
           </div>
         </div>
 
-        <Card className="p-6 bg-gradient-to-br from-purple-900/40 to-pink-900/30 border-purple-500/40">
-          <h3 className="text-lg font-bold mb-5 flex items-center gap-2 text-white">
-            <span className="text-2xl">📋</span> Cách chơi / 게임 방법
-          </h3>
-          
-          {/* 게임 개요 */}
-          <div className="mb-5 p-4 rounded-lg bg-background/50 border border-purple-500/20">
-            <h4 className="font-semibold text-purple-300 mb-2 text-sm">🎯 게임 개요 / Mô tả trò chơi</h4>
-            <p className="text-sm text-foreground/80 leading-relaxed">
-              Đây là trò chơi nối từ theo <span className="text-purple-400 font-bold">ý nghĩa liên quan</span>, không phải theo âm tiết cuối như "끝말잇기" truyền thống. 
-              Ví dụ: "바다" → "파도" (biển → sóng), "학교" → "선생님" (trường → giáo viên).
+        {/* Game Rules Card */}
+        <Card className="p-6 sm:p-8 bg-gradient-to-br from-purple-500/5 to-pink-500/5 border-purple-500/20">
+          <h2 className="text-xl sm:text-2xl font-bold mb-6 flex items-center gap-3">
+            <span className="text-2xl sm:text-3xl">📋</span>
+            <span>Cách chơi</span>
+            <span className="text-muted-foreground font-normal">/ 게임 방법</span>
+          </h2>
+
+          {/* Game Overview */}
+          <div className="mb-6 p-5 rounded-xl bg-background/80 border border-purple-500/20">
+            <p className="text-base sm:text-lg leading-relaxed">
+              Nối từ theo <span className="text-purple-400 font-bold">ý nghĩa liên quan</span>, không phải âm tiết cuối.
+              <br />
+              <span className="text-muted-foreground">
+                Ví dụ: <span className="text-foreground">"바다"</span> → <span className="text-foreground">"파도"</span> (biển → sóng), 
+                <span className="text-foreground"> "학교"</span> → <span className="text-foreground">"선생님"</span> (trường → giáo viên)
+              </span>
             </p>
           </div>
 
-          {/* 규칙 상세 */}
-          <div className="space-y-3">
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-green-500/10 border border-green-500/30">
-              <span className="text-xl">🤖</span>
-              <div>
-                <p className="font-semibold text-green-400 text-sm">AI chấm điểm liên quan</p>
-                <p className="text-xs text-foreground/70 mt-1">AI sẽ đánh giá mức độ liên quan từ 0-100 điểm. <span className="text-green-400 font-bold">≥70 điểm = PASS</span>, dưới 70 = cảnh báo.</p>
+          {/* Rules Grid */}
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/30">
+              <div className="flex items-center gap-3 mb-2">
+                <Lightbulb className="w-6 h-6 text-green-400" />
+                <span className="font-bold text-lg text-green-400">AI chấm điểm</span>
               </div>
+              <p className="text-muted-foreground">
+                ≥70 điểm = PASS, dưới 70 = cảnh báo.
+              </p>
             </div>
-            
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
-              <span className="text-xl">⏱️</span>
-              <div>
-                <p className="font-semibold text-yellow-400 text-sm">Thời gian mỗi lượt: 12 giây</p>
-                <p className="text-xs text-foreground/70 mt-1">Hết thời gian mà chưa nhập từ = nhận cảnh báo. Hãy suy nghĩ nhanh!</p>
+
+            <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/30">
+              <div className="flex items-center gap-3 mb-2">
+                <Timer className="w-6 h-6 text-blue-400" />
+                <span className="font-bold text-lg text-blue-400">12 giây mỗi lượt</span>
               </div>
+              <p className="text-muted-foreground">
+                Hết giờ = nhận cảnh báo ngay!
+              </p>
             </div>
-            
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-red-500/10 border border-red-500/30">
-              <span className="text-xl">⚠️</span>
-              <div>
-                <p className="font-semibold text-red-400 text-sm">Quy tắc cảnh báo</p>
-                <p className="text-xs text-foreground/70 mt-1">Nhận cảnh báo khi: từ không liên quan (&lt;70 điểm), hết giờ, hoặc từ đã dùng. <span className="text-red-400 font-bold">2 cảnh báo = THUA!</span></p>
+
+            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30">
+              <div className="flex items-center gap-3 mb-2">
+                <AlertTriangle className="w-6 h-6 text-red-400" />
+                <span className="font-bold text-lg text-red-400">2 cảnh báo = Thua</span>
               </div>
+              <p className="text-muted-foreground">
+                Từ sai, hết giờ, hoặc từ đã dùng.
+              </p>
             </div>
-            
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-purple-500/10 border border-purple-500/30">
-              <span className="text-xl">🏆</span>
-              <div>
-                <p className="font-semibold text-purple-400 text-sm">Phần thưởng chiến thắng</p>
-                <p className="text-xs text-foreground/70 mt-1">Người thắng sẽ nhận <span className="text-yellow-400 font-bold">+1,000 điểm</span> vào tài khoản!</p>
+
+            <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30">
+              <div className="flex items-center gap-3 mb-2">
+                <Trophy className="w-6 h-6 text-yellow-400" />
+                <span className="font-bold text-lg text-yellow-400">+1,000 điểm</span>
               </div>
+              <p className="text-muted-foreground">
+                Chiến thắng để nhận điểm thưởng!
+              </p>
             </div>
           </div>
 
-          {/* 예시 */}
-          <div className="mt-5 p-4 rounded-lg bg-background/30 border border-muted">
-            <h4 className="font-semibold text-blue-300 mb-2 text-sm">💡 Ví dụ từ liên quan / 연관 단어 예시</h4>
-            <div className="flex flex-wrap gap-2 text-xs">
-              <span className="px-2 py-1 bg-purple-500/20 rounded text-purple-300">커피 → 카페</span>
-              <span className="px-2 py-1 bg-pink-500/20 rounded text-pink-300">겨울 → 눈</span>
-              <span className="px-2 py-1 bg-blue-500/20 rounded text-blue-300">음악 → 노래</span>
-              <span className="px-2 py-1 bg-green-500/20 rounded text-green-300">병원 → 의사</span>
+          {/* Examples */}
+          <div className="mt-6 p-4 rounded-xl bg-background/50 border border-muted">
+            <p className="font-semibold mb-3 flex items-center gap-2">
+              <span className="text-xl">💡</span>
+              Ví dụ từ liên quan
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <span className="px-4 py-2 bg-purple-500/20 rounded-lg text-purple-300 font-medium">커피 → 카페</span>
+              <span className="px-4 py-2 bg-pink-500/20 rounded-lg text-pink-300 font-medium">겨울 → 눈</span>
+              <span className="px-4 py-2 bg-blue-500/20 rounded-lg text-blue-300 font-medium">음악 → 노래</span>
+              <span className="px-4 py-2 bg-green-500/20 rounded-lg text-green-300 font-medium">병원 → 의사</span>
             </div>
           </div>
         </Card>
 
-        <div className="space-y-4">
-          <Input
-            placeholder="Nhập tên của bạn / 닉네임 입력"
-            value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
-            maxLength={20}
-          />
-
-          <div className="grid grid-cols-2 gap-3">
-            <Button onClick={createRoom} className="h-14 gap-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
-              <Play className="w-5 h-5" />
-              Tạo phòng
-            </Button>
-            <div className="space-y-2">
+        {/* Action Section */}
+        <Card className="p-6 sm:p-8">
+          <div className="space-y-5">
+            <div>
+              <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                Tên của bạn / 닉네임
+              </label>
               <Input
-                placeholder="Mã phòng (6 ký tự)"
-                value={roomCodeInput}
-                onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
-                maxLength={6}
+                value={playerName}
+                onChange={(e) => setPlayerName(e.target.value)}
+                placeholder="Nhập tên..."
+                className="text-lg h-12"
+                maxLength={20}
               />
-              <Button onClick={joinRoom} variant="outline" className="w-full">Tham gia</Button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  onClick={createRoom}
+                  className="w-full h-16 text-lg font-bold gap-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white"
+                  disabled={!playerName.trim()}
+                >
+                  <Crown className="w-6 h-6" />
+                  Tạo phòng
+                </Button>
+              </motion.div>
+
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  variant="outline"
+                  onClick={() => setGamePhase("joining")}
+                  className="w-full h-16 text-lg font-bold gap-3 border-2"
+                  disabled={!playerName.trim()}
+                >
+                  <Users className="w-6 h-6" />
+                  Tham gia
+                </Button>
+              </motion.div>
             </div>
           </div>
-        </div>
-      </div>
+        </Card>
+      </motion.div>
     );
   }
 
-  if (gamePhase === "creating" || gamePhase === "joining") {
+  if (gamePhase === "joining") {
+    return (
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} 
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-md mx-auto"
+      >
+        <Card className="p-6 sm:p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <Button variant="ghost" size="icon" onClick={() => setGamePhase("menu")}>
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <h2 className="text-xl font-bold">Tham gia phòng</h2>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                Mã phòng / 방 코드
+              </label>
+              <Input
+                value={roomCodeInput}
+                onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
+                placeholder="6 ký tự..."
+                className="text-center text-2xl tracking-widest h-14 font-mono"
+                maxLength={6}
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => setGamePhase("menu")}
+                className="flex-1 h-12"
+              >
+                Hủy
+              </Button>
+              <Button
+                onClick={joinRoom}
+                disabled={roomCodeInput.length !== 6 || !playerName.trim()}
+                className="flex-1 h-12 bg-gradient-to-r from-purple-500 to-pink-500"
+              >
+                <Users className="w-5 h-5 mr-2" />
+                Tham gia
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </motion.div>
+    );
+  }
+
+  if (gamePhase === "creating") {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <Loader2 className="w-12 h-12 animate-spin text-purple-500 mb-4" />
-        <p className="text-muted-foreground">{gamePhase === "creating" ? "Đang tạo phòng..." : "Đang tham gia..."}</p>
+        <p className="text-muted-foreground">Đang tạo phòng...</p>
       </div>
     );
   }
