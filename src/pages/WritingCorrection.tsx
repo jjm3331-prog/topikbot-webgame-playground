@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import { 
   PenTool, 
   Upload, 
@@ -120,6 +121,7 @@ const WritingCorrection = () => {
   const questionCameraRef = useRef<HTMLInputElement>(null);
   const answerInputRef = useRef<HTMLInputElement>(null);
   const answerCameraRef = useRef<HTMLInputElement>(null);
+  const pdfContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     checkAuth();
@@ -468,165 +470,75 @@ const WritingCorrection = () => {
       .trim();
   };
 
-  const handleExportPDF = () => {
-    if (!result) return;
-
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 15;
-    const contentWidth = pageWidth - margin * 2;
-    let yPos = 20;
-    
-    // Helper function to add text with word wrap
-    const addText = (text: string, x: number, y: number, maxWidth: number, fontSize: number = 10) => {
-      doc.setFontSize(fontSize);
-      const lines = doc.splitTextToSize(cleanMarkdown(text), maxWidth);
-      doc.text(lines, x, y);
-      return y + (lines.length * fontSize * 0.4);
-    };
-
-    // Helper to check and add new page
-    const checkNewPage = (requiredSpace: number) => {
-      if (yPos + requiredSpace > 280) {
-        doc.addPage();
-        yPos = 20;
-      }
-    };
-
-    // Title
-    doc.setFontSize(18);
-    doc.setFont("helvetica", "bold");
-    doc.text("TOPIK Writing Correction Report", pageWidth / 2, yPos, { align: "center" });
-    yPos += 8;
-    
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text("LUKATO AI - topikbot.kr", pageWidth / 2, yPos, { align: "center" });
-    yPos += 15;
-
-    // Score Section
-    doc.setDrawColor(200, 200, 200);
-    doc.rect(margin, yPos, contentWidth, 45);
-    
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.text(`Overall Score: ${result.overall_score}/100`, pageWidth / 2, yPos + 12, { align: "center" });
-    
-    yPos += 22;
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    
-    // Score table
-    const scores = [
-      { label: "Grammar", score: result.grammar_score },
-      { label: "Vocabulary", score: result.vocabulary_score },
-      { label: "Structure", score: result.structure_score },
-      { label: "Content", score: result.content_score },
-    ];
-    
-    const colWidth = contentWidth / 4;
-    scores.forEach((s, i) => {
-      const x = margin + (i * colWidth) + colWidth / 2;
-      doc.text(s.label, x, yPos, { align: "center" });
-      doc.setFont("helvetica", "bold");
-      doc.text(`${s.score}/25`, x, yPos + 6, { align: "center" });
-      doc.setFont("helvetica", "normal");
-    });
-    
-    yPos += 30;
-
-    // Strengths
-    checkNewPage(40);
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("Strengths", margin, yPos);
-    yPos += 8;
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    result.strengths.forEach(s => {
-      checkNewPage(10);
-      yPos = addText(`- ${s}`, margin + 5, yPos, contentWidth - 10, 10);
-      yPos += 2;
-    });
-    yPos += 5;
-
-    // Improvements
-    checkNewPage(40);
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("Areas for Improvement", margin, yPos);
-    yPos += 8;
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    result.improvements.forEach(i => {
-      checkNewPage(10);
-      yPos = addText(`- ${i}`, margin + 5, yPos, contentWidth - 10, 10);
-      yPos += 2;
-    });
-    yPos += 10;
-
-    // Corrections
-    if (result.corrections.length > 0) {
-      checkNewPage(40);
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "bold");
-      doc.text("Corrections", margin, yPos);
-      yPos += 8;
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "normal");
-      result.corrections.slice(0, 10).forEach(c => {
-        checkNewPage(20);
-        doc.setTextColor(200, 0, 0);
-        yPos = addText(`Original: ${c.original}`, margin + 5, yPos, contentWidth - 10, 9);
-        doc.setTextColor(0, 150, 0);
-        yPos = addText(`Corrected: ${c.corrected}`, margin + 5, yPos + 2, contentWidth - 10, 9);
-        doc.setTextColor(100, 100, 100);
-        yPos = addText(`${c.explanation}`, margin + 5, yPos + 2, contentWidth - 10, 8);
-        doc.setTextColor(0, 0, 0);
-        yPos += 5;
-      });
-      yPos += 5;
-    }
-
-    // Model Answer
-    checkNewPage(50);
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("Model Answer", margin, yPos);
-    yPos += 8;
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    yPos = addText(result.model_answer, margin + 5, yPos, contentWidth - 10, 10);
-    yPos += 10;
-
-    // Detailed Feedback
-    if (result.detailed_feedback) {
-      checkNewPage(50);
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "bold");
-      doc.text("Detailed Feedback", margin, yPos);
-      yPos += 8;
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "normal");
-      yPos = addText(result.detailed_feedback, margin + 5, yPos, contentWidth - 10, 10);
-    }
-
-    // Footer
-    const pageCount = doc.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
-      doc.text(`Generated by LUKATO AI | Page ${i} of ${pageCount}`, pageWidth / 2, 290, { align: "center" });
-      doc.setTextColor(0, 0, 0);
-    }
-
-    doc.save(`TOPIK_Writing_Report_${Date.now()}.pdf`);
+  const handleExportPDF = async () => {
+    if (!result || !pdfContentRef.current) return;
 
     toast({
-      title: "PDF 다운로드 완료!",
-      description: "파일이 다운로드되었습니다"
+      title: "PDF 생성 중...",
+      description: "잠시만 기다려주세요"
     });
+
+    try {
+      // Make the hidden content visible temporarily
+      const pdfElement = pdfContentRef.current;
+      pdfElement.style.display = 'block';
+      pdfElement.style.position = 'absolute';
+      pdfElement.style.left = '-9999px';
+      pdfElement.style.top = '0';
+      
+      // Wait for rendering
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Capture with html2canvas
+      const canvas = await html2canvas(pdfElement, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+      
+      // Hide the element again
+      pdfElement.style.display = 'none';
+      
+      // Create PDF from canvas
+      const imgData = canvas.toDataURL('image/png');
+      const doc = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      
+      // Calculate dimensions
+      const imgWidth = pageWidth - 20; // 10mm margin on each side
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      let heightLeft = imgHeight;
+      let position = 10; // Top margin
+      
+      // Add first page
+      doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+      heightLeft -= (pageHeight - 20);
+      
+      // Add additional pages if content is longer
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight + 10;
+        doc.addPage();
+        doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= (pageHeight - 20);
+      }
+      
+      doc.save(`TOPIK_Writing_Report_${Date.now()}.pdf`);
+
+      toast({
+        title: "PDF 다운로드 완료!",
+        description: "파일이 다운로드되었습니다"
+      });
+    } catch (error) {
+      console.error('PDF export error:', error);
+      toast({
+        title: "PDF 생성 실패",
+        description: "다시 시도해주세요",
+        variant: "destructive"
+      });
+    }
   };
 
   const formatTimeRemaining = (targetDate: Date) => {
@@ -1722,6 +1634,126 @@ const WritingCorrection = () => {
           )}
         </motion.div>
       </main>
+      
+      {/* Hidden PDF Content for Export */}
+      {result && (
+        <div
+          ref={pdfContentRef}
+          style={{ display: 'none', width: '800px', fontFamily: 'sans-serif' }}
+          className="bg-white text-black p-8"
+        >
+          {/* Header */}
+          <div className="text-center mb-8 border-b-2 border-gray-200 pb-6">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              TOPIK Writing Correction Report
+            </h1>
+            <p className="text-gray-600">LUKATO AI - topikbot.kr</p>
+          </div>
+          
+          {/* Score Section */}
+          <div className="border-2 border-gray-300 rounded-lg p-6 mb-8">
+            <h2 className="text-2xl font-bold text-center text-gray-900 mb-4">
+              Overall Score: {result.overall_score}/100
+            </h2>
+            <div className="grid grid-cols-4 gap-4 text-center">
+              <div>
+                <p className="text-gray-600 text-sm">Grammar</p>
+                <p className="text-xl font-bold text-gray-900">{result.grammar_score}/25</p>
+              </div>
+              <div>
+                <p className="text-gray-600 text-sm">Vocabulary</p>
+                <p className="text-xl font-bold text-gray-900">{result.vocabulary_score}/25</p>
+              </div>
+              <div>
+                <p className="text-gray-600 text-sm">Structure</p>
+                <p className="text-xl font-bold text-gray-900">{result.structure_score}/25</p>
+              </div>
+              <div>
+                <p className="text-gray-600 text-sm">Content</p>
+                <p className="text-xl font-bold text-gray-900">{result.content_score}/25</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Strengths */}
+          <div className="mb-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-200 pb-2">
+              Strengths
+            </h3>
+            <ul className="space-y-2">
+              {result.strengths.map((s, i) => (
+                <li key={i} className="text-gray-700 pl-4 relative">
+                  <span className="absolute left-0">-</span> {cleanMarkdown(s)}
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          {/* Areas for Improvement */}
+          <div className="mb-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-200 pb-2">
+              Areas for Improvement
+            </h3>
+            <ul className="space-y-2">
+              {result.improvements.map((imp, i) => (
+                <li key={i} className="text-gray-700 pl-4 relative">
+                  <span className="absolute left-0">-</span> {cleanMarkdown(imp)}
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          {/* Corrections */}
+          {result.corrections.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-200 pb-2">
+                Corrections
+              </h3>
+              <div className="space-y-4">
+                {result.corrections.slice(0, 10).map((c, i) => (
+                  <div key={i} className="bg-gray-50 p-3 rounded">
+                    <p className="text-red-600 mb-1">
+                      <span className="font-medium">Original:</span> {cleanMarkdown(c.original)}
+                    </p>
+                    <p className="text-green-600 mb-1">
+                      <span className="font-medium">Corrected:</span> {cleanMarkdown(c.corrected)}
+                    </p>
+                    <p className="text-gray-500 text-sm">{cleanMarkdown(c.explanation)}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Model Answer */}
+          <div className="mb-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-200 pb-2">
+              Model Answer
+            </h3>
+            <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+              {cleanMarkdown(result.model_answer)}
+            </p>
+          </div>
+          
+          {/* Detailed Feedback */}
+          {result.detailed_feedback && (
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-200 pb-2">
+                Detailed Feedback
+              </h3>
+              <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                {cleanMarkdown(result.detailed_feedback)}
+              </p>
+            </div>
+          )}
+          
+          {/* Footer */}
+          <div className="text-center text-gray-400 text-sm mt-8 pt-4 border-t border-gray-200">
+            Generated by LUKATO AI | topikbot.kr
+          </div>
+        </div>
+      )}
+      
       <AppFooter />
     </div>
   );
