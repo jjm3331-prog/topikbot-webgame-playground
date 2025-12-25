@@ -65,8 +65,8 @@ const ListeningExercise = ({ questions, onComplete }: ListeningExerciseProps) =>
           },
           body: JSON.stringify({ 
             text: currentQuestion.korean,
-            voice: "nova",
-            speed: playCount === 0 ? 0.9 : 0.7 // Slower on repeat
+            voice: "nova", // OpenAI TTS HD - most natural Korean voice
+            speed: playCount === 0 ? 1.0 : 0.85 // Normal speed first, slower on repeat
           }),
         }
       );

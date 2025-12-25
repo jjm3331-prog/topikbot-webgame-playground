@@ -187,8 +187,8 @@ const ListeningPractice = () => {
         setIsLoading(true);
         if (lineIndex !== undefined) setCurrentPlayingLine(lineIndex);
         
-        // Daniel for male voice, Sarah for female voice
-        const voiceId = isMale ? "onwK4e9ZLuTAKqWW03F9" : "EXAVITQu4vr4xnSDxMaL";
+        // OpenAI TTS HD voices: onyx for male, nova for female (most natural Korean)
+        const voice = isMale ? "onyx" : "nova";
         
         const response = await fetch(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/korean-tts`,
@@ -198,7 +198,7 @@ const ListeningPractice = () => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
             },
-            body: JSON.stringify({ text, speed: ttsSpeed, voiceId }),
+            body: JSON.stringify({ text, speed: ttsSpeed, voice }),
           }
         );
 
