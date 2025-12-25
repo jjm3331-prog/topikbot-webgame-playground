@@ -104,3 +104,6 @@ verify_jwt = false
 
 [functions.grammar-content]
 verify_jwt = false
+
+[functions.chain-validate]
+verify_jwt = false
