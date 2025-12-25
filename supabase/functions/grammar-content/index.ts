@@ -10,6 +10,15 @@ const corsHeaders = {
 type TopikLevel = "1-2" | "3-4" | "5-6";
 type GrammarType = "assembly" | "battle" | "correction";
 
+// 캐싱용 시스템 프롬프트 (고정)
+const SYSTEM_PROMPT_BASE = `당신은 한국어(TOPIK) 문법 교육 전문가입니다.
+사용자: 베트남인 학습자.
+
+규칙:
+- 출력은 오직 JSON 하나만 (마크다운 금지)
+- 베트남어는 번역투 금지, 자연스러운 네이티브 표현
+- 난이도는 TOPIK 레벨에 엄격히 맞출 것`;
+
 const TOPIK_GRAMMAR_GUIDELINES: Record<TopikLevel, string> = {
   "1-2": `초급 문법 (TOPIK I):
 - 기본 조사: 은/는, 이/가, 을/를, 에, 에서, 로/으로
@@ -97,7 +106,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 캐시 확인
+    // 캐시 확인 (4시간 유효)
     const cacheKey = `grammar_${safeLevel}_${safeType}_${safeCount}`;
     const { data: cached } = await supabase
       .from("ai_response_cache")
@@ -115,17 +124,11 @@ serve(async (req) => {
       });
     }
 
-    // Lovable AI (Gemini 2.5 Flash)
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+    // Gemini 2.5 Flash 직접 호출
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not configured");
 
-    const systemPrompt = `당신은 한국어(TOPIK) 문법 교육 전문가입니다.
-사용자: 베트남인 학습자.
-
-규칙:
-- 출력은 오직 JSON 하나만 (마크다운 금지)
-- 베트남어는 번역투 금지, 자연스러운 네이티브 표현
-- 난이도는 TOPIK ${safeLevel}급에 엄격히 맞출 것
+    const systemPrompt = `${SYSTEM_PROMPT_BASE}
 
 ${TOPIK_GRAMMAR_GUIDELINES[safeLevel]}`;
 
@@ -134,42 +137,48 @@ ${TOPIK_GRAMMAR_GUIDELINES[safeLevel]}`;
 생성 개수: ${safeCount}
 반드시 {"questions": [...]} 형태의 JSON 객체로 반환하세요.`;
 
-    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        temperature: safeLevel === "5-6" ? 0.6 : 0.8,
-      }),
-    });
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          generationConfig: {
+            temperature: safeLevel === "5-6" ? 0.6 : 0.8,
+            maxOutputTokens: 8192,
+            responseMimeType: "application/json",
+          },
+        }),
+      }
+    );
 
     if (!resp.ok) {
       const t = await resp.text().catch(() => "");
-      console.error("[Grammar] Lovable AI error:", resp.status, t);
-      throw new Error(`AI API error: ${resp.status}`);
+      console.error("[Grammar] Gemini API error:", resp.status, t);
+      throw new Error(`Gemini API error: ${resp.status}`);
     }
 
     const aiData = await resp.json();
-    const content = aiData.choices?.[0]?.message?.content || "";
-    const jsonStr = safeExtractJsonObject(content);
-    if (!jsonStr) throw new Error("Failed to parse AI response as JSON object");
+    const content = aiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    
+    let parsed;
+    try {
+      parsed = JSON.parse(content);
+    } catch {
+      const jsonStr = safeExtractJsonObject(content);
+      if (!jsonStr) throw new Error("Failed to parse AI response as JSON object");
+      parsed = JSON.parse(jsonStr);
+    }
 
-    const parsed = JSON.parse(jsonStr);
-
-    // 캐시 저장
+    // 캐시 저장 (4시간 유효)
     await supabase.from("ai_response_cache").insert({
       cache_key: cacheKey,
       function_name: "grammar-content",
       request_params: { level: safeLevel, type: safeType, count: safeCount },
       response: parsed,
-      expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+      expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
     });
 
     return new Response(JSON.stringify(parsed), {

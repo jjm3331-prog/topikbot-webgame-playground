@@ -28,41 +28,19 @@ type QuizQuestion = {
   example_translation: string;
 };
 
-function safeExtractJsonObject(raw: string): string | null {
-  const m = raw.match(/\{[\s\S]*\}/);
-  return m?.[0] ?? null;
-}
-
-async function generateQuizWithLovableAI({
-  difficulty,
-  usedExpressions,
-}: {
-  difficulty: Difficulty;
-  usedExpressions: string[];
-}): Promise<QuizQuestion> {
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
-
-  const difficultyGuide =
-    difficulty === "easy"
-      ? "쉬운 관용어/속담"
-      : difficulty === "medium"
-      ? "중급 관용어/속담"
-      : "고급/신조어/인터넷 용어";
-
-  const systemPrompt = `당신은 한국어 관용어/속담/유행어 전문가입니다.
+// 캐싱용 시스템 프롬프트 (고정)
+const SYSTEM_PROMPT_BASE = `당신은 한국어 관용어/속담/유행어 전문가입니다.
 사용자: 베트남인 학습자
 
 규칙:
 1. 출력은 오직 JSON 하나만 (마크다운 금지)
 2. 베트남어는 번역투 금지, 네이티브 표현
-3. 난이도: ${difficultyGuide}
 
 JSON 스키마:
 {
   "expression": "한국어 표현",
   "type": "idiom" | "proverb" | "slang" | "internet",
-  "difficulty": "${difficulty}",
+  "difficulty": "easy" | "medium" | "hard",
   "hint_ko": "힌트 (한국어)",
   "hint_vi": "Gợi ý (tiếng Việt)",
   "correct_answer_ko": "정답 뜻 (한국어)",
@@ -80,39 +58,73 @@ JSON 스키마:
   "example_translation": "Câu ví dụ (tiếng Việt)"
 }`;
 
+function safeExtractJsonObject(raw: string): string | null {
+  const m = raw.match(/\{[\s\S]*\}/);
+  return m?.[0] ?? null;
+}
+
+async function generateQuizWithGemini({
+  difficulty,
+  usedExpressions,
+}: {
+  difficulty: Difficulty;
+  usedExpressions: string[];
+}): Promise<QuizQuestion> {
+  const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+  if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not configured");
+
+  const difficultyGuide =
+    difficulty === "easy"
+      ? "쉬운 관용어/속담"
+      : difficulty === "medium"
+      ? "중급 관용어/속담"
+      : "고급/신조어/인터넷 용어";
+
+  const systemPrompt = `${SYSTEM_PROMPT_BASE}
+
+난이도: ${difficultyGuide}`;
+
   const userPrompt = `새로운 한국어 ${difficultyGuide} 퀴즈 1개를 JSON으로 생성하세요.
 
 다음 표현들은 이미 사용되었으니 제외하세요:
 ${usedExpressions.slice(-100).join("\n") || "(없음)"}`;
 
-  const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${LOVABLE_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      temperature: 0.9,
-    }),
-  });
+  const resp = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        generationConfig: {
+          temperature: 0.9,
+          maxOutputTokens: 2048,
+          responseMimeType: "application/json",
+        },
+      }),
+    }
+  );
 
   if (!resp.ok) {
     const t = await resp.text().catch(() => "");
-    console.error("[Idiom] Lovable AI error:", resp.status, t);
-    throw new Error(`AI error: ${resp.status}`);
+    console.error("[Idiom] Gemini API error:", resp.status, t);
+    throw new Error(`Gemini API error: ${resp.status}`);
   }
 
   const aiData = await resp.json();
-  const content = aiData.choices?.[0]?.message?.content || "";
-  const jsonStr = safeExtractJsonObject(content);
-  if (!jsonStr) throw new Error("Failed to parse quiz JSON");
+  const content = aiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  
+  let quiz;
+  try {
+    quiz = JSON.parse(content);
+  } catch {
+    const jsonStr = safeExtractJsonObject(content);
+    if (!jsonStr) throw new Error("Failed to parse quiz JSON");
+    quiz = JSON.parse(jsonStr);
+  }
 
-  return JSON.parse(jsonStr) as QuizQuestion;
+  return quiz as QuizQuestion;
 }
 
 serve(async (req) => {
@@ -147,8 +159,8 @@ serve(async (req) => {
       usedExpressions = history?.map((h: any) => h.expression) || [];
     }
 
-    // 2) LLM으로 퀴즈 생성
-    const quiz = await generateQuizWithLovableAI({ difficulty, usedExpressions });
+    // 2) Gemini 2.5 Flash로 퀴즈 생성
+    const quiz = await generateQuizWithGemini({ difficulty, usedExpressions });
 
     // 3) 사용 기록 저장
     if (userId) {

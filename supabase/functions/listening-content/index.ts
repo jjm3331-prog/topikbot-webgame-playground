@@ -7,7 +7,27 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// TOPIK 급수별 어휘/문법 가이드라인
+// TOPIK 급수별 어휘/문법 가이드라인 (캐싱용 시스템 프롬프트)
+const SYSTEM_PROMPT_BASE = `당신은 한국어 TOPIK 시험 전문가입니다.
+사용자: 베트남인 학습자
+
+[엄격한 규칙]
+1. 출력은 오직 JSON 배열만 (마크다운 금지)
+2. 베트남어 설명은 번역투 금지, 네이티브 표현
+3. 난이도를 정확히 맞출 것
+
+[JSON 스키마]
+{
+  "type": "dialogue" | "single",
+  "speaker1Text": "첫 번째 화자 대사 (한국어)",
+  "speaker2Text": "두 번째 화자 대사 (dialogue만, 한국어)",
+  "question": "질문 (한국어)",
+  "options": ["선택지1", "선택지2", "선택지3", "선택지4"],
+  "answer": 0,
+  "explanation": "왜 정답인지 설명 (한국어)",
+  "explanationVi": "Giải thích (tiếng Việt tự nhiên)"
+}`;
+
 const TOPIK_LEVEL_GUIDELINES: Record<string, string> = {
   "1-2": `[TOPIK 1-2급 듣기 가이드라인]
 어휘: 기초 어휘 800~1500개 범위 (가족, 음식, 날씨, 시간, 장소)
@@ -36,73 +56,61 @@ interface Question {
   explanationVi: string;
 }
 
-// Lovable AI Gateway로 듣기 문제 생성 (Gemini 2.5 Flash)
+// Gemini 2.5 Flash 직접 호출 (Context Caching 적용)
 async function generateListeningQuestions(
   count: number,
   topikLevel: string
 ): Promise<Question[]> {
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  if (!LOVABLE_API_KEY) {
-    throw new Error("LOVABLE_API_KEY not configured");
+  const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+  if (!GEMINI_API_KEY) {
+    throw new Error("GEMINI_API_KEY not configured");
   }
 
-  const systemPrompt = `당신은 한국어 TOPIK 시험 전문가입니다.
-사용자: 베트남인 학습자
-
-[엄격한 규칙]
-1. 출력은 오직 JSON 배열만 (마크다운 금지)
-2. 베트남어 설명은 번역투 금지, 네이티브 표현
-3. 난이도를 정확히 맞출 것 (TOPIK ${topikLevel}급)
-
-${TOPIK_LEVEL_GUIDELINES[topikLevel] || TOPIK_LEVEL_GUIDELINES["1-2"]}
-
-[JSON 스키마]
-{
-  "type": "dialogue" | "single",
-  "speaker1Text": "첫 번째 화자 대사 (한국어)",
-  "speaker2Text": "두 번째 화자 대사 (dialogue만, 한국어)",
-  "question": "질문 (한국어)",
-  "options": ["선택지1", "선택지2", "선택지3", "선택지4"],
-  "answer": 0,  // 정답 인덱스 (0~3)
-  "explanation": "왜 정답인지 설명 (한국어)",
-  "explanationVi": "Giải thích (tiếng Việt tự nhiên)"
-}`;
+  const levelGuideline = TOPIK_LEVEL_GUIDELINES[topikLevel] || TOPIK_LEVEL_GUIDELINES["1-2"];
+  const systemPrompt = `${SYSTEM_PROMPT_BASE}\n\n${levelGuideline}`;
 
   const userPrompt = `TOPIK ${topikLevel}급 수준으로 ${count}개의 듣기 문제를 JSON 배열로 생성하세요.
 dialogue(대화형)과 single(발표/안내형)을 적절히 섞어주세요.
 반드시 ${topikLevel}급에 맞는 어휘와 문법만 사용하세요.`;
 
-  console.log(`[Listening] Calling Lovable AI for ${count} questions, TOPIK ${topikLevel}`);
+  console.log(`[Listening] Calling Gemini 2.5 Flash for ${count} questions, TOPIK ${topikLevel}`);
 
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${LOVABLE_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt }
-      ],
-      temperature: 0.7,
-    }),
-  });
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 8192,
+          responseMimeType: "application/json",
+        },
+        // Context Caching: cachedContent 자동 활성화 (Gemini API 서버측 캐싱)
+      }),
+    }
+  );
 
   if (!response.ok) {
     const errText = await response.text();
-    console.error("[Listening] Lovable AI error:", response.status, errText);
-    throw new Error(`Lovable AI error: ${response.status}`);
+    console.error("[Listening] Gemini API error:", response.status, errText);
+    throw new Error(`Gemini API error: ${response.status}`);
   }
 
   const data = await response.json();
-  const content = data.choices?.[0]?.message?.content || '';
+  const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
   
   // JSON 파싱
-  const jsonMatch = content.match(/\[[\s\S]*\]/);
-  if (jsonMatch) {
-    return JSON.parse(jsonMatch[0]);
+  try {
+    const parsed = JSON.parse(content);
+    return Array.isArray(parsed) ? parsed : parsed.questions || [];
+  } catch {
+    const jsonMatch = content.match(/\[[\s\S]*\]/);
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0]);
+    }
   }
   
   return [];
@@ -145,7 +153,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 캐시 확인
+    // 캐시 확인 (4시간 유효 - 비용 절감)
     const cacheKey = `listening_${topikLevel}_${count}`;
     const { data: cached } = await supabase
       .from('ai_response_cache')
@@ -172,7 +180,7 @@ serve(async (req) => {
 
     console.log(`[Listening] Generating ${count} questions for TOPIK ${topikLevel}`);
 
-    // Lovable AI(Gemini 2.5 Flash)로 문제 생성
+    // Gemini 2.5 Flash로 문제 생성
     const generatedQuestions = await generateListeningQuestions(count, topikLevel);
     console.log(`[Listening] Generated ${generatedQuestions.length} questions`);
 
@@ -183,8 +191,8 @@ serve(async (req) => {
       finalQuestions = [...finalQuestions, ...additional];
     }
 
-    // 캐시에 저장 (1시간 유효)
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+    // 캐시에 저장 (4시간 유효 - 비용 절감)
+    const expiresAt = new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString();
     await supabase.from('ai_response_cache').upsert({
       cache_key: cacheKey,
       function_name: 'listening-content',
