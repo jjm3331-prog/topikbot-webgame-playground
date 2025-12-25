@@ -91,24 +91,23 @@ export const CleanHeader = ({ isLoggedIn, username }: CleanHeaderProps) => {
 
   return (
     <>
-      <header className="sticky top-0 z-50 h-[64px] bg-background border-b border-border">
-        <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
+      <header className="sticky top-0 z-50 min-h-[56px] sm:min-h-[64px] bg-background border-b border-border safe-area-top">
+        <div className="h-full max-w-7xl mx-auto px-2 sm:px-4 md:px-6 flex items-center justify-between gap-1 sm:gap-2 py-2">
           {/* Brand */}
           <div
-            className="flex items-center gap-2.5 cursor-pointer"
+            className="flex items-center gap-1.5 sm:gap-2.5 cursor-pointer shrink-0 min-w-0"
             onClick={() => {
               setIsMenuOpen(false);
               navigate(effectiveLoggedIn ? "/dashboard" : "/");
             }}
             aria-label="Go to home"
           >
-            <span className="text-xl sm:text-2xl">🇰🇷</span>
-            <span className="font-heading font-bold text-lg sm:text-xl text-foreground whitespace-nowrap">LUKATO AI</span>
-            <span className="hidden sm:block text-card-caption text-muted-foreground">Học tiếng Hàn #1 VN</span>
+            <span className="text-base sm:text-xl md:text-2xl shrink-0">🇰🇷</span>
+            <span className="font-heading font-bold text-sm sm:text-lg md:text-xl text-foreground whitespace-nowrap">LUKATO AI</span>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0">
             <ThemeToggle />
 
             {effectiveLoggedIn ? (
@@ -136,28 +135,28 @@ export const CleanHeader = ({ isLoggedIn, username }: CleanHeaderProps) => {
                 </Button>
               </>
             ) : (
-              <Button onClick={() => navigate("/auth")} size="sm" className="h-8 sm:h-10 rounded-full text-badge sm:text-card-caption px-3 sm:px-4">
-                <LogIn className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="ml-1.5">Đăng nhập</span>
+              <Button onClick={() => navigate("/auth")} size="sm" className="h-7 sm:h-8 md:h-10 rounded-full text-[11px] sm:text-xs md:text-sm px-2 sm:px-3 md:px-4">
+                <LogIn className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 shrink-0" />
+                <span className="ml-1 sm:ml-1.5 whitespace-nowrap">Đăng nhập</span>
               </Button>
             )}
 
-            {/* Menu button (THPT AI 스타일) */}
+            {/* Menu button */}
             <Button
               variant="ghost"
               onClick={() => setIsMenuOpen((v) => !v)}
-              className="h-10 rounded-full px-3 gap-2"
+              className="h-7 sm:h-8 md:h-10 rounded-full px-2 sm:px-3 gap-1 sm:gap-2"
               aria-expanded={isMenuOpen}
               aria-label="Open menu"
             >
-              <Menu className="w-4 h-4" />
-              <span className="hidden sm:inline">Menu</span>
+              <Menu className="w-4 h-4 shrink-0" />
+              <span className="hidden md:inline text-sm">Menu</span>
               <motion.span
                 animate={{ rotate: isMenuOpen ? 180 : 0 }}
                 transition={{ duration: 0.18 }}
-                className="inline-flex"
+                className="hidden sm:inline-flex"
               >
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </motion.span>
             </Button>
           </div>
