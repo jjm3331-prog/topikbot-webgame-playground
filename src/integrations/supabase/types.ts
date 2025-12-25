@@ -281,6 +281,42 @@ export type Database = {
           },
         ]
       }
+      chain_reaction_moves: {
+        Row: {
+          chain_length: number
+          connection_mode: string
+          created_at: string
+          id: string
+          player_id: string
+          player_name: string
+          room_id: string
+          score_delta: number
+          word: string
+        }
+        Insert: {
+          chain_length?: number
+          connection_mode?: string
+          created_at?: string
+          id?: string
+          player_id: string
+          player_name: string
+          room_id: string
+          score_delta?: number
+          word: string
+        }
+        Update: {
+          chain_length?: number
+          connection_mode?: string
+          created_at?: string
+          id?: string
+          player_id?: string
+          player_name?: string
+          room_id?: string
+          score_delta?: number
+          word?: string
+        }
+        Relationships: []
+      }
       chain_reaction_rooms: {
         Row: {
           connection_mode: string
