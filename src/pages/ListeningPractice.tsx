@@ -181,11 +181,14 @@ const ListeningPractice = () => {
 
   const currentQuestion = listeningQuestions[currentQuestionIndex];
 
-  const playTTS = async (text: string, lineIndex?: number): Promise<void> => {
+  const playTTS = async (text: string, lineIndex?: number, isMale?: boolean): Promise<void> => {
     return new Promise(async (resolve, reject) => {
       try {
         setIsLoading(true);
         if (lineIndex !== undefined) setCurrentPlayingLine(lineIndex);
+        
+        // Daniel for male voice, Sarah for female voice
+        const voiceId = isMale ? "onwK4e9ZLuTAKqWW03F9" : "EXAVITQu4vr4xnSDxMaL";
         
         const response = await fetch(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/korean-tts`,
@@ -195,7 +198,7 @@ const ListeningPractice = () => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
             },
-            body: JSON.stringify({ text, speed: ttsSpeed }),
+            body: JSON.stringify({ text, speed: ttsSpeed, voiceId }),
           }
         );
 
@@ -245,15 +248,17 @@ const ListeningPractice = () => {
     
     if (currentQuestion.type === "dialogue") {
       if (currentQuestion.speaker1Text) {
-        await playTTS(currentQuestion.speaker1Text, 0);
+        // Speaker 1 is male (Daniel)
+        await playTTS(currentQuestion.speaker1Text, 0, true);
         // 1초 대기 (대화자 간 자연스러운 텀)
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
       if (currentQuestion.speaker2Text) {
-        await playTTS(currentQuestion.speaker2Text, 1);
+        // Speaker 2 is female (Sarah)
+        await playTTS(currentQuestion.speaker2Text, 1, false);
       }
     } else if (currentQuestion.singleText) {
-      await playTTS(currentQuestion.singleText, 0);
+      await playTTS(currentQuestion.singleText, 0, false);
     }
   };
 
@@ -587,7 +592,7 @@ const ListeningPractice = () => {
                         <>
                           {/* Speaker 1 */}
                           <motion.button
-                            onClick={() => currentQuestion.speaker1Text && playTTS(currentQuestion.speaker1Text, 0)}
+                            onClick={() => currentQuestion.speaker1Text && playTTS(currentQuestion.speaker1Text, 0, true)}
                             disabled={isPlaying || isLoading}
                             whileHover={{ scale: 1.01 }}
                             whileTap={{ scale: 0.99 }}
@@ -621,7 +626,7 @@ const ListeningPractice = () => {
 
                           {/* Speaker 2 */}
                           <motion.button
-                            onClick={() => currentQuestion.speaker2Text && playTTS(currentQuestion.speaker2Text, 1)}
+                            onClick={() => currentQuestion.speaker2Text && playTTS(currentQuestion.speaker2Text, 1, false)}
                             disabled={isPlaying || isLoading}
                             whileHover={{ scale: 1.01 }}
                             whileTap={{ scale: 0.99 }}
@@ -656,7 +661,7 @@ const ListeningPractice = () => {
                       ) : (
                         /* Single speaker */
                         <motion.button
-                          onClick={() => currentQuestion.singleText && playTTS(currentQuestion.singleText, 0)}
+                          onClick={() => currentQuestion.singleText && playTTS(currentQuestion.singleText, 0, false)}
                           disabled={isPlaying || isLoading}
                           whileHover={{ scale: 1.01 }}
                           whileTap={{ scale: 0.99 }}
