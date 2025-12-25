@@ -836,19 +836,22 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
   // Copy URL
   const copyRoomUrl = () => {
-    if (room?.room_code) {
-      const url = `https://game.topikbot.kr/#/vocabulary?mode=multiplayer&room=${room.room_code}`;
-      navigator.clipboard.writeText(url);
-      setCopied(true);
-      toast({ title: "🔗 Đã sao chép link!" });
-      setTimeout(() => setCopied(false), 2000);
-    }
+    if (!room?.room_code) return;
+
+    // Use current origin so the link works in preview + production.
+    // Hash route is required in our deployment.
+    const url = `${window.location.origin}/#/battle?game=word-chain&room=${room.room_code}`;
+
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    toast({ title: "🔗 Đã sao chép link!" });
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const shareRoom = async () => {
     if (!room?.room_code) return;
 
-    const url = `https://game.topikbot.kr/#/vocabulary?mode=multiplayer&room=${room.room_code}`;
+    const url = `${window.location.origin}/#/battle?game=word-chain&room=${room.room_code}`;
     const shareData = {
       title: "Nối từ 1:1",
       text: `🎮 Chơi nối từ với mình nhé! Mã phòng: ${room.room_code}`,
