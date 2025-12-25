@@ -544,12 +544,22 @@ const Vocabulary = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [gameComplete, setGameComplete] = useState(false);
   const [gameResult, setGameResult] = useState<any>(null);
+  
+  // 이전에 학습한 단어들을 추적 (세션 동안 유지)
+  const [learnedWords, setLearnedWords] = useState<Record<TopikLevel, string[]>>({
+    "1-2": [],
+    "3-4": [],
+    "5-6": [],
+  });
+  const [sessionId] = useState(() => crypto.randomUUID());
 
   // Fetch vocabulary words
-  const fetchWords = useCallback(async (level: TopikLevel) => {
+  const fetchWords = useCallback(async (level: TopikLevel, forceNew = false) => {
     setIsLoading(true);
     setGameComplete(false);
     setGameResult(null);
+    
+    const excludeWords = learnedWords[level] || [];
     
     try {
       const response = await fetch(
@@ -557,7 +567,13 @@ const Vocabulary = () => {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ count: 12, topikLevel: level }),
+          body: JSON.stringify({ 
+            count: 12, 
+            topikLevel: level,
+            sessionId,
+            excludeWords,
+            forceNew: forceNew || excludeWords.length > 0,
+          }),
         }
       );
       
@@ -567,7 +583,13 @@ const Vocabulary = () => {
       
       if (data.success && data.words?.length > 0) {
         setWords(data.words);
-        console.log(`✅ Loaded ${data.words.length} words for TOPIK ${level}`);
+        // 새로 받은 단어들을 학습 기록에 추가
+        const newKoreanWords = data.words.map((w: Word) => w.korean);
+        setLearnedWords(prev => ({
+          ...prev,
+          [level]: [...prev[level], ...newKoreanWords],
+        }));
+        console.log(`✅ Loaded ${data.words.length} NEW words for TOPIK ${level} (excluded ${excludeWords.length})`);
       } else {
         // Fallback words
         setWords(getFallbackWords(level));
@@ -578,7 +600,7 @@ const Vocabulary = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [learnedWords, sessionId]);
 
   // Fallback words by level
   const getFallbackWords = (level: TopikLevel): Word[] => {
@@ -693,7 +715,13 @@ const Vocabulary = () => {
   const handleRestart = () => {
     setGameComplete(false);
     setGameResult(null);
-    fetchWords(topikLevel);
+    // 다시 하기는 현재 단어 유지 (새 단어 로드 안함)
+  };
+  
+  const handleNewWords = () => {
+    setGameComplete(false);
+    setGameResult(null);
+    fetchWords(topikLevel, true); // forceNew = true로 항상 새 단어 생성
   };
 
   return (
@@ -858,7 +886,7 @@ const Vocabulary = () => {
                     <RotateCcw className="w-4 h-4 mr-2" />
                     다시 하기
                   </Button>
-                  <Button onClick={() => fetchWords(topikLevel)}>
+                  <Button onClick={handleNewWords}>
                     <RefreshCw className="w-4 h-4 mr-2" />
                     새 단어
                   </Button>
