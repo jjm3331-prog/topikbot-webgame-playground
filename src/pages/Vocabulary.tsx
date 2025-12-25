@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import CleanHeader from "@/components/CleanHeader";
@@ -553,13 +553,19 @@ const Vocabulary = () => {
   });
   const [sessionId] = useState(() => crypto.randomUUID());
 
+  // Ref to track learned words without causing re-renders
+  const learnedWordsRef = useRef(learnedWords);
+  useEffect(() => {
+    learnedWordsRef.current = learnedWords;
+  }, [learnedWords]);
+
   // Fetch vocabulary words
   const fetchWords = useCallback(async (level: TopikLevel, forceNew = false) => {
     setIsLoading(true);
     setGameComplete(false);
     setGameResult(null);
     
-    const excludeWords = learnedWords[level] || [];
+    const excludeWords = learnedWordsRef.current[level] || [];
     
     try {
       const response = await fetch(
@@ -600,7 +606,7 @@ const Vocabulary = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [learnedWords, sessionId]);
+  }, [sessionId]);
 
   // Fallback words by level
   const getFallbackWords = (level: TopikLevel): Word[] => {
@@ -661,7 +667,7 @@ const Vocabulary = () => {
 
   useEffect(() => {
     fetchWords(topikLevel);
-  }, [topikLevel, fetchWords]);
+  }, [topikLevel]);
 
   const handleLevelChange = (level: TopikLevel) => {
     setTopikLevel(level);
