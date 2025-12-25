@@ -44,29 +44,61 @@ interface Monster {
   hp: number; // 보스용
 }
 
-type GameState = "menu" | "playing" | "gameover" | "victory";
+type GameState = "menu" | "tutorial" | "playing" | "gameover" | "victory";
 
-// 스테이지별 설정
+// 스테이지별 설정 - 속도 느리게 조정
 const STAGE_CONFIG = {
   "1-2": {
     name: { vi: "Sơ cấp", ko: "초급" },
-    monsterSpeed: 15, // 기본 속도 (초당 %)
-    timePerMonster: 5, // 초
+    monsterSpeed: 8, // 느린 속도 (초당 %)
+    timePerMonster: 8, // 초
     totalQuestions: 10,
   },
   "3-4": {
     name: { vi: "Trung cấp", ko: "중급" },
-    monsterSpeed: 20,
-    timePerMonster: 4,
+    monsterSpeed: 10,
+    timePerMonster: 6,
     totalQuestions: 10,
   },
   "5-6": {
     name: { vi: "Cao cấp", ko: "고급" },
-    monsterSpeed: 25,
-    timePerMonster: 3,
+    monsterSpeed: 12,
+    timePerMonster: 5,
     totalQuestions: 10,
   },
 };
+
+// 튜토리얼 스텝
+const TUTORIAL_STEPS = [
+  {
+    icon: "👾",
+    titleVi: "Quái vật xuất hiện!",
+    titleKo: "몬스터 등장!",
+    descVi: "Câu có lỗi ngữ pháp sẽ xuất hiện và di chuyển về phía tháp của bạn.",
+    descKo: "문법 오류가 있는 문장이 나타나 기지로 다가옵니다.",
+  },
+  {
+    icon: "🎯",
+    titleVi: "Chọn đáp án đúng",
+    titleKo: "정답 선택",
+    descVi: "Nhấn vào đáp án đúng để tiêu diệt quái vật trước khi nó đến tháp!",
+    descKo: "정답을 터치해서 몬스터가 기지에 도달하기 전에 격파하세요!",
+  },
+  {
+    icon: "❤️",
+    titleVi: "Bảo vệ HP",
+    titleKo: "HP 보호",
+    descVi: "Bạn có 3 HP. Nếu quái vật đến tháp hoặc bạn chọn sai, mất 1 HP!",
+    descKo: "HP는 3개입니다. 몬스터가 도착하거나 오답 시 HP -1!",
+  },
+  {
+    icon: "⭐",
+    titleVi: "Nhận sao thưởng",
+    titleKo: "별 획득",
+    descVi: "Hoàn thành 10 câu để chiến thắng! Không mất HP = 3 sao!",
+    descKo: "10문제를 클리어하면 승리! 노데미지 = 3스타!",
+  },
+];
 
 // Fallback 문제들
 const FALLBACK_QUESTIONS: Record<TopikLevel, TowerQuestion[]> = {
@@ -389,6 +421,7 @@ const MONSTER_EMOJI: Record<Monster["type"], string> = {
 
 export default function TowerDefenseGame({ level }: { level: TopikLevel }) {
   const [gameState, setGameState] = useState<GameState>("menu");
+  const [tutorialStep, setTutorialStep] = useState(0);
   const [hp, setHp] = useState(3);
   const [gold, setGold] = useState(0);
   const [combo, setCombo] = useState(0);
@@ -406,6 +439,41 @@ export default function TowerDefenseGame({ level }: { level: TopikLevel }) {
   const lastTimeRef = useRef<number>(0);
 
   const config = STAGE_CONFIG[level];
+
+  // 튜토리얼 완료 여부 확인
+  const hasSenTutorial = () => {
+    return localStorage.getItem("tower_defense_tutorial_done") === "true";
+  };
+
+  const markTutorialDone = () => {
+    localStorage.setItem("tower_defense_tutorial_done", "true");
+  };
+
+  // 시작 버튼 클릭
+  const handleStartClick = () => {
+    if (hasSenTutorial()) {
+      startGame();
+    } else {
+      setTutorialStep(0);
+      setGameState("tutorial");
+    }
+  };
+
+  // 튜토리얼 다음
+  const handleTutorialNext = () => {
+    if (tutorialStep < TUTORIAL_STEPS.length - 1) {
+      setTutorialStep((prev) => prev + 1);
+    } else {
+      markTutorialDone();
+      startGame();
+    }
+  };
+
+  // 튜토리얼 스킵
+  const handleTutorialSkip = () => {
+    markTutorialDone();
+    startGame();
+  };
 
   // Fetch questions from API or use fallback
   const fetchQuestions = useCallback(async () => {
@@ -621,21 +689,67 @@ export default function TowerDefenseGame({ level }: { level: TopikLevel }) {
   // Menu
   if (gameState === "menu") {
     return (
-      <Card className="p-8 text-center">
-        <Shield className="w-16 h-16 mx-auto mb-4 text-primary" />
-        <h2 className="text-2xl font-bold mb-2">Bảo vệ tháp / 타워 디펜스</h2>
-        <p className="text-muted-foreground mb-2">
+      <Card className="p-6 text-center">
+        <Shield className="w-14 h-14 mx-auto mb-3 text-primary" />
+        <h2 className="text-xl font-bold mb-2">Bảo vệ tháp / 타워 디펜스</h2>
+        <p className="text-muted-foreground mb-2 text-sm">
           {config.name.vi} ({config.name.ko})
         </p>
-        <div className="text-sm text-muted-foreground mb-6 space-y-1">
-          <p>🎯 Câu sai sẽ tiến về tháp / 틀린 문장이 기지로 다가옵니다</p>
-          <p>✅ Chọn đáp án đúng để tiêu diệt / 올바른 답을 골라 격파하세요</p>
-          <p>❤️ HP: 3 | 💰 Mỗi đáp án đúng: +10G</p>
+        <div className="text-xs text-muted-foreground mb-4 space-y-1">
+          <p>🎯 Câu sai tiến về tháp → Chọn đáp án đúng để tiêu diệt!</p>
+          <p>❤️ HP: 3 | 💰 Đúng: +10G | ⭐ No damage = 3 sao</p>
         </div>
-        <Button onClick={startGame} size="lg" className="gap-2">
+        <Button onClick={handleStartClick} size="lg" className="gap-2">
           <Target className="w-5 h-5" />
           Bắt đầu / 시작하기
         </Button>
+      </Card>
+    );
+  }
+
+  // Tutorial
+  if (gameState === "tutorial") {
+    const step = TUTORIAL_STEPS[tutorialStep];
+    return (
+      <Card className="p-6 text-center">
+        <motion.div
+          key={tutorialStep}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          className="space-y-4"
+        >
+          <div className="text-5xl mb-2">{step.icon}</div>
+          <div>
+            <h3 className="text-lg font-bold">{step.titleVi}</h3>
+            <p className="text-sm text-muted-foreground">{step.titleKo}</p>
+          </div>
+          <div className="text-sm">
+            <p>{step.descVi}</p>
+            <p className="text-muted-foreground text-xs mt-1">{step.descKo}</p>
+          </div>
+
+          {/* Progress dots */}
+          <div className="flex justify-center gap-2 my-4">
+            {TUTORIAL_STEPS.map((_, i) => (
+              <div
+                key={i}
+                className={`w-2 h-2 rounded-full ${
+                  i === tutorialStep ? "bg-primary" : "bg-muted"
+                }`}
+              />
+            ))}
+          </div>
+
+          <div className="flex gap-2">
+            <Button variant="ghost" onClick={handleTutorialSkip} className="flex-1">
+              Bỏ qua / 건너뛰기
+            </Button>
+            <Button onClick={handleTutorialNext} className="flex-1">
+              {tutorialStep < TUTORIAL_STEPS.length - 1 ? "Tiếp / 다음" : "Bắt đầu! / 시작!"}
+            </Button>
+          </div>
+        </motion.div>
       </Card>
     );
   }
