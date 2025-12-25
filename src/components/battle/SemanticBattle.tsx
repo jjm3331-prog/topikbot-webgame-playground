@@ -529,19 +529,24 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
 
   const copyRoomLink = () => {
     if (!room) return;
-    const link = `https://game.topikbot.kr/#/battle?game=semantic&room=${room.room_code}`;
+    const link = `${window.location.origin}/#/battle?game=semantic&room=${room.room_code}`;
     navigator.clipboard.writeText(link);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-    toast({ title: "Link đã được copy!" });
+    toast({ title: "🔗 Đã sao chép link!" });
   };
 
   const shareRoom = async () => {
     if (!room) return;
-    const link = `https://game.topikbot.kr/#/battle?game=semantic&room=${room.room_code}`;
-    if (navigator.share) {
+    const link = `${window.location.origin}/#/battle?game=semantic&room=${room.room_code}`;
+    const shareData = {
+      title: "🧠 Đấu Nghĩa 1:1",
+      text: `Chơi đấu nghĩa với mình nhé! Mã phòng: ${room.room_code}`,
+      url: link,
+    };
+    if (navigator.share && navigator.canShare?.(shareData)) {
       try {
-        await navigator.share({ title: "🧠 Đấu Nghĩa 1:1", text: `Tham gia đấu nghĩa với tôi! Mã phòng: ${room.room_code}`, url: link });
+        await navigator.share(shareData);
       } catch (err) {}
     } else {
       copyRoomLink();
