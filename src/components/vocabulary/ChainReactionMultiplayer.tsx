@@ -62,13 +62,14 @@ type GamePhase = "menu" | "creating" | "joining" | "waiting" | "ready" | "countd
 export default function ChainReactionMultiplayer({ words, onBack, initialRoomCode }: ChainReactionMultiplayerProps) {
   const { toast } = useToast();
   const [gamePhase, setGamePhase] = useState<GamePhase>("menu");
+  const gamePhaseRef = useRef<GamePhase>("menu");
   const [room, setRoom] = useState<Room | null>(null);
   const [playerId] = useState(() => crypto.randomUUID());
   const [playerName, setPlayerName] = useState("");
   const [roomCodeInput, setRoomCodeInput] = useState(initialRoomCode || "");
   const [copied, setCopied] = useState(false);
   const [connectionMode, setConnectionMode] = useState<"semantic" | "phonetic">("semantic");
-  
+
   // Game state
   const [timeLeft, setTimeLeft] = useState(60);
   const [chain, setChain] = useState<ChainWord[]>([]);
@@ -77,11 +78,15 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   const [isValidating, setIsValidating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(3);
-  
+
   const inputRef = useRef<HTMLInputElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const channelRef = useRef<any>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+
+  useEffect(() => {
+    gamePhaseRef.current = gamePhase;
+  }, [gamePhase]);
 
   const isHost = room?.host_id === playerId;
 
@@ -397,33 +402,39 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       .on(
         "postgres_changes",
         {
-          event: "UPDATE",
+          event: "*",
           schema: "public",
           table: "chain_reaction_rooms",
-          filter: `id=eq.${roomId}`
+          filter: `id=eq.${roomId}`,
         },
-          (payload) => {
-            const newRoom = payload.new as Room;
-            setRoom(newRoom);
+        (payload) => {
+          console.log("[ChainRT] room update:", payload);
+          const newRoom = payload.new as Room;
+          setRoom(newRoom);
 
-            // Handle phase transitions
-            // 게스트가 들어오면 status와 무관하게 ready 화면으로 전환
-            if (newRoom.guest_id && (gamePhase === "waiting" || gamePhase === "creating" || gamePhase === "joining")) {
-              setGamePhase("ready");
-            }
-            // 게임 시작 시 카운트다운 실행
-            if (newRoom.status === "playing" && gamePhase !== "playing" && gamePhase !== "countdown") {
-              startCountdown(newRoom);
-            }
-            if (newRoom.status === "finished" && gamePhase !== "finished") {
-              setGamePhase("finished");
-              if (newRoom.winner_id === playerId) {
-                confetti({ particleCount: 150, spread: 100 });
-              }
+          const phase = gamePhaseRef.current;
+
+          // 게스트가 들어오면 status와 무관하게 ready 화면으로 전환
+          if (newRoom.guest_id && (phase === "waiting" || phase === "creating" || phase === "joining")) {
+            setGamePhase("ready");
+          }
+
+          // 게임 시작 시 카운트다운 실행
+          if (newRoom.status === "playing" && phase !== "playing" && phase !== "countdown") {
+            startCountdown(newRoom);
+          }
+
+          if (newRoom.status === "finished" && phase !== "finished") {
+            setGamePhase("finished");
+            if (newRoom.winner_id === playerId) {
+              confetti({ particleCount: 150, spread: 100 });
             }
           }
+        }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("[ChainRT] subscribe status:", status, "roomId:", roomId);
+      });
 
     channelRef.current = channel;
   };
