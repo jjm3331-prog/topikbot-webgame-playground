@@ -348,172 +348,241 @@ export default function Battle() {
         )}
       </AnimatePresence>
       
-      <main className="container mx-auto px-4 py-6 pt-20 pb-24">
-        {/* Hero Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
-        >
-          <div className="flex items-center justify-center gap-3 mb-4">
+      <main className="pt-20 pb-24">
+        {/* Hero Section - Full Width Premium Gradient */}
+        <section className="relative overflow-hidden">
+          {/* Background Effects */}
+          <div className="absolute inset-0 -z-10">
+            <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-gradient-to-br from-yellow-500/20 via-orange-500/15 to-red-500/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-gradient-to-tr from-purple-500/15 via-pink-500/10 to-transparent rounded-full blur-3xl" />
+          </div>
+
+          <div className="container mx-auto px-4 py-16 sm:py-24">
             <motion.div
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ repeat: Infinity, duration: 1.5 }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center max-w-3xl mx-auto"
             >
-              <Swords className="w-12 h-12 text-yellow-500" />
+              {/* Icon */}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", delay: 0.2 }}
+                className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 mb-6 rounded-2xl bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 shadow-2xl shadow-orange-500/30"
+              >
+                <Swords className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
+              </motion.div>
+              
+              {/* Title */}
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight mb-4">
+                <span className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
+                  Đấu trường 1:1
+                </span>
+              </h1>
+              
+              {/* Subtitle */}
+              <p className="text-xl sm:text-2xl text-muted-foreground mb-8">
+                1:1 실시간 대결 / Đối đầu thời gian thực
+              </p>
+              
+              {/* Points Badge */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4 }}
+                className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-yellow-500/10 via-orange-500/10 to-red-500/10 border border-yellow-500/30 rounded-2xl backdrop-blur-sm"
+              >
+                <Trophy className="w-6 h-6 text-yellow-500" />
+                <span className="text-lg font-bold text-yellow-600 dark:text-yellow-400">
+                  Thắng = +1,000 điểm!
+                </span>
+              </motion.div>
             </motion.div>
           </div>
-          
-          <h1 className="text-3xl sm:text-4xl font-black mb-2">
-            <span className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
-              Đấu trường 1:1
-            </span>
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            1:1 실시간 대결 / Đối đầu thời gian thực
-          </p>
-          
-          {/* Points info */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-full"
-          >
-            <Trophy className="w-5 h-5 text-yellow-500" />
-            <span className="text-sm font-semibold text-yellow-600 dark:text-yellow-400">
-              Thắng = +1,000 điểm!
-            </span>
-          </motion.div>
-        </motion.div>
+        </section>
 
         {/* Login CTA if not logged in */}
         {!isLoggedIn && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6"
-          >
-            <Card className="p-4 bg-primary/5 border-primary/20">
-              <div className="flex items-center justify-between gap-4 flex-wrap">
-                <div className="flex items-center gap-3">
-                  <Users className="w-5 h-5 text-primary" />
-                  <span className="text-sm">
-                    Đăng nhập để đối đầu 1:1 với người chơi khác!
-                  </span>
+          <section className="container mx-auto px-4 -mt-8 mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <Card className="p-6 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20 backdrop-blur-sm">
+                <div className="flex items-center justify-between gap-6 flex-wrap">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                      <Users className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-lg">Đăng nhập để tham gia</p>
+                      <p className="text-sm text-muted-foreground">Đối đầu 1:1 với người chơi khác trong thời gian thực!</p>
+                    </div>
+                  </div>
+                  <Button onClick={() => navigate("/auth")} size="lg" className="px-8">
+                    Đăng nhập
+                  </Button>
                 </div>
-                <Button onClick={() => navigate("/auth")} size="sm">
-                  Đăng nhập
-                </Button>
+              </Card>
+            </motion.div>
+          </section>
+        )}
+
+        {/* Game Cards - Premium Grid */}
+        <section className="container mx-auto px-4">
+          <div className="grid gap-6 lg:gap-8 md:grid-cols-2 max-w-5xl mx-auto">
+            {battleGames.map((game, index) => (
+              <motion.div
+                key={game.id}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 + index * 0.1 }}
+              >
+                <Card
+                  className={`group relative overflow-hidden transition-all duration-500 ${
+                    game.available
+                      ? "cursor-pointer hover:scale-[1.02] hover:shadow-2xl hover:shadow-primary/10"
+                      : "opacity-50 cursor-not-allowed"
+                  }`}
+                  onClick={() => handleSelectGame(game)}
+                >
+                  {/* Premium Glow Effect */}
+                  {game.available && (
+                    <div className="absolute inset-0 -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <div className={`absolute inset-0 bg-gradient-to-br ${game.gradient || "from-yellow-500/10 to-orange-500/10"}`} />
+                      <div className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-br ${game.gradient || "from-yellow-500/30 to-orange-500/30"} rounded-full blur-3xl opacity-50 translate-x-1/2 -translate-y-1/2`} />
+                    </div>
+                  )}
+
+                  {/* Border Gradient */}
+                  {game.available && (
+                    <div className={`absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r ${game.gradient} p-[1px] -z-10`}>
+                      <div className="absolute inset-[1px] bg-card rounded-xl" />
+                    </div>
+                  )}
+
+                  {/* Content */}
+                  <div className="p-6 sm:p-8">
+                    {/* Coming Soon Badge */}
+                    {game.comingSoon && (
+                      <div className="absolute top-4 right-4">
+                        <span className="px-3 py-1.5 text-xs font-bold bg-muted text-muted-foreground rounded-full border border-border">
+                          Sắp ra mắt
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Icon & Title */}
+                    <div className="flex items-start gap-5 mb-6">
+                      <div className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center ${
+                        game.available
+                          ? `bg-gradient-to-br ${game.gradient || "from-yellow-400 to-orange-500"} shadow-lg shadow-orange-500/20`
+                          : "bg-muted"
+                      }`}>
+                        {game.available ? (
+                          <game.icon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                        ) : (
+                          <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-muted-foreground" />
+                        )}
+                      </div>
+
+                      <div className="flex-1 pt-1">
+                        <h3 className="text-2xl sm:text-3xl font-black mb-1 group-hover:text-primary transition-colors">
+                          {game.name}
+                        </h3>
+                        <p className="text-sm text-muted-foreground font-medium">{game.nameKo}</p>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                      {game.description}
+                    </p>
+
+                    {/* Play Button */}
+                    {game.available && (
+                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                        <Button
+                          className={`w-full h-14 text-lg font-bold gap-3 bg-gradient-to-r ${game.gradient || "from-yellow-500 to-orange-500"} hover:opacity-90 shadow-lg transition-all duration-300`}
+                        >
+                          <Swords className="w-5 h-5" />
+                          Đấu ngay
+                        </Button>
+                      </motion.div>
+                    )}
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* Rules Section - Premium Card */}
+        <section className="container mx-auto px-4 mt-12 sm:mt-16">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="max-w-3xl mx-auto"
+          >
+            <Card className="relative overflow-hidden bg-gradient-to-br from-card via-card to-muted/30 border-border/50">
+              {/* Decorative Elements */}
+              <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-yellow-500/10 to-orange-500/5 rounded-full blur-3xl" />
+              
+              <div className="p-6 sm:p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
+                    <Trophy className="w-6 h-6 text-white" />
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-black">Quy tắc đấu trường</h2>
+                </div>
+                
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/30 border border-border/50">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Users className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-lg">Đăng nhập bắt buộc</p>
+                      <p className="text-sm text-muted-foreground">Chỉ thành viên mới tham gia được</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/30 border border-border/50">
+                    <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center flex-shrink-0">
+                      <Zap className="w-5 h-5 text-yellow-500" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-lg">12 giây mỗi lượt</p>
+                      <p className="text-sm text-muted-foreground">Tốc độ là chìa khóa chiến thắng</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/30 border border-border/50">
+                    <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center flex-shrink-0">
+                      <X className="w-5 h-5 text-destructive" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-lg">2 cảnh báo = thua</p>
+                      <p className="text-sm text-muted-foreground">Được phép sai 1 lần duy nhất</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-orange-500/20">
+                      <Crown className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-lg text-yellow-600 dark:text-yellow-400">Thắng = +1,000 điểm!</p>
+                      <p className="text-sm text-muted-foreground">Tích điểm để lên hạng TOPIK</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </Card>
           </motion.div>
-        )}
-
-        {/* Game Cards */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          {battleGames.map((game, index) => (
-            <motion.div
-              key={game.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card
-                className={`relative overflow-hidden p-6 cursor-pointer transition-all duration-300 ${
-                  game.available
-                    ? "hover:scale-[1.02] hover:shadow-xl hover:border-primary/50"
-                    : "opacity-60"
-                }`}
-                onClick={() => handleSelectGame(game)}
-              >
-                {/* Glow effect for available games */}
-                {game.available && (
-                  <div className="absolute inset-0 -z-10">
-                    <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${game.gradient || "from-yellow-500/20 to-orange-500/20"} rounded-full blur-3xl opacity-50`} />
-                  </div>
-                )}
-
-                {/* Coming Soon Badge */}
-                {game.comingSoon && (
-                  <div className="absolute top-3 right-3">
-                    <span className="px-2 py-1 text-xs font-bold bg-muted text-muted-foreground rounded-full">
-                      Sắp ra mắt
-                    </span>
-                  </div>
-                )}
-
-                <div className="flex items-start gap-4">
-                  <div className={`p-3 rounded-xl ${
-                    game.available
-                      ? `bg-gradient-to-br ${game.gradient || "from-yellow-400 to-orange-500"}`
-                      : "bg-muted"
-                  }`}>
-                    {game.available ? (
-                      <game.icon className="w-8 h-8 text-white" />
-                    ) : (
-                      <Lock className="w-8 h-8 text-muted-foreground" />
-                    )}
-                  </div>
-
-                  <div className="flex-1">
-                    <h3 className="font-bold text-lg mb-1">{game.name}</h3>
-                    <p className="text-xs text-muted-foreground mb-2">{game.nameKo}</p>
-                    <p className="text-sm text-muted-foreground">{game.description}</p>
-                  </div>
-                </div>
-
-                {game.available && (
-                  <motion.div
-                    className="mt-4"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Button className={`w-full gap-2 bg-gradient-to-r ${game.gradient || "from-yellow-500 to-orange-500"} hover:opacity-90`}>
-                      <Swords className="w-4 h-4" />
-                      Đấu ngay
-                    </Button>
-                  </motion.div>
-                )}
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Rules Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mt-8"
-        >
-          <Card className="p-6 bg-card/50">
-            <h2 className="font-bold text-lg mb-4 flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-yellow-500" />
-              Quy tắc đấu trường
-            </h2>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-500">•</span>
-                Chỉ dành cho thành viên đã đăng nhập
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-500">•</span>
-                Mỗi lượt có 12 giây để trả lời
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-500">•</span>
-                2 lần cảnh báo = thua (1 lần được phép)
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-500">•</span>
-                <span className="text-yellow-600 dark:text-yellow-400 font-semibold">
-                  Thắng = +1,000 điểm!
-                </span>
-              </li>
-            </ul>
-          </Card>
-        </motion.div>
+        </section>
       </main>
 
       <CommonFooter />
