@@ -52,32 +52,6 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
   
   const inputRef = useRef<HTMLInputElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Multiplayer mode
-  if (gameState === "multiplayer") {
-    return (
-      <ChainReactionMultiplayer 
-        words={words} 
-        onBack={() => setGameState("ready")} 
-      />
-    );
-  }
-
-  // Calculate exponential score
-  const calculateScore = (chainLength: number) => {
-    // Base: 10 * 2^(n-1) where n is chain length
-    return Math.floor(10 * Math.pow(2, chainLength - 1));
-  };
-
-  // Get total score for current chain
-  const getTotalScore = (chainLength: number) => {
-    let total = 0;
-    for (let i = 1; i <= chainLength; i++) {
-      total += calculateScore(i);
-    }
-    return total;
-  };
-
   // Create particle effect
   const createParticles = useCallback((count: number = 8) => {
     const newParticles = Array.from({ length: count }, (_, i) => ({
@@ -90,6 +64,11 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
       setParticles(prev => prev.filter(p => !newParticles.find(np => np.id === p.id)));
     }, 800);
   }, []);
+
+  // Calculate exponential score
+  const calculateScore = (chainLength: number) => {
+    return Math.floor(10 * Math.pow(2, chainLength - 1));
+  };
 
   // Validate word connection
   const validateConnection = async (newWord: string, previousWord: string, mode: "semantic" | "phonetic") => {
@@ -227,6 +206,16 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
       setChain([{ word: startWord.korean, meaning: startWord.meaning, connectionType: "start" }]);
     }
   };
+
+  // Multiplayer mode - must be after all hooks
+  if (gameState === "multiplayer") {
+    return (
+      <ChainReactionMultiplayer 
+        words={words} 
+        onBack={() => setGameState("ready")} 
+      />
+    );
+  }
 
   // Ready screen
   if (gameState === "ready") {
