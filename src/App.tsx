@@ -36,6 +36,7 @@ import GameHub from "./pages/GameHub";
 import Pricing from "./pages/Pricing";
 import Profile from "./pages/Profile";
 import Ranking from "./pages/Ranking";
+import PointsSystem from "./pages/PointsSystem";
 import Admin from "./pages/Admin";
 import AdminLogin from "./pages/AdminLogin";
 import Terms from "./pages/Terms";
@@ -167,6 +168,7 @@ const App = () => {
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/ranking" element={<Ranking />} />
+              <Route path="/points-system" element={<PointsSystem />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/terms" element={<Terms />} />
