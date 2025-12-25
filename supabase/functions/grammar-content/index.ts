@@ -42,10 +42,7 @@ serve(async (req) => {
     const { level, type, count = 10 } = await req.json();
     console.log(`Generating ${count} ${type} grammar questions for level ${level}`);
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY not configured");
-    }
+    // X_AI_API_KEY is checked later in the API call section
 
     // Check cache
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -144,14 +141,19 @@ JSON 형식:
 }`
     };
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const X_AI_API_KEY = Deno.env.get("X_AI_API_KEY");
+    if (!X_AI_API_KEY) {
+      throw new Error("X_AI_API_KEY not configured");
+    }
+
+    const response = await fetch("https://api.x.ai/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${X_AI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: "grok-4.1-fast-non-reasoning",
         messages: [
           {
             role: "system",
