@@ -103,17 +103,17 @@ const KoreaCareer = () => {
               <span className="text-sm font-medium text-foreground">🇰🇷 Việc làm tại Hàn Quốc</span>
             </motion.div>
             
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold">
+            <h1 className="text-headline">
               <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
                 Korea Career
               </span>
               <span className="text-foreground"> Hub</span>
             </h1>
             
-            <p className="text-muted-foreground max-w-2xl mx-auto text-base sm:text-lg">
+            <p className="text-body text-muted-foreground max-w-2xl mx-auto">
               Nền tảng <span className="text-primary font-semibold">All-in-One</span> giúp người Việt tìm việc tại Hàn Quốc
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-card-caption text-muted-foreground">
               Headhunting • Báo cáo doanh nghiệp • Phỏng vấn mô phỏng AI
             </p>
           </div>
@@ -191,11 +191,11 @@ const KoreaCareer = () => {
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-xl font-bold text-foreground mb-1">{service.title}</h3>
-                    <p className="text-xs text-primary font-medium mb-3">{service.subtitle}</p>
+                    <h3 className="text-card-title-lg text-foreground mb-1">{service.title}</h3>
+                    <p className="text-badge text-primary font-medium mb-3">{service.subtitle}</p>
 
                     {/* Description */}
-                    <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{service.description}</p>
+                    <p className="text-card-body text-muted-foreground mb-4 leading-relaxed">{service.description}</p>
 
                     {/* Features */}
                     <div className="space-y-2 mb-4">
@@ -244,41 +244,41 @@ const KoreaCareer = () => {
                   whileHover={{ scale: 1.05 }}
                   className="space-y-1"
                 >
-                  <div className="text-2xl sm:text-3xl font-bold text-primary flex items-center justify-center gap-1">
+                  <div className="text-title font-bold text-primary flex items-center justify-center gap-1">
                     <Building2 className="w-5 h-5" />
                     500+
                   </div>
-                  <div className="text-sm text-muted-foreground">Công ty đối tác</div>
+                  <div className="text-card-caption text-muted-foreground">Công ty đối tác</div>
                 </motion.div>
                 <motion.div 
                   whileHover={{ scale: 1.05 }}
                   className="space-y-1"
                 >
-                  <div className="text-2xl sm:text-3xl font-bold text-purple-500 flex items-center justify-center gap-1">
+                  <div className="text-title font-bold text-purple-500 flex items-center justify-center gap-1">
                     <TrendingUp className="w-5 h-5" />
                     1,000+
                   </div>
-                  <div className="text-sm text-muted-foreground">Tuyển dụng thành công</div>
+                  <div className="text-card-caption text-muted-foreground">Tuyển dụng thành công</div>
                 </motion.div>
                 <motion.div 
                   whileHover={{ scale: 1.05 }}
                   className="space-y-1"
                 >
-                  <div className="text-2xl sm:text-3xl font-bold text-pink-500 flex items-center justify-center gap-1">
+                  <div className="text-title font-bold text-pink-500 flex items-center justify-center gap-1">
                     <Star className="w-5 h-5" />
                     98%
                   </div>
-                  <div className="text-sm text-muted-foreground">Mức độ hài lòng</div>
+                  <div className="text-card-caption text-muted-foreground">Mức độ hài lòng</div>
                 </motion.div>
                 <motion.div 
                   whileHover={{ scale: 1.05 }}
                   className="space-y-1"
                 >
-                  <div className="text-2xl sm:text-3xl font-bold text-orange-500 flex items-center justify-center gap-1">
+                  <div className="text-title font-bold text-orange-500 flex items-center justify-center gap-1">
                     <Sparkles className="w-5 h-5" />
                     24/7
                   </div>
-                  <div className="text-sm text-muted-foreground">Hỗ trợ AI</div>
+                  <div className="text-card-caption text-muted-foreground">Hỗ trợ AI</div>
                 </motion.div>
               </div>
             </Card>
@@ -305,11 +305,11 @@ const KoreaCareer = () => {
                       <Crown className="w-6 h-6 text-white" />
                     </motion.div>
                     <div>
-                      <h3 className="font-bold text-foreground flex items-center gap-2">
+                      <h3 className="text-card-title-lg text-foreground flex items-center gap-2">
                         Nâng cấp lên Premium
                         <Sparkles className="w-4 h-4 text-yellow-500" />
                       </h3>
-                      <p className="text-sm text-muted-foreground">Sử dụng không giới hạn tất cả dịch vụ tuyển dụng</p>
+                      <p className="text-card-body text-muted-foreground">Sử dụng không giới hạn tất cả dịch vụ tuyển dụng</p>
                     </div>
                   </div>
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
@@ -331,8 +331,8 @@ const KoreaCareer = () => {
                   <Users className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-foreground">Đội ngũ Headhunter chuyên nghiệp</h4>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <h4 className="text-card-title-lg text-foreground">Đội ngũ Headhunter chuyên nghiệp</h4>
+                  <p className="text-card-body text-muted-foreground mt-1">
                     Kết nối với Samsung, LG, Hyundai và nhiều tập đoàn lớn, cùng các startup tiềm năng
                   </p>
                 </div>
@@ -344,8 +344,8 @@ const KoreaCareer = () => {
                   <Sparkles className="w-5 h-5 text-purple-500" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-foreground">Dịch vụ tùy chỉnh bằng AI</h4>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <h4 className="text-card-title-lg text-foreground">Dịch vụ tùy chỉnh bằng AI</h4>
+                  <p className="text-card-body text-muted-foreground mt-1">
                     Công nghệ AI mới nhất hỗ trợ phân tích công ty, luyện phỏng vấn, tối ưu CV
                   </p>
                 </div>

@@ -127,12 +127,12 @@ const CompanyReport = () => {
               <span className="text-sm font-medium">Dựa trên AI Web Search</span>
             </div>
             
-            <h1 className="text-2xl sm:text-3xl font-bold">
+            <h1 className="text-headline">
               <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
                 Báo Cáo Chuyên Sâu Công Ty
               </span>
             </h1>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-body text-muted-foreground">
               Phân tích thông tin ẩn của các công ty Hàn Quốc với LUKATO RAG AI
             </p>
           </div>
@@ -163,7 +163,7 @@ const CompanyReport = () => {
 
               {/* Quick Search */}
               <div>
-                <p className="text-sm text-muted-foreground mb-2">Tìm kiếm nhanh:</p>
+                <p className="text-card-body text-muted-foreground mb-2">Tìm kiếm nhanh:</p>
                 <div className="flex flex-wrap gap-2">
                   {quickSearches.map((company) => (
                     <Button
@@ -185,12 +185,12 @@ const CompanyReport = () => {
 
               {/* What you'll get */}
               <div className="pt-4 border-t">
-                <p className="text-sm font-medium mb-3">Nội dung báo cáo bao gồm:</p>
+                <p className="text-card-title text-foreground mb-3">Nội dung báo cáo bao gồm:</p>
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                   {reportSections.map((section) => (
-                    <div key={section.label} className="flex items-center gap-2 text-sm">
+                    <div key={section.label} className="flex items-center gap-2">
                       <section.icon className={`w-4 h-4 ${section.color}`} />
-                      <span className="text-muted-foreground">{section.label}</span>
+                      <span className="text-card-caption text-muted-foreground">{section.label}</span>
                     </div>
                   ))}
                 </div>
@@ -207,8 +207,8 @@ const CompanyReport = () => {
                   <Loader2 className="w-8 h-8 text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-spin" />
                 </div>
                 <div className="text-center">
-                  <p className="font-medium text-foreground">AI đang tìm kiếm trên web...</p>
-                  <p className="text-sm text-muted-foreground">Đang phân tích lương, văn hóa, review phỏng vấn...</p>
+                  <p className="text-card-title-lg text-foreground">AI đang tìm kiếm trên web...</p>
+                  <p className="text-card-body text-muted-foreground">Đang phân tích lương, văn hóa, review phỏng vấn...</p>
                 </div>
               </div>
             </Card>
@@ -224,7 +224,7 @@ const CompanyReport = () => {
               <Card className="p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <Sparkles className="w-5 h-5 text-purple-500" />
-                  <h2 className="font-bold text-lg">Báo cáo chuyên sâu: {companyName}</h2>
+                  <h2 className="text-title text-foreground">Báo cáo chuyên sâu: {companyName}</h2>
                 </div>
                 
                 <div className="prose prose-sm dark:prose-invert max-w-none">
