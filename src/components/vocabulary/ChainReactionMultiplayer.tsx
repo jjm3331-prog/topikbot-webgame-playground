@@ -188,6 +188,47 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     setTimeout(() => playBeep(250, 300, "sawtooth"), 200);
   };
 
+  // Award 1000 points for winning
+  const awardWinnerPoints = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) return;
+
+      // Get current points
+      const { data: profile, error: fetchError } = await supabase
+        .from("profiles")
+        .select("points")
+        .eq("id", session.user.id)
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error("Failed to fetch profile:", fetchError);
+        return;
+      }
+
+      const currentPoints = profile?.points || 0;
+      const newPoints = currentPoints + 1000;
+
+      // Update points
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ points: newPoints })
+        .eq("id", session.user.id);
+
+      if (updateError) {
+        console.error("Failed to update points:", updateError);
+        return;
+      }
+
+      toast({
+        title: "🎉 +1,000 điểm!",
+        description: "Bạn đã nhận được 1,000 điểm thưởng chiến thắng!",
+      });
+    } catch (err) {
+      console.error("Error awarding points:", err);
+    }
+  };
+
   // Random nickname
   const generateRandomNickname = () => {
     const adjectives = ["빠른", "용감한", "똑똒한", "귀여운", "멋진", "신나는", "활발한", "재미있는"];
@@ -414,6 +455,8 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             if (newRoom.winner_id === playerId) {
               playWinSound();
               confetti({ particleCount: 150, spread: 100 });
+              // Award 1000 points for winning
+              awardWinnerPoints();
             } else {
               playLoseSound();
             }
@@ -1290,7 +1333,19 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
           <h2 className={`text-3xl font-black mb-2 ${isWinner ? "text-yellow-500" : "text-gray-400"}`}>{isWinner ? "🎉 승리!" : "😢 패배"}</h2>
 
-          <p className="text-muted-foreground mb-6">{isWinner ? `${opponentName}을(를) 이겼습니다!` : `${opponentName}에게 졌습니다...`}</p>
+          <p className="text-muted-foreground mb-4">{isWinner ? `${opponentName}을(를) 이겼습니다!` : `${opponentName}에게 졌습니다...`}</p>
+
+          {isWinner && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3 }}
+              className="mb-4 inline-flex items-center gap-2 px-4 py-2 bg-yellow-500/20 border border-yellow-500/50 rounded-full"
+            >
+              <Trophy className="w-5 h-5 text-yellow-500" />
+              <span className="text-lg font-black text-yellow-500">+1,000 điểm!</span>
+            </motion.div>
+          )}
 
           <div className="bg-muted/50 rounded-xl p-4 mb-6">
             <div className="text-sm text-muted-foreground mb-2">총 이어간 단어</div>

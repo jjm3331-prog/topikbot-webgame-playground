@@ -26,6 +26,7 @@ import {
   Lock,
   Search,
   Mic,
+  Swords,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -38,6 +39,7 @@ interface MenuItem {
   href: string;
   isPremium?: boolean;
   isHighlight?: boolean;
+  isBattle?: boolean;
 }
 
 interface MenuCategory {
@@ -70,6 +72,7 @@ const baseMenuCategories: MenuCategory[] = [
     emoji: "🎮",
     items: [
       { icon: Gamepad2, label: "Trung tâm Game", href: "/game-hub", isHighlight: true },
+      { icon: Swords, label: "⚔️ Đấu 1:1", href: "/battle", isHighlight: true, isBattle: true },
     ]
   },
   {
@@ -163,32 +166,43 @@ const MobileAccordionCategory = ({
             <ul className="pb-2 px-2">
               {category.items.map((item) => {
                 const active = isActive(item.href);
+                const isBattleItem = item.isBattle;
                 return (
                   <li key={item.label}>
                     <button
                       onClick={() => onNavigate(item.href, item.isPremium)}
                       className={`group flex items-center gap-3 w-full py-3 px-4 rounded-lg text-left transition-all ${
                         active
-                          ? 'bg-primary text-primary-foreground'
-                          : item.isHighlight 
-                            ? 'bg-primary/10 text-primary' 
-                            : 'hover:bg-muted/80'
+                          ? isBattleItem 
+                            ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white'
+                            : 'bg-primary text-primary-foreground'
+                          : isBattleItem
+                            ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border border-yellow-500/30'
+                            : item.isHighlight 
+                              ? 'bg-primary/10 text-primary' 
+                              : 'hover:bg-muted/80'
                       }`}
                     >
                       <item.icon className={`w-5 h-5 ${
+                        isBattleItem ? 'animate-heartbeat' : ''
+                      } ${
                         active
-                          ? 'text-primary-foreground'
-                          : item.isHighlight 
-                            ? 'text-primary' 
-                            : 'text-foreground/70'
+                          ? 'text-white'
+                          : isBattleItem 
+                            ? 'text-yellow-500' 
+                            : item.isHighlight 
+                              ? 'text-primary' 
+                              : 'text-foreground/70'
                       }`} />
                       
-                      <span className={`text-sm font-medium flex-1 ${
+                      <span className={`text-sm font-bold flex-1 ${
                         active
-                          ? 'text-primary-foreground'
-                          : item.isHighlight 
-                            ? 'text-primary' 
-                            : 'text-foreground'
+                          ? 'text-white'
+                          : isBattleItem 
+                            ? 'text-yellow-600 dark:text-yellow-400' 
+                            : item.isHighlight 
+                              ? 'text-primary' 
+                              : 'text-foreground'
                       }`}>
                         {item.label}
                       </span>
@@ -200,7 +214,7 @@ const MobileAccordionCategory = ({
                       )}
                       
                       {active && (
-                        <ChevronRight className="w-3 h-3 text-primary-foreground" />
+                        <ChevronRight className="w-3 h-3 text-white" />
                       )}
                     </button>
                   </li>
@@ -358,6 +372,7 @@ export const MegaMenuOverlay = ({
                       <ul className="space-y-1">
                         {category.items.map((item, itemIndex) => {
                           const active = isActive(item.href);
+                          const isBattleItem = item.isBattle;
                           return (
                             <motion.li
                               key={item.label}
@@ -371,17 +386,23 @@ export const MegaMenuOverlay = ({
                                 whileTap={{ scale: 0.98 }}
                                 className={`group flex items-center gap-3 w-full py-2.5 px-3 rounded-lg text-left transition-all relative overflow-hidden ${
                                   active
-                                    ? 'bg-primary text-primary-foreground shadow-md'
-                                    : item.isHighlight 
-                                      ? 'bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground' 
-                                      : 'hover:bg-muted/80'
+                                    ? isBattleItem
+                                      ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg shadow-yellow-500/30'
+                                      : 'bg-primary text-primary-foreground shadow-md'
+                                    : isBattleItem
+                                      ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500 hover:text-white'
+                                      : item.isHighlight 
+                                        ? 'bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground' 
+                                        : 'hover:bg-muted/80'
                                 }`}
                               >
                                 {/* Active indicator bar */}
                                 {active && (
                                   <motion.div
                                     layoutId="activeIndicator"
-                                    className="absolute left-0 top-0 bottom-0 w-1 bg-primary-foreground rounded-r-full"
+                                    className={`absolute left-0 top-0 bottom-0 w-1 rounded-r-full ${
+                                      isBattleItem ? 'bg-white' : 'bg-primary-foreground'
+                                    }`}
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.2 }}
@@ -389,19 +410,25 @@ export const MegaMenuOverlay = ({
                                 )}
                                 
                                 <item.icon className={`w-5 h-5 transition-all duration-200 ${
+                                  isBattleItem ? 'animate-heartbeat' : ''
+                                } ${
                                   active
-                                    ? 'text-primary-foreground'
-                                    : item.isHighlight 
-                                      ? 'text-primary group-hover:text-primary-foreground' 
-                                      : 'text-foreground/70 group-hover:text-primary group-hover:scale-110'
+                                    ? 'text-white'
+                                    : isBattleItem
+                                      ? 'text-yellow-500 group-hover:text-white'
+                                      : item.isHighlight 
+                                        ? 'text-primary group-hover:text-primary-foreground' 
+                                        : 'text-foreground/70 group-hover:text-primary group-hover:scale-110'
                                 }`} />
                                 
-                                <span className={`text-sm font-medium transition-colors duration-200 flex-1 ${
+                                <span className={`text-sm font-bold transition-colors duration-200 flex-1 ${
                                   active
-                                    ? 'text-primary-foreground'
-                                    : item.isHighlight 
-                                      ? 'text-primary group-hover:text-primary-foreground' 
-                                      : 'text-foreground group-hover:text-primary'
+                                    ? 'text-white'
+                                    : isBattleItem
+                                      ? 'text-yellow-600 dark:text-yellow-400 group-hover:text-white'
+                                      : item.isHighlight 
+                                        ? 'text-primary group-hover:text-primary-foreground' 
+                                        : 'text-foreground group-hover:text-primary'
                                 }`}>
                                   {item.label}
                                 </span>
@@ -415,7 +442,7 @@ export const MegaMenuOverlay = ({
                                 {/* Hover arrow indicator */}
                                 <ChevronRight className={`w-3 h-3 opacity-0 -translate-x-2 transition-all duration-200 ${
                                   active 
-                                    ? 'text-primary-foreground opacity-100 translate-x-0' 
+                                    ? 'text-white opacity-100 translate-x-0' 
                                     : 'group-hover:opacity-100 group-hover:translate-x-0 text-muted-foreground group-hover:text-primary'
                                 }`} />
                               </motion.button>
