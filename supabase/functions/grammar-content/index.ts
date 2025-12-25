@@ -235,14 +235,17 @@ ${TOPIK_GRAMMAR_GUIDELINES[safeLevel]}
 [RAG 참고자료]
 ${ragContent ? ragContent : "(참고자료 없음 - 내부 지식으로 생성하되, 품질 규칙을 더 엄격히 지킬 것)"}`;
 
-    const resp = await fetch("https://api.x.ai/v1/chat/completions", {
+    const primaryModel = "grok-4-1-fast-reasoning";
+    const fallbackModel = "grok-4.1-fast-reasoning";
+
+    let resp = await fetch("https://api.x.ai/v1/chat/completions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${X_AI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "grok-4.1-fast-reasoning",
+        model: primaryModel,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
@@ -250,6 +253,27 @@ ${ragContent ? ragContent : "(참고자료 없음 - 내부 지식으로 생성�
         temperature: safeLevel === "5-6" ? 0.6 : 0.8,
       }),
     });
+
+    if (!resp.ok && (resp.status === 400 || resp.status === 404)) {
+      const t = await resp.text().catch(() => "");
+      console.warn("xAI model rejected, retrying with fallback model:", resp.status, t);
+
+      resp = await fetch("https://api.x.ai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${X_AI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: fallbackModel,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: safeLevel === "5-6" ? 0.6 : 0.8,
+        }),
+      });
+    }
 
     if (!resp.ok) {
       const t = await resp.text().catch(() => "");

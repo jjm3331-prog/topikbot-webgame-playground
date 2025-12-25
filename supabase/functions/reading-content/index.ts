@@ -396,14 +396,17 @@ ${levelGuideline}
     throw new Error('X_AI_API_KEY not configured');
   }
 
-  const response = await fetch('https://api.x.ai/v1/chat/completions', {
+  const primaryModel = 'grok-4-1-fast-reasoning';
+  const fallbackModel = 'grok-4.1-fast-reasoning';
+
+  let response = await fetch('https://api.x.ai/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${xaiApiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'grok-4.1-fast-reasoning',
+      model: primaryModel,
       messages: [
         {
           role: 'system',
@@ -414,6 +417,30 @@ ${levelGuideline}
       temperature: topikLevel === "5-6" ? 0.7 : 0.8,
     }),
   });
+
+  if (!response.ok && (response.status === 400 || response.status === 404)) {
+    const errText = await response.text().catch(() => '');
+    console.warn('xAI model rejected, retrying with fallback model:', response.status, errText);
+
+    response = await fetch('https://api.x.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${xaiApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: fallbackModel,
+        messages: [
+          {
+            role: 'system',
+            content: `당신은 TOPIK ${topikLevel}급 읽기 문제 생성 전문가입니다. 반드시 JSON 배열 형식으로만 응답하세요.`
+          },
+          { role: 'user', content: prompt }
+        ],
+        temperature: topikLevel === "5-6" ? 0.7 : 0.8,
+      }),
+    });
+  }
 
   if (!response.ok) {
     const errText = await response.text();
