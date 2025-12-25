@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { motion, AnimatePresence, PanInfo } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
@@ -12,21 +12,15 @@ import {
   Sparkles,
   Loader2,
   RefreshCw,
-  Layers,
   Timer,
   Zap,
-  ThumbsUp,
-  ThumbsDown,
   RotateCcw,
   Trophy,
-  CheckCircle2,
-  XCircle,
-  Eye,
-  EyeOff,
-  Volume2,
-  Flame
+  Flame,
+  Car
 } from "lucide-react";
 import confetti from "canvas-confetti";
+import WordRacing from "@/components/vocabulary/WordRacing";
 
 // Word interface
 interface Word {
@@ -49,184 +43,13 @@ type TopikLevel = keyof typeof topikLevels;
 
 // Tab types
 const tabs = [
-  { id: "flashcard", label: "플래시카드", icon: Layers, description: "Thẻ lật từ vựng" },
+  { id: "racing", label: "단어 레이싱", icon: Car, description: "Đua xe từ vựng" },
   { id: "memory", label: "메모리 매칭", icon: Zap, description: "Ghép thẻ" },
   { id: "sprint", label: "60초 스프린트", icon: Timer, description: "Chạy đua 60 giây" },
 ];
 
-type TabType = "flashcard" | "memory" | "sprint";
+type TabType = "racing" | "memory" | "sprint";
 
-// ================== FLASHCARD COMPONENT ==================
-interface FlashcardGameProps {
-  words: Word[];
-  onComplete: (known: number, unknown: number) => void;
-  onPlayTTS: (text: string) => void;
-}
-
-const FlashcardGame = ({ words, onComplete, onPlayTTS }: FlashcardGameProps) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [showMeaning, setShowMeaning] = useState(false);
-  const [knownCount, setKnownCount] = useState(0);
-  const [unknownCount, setUnknownCount] = useState(0);
-  const [exitX, setExitX] = useState(0);
-  const [combo, setCombo] = useState(0);
-
-  const currentWord = words[currentIndex];
-  const progress = ((currentIndex) / words.length) * 100;
-
-  const handleSwipe = (direction: "left" | "right") => {
-    setExitX(direction === "right" ? 300 : -300);
-    
-    if (direction === "right") {
-      setKnownCount(prev => prev + 1);
-      setCombo(prev => prev + 1);
-      if (combo >= 4) {
-        confetti({ particleCount: 30, spread: 60, origin: { y: 0.6 } });
-      }
-    } else {
-      setUnknownCount(prev => prev + 1);
-      setCombo(0);
-    }
-
-    setTimeout(() => {
-      if (currentIndex < words.length - 1) {
-        setCurrentIndex(prev => prev + 1);
-        setShowMeaning(false);
-        setExitX(0);
-      } else {
-        onComplete(knownCount + (direction === "right" ? 1 : 0), unknownCount + (direction === "left" ? 1 : 0));
-      }
-    }, 200);
-  };
-
-  const handleDragEnd = (event: any, info: PanInfo) => {
-    if (Math.abs(info.offset.x) > 100) {
-      handleSwipe(info.offset.x > 0 ? "right" : "left");
-    }
-  };
-
-  if (!currentWord) return null;
-
-  return (
-    <div className="relative">
-      {/* Progress Bar */}
-      <div className="mb-6">
-        <div className="flex justify-between text-sm text-muted-foreground mb-2">
-          <span>{currentIndex + 1} / {words.length}</span>
-          <div className="flex items-center gap-2">
-            {combo >= 3 && (
-              <motion.span 
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="flex items-center gap-1 text-orange-500 font-bold"
-              >
-                <Flame className="w-4 h-4" />
-                {combo} combo!
-              </motion.span>
-            )}
-            <span className="text-green-500">✓ {knownCount}</span>
-            <span className="text-red-500">✗ {unknownCount}</span>
-          </div>
-        </div>
-        <div className="h-2 bg-muted rounded-full overflow-hidden">
-          <motion.div 
-            className="h-full bg-gradient-to-r from-primary to-primary/70"
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Swipe Instructions */}
-      <div className="flex justify-between text-sm text-muted-foreground mb-4 px-4">
-        <span className="flex items-center gap-1"><ThumbsDown className="w-4 h-4 text-red-400" /> 모르겠어요</span>
-        <span className="flex items-center gap-1">알아요 <ThumbsUp className="w-4 h-4 text-green-400" /></span>
-      </div>
-
-      {/* Card */}
-      <div className="relative h-[400px] flex items-center justify-center">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentWord.id}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            onDragEnd={handleDragEnd}
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1, x: 0 }}
-            exit={{ x: exitX, opacity: 0, rotate: exitX > 0 ? 15 : -15 }}
-            whileDrag={{ scale: 1.05, rotate: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="absolute w-full max-w-sm cursor-grab active:cursor-grabbing"
-          >
-            <div 
-              className="bg-gradient-to-br from-card to-card/80 border-2 border-border rounded-3xl p-8 shadow-2xl min-h-[320px] flex flex-col items-center justify-center text-center"
-              onClick={() => setShowMeaning(!showMeaning)}
-            >
-              {/* Korean Word */}
-              <div className="mb-4">
-                <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-2">
-                  {currentWord.korean}
-                </h2>
-                {currentWord.pronunciation && (
-                  <p className="text-muted-foreground text-lg">[{currentWord.pronunciation}]</p>
-                )}
-              </div>
-
-              {/* Meaning (revealed on tap) */}
-              <AnimatePresence>
-                {showMeaning && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className="mt-4 pt-4 border-t border-border w-full"
-                  >
-                    <p className="text-xl text-primary font-semibold mb-2">{currentWord.meaning}</p>
-                    {currentWord.example && (
-                      <div className="text-sm text-muted-foreground">
-                        <p className="italic">"{currentWord.example}"</p>
-                        {currentWord.exampleMeaning && (
-                          <p className="text-xs mt-1">({currentWord.exampleMeaning})</p>
-                        )}
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Tap hint */}
-              {!showMeaning && (
-                <p className="text-sm text-muted-foreground mt-4 flex items-center gap-1">
-                  <Eye className="w-4 h-4" /> Nhấn để xem nghĩa
-                </p>
-              )}
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      {/* Button Controls */}
-      <div className="flex justify-center gap-6 mt-8">
-        <Button
-          size="lg"
-          variant="outline"
-          onClick={() => handleSwipe("left")}
-          className="rounded-full w-16 h-16 border-red-300 hover:bg-red-50 hover:border-red-400"
-        >
-          <ThumbsDown className="w-6 h-6 text-red-500" />
-        </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          onClick={() => handleSwipe("right")}
-          className="rounded-full w-16 h-16 border-green-300 hover:bg-green-50 hover:border-green-400"
-        >
-          <ThumbsUp className="w-6 h-6 text-green-500" />
-        </Button>
-      </div>
-    </div>
-  );
-};
 
 // ================== MEMORY MATCHING COMPONENT ==================
 interface MemoryGameProps {
@@ -538,7 +361,7 @@ const Vocabulary = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<TabType>("flashcard");
+  const [activeTab, setActiveTab] = useState<TabType>("racing");
   const [topikLevel, setTopikLevel] = useState<TopikLevel>("1-2");
   const [words, setWords] = useState<Word[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -719,10 +542,10 @@ const Vocabulary = () => {
     }
   };
 
-  const handleFlashcardComplete = (known: number, unknown: number) => {
+  const handleRacingComplete = (score: number, wordsCompleted: number) => {
     setGameComplete(true);
-    setGameResult({ type: "flashcard", known, unknown, total: known + unknown });
-    if (known > unknown) {
+    setGameResult({ type: "racing", score, wordsCompleted });
+    if (wordsCompleted >= 3) {
       confetti({ particleCount: 100, spread: 70 });
     }
   };
@@ -879,14 +702,11 @@ const Vocabulary = () => {
                 
                 <h2 className="text-2xl font-bold mb-4">완료! 🎉</h2>
                 
-                {gameResult?.type === "flashcard" && (
+                {gameResult?.type === "racing" && (
                   <div className="mb-6">
-                    <p className="text-lg">
-                      총 <span className="font-bold">{gameResult.total}</span>개 중{" "}
-                      <span className="text-green-500 font-bold">{gameResult.known}</span>개를 알았어요!
-                    </p>
+                    <p className="text-3xl font-bold text-primary mb-2">{gameResult.score}점</p>
                     <p className="text-muted-foreground">
-                      정답률: {Math.round((gameResult.known / gameResult.total) * 100)}%
+                      {gameResult.wordsCompleted}개 단어 완성 / {gameResult.wordsCompleted} từ hoàn thành
                     </p>
                   </div>
                 )}
@@ -920,11 +740,10 @@ const Vocabulary = () => {
             ) : (
               /* Game Components */
               <>
-                {activeTab === "flashcard" && (
-                  <FlashcardGame 
+                {activeTab === "racing" && (
+                  <WordRacing 
                     words={words} 
-                    onComplete={handleFlashcardComplete}
-                    onPlayTTS={playTTS}
+                    onComplete={handleRacingComplete}
                   />
                 )}
                 {activeTab === "memory" && (
