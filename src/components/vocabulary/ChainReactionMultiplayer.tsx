@@ -250,30 +250,39 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     return code;
   };
 
-  // Validate word connection (phonetic only for turn-based)
-  const validateConnection = async (newWord: string, previousWord: string) => {
-    const lastChar = previousWord.charAt(previousWord.length - 1);
-    const dueum: Record<string, string[]> = {
-      녀: ["여"],
-      뇨: ["요"],
-      뉴: ["유"],
-      니: ["이"],
-      랴: ["야"],
-      려: ["여"],
-      례: ["예"],
-      료: ["요"],
-      류: ["유"],
-      리: ["이"],
-      라: ["나"],
-      래: ["내"],
-      로: ["노"],
-      뢰: ["뇌"],
-      루: ["누"],
-      르: ["느"],
-    };
-    const validStarts = [lastChar, ...(dueum[lastChar] || [])];
-    const firstChar = newWord.charAt(0);
-    return validStarts.includes(firstChar);
+  // Validate word connection AND word existence via edge function
+  const validateConnection = async (newWord: string, previousWord: string): Promise<{ valid: boolean; reason?: string }> => {
+    try {
+      const { data, error } = await supabase.functions.invoke("chain-validate", {
+        body: { previousWord, newWord, mode: "phonetic" }
+      });
+
+      if (error) {
+        console.error("chain-validate error:", error);
+        // Fallback to local validation on error
+        const lastChar = previousWord.charAt(previousWord.length - 1);
+        const dueum: Record<string, string[]> = {
+          녀: ["여"], 뇨: ["요"], 뉴: ["유"], 니: ["이"],
+          랴: ["야"], 려: ["여"], 례: ["예"], 료: ["요"],
+          류: ["유"], 리: ["이"], 라: ["나"], 래: ["내"],
+          로: ["노"], 뢰: ["뇌"], 루: ["누"], 르: ["느"],
+        };
+        const validStarts = [lastChar, ...(dueum[lastChar] || [])];
+        const firstChar = newWord.charAt(0);
+        return { valid: validStarts.includes(firstChar) };
+      }
+
+      return { 
+        valid: data?.isValid === true, 
+        reason: data?.reason 
+      };
+    } catch (err) {
+      console.error("validateConnection error:", err);
+      // Fallback to local phonetic check
+      const lastChar = previousWord.charAt(previousWord.length - 1);
+      const firstChar = newWord.charAt(0);
+      return { valid: lastChar === firstChar };
+    }
   };
 
   // URL auto-join
@@ -640,16 +649,17 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       return;
     }
 
-    // Validate connection
+    // Validate connection AND word existence
     if (chain.length > 0) {
       setIsValidating(true);
       const previousWord = chain[chain.length - 1].word;
-      const isValid = await validateConnection(newWord, previousWord);
+      const result = await validateConnection(newWord, previousWord);
       setIsValidating(false);
 
-      if (!isValid) {
-        const lastChar = previousWord.charAt(previousWord.length - 1);
-        await handleViolation(`'${lastChar}'로 시작해야 해요!`);
+      if (!result.valid) {
+        // Use the reason from validation or fallback message
+        const message = result.reason || `유효하지 않은 단어예요!`;
+        await handleViolation(message);
         return;
       }
     }
