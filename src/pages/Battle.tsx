@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Swords, Link2, Brain, Users, Trophy, Zap, Crown, Lock, X, Loader2, Play } from "lucide-react";
+import { Swords, Link2, Brain, Users, Trophy, Zap, Crown, Lock, X, Loader2, Play, Timer, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import CleanHeader from "@/components/CleanHeader";
@@ -236,112 +236,171 @@ export default function Battle() {
     <div className="min-h-screen bg-background">
       <CleanHeader />
 
-      {/* Invite Modal Popup */}
+      {/* Premium Invite Modal Popup */}
       <AnimatePresence>
         {showInviteModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
             onClick={handleCloseInviteModal}
           >
+            {/* Backdrop with blur */}
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-md" />
+            
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.8, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.8, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-sm bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
+              className="relative w-full max-w-md"
             >
-              {/* Close button */}
-              <button
-                onClick={handleCloseInviteModal}
-                className="absolute top-3 right-3 p-1 rounded-full hover:bg-muted transition-colors z-10"
-              >
-                <X className="w-5 h-5 text-muted-foreground" />
-              </button>
+              {/* Card with glass morphism */}
+              <div className="relative bg-card/95 backdrop-blur-xl border border-border/50 rounded-3xl shadow-2xl overflow-hidden">
+                {/* Background Effects */}
+                <div className="absolute inset-0 -z-10">
+                  <div className={`absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl opacity-30 ${inviteGame === "semantic" ? "bg-purple-500" : "bg-orange-500"}`} />
+                  <div className={`absolute bottom-0 left-0 w-48 h-48 rounded-full blur-3xl opacity-20 ${inviteGame === "semantic" ? "bg-pink-500" : "bg-yellow-500"}`} />
+                </div>
+                
+                {/* Close button */}
+                <button
+                  onClick={handleCloseInviteModal}
+                  className="absolute top-4 right-4 p-2 rounded-full bg-muted/50 hover:bg-muted transition-colors z-10"
+                >
+                  <X className="w-5 h-5 text-muted-foreground" />
+                </button>
 
-              {/* Header with gradient */}
-              <div className={`bg-gradient-to-r ${inviteGame === "semantic" ? "from-purple-500 to-pink-500" : "from-yellow-400 to-orange-500"} p-6 text-center`}>
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                  {inviteGame === "semantic" ? (
-                    <Brain className="w-8 h-8 text-white" />
+                {/* Header */}
+                <div className="pt-8 pb-6 px-6 text-center">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", delay: 0.1 }}
+                    className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${inviteGame === "semantic" ? "from-purple-500 to-pink-500" : "from-yellow-400 to-orange-500"} flex items-center justify-center mx-auto mb-5 shadow-xl ${inviteGame === "semantic" ? "shadow-purple-500/30" : "shadow-orange-500/30"}`}
+                  >
+                    {inviteGame === "semantic" ? (
+                      <Brain className="w-10 h-10 text-white" />
+                    ) : (
+                      <Link2 className="w-10 h-10 text-white" />
+                    )}
+                  </motion.div>
+                  
+                  <h2 className={`text-2xl sm:text-3xl font-black mb-1 bg-gradient-to-r ${inviteGame === "semantic" ? "from-purple-400 to-pink-400" : "from-yellow-400 to-orange-400"} bg-clip-text text-transparent`}>
+                    {inviteGame === "semantic" ? "Đấu Nghĩa 1:1" : "Nối từ 1:1"}
+                  </h2>
+                  <p className="text-muted-foreground text-sm">
+                    {inviteGame === "semantic" ? "의미 연결 대결" : "끝말잇기 대결"}
+                  </p>
+                </div>
+
+                {/* Content */}
+                <div className="px-6 pb-8">
+                  {loadingRoom ? (
+                    <div className="py-8 text-center">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                        className={`w-16 h-16 rounded-full border-4 border-muted ${inviteGame === "semantic" ? "border-t-purple-500" : "border-t-orange-500"} mx-auto mb-4`}
+                      />
+                      <p className="text-muted-foreground">Đang tải thông tin phòng...</p>
+                    </div>
+                  ) : roomError ? (
+                    <div className="py-6 text-center">
+                      <div className="w-16 h-16 bg-destructive/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <X className="w-8 h-8 text-destructive" />
+                      </div>
+                      <p className="text-destructive font-bold text-lg mb-2">{roomError}</p>
+                      <p className="text-sm text-muted-foreground mb-6">
+                        Phòng này không còn khả dụng.
+                      </p>
+                      <Button
+                        onClick={handleCloseInviteModal}
+                        variant="outline"
+                        className="w-full h-12"
+                      >
+                        Đóng
+                      </Button>
+                    </div>
                   ) : (
-                    <Link2 className="w-8 h-8 text-white" />
+                    <>
+                      {/* Host info card */}
+                      {roomInfo && (
+                        <motion.div 
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.2 }}
+                          className="mb-6 p-5 bg-gradient-to-br from-muted/50 to-muted/30 rounded-2xl border border-border/50"
+                        >
+                          <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">Chủ phòng đang chờ bạn</p>
+                          <div className="flex items-center justify-center gap-3">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
+                              <Crown className="w-6 h-6 text-white" />
+                            </div>
+                            <span className="font-black text-2xl">{roomInfo.host_name}</span>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {/* Room code display */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="mb-6 text-center"
+                      >
+                        <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">Mã phòng</p>
+                        <p className={`text-4xl sm:text-5xl font-mono font-black tracking-[0.3em] bg-gradient-to-r ${inviteGame === "semantic" ? "from-purple-400 to-pink-400" : "from-yellow-400 to-orange-400"} bg-clip-text text-transparent`}>
+                          {initialRoomCode}
+                        </p>
+                      </motion.div>
+
+                      {/* Join button */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <Button
+                          onClick={handleJoinFromInvite}
+                          disabled={joiningRoom || !roomInfo}
+                          className={`w-full h-16 text-xl font-black rounded-2xl bg-gradient-to-r ${inviteGame === "semantic" ? "from-purple-500 to-pink-500 shadow-purple-500/30" : "from-yellow-400 to-orange-500 shadow-orange-500/30"} hover:opacity-90 text-white shadow-xl`}
+                        >
+                          {joiningRoom ? (
+                            <Loader2 className="w-7 h-7 animate-spin" />
+                          ) : (
+                            <>
+                              <Play className="w-7 h-7 mr-3" />
+                              Tham gia ngay!
+                            </>
+                          )}
+                        </Button>
+                      </motion.div>
+
+                      {/* Rules reminder */}
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                        className="mt-6 flex items-center justify-center gap-4 text-sm text-muted-foreground"
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <Timer className="w-4 h-4" />
+                          <span>12 giây/lượt</span>
+                        </div>
+                        <div className="w-1 h-1 rounded-full bg-muted-foreground" />
+                        <div className="flex items-center gap-1.5">
+                          <AlertTriangle className="w-4 h-4" />
+                          <span>2 cảnh báo = thua</span>
+                        </div>
+                      </motion.div>
+                    </>
                   )}
                 </div>
-                <h2 className="text-xl font-bold text-white">
-                  {inviteGame === "semantic" ? "Đấu Nghĩa 1:1" : "Nối từ 1:1"}
-                </h2>
-                <p className="text-white/70 text-xs mt-1">
-                  {inviteGame === "semantic" ? "의미 연결 대결" : "끝말잇기 대결"}
-                </p>
-              </div>
-
-              {/* Content */}
-              <div className="p-6 text-center">
-                {loadingRoom ? (
-                  <div className="py-8">
-                    <Loader2 className="w-10 h-10 animate-spin text-muted-foreground mx-auto mb-3" />
-                    <p className="text-sm text-muted-foreground">Đang tải thông tin phòng...</p>
-                  </div>
-                ) : roomError ? (
-                  <div className="py-6">
-                    <div className="w-14 h-14 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <X className="w-7 h-7 text-destructive" />
-                    </div>
-                    <p className="text-destructive font-semibold mb-2">{roomError}</p>
-                    <p className="text-sm text-muted-foreground mb-6">
-                      Phòng này không còn khả dụng.
-                    </p>
-                    <Button
-                      onClick={handleCloseInviteModal}
-                      variant="outline"
-                      className="w-full"
-                    >
-                      Đóng
-                    </Button>
-                  </div>
-                ) : (
-                  <>
-                    {/* Host info */}
-                    {roomInfo && (
-                      <div className="mb-4 p-3 bg-muted/50 rounded-xl">
-                        <p className="text-xs text-muted-foreground mb-1">Đang chờ bạn</p>
-                        <div className="flex items-center justify-center gap-2">
-                          <Crown className="w-5 h-5 text-yellow-500" />
-                          <span className="font-bold text-lg">{roomInfo.host_name}</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Room code */}
-                    <p className="text-xs text-muted-foreground mb-1">Mã phòng</p>
-                    <p className="text-3xl font-mono font-bold text-primary tracking-widest mb-5">
-                      {initialRoomCode}
-                    </p>
-
-                    {/* Join button */}
-                    <Button
-                      onClick={handleJoinFromInvite}
-                      disabled={joiningRoom || !roomInfo}
-                      className={`w-full h-14 text-lg font-bold rounded-xl bg-gradient-to-r ${inviteGame === "semantic" ? "from-purple-500 to-pink-500" : "from-yellow-400 to-orange-500"} hover:opacity-90 text-white`}
-                    >
-                      {joiningRoom ? (
-                        <Loader2 className="w-6 h-6 animate-spin" />
-                      ) : (
-                        <>
-                          <Play className="w-6 h-6 mr-2" />
-                          Tham gia ngay!
-                        </>
-                      )}
-                    </Button>
-
-                    <p className="text-xs text-muted-foreground mt-4">
-                      12 giây mỗi lượt • 2 cảnh báo = thua
-                    </p>
-                  </>
-                )}
               </div>
             </motion.div>
           </motion.div>
