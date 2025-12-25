@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Swords, Link2, Brain, Users, Trophy, Zap, Crown, Lock } from "lucide-react";
+import { Swords, Link2, Brain, Users, Trophy, Zap, Crown, Lock, X, Loader2, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import CleanHeader from "@/components/CleanHeader";
@@ -64,9 +64,12 @@ const battleGames: BattleGame[] = [
 export default function Battle() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); // null = loading
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
   const [initialRoomCode, setInitialRoomCode] = useState<string | undefined>();
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteGame, setInviteGame] = useState<string | null>(null);
+  const [joiningRoom, setJoiningRoom] = useState(false);
 
   // Check URL params for room code
   useEffect(() => {
@@ -76,15 +79,7 @@ export default function Battle() {
     if (!roomCode) return;
 
     setInitialRoomCode(roomCode);
-
-    // If a room code is present but "game" is missing (or invalid), default to Word Chain.
-    // This makes shared links work without requiring users to manually type the code.
-    if (game === "semantic") {
-      setSelectedGame("semantic");
-      return;
-    }
-
-    setSelectedGame("word-chain");
+    setInviteGame(game === "semantic" ? "semantic" : "word-chain");
   }, [searchParams]);
 
   // Check auth
@@ -101,6 +96,36 @@ export default function Battle() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Handle invite flow: redirect to auth if not logged in, show modal if logged in
+  useEffect(() => {
+    if (isLoggedIn === null) return; // Still loading auth state
+    if (!initialRoomCode) return; // No invite
+
+    if (!isLoggedIn) {
+      // Redirect to auth with return URL
+      const currentPath = `/battle?game=${inviteGame || "word-chain"}&room=${initialRoomCode}`;
+      navigate(`/auth?redirect=${encodeURIComponent(currentPath)}`);
+      return;
+    }
+
+    // Logged in with invite → show modal
+    setShowInviteModal(true);
+  }, [isLoggedIn, initialRoomCode, inviteGame, navigate]);
+
+  const handleJoinFromInvite = () => {
+    setJoiningRoom(true);
+    setShowInviteModal(false);
+    setSelectedGame(inviteGame || "word-chain");
+  };
+
+  const handleCloseInviteModal = () => {
+    setShowInviteModal(false);
+    setInitialRoomCode(undefined);
+    setInviteGame(null);
+    // Clear URL params
+    navigate("/battle", { replace: true });
+  };
 
   const handleSelectGame = (game: BattleGame) => {
     if (!game.available) {
@@ -161,6 +186,76 @@ export default function Battle() {
   return (
     <div className="min-h-screen bg-background">
       <CleanHeader />
+
+      {/* Invite Modal Popup */}
+      <AnimatePresence>
+        {showInviteModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={handleCloseInviteModal}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-sm bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
+            >
+              {/* Close button */}
+              <button
+                onClick={handleCloseInviteModal}
+                className="absolute top-3 right-3 p-1 rounded-full hover:bg-muted transition-colors z-10"
+              >
+                <X className="w-5 h-5 text-muted-foreground" />
+              </button>
+
+              {/* Header with gradient */}
+              <div className={`bg-gradient-to-r ${inviteGame === "semantic" ? "from-purple-500 to-pink-500" : "from-yellow-400 to-orange-500"} p-6 text-center`}>
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Swords className="w-8 h-8 text-white" />
+                </div>
+                <h2 className="text-xl font-bold text-white">
+                  {inviteGame === "semantic" ? "Đấu Nghĩa 1:1" : "Nối từ 1:1"}
+                </h2>
+                <p className="text-white/80 text-sm mt-1">
+                  Bạn được mời tham gia trận đấu!
+                </p>
+              </div>
+
+              {/* Room code display */}
+              <div className="p-6 text-center">
+                <p className="text-sm text-muted-foreground mb-2">Mã phòng</p>
+                <p className="text-3xl font-mono font-bold text-primary tracking-widest mb-6">
+                  {initialRoomCode}
+                </p>
+
+                {/* Join button */}
+                <Button
+                  onClick={handleJoinFromInvite}
+                  disabled={joiningRoom}
+                  className={`w-full h-14 text-lg font-bold rounded-xl bg-gradient-to-r ${inviteGame === "semantic" ? "from-purple-500 to-pink-500" : "from-yellow-400 to-orange-500"} hover:opacity-90 text-white`}
+                >
+                  {joiningRoom ? (
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                  ) : (
+                    <>
+                      <Play className="w-6 h-6 mr-2" />
+                      Tham gia ngay!
+                    </>
+                  )}
+                </Button>
+
+                <p className="text-xs text-muted-foreground mt-4">
+                  12 giây mỗi lượt • 2 cảnh báo = thua
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       <main className="container mx-auto px-4 py-6 pt-20 pb-24">
         {/* Hero Section */}
