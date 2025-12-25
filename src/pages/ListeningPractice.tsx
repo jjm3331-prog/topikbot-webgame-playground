@@ -177,7 +177,7 @@ const ListeningPractice = () => {
   // Load questions when level changes
   useEffect(() => {
     fetchListeningQuestions(topikLevel);
-  }, [topikLevel, fetchListeningQuestions]);
+  }, [topikLevel]);
 
   const currentQuestion = listeningQuestions[currentQuestionIndex];
 
