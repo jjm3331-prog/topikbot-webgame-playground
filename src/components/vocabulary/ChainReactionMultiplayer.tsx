@@ -395,9 +395,11 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   };
 
   // Copy room URL (전체 URL 복사)
+  // NOTE: 카카오톡/일부 인앱브라우저는 딥링크(/vocabulary)로 접속 시 404가 날 수 있어
+  // 해시(#) 기반 URL로 공유해 서버 라우팅 의존성을 제거합니다.
   const copyRoomUrl = () => {
     if (room?.room_code) {
-      const url = `https://game.topikbot.kr/vocabulary?mode=multiplayer&room=${room.room_code}`;
+      const url = `https://game.topikbot.kr/#/vocabulary?mode=multiplayer&room=${room.room_code}`;
       navigator.clipboard.writeText(url);
       setCopied(true);
       toast({
@@ -411,8 +413,8 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   // Share using Web Share API (모바일에서 더 편리)
   const shareRoom = async () => {
     if (!room?.room_code) return;
-    
-    const url = `https://game.topikbot.kr/vocabulary?mode=multiplayer&room=${room.room_code}`;
+
+    const url = `https://game.topikbot.kr/#/vocabulary?mode=multiplayer&room=${room.room_code}`;
     const shareData = {
       title: "LUKATO 단어 대결",
       text: `🎮 나와 단어 대결해! 방 코드: ${room.room_code}`,

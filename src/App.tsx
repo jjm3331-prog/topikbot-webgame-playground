@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
@@ -58,6 +58,31 @@ import PWAWelcome from "./components/PWAWelcome";
 import SplashScreen from "./components/SplashScreen";
 
 const queryClient = new QueryClient();
+
+function HashDeepLinkBridge() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // KakaoTalk/Zalo 인앱브라우저에서 딥링크(/vocabulary 등) 접근 시 404가 날 수 있어
+    // 공유 링크를 https://game.topikbot.kr/#/vocabulary?... 형태로 만들고,
+    // 여기서 hash 경로를 BrowserRouter 경로로 변환합니다.
+    const hash = window.location.hash || "";
+    if (!hash.startsWith("#/")) return;
+
+    const target = hash.slice(1); // remove leading '#'
+    if (!target.startsWith("/")) return;
+
+    try {
+      navigate(target, { replace: true });
+      // 해시 제거 (URL 깔끔하게)
+      window.history.replaceState(null, "", target);
+    } catch {
+      // ignore
+    }
+  }, [navigate]);
+
+  return null;
+}
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -129,6 +154,7 @@ const App = () => {
           <PWAInstallPrompt />
           <PWAWelcome />
           <BrowserRouter>
+            <HashDeepLinkBridge />
             <Routes>
               <Route path="/" element={<Landing />} />
               <Route path="/auth" element={<Auth />} />
