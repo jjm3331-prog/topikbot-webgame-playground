@@ -280,22 +280,35 @@ B: "물론이죠. 다만 단기적 처방보다는 산업 구조 재편이라는
 참고 텍스트:
 ${ragContent}`;
 
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${geminiApiKey}`, {
+  const xaiApiKey = Deno.env.get('X_AI_API_KEY');
+  if (!xaiApiKey) {
+    throw new Error('X_AI_API_KEY not configured');
+  }
+
+  const response = await fetch('https://api.x.ai/v1/chat/completions', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Authorization': `Bearer ${xaiApiKey}`,
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({
-      contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-      systemInstruction: { parts: [{ text: systemPrompt }] },
-      generationConfig: { temperature: topikLevel === "5-6" ? 0.7 : 0.9, maxOutputTokens: 4096 },
+      model: 'grok-4.1-fast-non-reasoning',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+      temperature: topikLevel === "5-6" ? 0.7 : 0.9,
     }),
   });
 
   if (!response.ok) {
-    throw new Error(`Gemini API error: ${response.status}`);
+    const errText = await response.text();
+    console.error('xAI API error:', response.status, errText);
+    throw new Error(`xAI API error: ${response.status}`);
   }
 
   const data = await response.json();
-  const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  const content = data.choices?.[0]?.message?.content || '';
   
   // JSON 파싱
   const jsonMatch = content.match(/\[[\s\S]*\]/);

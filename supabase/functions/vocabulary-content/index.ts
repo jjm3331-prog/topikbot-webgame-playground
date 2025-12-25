@@ -154,29 +154,38 @@ ${excludeList}
 
 반드시 JSON 배열만 반환하세요. ${count}개의 단어를 모두 포함하세요.`;
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${geminiApiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 1.2, // 더 높은 temperature로 다양성 증가
-          maxOutputTokens: 4096,
-          topP: 0.95,
-          topK: 64,
+  const xaiApiKey = Deno.env.get('X_AI_API_KEY');
+  if (!xaiApiKey) {
+    throw new Error('X_AI_API_KEY not configured');
+  }
+
+  const response = await fetch('https://api.x.ai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${xaiApiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'grok-4.1-fast-non-reasoning',
+      messages: [
+        {
+          role: 'system',
+          content: `당신은 TOPIK ${topikLevel}급 한국어 어휘 교육 전문가입니다. 반드시 JSON 배열 형식으로만 응답하세요.`
         },
-      }),
-    }
-  );
+        { role: 'user', content: prompt }
+      ],
+      temperature: 1.2,
+    }),
+  });
 
   if (!response.ok) {
-    throw new Error(`Gemini API error: ${response.status}`);
+    const errText = await response.text();
+    console.error('xAI API error:', response.status, errText);
+    throw new Error(`xAI API error: ${response.status}`);
   }
 
   const data = await response.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  const text = data.choices?.[0]?.message?.content || '';
   
   const jsonMatch = text.match(/\[[\s\S]*\]/);
   if (jsonMatch) {
