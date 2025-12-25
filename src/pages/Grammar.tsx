@@ -101,7 +101,7 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
 
   useEffect(() => {
     fetchQuestions();
-  }, [fetchQuestions]);
+  }, [level]);
 
   const resetGame = (question: GrammarQuestion) => {
     setSelectedParts([]);
@@ -320,7 +320,7 @@ function CorrectionGame({ level }: { level: TopikLevel }) {
 
   useEffect(() => {
     fetchQuestions();
-  }, [fetchQuestions]);
+  }, [level]);
 
   const handleSelectError = (word: string) => {
     const current = questions[currentIndex];
@@ -517,7 +517,7 @@ function BattleGame({ level }: { level: TopikLevel }) {
 
   useEffect(() => {
     fetchQuestions();
-  }, [fetchQuestions]);
+  }, [level]);
 
   useEffect(() => {
     if (gameState !== 'playing') return;

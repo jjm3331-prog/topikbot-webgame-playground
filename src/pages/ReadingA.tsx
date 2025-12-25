@@ -152,7 +152,7 @@ const ReadingA = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -165,7 +165,7 @@ const ReadingA = () => {
   // 탭/레벨 변경 또는 초기 로드 시 문제 가져오기
   useEffect(() => {
     fetchQuestions(activeTab, topikLevel);
-  }, [activeTab, topikLevel, fetchQuestions]);
+  }, [activeTab, topikLevel]);
 
   const currentCategory = tabCategories[activeTab];
   const currentQuestion = questions[currentQuestionIndex];
