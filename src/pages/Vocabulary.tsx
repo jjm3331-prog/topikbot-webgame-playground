@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import ChainReactionMultiplayer from "@/components/vocabulary/ChainReactionMultiplayer";
 import { 
   ArrowLeft, 
   BookOpen,
@@ -216,6 +217,7 @@ const SprintGame = ({ words, onComplete }: SprintGameProps) => {
 // ================== MAIN COMPONENT ==================
 const Vocabulary = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<TabType>("racing");
@@ -224,6 +226,11 @@ const Vocabulary = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [gameComplete, setGameComplete] = useState(false);
   const [gameResult, setGameResult] = useState<any>(null);
+  
+  // URL 파라미터에서 멀티플레이어 모드 및 방 코드 확인
+  const urlMode = searchParams.get("mode");
+  const urlRoomCode = searchParams.get("room");
+  const [showMultiplayer, setShowMultiplayer] = useState(urlMode === "multiplayer");
   
   // 이전에 학습한 단어들을 추적 (세션 동안 유지)
   const [learnedWords, setLearnedWords] = useState<Record<TopikLevel, string[]>>({
@@ -363,6 +370,14 @@ const Vocabulary = () => {
     };
     checkAuth();
   }, []);
+
+  // URL 파라미터로 멀티플레이어 모드 접속 시 자동으로 chain 탭으로 이동
+  useEffect(() => {
+    if (urlMode === "multiplayer") {
+      setActiveTab("chain");
+      setShowMultiplayer(true);
+    }
+  }, [urlMode]);
 
   useEffect(() => {
     fetchWords(topikLevel);
@@ -607,10 +622,21 @@ const Vocabulary = () => {
                   />
                 )}
                 {activeTab === "chain" && (
-                  <WordChainReaction 
-                    words={words} 
-                    onComplete={handleChainComplete}
-                  />
+                  showMultiplayer ? (
+                    <ChainReactionMultiplayer 
+                      words={words} 
+                      onBack={() => {
+                        setShowMultiplayer(false);
+                        setSearchParams({});
+                      }}
+                      initialRoomCode={urlRoomCode || undefined}
+                    />
+                  ) : (
+                    <WordChainReaction 
+                      words={words} 
+                      onComplete={handleChainComplete}
+                    />
+                  )
                 )}
                 {activeTab === "sprint" && (
                   <SprintGame 
