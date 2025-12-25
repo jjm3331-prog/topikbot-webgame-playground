@@ -83,11 +83,67 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
   const isHost = room?.host_id === playerId;
 
-  // URL에서 방 코드를 받았으면 자동으로 참가 화면으로 이동
+  // 랜덤 닉네임 생성 함수
+  const generateRandomNickname = () => {
+    const adjectives = ["빠른", "용감한", "똑똑한", "귀여운", "멋진", "신나는", "활발한", "재미있는"];
+    const nouns = ["호랑이", "토끼", "용", "펭귄", "고양이", "강아지", "여우", "곰"];
+    const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const noun = nouns[Math.floor(Math.random() * nouns.length)];
+    const num = Math.floor(Math.random() * 100);
+    return `${adj}${noun}${num}`;
+  };
+
+  // URL에서 방 코드를 받았으면 자동으로 닉네임 생성 후 즉시 참가
   useEffect(() => {
-    if (initialRoomCode && initialRoomCode.length === 6) {
+    if (initialRoomCode && initialRoomCode.length === 6 && gamePhase === "menu") {
+      const autoNickname = generateRandomNickname();
+      setPlayerName(autoNickname);
       setRoomCodeInput(initialRoomCode.toUpperCase());
+      
+      // 자동 참가 실행 (약간의 딜레이 후)
+      const autoJoin = async () => {
+        try {
+          // Find room
+          const { data: roomData, error: findError } = await supabase
+            .from("chain_reaction_rooms")
+            .select()
+            .eq("room_code", initialRoomCode.toUpperCase())
+            .eq("status", "waiting")
+            .single();
+
+          if (findError || !roomData) {
+            toast({ title: "방을 찾을 수 없습니다", description: "이미 시작되었거나 존재하지 않는 방입니다.", variant: "destructive" });
+            setGamePhase("menu");
+            return;
+          }
+
+          // Join room
+          const { data, error } = await supabase
+            .from("chain_reaction_rooms")
+            .update({
+              guest_id: playerId,
+              guest_name: autoNickname,
+              status: "ready"
+            })
+            .eq("id", roomData.id)
+            .select()
+            .single();
+
+          if (error) throw error;
+          setRoom(data);
+          setConnectionMode(data.connection_mode as "semantic" | "phonetic");
+          setGamePhase("ready");
+          subscribeToRoom(data.id);
+          toast({ title: `${autoNickname}(으)로 참가 완료!` });
+        } catch (err) {
+          console.error("Auto join failed:", err);
+          toast({ title: "자동 참가 실패", description: "수동으로 참가해주세요.", variant: "destructive" });
+          setGamePhase("joining");
+        }
+      };
+      
       setGamePhase("joining");
+      autoJoin();
     }
   }, [initialRoomCode]);
 
