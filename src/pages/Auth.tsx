@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,7 +35,11 @@ const Auth = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
+
+  // Get redirect URL from query params (for invite links)
+  const redirectTo = searchParams.get("redirect") || "/dashboard";
 
   useEffect(() => {
     setTimeout(() => setIsLoaded(true), 100);
@@ -71,13 +75,13 @@ const Auth = () => {
           password,
         });
         if (error) throw error;
-        navigate("/dashboard");
+        navigate(redirectTo);
       } else {
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `${window.location.origin}${redirectTo}`,
             data: { username },
           },
         });
@@ -86,7 +90,7 @@ const Auth = () => {
           title: "Đăng ký thành công!",
           description: "Chào mừng bạn đến với LUKATO AI",
         });
-        navigate("/dashboard");
+        navigate(redirectTo);
       }
     } catch (error: any) {
       let message = error.message;
@@ -109,10 +113,15 @@ const Auth = () => {
     setLoading(true);
     try {
       const productionUrl = 'https://game.topikbot.kr';
+      // For Google OAuth, we need to handle redirect after OAuth completes
+      // Store the intended redirect in sessionStorage so we can use it after OAuth callback
+      if (redirectTo !== "/dashboard") {
+        sessionStorage.setItem("auth_redirect", redirectTo);
+      }
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${productionUrl}/dashboard`
+          redirectTo: `${productionUrl}${redirectTo}`
         }
       });
       if (error) throw error;
