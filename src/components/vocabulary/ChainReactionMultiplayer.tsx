@@ -68,7 +68,7 @@ export default function ChainReactionMultiplayer({ words, onBack }: ChainReactio
   const [connectionMode, setConnectionMode] = useState<"semantic" | "phonetic">("semantic");
   
   // Game state
-  const [timeLeft, setTimeLeft] = useState(30);
+  const [timeLeft, setTimeLeft] = useState(60);
   const [chain, setChain] = useState<ChainWord[]>([]);
   const [currentInput, setCurrentInput] = useState("");
   const [score, setScore] = useState(0);
@@ -266,7 +266,7 @@ export default function ChainReactionMultiplayer({ words, onBack }: ChainReactio
   // Local game start
   const startGameLocal = (roomData: Room) => {
     setGamePhase("playing");
-    setTimeLeft(30);
+    setTimeLeft(60);
     setScore(0);
     setChain([]);
     setCurrentInput("");
