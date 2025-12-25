@@ -123,9 +123,9 @@ const Pricing = () => {
       case "1-month":
         return { price: 299000, perMonth: 299000, savings: 0 };
       case "6-months":
-        return { price: 1494000, perMonth: 249000, savings: 300000 };
+        return { price: 1500000, perMonth: 250000, savings: 294000 };
       case "12-months":
-        return { price: 2388000, perMonth: 199000, savings: 1200000 };
+        return { price: 2500000, perMonth: 208333, savings: 1088000 };
     }
   };
 

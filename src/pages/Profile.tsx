@@ -35,6 +35,7 @@ interface Profile {
   id: string;
   username: string;
   created_at: string;
+  points?: number;
 }
 
 interface UserData {
@@ -73,7 +74,7 @@ const Profile = () => {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, username, created_at, avatar_url")
+        .select("id, username, created_at, avatar_url, points")
         .eq("id", session.user.id)
         .single();
 
@@ -260,7 +261,7 @@ const Profile = () => {
       <div className="min-h-[100dvh] bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <img src="/favicon.png" alt="LUKATO" className="w-16 h-16 rounded-full animate-pulse" />
-          <div className="text-muted-foreground text-sm">로딩중... / Đang tải...</div>
+          <div className="text-muted-foreground text-sm">Đang tải...</div>
         </div>
       </div>
     );
@@ -451,11 +452,15 @@ const Profile = () => {
                   </div>
                 )}
               </div>
-              <div>
+              <div className="flex-1">
                 <h2 className="text-xl font-bold text-foreground">{profile?.username}</h2>
                 <p className="text-sm text-muted-foreground">
                   {isPremium ? "👑 Premium Member" : isPlus ? "⭐ Plus Member" : "Thành viên"}
                 </p>
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-bold text-korean-orange">{profile?.points?.toLocaleString() || 0}</p>
+                <p className="text-xs text-muted-foreground">điểm</p>
               </div>
             </div>
           </motion.div>
@@ -470,44 +475,44 @@ const Profile = () => {
           >
             <h3 className="font-semibold text-foreground flex items-center gap-2 mb-4">
               <User className="w-4 h-4" />
-              메뉴
+              Menu
             </h3>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <Button variant="secondary" className="justify-start" onClick={() => navigate("/ranking")}
               >
                 <Trophy className="w-4 h-4 mr-2" />
-                랭킹
+                Xếp hạng
+              </Button>
+
+              <Button variant="secondary" className="justify-start" onClick={() => navigate("/points-system")}
+              >
+                <Star className="w-4 h-4 mr-2" />
+                Điểm thưởng
               </Button>
 
               <Button variant="secondary" className="justify-start" onClick={() => navigate("/pricing")}
               >
                 <Crown className="w-4 h-4 mr-2" />
-                요금제
+                Bảng giá
               </Button>
 
               <Button variant="secondary" className="justify-start" onClick={() => navigate("/help-center")}
               >
                 <Headphones className="w-4 h-4 mr-2" />
-                고객센터
+                Hỗ trợ
               </Button>
 
               <Button variant="secondary" className="justify-start" onClick={() => navigate("/terms")}
               >
                 <Notebook className="w-4 h-4 mr-2" />
-                이용약관
-              </Button>
-
-              <Button variant="secondary" className="justify-start" onClick={() => navigate("/privacy")}
-              >
-                <HelpCircle className="w-4 h-4 mr-2" />
-                개인정보
+                Điều khoản
               </Button>
 
               <Button variant="secondary" className="justify-start" onClick={() => navigate("/dashboard")}
               >
                 <ArrowRight className="w-4 h-4 mr-2" />
-                대시보드
+                Tổng quan
               </Button>
             </div>
           </motion.section>
