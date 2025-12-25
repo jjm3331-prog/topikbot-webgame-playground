@@ -13,14 +13,15 @@ import {
   Loader2,
   RefreshCw,
   Timer,
-  Zap,
   RotateCcw,
   Trophy,
   Flame,
-  Car
+  Car,
+  Link2
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import WordRacing from "@/components/vocabulary/WordRacing";
+import WordChainReaction from "@/components/vocabulary/WordChainReaction";
 
 // Word interface
 interface Word {
@@ -44,157 +45,13 @@ type TopikLevel = keyof typeof topikLevels;
 // Tab types
 const tabs = [
   { id: "racing", label: "단어 레이싱", icon: Car, description: "Đua xe từ vựng" },
-  { id: "memory", label: "메모리 매칭", icon: Zap, description: "Ghép thẻ" },
+  { id: "chain", label: "체인 리액션", icon: Link2, description: "Chuỗi phản ứng" },
   { id: "sprint", label: "60초 스프린트", icon: Timer, description: "Chạy đua 60 giây" },
 ];
 
-type TabType = "racing" | "memory" | "sprint";
+type TabType = "racing" | "chain" | "sprint";
 
 
-// ================== MEMORY MATCHING COMPONENT ==================
-interface MemoryGameProps {
-  words: Word[];
-  onComplete: (attempts: number, time: number) => void;
-}
-
-interface MemoryCard {
-  id: string;
-  wordId: number;
-  content: string;
-  type: "korean" | "meaning";
-  isFlipped: boolean;
-  isMatched: boolean;
-}
-
-const MemoryGame = ({ words, onComplete }: MemoryGameProps) => {
-  const [cards, setCards] = useState<MemoryCard[]>([]);
-  const [flippedCards, setFlippedCards] = useState<string[]>([]);
-  const [attempts, setAttempts] = useState(0);
-  const [matchedPairs, setMatchedPairs] = useState(0);
-  const [startTime] = useState(Date.now());
-  const [isChecking, setIsChecking] = useState(false);
-
-  // Initialize cards (use first 6 words for 12 cards)
-  useEffect(() => {
-    const gameWords = words.slice(0, 6);
-    const newCards: MemoryCard[] = [];
-    
-    gameWords.forEach((word, idx) => {
-      newCards.push({
-        id: `korean-${idx}`,
-        wordId: word.id,
-        content: word.korean,
-        type: "korean",
-        isFlipped: false,
-        isMatched: false,
-      });
-      newCards.push({
-        id: `meaning-${idx}`,
-        wordId: word.id,
-        content: word.meaning,
-        type: "meaning",
-        isFlipped: false,
-        isMatched: false,
-      });
-    });
-
-    // Shuffle cards
-    setCards(newCards.sort(() => Math.random() - 0.5));
-  }, [words]);
-
-  const handleCardClick = (cardId: string) => {
-    if (isChecking) return;
-    
-    const card = cards.find(c => c.id === cardId);
-    if (!card || card.isFlipped || card.isMatched) return;
-    if (flippedCards.length >= 2) return;
-
-    // Flip the card
-    setCards(prev => prev.map(c => 
-      c.id === cardId ? { ...c, isFlipped: true } : c
-    ));
-
-    const newFlipped = [...flippedCards, cardId];
-    setFlippedCards(newFlipped);
-
-    // Check for match when 2 cards are flipped
-    if (newFlipped.length === 2) {
-      setIsChecking(true);
-      setAttempts(prev => prev + 1);
-
-      const [firstId, secondId] = newFlipped;
-      const firstCard = cards.find(c => c.id === firstId)!;
-      const secondCard = cards.find(c => c.id === secondId)!;
-
-      setTimeout(() => {
-        if (firstCard.wordId === secondCard.wordId && firstCard.type !== secondCard.type) {
-          // Match found!
-          setCards(prev => prev.map(c => 
-            c.wordId === firstCard.wordId ? { ...c, isMatched: true } : c
-          ));
-          setMatchedPairs(prev => {
-            const newMatched = prev + 1;
-            if (newMatched === 6) {
-              confetti({ particleCount: 100, spread: 70 });
-              onComplete(attempts + 1, Math.floor((Date.now() - startTime) / 1000));
-            }
-            return newMatched;
-          });
-        } else {
-          // No match - flip back
-          setCards(prev => prev.map(c => 
-            newFlipped.includes(c.id) ? { ...c, isFlipped: false } : c
-          ));
-        }
-        setFlippedCards([]);
-        setIsChecking(false);
-      }, 800);
-    }
-  };
-
-  return (
-    <div>
-      {/* Stats */}
-      <div className="flex justify-between text-sm mb-6">
-        <span className="text-muted-foreground">시도: <span className="font-bold text-foreground">{attempts}</span></span>
-        <span className="text-muted-foreground">매칭: <span className="font-bold text-primary">{matchedPairs}/6</span></span>
-      </div>
-
-      {/* Card Grid */}
-      <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-        {cards.map((card) => (
-          <motion.div
-            key={card.id}
-            onClick={() => handleCardClick(card.id)}
-            whileHover={{ scale: card.isMatched ? 1 : 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className={`aspect-square rounded-xl cursor-pointer transition-all ${
-              card.isMatched 
-                ? "bg-green-100 border-2 border-green-400" 
-                : "bg-card border-2 border-border hover:border-primary/50"
-            }`}
-          >
-            <div className="w-full h-full flex items-center justify-center p-2">
-              {card.isFlipped || card.isMatched ? (
-                <motion.span 
-                  initial={{ rotateY: -90 }}
-                  animate={{ rotateY: 0 }}
-                  className={`text-center font-medium ${
-                    card.type === "korean" ? "text-lg" : "text-sm"
-                  } ${card.isMatched ? "text-green-600" : "text-foreground"}`}
-                >
-                  {card.content}
-                </motion.span>
-              ) : (
-                <span className="text-3xl">❓</span>
-              )}
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  );
-};
 
 // ================== SPRINT COMPONENT ==================
 interface SprintGameProps {
@@ -550,9 +407,12 @@ const Vocabulary = () => {
     }
   };
 
-  const handleMemoryComplete = (attempts: number, time: number) => {
+  const handleChainComplete = (score: number, chainLength: number) => {
     setGameComplete(true);
-    setGameResult({ type: "memory", attempts, time });
+    setGameResult({ type: "chain", score, chainLength });
+    if (chainLength >= 5) {
+      confetti({ particleCount: 100, spread: 70 });
+    }
   };
 
   const handleSprintComplete = (score: number) => {
@@ -711,11 +571,11 @@ const Vocabulary = () => {
                   </div>
                 )}
                 
-                {gameResult?.type === "memory" && (
+                {gameResult?.type === "chain" && (
                   <div className="mb-6">
-                    <p className="text-lg">
-                      <span className="font-bold">{gameResult.attempts}</span>번 시도,{" "}
-                      <span className="font-bold">{gameResult.time}</span>초 소요
+                    <p className="text-3xl font-bold text-primary mb-2">{gameResult.score}점</p>
+                    <p className="text-muted-foreground">
+                      {gameResult.chainLength} 체인 / chuỗi
                     </p>
                   </div>
                 )}
@@ -746,10 +606,10 @@ const Vocabulary = () => {
                     onComplete={handleRacingComplete}
                   />
                 )}
-                {activeTab === "memory" && (
-                  <MemoryGame 
+                {activeTab === "chain" && (
+                  <WordChainReaction 
                     words={words} 
-                    onComplete={handleMemoryComplete}
+                    onComplete={handleChainComplete}
                   />
                 )}
                 {activeTab === "sprint" && (
