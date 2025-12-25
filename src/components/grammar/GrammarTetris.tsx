@@ -13,8 +13,8 @@ import {
   ChevronRight, 
   ChevronDown,
   Zap,
-  Link as LinkIcon,
-  CircleDot
+  Sparkles,
+  Star
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -58,14 +58,38 @@ const SENTENCES: Record<TopikLevel, Sentence[]> = {
   ],
 };
 
-// 블록 색상
-const BLOCK_COLORS: Record<BlockType, string> = {
-  subject: "bg-blue-500",
-  object: "bg-green-500",
-  verb: "bg-red-500",
-  adverb: "bg-yellow-500",
-  connector: "bg-purple-500",
-  ending: "bg-pink-500",
+// 블록 색상 - 그라데이션과 글로우 효과
+const BLOCK_STYLES: Record<BlockType, { gradient: string; glow: string; ring: string }> = {
+  subject: { 
+    gradient: "from-rose-500 via-pink-500 to-rose-600", 
+    glow: "shadow-[0_0_20px_rgba(244,63,94,0.6)]",
+    ring: "ring-rose-400/50"
+  },
+  object: { 
+    gradient: "from-amber-400 via-orange-500 to-amber-600", 
+    glow: "shadow-[0_0_20px_rgba(251,146,60,0.6)]",
+    ring: "ring-amber-400/50"
+  },
+  verb: { 
+    gradient: "from-emerald-400 via-green-500 to-emerald-600", 
+    glow: "shadow-[0_0_20px_rgba(34,197,94,0.6)]",
+    ring: "ring-emerald-400/50"
+  },
+  adverb: { 
+    gradient: "from-violet-400 via-purple-500 to-violet-600", 
+    glow: "shadow-[0_0_20px_rgba(168,85,247,0.6)]",
+    ring: "ring-violet-400/50"
+  },
+  connector: { 
+    gradient: "from-cyan-400 via-teal-500 to-cyan-600", 
+    glow: "shadow-[0_0_25px_rgba(34,211,238,0.7)]",
+    ring: "ring-cyan-400/50"
+  },
+  ending: { 
+    gradient: "from-fuchsia-400 via-pink-500 to-fuchsia-600", 
+    glow: "shadow-[0_0_25px_rgba(232,121,249,0.7)]",
+    ring: "ring-fuchsia-400/50"
+  },
 };
 
 const BLOCK_LABELS: Record<BlockType, { vi: string; ko: string }> = {
@@ -77,12 +101,42 @@ const BLOCK_LABELS: Record<BlockType, { vi: string; ko: string }> = {
   ending: { vi: "Kết thúc", ko: "종결어미" },
 };
 
-const COLS = 6;
-const ROWS = 8;
+const COLS = 5;
+const ROWS = 7;
 
 interface GrammarTetrisProps {
   level: TopikLevel;
 }
+
+// 파티클 컴포넌트
+const Particles = ({ x, y, color }: { x: number; y: number; color: string }) => {
+  return (
+    <>
+      {[...Array(8)].map((_, i) => (
+        <motion.div
+          key={i}
+          className={`absolute w-2 h-2 rounded-full ${color}`}
+          initial={{ 
+            x, 
+            y, 
+            scale: 1, 
+            opacity: 1 
+          }}
+          animate={{ 
+            x: x + (Math.random() - 0.5) * 150,
+            y: y + (Math.random() - 0.5) * 150,
+            scale: 0,
+            opacity: 0
+          }}
+          transition={{ 
+            duration: 0.8, 
+            ease: "easeOut" 
+          }}
+        />
+      ))}
+    </>
+  );
+};
 
 export default function GrammarTetris({ level }: GrammarTetrisProps) {
   const [gameState, setGameState] = useState<"ready" | "playing" | "paused" | "finished">("ready");
@@ -97,9 +151,20 @@ export default function GrammarTetris({ level }: GrammarTetrisProps) {
   const [currentSentence, setCurrentSentence] = useState<Sentence | null>(null);
   const [sentenceIndex, setSentenceIndex] = useState(0);
   const [blockQueue, setBlockQueue] = useState<{ text: string; type: BlockType }[]>([]);
+  const [particles, setParticles] = useState<{ id: number; x: number; y: number; color: string }[]>([]);
+  const [showCombo, setShowCombo] = useState(false);
   
   const gameLoopRef = useRef<NodeJS.Timeout | null>(null);
   const dropSpeedRef = useRef(1000);
+
+  // 파티클 생성
+  const createParticles = useCallback((x: number, y: number, color: string) => {
+    const id = Date.now();
+    setParticles(prev => [...prev, { id, x, y, color }]);
+    setTimeout(() => {
+      setParticles(prev => prev.filter(p => p.id !== id));
+    }, 1000);
+  }, []);
 
   // 새 문장 시작
   const startNewSentence = useCallback(() => {
@@ -125,7 +190,7 @@ export default function GrammarTetris({ level }: GrammarTetrisProps) {
       id: crypto.randomUUID(),
       text: nextPart.text,
       type: nextPart.type,
-      col: Math.floor(COLS / 2) - 1,
+      col: Math.floor(COLS / 2),
       row: 0,
       isSpecial: nextPart.type === "connector" || nextPart.type === "ending",
     };
@@ -192,9 +257,12 @@ export default function GrammarTetris({ level }: GrammarTetrisProps) {
       return newBoard;
     });
 
+    // 파티클 효과
+    createParticles(150 + block.col * 60, 50 + block.row * 60, "bg-white");
+
     // 줄 체크
     setTimeout(() => checkLines(), 100);
-  }, []);
+  }, [createParticles]);
 
   // 줄 클리어 체크
   const checkLines = useCallback(() => {
@@ -221,6 +289,11 @@ export default function GrammarTetris({ level }: GrammarTetrisProps) {
             cleared++;
             newBoard[row] = Array(COLS).fill(null);
             
+            // 파티클 효과 추가
+            for (let i = 0; i < 5; i++) {
+              createParticles(150 + i * 60, 50 + row * 60, "bg-primary");
+            }
+            
             // 위의 블록들 내리기
             for (let r = row - 1; r >= 0; r--) {
               newBoard[r + 1] = [...newBoard[r]];
@@ -236,13 +309,18 @@ export default function GrammarTetris({ level }: GrammarTetrisProps) {
       }
 
       if (cleared > 0) {
-        const comboBonus = combo * 10;
+        const comboBonus = combo * 20;
         const lineBonus = cleared * 100;
         const total = lineBonus + comboBonus;
         
         setScore((s) => s + total);
         setCombo((c) => c + 1);
         setLinesCleared((l) => l + cleared);
+        
+        if (combo >= 1) {
+          setShowCombo(true);
+          setTimeout(() => setShowCombo(false), 1500);
+        }
         
         if (cleared >= 2) {
           toast.success(`🔥 멀티 클리어! +${total}점`, { duration: 1500 });
@@ -256,7 +334,7 @@ export default function GrammarTetris({ level }: GrammarTetrisProps) {
 
     // 다음 블록
     setTimeout(() => spawnNextBlock(), 200);
-  }, [currentSentence, combo, spawnNextBlock]);
+  }, [currentSentence, combo, spawnNextBlock, createParticles]);
 
   // 부분 매칭 체크
   const checkPartialMatch = (rowBlocks: Block[], parts: { text: string; type: BlockType }[]) => {
@@ -361,110 +439,240 @@ export default function GrammarTetris({ level }: GrammarTetrisProps) {
   // Ready 화면
   if (gameState === "ready") {
     return (
-      <Card className="p-8 text-center">
-        <div className="text-6xl mb-4">🧱</div>
-        <h2 className="text-2xl font-bold mb-2">Grammar Tetris</h2>
-        <p className="text-muted-foreground mb-4">
-          문법 테트리스 / Xếp hình ngữ pháp
-        </p>
-        <div className="text-left bg-muted/50 rounded-lg p-4 mb-6 text-sm">
-          <p className="font-semibold mb-2">🎮 Cách chơi / 게임 방법:</p>
-          <ul className="space-y-1 text-muted-foreground">
-            <li>← → : Di chuyển / 이동</li>
-            <li>↓ : Rơi nhanh / 빠르게</li>
-            <li>Space : Rơi ngay / 즉시 낙하</li>
-            <li>✅ Xếp đúng thứ tự ngữ pháp để xóa dòng!</li>
-            <li>✅ 올바른 어순으로 배치하면 줄 클리어!</li>
-          </ul>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="relative"
+      >
+        {/* 배경 효과 */}
+        <div className="absolute inset-0 -z-10 overflow-hidden rounded-2xl">
+          <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-accent/20 rounded-full blur-3xl animate-pulse delay-1000" />
         </div>
         
-        {/* 블록 타입 설명 */}
-        <div className="flex flex-wrap justify-center gap-2 mb-6">
-          {Object.entries(BLOCK_LABELS).map(([type, labels]) => (
-            <Badge
-              key={type}
-              className={`${BLOCK_COLORS[type as BlockType]} text-white`}
-            >
-              {labels.vi} / {labels.ko}
-            </Badge>
-          ))}
-        </div>
+        <Card className="p-8 text-center backdrop-blur-sm bg-background/80 border-primary/30">
+          <motion.div
+            initial={{ y: -20 }}
+            animate={{ y: 0 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <div className="text-7xl mb-4 drop-shadow-2xl">🧱</div>
+            <h2 className="text-3xl font-black mb-2 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+              Grammar Tetris
+            </h2>
+            <p className="text-muted-foreground mb-6 text-lg">
+              문법 테트리스 / Xếp hình ngữ pháp
+            </p>
+          </motion.div>
+          
+          <div className="text-left bg-gradient-to-br from-muted/50 to-muted/30 rounded-xl p-5 mb-6 border border-border/50">
+            <p className="font-bold mb-3 flex items-center gap-2 text-lg">
+              <Sparkles className="w-5 h-5 text-primary" />
+              Cách chơi / 게임 방법
+            </p>
+            <ul className="space-y-2 text-muted-foreground">
+              <li className="flex items-center gap-2">
+                <span className="bg-primary/20 px-2 py-0.5 rounded text-xs font-mono">← →</span>
+                Di chuyển / 이동
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="bg-primary/20 px-2 py-0.5 rounded text-xs font-mono">↓</span>
+                Rơi nhanh / 빠르게
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="bg-primary/20 px-2 py-0.5 rounded text-xs font-mono">Space</span>
+                Rơi ngay / 즉시 낙하
+              </li>
+              <li className="mt-3 text-foreground font-medium">
+                ✨ Xếp đúng thứ tự ngữ pháp để xóa dòng!
+              </li>
+              <li className="text-foreground font-medium">
+                ✨ 올바른 어순으로 배치하면 줄 클리어!
+              </li>
+            </ul>
+          </div>
+          
+          {/* 블록 타입 설명 */}
+          <div className="grid grid-cols-3 gap-2 mb-6">
+            {Object.entries(BLOCK_LABELS).map(([type, labels]) => (
+              <motion.div
+                key={type}
+                whileHover={{ scale: 1.05 }}
+                className={`
+                  p-2 rounded-lg bg-gradient-to-r ${BLOCK_STYLES[type as BlockType].gradient}
+                  ${BLOCK_STYLES[type as BlockType].glow}
+                  text-white text-xs font-medium text-center
+                `}
+              >
+                <div>{labels.ko}</div>
+                <div className="opacity-80 text-[10px]">{labels.vi}</div>
+              </motion.div>
+            ))}
+          </div>
 
-        <Button onClick={startGame} size="lg" className="gap-2">
-          <Play className="w-5 h-5" />
-          Bắt đầu / 시작
-        </Button>
-      </Card>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button onClick={startGame} size="lg" className="gap-2 text-lg px-8 py-6 bg-gradient-to-r from-primary to-accent hover:opacity-90">
+              <Play className="w-6 h-6" />
+              Bắt đầu / 시작
+            </Button>
+          </motion.div>
+        </Card>
+      </motion.div>
     );
   }
 
   // Finished 화면
   if (gameState === "finished") {
     return (
-      <Card className="p-8 text-center">
-        <Trophy className="w-16 h-16 mx-auto mb-4 text-yellow-500" />
-        <h2 className="text-2xl font-bold mb-2">Game Over!</h2>
-        <div className="space-y-2 mb-6">
-          <p className="text-4xl font-bold text-primary">{score}점</p>
-          <p className="text-muted-foreground">
-            {linesCleared} dòng đã xóa / {linesCleared} 줄 클리어
-          </p>
-        </div>
-        <Button onClick={startGame} size="lg" className="gap-2">
-          <RotateCcw className="w-5 h-5" />
-          Thử lại / 다시 도전
-        </Button>
-      </Card>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+      >
+        <Card className="p-8 text-center relative overflow-hidden">
+          {/* 배경 효과 */}
+          <div className="absolute inset-0 -z-10">
+            <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-yellow-500/20 rounded-full blur-2xl animate-pulse" />
+            <div className="absolute bottom-1/4 right-1/4 w-32 h-32 bg-primary/20 rounded-full blur-2xl animate-pulse delay-500" />
+          </div>
+          
+          <motion.div
+            initial={{ rotate: -180, scale: 0 }}
+            animate={{ rotate: 0, scale: 1 }}
+            transition={{ type: "spring", stiffness: 200 }}
+          >
+            <Trophy className="w-20 h-20 mx-auto mb-4 text-yellow-500 drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]" />
+          </motion.div>
+          <h2 className="text-3xl font-black mb-4 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+            Game Over!
+          </h2>
+          <div className="space-y-3 mb-6">
+            <motion.p 
+              className="text-5xl font-black text-primary"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.3, type: "spring" }}
+            >
+              {score}점
+            </motion.p>
+            <div className="flex justify-center gap-4 text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <Star className="w-4 h-4 text-amber-400" />
+                <span>{linesCleared} dòng / 줄</span>
+              </div>
+            </div>
+          </div>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button onClick={startGame} size="lg" className="gap-2 text-lg px-8">
+              <RotateCcw className="w-5 h-5" />
+              Thử lại / 다시 도전
+            </Button>
+          </motion.div>
+        </Card>
+      </motion.div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 relative">
+      {/* 파티클 */}
+      <AnimatePresence>
+        {particles.map(p => (
+          <Particles key={p.id} x={p.x} y={p.y} color={p.color} />
+        ))}
+      </AnimatePresence>
+
+      {/* 콤보 표시 */}
+      <AnimatePresence>
+        {showCombo && combo >= 2 && (
+          <motion.div
+            initial={{ scale: 0, y: 50 }}
+            animate={{ scale: 1, y: 0 }}
+            exit={{ scale: 0, y: -50 }}
+            className="absolute top-1/3 left-1/2 -translate-x-1/2 z-50"
+          >
+            <div className="bg-gradient-to-r from-orange-500 to-red-500 px-8 py-4 rounded-2xl shadow-[0_0_30px_rgba(249,115,22,0.6)]">
+              <p className="text-3xl font-black text-white flex items-center gap-2">
+                <Flame className="w-8 h-8" />
+                {combo}x COMBO!
+                <Flame className="w-8 h-8" />
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Stats */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-lg px-4 py-2">
-            <Trophy className="w-4 h-4 mr-2" />
-            {score}점
-          </Badge>
-          {combo > 0 && (
-            <Badge className="bg-orange-500 text-lg px-4 py-2">
-              <Flame className="w-4 h-4 mr-2" />
-              {combo}x
-            </Badge>
-          )}
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setGameState(gameState === "paused" ? "playing" : "paused")}
+        <div className="flex items-center gap-3">
+          <motion.div 
+            className="flex items-center gap-2 bg-gradient-to-r from-amber-500/20 to-orange-500/20 px-4 py-2 rounded-xl border border-amber-500/30"
+            animate={{ scale: score > 0 ? [1, 1.1, 1] : 1 }}
+            transition={{ duration: 0.3 }}
           >
-            {gameState === "paused" ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
-          </Button>
+            <Trophy className="w-5 h-5 text-amber-400" />
+            <span className="font-bold text-xl text-amber-400">{score}</span>
+          </motion.div>
+          
+          <AnimatePresence>
+            {combo > 0 && (
+              <motion.div
+                initial={{ scale: 0, x: -20 }}
+                animate={{ scale: 1, x: 0 }}
+                exit={{ scale: 0 }}
+                className="flex items-center gap-2 bg-gradient-to-r from-orange-500/20 to-red-500/20 px-4 py-2 rounded-xl border border-orange-500/30"
+              >
+                <Flame className="w-5 h-5 text-orange-400" />
+                <span className="font-bold text-lg text-orange-400">{combo}x</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
+        
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setGameState(gameState === "paused" ? "playing" : "paused")}
+          className="border-primary/30"
+        >
+          {gameState === "paused" ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
+        </Button>
       </div>
 
       {/* 현재 문장 힌트 */}
       {currentSentence && (
-        <Card className="p-3 bg-primary/5 border-primary/20">
-          <div className="text-sm font-medium text-center">
-            🎯 목표 문장 / Câu mục tiêu:
-          </div>
-          <div className="text-center mt-1">
-            <span className="font-bold">{currentSentence.meaning_ko}</span>
-            <span className="text-muted-foreground ml-2 text-sm">
-              ({currentSentence.meaning_vi})
-            </span>
-          </div>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="p-4 bg-gradient-to-r from-primary/10 to-accent/10 border-primary/30 backdrop-blur-sm">
+            <div className="text-sm font-medium text-center text-muted-foreground mb-1">
+              🎯 목표 문장 / Câu mục tiêu
+            </div>
+            <div className="text-center">
+              <span className="font-bold text-lg">{currentSentence.meaning_ko}</span>
+              <span className="text-muted-foreground ml-2">
+                ({currentSentence.meaning_vi})
+              </span>
+            </div>
+          </Card>
+        </motion.div>
       )}
 
       <div className="flex gap-4">
         {/* 게임 보드 */}
-        <Card className="flex-1 p-2 bg-slate-900">
+        <Card className="flex-1 p-3 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border-2 border-primary/30 shadow-[0_0_30px_rgba(var(--primary),0.1)] overflow-hidden">
+          {/* 그리드 라인 배경 */}
+          <div className="absolute inset-0 opacity-10">
+            {Array.from({ length: ROWS }).map((_, i) => (
+              <div key={`row-${i}`} className="absolute w-full h-px bg-primary" style={{ top: `${(i + 1) * (100 / ROWS)}%` }} />
+            ))}
+            {Array.from({ length: COLS }).map((_, i) => (
+              <div key={`col-${i}`} className="absolute h-full w-px bg-primary" style={{ left: `${(i + 1) * (100 / COLS)}%` }} />
+            ))}
+          </div>
+          
           <div
-            className="grid gap-0.5"
+            className="grid gap-1 relative"
             style={{
               gridTemplateColumns: `repeat(${COLS}, 1fr)`,
               gridTemplateRows: `repeat(${ROWS}, 1fr)`,
@@ -481,20 +689,36 @@ export default function GrammarTetris({ level }: GrammarTetrisProps) {
                 const block = isCurrentBlock ? currentBlock : cell;
 
                 return (
-                  <div
+                  <motion.div
                     key={`${rowIndex}-${colIndex}`}
+                    initial={isCurrentBlock ? { scale: 0, rotate: -180 } : false}
+                    animate={isCurrentBlock ? { scale: 1, rotate: 0 } : {}}
                     className={`
-                      aspect-square flex items-center justify-center text-xs font-bold rounded-sm
-                      ${block ? BLOCK_COLORS[block.type] + " text-white" : "bg-slate-800"}
-                      ${block?.isSpecial ? "ring-2 ring-yellow-400" : ""}
+                      aspect-square flex items-center justify-center font-bold rounded-lg
+                      min-h-[48px] sm:min-h-[56px]
+                      ${block 
+                        ? `bg-gradient-to-br ${BLOCK_STYLES[block.type].gradient} ${BLOCK_STYLES[block.type].glow} text-white ring-2 ${BLOCK_STYLES[block.type].ring}` 
+                        : "bg-slate-800/50 border border-slate-700/30"
+                      }
+                      ${block?.isSpecial ? "ring-4 ring-yellow-400/60 animate-pulse" : ""}
+                      transition-all duration-200
                     `}
                   >
                     {block && (
-                      <span className="truncate px-0.5 text-[10px] sm:text-xs">
-                        {block.text}
-                      </span>
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="text-center px-1"
+                      >
+                        <span className="text-sm sm:text-base font-bold drop-shadow-lg truncate block">
+                          {block.text}
+                        </span>
+                        <span className="text-[8px] sm:text-[10px] opacity-70">
+                          {BLOCK_LABELS[block.type].ko}
+                        </span>
+                      </motion.div>
                     )}
-                  </div>
+                  </motion.div>
                 );
               })
             )}
@@ -502,68 +726,82 @@ export default function GrammarTetris({ level }: GrammarTetrisProps) {
         </Card>
 
         {/* 사이드 패널 */}
-        <div className="w-24 space-y-4">
+        <div className="w-28 space-y-4">
           {/* Next 블록 */}
-          <Card className="p-2">
-            <div className="text-xs text-center mb-2 text-muted-foreground">NEXT</div>
-            <div className="space-y-1">
+          <Card className="p-3 bg-gradient-to-b from-slate-900 to-slate-950 border-primary/30">
+            <div className="text-xs text-center mb-2 text-primary font-bold tracking-wider">NEXT</div>
+            <div className="space-y-2">
               {nextBlocks.map((block, i) => (
-                <div
+                <motion.div
                   key={block.id}
+                  initial={{ x: 20, opacity: 0 }}
+                  animate={{ x: 0, opacity: i === 0 ? 1 : 0.6 }}
                   className={`
-                    p-1 rounded text-center text-[10px] font-medium text-white
-                    ${BLOCK_COLORS[block.type]}
-                    ${i === 0 ? "opacity-100" : "opacity-60"}
+                    p-2 rounded-lg text-center text-sm font-bold text-white
+                    bg-gradient-to-r ${BLOCK_STYLES[block.type].gradient}
+                    ${i === 0 ? BLOCK_STYLES[block.type].glow : ""}
                   `}
                 >
                   {block.text}
-                </div>
+                </motion.div>
               ))}
             </div>
           </Card>
 
           {/* 클리어 카운트 */}
-          <Card className="p-2 text-center">
-            <div className="text-xs text-muted-foreground">LINES</div>
-            <div className="text-2xl font-bold">{linesCleared}</div>
+          <Card className="p-3 text-center bg-gradient-to-b from-slate-900 to-slate-950 border-primary/30">
+            <div className="text-xs text-primary font-bold tracking-wider">LINES</div>
+            <motion.div 
+              className="text-3xl font-black text-white"
+              animate={{ scale: linesCleared > 0 ? [1, 1.2, 1] : 1 }}
+            >
+              {linesCleared}
+            </motion.div>
           </Card>
         </div>
       </div>
 
       {/* 모바일 컨트롤 */}
-      <div className="flex justify-center gap-4 mt-4">
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={() => moveBlock("left")}
-          className="w-16 h-16"
-        >
-          <ChevronLeft className="w-8 h-8" />
-        </Button>
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={() => moveBlock("down")}
-          className="w-16 h-16"
-        >
-          <ChevronDown className="w-8 h-8" />
-        </Button>
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={() => moveBlock("right")}
-          className="w-16 h-16"
-        >
-          <ChevronRight className="w-8 h-8" />
-        </Button>
-        <Button
-          variant="default"
-          size="lg"
-          onClick={hardDrop}
-          className="w-16 h-16"
-        >
-          <Zap className="w-8 h-8" />
-        </Button>
+      <div className="flex justify-center gap-3 mt-4">
+        <motion.div whileTap={{ scale: 0.9 }}>
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => moveBlock("left")}
+            className="w-16 h-16 text-2xl border-primary/30 bg-background/80 hover:bg-primary/20"
+          >
+            <ChevronLeft className="w-8 h-8" />
+          </Button>
+        </motion.div>
+        <motion.div whileTap={{ scale: 0.9 }}>
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => moveBlock("down")}
+            className="w-16 h-16 text-2xl border-primary/30 bg-background/80 hover:bg-primary/20"
+          >
+            <ChevronDown className="w-8 h-8" />
+          </Button>
+        </motion.div>
+        <motion.div whileTap={{ scale: 0.9 }}>
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => moveBlock("right")}
+            className="w-16 h-16 text-2xl border-primary/30 bg-background/80 hover:bg-primary/20"
+          >
+            <ChevronRight className="w-8 h-8" />
+          </Button>
+        </motion.div>
+        <motion.div whileTap={{ scale: 0.9 }}>
+          <Button
+            size="lg"
+            onClick={hardDrop}
+            className="w-16 h-16 bg-gradient-to-r from-primary to-accent hover:opacity-90"
+          >
+            <Zap className="w-8 h-8" />
+          </Button>
+        </motion.div>
       </div>
 
       {/* 일시정지 오버레이 */}
@@ -573,14 +811,23 @@ export default function GrammarTetris({ level }: GrammarTetrisProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50"
+            className="fixed inset-0 bg-background/80 backdrop-blur-md flex items-center justify-center z-50"
             onClick={() => setGameState("playing")}
           >
-            <Card className="p-8 text-center">
-              <Pause className="w-16 h-16 mx-auto mb-4 text-primary" />
-              <h2 className="text-2xl font-bold mb-2">Tạm dừng / 일시정지</h2>
-              <p className="text-muted-foreground mb-4">Nhấn để tiếp tục / 터치하여 계속</p>
-            </Card>
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              exit={{ scale: 0 }}
+            >
+              <Card className="p-10 text-center bg-gradient-to-b from-background to-muted border-primary/30">
+                <Pause className="w-20 h-20 mx-auto mb-4 text-primary drop-shadow-[0_0_15px_hsl(var(--primary))]" />
+                <h2 className="text-3xl font-black mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  Tạm dừng
+                </h2>
+                <p className="text-xl text-muted-foreground">일시정지</p>
+                <p className="text-muted-foreground mt-4">Nhấn để tiếp tục / 터치하여 계속</p>
+              </Card>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
