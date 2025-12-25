@@ -14,10 +14,13 @@ import {
   Send,
   Loader2,
   ToggleLeft,
-  ToggleRight
+  ToggleRight,
+  Users,
+  Swords
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { supabase } from "@/integrations/supabase/client";
+import ChainReactionMultiplayer from "./ChainReactionMultiplayer";
 
 interface Word {
   id: number;
@@ -37,7 +40,7 @@ interface ChainWord {
 }
 
 export default function WordChainReaction({ words, onComplete }: WordChainReactionProps) {
-  const [gameState, setGameState] = useState<"ready" | "playing" | "finished">("ready");
+  const [gameState, setGameState] = useState<"ready" | "playing" | "finished" | "multiplayer">("ready");
   const [timeLeft, setTimeLeft] = useState(30);
   const [chain, setChain] = useState<ChainWord[]>([]);
   const [currentInput, setCurrentInput] = useState("");
@@ -49,6 +52,16 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
   
   const inputRef = useRef<HTMLInputElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Multiplayer mode
+  if (gameState === "multiplayer") {
+    return (
+      <ChainReactionMultiplayer 
+        words={words} 
+        onBack={() => setGameState("ready")} 
+      />
+    );
+  }
 
   // Calculate exponential score
   const calculateScore = (chainLength: number) => {
@@ -287,12 +300,29 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
             </Button>
           </div>
 
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button onClick={startGame} size="lg" className="gap-2 text-lg px-8 py-6 bg-gradient-to-r from-orange-500 to-red-500 hover:opacity-90">
-              <Play className="w-6 h-6" />
-              Bắt đầu / 시작
-            </Button>
-          </motion.div>
+          {/* Game mode buttons */}
+          <div className="flex flex-col sm:flex-row justify-center gap-3">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button onClick={startGame} size="lg" className="gap-2 text-lg px-8 py-6 bg-gradient-to-r from-orange-500 to-red-500 hover:opacity-90 w-full">
+                <Play className="w-6 h-6" />
+                혼자하기 / Solo
+              </Button>
+            </motion.div>
+            
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button 
+                onClick={() => setGameState("multiplayer")} 
+                size="lg" 
+                variant="outline"
+                className="gap-2 text-lg px-8 py-6 border-2 border-purple-500/50 hover:bg-purple-500/10 w-full"
+              >
+                <Swords className="w-6 h-6 text-purple-500" />
+                <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent font-bold">
+                  1:1 대결
+                </span>
+              </Button>
+            </motion.div>
+          </div>
         </Card>
       </motion.div>
     );

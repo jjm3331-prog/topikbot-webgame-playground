@@ -281,6 +281,72 @@ export type Database = {
           },
         ]
       }
+      chain_reaction_rooms: {
+        Row: {
+          connection_mode: string
+          created_at: string
+          finished_at: string | null
+          guest_chain_length: number | null
+          guest_id: string | null
+          guest_name: string | null
+          guest_ready: boolean | null
+          guest_score: number | null
+          host_chain_length: number | null
+          host_id: string
+          host_name: string
+          host_ready: boolean | null
+          host_score: number | null
+          id: string
+          room_code: string
+          started_at: string | null
+          status: string
+          updated_at: string
+          winner_id: string | null
+        }
+        Insert: {
+          connection_mode?: string
+          created_at?: string
+          finished_at?: string | null
+          guest_chain_length?: number | null
+          guest_id?: string | null
+          guest_name?: string | null
+          guest_ready?: boolean | null
+          guest_score?: number | null
+          host_chain_length?: number | null
+          host_id: string
+          host_name?: string
+          host_ready?: boolean | null
+          host_score?: number | null
+          id?: string
+          room_code: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          winner_id?: string | null
+        }
+        Update: {
+          connection_mode?: string
+          created_at?: string
+          finished_at?: string | null
+          guest_chain_length?: number | null
+          guest_id?: string | null
+          guest_name?: string | null
+          guest_ready?: boolean | null
+          guest_score?: number | null
+          host_chain_length?: number | null
+          host_id?: string
+          host_name?: string
+          host_ready?: boolean | null
+          host_score?: number | null
+          id?: string
+          room_code?: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          winner_id?: string | null
+        }
+        Relationships: []
+      }
       headhunting_applications: {
         Row: {
           additional_skills: string | null
