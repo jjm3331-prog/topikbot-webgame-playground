@@ -175,7 +175,7 @@ export default function LearningHub() {
             initial="hidden"
             animate="visible"
           >
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
               {topikMenus.map((menu) => (
                 <motion.div 
                   key={menu.id} 
@@ -183,26 +183,26 @@ export default function LearningHub() {
                 >
                   <Card
                     onClick={() => navigate(menu.path)}
-                    className={`relative overflow-hidden cursor-pointer group h-full border ${menu.borderColor} hover:shadow-xl hover:scale-[1.03] transition-all duration-300`}
+                    className={`relative overflow-hidden cursor-pointer group h-full border-2 ${menu.borderColor} hover:shadow-2xl hover:scale-[1.02] transition-all duration-300`}
                   >
                     {/* Gradient overlay on hover */}
                     <div className={`absolute inset-0 bg-gradient-to-br ${menu.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
                     
                     {/* New badge */}
                     {menu.isNew && (
-                      <div className="absolute top-2 right-2 z-20">
-                        <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-[9px] px-1.5 py-0.5">
+                      <div className="absolute top-3 right-3 z-20">
+                        <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs px-2.5 py-1 font-semibold">
                           ✨ NEW
                         </Badge>
                       </div>
                     )}
 
-                    <div className="relative z-10 p-5 flex flex-col items-center text-center h-full">
+                    <div className="relative z-10 p-6 sm:p-8 flex flex-col items-center text-center h-full">
                       {/* Icon with glow effect */}
-                      <div className="relative mb-3">
-                        <div className={`w-14 h-14 rounded-xl ${menu.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                      <div className="relative mb-4">
+                        <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl ${menu.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                           <menu.icon 
-                            className="w-7 h-7" 
+                            className="w-8 h-8 sm:w-10 sm:h-10" 
                             style={{ color: getIconColor(menu.color) }} 
                           />
                         </div>
@@ -210,19 +210,19 @@ export default function LearningHub() {
                       </div>
                       
                       {/* Title */}
-                      <h3 className="font-bold text-foreground text-base mb-0.5">{menu.title}</h3>
-                      <p className="text-[11px] text-muted-foreground mb-2">{menu.subtitle}</p>
+                      <h3 className="font-bold text-foreground text-xl sm:text-2xl mb-1">{menu.title}</h3>
+                      <p className="text-sm sm:text-base text-muted-foreground mb-3">{menu.subtitle}</p>
 
-                      {/* Description - hidden on mobile for cleaner look */}
-                      <p className="text-[10px] text-muted-foreground/80 line-clamp-2 hidden sm:block flex-1">
+                      {/* Description */}
+                      <p className="text-sm sm:text-base text-muted-foreground/90 leading-relaxed flex-1">
                         {menu.description}
                       </p>
                       
                       {/* Play button indicator */}
-                      <div className="mt-3 w-full">
-                        <div className={`flex items-center justify-center gap-1 py-1.5 rounded-full bg-gradient-to-r ${menu.color} opacity-0 group-hover:opacity-100 transition-all duration-300`}>
-                          <span className="text-white text-[10px] font-semibold">Học ngay</span>
-                          <ChevronRight className="w-3 h-3 text-white" />
+                      <div className="mt-5 w-full">
+                        <div className={`flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r ${menu.color} opacity-0 group-hover:opacity-100 transition-all duration-300`}>
+                          <span className="text-white text-sm sm:text-base font-bold">Học ngay</span>
+                          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                         </div>
                       </div>
                     </div>
