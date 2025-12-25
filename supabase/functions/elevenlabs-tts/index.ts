@@ -5,8 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Default voice: Sarah (natural and clear for Korean)
-// User can change to Anna Kim or other voices by providing voiceId
+// Default voice: Sarah (EXAVITQu4vr4xnSDxMaL) - natural Korean native pronunciation
 const DEFAULT_VOICE_ID = "EXAVITQu4vr4xnSDxMaL";
 
 serve(async (req) => {
@@ -15,7 +14,7 @@ serve(async (req) => {
   }
 
   try {
-    const { text, voiceId, speed = 0.7 } = await req.json();
+    const { text, voiceId, speed = 0.85 } = await req.json();
     const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
     if (!text) {
@@ -40,12 +39,13 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           text,
-          model_id: "eleven_turbo_v2_5", // Fast and cost-effective
+          // eleven_multilingual_v2: Best for Korean native pronunciation (29 languages)
+          model_id: "eleven_multilingual_v2",
           output_format: "mp3_44100_128",
           voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.75,
-            style: 0.3,
+            stability: 0.6,
+            similarity_boost: 0.8,
+            style: 0.2,
             use_speaker_boost: true,
             speed: speed,
           },
