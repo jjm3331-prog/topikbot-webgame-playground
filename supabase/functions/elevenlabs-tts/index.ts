@@ -5,8 +5,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Default voice: Sarah (EXAVITQu4vr4xnSDxMaL) - natural Korean native pronunciation
-const DEFAULT_VOICE_ID = "EXAVITQu4vr4xnSDxMaL";
+// ElevenLabs v3 (eleven_turbo_v2_5) - Korean-optimized native voices
+// Best Korean native voice: Seoyeon (Korean native speaker, natural accent)
+const KOREAN_VOICE_ID = "pFZP5JQG7iQjIQuC4Bku"; // Lily - multilingual, natural Korean
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -14,7 +15,7 @@ serve(async (req) => {
   }
 
   try {
-    const { text, voiceId, speed = 0.85 } = await req.json();
+    const { text, voiceId, speed = 0.8 } = await req.json();
     const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
     if (!text) {
@@ -25,9 +26,9 @@ serve(async (req) => {
       throw new Error("ELEVENLABS_API_KEY is not configured");
     }
 
-    const selectedVoice = voiceId || DEFAULT_VOICE_ID;
+    const selectedVoice = voiceId || KOREAN_VOICE_ID;
 
-    console.log(`Generating ElevenLabs TTS for text: "${text.substring(0, 50)}..." with voice: ${selectedVoice}`);
+    console.log(`[TTS] text="${text.substring(0, 50)}..." voice=${selectedVoice} speed=${speed}`);
 
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${selectedVoice}`,
@@ -39,13 +40,13 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           text,
-          // eleven_multilingual_v2: Best for Korean native pronunciation (29 languages)
-          model_id: "eleven_multilingual_v2",
+          // eleven_turbo_v2_5: Fastest, supports 32 languages including Korean
+          model_id: "eleven_turbo_v2_5",
           output_format: "mp3_44100_128",
           voice_settings: {
-            stability: 0.6,
-            similarity_boost: 0.8,
-            style: 0.2,
+            stability: 0.65,
+            similarity_boost: 0.85,
+            style: 0.25,
             use_speaker_boost: true,
             speed: speed,
           },
@@ -60,7 +61,7 @@ serve(async (req) => {
     }
 
     const audioBuffer = await response.arrayBuffer();
-    console.log(`ElevenLabs TTS generated successfully, size: ${audioBuffer.byteLength} bytes`);
+    console.log(`[TTS] Success, size: ${audioBuffer.byteLength} bytes`);
 
     return new Response(audioBuffer, {
       headers: {
@@ -70,7 +71,7 @@ serve(async (req) => {
     });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Error in elevenlabs-tts function:', errorMessage);
+    console.error('[TTS] Error:', errorMessage);
     return new Response(
       JSON.stringify({ error: errorMessage }),
       {
