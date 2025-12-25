@@ -1059,241 +1059,182 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     );
   }
 
-  // Premium Waiting / Creating Screen
-  if (gamePhase === "waiting" || gamePhase === "creating") {
+  // Creating loader
+  if (gamePhase === "creating") {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="w-16 h-16 rounded-full border-4 border-muted border-t-yellow-500 mb-4"
+        />
+        <p className="text-muted-foreground text-lg">Đang tạo phòng...</p>
+      </div>
+    );
+  }
+
+  // Premium Waiting/Ready Screen (통합 디자인 - 의미연결과 동일)
+  if ((gamePhase === "waiting" || gamePhase === "ready") && room) {
+    const bothReady = room.host_ready && room.guest_ready;
+
     return (
       <motion.div 
         initial={{ opacity: 0, y: 20 }} 
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-lg mx-auto"
+        className="max-w-lg mx-auto space-y-6"
       >
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={onBack}><ArrowLeft className="w-5 h-5" /></Button>
+          <h2 className="text-xl font-bold">Phòng chờ</h2>
+        </div>
+
+        {/* Room Code Card */}
         <Card className="relative overflow-hidden bg-gradient-to-br from-card via-card to-muted/30 border-border/50">
-          {/* Background Effects */}
           <div className="absolute inset-0 -z-10">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-yellow-500/20 to-orange-500/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-purple-500/10 to-pink-500/5 rounded-full blur-3xl" />
+            <div className="absolute top-0 right-0 w-48 h-48 bg-yellow-500/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-40 h-40 bg-orange-500/10 rounded-full blur-3xl" />
           </div>
-
-          <div className="p-6 sm:p-8 text-center">
-            {/* Loading Animation */}
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-              className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-xl shadow-orange-500/30"
-            >
-              <Users className="w-10 h-10 text-white" />
-            </motion.div>
-
-            <h2 className="text-2xl sm:text-3xl font-black mb-2">Đang chờ đối thủ...</h2>
-            <p className="text-muted-foreground mb-8">Chia sẻ link để mời bạn bè tham gia!</p>
-
-            {room && (
-              <>
-                {/* Room Code Display */}
-                <div className="mb-6 p-5 bg-muted/30 rounded-2xl border border-border/50">
-                  <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">Mã phòng</p>
-                  <p className="text-4xl sm:text-5xl font-mono font-black tracking-[0.3em] bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                    {room.room_code}
-                  </p>
-                </div>
-
-                {/* Share Buttons */}
-                <div className="flex gap-3 mb-8">
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1">
-                    <Button onClick={shareRoom} className="w-full h-14 text-lg font-bold gap-3 bg-gradient-to-r from-yellow-400 to-orange-500 hover:opacity-90">
-                      <Share2 className="w-5 h-5" />
-                      Chia sẻ link
-                    </Button>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button variant="outline" onClick={copyRoomUrl} className="h-14 px-6 border-2">
-                      {copied ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
-                    </Button>
-                  </motion.div>
-                </div>
-
-                {/* Players Status */}
-                <div className="bg-muted/30 rounded-2xl p-5 border border-border/50">
-                  <p className="text-xs text-muted-foreground mb-4 uppercase tracking-wider">Người chơi</p>
-                  <div className="flex items-center justify-center gap-6">
-                    <div className="text-center">
-                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center mx-auto mb-2 shadow-lg shadow-orange-500/20">
-                        <Crown className="w-8 h-8 text-white" />
-                      </div>
-                      <p className="font-bold text-lg">{room?.host_name}</p>
-                      <p className="text-xs text-muted-foreground">Chủ phòng</p>
-                    </div>
-                    
-                    <motion.div
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                    >
-                      <Swords className="w-8 h-8 text-muted-foreground" />
-                    </motion.div>
-                    
-                    <div className="text-center">
-                      <div className="w-16 h-16 rounded-2xl bg-muted/50 border-2 border-dashed border-muted-foreground/30 flex items-center justify-center mx-auto mb-2">
-                        <Users className="w-8 h-8 text-muted-foreground/50" />
-                      </div>
-                      <p className="font-bold text-lg text-muted-foreground">???</p>
-                      <p className="text-xs text-muted-foreground">Đang chờ...</p>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-
-            <Button variant="ghost" onClick={onBack} className="mt-6">
-              Hủy bỏ
-            </Button>
-          </div>
-        </Card>
-      </motion.div>
-    );
-  }
-
-  // Premium Ready Screen
-  if (gamePhase === "ready") {
-    const bothReady = room?.host_ready && room?.guest_ready;
-    
-    return (
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }} 
-        animate={{ opacity: 1, scale: 1 }}
-        className="max-w-lg mx-auto"
-      >
-        <Card className="relative overflow-hidden bg-gradient-to-br from-card via-card to-muted/30 border-border/50">
-          {/* Background Pulse */}
-          <div className="absolute inset-0 -z-10">
-            <motion.div
-              animate={{ opacity: [0.2, 0.4, 0.2] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-green-500/20 rounded-full blur-3xl"
-            />
-          </div>
-
-          <div className="p-6 sm:p-8 text-center">
-            {/* Icon */}
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200 }}
-              className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-xl shadow-green-500/30"
-            >
-              <Swords className="w-10 h-10 text-white" />
-            </motion.div>
-
-            <h2 className="text-2xl sm:text-3xl font-black mb-2">Chuẩn bị đấu!</h2>
-            <p className="text-muted-foreground mb-8">Lần lượt nối từ • 12 giây/lượt • 1 cảnh báo</p>
-
-            {/* Players Ready Status */}
-            <div className="bg-muted/30 rounded-2xl p-6 mb-6 border border-border/50">
-              <div className="flex items-center justify-center gap-8">
-                {/* Host */}
-                <div className="text-center">
-                  <motion.div
-                    animate={room?.host_ready ? { scale: [1, 1.05, 1] } : {}}
-                    transition={{ duration: 0.5, repeat: room?.host_ready ? Infinity : 0, repeatDelay: 1 }}
-                    className={`w-18 h-18 rounded-2xl flex items-center justify-center mx-auto mb-3 transition-all ${
-                      room?.host_ready 
-                        ? "bg-gradient-to-br from-green-400 to-emerald-500 shadow-xl shadow-green-500/30" 
-                        : "bg-muted/50 border-2 border-dashed border-muted-foreground/30"
-                    }`}
-                    style={{ width: 72, height: 72 }}
-                  >
-                    {room?.host_ready 
-                      ? <Check className="w-9 h-9 text-white" /> 
-                      : <Crown className="w-9 h-9 text-muted-foreground" />
-                    }
-                  </motion.div>
-                  <p className="font-bold text-lg">{room?.host_name}</p>
-                  <p className={`text-sm font-medium ${room?.host_ready ? "text-green-500" : "text-muted-foreground"}`}>
-                    {room?.host_ready ? "✓ Sẵn sàng" : "Đang chờ..."}
-                  </p>
-                  {isHost && <p className="text-xs text-primary mt-1">Tôi</p>}
-                </div>
-
-                <div className="text-3xl">⚡</div>
-
-                {/* Guest */}
-                <div className="text-center">
-                  <motion.div
-                    animate={room?.guest_ready ? { scale: [1, 1.05, 1] } : {}}
-                    transition={{ duration: 0.5, repeat: room?.guest_ready ? Infinity : 0, repeatDelay: 1 }}
-                    className={`w-18 h-18 rounded-2xl flex items-center justify-center mx-auto mb-3 transition-all ${
-                      room?.guest_ready 
-                        ? "bg-gradient-to-br from-green-400 to-emerald-500 shadow-xl shadow-green-500/30" 
-                        : "bg-muted/50 border-2 border-dashed border-muted-foreground/30"
-                    }`}
-                    style={{ width: 72, height: 72 }}
-                  >
-                    {room?.guest_ready 
-                      ? <Check className="w-9 h-9 text-white" /> 
-                      : <Users className="w-9 h-9 text-muted-foreground" />
-                    }
-                  </motion.div>
-                  <p className="font-bold text-lg">{room?.guest_name}</p>
-                  <p className={`text-sm font-medium ${room?.guest_ready ? "text-green-500" : "text-muted-foreground"}`}>
-                    {room?.guest_ready ? "✓ Sẵn sàng" : "Đang chờ..."}
-                  </p>
-                  {!isHost && <p className="text-xs text-primary mt-1">Tôi</p>}
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="space-y-3">
+          
+          <div className="p-6 text-center">
+            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">Mã phòng</p>
+            <p className="text-4xl sm:text-5xl font-mono font-black tracking-[0.3em] bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-4">
+              {room.room_code}
+            </p>
+            <div className="flex justify-center gap-3">
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  onClick={toggleReady}
-                  size="lg"
-                  className={`w-full h-14 text-lg font-bold gap-3 ${
-                    (isHost && room?.host_ready) || (!isHost && room?.guest_ready)
-                      ? "bg-green-500 hover:bg-green-600"
-                      : "bg-gradient-to-r from-yellow-400 to-orange-500"
-                  }`}
-                >
-                  {(isHost && room?.host_ready) || (!isHost && room?.guest_ready) ? (
-                    <>
-                      <Check className="w-6 h-6" />
-                      Đã sẵn sàng!
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="w-6 h-6" />
-                      Sẵn sàng
-                    </>
-                  )}
+                <Button onClick={copyRoomUrl} variant="outline" className="gap-2 h-11">
+                  {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                  {copied ? "Đã copy" : "Copy link"}
                 </Button>
               </motion.div>
-
-              {isHost && (
-                <motion.div whileHover={{ scale: bothReady ? 1.02 : 1 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    onClick={startGame}
-                    size="lg"
-                    disabled={!bothReady}
-                    className={`w-full h-14 text-lg font-bold gap-3 ${
-                      bothReady
-                        ? "bg-gradient-to-r from-green-400 to-emerald-500 hover:opacity-90 shadow-xl shadow-green-500/30"
-                        : "bg-muted text-muted-foreground cursor-not-allowed"
-                    }`}
-                  >
-                    <Play className="w-6 h-6" />
-                    {bothReady ? "Bắt đầu!" : "Cả hai cần sẵn sàng"}
-                  </Button>
-                </motion.div>
-              )}
-
-              {!isHost && room?.host_ready && room?.guest_ready && (
-                <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm py-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Đang chờ chủ phòng bắt đầu...
-                </div>
-              )}
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button onClick={shareRoom} className="gap-2 h-11 bg-gradient-to-r from-yellow-400 to-orange-500">
+                  <Share2 className="w-4 h-4" />
+                  Chia sẻ
+                </Button>
+              </motion.div>
             </div>
           </div>
         </Card>
+
+        {/* Players Status */}
+        <Card className="p-5 bg-gradient-to-br from-card to-muted/30 border-border/50">
+          <p className="text-xs text-muted-foreground mb-4 uppercase tracking-wider text-center">Người chơi</p>
+          <div className="grid grid-cols-2 gap-4">
+            <motion.div 
+              animate={room.host_ready ? { scale: [1, 1.02, 1] } : {}}
+              transition={{ duration: 1, repeat: room.host_ready ? Infinity : 0, repeatDelay: 1 }}
+              className={`p-4 rounded-2xl text-center transition-all ${
+                room.host_ready 
+                  ? "bg-gradient-to-br from-green-500/20 to-emerald-500/10 border-2 border-green-500 shadow-lg shadow-green-500/10" 
+                  : "bg-muted/30 border border-border/50"
+              }`}
+            >
+              <div className={`w-12 h-12 rounded-xl mx-auto mb-2 flex items-center justify-center ${
+                room.host_ready ? "bg-gradient-to-br from-green-400 to-emerald-500" : "bg-gradient-to-br from-yellow-400 to-orange-500"
+              }`}>
+                {room.host_ready ? <Check className="w-6 h-6 text-white" /> : <Crown className="w-6 h-6 text-white" />}
+              </div>
+              <p className="font-bold text-lg">{room.host_name}</p>
+              <p className={`text-sm font-medium ${room.host_ready ? "text-green-500" : "text-muted-foreground"}`}>
+                {room.host_ready ? "✅ Sẵn sàng" : "⏳ Chờ..."}
+              </p>
+              {isHost && <p className="text-xs text-primary mt-1">Tôi</p>}
+            </motion.div>
+            
+            <motion.div 
+              animate={room.guest_ready ? { scale: [1, 1.02, 1] } : {}}
+              transition={{ duration: 1, repeat: room.guest_ready ? Infinity : 0, repeatDelay: 1 }}
+              className={`p-4 rounded-2xl text-center transition-all ${
+                room.guest_id 
+                  ? room.guest_ready 
+                    ? "bg-gradient-to-br from-green-500/20 to-emerald-500/10 border-2 border-green-500 shadow-lg shadow-green-500/10" 
+                    : "bg-muted/30 border border-border/50"
+                  : "bg-muted/20 border-2 border-dashed border-muted-foreground/30"
+              }`}
+            >
+              <div className={`w-12 h-12 rounded-xl mx-auto mb-2 flex items-center justify-center ${
+                room.guest_id 
+                  ? room.guest_ready ? "bg-gradient-to-br from-green-400 to-emerald-500" : "bg-gradient-to-br from-blue-400 to-cyan-500"
+                  : "bg-muted/50"
+              }`}>
+                {room.guest_id 
+                  ? room.guest_ready ? <Check className="w-6 h-6 text-white" /> : <Users className="w-6 h-6 text-white" />
+                  : <Users className="w-6 h-6 text-muted-foreground/50" />
+                }
+              </div>
+              <p className="font-bold text-lg">{room.guest_name || "Đang chờ..."}</p>
+              {room.guest_id ? (
+                <>
+                  <p className={`text-sm font-medium ${room.guest_ready ? "text-green-500" : "text-muted-foreground"}`}>
+                    {room.guest_ready ? "✅ Sẵn sàng" : "⏳ Chờ..."}
+                  </p>
+                  {!isHost && <p className="text-xs text-primary mt-1">Tôi</p>}
+                </>
+              ) : null}
+            </motion.div>
+          </div>
+        </Card>
+
+        {/* Action Buttons */}
+        {room.guest_id && (
+          <div className="space-y-3">
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button 
+                onClick={toggleReady} 
+                size="lg"
+                className={`w-full h-14 text-lg font-bold gap-2 ${
+                  (isHost ? room.host_ready : room.guest_ready)
+                    ? "bg-green-500 hover:bg-green-600"
+                    : "bg-gradient-to-r from-yellow-400 to-orange-500"
+                }`}
+              >
+                {(isHost ? room.host_ready : room.guest_ready) ? (
+                  <>
+                    <Check className="w-5 h-5" />
+                    Đã sẵn sàng!
+                  </>
+                ) : (
+                  <>
+                    <Zap className="w-5 h-5" />
+                    Sẵn sàng
+                  </>
+                )}
+              </Button>
+            </motion.div>
+
+            {isHost && (
+              <motion.div whileHover={{ scale: bothReady ? 1.02 : 1 }} whileTap={{ scale: bothReady ? 0.98 : 1 }}>
+                <Button
+                  onClick={startGame}
+                  size="lg"
+                  disabled={!bothReady}
+                  className={`w-full h-14 text-lg font-bold gap-2 ${
+                    bothReady
+                      ? "bg-gradient-to-r from-green-400 to-emerald-500 hover:opacity-90 shadow-xl shadow-green-500/30"
+                      : "bg-muted text-muted-foreground cursor-not-allowed"
+                  }`}
+                >
+                  <Play className="w-5 h-5" />
+                  {bothReady ? "Bắt đầu!" : "Cả hai cần sẵn sàng"}
+                </Button>
+              </motion.div>
+            )}
+
+            {!isHost && bothReady && (
+              <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm py-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Đang chờ chủ phòng bắt đầu...
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Cancel Button */}
+        <Button variant="ghost" onClick={onBack} className="w-full">
+          Hủy bỏ
+        </Button>
       </motion.div>
     );
   }
@@ -1318,7 +1259,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             {countdown > 0 ? (
               <div className="relative">
                 <motion.div
-                  className="text-9xl font-black bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 bg-clip-text text-transparent"
+                  className="text-9xl font-black bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent"
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 0.5 }}
                 >
