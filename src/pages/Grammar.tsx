@@ -163,6 +163,25 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
     setIsCorrect(null);
   };
 
+  const assembleKorean = (parts: string[]) => {
+    const raw = parts.join(" ").trim();
+
+    // 붙여 써야 하는 형태(입니다/예요/이에요 등)는 앞말과 결합
+    // 예: "사과 입니다" -> "사과입니다"
+    const boundEndings = ["입니다", "예요", "이에요", "였어요", "이었어요"] as const;
+    const re = new RegExp(`([\\p{Script=Hangul}0-9])\\s+(${boundEndings.join("|")})(?=\\s|$)`, "gu");
+
+    return raw.replace(re, "$1$2");
+  };
+
+  const normalizeForCompare = (s: string) =>
+    assembleKorean([s])
+      .normalize("NFKC")
+      .replace(/[\u200B\u200C\u200D\uFEFF]/g, "")
+      .trim()
+      .replace(/\s+/g, " ")
+      .replace(/[.?!]+$/g, "");
+
   const handleSelectPart = (part: string, index: number) => {
     setSelectedParts([...selectedParts, part]);
     setAvailableParts(availableParts.filter((_, i) => i !== index));
@@ -175,15 +194,15 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
 
   const handleCheck = () => {
     const current = questions[currentIndex];
-    const userAnswer = selectedParts.join(' ');
-    const correct = userAnswer === current.answer;
-    
+    const userAnswer = assembleKorean(selectedParts);
+    const correct = normalizeForCompare(userAnswer) === normalizeForCompare(current.answer);
+
     setIsCorrect(correct);
-    
+
     if (correct) {
       const comboBonus = Math.min(combo, 5) * 5;
-      setScore(prev => prev + 10 + comboBonus);
-      setCombo(prev => prev + 1);
+      setScore((prev) => prev + 10 + comboBonus);
+      setCombo((prev) => prev + 1);
       toast.success(`Đúng! +${10 + comboBonus} / 정답! +${10 + comboBonus}`);
     } else {
       setCombo(0);
