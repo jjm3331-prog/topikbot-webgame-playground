@@ -15,19 +15,32 @@ import {
   Trash2,
   Send,
   Reply,
-  Youtube
+  Youtube,
+  Flag,
+  AlertTriangle,
+  RefreshCw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { supabase } from "@/integrations/supabase/client";
@@ -88,11 +101,52 @@ export default function BoardPost() {
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [newCommentsCount, setNewCommentsCount] = useState(0);
+  
+  // Report dialog state
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
+  const [reportTarget, setReportTarget] = useState<{ type: 'post' | 'comment'; id: string } | null>(null);
+  const [reportReason, setReportReason] = useState<'spam' | 'abuse' | 'other'>('spam');
+  const [reportDescription, setReportDescription] = useState("");
+  const [reportSubmitting, setReportSubmitting] = useState(false);
 
   useEffect(() => {
     checkAuth();
     fetchPost();
     incrementViewCount();
+    
+    // Realtime subscription for comments
+    const channel = supabase
+      .channel('board-comments-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'board_comments',
+          filter: `post_id=eq.${postId}`
+        },
+        (payload) => {
+          console.log('New comment received:', payload);
+          setNewCommentsCount(prev => prev + 1);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'board_comments'
+        },
+        (payload) => {
+          setComments(prev => prev.filter(c => c.id !== payload.old.id));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [postId]);
 
   const checkAuth = async () => {
@@ -121,6 +175,7 @@ export default function BoardPost() {
 
   const fetchPost = async () => {
     setLoading(true);
+    setNewCommentsCount(0);
     try {
       const { data: postData, error: postError } = await supabase
         .from("board_posts")
@@ -281,6 +336,46 @@ export default function BoardPost() {
     }
   };
 
+  const openReportDialog = (type: 'post' | 'comment', id: string) => {
+    if (!currentUser) {
+      toast({ title: "Vui lòng đăng nhập để báo cáo" });
+      return;
+    }
+    setReportTarget({ type, id });
+    setReportReason('spam');
+    setReportDescription('');
+    setReportDialogOpen(true);
+  };
+
+  const handleReport = async () => {
+    if (!currentUser || !reportTarget) return;
+    
+    setReportSubmitting(true);
+    try {
+      const reportData: any = {
+        reporter_id: currentUser,
+        reason: reportReason,
+        description: reportDescription.trim() || null
+      };
+      
+      if (reportTarget.type === 'post') {
+        reportData.post_id = reportTarget.id;
+      } else {
+        reportData.comment_id = reportTarget.id;
+      }
+
+      await supabase.from("board_reports").insert(reportData);
+      
+      toast({ title: "Đã gửi báo cáo", description: "Quản trị viên sẽ xem xét báo cáo của bạn." });
+      setReportDialogOpen(false);
+    } catch (error) {
+      console.error("Error submitting report:", error);
+      toast({ title: "Lỗi", description: "Không thể gửi báo cáo", variant: "destructive" });
+    } finally {
+      setReportSubmitting(false);
+    }
+  };
+
   const getAuthorDisplay = (authorId: string | null, authorName: string | null, isAnon: boolean) => {
     if (isAnon || boardType === "anonymous") {
       return { name: "Ẩn danh", avatar: null };
@@ -320,15 +415,26 @@ export default function BoardPost() {
                 </span>
               </div>
               <p className="text-sm mt-1">{comment.content}</p>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="mt-1 h-7 text-xs"
-                onClick={() => setReplyTo(comment.id)}
-              >
-                <Reply className="w-3 h-3 mr-1" />
-                Trả lời
-              </Button>
+              <div className="flex items-center gap-2 mt-1">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-7 text-xs"
+                  onClick={() => setReplyTo(comment.id)}
+                >
+                  <Reply className="w-3 h-3 mr-1" />
+                  Trả lời
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 text-xs text-muted-foreground hover:text-destructive"
+                  onClick={() => openReportDialog('comment', comment.id)}
+                >
+                  <Flag className="w-3 h-3 mr-1" />
+                  Báo cáo
+                </Button>
+              </div>
             </div>
           </div>
           {renderComments(comment.id, depth + 1)}
@@ -394,25 +500,35 @@ export default function BoardPost() {
                 <h1 className="text-xl sm:text-2xl font-bold text-foreground">
                   {post.title}
                 </h1>
-                {canModify && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => navigate(`/board/${boardType}/write?edit=${post.id}`)}>
-                        <Edit className="w-4 h-4 mr-2" />
-                        Chỉnh sửa
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={handleDelete} className="text-destructive">
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Xóa bài
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground hover:text-destructive"
+                    onClick={() => openReportDialog('post', post.id)}
+                  >
+                    <Flag className="w-4 h-4" />
+                  </Button>
+                  {canModify && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => navigate(`/board/${boardType}/write?edit=${post.id}`)}>
+                          <Edit className="w-4 h-4 mr-2" />
+                          Chỉnh sửa
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleDelete} className="text-destructive">
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Xóa bài
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                </div>
               </div>
 
               {/* Author Info */}
@@ -468,18 +584,34 @@ export default function BoardPost() {
               {post.attachment_urls && post.attachment_urls.length > 0 && (
                 <div className="mt-6">
                   <p className="text-sm font-medium mb-2">Tệp đính kèm:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {post.attachment_urls.map((url, i) => (
-                      <a 
-                        key={i}
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-3 py-2 bg-muted rounded-lg text-sm hover:bg-muted/80"
-                      >
-                        Tệp {i + 1}
-                      </a>
-                    ))}
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {post.attachment_urls.map((url, i) => {
+                      const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+                      if (isImage) {
+                        return (
+                          <a 
+                            key={i}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block aspect-video rounded-lg overflow-hidden bg-muted"
+                          >
+                            <img src={url} alt={`Attachment ${i + 1}`} className="w-full h-full object-cover hover:opacity-80 transition-opacity" />
+                          </a>
+                        );
+                      }
+                      return (
+                        <a 
+                          key={i}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-3 py-2 bg-muted rounded-lg text-sm hover:bg-muted/80"
+                        >
+                          Tệp {i + 1}
+                        </a>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -508,56 +640,125 @@ export default function BoardPost() {
           </motion.div>
 
           {/* Comments Section */}
-          <Card className="mt-6 p-6">
-            <h3 className="font-bold text-lg mb-4">Bình luận ({post.comment_count})</h3>
-            
-            {/* Comment Form */}
-            {currentUser ? (
-              <div className="mb-6">
-                {replyTo && (
-                  <div className="flex items-center gap-2 mb-2 text-sm text-muted-foreground">
-                    <Reply className="w-4 h-4" />
-                    Đang trả lời bình luận
-                    <Button variant="ghost" size="sm" className="h-6" onClick={() => setReplyTo(null)}>
-                      Hủy
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="mt-6"
+          >
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Bình luận ({comments.length})</h3>
+              
+              {/* New comments notification */}
+              {newCommentsCount > 0 && (
+                <Button 
+                  variant="outline" 
+                  className="w-full mb-4 border-primary text-primary"
+                  onClick={fetchPost}
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  {newCommentsCount} bình luận mới - Nhấn để tải
+                </Button>
+              )}
+
+              {/* Comment Input */}
+              {currentUser && (
+                <div className="mb-6">
+                  {replyTo && (
+                    <div className="flex items-center gap-2 mb-2 text-sm text-muted-foreground">
+                      <Reply className="w-4 h-4" />
+                      <span>Đang trả lời bình luận</span>
+                      <Button variant="ghost" size="sm" onClick={() => setReplyTo(null)}>
+                        Hủy
+                      </Button>
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <Textarea
+                      placeholder="Viết bình luận..."
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      rows={2}
+                      className="resize-none"
+                    />
+                    <Button onClick={handleComment} disabled={submitting || !newComment.trim()}>
+                      <Send className="w-4 h-4" />
                     </Button>
                   </div>
-                )}
-                <div className="flex gap-3">
-                  <Textarea
-                    placeholder="Viết bình luận..."
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    className="flex-1"
-                    rows={2}
-                  />
-                  <Button onClick={handleComment} disabled={submitting || !newComment.trim()}>
-                    <Send className="w-4 h-4" />
-                  </Button>
                 </div>
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground mb-6">
-                <Button variant="link" className="p-0 h-auto" onClick={() => navigate("/auth")}>
-                  Đăng nhập
-                </Button>
-                {" "}để bình luận
-              </p>
-            )}
-
-            {/* Comments List */}
-            <div className="divide-y">
-              {comments.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">Chưa có bình luận nào</p>
-              ) : (
-                renderComments(null)
               )}
-            </div>
-          </Card>
+
+              {/* Comments List */}
+              <div className="divide-y">
+                {comments.length === 0 ? (
+                  <p className="text-center py-8 text-muted-foreground">Chưa có bình luận nào</p>
+                ) : (
+                  renderComments()
+                )}
+              </div>
+            </Card>
+          </motion.div>
         </div>
       </main>
       
       <AppFooter />
+
+      {/* Report Dialog */}
+      <Dialog open={reportDialogOpen} onOpenChange={setReportDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-destructive" />
+              Báo cáo vi phạm
+            </DialogTitle>
+            <DialogDescription>
+              Vui lòng cho chúng tôi biết lý do bạn báo cáo {reportTarget?.type === 'post' ? 'bài viết' : 'bình luận'} này.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <RadioGroup value={reportReason} onValueChange={(v: any) => setReportReason(v)}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="spam" id="spam" />
+                <Label htmlFor="spam">Spam / Quảng cáo</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="abuse" id="abuse" />
+                <Label htmlFor="abuse">Nội dung xúc phạm / Quấy rối</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="other" id="other" />
+                <Label htmlFor="other">Lý do khác</Label>
+              </div>
+            </RadioGroup>
+            
+            <div>
+              <Label htmlFor="description">Mô tả chi tiết (tùy chọn)</Label>
+              <Textarea
+                id="description"
+                placeholder="Mô tả thêm về vi phạm..."
+                value={reportDescription}
+                onChange={(e) => setReportDescription(e.target.value)}
+                rows={3}
+                className="mt-2"
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setReportDialogOpen(false)}>
+              Hủy
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleReport}
+              disabled={reportSubmitting}
+            >
+              {reportSubmitting ? "Đang gửi..." : "Gửi báo cáo"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
