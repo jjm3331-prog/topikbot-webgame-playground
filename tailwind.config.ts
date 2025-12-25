@@ -66,6 +66,29 @@ export default {
         body: ['Be Vietnam Pro', 'sans-serif'],
         ui: ['Be Vietnam Pro', 'sans-serif'],
       },
+      fontSize: {
+        // Mobile-first responsive typography
+        'xs': ['0.75rem', { lineHeight: '1.5' }],
+        'sm': ['0.875rem', { lineHeight: '1.5' }],
+        'base': ['1rem', { lineHeight: '1.7' }],
+        'lg': ['1.125rem', { lineHeight: '1.7' }],
+        'xl': ['1.25rem', { lineHeight: '1.6' }],
+        '2xl': ['1.5rem', { lineHeight: '1.4' }],
+        '3xl': ['1.875rem', { lineHeight: '1.3' }],
+        '4xl': ['2.25rem', { lineHeight: '1.2' }],
+        '5xl': ['3rem', { lineHeight: '1.1' }],
+        '6xl': ['3.75rem', { lineHeight: '1.1' }],
+        '7xl': ['4.5rem', { lineHeight: '1.05' }],
+        // Semantic sizes for cards and UI
+        'card-title': ['1.25rem', { lineHeight: '1.4', fontWeight: '700' }],
+        'card-title-lg': ['1.5rem', { lineHeight: '1.3', fontWeight: '700' }],
+        'card-body': ['1rem', { lineHeight: '1.7' }],
+        'card-caption': ['0.875rem', { lineHeight: '1.6' }],
+        'button': ['0.9375rem', { lineHeight: '1.4', fontWeight: '600' }],
+        'button-lg': ['1.0625rem', { lineHeight: '1.4', fontWeight: '600' }],
+        'label': ['0.8125rem', { lineHeight: '1.4', fontWeight: '500' }],
+        'badge': ['0.75rem', { lineHeight: '1.4', fontWeight: '600' }],
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
@@ -76,6 +99,18 @@ export default {
       },
       spacing: {
         '70': '17.5rem', // 280px for sidebar
+        // Consistent spacing scale
+        '4.5': '1.125rem',  // 18px
+        '5.5': '1.375rem',  // 22px
+        '7': '1.75rem',     // 28px
+        '9': '2.25rem',     // 36px
+        '11': '2.75rem',    // 44px
+        '13': '3.25rem',    // 52px
+        '15': '3.75rem',    // 60px
+        '18': '4.5rem',     // 72px
+        '22': '5.5rem',     // 88px
+        '26': '6.5rem',     // 104px
+        '30': '7.5rem',     // 120px
       },
       keyframes: {
         "accordion-down": {
