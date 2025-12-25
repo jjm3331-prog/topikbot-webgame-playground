@@ -321,63 +321,75 @@ export type Database = {
         Row: {
           connection_mode: string
           created_at: string
+          current_turn_player_id: string | null
           finished_at: string | null
           guest_chain_length: number | null
           guest_id: string | null
           guest_name: string | null
           guest_ready: boolean | null
           guest_score: number | null
+          guest_warnings: number
           host_chain_length: number | null
           host_id: string
           host_name: string
           host_ready: boolean | null
           host_score: number | null
+          host_warnings: number
           id: string
           room_code: string
           started_at: string | null
           status: string
+          turn_start_at: string | null
           updated_at: string
           winner_id: string | null
         }
         Insert: {
           connection_mode?: string
           created_at?: string
+          current_turn_player_id?: string | null
           finished_at?: string | null
           guest_chain_length?: number | null
           guest_id?: string | null
           guest_name?: string | null
           guest_ready?: boolean | null
           guest_score?: number | null
+          guest_warnings?: number
           host_chain_length?: number | null
           host_id: string
           host_name?: string
           host_ready?: boolean | null
           host_score?: number | null
+          host_warnings?: number
           id?: string
           room_code: string
           started_at?: string | null
           status?: string
+          turn_start_at?: string | null
           updated_at?: string
           winner_id?: string | null
         }
         Update: {
           connection_mode?: string
           created_at?: string
+          current_turn_player_id?: string | null
           finished_at?: string | null
           guest_chain_length?: number | null
           guest_id?: string | null
           guest_name?: string | null
           guest_ready?: boolean | null
           guest_score?: number | null
+          guest_warnings?: number
           host_chain_length?: number | null
           host_id?: string
           host_name?: string
           host_ready?: boolean | null
           host_score?: number | null
+          host_warnings?: number
           id?: string
           room_code?: string
           started_at?: string | null
           status?: string
+          turn_start_at?: string | null
           updated_at?: string
           winner_id?: string | null
         }

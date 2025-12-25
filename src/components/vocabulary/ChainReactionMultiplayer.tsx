@@ -3,9 +3,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { 
-  Play, 
-  Trophy, 
+import {
+  Play,
+  Trophy,
   Flame,
   Zap,
   Link2,
@@ -20,7 +20,8 @@ import {
   Swords,
   Timer,
   RefreshCw,
-  Share2
+  Share2,
+  AlertTriangle,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,7 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 interface ChainReactionMultiplayerProps {
   words: { id: number; korean: string; meaning: string }[];
   onBack: () => void;
-  initialRoomCode?: string; // URL에서 받은 방 코드
+  initialRoomCode?: string;
 }
 
 interface Room {
@@ -50,11 +51,17 @@ interface Room {
   winner_id: string | null;
   started_at: string | null;
   finished_at: string | null;
+  // Turn-based fields
+  current_turn_player_id: string | null;
+  turn_start_at: string | null;
+  host_warnings: number;
+  guest_warnings: number;
 }
 
 interface ChainWord {
   word: string;
   connectionType: "semantic" | "phonetic" | "start";
+  player_id?: string;
 }
 
 interface MoveRow {
@@ -71,6 +78,9 @@ interface MoveRow {
 
 type GamePhase = "menu" | "creating" | "joining" | "waiting" | "ready" | "countdown" | "playing" | "finished";
 
+const TURN_TIME_LIMIT = 12; // seconds per turn
+const MAX_WARNINGS = 1; // 1 warning allowed, 2nd violation = lose
+
 export default function ChainReactionMultiplayer({ words, onBack, initialRoomCode }: ChainReactionMultiplayerProps) {
   const { toast } = useToast();
   const [gamePhase, setGamePhase] = useState<GamePhase>("menu");
@@ -80,24 +90,25 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   const [playerName, setPlayerName] = useState("");
   const [roomCodeInput, setRoomCodeInput] = useState(initialRoomCode || "");
   const [copied, setCopied] = useState(false);
-  const [connectionMode, setConnectionMode] = useState<"semantic" | "phonetic">("semantic");
+  const [connectionMode, setConnectionMode] = useState<"semantic" | "phonetic">("phonetic");
 
-  // Realtime moves (actual words sync)
+  // Realtime moves
   const [moves, setMoves] = useState<MoveRow[]>([]);
   const moveIdsRef = useRef<Set<string>>(new Set());
   const movesChannelRef = useRef<any>(null);
 
+  // Turn-based state
+  const [turnTimeLeft, setTurnTimeLeft] = useState(TURN_TIME_LIMIT);
+  const turnTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   // Game state
-  const [timeLeft, setTimeLeft] = useState(60);
   const [chain, setChain] = useState<ChainWord[]>([]);
   const [currentInput, setCurrentInput] = useState("");
-  const [score, setScore] = useState(0);
   const [isValidating, setIsValidating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(3);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const channelRef = useRef<any>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
 
@@ -106,8 +117,11 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   }, [gamePhase]);
 
   const isHost = room?.host_id === playerId;
+  const isMyTurn = room?.current_turn_player_id === playerId;
+  const myWarnings = isHost ? (room?.host_warnings || 0) : (room?.guest_warnings || 0);
+  const opponentWarnings = isHost ? (room?.guest_warnings || 0) : (room?.host_warnings || 0);
 
-  // 효과음 재생 함수 (Web Audio API)
+  // Audio helpers
   const playBeep = (frequency: number = 440, duration: number = 150, type: OscillatorType = "sine") => {
     try {
       if (!audioContextRef.current) {
@@ -116,15 +130,15 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       const ctx = audioContextRef.current;
       const oscillator = ctx.createOscillator();
       const gainNode = ctx.createGain();
-      
+
       oscillator.connect(gainNode);
       gainNode.connect(ctx.destination);
-      
+
       oscillator.type = type;
       oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
       gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
       gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration / 1000);
-      
+
       oscillator.start(ctx.currentTime);
       oscillator.stop(ctx.currentTime + duration / 1000);
     } catch (e) {
@@ -132,34 +146,46 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     }
   };
 
-  // 진동 피드백
   const vibrate = (pattern: number | number[] = 100) => {
     if (navigator.vibrate) {
       navigator.vibrate(pattern);
     }
   };
 
-  // 준비 완료 피드백
   const playReadyFeedback = () => {
-    playBeep(880, 100, "sine"); // 높은 톤
+    playBeep(880, 100, "sine");
     vibrate(50);
   };
 
-  // 카운트다운 피드백
   const playCountdownBeep = (num: number) => {
     if (num > 0) {
       playBeep(600, 100, "square");
       vibrate(30);
     } else {
-      // 시작! - 더 화려한 사운드
       playBeep(880, 200, "sawtooth");
       vibrate([50, 50, 100]);
     }
   };
 
-  // 랜덤 닉네임 생성 함수
+  const playWarnBeep = () => {
+    playBeep(300, 300, "square");
+    vibrate([100, 50, 100]);
+  };
+
+  const playWinSound = () => {
+    playBeep(523, 150, "sine");
+    setTimeout(() => playBeep(659, 150, "sine"), 150);
+    setTimeout(() => playBeep(784, 300, "sine"), 300);
+  };
+
+  const playLoseSound = () => {
+    playBeep(300, 200, "sawtooth");
+    setTimeout(() => playBeep(250, 300, "sawtooth"), 200);
+  };
+
+  // Random nickname
   const generateRandomNickname = () => {
-    const adjectives = ["빠른", "용감한", "똑똑한", "귀여운", "멋진", "신나는", "활발한", "재미있는"];
+    const adjectives = ["빠른", "용감한", "똑똒한", "귀여운", "멋진", "신나는", "활발한", "재미있는"];
     const nouns = ["호랑이", "토끼", "용", "펭귄", "고양이", "강아지", "여우", "곰"];
     const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
     const noun = nouns[Math.floor(Math.random() * nouns.length)];
@@ -167,102 +193,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     return `${adj}${noun}${num}`;
   };
 
-  // URL에서 방 코드를 받았으면 자동으로 닉네임 생성 후 즉시 참가
-  useEffect(() => {
-    if (initialRoomCode && initialRoomCode.length === 6 && gamePhase === "menu") {
-      const autoNickname = generateRandomNickname();
-      setPlayerName(autoNickname);
-      setRoomCodeInput(initialRoomCode.toUpperCase());
-
-      const autoJoin = async () => {
-        try {
-          const code = initialRoomCode.toUpperCase();
-
-          // Find room (waiting/ready 모두 허용)
-          const { data: roomData, error: findError } = await supabase
-            .from("chain_reaction_rooms")
-            .select()
-            .eq("room_code", code)
-            .maybeSingle();
-
-          if (findError) throw findError;
-          if (!roomData) {
-            toast({
-              title: "방을 찾을 수 없습니다",
-              description: "방 코드가 없거나 만료되었습니다.",
-              variant: "destructive",
-            });
-            setGamePhase("menu");
-            return;
-          }
-
-          if (roomData.status === "playing") {
-            toast({
-              title: "이미 게임이 시작되었습니다",
-              description: "새 방을 만들어 다시 진행해주세요.",
-              variant: "destructive",
-            });
-            setGamePhase("menu");
-            return;
-          }
-
-          if (roomData.status === "finished") {
-            toast({
-              title: "이미 종료된 방입니다",
-              description: "새 방을 만들어 다시 진행해주세요.",
-              variant: "destructive",
-            });
-            setGamePhase("menu");
-            return;
-          }
-
-          // 이미 게스트가 차 있으면(=다른 사람이 참가) 안내
-          if (roomData.guest_id) {
-            toast({
-              title: "이미 다른 사람이 참가했습니다",
-              description: "1:1 대결은 한 명만 참가할 수 있어요. 새 방을 만들어 주세요.",
-              variant: "destructive",
-            });
-            setGamePhase("menu");
-            return;
-          }
-
-          // Join room (status는 waiting 그대로 두고, UI는 guest_id로 ready 전환)
-          const { data, error } = await supabase
-            .from("chain_reaction_rooms")
-            .update({
-              guest_id: playerId,
-              guest_name: autoNickname,
-            })
-            .eq("id", roomData.id)
-            .select()
-            .single();
-
-          if (error) throw error;
-
-          setRoom(data);
-          setConnectionMode(data.connection_mode as "semantic" | "phonetic");
-          setGamePhase("ready");
-          subscribeToRoom(data.id);
-          toast({ title: `${autoNickname}(으)로 참가 완료!` });
-        } catch (err) {
-          console.error("Auto join failed:", err);
-          toast({
-            title: "자동 참가 실패",
-            description: "잠시 후 다시 시도해주세요.",
-            variant: "destructive",
-          });
-          setGamePhase("menu");
-        }
-      };
-
-      // menu → joining(로딩 느낌) 후 자동 참가 실행
-      setGamePhase("joining");
-      void autoJoin();
-    }
-  }, [initialRoomCode, gamePhase, playerId, toast]);
-
-  // Generate room code
+  // Room code generator
   const generateRoomCode = () => {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     let code = "";
@@ -272,36 +203,89 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     return code;
   };
 
-  // Calculate exponential score
-  const calculateScore = (chainLength: number) => {
-    return Math.floor(10 * Math.pow(2, chainLength - 1));
+  // Validate word connection (phonetic only for turn-based)
+  const validateConnection = async (newWord: string, previousWord: string) => {
+    const lastChar = previousWord.charAt(previousWord.length - 1);
+    const dueum: Record<string, string[]> = {
+      녀: ["여"],
+      뇨: ["요"],
+      뉴: ["유"],
+      니: ["이"],
+      랴: ["야"],
+      려: ["여"],
+      례: ["예"],
+      료: ["요"],
+      류: ["유"],
+      리: ["이"],
+      라: ["나"],
+      래: ["내"],
+      로: ["노"],
+      뢰: ["뇌"],
+      루: ["누"],
+      르: ["느"],
+    };
+    const validStarts = [lastChar, ...(dueum[lastChar] || [])];
+    const firstChar = newWord.charAt(0);
+    return validStarts.includes(firstChar);
   };
 
-  // Validate word connection
-  const validateConnection = async (newWord: string, previousWord: string, mode: "semantic" | "phonetic") => {
-    if (mode === "phonetic") {
-      const lastChar = previousWord.charAt(previousWord.length - 1);
-      const dueum: Record<string, string[]> = {
-        "녀": ["여"], "뇨": ["요"], "뉴": ["유"], "니": ["이"],
-        "랴": ["야"], "려": ["여"], "례": ["예"], "료": ["요"], 
-        "류": ["유"], "리": ["이"], "라": ["나"], "래": ["내"],
-        "로": ["노"], "뢰": ["뇌"], "루": ["누"], "르": ["느"],
+  // URL auto-join
+  useEffect(() => {
+    if (initialRoomCode && initialRoomCode.length === 6 && gamePhase === "menu") {
+      const autoNickname = generateRandomNickname();
+      setPlayerName(autoNickname);
+      setRoomCodeInput(initialRoomCode.toUpperCase());
+
+      const autoJoin = async () => {
+        try {
+          const code = initialRoomCode.toUpperCase();
+          const { data: roomData, error: findError } = await supabase
+            .from("chain_reaction_rooms")
+            .select()
+            .eq("room_code", code)
+            .maybeSingle();
+
+          if (findError) throw findError;
+          if (!roomData) {
+            toast({ title: "방을 찾을 수 없습니다", variant: "destructive" });
+            setGamePhase("menu");
+            return;
+          }
+          if (roomData.status === "playing" || roomData.status === "finished") {
+            toast({ title: "이미 진행 중이거나 종료된 방입니다", variant: "destructive" });
+            setGamePhase("menu");
+            return;
+          }
+          if (roomData.guest_id) {
+            toast({ title: "이미 다른 사람이 참가했습니다", variant: "destructive" });
+            setGamePhase("menu");
+            return;
+          }
+
+          const { data, error } = await supabase
+            .from("chain_reaction_rooms")
+            .update({ guest_id: playerId, guest_name: autoNickname })
+            .eq("id", roomData.id)
+            .select()
+            .single();
+
+          if (error) throw error;
+          setRoom(data as Room);
+          setConnectionMode((data.connection_mode as "semantic" | "phonetic") || "phonetic");
+          setGamePhase("ready");
+          subscribeToRoom(data.id);
+          toast({ title: `${autoNickname}(으)로 참가 완료!` });
+        } catch (err) {
+          console.error("Auto join failed:", err);
+          toast({ title: "자동 참가 실패", variant: "destructive" });
+          setGamePhase("menu");
+        }
       };
-      const validStarts = [lastChar, ...(dueum[lastChar] || [])];
-      const firstChar = newWord.charAt(0);
-      return validStarts.includes(firstChar);
-    } else {
-      try {
-        const { data, error } = await supabase.functions.invoke("chain-validate", {
-          body: { previousWord, newWord, mode: "semantic" }
-        });
-        if (error) throw error;
-        return data.isValid;
-      } catch {
-        return true;
-      }
+
+      setGamePhase("joining");
+      void autoJoin();
     }
-  };
+  }, [initialRoomCode]);
 
   // Create room
   const createRoom = async () => {
@@ -309,7 +293,6 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       toast({ title: "이름을 입력해주세요", variant: "destructive" });
       return;
     }
-
     setGamePhase("creating");
     const roomCode = generateRoomCode();
 
@@ -320,14 +303,15 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
           room_code: roomCode,
           host_id: playerId,
           host_name: playerName.trim(),
-          connection_mode: connectionMode,
-          status: "waiting"
+          connection_mode: "phonetic",
+          status: "waiting",
         })
         .select()
         .single();
 
       if (error) throw error;
-      setRoom(data);
+      setRoom(data as Room);
+      setConnectionMode("phonetic");
       setGamePhase("waiting");
       subscribeToRoom(data.id);
     } catch (err) {
@@ -343,13 +327,10 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       toast({ title: "이름과 방 코드를 입력해주세요", variant: "destructive" });
       return;
     }
-
     setGamePhase("joining");
 
     try {
       const code = roomCodeInput.toUpperCase();
-
-      // Find room (waiting/ready 모두 허용)
       const { data: roomData, error: findError } = await supabase
         .from("chain_reaction_rooms")
         .select()
@@ -358,52 +339,36 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
       if (findError) throw findError;
       if (!roomData) {
-        toast({ title: "방을 찾을 수 없습니다", description: "코드를 다시 확인해주세요.", variant: "destructive" });
+        toast({ title: "방을 찾을 수 없습니다", variant: "destructive" });
         setGamePhase("menu");
         return;
       }
-
-      if (roomData.status === "playing") {
-        toast({ title: "이미 게임이 시작되었습니다", description: "새 방을 만들어 다시 진행해주세요.", variant: "destructive" });
+      if (roomData.status === "playing" || roomData.status === "finished") {
+        toast({ title: "이미 진행 중이거나 종료된 방입니다", variant: "destructive" });
         setGamePhase("menu");
         return;
       }
-
-      if (roomData.status === "finished") {
-        toast({ title: "이미 종료된 방입니다", description: "새 방을 만들어 다시 진행해주세요.", variant: "destructive" });
-        setGamePhase("menu");
-        return;
-      }
-
       if (roomData.guest_id) {
-        toast({
-          title: "이미 다른 사람이 참가했습니다",
-          description: "1:1 대결은 한 명만 참가할 수 있어요.",
-          variant: "destructive",
-        });
+        toast({ title: "이미 다른 사람이 참가했습니다", variant: "destructive" });
         setGamePhase("menu");
         return;
       }
 
-      // Join room (status는 waiting 유지)
       const { data, error } = await supabase
         .from("chain_reaction_rooms")
-        .update({
-          guest_id: playerId,
-          guest_name: playerName.trim(),
-        })
+        .update({ guest_id: playerId, guest_name: playerName.trim() })
         .eq("id", roomData.id)
         .select()
         .single();
 
       if (error) throw error;
-      setRoom(data);
-      setConnectionMode(data.connection_mode as "semantic" | "phonetic");
+      setRoom(data as Room);
+      setConnectionMode((data.connection_mode as "semantic" | "phonetic") || "phonetic");
       setGamePhase("ready");
       subscribeToRoom(data.id);
     } catch (err) {
       console.error("Failed to join room:", err);
-      toast({ title: "방 참가 실패", description: "네트워크 오류 또는 권한 문제입니다. 잠시 후 다시 시도해주세요.", variant: "destructive" });
+      toast({ title: "방 참가 실패", variant: "destructive" });
       setGamePhase("menu");
     }
   };
@@ -431,12 +396,10 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
           const phase = gamePhaseRef.current;
 
-          // 게스트가 들어오면 status와 무관하게 ready 화면으로 전환
           if (newRoom.guest_id && (phase === "waiting" || phase === "creating" || phase === "joining")) {
             setGamePhase("ready");
           }
 
-          // 게임 시작 시 카운트다운 실행
           if (newRoom.status === "playing" && phase !== "playing" && phase !== "countdown") {
             startCountdown(newRoom);
           }
@@ -444,7 +407,10 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
           if (newRoom.status === "finished" && phase !== "finished") {
             setGamePhase("finished");
             if (newRoom.winner_id === playerId) {
+              playWinSound();
               confetti({ particleCount: 150, spread: 100 });
+            } else {
+              playLoseSound();
             }
           }
         }
@@ -456,41 +422,53 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     channelRef.current = channel;
   };
 
-  // Toggle ready status
+  // Toggle ready
   const toggleReady = async () => {
     if (!room) return;
     const field = isHost ? "host_ready" : "guest_ready";
     const currentValue = isHost ? room.host_ready : room.guest_ready;
 
     try {
-      await supabase
-        .from("chain_reaction_rooms")
-        .update({ [field]: !currentValue })
-        .eq("id", room.id);
-      
-      // 준비 완료 시 피드백
-      if (!currentValue) {
-        playReadyFeedback();
-      }
+      await supabase.from("chain_reaction_rooms").update({ [field]: !currentValue }).eq("id", room.id);
+      if (!currentValue) playReadyFeedback();
     } catch (err) {
       console.error("Failed to toggle ready:", err);
     }
   };
 
-  // Start game (host only, both must be ready)
+  // Start game (host only)
   const startGame = async () => {
     if (!room || !isHost) return;
     if (!room.host_ready || !room.guest_ready) {
-      toast({ title: "양쪽 모두 준비 완료해야 시작할 수 있습니다", variant: "destructive" });
+      toast({ title: "양쪽 모두 준비해야 시작할 수 있습니다", variant: "destructive" });
       return;
     }
 
+    // Pick random start word
+    const startWord = words.length > 0 ? words[Math.floor(Math.random() * words.length)].korean : "사과";
+
     try {
+      // Insert start move
+      await (supabase as any)
+        .from("chain_reaction_moves")
+        .insert({
+          room_id: room.id,
+          player_id: "SYSTEM",
+          player_name: "시작",
+          word: startWord,
+          connection_mode: "phonetic",
+          chain_length: 0,
+          score_delta: 0,
+        });
+
+      // Host goes first
       await supabase
         .from("chain_reaction_rooms")
         .update({
           status: "playing",
-          started_at: new Date().toISOString()
+          started_at: new Date().toISOString(),
+          current_turn_player_id: room.host_id,
+          turn_start_at: new Date().toISOString(),
         })
         .eq("id", room.id);
 
@@ -500,22 +478,21 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     }
   };
 
-  // 카운트다운 시작
+  // Countdown
   const startCountdown = (roomData: Room) => {
     setGamePhase("countdown");
     setCountdown(3);
-    
+
     let count = 3;
     playCountdownBeep(count);
-    
+
     const countdownInterval = setInterval(() => {
       count--;
       setCountdown(count);
       playCountdownBeep(count);
-      
+
       if (count <= 0) {
         clearInterval(countdownInterval);
-        // 카운트다운 끝나면 실제 게임 시작
         setTimeout(() => {
           startGameLocal(roomData);
         }, 500);
@@ -526,135 +503,185 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   // Local game start
   const startGameLocal = (roomData: Room) => {
     setGamePhase("playing");
-    setTimeLeft(60);
-    setScore(0);
+    setTurnTimeLeft(TURN_TIME_LIMIT);
     setChain([]);
     setMoves([]);
     moveIdsRef.current = new Set();
     setCurrentInput("");
     setError(null);
-    setConnectionMode(roomData.connection_mode as "semantic" | "phonetic");
-
-    // Set start word
-    if (words.length > 0) {
-      const startWord = words[Math.floor(Math.random() * words.length)];
-      setChain([{ word: startWord.korean, connectionType: "start" }]);
-    }
+    setConnectionMode("phonetic");
   };
 
-  // Handle word submission
-  const handleSubmit = async () => {
-    if (!currentInput.trim() || isValidating || !room) return;
-
-    const newWord = currentInput.trim();
-    setError(null);
-
-    if (chain.some((c) => c.word === newWord)) {
-      setError("이미 사용한 단어예요!");
-      return;
-    }
-
-    if (chain.length === 0) {
-      setChain([{ word: newWord, connectionType: "start" }]);
-      setCurrentInput("");
-      return;
-    }
-
-    setIsValidating(true);
-    const previousWord = chain[chain.length - 1].word;
-    const isValid = await validateConnection(newWord, previousWord, connectionMode);
-    setIsValidating(false);
-
-    if (!isValid) {
-      if (connectionMode === "phonetic") {
-        const lastChar = previousWord.charAt(previousWord.length - 1);
-        setError(`'${lastChar}'로 시작해야 해요!`);
-      } else {
-        setError("의미적으로 연결되지 않아요!");
-      }
-      inputRef.current?.focus();
-      return;
-    }
-
-    const newChainLength = chain.length + 1;
-    const pointsEarned = calculateScore(newChainLength);
-
-    // 1) Persist scores to room (so the scoreboard stays accurate)
-    const updateField = isHost ? "host_score" : "guest_score";
-    const chainField = isHost ? "host_chain_length" : "guest_chain_length";
-
-    await supabase
-      .from("chain_reaction_rooms")
-      .update({
-        [updateField]: score + pointsEarned,
-        [chainField]: newChainLength,
-      })
-      .eq("id", room.id);
-
-    // 2) Insert move for realtime word sync (this is what the opponent sees)
-    const { data: moveRow, error: moveErr } = await (supabase as any)
-      .from("chain_reaction_moves")
-      .insert({
-        room_id: room.id,
-        player_id: playerId,
-        player_name: playerName || (isHost ? room.host_name : room.guest_name || "Player"),
-        word: newWord,
-        connection_mode: connectionMode,
-        chain_length: newChainLength,
-        score_delta: pointsEarned,
-      })
-      .select()
-      .single();
-
-    if (moveErr) {
-      console.error("Failed to insert move:", moveErr);
-      toast({
-        title: "단어 전송 실패",
-        description: "상대에게 전송되지 않았을 수 있어요. 잠시 후 다시 시도해주세요.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Apply locally (avoid duplicates with move id)
-    if (moveRow?.id && !moveIdsRef.current.has(moveRow.id)) {
-      moveIdsRef.current.add(moveRow.id);
-      setMoves((prev) => [...prev, moveRow as MoveRow]);
-      setChain((prev) => [...prev, { word: newWord, connectionType: connectionMode }]);
-      setScore((prev) => prev + pointsEarned);
-      setCurrentInput("");
-
-      if (newChainLength >= 5) {
-        confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 } });
-      }
-    }
-
-    inputRef.current?.focus();
-  };
-
-  // Timer effect
+  // Turn timer
   useEffect(() => {
-    if (gamePhase !== "playing") {
-      if (timerRef.current) clearInterval(timerRef.current);
+    if (gamePhase !== "playing" || !room) {
+      if (turnTimerRef.current) clearInterval(turnTimerRef.current);
       return;
     }
 
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
+    // Reset turn timer when turn changes
+    setTurnTimeLeft(TURN_TIME_LIMIT);
+
+    turnTimerRef.current = setInterval(() => {
+      setTurnTimeLeft((prev) => {
         if (prev <= 1) {
-          finishGame();
-          return 0;
+          // Time's up for current player
+          handleTimeUp();
+          return TURN_TIME_LIMIT;
         }
         return prev - 1;
       });
     }, 1000);
 
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (turnTimerRef.current) clearInterval(turnTimerRef.current);
     };
-  }, [gamePhase]);
+  }, [gamePhase, room?.current_turn_player_id]);
 
-  // Moves realtime sync (words)
+  // Handle time up
+  const handleTimeUp = async () => {
+    if (!room || !isMyTurn) return;
+
+    const warningField = isHost ? "host_warnings" : "guest_warnings";
+    const currentWarnings = isHost ? (room.host_warnings || 0) : (room.guest_warnings || 0);
+
+    if (currentWarnings >= MAX_WARNINGS) {
+      // Lose the game
+      const winnerId = isHost ? room.guest_id : room.host_id;
+      await supabase
+        .from("chain_reaction_rooms")
+        .update({
+          status: "finished",
+          finished_at: new Date().toISOString(),
+          winner_id: winnerId,
+        })
+        .eq("id", room.id);
+
+      toast({ title: "⏰ 시간 초과! 패배했습니다", variant: "destructive" });
+    } else {
+      // Give warning and pass turn
+      playWarnBeep();
+      toast({ title: "⚠️ 경고! 시간 초과로 경고 1회 부여", variant: "destructive" });
+
+      const nextTurnPlayer = isHost ? room.guest_id : room.host_id;
+
+      await supabase
+        .from("chain_reaction_rooms")
+        .update({
+          [warningField]: currentWarnings + 1,
+          current_turn_player_id: nextTurnPlayer,
+          turn_start_at: new Date().toISOString(),
+        })
+        .eq("id", room.id);
+    }
+  };
+
+  // Handle word submission
+  const handleSubmit = async () => {
+    if (!currentInput.trim() || isValidating || !room || !isMyTurn) return;
+
+    const newWord = currentInput.trim();
+    setError(null);
+
+    // Check duplicate
+    if (chain.some((c) => c.word === newWord)) {
+      // Duplicate = violation
+      await handleViolation("이미 사용한 단어예요!");
+      return;
+    }
+
+    // Validate connection
+    if (chain.length > 0) {
+      setIsValidating(true);
+      const previousWord = chain[chain.length - 1].word;
+      const isValid = await validateConnection(newWord, previousWord);
+      setIsValidating(false);
+
+      if (!isValid) {
+        const lastChar = previousWord.charAt(previousWord.length - 1);
+        await handleViolation(`'${lastChar}'로 시작해야 해요!`);
+        return;
+      }
+    }
+
+    // Valid word - insert move and pass turn
+    const newChainLength = chain.length + 1;
+    const nextTurnPlayer = isHost ? room.guest_id : room.host_id;
+
+    try {
+      // Insert move
+      await (supabase as any)
+        .from("chain_reaction_moves")
+        .insert({
+          room_id: room.id,
+          player_id: playerId,
+          player_name: playerName || (isHost ? room.host_name : room.guest_name || "Player"),
+          word: newWord,
+          connection_mode: "phonetic",
+          chain_length: newChainLength,
+          score_delta: 0,
+        });
+
+      // Update room: pass turn
+      await supabase
+        .from("chain_reaction_rooms")
+        .update({
+          current_turn_player_id: nextTurnPlayer,
+          turn_start_at: new Date().toISOString(),
+        })
+        .eq("id", room.id);
+
+      setCurrentInput("");
+      setTurnTimeLeft(TURN_TIME_LIMIT);
+    } catch (err) {
+      console.error("Failed to submit word:", err);
+      toast({ title: "단어 전송 실패", variant: "destructive" });
+    }
+
+    inputRef.current?.focus();
+  };
+
+  // Handle rule violation
+  const handleViolation = async (message: string) => {
+    if (!room) return;
+
+    const warningField = isHost ? "host_warnings" : "guest_warnings";
+    const currentWarnings = isHost ? (room.host_warnings || 0) : (room.guest_warnings || 0);
+
+    if (currentWarnings >= MAX_WARNINGS) {
+      // Lose
+      const winnerId = isHost ? room.guest_id : room.host_id;
+      await supabase
+        .from("chain_reaction_rooms")
+        .update({
+          status: "finished",
+          finished_at: new Date().toISOString(),
+          winner_id: winnerId,
+        })
+        .eq("id", room.id);
+
+      toast({ title: `❌ ${message} 패배!`, variant: "destructive" });
+    } else {
+      // Warning
+      playWarnBeep();
+      setError(`⚠️ ${message} 경고 1회!`);
+
+      const nextTurnPlayer = isHost ? room.guest_id : room.host_id;
+
+      await supabase
+        .from("chain_reaction_rooms")
+        .update({
+          [warningField]: currentWarnings + 1,
+          current_turn_player_id: nextTurnPlayer,
+          turn_start_at: new Date().toISOString(),
+        })
+        .eq("id", room.id);
+
+      setCurrentInput("");
+    }
+  };
+
+  // Moves realtime sync
   useEffect(() => {
     const roomId = room?.id;
     if (!roomId || gamePhase !== "playing") return;
@@ -681,15 +708,14 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       moveIdsRef.current = new Set(rows.map((r) => r.id));
       setMoves(rows);
 
-      // Merge into chain view (start word + moves timeline)
-      setChain((prev) => {
-        const start = prev.length && prev[0]?.connectionType === "start" ? [prev[0]] : [];
-        const timeline = rows.map((r) => ({
+      // Build chain from moves
+      setChain(
+        rows.map((r) => ({
           word: r.word,
-          connectionType: (r.connection_mode as "semantic" | "phonetic") || "semantic",
-        }));
-        return [...start, ...timeline];
-      });
+          connectionType: r.player_id === "SYSTEM" ? "start" : "phonetic",
+          player_id: r.player_id,
+        }))
+      );
 
       if (movesChannelRef.current) {
         supabase.removeChannel(movesChannelRef.current);
@@ -712,8 +738,15 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             if (moveIdsRef.current.has(row.id)) return;
 
             moveIdsRef.current.add(row.id);
-            setMoves((prevMoves) => [...prevMoves, row]);
-            setChain((prevChain) => [...prevChain, { word: row.word, connectionType: (row.connection_mode as any) || "semantic" }]);
+            setMoves((prev) => [...prev, row]);
+            setChain((prev) => [
+              ...prev,
+              {
+                word: row.word,
+                connectionType: row.player_id === "SYSTEM" ? "start" : "phonetic",
+                player_id: row.player_id,
+              },
+            ]);
           }
         )
         .subscribe((status) => {
@@ -734,87 +767,53 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     };
   }, [room?.id, gamePhase]);
 
-  // Finish game
-  const finishGame = async () => {
-    if (!room) return;
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      if (channelRef.current) supabase.removeChannel(channelRef.current);
+      if (movesChannelRef.current) supabase.removeChannel(movesChannelRef.current);
+      if (turnTimerRef.current) clearInterval(turnTimerRef.current);
+    };
+  }, []);
 
-    setGamePhase("finished");
+  // Auto-focus
+  useEffect(() => {
+    if (gamePhase === "playing" && isMyTurn) {
+      inputRef.current?.focus();
+    }
+  }, [gamePhase, isMyTurn]);
 
-    // Determine winner
-    const myScore = isHost ? score : score;
-    const opponentScore = isHost ? (room.guest_score || 0) : (room.host_score || 0);
-    const winnerId = myScore > opponentScore ? playerId : 
-                     myScore < opponentScore ? (isHost ? room.guest_id : room.host_id) : null;
-
-    await supabase
-      .from("chain_reaction_rooms")
-      .update({
-        [isHost ? "host_score" : "guest_score"]: score,
-        [isHost ? "host_chain_length" : "guest_chain_length"]: chain.length,
-        status: "finished",
-        finished_at: new Date().toISOString(),
-        winner_id: winnerId
-      })
-      .eq("id", room.id);
-  };
-
-  // Copy room URL (전체 URL 복사)
-  // NOTE: 카카오톡/일부 인앱브라우저는 딥링크(/vocabulary)로 접속 시 404가 날 수 있어
-  // 해시(#) 기반 URL로 공유해 서버 라우팅 의존성을 제거합니다.
+  // Copy URL
   const copyRoomUrl = () => {
     if (room?.room_code) {
       const url = `https://game.topikbot.kr/#/vocabulary?mode=multiplayer&room=${room.room_code}`;
       navigator.clipboard.writeText(url);
       setCopied(true);
-      toast({
-        title: "🔗 링크 복사 완료!",
-        description: "친구에게 링크를 보내세요!",
-      });
+      toast({ title: "🔗 링크 복사 완료!" });
       setTimeout(() => setCopied(false), 2000);
     }
   };
 
-  // Share using Web Share API (모바일에서 더 편리)
   const shareRoom = async () => {
     if (!room?.room_code) return;
 
     const url = `https://game.topikbot.kr/#/vocabulary?mode=multiplayer&room=${room.room_code}`;
     const shareData = {
-      title: "LUKATO 단어 대결",
-      text: `🎮 나와 단어 대결해! 방 코드: ${room.room_code}`,
+      title: "끝말잇기 대결",
+      text: `🎮 나와 끝말잇기 대결해! 방 코드: ${room.room_code}`,
       url,
     };
 
     if (navigator.share && navigator.canShare?.(shareData)) {
       try {
         await navigator.share(shareData);
-      } catch (err) {
-        // User cancelled or error
+      } catch {
         copyRoomUrl();
       }
     } else {
       copyRoomUrl();
     }
   };
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (channelRef.current) {
-        supabase.removeChannel(channelRef.current);
-      }
-      if (movesChannelRef.current) {
-        supabase.removeChannel(movesChannelRef.current);
-      }
-    };
-  }, []);
-
-  // Auto-focus input
-  useEffect(() => {
-    if (gamePhase === "playing") {
-      inputRef.current?.focus();
-    }
-  }, [gamePhase]);
 
   // ==================== RENDER ====================
 
@@ -830,41 +829,20 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
           <div className="text-6xl mb-4">⚔️</div>
           <h2 className="text-xl sm:text-2xl font-black mb-2 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-            1:1 실시간 대결
+            1:1 끝말잇기 대결
           </h2>
           <p className="text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">
-            Đối đầu 1:1 thời gian thực / 실시간으로 상대와 경쟁하세요!
+            번갈아 입력! 12초 안에 못 잇면 경고, 2번째에 패배!
           </p>
 
-          {/* Player name input */}
           <div className="mb-4 sm:mb-6">
             <Input
               value={playerName}
               onChange={(e) => setPlayerName(e.target.value)}
-              placeholder="닉네임 입력... / Nhập tên..."
+              placeholder="닉네임 입력..."
               className="text-center text-base sm:text-lg"
               maxLength={20}
             />
-          </div>
-
-          {/* Connection mode */}
-          <div className="flex justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-            <Button
-              variant={connectionMode === "semantic" ? "default" : "outline"}
-              onClick={() => setConnectionMode("semantic")}
-              size="sm"
-              className="text-xs sm:text-sm"
-            >
-              🔗 의미 연결
-            </Button>
-            <Button
-              variant={connectionMode === "phonetic" ? "default" : "outline"}
-              onClick={() => setConnectionMode("phonetic")}
-              size="sm"
-              className="text-xs sm:text-sm"
-            >
-              🔤 끝말잇기
-            </Button>
           </div>
 
           <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4">
@@ -876,7 +854,6 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
               >
                 <Crown className="w-6 h-6 sm:w-8 sm:h-8" />
                 <span className="text-sm sm:text-lg font-bold">방 만들기</span>
-                <span className="text-[10px] sm:text-xs opacity-80">Tạo phòng</span>
               </Button>
             </motion.div>
 
@@ -884,18 +861,17 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
               <Button
                 variant="outline"
                 onClick={() => setGamePhase("joining")}
-                className="w-full h-20 sm:h-24 flex-col gap-1 sm:gap-2 border-2"
+                className="w-full h-20 sm:h-24 flex-col gap-1 sm:gap-2"
                 disabled={!playerName.trim()}
               >
                 <Users className="w-6 h-6 sm:w-8 sm:h-8" />
                 <span className="text-sm sm:text-lg font-bold">참가하기</span>
-                <span className="text-[10px] sm:text-xs opacity-60">Tham gia</span>
               </Button>
             </motion.div>
           </div>
 
-          <Button variant="ghost" onClick={onBack} className="mt-2">
-            <ArrowLeft className="w-4 h-4 mr-2" />
+          <Button variant="ghost" onClick={onBack} className="gap-2">
+            <ArrowLeft className="w-4 h-4" />
             돌아가기
           </Button>
         </Card>
@@ -903,27 +879,22 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     );
   }
 
-  // Joining room (entering code)
+  // Joining
   if (gamePhase === "joining") {
     return (
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <Card className="p-4 sm:p-6 md:p-8 text-center">
           <Users className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-primary" />
           <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">방 참가하기</h2>
-          <p className="text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">
-            닉네임과 방 코드를 입력하세요 / Nhập tên và mã phòng
-          </p>
 
-          {/* 닉네임 입력 */}
           <Input
             value={playerName}
             onChange={(e) => setPlayerName(e.target.value)}
-            placeholder="닉네임 입력... / Nhập tên..."
+            placeholder="닉네임 입력..."
             className="text-center text-base sm:text-lg mb-3"
             maxLength={20}
           />
 
-          {/* 방 코드 입력 */}
           <Input
             value={roomCodeInput}
             onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
@@ -936,7 +907,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             <Button variant="outline" onClick={() => setGamePhase("menu")}>
               취소
             </Button>
-            <Button 
+            <Button
               onClick={joinRoom}
               disabled={roomCodeInput.length !== 6 || !playerName.trim()}
               className="bg-gradient-to-r from-purple-500 to-pink-500"
@@ -950,7 +921,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     );
   }
 
-  // Waiting for opponent
+  // Waiting / Creating
   if (gamePhase === "waiting" || gamePhase === "creating") {
     return (
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -962,47 +933,26 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
           >
             <Loader2 className="w-12 h-12 sm:w-16 sm:h-16 text-primary" />
           </motion.div>
-          
+
           <h2 className="text-xl sm:text-2xl font-bold mb-2">상대를 기다리는 중...</h2>
-          <p className="text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">
-            Đang chờ đối thủ... / 친구에게 코드를 공유하세요!
-          </p>
+          <p className="text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">친구에게 링크를 공유하세요!</p>
 
           {room && (
             <div className="mb-4 sm:mb-6">
-              <div className="text-xs sm:text-sm text-muted-foreground mb-2">방 코드 / Mã phòng</div>
-              <div className="flex justify-center items-center gap-2 mb-3">
-                <div className="text-2xl sm:text-4xl font-mono font-bold tracking-widest bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-                  {room.room_code}
-                </div>
+              <div className="text-xs sm:text-sm text-muted-foreground mb-2">방 코드</div>
+              <div className="text-2xl sm:text-4xl font-mono font-bold tracking-widest bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent mb-3">
+                {room.room_code}
               </div>
-              
-              {/* Share buttons */}
+
               <div className="flex justify-center gap-2 mb-4">
-                <Button 
-                  onClick={shareRoom}
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90"
-                >
+                <Button onClick={shareRoom} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90">
                   <Share2 className="w-4 h-4 mr-2" />
-                  링크 공유하기
+                  링크 공유
                 </Button>
                 <Button variant="outline" onClick={copyRoomUrl}>
                   {copied ? <Check className="w-4 h-4 mr-2 text-green-500" /> : <Copy className="w-4 h-4 mr-2" />}
                   {copied ? "복사됨!" : "복사"}
                 </Button>
-              </div>
-              
-              {/* Share instructions */}
-              <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 text-xs sm:text-sm text-left">
-                <p className="font-medium text-primary mb-2">📤 Cách chia sẻ / 공유 방법:</p>
-                <ol className="space-y-1 text-muted-foreground list-decimal list-inside">
-                  <li>Nhấn nút <span className="text-primary font-medium">[🔗 Chia sẻ link]</span></li>
-                  <li>Gửi link cho bạn bè qua Zalo, KakaoTalk</li>
-                  <li>Bạn bè nhấn link sẽ vào phòng ngay!</li>
-                </ol>
-                <p className="mt-2 text-[10px] sm:text-xs text-muted-foreground/70">
-                  💡 Bạn bè chỉ cần nhấn link là vào được, không cần nhập mã!
-                </p>
               </div>
             </div>
           )}
@@ -1035,7 +985,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     );
   }
 
-  // Ready to start (both players joined)
+  // Ready
   if (gamePhase === "ready") {
     return (
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
@@ -1044,119 +994,74 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-green-500/20 rounded-full blur-3xl animate-pulse" />
           </div>
 
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 200 }}
-          >
+          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200 }}>
             <Swords className="w-20 h-20 mx-auto mb-4 text-primary" />
           </motion.div>
 
-          <h2 className="text-2xl font-bold mb-2">대결 준비 완료!</h2>
-          <p className="text-muted-foreground mb-6">
-            Sẵn sàng đối đầu! / 모든 플레이어가 참가했습니다
-          </p>
+          <h2 className="text-2xl font-bold mb-2">대결 준비!</h2>
+          <p className="text-muted-foreground mb-4">번갈아 끝말잇기 • 12초 제한 • 경고 1회</p>
 
-          {/* Players with ready status */}
           <div className="bg-muted/50 rounded-xl p-4 mb-6">
             <div className="flex items-center justify-center gap-6">
-              {/* Host */}
               <div className="text-center">
-                <div className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-1 transition-all ${
-                  room?.host_ready 
-                    ? "bg-green-500/30 ring-2 ring-green-500" 
-                    : "bg-purple-500/20"
-                }`}>
-                  {room?.host_ready ? (
-                    <Check className="w-7 h-7 text-green-500" />
-                  ) : (
-                    <Crown className="w-7 h-7 text-purple-500" />
-                  )}
+                <div
+                  className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-1 transition-all ${
+                    room?.host_ready ? "bg-green-500/30 ring-2 ring-green-500" : "bg-purple-500/20"
+                  }`}
+                >
+                  {room?.host_ready ? <Check className="w-7 h-7 text-green-500" /> : <Crown className="w-7 h-7 text-purple-500" />}
                 </div>
                 <div className="font-bold">{room?.host_name}</div>
                 <div className={`text-xs ${room?.host_ready ? "text-green-500 font-medium" : "text-muted-foreground"}`}>
-                  {room?.host_ready ? "준비 완료 ✓" : "대기중..."}
+                  {room?.host_ready ? "준비 ✓" : "대기중..."}
                 </div>
                 {isHost && <div className="text-xs text-primary mt-0.5">나</div>}
               </div>
 
               <div className="text-2xl">⚡</div>
 
-              {/* Guest */}
               <div className="text-center">
-                <div className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-1 transition-all ${
-                  room?.guest_ready 
-                    ? "bg-green-500/30 ring-2 ring-green-500" 
-                    : "bg-pink-500/20"
-                }`}>
-                  {room?.guest_ready ? (
-                    <Check className="w-7 h-7 text-green-500" />
-                  ) : (
-                    <Users className="w-7 h-7 text-pink-500" />
-                  )}
+                <div
+                  className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-1 transition-all ${
+                    room?.guest_ready ? "bg-green-500/30 ring-2 ring-green-500" : "bg-pink-500/20"
+                  }`}
+                >
+                  {room?.guest_ready ? <Check className="w-7 h-7 text-green-500" /> : <Users className="w-7 h-7 text-pink-500" />}
                 </div>
                 <div className="font-bold">{room?.guest_name}</div>
                 <div className={`text-xs ${room?.guest_ready ? "text-green-500 font-medium" : "text-muted-foreground"}`}>
-                  {room?.guest_ready ? "준비 완료 ✓" : "대기중..."}
+                  {room?.guest_ready ? "준비 ✓" : "대기중..."}
                 </div>
                 {!isHost && <div className="text-xs text-primary mt-0.5">나</div>}
               </div>
             </div>
           </div>
 
-          {/* Mode indicator */}
-          <div className="mb-6">
-            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${
-              connectionMode === "semantic" 
-                ? "bg-blue-500/20 text-blue-400" 
-                : "bg-orange-500/20 text-orange-400"
-            }`}>
-              {connectionMode === "semantic" ? "🔗 의미 연결 모드" : "🔤 끝말잇기 모드"}
-            </div>
-          </div>
-
-          {/* Rules reminder */}
-          <div className="text-left bg-muted/30 rounded-xl p-4 mb-6 text-sm">
-            <div className="font-bold mb-2 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-yellow-500" />
-              게임 규칙 / Luật chơi
-            </div>
-            <ul className="space-y-1 text-muted-foreground">
-              <li>⏱️ 60초 타임어택</li>
-              <li>⛓️ 체인이 길수록 점수 기하급수 증가 (10→20→40→80...)</li>
-              <li>🏆 시간 종료 시 높은 점수가 승리!</li>
-            </ul>
-          </div>
-
-          {/* Ready button for everyone */}
           <div className="space-y-3">
-            {/* My ready toggle */}
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 onClick={toggleReady}
                 size="lg"
-                variant={(isHost ? room?.host_ready : room?.guest_ready) ? "outline" : "default"}
                 className={`w-full gap-2 text-lg ${
-                  (isHost ? room?.host_ready : room?.guest_ready)
-                    ? "border-green-500 text-green-500 hover:bg-green-500/10"
-                    : "bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90"
+                  (isHost && room?.host_ready) || (!isHost && room?.guest_ready)
+                    ? "bg-green-500 hover:bg-green-600"
+                    : "bg-gradient-to-r from-purple-500 to-pink-500"
                 }`}
               >
-                {(isHost ? room?.host_ready : room?.guest_ready) ? (
+                {(isHost && room?.host_ready) || (!isHost && room?.guest_ready) ? (
                   <>
                     <Check className="w-5 h-5" />
-                    준비 완료! (클릭하면 취소)
+                    준비 완료!
                   </>
                 ) : (
                   <>
                     <Zap className="w-5 h-5" />
-                    준비 완료 / Sẵn sàng
+                    준비하기
                   </>
                 )}
               </Button>
             </motion.div>
 
-            {/* Start button (host only, enabled when both ready) */}
             {isHost && (
               <motion.div whileHover={{ scale: room?.host_ready && room?.guest_ready ? 1.02 : 1 }} whileTap={{ scale: 0.98 }}>
                 <Button
@@ -1170,18 +1075,15 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                   }`}
                 >
                   <Play className="w-6 h-6" />
-                  {room?.host_ready && room?.guest_ready
-                    ? "게임 시작! / Bắt đầu!"
-                    : "양쪽 모두 준비해야 시작 가능"}
+                  {room?.host_ready && room?.guest_ready ? "게임 시작!" : "양쪽 모두 준비해야 시작"}
                 </Button>
               </motion.div>
             )}
 
-            {/* Guest waiting message */}
             {!isHost && room?.host_ready && room?.guest_ready && (
               <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                호스트가 시작 버튼을 누르기를 기다리는 중...
+                호스트가 시작하기를 기다리는 중...
               </div>
             )}
           </div>
@@ -1216,31 +1118,12 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                 >
                   {countdown}
                 </motion.div>
-                <motion.div
-                  className="absolute inset-0 text-9xl font-black text-primary/20 blur-2xl"
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 0.5 }}
-                >
-                  {countdown}
-                </motion.div>
               </div>
             ) : (
-              <motion.div
-                initial={{ scale: 0, rotate: -10 }}
-                animate={{ scale: 1, rotate: 0 }}
-                className="relative"
-              >
+              <motion.div initial={{ scale: 0, rotate: -10 }} animate={{ scale: 1, rotate: 0 }} className="relative">
                 <div className="text-6xl sm:text-8xl font-black bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500 bg-clip-text text-transparent">
                   시작! 🎮
                 </div>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="text-xl text-muted-foreground mt-4"
-                >
-                  Bắt đầu!
-                </motion.div>
               </motion.div>
             )}
           </motion.div>
@@ -1251,43 +1134,56 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
   // Playing
   if (gamePhase === "playing") {
-    const opponentScore = isHost ? (room?.guest_score || 0) : (room?.host_score || 0);
-    const opponentChain = isHost ? (room?.guest_chain_length || 0) : (room?.host_chain_length || 0);
     const opponentName = isHost ? room?.guest_name : room?.host_name;
 
     return (
       <div className="space-y-4">
-        {/* Scoreboard */}
-        <div className="grid grid-cols-3 gap-2 items-center bg-card rounded-xl p-3 border">
-          <div className="text-center">
-            <div className="font-bold text-sm truncate">{isHost ? room?.host_name : room?.guest_name}</div>
-            <div className="text-2xl font-black text-primary">{score}</div>
-            <div className="text-xs text-muted-foreground">{chain.length}체인</div>
-          </div>
-          <div className="text-center">
-            <motion.div
-              className={`text-3xl font-black ${timeLeft <= 10 ? "text-red-500" : "text-foreground"}`}
-              animate={timeLeft <= 10 ? { scale: [1, 1.1, 1] } : {}}
-              transition={{ duration: 0.5, repeat: timeLeft <= 10 ? Infinity : 0 }}
-            >
-              {timeLeft}s
-            </motion.div>
-          </div>
-          <div className="text-center">
-            <div className="font-bold text-sm truncate text-muted-foreground">{opponentName}</div>
-            <div className="text-2xl font-black text-muted-foreground">{opponentScore}</div>
-            <div className="text-xs text-muted-foreground">{opponentChain}체인</div>
-          </div>
+        {/* Turn indicator */}
+        <div
+          className={`text-center py-3 rounded-xl font-bold text-lg ${
+            isMyTurn ? "bg-green-500/20 text-green-400 border border-green-500/50" : "bg-muted text-muted-foreground"
+          }`}
+        >
+          {isMyTurn ? "🎯 내 차례! 단어를 입력하세요!" : `⏳ ${opponentName}의 차례...`}
         </div>
 
-        {/* Mode indicator */}
-        <div className="flex justify-center">
-          <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-            connectionMode === "semantic" 
-              ? "bg-blue-500/20 text-blue-400" 
-              : "bg-orange-500/20 text-orange-400"
-          }`}>
-            {connectionMode === "semantic" ? "🔗 의미 연결" : "🔤 끝말잇기"}
+        {/* Timer & Warnings */}
+        <div className="grid grid-cols-3 gap-2 items-center bg-card rounded-xl p-3 border">
+          <div className="text-center">
+            <div className="font-bold text-sm">{isHost ? room?.host_name : room?.guest_name}</div>
+            <div className="flex items-center justify-center gap-1 mt-1">
+              {Array.from({ length: MAX_WARNINGS + 1 }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-4 h-4 rounded-full ${i < myWarnings ? "bg-red-500" : "bg-muted"}`}
+                  title={i < myWarnings ? "경고" : ""}
+                />
+              ))}
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">{myWarnings > 0 && <span className="text-red-400">경고 {myWarnings}회</span>}</div>
+          </div>
+
+          <div className="text-center">
+            <motion.div
+              className={`text-4xl font-black ${turnTimeLeft <= 5 ? "text-red-500" : isMyTurn ? "text-green-400" : "text-muted-foreground"}`}
+              animate={turnTimeLeft <= 5 && isMyTurn ? { scale: [1, 1.1, 1] } : {}}
+              transition={{ duration: 0.5, repeat: turnTimeLeft <= 5 && isMyTurn ? Infinity : 0 }}
+            >
+              {turnTimeLeft}s
+            </motion.div>
+            <div className="text-xs text-muted-foreground">턴 제한</div>
+          </div>
+
+          <div className="text-center">
+            <div className="font-bold text-sm text-muted-foreground">{opponentName}</div>
+            <div className="flex items-center justify-center gap-1 mt-1">
+              {Array.from({ length: MAX_WARNINGS + 1 }).map((_, i) => (
+                <div key={i} className={`w-4 h-4 rounded-full ${i < opponentWarnings ? "bg-red-500" : "bg-muted"}`} />
+              ))}
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">
+              {opponentWarnings > 0 && <span className="text-red-400">경고 {opponentWarnings}회</span>}
+            </div>
           </div>
         </div>
 
@@ -1296,39 +1192,45 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
           <div className="min-h-[80px] max-h-[150px] overflow-y-auto">
             <div className="flex flex-wrap gap-2 items-center justify-center">
               {chain.map((item, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ scale: 0, rotate: -10 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  className="flex items-center gap-1"
-                >
-                  <div className={`px-3 py-1.5 rounded-lg font-bold text-sm ${
-                    idx === 0 
-                      ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white" 
-                      : item.connectionType === "phonetic"
-                        ? "bg-gradient-to-r from-orange-500 to-red-500 text-white"
-                        : "bg-gradient-to-r from-blue-500 to-cyan-500 text-white"
-                  }`}>
+                <motion.div key={idx} initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex items-center gap-1">
+                  <div
+                    className={`px-3 py-1.5 rounded-lg font-bold text-sm ${
+                      item.connectionType === "start"
+                        ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white"
+                        : item.player_id === playerId
+                          ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+                          : "bg-gradient-to-r from-blue-500 to-cyan-500 text-white"
+                    }`}
+                  >
                     {item.word}
                   </div>
                   {idx < chain.length - 1 && <span className="text-lg">→</span>}
                 </motion.div>
               ))}
-              <motion.div
-                animate={{ opacity: [0.3, 0.7, 0.3] }}
-                transition={{ duration: 1, repeat: Infinity }}
-                className="px-3 py-1.5 rounded-lg border-2 border-dashed border-primary/50 text-primary/50 font-bold text-sm"
-              >
-                ?
-              </motion.div>
+              {chain.length > 0 && (
+                <motion.div
+                  animate={{ opacity: [0.3, 0.7, 0.3] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                  className="px-3 py-1.5 rounded-lg border-2 border-dashed border-primary/50 text-primary/50 font-bold text-sm"
+                >
+                  ?
+                </motion.div>
+              )}
             </div>
           </div>
           {chain.length > 0 && (
             <div className="mt-2 text-center text-xs text-muted-foreground">
-              다음: +{calculateScore(chain.length + 1)}점
+              다음: '{chain[chain.length - 1].word.slice(-1)}'로 시작
             </div>
           )}
         </Card>
+
+        {/* Error message */}
+        {error && (
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center text-red-400 font-medium">
+            {error}
+          </motion.div>
+        )}
 
         {/* Input */}
         <div className="flex gap-2">
@@ -1341,181 +1243,69 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             }}
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             placeholder={
-              connectionMode === "phonetic" && chain.length > 0
-                ? `'${chain[chain.length - 1].word.slice(-1)}'로 시작...`
-                : "단어 입력..."
+              !isMyTurn
+                ? "상대 차례입니다..."
+                : chain.length > 0
+                  ? `'${chain[chain.length - 1].word.slice(-1)}'로 시작...`
+                  : "단어 입력..."
             }
-            className="text-lg"
-            disabled={isValidating}
+            className={`text-lg ${!isMyTurn ? "opacity-50" : ""}`}
+            disabled={isValidating || !isMyTurn}
           />
-          <Button 
-            onClick={handleSubmit} 
-            disabled={!currentInput.trim() || isValidating}
-          >
+          <Button onClick={handleSubmit} disabled={!currentInput.trim() || isValidating || !isMyTurn} size="icon" className="h-12 w-12">
             {isValidating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
           </Button>
         </div>
-
-        {/* Error */}
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="p-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-center text-sm"
-            >
-              {error}
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     );
   }
 
   // Finished
-  if (gamePhase === "finished" && room) {
-    const myScore = score;
-    const opponentScore = isHost ? (room.guest_score || 0) : (room.host_score || 0);
-    const opponentName = isHost ? room.guest_name : room.host_name;
-    const isWinner = room.winner_id === playerId;
-    const isDraw = room.winner_id === null;
+  if (gamePhase === "finished") {
+    const isWinner = room?.winner_id === playerId;
+    const opponentName = isHost ? room?.guest_name : room?.host_name;
 
     return (
-      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
-        <Card className="p-4 sm:p-6 md:p-8 text-center relative overflow-hidden">
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
+        <Card className="p-6 sm:p-8 text-center relative overflow-hidden">
           <div className="absolute inset-0 -z-10">
-            <div className={`absolute top-1/4 left-1/4 w-48 h-48 rounded-full blur-3xl animate-pulse ${
-              isWinner ? "bg-yellow-500/30" : isDraw ? "bg-blue-500/20" : "bg-muted"
-            }`} />
+            <div
+              className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl ${
+                isWinner ? "bg-yellow-500/30" : "bg-gray-500/20"
+              }`}
+            />
           </div>
 
-          <motion.div
-            initial={{ rotate: -180, scale: 0 }}
-            animate={{ rotate: 0, scale: 1 }}
-            transition={{ type: "spring", stiffness: 200 }}
-          >
-            {isWinner ? (
-              <Trophy className="w-20 h-20 mx-auto mb-4 text-yellow-500 drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]" />
-            ) : isDraw ? (
-              <Swords className="w-20 h-20 mx-auto mb-4 text-blue-500" />
-            ) : (
-              <div className="text-6xl mb-4">😢</div>
-            )}
+          <motion.div initial={{ scale: 0, rotate: -10 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 200 }}>
+            {isWinner ? <Trophy className="w-24 h-24 mx-auto mb-4 text-yellow-500" /> : <Flame className="w-24 h-24 mx-auto mb-4 text-gray-400" />}
           </motion.div>
 
-          <h2 className={`text-3xl font-black mb-4 ${
-            isWinner 
-              ? "bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent"
-              : isDraw
-                ? "text-blue-500"
-                : "text-muted-foreground"
-          }`}>
-            {isWinner ? "🎉 승리! / Chiến thắng!" : isDraw ? "🤝 무승부! / Hòa!" : "아쉽네요..."}
-          </h2>
+          <h2 className={`text-3xl font-black mb-2 ${isWinner ? "text-yellow-500" : "text-gray-400"}`}>{isWinner ? "🎉 승리!" : "😢 패배"}</h2>
 
-          {/* Score comparison */}
-          <div className="grid grid-cols-3 gap-2 items-center bg-muted/50 rounded-xl p-4 mb-6">
-            <div className="text-center">
-              <div className="font-bold truncate">{isHost ? room.host_name : room.guest_name}</div>
-              <motion.div 
-                className="text-3xl font-black text-primary"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                {myScore}
-              </motion.div>
-              <div className="text-sm text-muted-foreground">{chain.length} 체인</div>
-            </div>
-            <div className="text-2xl">VS</div>
-            <div className="text-center">
-              <div className="font-bold truncate text-muted-foreground">{opponentName}</div>
-              <motion.div 
-                className="text-3xl font-black text-muted-foreground"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.3 }}
-              >
-                {opponentScore}
-              </motion.div>
-              <div className="text-sm text-muted-foreground">
-                {isHost ? room.guest_chain_length : room.host_chain_length} 체인
-              </div>
-            </div>
+          <p className="text-muted-foreground mb-6">{isWinner ? `${opponentName}을(를) 이겼습니다!` : `${opponentName}에게 졌습니다...`}</p>
+
+          <div className="bg-muted/50 rounded-xl p-4 mb-6">
+            <div className="text-sm text-muted-foreground mb-2">총 이어간 단어</div>
+            <div className="text-4xl font-black text-primary">{chain.length}개</div>
           </div>
 
-          {/* My chain */}
-          <div className="mb-6 p-3 bg-muted/30 rounded-xl max-h-32 overflow-y-auto">
-            <div className="text-sm font-medium mb-2">내 체인 / Chuỗi của tôi</div>
-            <div className="flex flex-wrap gap-1 justify-center">
-              {chain.map((item, idx) => (
-                <span key={idx} className="flex items-center gap-0.5 text-sm">
-                  <span className="px-1.5 py-0.5 bg-primary/20 rounded text-xs">
-                    {item.word}
-                  </span>
-                  {idx < chain.length - 1 && <span className="text-muted-foreground">→</span>}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
-            <Button variant="outline" onClick={onBack} className="w-full sm:w-auto">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              나가기 / Thoát
+          <div className="flex gap-3 justify-center">
+            <Button onClick={onBack} variant="outline" className="gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              나가기
             </Button>
-            <Button 
-              onClick={async () => {
-                // Reset for rematch in same room
-                if (room) {
-                  try {
-                    await supabase
-                      .from("chain_reaction_rooms")
-                      .update({
-                        status: "ready",
-                        host_score: 0,
-                        guest_score: 0,
-                        host_chain_length: 0,
-                        guest_chain_length: 0,
-                        host_ready: false,
-                        guest_ready: false,
-                        winner_id: null,
-                        started_at: null,
-                        finished_at: null
-                      })
-                      .eq("id", room.id);
-                    
-                    setGamePhase("ready");
-                    setChain([]);
-                    setScore(0);
-                    setTimeLeft(60);
-                  } catch (err) {
-                    console.error("Rematch error:", err);
-                    // Fallback to menu
-                    setGamePhase("menu");
-                    setRoom(null);
-                    setChain([]);
-                    setScore(0);
-                  }
-                }
-              }}
-              className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-pink-500"
-            >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              리매치 / Đấu lại
-            </Button>
-            <Button 
-              variant="outline"
+            <Button
               onClick={() => {
                 setGamePhase("menu");
                 setRoom(null);
                 setChain([]);
-                setScore(0);
+                setMoves([]);
+                setError(null);
               }}
-              className="w-full sm:w-auto"
+              className="gap-2 bg-gradient-to-r from-purple-500 to-pink-500"
             >
-              새 방 / Phòng mới
+              <RefreshCw className="w-4 h-4" />
+              다시 하기
             </Button>
           </div>
         </Card>
