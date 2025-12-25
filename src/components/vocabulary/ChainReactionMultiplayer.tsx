@@ -1146,14 +1146,6 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
       return (
         <div className="space-y-4">
-          {/* Realtime debug */}
-          <div className="text-xs text-muted-foreground flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
-            <span>room: {roomSubStatus}</span>
-            <span>moves: {movesSubStatus}</span>
-            <span>movesCount: {moves.length}</span>
-            <span>lastMove: {lastMoveAt ? new Date(lastMoveAt).toLocaleTimeString() : "-"}</span>
-          </div>
-
           {/* Turn indicator */}
           <div
             className={`text-center py-3 rounded-xl font-bold text-lg ${
