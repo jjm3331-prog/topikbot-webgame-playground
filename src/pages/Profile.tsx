@@ -16,7 +16,11 @@ import {
   ArrowRight,
   Star,
   Sparkles,
-  Camera
+  Camera,
+  Trophy,
+  Headphones,
+  Notebook,
+  HelpCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -455,6 +459,58 @@ const Profile = () => {
               </div>
             </div>
           </motion.div>
+
+          {/* Quick Menu (under profile) */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="glass-card rounded-2xl p-6 mb-6"
+            aria-label="My menu"
+          >
+            <h3 className="font-semibold text-foreground flex items-center gap-2 mb-4">
+              <User className="w-4 h-4" />
+              메뉴
+            </h3>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <Button variant="secondary" className="justify-start" onClick={() => navigate("/ranking")}
+              >
+                <Trophy className="w-4 h-4 mr-2" />
+                랭킹
+              </Button>
+
+              <Button variant="secondary" className="justify-start" onClick={() => navigate("/pricing")}
+              >
+                <Crown className="w-4 h-4 mr-2" />
+                요금제
+              </Button>
+
+              <Button variant="secondary" className="justify-start" onClick={() => navigate("/help-center")}
+              >
+                <Headphones className="w-4 h-4 mr-2" />
+                고객센터
+              </Button>
+
+              <Button variant="secondary" className="justify-start" onClick={() => navigate("/terms")}
+              >
+                <Notebook className="w-4 h-4 mr-2" />
+                이용약관
+              </Button>
+
+              <Button variant="secondary" className="justify-start" onClick={() => navigate("/privacy")}
+              >
+                <HelpCircle className="w-4 h-4 mr-2" />
+                개인정보
+              </Button>
+
+              <Button variant="secondary" className="justify-start" onClick={() => navigate("/dashboard")}
+              >
+                <ArrowRight className="w-4 h-4 mr-2" />
+                대시보드
+              </Button>
+            </div>
+          </motion.section>
 
           {/* Edit Profile Section */}
           <motion.div
