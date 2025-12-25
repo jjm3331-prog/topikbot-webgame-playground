@@ -99,37 +99,73 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       const autoNickname = generateRandomNickname();
       setPlayerName(autoNickname);
       setRoomCodeInput(initialRoomCode.toUpperCase());
-      
-      // 자동 참가 실행 (약간의 딜레이 후)
+
       const autoJoin = async () => {
         try {
-          // Find room
+          const code = initialRoomCode.toUpperCase();
+
+          // Find room (waiting/ready 모두 허용)
           const { data: roomData, error: findError } = await supabase
             .from("chain_reaction_rooms")
             .select()
-            .eq("room_code", initialRoomCode.toUpperCase())
-            .eq("status", "waiting")
-            .single();
+            .eq("room_code", code)
+            .maybeSingle();
 
-          if (findError || !roomData) {
-            toast({ title: "방을 찾을 수 없습니다", description: "이미 시작되었거나 존재하지 않는 방입니다.", variant: "destructive" });
+          if (findError) throw findError;
+          if (!roomData) {
+            toast({
+              title: "방을 찾을 수 없습니다",
+              description: "방 코드가 없거나 만료되었습니다.",
+              variant: "destructive",
+            });
             setGamePhase("menu");
             return;
           }
 
-          // Join room
+          if (roomData.status === "playing") {
+            toast({
+              title: "이미 게임이 시작되었습니다",
+              description: "새 방을 만들어 다시 진행해주세요.",
+              variant: "destructive",
+            });
+            setGamePhase("menu");
+            return;
+          }
+
+          if (roomData.status === "finished") {
+            toast({
+              title: "이미 종료된 방입니다",
+              description: "새 방을 만들어 다시 진행해주세요.",
+              variant: "destructive",
+            });
+            setGamePhase("menu");
+            return;
+          }
+
+          // 이미 게스트가 차 있으면(=다른 사람이 참가) 안내
+          if (roomData.guest_id) {
+            toast({
+              title: "이미 다른 사람이 참가했습니다",
+              description: "1:1 대결은 한 명만 참가할 수 있어요. 새 방을 만들어 주세요.",
+              variant: "destructive",
+            });
+            setGamePhase("menu");
+            return;
+          }
+
+          // Join room (status는 waiting 그대로 두고, UI는 guest_id로 ready 전환)
           const { data, error } = await supabase
             .from("chain_reaction_rooms")
             .update({
               guest_id: playerId,
               guest_name: autoNickname,
-              status: "ready"
             })
             .eq("id", roomData.id)
             .select()
             .single();
 
           if (error) throw error;
+
           setRoom(data);
           setConnectionMode(data.connection_mode as "semantic" | "phonetic");
           setGamePhase("ready");
@@ -137,15 +173,20 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
           toast({ title: `${autoNickname}(으)로 참가 완료!` });
         } catch (err) {
           console.error("Auto join failed:", err);
-          toast({ title: "자동 참가 실패", description: "수동으로 참가해주세요.", variant: "destructive" });
-          setGamePhase("joining");
+          toast({
+            title: "자동 참가 실패",
+            description: "잠시 후 다시 시도해주세요.",
+            variant: "destructive",
+          });
+          setGamePhase("menu");
         }
       };
-      
+
+      // menu → joining(로딩 느낌) 후 자동 참가 실행
       setGamePhase("joining");
-      autoJoin();
+      void autoJoin();
     }
-  }, [initialRoomCode]);
+  }, [initialRoomCode, gamePhase, playerId, toast]);
 
   // Generate room code
   const generateRoomCode = () => {
@@ -232,25 +273,50 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     setGamePhase("joining");
 
     try {
-      // Find room
+      const code = roomCodeInput.toUpperCase();
+
+      // Find room (waiting/ready 모두 허용)
       const { data: roomData, error: findError } = await supabase
         .from("chain_reaction_rooms")
         .select()
-        .eq("room_code", roomCodeInput.toUpperCase())
-        .eq("status", "waiting")
-        .single();
+        .eq("room_code", code)
+        .maybeSingle();
 
-      if (findError || !roomData) {
-        throw new Error("Room not found");
+      if (findError) throw findError;
+      if (!roomData) {
+        toast({ title: "방을 찾을 수 없습니다", description: "코드를 다시 확인해주세요.", variant: "destructive" });
+        setGamePhase("menu");
+        return;
       }
 
-      // Join room
+      if (roomData.status === "playing") {
+        toast({ title: "이미 게임이 시작되었습니다", description: "새 방을 만들어 다시 진행해주세요.", variant: "destructive" });
+        setGamePhase("menu");
+        return;
+      }
+
+      if (roomData.status === "finished") {
+        toast({ title: "이미 종료된 방입니다", description: "새 방을 만들어 다시 진행해주세요.", variant: "destructive" });
+        setGamePhase("menu");
+        return;
+      }
+
+      if (roomData.guest_id) {
+        toast({
+          title: "이미 다른 사람이 참가했습니다",
+          description: "1:1 대결은 한 명만 참가할 수 있어요.",
+          variant: "destructive",
+        });
+        setGamePhase("menu");
+        return;
+      }
+
+      // Join room (status는 waiting 유지)
       const { data, error } = await supabase
         .from("chain_reaction_rooms")
         .update({
           guest_id: playerId,
           guest_name: playerName.trim(),
-          status: "ready"
         })
         .eq("id", roomData.id)
         .select()
@@ -263,7 +329,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       subscribeToRoom(data.id);
     } catch (err) {
       console.error("Failed to join room:", err);
-      toast({ title: "방 참가 실패. 코드를 확인해주세요.", variant: "destructive" });
+      toast({ title: "방 참가 실패", description: "네트워크 오류 또는 권한 문제입니다. 잠시 후 다시 시도해주세요.", variant: "destructive" });
       setGamePhase("menu");
     }
   };
@@ -284,24 +350,25 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
           table: "chain_reaction_rooms",
           filter: `id=eq.${roomId}`
         },
-        (payload) => {
-          const newRoom = payload.new as Room;
-          setRoom(newRoom);
+          (payload) => {
+            const newRoom = payload.new as Room;
+            setRoom(newRoom);
 
-          // Handle phase transitions
-          if (newRoom.status === "ready" && gamePhase === "waiting") {
-            setGamePhase("ready");
-          }
-          if (newRoom.status === "playing" && gamePhase !== "playing") {
-            startGameLocal(newRoom);
-          }
-          if (newRoom.status === "finished" && gamePhase !== "finished") {
-            setGamePhase("finished");
-            if (newRoom.winner_id === playerId) {
-              confetti({ particleCount: 150, spread: 100 });
+            // Handle phase transitions
+            // 게스트가 들어오면 status와 무관하게 ready 화면으로 전환
+            if (newRoom.guest_id && (gamePhase === "waiting" || gamePhase === "creating" || gamePhase === "joining")) {
+              setGamePhase("ready");
+            }
+            if (newRoom.status === "playing" && gamePhase !== "playing") {
+              startGameLocal(newRoom);
+            }
+            if (newRoom.status === "finished" && gamePhase !== "finished") {
+              setGamePhase("finished");
+              if (newRoom.winner_id === playerId) {
+                confetti({ particleCount: 150, spread: 100 });
+              }
             }
           }
-        }
       )
       .subscribe();
 
