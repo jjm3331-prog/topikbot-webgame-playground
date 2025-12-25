@@ -572,15 +572,65 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
           </div>
         </div>
 
-        <Card className="p-6 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/30">
-          <h3 className="font-bold mb-4">📋 Cách chơi / 게임 방법</h3>
-          <ul className="text-sm space-y-2 text-muted-foreground">
-            <li>• Nối từ có <span className="text-purple-400 font-semibold">ý nghĩa liên quan</span> (không phải âm tiết)</li>
-            <li>• AI chấm điểm liên quan (0-100), <span className="text-green-400 font-semibold">≥70 điểm = Pass</span></li>
-            <li>• Mỗi lượt có <span className="text-yellow-400 font-semibold">12 giây</span></li>
-            <li>• <span className="text-red-400">2 lần cảnh báo = Thua</span></li>
-            <li>• Thắng = <span className="text-yellow-500 font-bold">+1,000 điểm!</span></li>
-          </ul>
+        <Card className="p-6 bg-gradient-to-br from-purple-900/40 to-pink-900/30 border-purple-500/40">
+          <h3 className="text-lg font-bold mb-5 flex items-center gap-2 text-white">
+            <span className="text-2xl">📋</span> Cách chơi / 게임 방법
+          </h3>
+          
+          {/* 게임 개요 */}
+          <div className="mb-5 p-4 rounded-lg bg-background/50 border border-purple-500/20">
+            <h4 className="font-semibold text-purple-300 mb-2 text-sm">🎯 게임 개요 / Mô tả trò chơi</h4>
+            <p className="text-sm text-foreground/80 leading-relaxed">
+              Đây là trò chơi nối từ theo <span className="text-purple-400 font-bold">ý nghĩa liên quan</span>, không phải theo âm tiết cuối như "끝말잇기" truyền thống. 
+              Ví dụ: "바다" → "파도" (biển → sóng), "학교" → "선생님" (trường → giáo viên).
+            </p>
+          </div>
+
+          {/* 규칙 상세 */}
+          <div className="space-y-3">
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-green-500/10 border border-green-500/30">
+              <span className="text-xl">🤖</span>
+              <div>
+                <p className="font-semibold text-green-400 text-sm">AI chấm điểm liên quan</p>
+                <p className="text-xs text-foreground/70 mt-1">AI sẽ đánh giá mức độ liên quan từ 0-100 điểm. <span className="text-green-400 font-bold">≥70 điểm = PASS</span>, dưới 70 = cảnh báo.</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+              <span className="text-xl">⏱️</span>
+              <div>
+                <p className="font-semibold text-yellow-400 text-sm">Thời gian mỗi lượt: 12 giây</p>
+                <p className="text-xs text-foreground/70 mt-1">Hết thời gian mà chưa nhập từ = nhận cảnh báo. Hãy suy nghĩ nhanh!</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-red-500/10 border border-red-500/30">
+              <span className="text-xl">⚠️</span>
+              <div>
+                <p className="font-semibold text-red-400 text-sm">Quy tắc cảnh báo</p>
+                <p className="text-xs text-foreground/70 mt-1">Nhận cảnh báo khi: từ không liên quan (&lt;70 điểm), hết giờ, hoặc từ đã dùng. <span className="text-red-400 font-bold">2 cảnh báo = THUA!</span></p>
+              </div>
+            </div>
+            
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-purple-500/10 border border-purple-500/30">
+              <span className="text-xl">🏆</span>
+              <div>
+                <p className="font-semibold text-purple-400 text-sm">Phần thưởng chiến thắng</p>
+                <p className="text-xs text-foreground/70 mt-1">Người thắng sẽ nhận <span className="text-yellow-400 font-bold">+1,000 điểm</span> vào tài khoản!</p>
+              </div>
+            </div>
+          </div>
+
+          {/* 예시 */}
+          <div className="mt-5 p-4 rounded-lg bg-background/30 border border-muted">
+            <h4 className="font-semibold text-blue-300 mb-2 text-sm">💡 Ví dụ từ liên quan / 연관 단어 예시</h4>
+            <div className="flex flex-wrap gap-2 text-xs">
+              <span className="px-2 py-1 bg-purple-500/20 rounded text-purple-300">커피 → 카페</span>
+              <span className="px-2 py-1 bg-pink-500/20 rounded text-pink-300">겨울 → 눈</span>
+              <span className="px-2 py-1 bg-blue-500/20 rounded text-blue-300">음악 → 노래</span>
+              <span className="px-2 py-1 bg-green-500/20 rounded text-green-300">병원 → 의사</span>
+            </div>
+          </div>
         </Card>
 
         <div className="space-y-4">
