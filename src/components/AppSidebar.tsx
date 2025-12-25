@@ -107,13 +107,14 @@ const menuSections: MenuSection[] = [
 
 interface AppSidebarProps {
   username?: string | null;
+  avatarUrl?: string | null;
   isOpen: boolean;
   onClose: () => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
 }
 
-export const AppSidebar = ({ username, isOpen, onClose, isCollapsed, onToggleCollapse }: AppSidebarProps) => {
+export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, onToggleCollapse }: AppSidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
@@ -208,9 +209,13 @@ export const AppSidebar = ({ username, isOpen, onClose, isCollapsed, onToggleCol
         <div className="border-b border-border shrink-0">
           <div className="px-4 py-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                <User className="w-5 h-5 text-primary" />
-              </div>
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={username} className="w-10 h-10 rounded-full object-cover" />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                  <User className="w-5 h-5 text-primary" />
+                </div>
+              )}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">{username}</p>
                 <p className="text-xs text-muted-foreground">Thành viên</p>
