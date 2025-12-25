@@ -415,37 +415,38 @@ export default function ChainReactionMultiplayer({ words, onBack }: ChainReactio
   if (gamePhase === "menu") {
     return (
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <Card className="p-8 text-center relative overflow-hidden">
+        <Card className="p-4 sm:p-6 md:p-8 text-center relative overflow-hidden">
           <div className="absolute inset-0 -z-10 overflow-hidden">
             <div className="absolute top-1/4 left-1/4 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
             <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-pink-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
           </div>
 
           <div className="text-6xl mb-4">⚔️</div>
-          <h2 className="text-2xl font-black mb-2 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+          <h2 className="text-xl sm:text-2xl font-black mb-2 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
             1:1 실시간 대결
           </h2>
-          <p className="text-muted-foreground mb-6">
+          <p className="text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">
             Đối đầu 1:1 thời gian thực / 실시간으로 상대와 경쟁하세요!
           </p>
 
           {/* Player name input */}
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
             <Input
               value={playerName}
               onChange={(e) => setPlayerName(e.target.value)}
               placeholder="닉네임 입력... / Nhập tên..."
-              className="text-center text-lg"
+              className="text-center text-base sm:text-lg"
               maxLength={20}
             />
           </div>
 
           {/* Connection mode */}
-          <div className="flex justify-center gap-3 mb-6">
+          <div className="flex justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
             <Button
               variant={connectionMode === "semantic" ? "default" : "outline"}
               onClick={() => setConnectionMode("semantic")}
               size="sm"
+              className="text-xs sm:text-sm"
             >
               🔗 의미 연결
             </Button>
@@ -453,21 +454,22 @@ export default function ChainReactionMultiplayer({ words, onBack }: ChainReactio
               variant={connectionMode === "phonetic" ? "default" : "outline"}
               onClick={() => setConnectionMode("phonetic")}
               size="sm"
+              className="text-xs sm:text-sm"
             >
               🔤 끝말잇기
             </Button>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4">
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 onClick={createRoom}
-                className="w-full h-24 flex-col gap-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90"
+                className="w-full h-20 sm:h-24 flex-col gap-1 sm:gap-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90"
                 disabled={!playerName.trim()}
               >
-                <Crown className="w-8 h-8" />
-                <span className="text-lg font-bold">방 만들기</span>
-                <span className="text-xs opacity-80">Tạo phòng</span>
+                <Crown className="w-6 h-6 sm:w-8 sm:h-8" />
+                <span className="text-sm sm:text-lg font-bold">방 만들기</span>
+                <span className="text-[10px] sm:text-xs opacity-80">Tạo phòng</span>
               </Button>
             </motion.div>
 
@@ -475,12 +477,12 @@ export default function ChainReactionMultiplayer({ words, onBack }: ChainReactio
               <Button
                 variant="outline"
                 onClick={() => setGamePhase("joining")}
-                className="w-full h-24 flex-col gap-2 border-2"
+                className="w-full h-20 sm:h-24 flex-col gap-1 sm:gap-2 border-2"
                 disabled={!playerName.trim()}
               >
-                <Users className="w-8 h-8" />
-                <span className="text-lg font-bold">참가하기</span>
-                <span className="text-xs opacity-60">Tham gia</span>
+                <Users className="w-6 h-6 sm:w-8 sm:h-8" />
+                <span className="text-sm sm:text-lg font-bold">참가하기</span>
+                <span className="text-[10px] sm:text-xs opacity-60">Tham gia</span>
               </Button>
             </motion.div>
           </div>
@@ -498,10 +500,10 @@ export default function ChainReactionMultiplayer({ words, onBack }: ChainReactio
   if (gamePhase === "joining") {
     return (
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <Card className="p-8 text-center">
-          <Users className="w-16 h-16 mx-auto mb-4 text-primary" />
-          <h2 className="text-2xl font-bold mb-4">방 참가하기</h2>
-          <p className="text-muted-foreground mb-6">
+        <Card className="p-4 sm:p-6 md:p-8 text-center">
+          <Users className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-primary" />
+          <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">방 참가하기</h2>
+          <p className="text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">
             친구에게 받은 코드를 입력하세요
           </p>
 
@@ -509,7 +511,7 @@ export default function ChainReactionMultiplayer({ words, onBack }: ChainReactio
             value={roomCodeInput}
             onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
             placeholder="방 코드 6자리..."
-            className="text-center text-2xl tracking-widest mb-4"
+            className="text-center text-xl sm:text-2xl tracking-widest mb-4"
             maxLength={6}
           />
 
@@ -535,25 +537,25 @@ export default function ChainReactionMultiplayer({ words, onBack }: ChainReactio
   if (gamePhase === "waiting" || gamePhase === "creating") {
     return (
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <Card className="p-8 text-center">
+        <Card className="p-4 sm:p-6 md:p-8 text-center">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="w-16 h-16 mx-auto mb-4"
+            className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4"
           >
-            <Loader2 className="w-16 h-16 text-primary" />
+            <Loader2 className="w-12 h-12 sm:w-16 sm:h-16 text-primary" />
           </motion.div>
           
-          <h2 className="text-2xl font-bold mb-2">상대를 기다리는 중...</h2>
-          <p className="text-muted-foreground mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold mb-2">상대를 기다리는 중...</h2>
+          <p className="text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">
             Đang chờ đối thủ... / 친구에게 코드를 공유하세요!
           </p>
 
           {room && (
-            <div className="mb-6">
-              <div className="text-sm text-muted-foreground mb-2">방 코드 / Mã phòng</div>
+            <div className="mb-4 sm:mb-6">
+              <div className="text-xs sm:text-sm text-muted-foreground mb-2">방 코드 / Mã phòng</div>
               <div className="flex justify-center items-center gap-2">
-                <div className="text-4xl font-mono font-bold tracking-widest bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+                <div className="text-2xl sm:text-4xl font-mono font-bold tracking-widest bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
                   {room.room_code}
                 </div>
                 <Button variant="ghost" size="sm" onClick={copyRoomCode}>
@@ -595,7 +597,7 @@ export default function ChainReactionMultiplayer({ words, onBack }: ChainReactio
   if (gamePhase === "ready") {
     return (
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
-        <Card className="p-8 text-center relative overflow-hidden">
+        <Card className="p-4 sm:p-6 md:p-8 text-center relative overflow-hidden">
           <div className="absolute inset-0 -z-10">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-green-500/20 rounded-full blur-3xl animate-pulse" />
           </div>
@@ -814,7 +816,7 @@ export default function ChainReactionMultiplayer({ words, onBack }: ChainReactio
 
     return (
       <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
-        <Card className="p-8 text-center relative overflow-hidden">
+        <Card className="p-4 sm:p-6 md:p-8 text-center relative overflow-hidden">
           <div className="absolute inset-0 -z-10">
             <div className={`absolute top-1/4 left-1/4 w-48 h-48 rounded-full blur-3xl animate-pulse ${
               isWinner ? "bg-yellow-500/30" : isDraw ? "bg-blue-500/20" : "bg-muted"

@@ -153,19 +153,19 @@ const SprintGame = ({ words, onComplete }: SprintGameProps) => {
   return (
     <div>
       {/* Timer & Score */}
-      <div className="flex justify-between items-center mb-6">
-        <div className={`text-3xl font-bold ${timeLeft <= 10 ? "text-red-500 animate-pulse" : "text-foreground"}`}>
+      <div className="flex justify-between items-center mb-4 sm:mb-6">
+        <div className={`text-2xl sm:text-3xl font-bold ${timeLeft <= 10 ? "text-red-500 animate-pulse" : "text-foreground"}`}>
           ⏱️ {timeLeft}s
         </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-primary">{score} 점</div>
+          <div className="text-xl sm:text-2xl font-bold text-primary">{score} 점</div>
           {streak >= 3 && (
             <motion.div 
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="text-sm text-orange-500 flex items-center gap-1"
+              className="text-xs sm:text-sm text-orange-500 flex items-center gap-1"
             >
-              <Flame className="w-4 h-4" /> {streak} 연속!
+              <Flame className="w-3 h-3 sm:w-4 sm:h-4" /> {streak} 연속!
             </motion.div>
           )}
         </div>
@@ -176,13 +176,13 @@ const SprintGame = ({ words, onComplete }: SprintGameProps) => {
         key={currentIndex}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-card border-2 border-border rounded-2xl p-8 text-center mb-6"
+        className="bg-card border-2 border-border rounded-2xl p-4 sm:p-6 md:p-8 text-center mb-4 sm:mb-6"
       >
-        <h2 className="text-4xl font-bold text-foreground">{currentWord.korean}</h2>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">{currentWord.korean}</h2>
       </motion.div>
 
       {/* Options */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
         {options.map((option, idx) => {
           const isCorrect = option === currentWord.meaning;
           const isSelected = selectedAnswer === idx;
@@ -194,12 +194,12 @@ const SprintGame = ({ words, onComplete }: SprintGameProps) => {
               whileTap={{ scale: 0.98 }}
               onClick={() => handleAnswer(idx)}
               disabled={showResult}
-              className={`p-4 rounded-xl text-left font-medium transition-all ${
+              className={`p-3 sm:p-4 rounded-xl text-left font-medium text-sm sm:text-base transition-all ${
                 showResult
                   ? isCorrect
-                    ? "bg-green-100 border-2 border-green-500 text-green-700"
+                    ? "bg-green-100 dark:bg-green-900/30 border-2 border-green-500 text-green-700 dark:text-green-400"
                     : isSelected
-                      ? "bg-red-100 border-2 border-red-500 text-red-700"
+                      ? "bg-red-100 dark:bg-red-900/30 border-2 border-red-500 text-red-700 dark:text-red-400"
                       : "bg-muted border-2 border-border text-muted-foreground"
                   : "bg-card border-2 border-border hover:border-primary/50"
               }`}
@@ -455,24 +455,24 @@ const Vocabulary = () => {
             </Button>
 
             {/* Hero Section */}
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600 p-8 mb-8">
+            <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600 p-4 sm:p-6 md:p-8 mb-6 sm:mb-8">
               <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIiBzdHJva2Utd2lkdGg9IjIiLz48L2c+PC9zdmc+')] opacity-30" />
               
-              <div className="relative z-10 flex items-center gap-6">
+              <div className="relative z-10 flex items-center gap-4 sm:gap-6">
                 <motion.div 
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", delay: 0.2 }}
-                  className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-2xl border border-white/30"
+                  className="w-14 h-14 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-2xl border border-white/30 shrink-0"
                 >
-                  <BookOpen className="w-10 h-10 text-white" />
+                  <BookOpen className="w-7 h-7 sm:w-10 sm:h-10 text-white" />
                 </motion.div>
-                <div>
+                <div className="min-w-0">
                   <motion.div 
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-medium mb-2"
+                    className="inline-flex items-center gap-2 px-2 sm:px-3 py-1 rounded-full bg-white/20 text-white text-[10px] sm:text-xs font-medium mb-2"
                   >
                     <Sparkles className="w-3 h-3" />
                     3가지 게임
@@ -481,7 +481,7 @@ const Vocabulary = () => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="text-3xl sm:text-4xl font-bold text-white mb-1"
+                    className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1"
                   >
                     어휘 학습
                   </motion.h1>
@@ -489,7 +489,7 @@ const Vocabulary = () => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.5 }}
-                    className="text-white/80"
+                    className="text-white/80 text-sm sm:text-base"
                   >
                     Từ vựng TOPIK
                   </motion.p>
@@ -542,7 +542,7 @@ const Vocabulary = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="rounded-3xl bg-card border border-border p-6 sm:p-8"
+            className="rounded-2xl sm:rounded-3xl bg-card border border-border p-4 sm:p-6 md:p-8"
           >
             {isLoading ? (
               <div className="text-center py-12">
