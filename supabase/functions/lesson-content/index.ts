@@ -85,72 +85,7 @@ const SYSTEM_PROMPT = `당신은 한국어 교육 전문가이자 TOPIK 시험 �
 - 고급 문법 (-는 바, -기 마련이다, -는 셈이다)
 - 전문적/학술적 주제
 
-## 제공된 컨텍스트 활용
-RAG 검색으로 제공된 지식 문서를 우선적으로 참고하여 문제를 생성하세요.
-컨텍스트가 없거나 부족한 경우, 위 기준에 따라 자체적으로 생성하되 정확성을 최우선으로 하세요.
-
 정확히 5개의 문제를 생성하세요.`;
-
-// Generate query embedding using OpenAI
-async function generateEmbedding(text: string, apiKey: string): Promise<number[]> {
-  const response = await fetch('https://api.openai.com/v1/embeddings', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'text-embedding-3-large',
-      input: text,
-      dimensions: 1536,
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    console.error('OpenAI embedding error:', error);
-    throw new Error(`OpenAI API error: ${response.status}`);
-  }
-
-  const data = await response.json();
-  return data.data[0].embedding;
-}
-
-// Rerank results using Cohere
-async function rerankResults(
-  query: string, 
-  documents: { id: string; content: string; similarity: number; document_title: string }[],
-  apiKey: string,
-  topN: number = 5
-): Promise<typeof documents> {
-  if (documents.length === 0) return [];
-
-  const response = await fetch('https://api.cohere.ai/v1/rerank', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'rerank-v3.5',
-      query,
-      documents: documents.map(d => d.content),
-      top_n: Math.min(topN, documents.length),
-      return_documents: false,
-    }),
-  });
-
-  if (!response.ok) {
-    console.error('Cohere rerank error:', await response.text());
-    return documents.slice(0, topN);
-  }
-
-  const data = await response.json();
-  return data.results.map((result: { index: number; relevance_score: number }) => ({
-    ...documents[result.index],
-    rerank_score: result.relevance_score,
-  }));
-}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -167,150 +102,122 @@ serve(async (req) => {
       });
     }
 
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-    const cohereApiKey = Deno.env.get('COHERE_API_KEY');
-    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
-    
-    if (!openAIApiKey) {
-      throw new Error('OPENAI_API_KEY not configured');
-    }
-    
-    if (!lovableApiKey) {
-      throw new Error('LOVABLE_API_KEY not configured');
+    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+    if (!GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY not configured');
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 1. Build semantic search query
-    const searchQuery = `TOPIK Level ${level} ${category} 한국어 ${title || ''} 학습 문제 예시`;
-    console.log(`Searching for: ${searchQuery}`);
+    // 캐시 확인 (4시간 유효)
+    const cacheKey = `lesson_${lessonId}_${category}_${level}`;
+    const { data: cached } = await supabase
+      .from('ai_response_cache')
+      .select('*')
+      .eq('cache_key', cacheKey)
+      .eq('function_name', 'lesson-content')
+      .gt('expires_at', new Date().toISOString())
+      .maybeSingle();
 
-    // 2. Generate query embedding
-    const queryEmbedding = await generateEmbedding(searchQuery, openAIApiKey);
-    console.log('Query embedding generated');
-
-    // 3. Vector similarity search
-    const { data: searchResults, error: searchError } = await supabase.rpc(
-      'search_knowledge',
-      {
-        query_embedding: `[${queryEmbedding.join(',')}]`,
-        match_threshold: 0.25, // Lower threshold for more results
-        match_count: 15,
-      }
-    );
-
-    let contextContent = '';
-    
-    if (!searchError && searchResults && searchResults.length > 0) {
-      console.log(`Found ${searchResults.length} initial results`);
-
-      // 4. Rerank with Cohere for semantic relevance
-      let finalResults = searchResults;
-      if (cohereApiKey) {
-        console.log('Reranking with Cohere...');
-        finalResults = await rerankResults(searchQuery, searchResults, cohereApiKey, 5);
-        console.log(`Reranked to top ${finalResults.length} results`);
-      }
-
-      // 5. Build context from top results
-      contextContent = finalResults
-        .map((r: { document_title: string; content: string; rerank_score?: number }) => 
-          `[문서: ${r.document_title}]\n${r.content}`
-        )
-        .join('\n\n---\n\n');
-    } else {
-      console.log('No RAG results found, generating without context');
+    if (cached) {
+      console.log(`[Lesson] Cache HIT for ${cacheKey}`);
+      await supabase.rpc('increment_cache_hit', { p_id: cached.id });
+      return new Response(JSON.stringify({
+        success: true,
+        questions: cached.response,
+        source: 'cache',
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    // 6. Generate content using Lovable AI with low temperature for accuracy
+    // Gemini 2.5 Flash 직접 호출
     const userPrompt = `## 요청
 레슨 ID: ${lessonId}
 카테고리: ${category}
 레벨: ${level}
 제목: ${title || '일반'}
 
-${contextContent ? `## 참고 자료 (RAG 검색 결과)\n${contextContent}\n\n` : ''}
+TOPIK Level ${level}에 적합한 ${category} 문제 5개를 생성하세요.`;
 
-위 정보를 바탕으로 TOPIK Level ${level}에 적합한 ${category} 문제 5개를 생성하세요.
-반드시 JSON 형식으로만 응답하세요.`;
+    console.log('[Lesson] Calling Gemini 2.5 Flash');
 
-    console.log('Calling Lovable AI with temperature 0.4');
-
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${lovableApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: userPrompt }
-        ],
-        temperature: 0.4, // Low temperature for accuracy
-        max_tokens: 4096,
-      }),
-    });
+    const aiResponse = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+          generationConfig: {
+            temperature: 0.4,
+            maxOutputTokens: 8192,
+            responseMimeType: "application/json",
+          },
+        }),
+      }
+    );
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
-      console.error('Lovable AI error:', aiResponse.status, errorText);
-      
-      if (aiResponse.status === 429) {
-        return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
-          status: 429,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      if (aiResponse.status === 402) {
-        return new Response(JSON.stringify({ error: 'Payment required' }), {
-          status: 402,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      throw new Error(`AI error: ${aiResponse.status}`);
+      console.error('[Lesson] Gemini API error:', aiResponse.status, errorText);
+      throw new Error(`Gemini API error: ${aiResponse.status}`);
     }
 
     const aiData = await aiResponse.json();
-    const content = aiData.choices?.[0]?.message?.content || '';
-    console.log('AI response received, parsing JSON');
+    const content = aiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    console.log('[Lesson] AI response received, parsing JSON');
 
     // Parse JSON from response
     let questions;
     try {
+      const parsed = JSON.parse(content);
+      questions = parsed.questions || parsed;
+    } catch (parseError) {
       // Extract JSON from markdown code blocks if present
       const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/) || 
                         content.match(/\{[\s\S]*"questions"[\s\S]*\}/);
       
-      const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content;
-      const parsed = JSON.parse(jsonStr.trim());
-      questions = parsed.questions || parsed;
-    } catch (parseError) {
-      console.error('JSON parse error:', parseError);
-      console.error('Raw content:', content);
-      return new Response(JSON.stringify({ 
-        error: 'Failed to parse AI response',
-        raw: content.substring(0, 500)
-      }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      if (jsonMatch) {
+        const jsonStr = jsonMatch[1] || jsonMatch[0];
+        const parsed = JSON.parse(jsonStr.trim());
+        questions = parsed.questions || parsed;
+      } else {
+        console.error('JSON parse error:', parseError);
+        console.error('Raw content:', content.substring(0, 500));
+        return new Response(JSON.stringify({ 
+          error: 'Failed to parse AI response',
+          raw: content.substring(0, 500)
+        }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
     }
+
+    // 캐시에 저장 (4시간 유효)
+    await supabase.from('ai_response_cache').upsert({
+      cache_key: cacheKey,
+      function_name: 'lesson-content',
+      response: questions,
+      request_params: { lessonId, category, level, title },
+      expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
+      hit_count: 0,
+    }, { onConflict: 'cache_key' });
 
     return new Response(JSON.stringify({
       success: true,
       questions,
-      hasRagContext: contextContent.length > 0,
-      ragResultCount: searchResults?.length || 0,
+      source: 'generated',
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error('Lesson content error:', error);
+    console.error('[Lesson] Error:', error);
     return new Response(JSON.stringify({ 
       error: error instanceof Error ? error.message : 'Unknown error' 
     }), {

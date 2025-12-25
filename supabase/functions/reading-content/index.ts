@@ -7,6 +7,26 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// 캐싱용 시스템 프롬프트 (고정)
+const SYSTEM_PROMPT_BASE = `당신은 한국어 TOPIK 읽기 시험 전문가입니다.
+사용자: 베트남인 학습자
+
+[규칙]
+1. 출력은 오직 JSON 배열만 (마크다운 금지)
+2. 베트남어 설명은 번역투 금지, 네이티브 표현
+3. 난이도는 TOPIK 레벨에 정확히 맞출 것
+
+[JSON 스키마]
+{
+  "id": 1,
+  "passage": "지문 (한국어)",
+  "question": "질문 (한국어)",
+  "options": ["①선택지1", "②선택지2", "③선택지3", "④선택지4"],
+  "answer": 0,
+  "explanationKo": "해설 (한국어): 왜 정답인지 + 오답 분석",
+  "explanationVi": "Giải thích (tiếng Việt tự nhiên)"
+}`;
+
 const TOPIK_READING_GUIDELINES: Record<string, string> = {
   "1-2": `[TOPIK 1-2급 읽기]
 어휘: 기초 800~1500개
@@ -57,7 +77,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 캐시 확인
+    // 캐시 확인 (4시간 유효)
     const cacheKey = `reading_${topikLevel}_${tab}_${subTab}_${count}`;
     const { data: cached } = await supabase
       .from('ai_response_cache')
@@ -85,74 +105,65 @@ serve(async (req) => {
 
     console.log(`[Reading] Generating ${count} questions for TOPIK ${topikLevel}, ${tab}/${subTab}`);
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY not configured");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY not configured");
     }
 
     const tabPrompts = TAB_PROMPTS[tab] || TAB_PROMPTS.readingA;
     const questionType = tabPrompts[subTab] || tabPrompts.grammar;
 
-    const systemPrompt = `당신은 한국어 TOPIK 읽기 시험 전문가입니다.
-사용자: 베트남인 학습자
-
-[규칙]
-1. 출력은 오직 JSON 배열만 (마크다운 금지)
-2. 베트남어 설명은 번역투 금지, 네이티브 표현
-3. 난이도는 TOPIK ${topikLevel}급에 정확히 맞출 것
+    const systemPrompt = `${SYSTEM_PROMPT_BASE}
 
 ${TOPIK_READING_GUIDELINES[topikLevel] || TOPIK_READING_GUIDELINES["1-2"]}
 
 [문제 유형]
-${questionType}
-
-[JSON 스키마]
-{
-  "id": 1,
-  "passage": "지문 (한국어)",
-  "question": "질문 (한국어)",
-  "options": ["①선택지1", "②선택지2", "③선택지3", "④선택지4"],
-  "answer": 0,
-  "explanationKo": "해설 (한국어): 왜 정답인지 + 오답 분석",
-  "explanationVi": "Giải thích (tiếng Việt tự nhiên)"
-}`;
+${questionType}`;
 
     const userPrompt = `TOPIK ${topikLevel}급 "${questionType}" 유형으로 ${count}개 읽기 문제를 JSON 배열로 생성하세요.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        temperature: 0.6,
-      }),
-    });
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          generationConfig: {
+            temperature: 0.6,
+            maxOutputTokens: 8192,
+            responseMimeType: "application/json",
+          },
+        }),
+      }
+    );
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error("[Reading] Lovable AI error:", response.status, errText);
-      throw new Error(`Lovable AI error: ${response.status}`);
+      console.error("[Reading] Gemini API error:", response.status, errText);
+      throw new Error(`Gemini API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || '';
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-    const jsonMatch = content.match(/\[[\s\S]*\]/);
-    if (!jsonMatch) {
-      throw new Error("Failed to parse reading JSON");
+    let questions;
+    try {
+      questions = JSON.parse(content);
+      if (!Array.isArray(questions)) {
+        questions = questions.questions || questions.data || [];
+      }
+    } catch {
+      const jsonMatch = content.match(/\[[\s\S]*\]/);
+      if (!jsonMatch) {
+        throw new Error("Failed to parse reading JSON");
+      }
+      questions = JSON.parse(jsonMatch[0]);
     }
 
-    const questions = JSON.parse(jsonMatch[0]);
-
-    // 캐시 저장 (30분 유효)
-    const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+    // 캐시 저장 (4시간 유효)
+    const expiresAt = new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString();
     await supabase.from('ai_response_cache').upsert({
       cache_key: cacheKey,
       function_name: 'reading-content',

@@ -7,7 +7,25 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// TOPIK 급수별 어휘 가이드라인
+// 캐싱용 시스템 프롬프트 (고정)
+const SYSTEM_PROMPT_BASE = `당신은 한국어 TOPIK 어휘 교육 전문가입니다.
+사용자: 베트남인 학습자
+
+[규칙]
+1. 출력은 오직 JSON 배열만 (마크다운 금지)
+2. 베트남어 번역은 네이티브 표현으로
+3. 난이도를 TOPIK 레벨에 정확히 맞출 것
+
+[JSON 스키마]
+{
+  "id": 1,
+  "korean": "한국어 단어",
+  "meaning": "베트남어 뜻",
+  "pronunciation": "발음 표기",
+  "example": "예문 (한국어)",
+  "exampleMeaning": "예문 번역 (베트남어)"
+}`;
+
 const TOPIK_VOCAB_GUIDELINES: Record<string, string> = {
   "1-2": `[TOPIK 1-2급 어휘]
 수준: 기초 어휘 800~1500개
@@ -45,7 +63,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 캐시 확인
+    // 캐시 확인 (4시간 유효)
     const cacheKey = `vocab_${topikLevel}_${count}`;
     const { data: cached } = await supabase
       .from('ai_response_cache')
@@ -74,67 +92,59 @@ serve(async (req) => {
     const categories = VOCAB_CATEGORIES[topikLevel] || VOCAB_CATEGORIES["1-2"];
     const randomCategory = categories[Math.floor(Math.random() * categories.length)];
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY not configured");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY not configured");
     }
 
-    const systemPrompt = `당신은 한국어 TOPIK 어휘 교육 전문가입니다.
-사용자: 베트남인 학습자
+    const systemPrompt = `${SYSTEM_PROMPT_BASE}
 
-[규칙]
-1. 출력은 오직 JSON 배열만 (마크다운 금지)
-2. 베트남어 번역은 네이티브 표현으로
-3. 난이도를 TOPIK ${topikLevel}급에 정확히 맞출 것
-
-${TOPIK_VOCAB_GUIDELINES[topikLevel] || TOPIK_VOCAB_GUIDELINES["1-2"]}
-
-[JSON 스키마]
-{
-  "id": 1,
-  "korean": "한국어 단어",
-  "meaning": "베트남어 뜻",
-  "pronunciation": "발음 표기",
-  "example": "예문 (한국어)",
-  "exampleMeaning": "예문 번역 (베트남어)"
-}`;
+${TOPIK_VOCAB_GUIDELINES[topikLevel] || TOPIK_VOCAB_GUIDELINES["1-2"]}`;
 
     const userPrompt = `"${randomCategory}" 카테고리에서 TOPIK ${topikLevel}급 수준 단어 ${count}개를 JSON 배열로 생성하세요.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        temperature: 0.7,
-      }),
-    });
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 8192,
+            responseMimeType: "application/json",
+          },
+        }),
+      }
+    );
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error("[Vocab] Lovable AI error:", response.status, errText);
-      throw new Error(`Lovable AI error: ${response.status}`);
+      console.error("[Vocab] Gemini API error:", response.status, errText);
+      throw new Error(`Gemini API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || '';
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-    const jsonMatch = content.match(/\[[\s\S]*\]/);
-    if (!jsonMatch) {
-      throw new Error("Failed to parse vocabulary JSON");
+    let words;
+    try {
+      words = JSON.parse(content);
+      if (!Array.isArray(words)) {
+        words = words.words || words.data || [];
+      }
+    } catch {
+      const jsonMatch = content.match(/\[[\s\S]*\]/);
+      if (!jsonMatch) {
+        throw new Error("Failed to parse vocabulary JSON");
+      }
+      words = JSON.parse(jsonMatch[0]);
     }
 
-    const words = JSON.parse(jsonMatch[0]);
-
-    // 캐시 저장 (30분 유효)
-    const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+    // 캐시 저장 (4시간 유효)
+    const expiresAt = new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString();
     await supabase.from('ai_response_cache').upsert({
       cache_key: cacheKey,
       function_name: 'vocabulary-content',
