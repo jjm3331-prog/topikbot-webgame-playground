@@ -49,6 +49,10 @@ import CompanyReport from "./pages/CompanyReport";
 import InterviewSimulation from "./pages/InterviewSimulation";
 import QuestionVariant from "./pages/QuestionVariant";
 import RoleplaySpeaking from "./pages/RoleplaySpeaking";
+import BoardHub from "./pages/BoardHub";
+import Board from "./pages/Board";
+import BoardPost from "./pages/BoardPost";
+import BoardWrite from "./pages/BoardWrite";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWAWelcome from "./components/PWAWelcome";
 import SplashScreen from "./components/SplashScreen";
@@ -174,6 +178,10 @@ const App = () => {
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/help-center" element={<HelpCenter />} />
+              <Route path="/board-hub" element={<BoardHub />} />
+              <Route path="/board/:boardType" element={<Board />} />
+              <Route path="/board/:boardType/:postId" element={<BoardPost />} />
+              <Route path="/board/:boardType/write" element={<BoardWrite />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

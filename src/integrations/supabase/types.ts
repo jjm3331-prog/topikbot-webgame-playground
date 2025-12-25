@@ -74,6 +74,153 @@ export type Database = {
         }
         Relationships: []
       }
+      board_comments: {
+        Row: {
+          author_id: string | null
+          author_name: string | null
+          content: string
+          created_at: string
+          id: string
+          is_anonymous: boolean | null
+          like_count: number | null
+          parent_id: string | null
+          post_id: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          author_name?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean | null
+          like_count?: number | null
+          parent_id?: string | null
+          post_id: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          author_name?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean | null
+          like_count?: number | null
+          parent_id?: string | null
+          post_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "board_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "board_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "board_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "board_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      board_likes: {
+        Row: {
+          comment_id: string | null
+          created_at: string
+          id: string
+          post_id: string | null
+          user_id: string
+        }
+        Insert: {
+          comment_id?: string | null
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          user_id: string
+        }
+        Update: {
+          comment_id?: string | null
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "board_likes_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "board_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "board_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "board_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      board_posts: {
+        Row: {
+          attachment_urls: string[] | null
+          author_id: string | null
+          author_name: string | null
+          board_type: Database["public"]["Enums"]["board_type"]
+          comment_count: number | null
+          content: string
+          created_at: string
+          id: string
+          is_anonymous: boolean | null
+          is_pinned: boolean | null
+          like_count: number | null
+          title: string
+          updated_at: string
+          view_count: number | null
+          youtube_urls: string[] | null
+        }
+        Insert: {
+          attachment_urls?: string[] | null
+          author_id?: string | null
+          author_name?: string | null
+          board_type: Database["public"]["Enums"]["board_type"]
+          comment_count?: number | null
+          content: string
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean | null
+          is_pinned?: boolean | null
+          like_count?: number | null
+          title: string
+          updated_at?: string
+          view_count?: number | null
+          youtube_urls?: string[] | null
+        }
+        Update: {
+          attachment_urls?: string[] | null
+          author_id?: string | null
+          author_name?: string | null
+          board_type?: Database["public"]["Enums"]["board_type"]
+          comment_count?: number | null
+          content?: string
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean | null
+          is_pinned?: boolean | null
+          like_count?: number | null
+          title?: string
+          updated_at?: string
+          view_count?: number | null
+          youtube_urls?: string[] | null
+        }
+        Relationships: []
+      }
       headhunting_applications: {
         Row: {
           additional_skills: string | null
@@ -772,6 +919,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      board_type: "notice" | "free" | "resource" | "anonymous"
       group_concept: "fresh" | "crush" | "hiphop" | "retro" | "dark" | "band"
       group_gender: "male" | "female" | "mixed"
       subscription_plan: "free" | "plus" | "premium"
@@ -903,6 +1051,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      board_type: ["notice", "free", "resource", "anonymous"],
       group_concept: ["fresh", "crush", "hiphop", "retro", "dark", "band"],
       group_gender: ["male", "female", "mixed"],
       subscription_plan: ["free", "plus", "premium"],
