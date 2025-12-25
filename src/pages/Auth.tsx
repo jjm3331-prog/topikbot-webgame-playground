@@ -127,10 +127,11 @@ const Auth = () => {
       if (redirectTo !== "/dashboard") {
         sessionStorage.setItem("auth_redirect", redirectTo);
       }
+      // IMPORTANT: Use hash routing (/#/) for OAuth redirect since this is a HashRouter app
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${productionUrl}${redirectTo}`
+          redirectTo: `${productionUrl}/#${redirectTo}`
         }
       });
       if (error) throw error;
