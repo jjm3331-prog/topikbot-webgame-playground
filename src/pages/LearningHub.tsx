@@ -142,27 +142,27 @@ export default function LearningHub() {
               Quay lại
             </Button>
             
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-korean-purple via-korean-pink to-korean-orange flex items-center justify-center shadow-lg">
-                <Sparkles className="w-8 h-8 text-white" />
+            <div className="flex items-center gap-5 mb-5">
+              <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-korean-purple via-korean-pink to-korean-orange flex items-center justify-center shadow-lg">
+                <Sparkles className="w-9 h-9 sm:w-10 sm:h-10 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-foreground">📚 Trung tâm học TOPIK</h1>
-                <p className="text-muted-foreground">Học tập TOPIK toàn diện với AI</p>
+                <h1 className="text-title font-bold text-foreground">📚 Trung tâm học TOPIK</h1>
+                <p className="text-body text-muted-foreground mt-1">Học tập TOPIK toàn diện với AI</p>
               </div>
             </div>
 
             {/* Stats */}
-            <div className="flex flex-wrap gap-3 mt-4">
-              <Badge variant="outline" className="gap-1.5 py-1.5 px-3">
+            <div className="flex flex-wrap gap-3 mt-5">
+              <Badge variant="outline" className="gap-2 py-2 px-4 text-card-caption">
                 <Target className="w-4 h-4 text-korean-purple" />
                 <span>6 bài học</span>
               </Badge>
-              <Badge variant="outline" className="gap-1.5 py-1.5 px-3">
+              <Badge variant="outline" className="gap-2 py-2 px-4 text-card-caption">
                 <Sparkles className="w-4 h-4 text-korean-pink" />
                 <span>Tương tác với AI</span>
               </Badge>
-              <Badge variant="outline" className="gap-1.5 py-1.5 px-3">
+              <Badge variant="outline" className="gap-2 py-2 px-4 text-card-caption">
                 <Zap className="w-4 h-4 text-korean-green" />
                 <span>Học có hệ thống</span>
               </Badge>
@@ -190,8 +190,8 @@ export default function LearningHub() {
                     
                     {/* New badge */}
                     {menu.isNew && (
-                      <div className="absolute top-3 right-3 z-20">
-                        <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs px-2.5 py-1 font-semibold">
+                      <div className="absolute top-4 right-4 z-20">
+                        <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-badge px-3 py-1.5 font-semibold">
                           ✨ NEW
                         </Badge>
                       </div>
@@ -210,19 +210,19 @@ export default function LearningHub() {
                       </div>
                       
                       {/* Title */}
-                      <h3 className="font-bold text-foreground text-xl sm:text-2xl mb-1">{menu.title}</h3>
-                      <p className="text-sm sm:text-base text-muted-foreground mb-3">{menu.subtitle}</p>
+                      <h3 className="font-bold text-foreground text-card-title-lg sm:text-2xl mb-1.5">{menu.title}</h3>
+                      <p className="text-card-caption sm:text-base text-muted-foreground mb-3">{menu.subtitle}</p>
 
                       {/* Description */}
-                      <p className="text-sm sm:text-base text-muted-foreground/90 leading-relaxed flex-1">
+                      <p className="text-card-body sm:text-lg text-muted-foreground/90 leading-relaxed flex-1">
                         {menu.description}
                       </p>
                       
                       {/* Play button indicator */}
-                      <div className="mt-5 w-full">
-                        <div className={`flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r ${menu.color} opacity-0 group-hover:opacity-100 transition-all duration-300`}>
-                          <span className="text-white text-sm sm:text-base font-bold">Học ngay</span>
-                          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                      <div className="mt-6 w-full">
+                        <div className={`flex items-center justify-center gap-2 py-3 sm:py-3.5 rounded-xl bg-gradient-to-r ${menu.color} opacity-0 group-hover:opacity-100 transition-all duration-300`}>
+                          <span className="text-white text-button-lg font-bold">Học ngay</span>
+                          <ChevronRight className="w-5 h-5 text-white" />
                         </div>
                       </div>
                     </div>
@@ -239,19 +239,19 @@ export default function LearningHub() {
             transition={{ delay: 0.5 }}
             className="mt-12 text-center"
           >
-            <Card className="p-6 bg-gradient-to-br from-korean-purple/10 via-korean-pink/10 to-korean-orange/10 border-korean-purple/20">
-              <Trophy className="w-12 h-12 mx-auto mb-4 text-korean-orange" />
-              <h3 className="text-xl font-bold text-foreground mb-2">
+            <Card className="p-8 sm:p-10 bg-gradient-to-br from-korean-purple/10 via-korean-pink/10 to-korean-orange/10 border-korean-purple/20">
+              <Trophy className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-5 text-korean-orange" />
+              <h3 className="text-headline sm:text-2xl font-bold text-foreground mb-3">
                 Chinh phục TOPIK ngay hôm nay!
               </h3>
-              <p className="text-muted-foreground mb-4">
+              <p className="text-body text-muted-foreground mb-6">
                 Hãy thử thách bản thân để đạt chứng chỉ TOPIK!
               </p>
               <Button 
                 onClick={() => navigate("/dashboard")}
-                className="bg-gradient-to-r from-korean-purple to-korean-pink hover:opacity-90"
+                className="bg-gradient-to-r from-korean-purple to-korean-pink hover:opacity-90 text-button-lg py-3 px-6"
               >
-                <Star className="w-4 h-4 mr-2" />
+                <Star className="w-5 h-5 mr-2" />
                 Quay lại Dashboard
               </Button>
             </Card>
