@@ -4,26 +4,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { 
   Puzzle, 
   Gamepad2, 
-  Zap, 
+  Shield, 
   RefreshCw, 
   Check, 
   X, 
   Trophy,
   Flame,
-  Timer,
   ArrowLeft,
   Sparkles,
   GripVertical,
-  AlertCircle
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AppLayout from "@/components/AppLayout";
 import GrammarTetris from "@/components/grammar/GrammarTetris";
+import TowerDefenseGame from "@/components/grammar/TowerDefenseGame";
 
 type TopikLevel = "1-2" | "3-4" | "5-6";
 
@@ -74,8 +72,8 @@ function GrammarLevelSelector({ value, onChange }: { value: TopikLevel; onChange
 interface GrammarQuestion {
   id: string;
   type: "assembly" | "correction" | "battle";
-  prompt: Bilingual; // question/instruction
-  sentence?: Bilingual; // for correction
+  prompt: Bilingual;
+  sentence?: Bilingual;
   parts?: string[];
   errorPart?: string;
   correctPart?: string;
@@ -89,7 +87,6 @@ type ApiGrammarQuestion = any;
 
 function normalizeGrammarQuestions(input: ApiGrammarQuestion[]): GrammarQuestion[] {
   return (input ?? []).map((q: any) => {
-    // New API shape (grammar-content)
     const promptVi = q.question_vi ?? q.sentence_vi ?? q.question ?? "";
     const promptKo = q.question_ko ?? q.sentence_ko ?? q.question ?? "";
 
@@ -118,7 +115,7 @@ function normalizeGrammarQuestions(input: ApiGrammarQuestion[]): GrammarQuestion
   });
 }
 
-// Fisher-Yates 셔플 알고리즘 (제대로 된 랜덤 셔플)
+// Fisher-Yates 셔플 알고리즘
 function shuffleArray<T>(array: T[]): T[] {
   const result = [...array];
   for (let i = result.length - 1; i > 0; i--) {
@@ -155,7 +152,6 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
       }
     } catch (error) {
       console.error('Error fetching grammar questions:', error);
-      // Fallback questions
       const fallback = getFallbackQuestions(level, 'assembly');
       setQuestions(fallback);
       resetGame(fallback[0]);
@@ -170,7 +166,6 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
 
   const resetGame = (question: GrammarQuestion) => {
     setSelectedParts([]);
-    // Fisher-Yates 셔플로 제대로 섞기
     const shuffled = shuffleArray(question.parts ?? []);
     setAvailableParts(shuffled);
     setIsCorrect(null);
@@ -178,12 +173,8 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
 
   const assembleKorean = (parts: string[]) => {
     const raw = parts.join(" ").trim();
-
-    // 붙여 써야 하는 형태(입니다/예요/이에요 등)는 앞말과 결합
-    // 예: "사과 입니다" -> "사과입니다"
     const boundEndings = ["입니다", "예요", "이에요", "였어요", "이었어요"] as const;
     const re = new RegExp(`([\\p{Script=Hangul}0-9])\\s+(${boundEndings.join("|")})(?=\\s|$)`, "gu");
-
     return raw.replace(re, "$1$2");
   };
 
@@ -383,181 +374,6 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
   );
 }
 
-// ==================== CorrectionGame 삭제 - GrammarTetris로 대체 ====================
-
-// ==================== 문법 배틀 (60초) ====================
-function BattleGame({ level }: { level: TopikLevel }) {
-  const [questions, setQuestions] = useState<GrammarQuestion[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [score, setScore] = useState(0);
-  const [combo, setCombo] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(60);
-  const [gameState, setGameState] = useState<'ready' | 'playing' | 'finished'>('ready');
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchQuestions = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('grammar-content', {
-        body: { level, type: 'battle', count: 30 }
-      });
-      
-      if (error) throw error;
-      
-      if (data?.questions?.length > 0) {
-        setQuestions(normalizeGrammarQuestions(data.questions));
-      }
-    } catch (error) {
-      console.error('Error fetching grammar questions:', error);
-      const fallback = getFallbackQuestions(level, 'battle');
-      setQuestions(fallback);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [level]);
-
-  useEffect(() => {
-    fetchQuestions();
-  }, [level]);
-
-  useEffect(() => {
-    if (gameState !== 'playing') return;
-    
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          setGameState('finished');
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [gameState]);
-
-  const startGame = () => {
-    setScore(0);
-    setCombo(0);
-    setTimeLeft(60);
-    setCurrentIndex(0);
-    setGameState('playing');
-  };
-
-  const handleAnswer = (option: string) => {
-    const current = questions[currentIndex];
-    const correct = option === current.answer;
-
-    if (correct) {
-      const comboBonus = Math.min(combo, 10) * 2;
-      setScore(prev => prev + 10 + comboBonus);
-      setCombo(prev => prev + 1);
-    } else {
-      setCombo(0);
-    }
-
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex(prev => prev + 1);
-    } else {
-      setGameState('finished');
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  // Ready State
-  if (gameState === 'ready') {
-    return (
-      <Card className="p-8 text-center">
-        <Zap className="w-16 h-16 mx-auto mb-4 text-yellow-500" />
-        <h2 className="text-2xl font-bold mb-2">Grammar Battle</h2>
-        <BilingualText
-          className="mb-6"
-          vi="Trong 60 giây, hãy giải càng nhiều câu hỏi ngữ pháp càng tốt!\nĐúng liên tiếp sẽ có thưởng combo."
-          ko="60초 안에 최대한 많은 문법 문제를 풀어보세요!\n연속 정답 시 콤보 보너스!"
-        />
-        <Button onClick={startGame} size="lg" className="gap-2">
-          <Timer className="w-5 h-5" />
-          Bắt đầu / 시작하기
-        </Button>
-      </Card>
-    );
-  }
-
-  // Finished State
-  if (gameState === 'finished') {
-    return (
-      <Card className="p-8 text-center">
-        <Trophy className="w-16 h-16 mx-auto mb-4 text-yellow-500" />
-        <h2 className="text-2xl font-bold mb-2">Hết giờ! / 게임 종료!</h2>
-        <p className="text-4xl font-bold text-primary mb-2">{score}점</p>
-        <p className="text-muted-foreground mb-6">{currentIndex} câu / {currentIndex}문제</p>
-        <Button onClick={() => { fetchQuestions(); startGame(); }} size="lg" className="gap-2">
-          <RefreshCw className="w-5 h-5" />
-          Thử lại / 다시 도전
-        </Button>
-      </Card>
-    );
-  }
-
-  // Playing State
-  const current = questions[currentIndex];
-  if (!current) return null;
-
-  return (
-    <div className="space-y-6">
-      {/* Timer & Score */}
-      <div className="flex items-center justify-between">
-        <Badge variant={timeLeft <= 10 ? "destructive" : "outline"} className="text-lg px-4 py-2">
-          <Timer className="w-4 h-4 mr-2" />
-          {timeLeft}초
-        </Badge>
-        <div className="flex items-center gap-3">
-          {combo > 0 && (
-            <Badge className="bg-orange-500 text-lg px-4 py-2">
-              <Flame className="w-4 h-4 mr-2" />
-              {combo}x
-            </Badge>
-          )}
-          <Badge variant="outline" className="text-lg px-4 py-2">
-            <Trophy className="w-4 h-4 mr-2" />
-            {score}
-          </Badge>
-        </div>
-      </div>
-
-      {/* Progress */}
-      <Progress value={(60 - timeLeft) / 60 * 100} className="h-2" />
-
-      {/* Question */}
-      <Card className="p-6">
-        <BilingualText vi={current.grammarPoint.vi} ko={current.grammarPoint.ko} className="mb-2" />
-        <BilingualText vi={current.prompt.vi} ko={current.prompt.ko} className="mb-6" />
-        
-        <div className="grid grid-cols-2 gap-3">
-          {current.options?.map((option, index) => (
-            <motion.div key={index} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button
-                variant="outline"
-                className="w-full h-14 text-lg"
-                onClick={() => handleAnswer(option)}
-              >
-                {option}
-              </Button>
-            </motion.div>
-          ))}
-        </div>
-      </Card>
-    </div>
-  );
-}
-
 // ==================== Fallback Questions ====================
 function getFallbackQuestions(level: TopikLevel, type: string): GrammarQuestion[] {
   const questions: Record<TopikLevel, Record<string, GrammarQuestion[]>> = {
@@ -576,47 +392,12 @@ function getFallbackQuestions(level: TopikLevel, type: string): GrammarQuestion[
           grammarPoint: { vi: "Trật tự câu cơ bản (SOV)", ko: "기본 어순 (SOV)" },
         },
       ],
-      correction: [
-        {
-          id: "1",
-          type: "correction",
-          prompt: { vi: "Chạm vào phần sai trong câu", ko: "문장에서 틀린 부분을 찾아 터치하세요" },
-          sentence: { vi: "Tôi đi đến trường", ko: "저는 학교를 가요" },
-          errorPart: "학교를",
-          correctPart: "학교에",
-          options: ["학교에", "학교가", "학교는"],
-          answer: "학교에",
-          explanation: {
-            vi: "Đích đến khi di chuyển dùng '-에'.",
-            ko: "이동의 목적지는 '-에'를 사용합니다",
-          },
-          grammarPoint: { vi: "-에 vs -을/를", ko: "조사 -에/-를" },
-        },
-      ],
-      battle: [
-        {
-          id: "1",
-          type: "battle",
-          prompt: { vi: "저는 밥___ 먹어요", ko: "저는 밥___ 먹어요" },
-          options: ["을", "를", "이", "가"],
-          answer: "을",
-          explanation: {
-            vi: "Danh từ có 받침 dùng '을'.",
-            ko: "받침 있는 명사 뒤에는 '을'",
-          },
-          grammarPoint: { vi: "Trợ từ tân ngữ", ko: "목적격 조사" },
-        },
-      ],
     },
     "3-4": {
       assembly: [],
-      correction: [],
-      battle: [],
     },
     "5-6": {
       assembly: [],
-      correction: [],
-      battle: [],
     },
   };
 
@@ -650,18 +431,17 @@ export default function Grammar() {
           <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="assembly" className="gap-2">
               <Puzzle className="w-4 h-4" />
-              <span className="hidden sm:inline">Ghép câu / 문장 조립</span>
-              <span className="sm:hidden">Ghép / 조립</span>
+              <span className="hidden sm:inline">Ghép / 조립</span>
+              <span className="sm:hidden">Ghép</span>
             </TabsTrigger>
             <TabsTrigger value="tetris" className="gap-2">
               <Gamepad2 className="w-4 h-4" />
-              <span className="hidden sm:inline">Tetris / 테트리스</span>
-              <span className="sm:hidden">Tetris</span>
+              <span>Tetris</span>
             </TabsTrigger>
-            <TabsTrigger value="battle" className="gap-2">
-              <Zap className="w-4 h-4" />
-              <span className="hidden sm:inline">Battle / 문법 배틀</span>
-              <span className="sm:hidden">Battle / 배틀</span>
+            <TabsTrigger value="tower" className="gap-2">
+              <Shield className="w-4 h-4" />
+              <span className="hidden sm:inline">Tower / 타워</span>
+              <span className="sm:hidden">Tower</span>
             </TabsTrigger>
           </TabsList>
 
@@ -673,8 +453,8 @@ export default function Grammar() {
             <GrammarTetris level={level} />
           </TabsContent>
           
-          <TabsContent value="battle">
-            <BattleGame level={level} />
+          <TabsContent value="tower">
+            <TowerDefenseGame level={level} />
           </TabsContent>
         </Tabs>
       </div>
