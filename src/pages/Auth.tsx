@@ -39,11 +39,18 @@ const Auth = () => {
   const { toast } = useToast();
 
   // Get redirect URL from query params (for invite links)
-  const redirectTo = searchParams.get("redirect") || "/dashboard";
+  // Note: OAuth callbacks may drop the query string, so we persist it in sessionStorage.
+  const redirectFromQuery = searchParams.get("redirect");
+  const redirectToRaw = redirectFromQuery || sessionStorage.getItem("auth_redirect") || "/dashboard";
+  const redirectTo = redirectToRaw.startsWith("/") ? redirectToRaw : "/dashboard";
 
   useEffect(() => {
     setTimeout(() => setIsLoaded(true), 100);
   }, []);
+
+  useEffect(() => {
+    if (redirectFromQuery) sessionStorage.setItem("auth_redirect", redirectFromQuery);
+  }, [redirectFromQuery]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,6 +82,7 @@ const Auth = () => {
           password,
         });
         if (error) throw error;
+        sessionStorage.removeItem("auth_redirect");
         navigate(redirectTo);
       } else {
         const { error } = await supabase.auth.signUp({
@@ -90,6 +98,7 @@ const Auth = () => {
           title: "Đăng ký thành công!",
           description: "Chào mừng bạn đến với LUKATO AI",
         });
+        sessionStorage.removeItem("auth_redirect");
         navigate(redirectTo);
       }
     } catch (error: any) {
