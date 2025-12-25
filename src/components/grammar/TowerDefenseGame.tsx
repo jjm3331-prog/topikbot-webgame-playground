@@ -721,83 +721,80 @@ export default function TowerDefenseGame({ level }: { level: TopikLevel }) {
   if (!monster) return null;
 
   return (
-    <div className="space-y-4">
-      {/* Header Stats */}
+    <div className="space-y-3">
+      {/* Header Stats - Compact */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           {[...Array(3)].map((_, i) => (
             <Heart
               key={i}
-              className={`w-6 h-6 ${
+              className={`w-5 h-5 ${
                 i < hp ? "text-red-500 fill-red-500" : "text-muted-foreground"
               }`}
             />
           ))}
+          <span className="text-xs text-muted-foreground ml-1">HP</span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {combo > 0 && (
-            <Badge className="bg-orange-500">
-              <Flame className="w-4 h-4 mr-1" />
+            <Badge className="bg-orange-500 text-xs px-2 py-0.5">
+              <Flame className="w-3 h-3 mr-1" />
               {combo}x
             </Badge>
           )}
-          <Badge variant="outline">
-            <Coins className="w-4 h-4 mr-1" />
+          <Badge variant="outline" className="text-xs px-2 py-0.5">
+            <Coins className="w-3 h-3 mr-1" />
             {gold}G
+          </Badge>
+          <Badge variant="secondary" className="text-xs px-2 py-0.5">
+            {questionIndex + 1}/{questions.length}
           </Badge>
         </div>
       </div>
 
-      {/* Progress */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <span>Wave {questionIndex + 1}/{questions.length}</span>
-        <Progress value={((questionIndex + 1) / questions.length) * 100} className="flex-1 h-2" />
+      {/* Monster Track - Compact */}
+      <div className="relative h-12 bg-muted/30 rounded-lg overflow-hidden">
+        {/* Base/Castle */}
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 text-2xl">
+          🏰
+        </div>
+
+        {/* Monster */}
+        <motion.div
+          className="absolute top-1/2 -translate-y-1/2 text-3xl"
+          style={{ left: `${Math.min(monster.position, 80)}%` }}
+          animate={showResult && isCorrect ? { scale: [1, 1.5, 0], opacity: [1, 1, 0] } : {}}
+        >
+          {MONSTER_EMOJI[monster.type]}
+        </motion.div>
+
+        {/* Progress indicator */}
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted">
+          <div
+            className="h-full bg-red-500 transition-all duration-100"
+            style={{ width: `${monster.position}%` }}
+          />
+        </div>
       </div>
 
-      {/* Game Area */}
-      <Card className="p-4 relative overflow-hidden min-h-[300px]">
-        {/* Monster Sentence */}
-        <div className="text-center mb-4">
-          <Badge variant="secondary" className="mb-2">
+      {/* Question Card - Compact */}
+      <Card className="p-3">
+        <div className="text-center mb-3">
+          <Badge variant="secondary" className="text-xs mb-1">
             {monster.question.errorType}
           </Badge>
-          <div className="text-lg font-bold text-destructive">
+          <div className="text-base font-bold text-destructive leading-tight">
             "{monster.question.wrongSentence}"
           </div>
-          <div className="text-sm text-muted-foreground">
+          <div className="text-xs text-muted-foreground mt-1">
             {monster.question.wrongSentenceVi}
           </div>
         </div>
 
-        {/* Monster Track */}
-        <div className="relative h-20 bg-muted/30 rounded-lg mb-4 overflow-hidden">
-          {/* Base/Castle */}
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 text-3xl">
-            🏰
-          </div>
-
-          {/* Monster */}
-          <motion.div
-            className="absolute top-1/2 -translate-y-1/2 text-4xl"
-            style={{ left: `${Math.min(monster.position, 85)}%` }}
-            animate={showResult && isCorrect ? { scale: [1, 1.5, 0], opacity: [1, 1, 0] } : {}}
-          >
-            {MONSTER_EMOJI[monster.type]}
-          </motion.div>
-
-          {/* Progress indicator */}
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted">
-            <div
-              className="h-full bg-red-500 transition-all duration-100"
-              style={{ width: `${monster.position}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Answer Options */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* Answer Options - Always Visible */}
+        <div className="grid grid-cols-2 gap-2">
           {monster.question.options.map((option, index) => (
-            <motion.div key={index} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <motion.div key={index} whileTap={{ scale: 0.95 }}>
               <Button
                 variant={
                   showResult
@@ -808,7 +805,7 @@ export default function TowerDefenseGame({ level }: { level: TopikLevel }) {
                       : "outline"
                     : "outline"
                 }
-                className={`w-full h-14 text-lg ${
+                className={`w-full h-12 text-base font-medium ${
                   showResult && option === monster.question.answer
                     ? "bg-green-500 hover:bg-green-600 text-white"
                     : ""
@@ -822,41 +819,36 @@ export default function TowerDefenseGame({ level }: { level: TopikLevel }) {
           ))}
         </div>
 
-        {/* Result Feedback */}
+        {/* Result Feedback - Compact */}
         <AnimatePresence>
           {showResult && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className={`mt-4 p-4 rounded-lg ${
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className={`mt-3 p-3 rounded-lg text-sm ${
                 isCorrect ? "bg-green-500/10 border border-green-500/30" : "bg-red-500/10 border border-red-500/30"
               }`}
             >
-              <div className="flex items-center gap-2 mb-2 font-bold">
+              <div className="flex items-center gap-2 mb-1 font-bold">
                 {isCorrect ? (
                   <>
-                    <Sparkles className="w-5 h-5 text-green-500" />
+                    <Sparkles className="w-4 h-4 text-green-500" />
                     <span className="text-green-500">Đúng! / 정답!</span>
                   </>
                 ) : (
                   <>
-                    <Skull className="w-5 h-5 text-red-500" />
-                    <span className="text-red-500">Sai rồi! / 틀렸습니다!</span>
+                    <Skull className="w-4 h-4 text-red-500" />
+                    <span className="text-red-500">Sai! / 틀림!</span>
                   </>
                 )}
               </div>
-              <div className="text-sm space-y-1">
-                <p>
-                  <strong>Đáp án / 정답:</strong> {monster.question.answer}
-                </p>
-                <p className="text-muted-foreground">
-                  💡 {monster.question.explanationVi}
-                </p>
-                <p className="text-muted-foreground text-xs">
-                  {monster.question.explanationKo}
-                </p>
-              </div>
+              <p className="text-xs">
+                <strong>Đáp án:</strong> {monster.question.answer}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                💡 {monster.question.explanationVi}
+              </p>
             </motion.div>
           )}
         </AnimatePresence>
