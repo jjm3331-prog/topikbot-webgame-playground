@@ -364,6 +364,7 @@ function SetupPhase({
   groupName, setGroupName, groupGender, setGroupGender, 
   groupConcept, setGroupConcept, isLoading, onStart 
 }: any) {
+  const { t } = useTranslation();
   return (
     <motion.div
       key="setup"
@@ -480,6 +481,7 @@ function SetupPhase({
 
 // ================== 로딩 화면 ==================
 function LoadingPhase({ chapter }: { chapter: number }) {
+  const { t } = useTranslation();
   return (
     <motion.div
       key="loading"
@@ -503,6 +505,7 @@ function LoadingPhase({ chapter }: { chapter: number }) {
 function ProloguePhase({ storyData, onContinue }: { 
   storyData: StoryData; onContinue: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <motion.div
       key="prologue"
@@ -567,6 +570,7 @@ function ProloguePhase({ storyData, onContinue }: {
 function DialoguePhase({ storyData, dialogueIndex, stats, onNext }: { 
   storyData: StoryData; dialogueIndex: number; stats: GameStats; onNext: () => void;
 }) {
+  const { t } = useTranslation();
   const currentLine = storyData.dialogue[dialogueIndex];
   const progress = ((dialogueIndex + 1) / storyData.dialogue.length) * 100;
 
@@ -664,6 +668,7 @@ function DialoguePhase({ storyData, dialogueIndex, stats, onNext }: {
 function MissionPhase({ storyData, stats, userInput, setUserInput, onSubmit }: {
   storyData: StoryData; stats: GameStats; userInput: string; setUserInput: (v: string) => void; onSubmit: () => void;
 }) {
+  const { t } = useTranslation();
   const mission = storyData.mission;
 
   return (
@@ -719,6 +724,7 @@ function MissionPhase({ storyData, stats, userInput, setUserInput, onSubmit }: {
 function ScoringPhase({ isEvaluating, scoreResult, onContinue }: {
   isEvaluating: boolean; scoreResult: any; onContinue: () => void;
 }) {
+  const { t } = useTranslation();
   if (isEvaluating) {
     return (
       <motion.div
@@ -810,6 +816,7 @@ function ScoringPhase({ isEvaluating, scoreResult, onContinue }: {
 
 // ================== 결과 화면 ==================
 function ResultPhase({ stats, onExit }: { stats: GameStats; onExit: () => void }) {
+  const { t } = useTranslation();
   return (
     <motion.div
       key="result"
