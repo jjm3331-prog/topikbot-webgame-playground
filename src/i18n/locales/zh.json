@@ -445,5 +445,95 @@
     "noQuestionsLeft": "今日免费提问次数已用完", "upgradePremiumBtn": "升级Premium", "uploadImage": "上传图片", "voiceInput": "语音输入",
     "placeholder": "输入您的问题... 💬", "hint": "按Enter发送 • Shift+Enter换行"
   },
+  "writing": {
+    "title": "写作批改", "subtitle": "TOPIK II 写作批改", "premiumFeature": "高级功能",
+    "questionUpload": "上传题目图片", "answerUpload": "上传答案图片", "answerText": "输入答案",
+    "submit": "提交批改", "processing": "AI批改中...", "save": "保存结果", "export": "导出PDF",
+    "overallScore": "综合得分", "grammarScore": "语法得分", "vocabularyScore": "词汇得分",
+    "structureScore": "结构得分", "contentScore": "内容得分", "corrections": "修改建议",
+    "strengths": "优点", "improvements": "改进建议", "modelAnswer": "范文",
+    "history": "历史记录", "freeUsage": "免费使用", "nextFree": "下次免费",
+    "uploadLimit": "最多10张图片", "missingInfo": "请上传题目和答案"
+  },
+  "interview": {
+    "title": "面试模拟", "subtitle": "韩国企业面试练习",
+    "selectCompany": "选择公司", "selectPosition": "选择职位", "selectInterviewer": "选择面试官类型",
+    "friendly": "友好型", "strict": "严格型", "pressure": "压力型", "technical": "技术型",
+    "startInterview": "开始面试", "endInterview": "结束面试", "micAccess": "请允许麦克风权限",
+    "recording": "录音中...", "processing": "处理中...", "ttsEnabled": "语音开启", "ttsDisabled": "语音关闭",
+    "evaluation": "面试评价", "overall": "综合评分", "content": "内容", "communication": "沟通",
+    "korean": "韩语能力", "attitude": "态度", "jobFit": "岗位匹配",
+    "strengths": "优点", "improvements": "改进点", "tips": "建议", "grade": "等级",
+    "restart": "重新开始", "backToCareer": "返回职业中心"
+  },
+  "kdrama": {
+    "title": "韩剧配音", "subtitle": "通过配音练习发音",
+    "genre": "类型", "romantic": "浪漫", "action": "动作", "fantasy": "奇幻", "thriller": "惊悚",
+    "difficulty": "难度", "easy": "简单", "normal": "普通", "hard": "困难",
+    "timer": "计时器", "timerOn": "计时开启", "timerOff": "计时关闭",
+    "play": "播放", "record": "录音", "stop": "停止", "processing": "处理中...",
+    "accuracy": "准确度", "grade": "等级", "score": "得分", "attempts": "尝试次数",
+    "complete": "配音完成", "avgScore": "平均分", "playAgain": "再玩一次",
+    "backToDashboard": "返回仪表板", "loading": "加载中...", "loadError": "加载失败"
+  },
+  "dating": {
+    "title": "恋爱模拟", "subtitle": "通过约会学习韩语表达",
+    "swipeLeft": "跳过", "swipeRight": "喜欢", "match": "配对成功",
+    "startChat": "开始聊天", "affinity": "好感度", "sendMessage": "发送消息",
+    "spin": "幸运转盘", "mbti": "MBTI兼容性", "miniGame": "小游戏",
+    "couplePhoto": "情侣照", "generating": "生成中...",
+    "noProfiles": "没有更多资料了", "restart": "重新开始",
+    "ending": "结局", "romantic": "浪漫结局", "dramatic": "戏剧结局",
+    "tsundere": "傲娇结局", "friend": "朋友结局"
+  },
+  "manager": {
+    "title": "LUKATO经纪人", "subtitle": "K-POP经纪管理RPG",
+    "groupSetup": "组合设置", "groupName": "组合名", "gender": "性别",
+    "male": "男团", "female": "女团", "mixed": "混合",
+    "concept": "概念", "fresh": "清新", "crush": "魅力", "hiphop": "嘻哈",
+    "retro": "复古", "dark": "暗黑", "band": "乐队",
+    "startGame": "开始游戏", "loading": "加载中...",
+    "chapter": "第{{number}}章", "prologue": "序幕", "dialogue": "对话",
+    "mission": "任务", "submit": "提交", "evaluating": "评估中...",
+    "score": "得分", "statChanges": "属性变化", "continue": "继续",
+    "mental": "心理", "chemistry": "默契", "mediaTone": "媒体好感", "rumor": "绯闻",
+    "result": "结果", "exit": "退出"
+  },
+  "headhunting": {
+    "title": "猎头服务", "subtitle": "连接韩国企业",
+    "history": "申请历史", "newApplication": "新建申请", "edit": "编辑", "delete": "删除",
+    "status": { "pending": "待审核", "reviewing": "审核中", "matched": "已匹配", "rejected": "未通过", "hired": "已录用" },
+    "form": {
+      "basicInfo": "基本信息", "fullName": "姓名", "email": "邮箱", "phone": "电话", "birthYear": "出生年份",
+      "education": "学历信息", "educationLevel": "学历", "university": "学校", "major": "专业", "graduationYear": "毕业年份",
+      "experience": "工作经验", "yearsOfExp": "工作年限", "currentJob": "当前职位", "currentCompany": "当前公司", "expDetails": "工作详情",
+      "preferences": "求职意向", "jobType": "工作类型", "industry": "行业", "location": "工作地点", "salaryRange": "期望薪资",
+      "introduction": "自我介绍", "strengths": "优势", "careerGoals": "职业目标", "additionalSkills": "其他技能",
+      "documents": "文件上传", "resume": "简历", "coverLetter": "求职信", "portfolio": "作品集"
+    },
+    "submit": "提交申请", "submitting": "提交中...", "submitSuccess": "申请成功", "submitError": "提交失败"
+  },
+  "reading": {
+    "title": "阅读A", "subtitle": "基础阅读理解",
+    "grammar": "语法填空", "vocabulary": "词汇/词义", "topic": "主题理解", "advertisement": "广告/通知",
+    "selectLevel": "选择级别", "beginner": "初级", "intermediate": "中级", "advanced": "高级",
+    "question": "第{{current}}/{{total}}题", "score": "得分",
+    "submit": "提交", "next": "下一题", "restart": "重新开始",
+    "correct": "正确", "wrong": "错误", "explanation": "解析",
+    "complete": "完成", "accuracy": "正确率", "goBack": "返回",
+    "loading": "加载中...", "reload": "重新加载", "noQuestions": "没有问题"
+  },
+  "listening": {
+    "title": "听力练习", "subtitle": "AI TTS听力训练",
+    "selectLevel": "选择级别", "beginner": "初级", "intermediate": "中级", "advanced": "高级",
+    "speedControl": "速度控制", "slow": "慢速", "normal": "正常",
+    "play": "播放", "pause": "暂停", "replay": "重播",
+    "dialogue": "对话", "single": "独白", "speaker": "说话者",
+    "question": "第{{current}}/{{total}}题", "score": "得分",
+    "submit": "提交", "next": "下一题", "restart": "重新开始", "newQuestions": "新题目",
+    "correct": "正确", "wrong": "错误", "explanation": "解析",
+    "complete": "完成", "accuracy": "正确率", "goBack": "返回",
+    "loading": "加载中...", "ttsError": "音频播放失败"
+  },
   "footer": { "hanoi": "河内官方", "qnaAgent": "Q&A Agent", "admin": "ADMIN", "copyright": "© 2025 Powered by LUKAS Edutainment" }
 }
