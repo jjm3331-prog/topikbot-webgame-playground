@@ -465,15 +465,21 @@
     "uploadLimit": "最多10张图片", "missingInfo": "请上传题目和答案"
   },
   "interview": {
-    "title": "面试模拟", "subtitle": "韩国企业面试练习",
-    "selectCompany": "选择公司", "selectPosition": "选择职位", "selectInterviewer": "选择面试官类型",
-    "friendly": "友好型", "strict": "严格型", "pressure": "压力型", "technical": "技术型",
-    "startInterview": "开始面试", "endInterview": "结束面试", "micAccess": "请允许麦克风权限",
-    "recording": "录音中...", "processing": "处理中...", "ttsEnabled": "语音开启", "ttsDisabled": "语音关闭",
-    "evaluation": "面试评价", "overall": "综合评分", "content": "内容", "communication": "沟通",
-    "korean": "韩语能力", "attitude": "态度", "jobFit": "岗位匹配",
-    "strengths": "优点", "improvements": "改进点", "tips": "建议", "grade": "等级",
-    "restart": "重新开始", "backToCareer": "返回职业中心"
+    "title": "面试模拟", "description": "韩国企业面试练习",
+    "featureName": "面试模拟", "heroTitle": "面试练习", "heroDescription": "与韩国顶尖企业进行面试练习", "supportVoiceText": "支持语音和文字",
+    "selectCompanyTitle": "选择面试公司", "selectPositionTitle": "选择应聘职位", "selectInterviewerTitle": "选择面试风格", "enterCompanyName": "输入公司名称...",
+    "preparingInterview": "正在准备面试...", "startInterviewBtn": "开始面试", "interviewProgress": "面试进度", "questions": "题",
+    "thinking": "思考中...", "inputPlaceholder": "输入您的回答...", "stopRecording": "停止录音", "answerByVoice": "语音回答", "endInterview": "结束",
+    "analyzingResults": "正在分析结果...", "aiEvaluating": "AI正在全面评估您的面试表现", "interviewComplete": "面试完成！", "simulationFor": "面试模拟",
+    "grade": "等级", "pointsUnit": "分", "overallScore": "综合得分", "scoresByCategory": "各项得分", "overallFeedback": "综合反馈",
+    "strengths": "优势", "improvements": "待改进", "tipsForNext": "下次面试建议", "restart": "重新面试", "startAgain": "重新开始",
+    "companies": { "samsung": "三星电子", "lg": "LG电子", "hyundai": "现代汽车", "naver": "Naver", "kakao": "Kakao", "coupang": "酷澎", "skhynix": "SK海力士", "other": "其他" },
+    "companyTypes": { "conglomerate": "大企业", "tech": "科技公司", "ecommerce": "电商", "semiconductor": "半导体", "custom": "自定义" },
+    "positions": { "software": "软件开发", "marketing": "市场营销/公关", "sales": "销售", "hr": "人力资源", "design": "设计/UX", "finance": "财务/会计", "production": "生产/制造", "office": "行政" },
+    "interviewerTypes": { "friendly": "友好型", "strict": "严格型", "pressure": "压力型", "technical": "技术型" },
+    "interviewerDescs": { "friendly": "轻松氛围，鼓励支持", "strict": "逻辑思维，具体回答", "pressure": "压力测试，挑战性问题", "technical": "专业知识，深度技术问题" },
+    "scoreLabels": { "content": "内容", "communication": "沟通", "korean": "韩语", "attitude": "态度", "jobFit": "岗位匹配" },
+    "micError": "需要麦克风权限", "allowMicAccess": "请允许麦克风访问。", "voiceNotRecognized": "未识别到语音", "tryAgain": "请重试。", "voiceRecognitionError": "语音识别错误", "selectAll": "请全部选择", "selectAllDesc": "请选择公司、职位和面试官类型。", "errorOccurred": "发生错误", "cannotStartInterview": "无法开始面试，请重试。", "noResponse": "无响应。"
   },
   "kdrama": {
     "title": "韩剧配音",

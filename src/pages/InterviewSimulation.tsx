@@ -88,57 +88,57 @@ const InterviewSimulation = () => {
   const [isEvaluating, setIsEvaluating] = useState(false);
 
   const companies = [
-    { name: "삼성전자", nameVi: "Samsung Electronics", type: "Tập đoàn lớn", color: "from-blue-600 to-blue-700", emoji: "🏢" },
-    { name: "LG전자", nameVi: "LG Electronics", type: "Tập đoàn lớn", color: "from-red-600 to-red-700", emoji: "🏭" },
-    { name: "현대자동차", nameVi: "Hyundai Motor", type: "Tập đoàn lớn", color: "from-slate-600 to-slate-700", emoji: "🚗" },
-    { name: "네이버", nameVi: "Naver", type: "Công nghệ", color: "from-green-600 to-green-700", emoji: "🌐" },
-    { name: "카카오", nameVi: "Kakao", type: "Công nghệ", color: "from-yellow-500 to-yellow-600", emoji: "💬" },
-    { name: "쿠팡", nameVi: "Coupang", type: "Thương mại điện tử", color: "from-amber-600 to-amber-700", emoji: "📦" },
-    { name: "SK하이닉스", nameVi: "SK Hynix", type: "Bán dẫn", color: "from-orange-600 to-orange-700", emoji: "💾" },
-    { name: "기타", nameVi: "Khác", type: "Tự nhập", color: "from-purple-600 to-purple-700", emoji: "✏️" }
+    { name: "삼성전자", nameKey: "interview.companies.samsung", typeKey: "interview.companyTypes.conglomerate", color: "from-blue-600 to-blue-700", emoji: "🏢" },
+    { name: "LG전자", nameKey: "interview.companies.lg", typeKey: "interview.companyTypes.conglomerate", color: "from-red-600 to-red-700", emoji: "🏭" },
+    { name: "현대자동차", nameKey: "interview.companies.hyundai", typeKey: "interview.companyTypes.conglomerate", color: "from-slate-600 to-slate-700", emoji: "🚗" },
+    { name: "네이버", nameKey: "interview.companies.naver", typeKey: "interview.companyTypes.tech", color: "from-green-600 to-green-700", emoji: "🌐" },
+    { name: "카카오", nameKey: "interview.companies.kakao", typeKey: "interview.companyTypes.tech", color: "from-yellow-500 to-yellow-600", emoji: "💬" },
+    { name: "쿠팡", nameKey: "interview.companies.coupang", typeKey: "interview.companyTypes.ecommerce", color: "from-amber-600 to-amber-700", emoji: "📦" },
+    { name: "SK하이닉스", nameKey: "interview.companies.skhynix", typeKey: "interview.companyTypes.semiconductor", color: "from-orange-600 to-orange-700", emoji: "💾" },
+    { name: "기타", nameKey: "interview.companies.other", typeKey: "interview.companyTypes.custom", color: "from-purple-600 to-purple-700", emoji: "✏️" }
   ];
 
   const positions = [
-    { name: "소프트웨어 개발", nameVi: "Phát triển phần mềm", icon: "💻" },
-    { name: "마케팅/홍보", nameVi: "Marketing / PR", icon: "📢" },
-    { name: "영업/세일즈", nameVi: "Kinh doanh / Sales", icon: "🤝" },
-    { name: "인사/HR", nameVi: "Nhân sự / HR", icon: "👥" },
-    { name: "디자인/UX", nameVi: "Thiết kế / UX", icon: "🎨" },
-    { name: "재무/회계", nameVi: "Tài chính / Kế toán", icon: "📊" },
-    { name: "생산/제조", nameVi: "Sản xuất / Chế tạo", icon: "🏭" },
-    { name: "일반 사무", nameVi: "Hành chính văn phòng", icon: "📋" }
+    { name: "소프트웨어 개발", nameKey: "interview.positions.software", icon: "💻" },
+    { name: "마케팅/홍보", nameKey: "interview.positions.marketing", icon: "📢" },
+    { name: "영업/세일즈", nameKey: "interview.positions.sales", icon: "🤝" },
+    { name: "인사/HR", nameKey: "interview.positions.hr", icon: "👥" },
+    { name: "디자인/UX", nameKey: "interview.positions.design", icon: "🎨" },
+    { name: "재무/회계", nameKey: "interview.positions.finance", icon: "📊" },
+    { name: "생산/제조", nameKey: "interview.positions.production", icon: "🏭" },
+    { name: "일반 사무", nameKey: "interview.positions.office", icon: "📋" }
   ];
 
   const interviewerTypes = [
     { 
       id: "friendly", 
       name: "친절한 면접관", 
-      nameVi: "Thân thiện",
-      description: "Không khí thoải mái, động viên, khuyến khích", 
+      nameKey: "interview.interviewerTypes.friendly",
+      descKey: "interview.interviewerDescs.friendly", 
       emoji: "😊",
       color: "from-green-500 to-emerald-500"
     },
     { 
       id: "strict", 
       name: "엄격한 면접관", 
-      nameVi: "Nghiêm khắc",
-      description: "Yêu cầu logic, câu trả lời cụ thể", 
+      nameKey: "interview.interviewerTypes.strict",
+      descKey: "interview.interviewerDescs.strict", 
       emoji: "🧐",
       color: "from-blue-500 to-indigo-500"
     },
     { 
       id: "pressure", 
       name: "압박 면접관", 
-      nameVi: "Áp lực cao",
-      description: "Stress test, câu hỏi thách thức", 
+      nameKey: "interview.interviewerTypes.pressure",
+      descKey: "interview.interviewerDescs.pressure", 
       emoji: "😤",
       color: "from-red-500 to-rose-500"
     },
     { 
       id: "technical", 
       name: "기술 면접관", 
-      nameVi: "Kỹ thuật",
-      description: "Câu hỏi chuyên môn, kỹ năng chuyên sâu", 
+      nameKey: "interview.interviewerTypes.technical",
+      descKey: "interview.interviewerDescs.technical", 
       emoji: "🔧",
       color: "from-purple-500 to-violet-500"
     }
@@ -458,7 +458,7 @@ const InterviewSimulation = () => {
           </Button>
 
           {/* Premium Banner */}
-          {!isPremium && <PremiumPreviewBanner featureName="Mô phỏng phỏng vấn" />}
+          {!isPremium && <PremiumPreviewBanner featureName={t('interview.featureName')} />}
 
           {/* Header */}
           <header className="text-center space-y-4">
@@ -470,19 +470,19 @@ const InterviewSimulation = () => {
             >
               <Mic className="w-4 h-4 text-orange-500" />
               <span className="text-card-caption font-medium tracking-wide text-foreground/90">
-                LUKATO RAG AI · Mô phỏng phỏng vấn
+                LUKATO RAG AI · {t('interview.featureName')}
               </span>
             </motion.div>
             
             <h1 className="text-headline font-bold tracking-tight">
               <span className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 bg-clip-text text-transparent">
-                Luyện Phỏng Vấn
+                {t('interview.heroTitle')}
               </span>
             </h1>
             <p className="text-body text-muted-foreground max-w-lg mx-auto leading-relaxed">
-              Thực hành phỏng vấn với các công ty Hàn Quốc hàng đầu
+              {t('interview.heroDescription')}
               <span className="block text-card-caption text-muted-foreground/70 mt-1">
-                Hỗ trợ giọng nói & văn bản
+                {t('interview.supportVoiceText')}
               </span>
             </p>
           </header>
@@ -501,7 +501,7 @@ const InterviewSimulation = () => {
                   <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
                     <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500" />
                   </div>
-                  <span className="text-base sm:text-lg">Chọn Công Ty Phỏng Vấn</span>
+                  <span className="text-base sm:text-lg">{t('interview.selectCompanyTitle')}</span>
                 </h3>
                 <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4">
                   {companies.map((company) => (
@@ -516,8 +516,8 @@ const InterviewSimulation = () => {
                       }`}
                     >
                       <span className="text-xl sm:text-2xl">{company.emoji}</span>
-                      <span className="text-xs sm:text-sm font-semibold text-center leading-tight line-clamp-2">{company.nameVi}</span>
-                      <span className="text-[10px] sm:text-xs opacity-70 text-center leading-tight line-clamp-1">{company.type}</span>
+                      <span className="text-xs sm:text-sm font-semibold text-center leading-tight line-clamp-2">{t(company.nameKey)}</span>
+                      <span className="text-[10px] sm:text-xs opacity-70 text-center leading-tight line-clamp-1">{t(company.typeKey)}</span>
                     </Button>
                   ))}
                 </div>
@@ -531,7 +531,7 @@ const InterviewSimulation = () => {
                     <Input
                       value={customCompany}
                       onChange={(e) => setCustomCompany(e.target.value)}
-                      placeholder="Nhập tên công ty..."
+                      placeholder={t('interview.enterCompanyName')}
                       className="max-w-sm text-body h-12"
                     />
                   </motion.div>
@@ -544,7 +544,7 @@ const InterviewSimulation = () => {
                   <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
                     <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-500" />
                   </div>
-                  <span className="text-base sm:text-lg">Chọn Vị Trí Ứng Tuyển</span>
+                  <span className="text-base sm:text-lg">{t('interview.selectPositionTitle')}</span>
                 </h3>
                 <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4">
                   {positions.map((position) => (
@@ -559,7 +559,7 @@ const InterviewSimulation = () => {
                       }`}
                     >
                       <span className="text-xl sm:text-2xl">{position.icon}</span>
-                      <span className="text-xs sm:text-sm font-semibold text-center leading-tight line-clamp-2">{position.nameVi}</span>
+                      <span className="text-xs sm:text-sm font-semibold text-center leading-tight line-clamp-2">{t(position.nameKey)}</span>
                     </Button>
                   ))}
                 </div>
@@ -571,7 +571,7 @@ const InterviewSimulation = () => {
                   <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0">
                     <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-500" />
                   </div>
-                  <span className="text-base sm:text-lg">Chọn Phong Cách Phỏng Vấn</span>
+                  <span className="text-base sm:text-lg">{t('interview.selectInterviewerTitle')}</span>
                 </h3>
                 <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
                   {interviewerTypes.map((interviewer) => (
@@ -587,10 +587,10 @@ const InterviewSimulation = () => {
                     >
                       <span className="text-2xl sm:text-3xl shrink-0">{interviewer.emoji}</span>
                       <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
-                        <p className="text-sm sm:text-base font-bold truncate">{interviewer.nameVi}</p>
+                        <p className="text-sm sm:text-base font-bold truncate">{t(interviewer.nameKey)}</p>
                         <p className="text-xs sm:text-sm opacity-60">{interviewer.name}</p>
                         <p className={`text-xs sm:text-sm mt-1 leading-relaxed line-clamp-2 ${selectedInterviewer === interviewer.id ? 'opacity-90' : 'text-muted-foreground'}`}>
-                          {interviewer.description}
+                          {t(interviewer.descKey)}
                         </p>
                       </div>
                     </Button>
@@ -612,12 +612,12 @@ const InterviewSimulation = () => {
                 {isLoading ? (
                   <>
                     <Loader2 className="w-5 h-5 mr-3 animate-spin" />
-                    Đang chuẩn bị phỏng vấn...
+                    {t('interview.preparingInterview')}
                   </>
                 ) : (
                   <>
                     <Mic className="w-5 h-5 mr-3" />
-                    Bắt Đầu Phỏng Vấn
+                    {t('interview.startInterviewBtn')}
                   </>
                 )}
               </Button>
@@ -641,7 +641,7 @@ const InterviewSimulation = () => {
                     <div>
                       <p className="text-card-title font-bold">{getCompanyName()}</p>
                       <p className="text-card-caption text-muted-foreground">
-                        {positions.find(p => p.name === selectedPosition)?.nameVi} · {interviewerTypes.find(i => i.id === selectedInterviewer)?.nameVi}
+                        {positions.find(p => p.name === selectedPosition)?.nameKey ? t(positions.find(p => p.name === selectedPosition)!.nameKey) : ''} · {interviewerTypes.find(i => i.id === selectedInterviewer)?.nameKey ? t(interviewerTypes.find(i => i.id === selectedInterviewer)!.nameKey) : ''}
                       </p>
                     </div>
                   </div>
@@ -663,8 +663,8 @@ const InterviewSimulation = () => {
                 </div>
                 <div className="mt-4">
                   <div className="flex items-center justify-between text-card-caption text-muted-foreground mb-2">
-                    <span>Tiến độ phỏng vấn</span>
-                    <span className="font-medium">{questionCount}/8 câu hỏi</span>
+                    <span>{t('interview.interviewProgress')}</span>
+                    <span className="font-medium">{questionCount}/8 {t('interview.questions')}</span>
                   </div>
                   <Progress value={(questionCount / 8) * 100} className="h-2" />
                 </div>
@@ -698,7 +698,7 @@ const InterviewSimulation = () => {
                     <div className="flex justify-start">
                       <div className="bg-muted rounded-2xl px-5 py-3.5 flex items-center gap-3">
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span className="text-card-body text-muted-foreground">Đang suy nghĩ...</span>
+                        <span className="text-card-body text-muted-foreground">{t('interview.thinking')}</span>
                       </div>
                     </div>
                   )}
@@ -713,7 +713,7 @@ const InterviewSimulation = () => {
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-                    placeholder="Nhập câu trả lời của bạn..."
+                    placeholder={t('interview.inputPlaceholder')}
                     className="flex-1 h-12 text-body"
                     disabled={isLoading || isRecording}
                   />
@@ -736,12 +736,12 @@ const InterviewSimulation = () => {
                     {isRecording ? (
                       <>
                         <MicOff className="w-5 h-5 mr-2" />
-                        Dừng ghi âm
+                        {t('interview.stopRecording')}
                       </>
                     ) : (
                       <>
                         <Mic className="w-5 h-5 mr-2" />
-                        Trả lời bằng giọng nói
+                        {t('interview.answerByVoice')}
                       </>
                     )}
                   </Button>
@@ -751,7 +751,7 @@ const InterviewSimulation = () => {
                     className="h-14 px-6 text-button"
                     disabled={isLoading || messages.length < 2}
                   >
-                    Kết thúc
+                    {t('interview.endInterview')}
                   </Button>
                 </div>
               </div>
@@ -768,8 +768,8 @@ const InterviewSimulation = () => {
               {isEvaluating ? (
                 <Card className="p-10 text-center border-border/50 bg-card/50 backdrop-blur-sm">
                   <Loader2 className="w-16 h-16 mx-auto text-primary animate-spin mb-5" />
-                  <h2 className="text-title font-bold mb-2">Đang phân tích kết quả...</h2>
-                  <p className="text-body text-muted-foreground">AI đang đánh giá toàn diện buổi phỏng vấn của bạn</p>
+                  <h2 className="text-title font-bold mb-2">{t('interview.analyzingResults')}</h2>
+                  <p className="text-body text-muted-foreground">{t('interview.aiEvaluating')}</p>
                 </Card>
               ) : evaluation ? (
                 <>
@@ -777,23 +777,23 @@ const InterviewSimulation = () => {
                   <Card className="p-8 text-center overflow-hidden relative border-border/50">
                     <div className={`absolute inset-0 bg-gradient-to-br ${getGradeColor(evaluation.grade)} opacity-10`} />
                     <Trophy className="w-16 h-16 mx-auto text-yellow-500 mb-5" />
-                    <h2 className="text-title font-bold mb-2">Hoàn thành phỏng vấn!</h2>
+                    <h2 className="text-title font-bold mb-2">{t('interview.interviewComplete')}</h2>
                     <p className="text-body text-muted-foreground mb-8">
-                      Phỏng vấn mô phỏng {getCompanyName()} - {positions.find(p => p.name === selectedPosition)?.nameVi}
+                      {t('interview.simulationFor')} {getCompanyName()} - {positions.find(p => p.name === selectedPosition)?.nameKey ? t(positions.find(p => p.name === selectedPosition)!.nameKey) : ''}
                     </p>
                     
                     {/* Grade Badge */}
                     <div className={`inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r ${getGradeColor(evaluation.grade)} text-white text-2xl font-bold mb-8 shadow-lg`}>
                       <Award className="w-7 h-7" />
-                      Hạng {evaluation.grade}
+                      {t('interview.grade')} {evaluation.grade}
                     </div>
 
                     {/* Overall Score */}
                     <div className={`text-6xl font-bold ${getScoreColor(evaluation.scores.overall)}`}>
                       {evaluation.scores.overall}
-                      <span className="text-2xl font-medium opacity-70"> điểm</span>
+                      <span className="text-2xl font-medium opacity-70"> {t('interview.pointsUnit')}</span>
                     </div>
-                    <p className="text-card-body text-muted-foreground mt-2">Điểm tổng hợp</p>
+                    <p className="text-card-body text-muted-foreground mt-2">{t('interview.overallScore')}</p>
                   </Card>
 
                   {/* Detailed Scores */}
@@ -802,20 +802,20 @@ const InterviewSimulation = () => {
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                         <Target className="w-4 h-4 text-primary" />
                       </div>
-                      <span>Điểm theo từng hạng mục</span>
+                      <span>{t('interview.scoresByCategory')}</span>
                     </h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                       {[
-                        { label: "Nội dung", score: evaluation.scores.content, icon: MessageSquare },
-                        { label: "Giao tiếp", score: evaluation.scores.communication, icon: Users },
-                        { label: "Tiếng Hàn", score: evaluation.scores.korean, icon: Sparkles },
-                        { label: "Thái độ", score: evaluation.scores.attitude, icon: Heart },
-                        { label: "Phù hợp vị trí", score: evaluation.scores.jobFit, icon: Target },
+                        { labelKey: "interview.scoreLabels.content", score: evaluation.scores.content, icon: MessageSquare },
+                        { labelKey: "interview.scoreLabels.communication", score: evaluation.scores.communication, icon: Users },
+                        { labelKey: "interview.scoreLabels.korean", score: evaluation.scores.korean, icon: Sparkles },
+                        { labelKey: "interview.scoreLabels.attitude", score: evaluation.scores.attitude, icon: Heart },
+                        { labelKey: "interview.scoreLabels.jobFit", score: evaluation.scores.jobFit, icon: Target },
                       ].map((item) => (
-                        <div key={item.label} className="text-center p-5 bg-muted/50 rounded-xl">
+                        <div key={item.labelKey} className="text-center p-5 bg-muted/50 rounded-xl">
                           <item.icon className={`w-5 h-5 mx-auto mb-3 ${getScoreColor(item.score)}`} />
                           <p className={`text-2xl font-bold ${getScoreColor(item.score)}`}>{item.score}</p>
-                          <p className="text-card-caption text-muted-foreground mt-1">{item.label}</p>
+                          <p className="text-card-caption text-muted-foreground mt-1">{t(item.labelKey)}</p>
                         </div>
                       ))}
                     </div>
@@ -827,7 +827,7 @@ const InterviewSimulation = () => {
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                         <TrendingUp className="w-4 h-4 text-primary" />
                       </div>
-                      <span>Nhận xét tổng hợp</span>
+                      <span>{t('interview.overallFeedback')}</span>
                     </h3>
                     <p className="text-body text-foreground/80 leading-relaxed">{evaluation.overallFeedback}</p>
                   </Card>
@@ -837,7 +837,7 @@ const InterviewSimulation = () => {
                     <Card className="p-6 bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/30">
                       <h3 className="text-card-title font-bold mb-4 flex items-center gap-3 text-green-600 dark:text-green-400">
                         <CheckCircle className="w-5 h-5" />
-                        Điểm mạnh
+                        {t('interview.strengths')}
                       </h3>
                       <ul className="space-y-3">
                         {evaluation.strengths.map((strength, idx) => (
@@ -852,7 +852,7 @@ const InterviewSimulation = () => {
                     <Card className="p-6 bg-gradient-to-br from-orange-500/10 to-amber-500/10 border-orange-500/30">
                       <h3 className="text-card-title font-bold mb-4 flex items-center gap-3 text-orange-600 dark:text-orange-400">
                         <AlertCircle className="w-5 h-5" />
-                        Cần cải thiện
+                        {t('interview.improvements')}
                       </h3>
                       <ul className="space-y-3">
                         {evaluation.improvements.map((improvement, idx) => (
@@ -869,7 +869,7 @@ const InterviewSimulation = () => {
                   <Card className="p-6 sm:p-8 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border-blue-500/30">
                     <h3 className="text-card-title-lg font-bold mb-5 flex items-center gap-3 text-blue-600 dark:text-blue-400">
                       <Lightbulb className="w-5 h-5" />
-                      Lời khuyên cho buổi phỏng vấn tiếp theo
+                      {t('interview.tipsForNext')}
                     </h3>
                     <ul className="space-y-3">
                       {evaluation.tips.map((tip, idx) => (
@@ -889,16 +889,16 @@ const InterviewSimulation = () => {
                     className="w-full h-16 text-button-lg bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 shadow-lg hover:opacity-90 transition-all"
                   >
                     <RotateCcw className="w-5 h-5 mr-3" />
-                    Phỏng vấn lại
+                    {t('interview.restart')}
                   </Button>
                 </>
               ) : (
                 <Card className="p-10 text-center border-border/50 bg-card/50 backdrop-blur-sm">
                   <Trophy className="w-16 h-16 mx-auto text-yellow-500 mb-5" />
-                  <h2 className="text-title font-bold mb-2">Hoàn thành phỏng vấn!</h2>
+                  <h2 className="text-title font-bold mb-2">{t('interview.interviewComplete')}</h2>
                   <Button onClick={resetInterview} className="mt-5">
                     <RotateCcw className="w-4 h-4 mr-2" />
-                    Bắt đầu lại
+                    {t('interview.startAgain')}
                   </Button>
                 </Card>
               )}

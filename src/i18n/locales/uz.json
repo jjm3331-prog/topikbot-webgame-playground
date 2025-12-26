@@ -465,15 +465,21 @@
     "uploadLimit": "Maksimum 10 ta rasm", "missingInfo": "Savol va javobni yuklang"
   },
   "interview": {
-    "title": "Intervyu simulyatsiyasi", "subtitle": "Koreya kompaniyalari intervyu mashqi",
-    "selectCompany": "Kompaniyani tanlang", "selectPosition": "Lavozimni tanlang", "selectInterviewer": "Intervyuer turini tanlang",
-    "friendly": "Do'stona", "strict": "Qat'iy", "pressure": "Stress", "technical": "Texnik",
-    "startInterview": "Intervyuni boshlash", "endInterview": "Tugatish", "micAccess": "Mikrofonga ruxsat bering",
-    "recording": "Yozib olmoqda...", "processing": "Qayta ishlanmoqda...", "ttsEnabled": "Ovoz yoqildi", "ttsDisabled": "Ovoz o'chirildi",
-    "evaluation": "Intervyu bahosi", "overall": "Umumiy baho", "content": "Mazmun", "communication": "Muloqot",
-    "korean": "Koreys tili", "attitude": "Munosabat", "jobFit": "Lavozimga moslik",
-    "strengths": "Kuchli tomonlar", "improvements": "Yaxshilash", "tips": "Maslahatlar", "grade": "Daraja",
-    "restart": "Qaytadan boshlash", "backToCareer": "Karyera markaziga"
+    "title": "Intervyu simulyatsiyasi", "description": "Koreya kompaniyalari intervyu mashqi",
+    "featureName": "Intervyu simulyatsiyasi", "heroTitle": "Intervyu mashqi", "heroDescription": "Koreya yetakchi kompaniyalari bilan intervyu mashqi", "supportVoiceText": "Ovoz va matn qo'llab-quvvatlash",
+    "selectCompanyTitle": "Kompaniyani tanlang", "selectPositionTitle": "Lavozimni tanlang", "selectInterviewerTitle": "Intervyu uslubini tanlang", "enterCompanyName": "Kompaniya nomini kiriting...",
+    "preparingInterview": "Intervyu tayyorlanmoqda...", "startInterviewBtn": "Intervyuni boshlash", "interviewProgress": "Intervyu jarayoni", "questions": "savol",
+    "thinking": "O'ylayapman...", "inputPlaceholder": "Javobingizni kiriting...", "stopRecording": "Yozishni to'xtatish", "answerByVoice": "Ovoz bilan javob berish", "endInterview": "Tugatish",
+    "analyzingResults": "Natijalar tahlil qilinmoqda...", "aiEvaluating": "AI intervyungizni to'liq baholayapti", "interviewComplete": "Intervyu yakunlandi!", "simulationFor": "Intervyu simulyatsiyasi",
+    "grade": "Daraja", "pointsUnit": "ball", "overallScore": "Umumiy ball", "scoresByCategory": "Kategoriya bo'yicha balllar", "overallFeedback": "Umumiy fikr-mulohaza",
+    "strengths": "Kuchli tomonlar", "improvements": "Yaxshilash kerak", "tipsForNext": "Keyingi intervyu uchun maslahatlar", "restart": "Qayta intervyu", "startAgain": "Qayta boshlash",
+    "companies": { "samsung": "Samsung Electronics", "lg": "LG Electronics", "hyundai": "Hyundai Motor", "naver": "Naver", "kakao": "Kakao", "coupang": "Coupang", "skhynix": "SK Hynix", "other": "Boshqa" },
+    "companyTypes": { "conglomerate": "Katta korporatsiya", "tech": "IT kompaniya", "ecommerce": "Elektron tijorat", "semiconductor": "Yarim o'tkazgich", "custom": "O'zingiz kiriting" },
+    "positions": { "software": "Dasturiy ta'minot", "marketing": "Marketing / PR", "sales": "Sotish", "hr": "HR", "design": "Dizayn / UX", "finance": "Moliya / Buxgalteriya", "production": "Ishlab chiqarish", "office": "Ofis ishi" },
+    "interviewerTypes": { "friendly": "Do'stona", "strict": "Qat'iy", "pressure": "Bosim ostida", "technical": "Texnik" },
+    "interviewerDescs": { "friendly": "Qulay muhit, qo'llab-quvvatlash", "strict": "Mantiqiy fikrlash, aniq javoblar", "pressure": "Stress-test, qiyin savollar", "technical": "Mutaxassislik, chuqur savollar" },
+    "scoreLabels": { "content": "Mazmun", "communication": "Muloqot", "korean": "Koreyscha", "attitude": "Munosabat", "jobFit": "Lavozimga mosligi" },
+    "micError": "Mikrofon ruxsati kerak", "allowMicAccess": "Mikrofon ruxsatini bering.", "voiceNotRecognized": "Ovoz aniqlanmadi", "tryAgain": "Qayta urinib ko'ring.", "voiceRecognitionError": "Ovoz aniqlash xatosi", "selectAll": "Hammasini tanlang", "selectAllDesc": "Kompaniya, lavozim va intervyuer turini tanlang.", "errorOccurred": "Xato yuz berdi", "cannotStartInterview": "Intervyuni boshlab bo'lmadi. Qayta urinib ko'ring.", "noResponse": "Javob yo'q."
   },
   "kdrama": {
     "title": "K-Drama Dublyaj",

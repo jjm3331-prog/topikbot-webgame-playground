@@ -465,15 +465,21 @@
     "uploadLimit": "Максимум 10 изображений", "missingInfo": "Загрузите задание и ответ"
   },
   "interview": {
-    "title": "Симуляция интервью", "subtitle": "Практика собеседования в корейских компаниях",
-    "selectCompany": "Выберите компанию", "selectPosition": "Выберите должность", "selectInterviewer": "Тип интервьюера",
-    "friendly": "Дружелюбный", "strict": "Строгий", "pressure": "Стрессовый", "technical": "Технический",
-    "startInterview": "Начать интервью", "endInterview": "Завершить", "micAccess": "Разрешите доступ к микрофону",
-    "recording": "Запись...", "processing": "Обработка...", "ttsEnabled": "Голос вкл", "ttsDisabled": "Голос выкл",
-    "evaluation": "Оценка интервью", "overall": "Общая оценка", "content": "Содержание", "communication": "Коммуникация",
-    "korean": "Корейский язык", "attitude": "Отношение", "jobFit": "Соответствие должности",
-    "strengths": "Сильные стороны", "improvements": "Улучшения", "tips": "Советы", "grade": "Оценка",
-    "restart": "Начать заново", "backToCareer": "В карьерный центр"
+    "title": "Симуляция интервью", "description": "Практика собеседования в корейских компаниях",
+    "featureName": "Симуляция интервью", "heroTitle": "Практика собеседования", "heroDescription": "Практикуйте собеседования с ведущими корейскими компаниями", "supportVoiceText": "Поддержка голоса и текста",
+    "selectCompanyTitle": "Выберите компанию", "selectPositionTitle": "Выберите должность", "selectInterviewerTitle": "Выберите стиль интервью", "enterCompanyName": "Введите название компании...",
+    "preparingInterview": "Подготовка к интервью...", "startInterviewBtn": "Начать интервью", "interviewProgress": "Прогресс интервью", "questions": "вопросов",
+    "thinking": "Думаю...", "inputPlaceholder": "Введите ваш ответ...", "stopRecording": "Остановить запись", "answerByVoice": "Ответить голосом", "endInterview": "Завершить",
+    "analyzingResults": "Анализ результатов...", "aiEvaluating": "ИИ комплексно оценивает ваше интервью", "interviewComplete": "Интервью завершено!", "simulationFor": "Симуляция интервью",
+    "grade": "Оценка", "pointsUnit": "баллов", "overallScore": "Общий балл", "scoresByCategory": "Баллы по категориям", "overallFeedback": "Общий отзыв",
+    "strengths": "Сильные стороны", "improvements": "Области для улучшения", "tipsForNext": "Советы для следующего интервью", "restart": "Попробовать снова", "startAgain": "Начать заново",
+    "companies": { "samsung": "Samsung Electronics", "lg": "LG Electronics", "hyundai": "Hyundai Motor", "naver": "Naver", "kakao": "Kakao", "coupang": "Coupang", "skhynix": "SK Hynix", "other": "Другое" },
+    "companyTypes": { "conglomerate": "Крупная корпорация", "tech": "IT компания", "ecommerce": "Электронная коммерция", "semiconductor": "Полупроводники", "custom": "Ввести вручную" },
+    "positions": { "software": "Разработка ПО", "marketing": "Маркетинг / PR", "sales": "Продажи", "hr": "HR", "design": "Дизайн / UX", "finance": "Финансы / Бухгалтерия", "production": "Производство", "office": "Офисная работа" },
+    "interviewerTypes": { "friendly": "Дружелюбный", "strict": "Строгий", "pressure": "Под давлением", "technical": "Технический" },
+    "interviewerDescs": { "friendly": "Расслабленная атмосфера, поддержка", "strict": "Логическое мышление, конкретные ответы", "pressure": "Стресс-тест, сложные вопросы", "technical": "Профессиональные знания, глубокие вопросы" },
+    "scoreLabels": { "content": "Содержание", "communication": "Общение", "korean": "Корейский", "attitude": "Отношение", "jobFit": "Соответствие должности" },
+    "micError": "Требуется доступ к микрофону", "allowMicAccess": "Пожалуйста, разрешите доступ к микрофону.", "voiceNotRecognized": "Голос не распознан", "tryAgain": "Попробуйте снова.", "voiceRecognitionError": "Ошибка распознавания голоса", "selectAll": "Выберите все", "selectAllDesc": "Выберите компанию, должность и тип интервьюера.", "errorOccurred": "Произошла ошибка", "cannotStartInterview": "Невозможно начать интервью. Попробуйте снова.", "noResponse": "Нет ответа."
   },
   "kdrama": {
     "title": "Дубляж K-Drama",
