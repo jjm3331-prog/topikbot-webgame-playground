@@ -241,7 +241,6 @@ const HandwritingPractice = () => {
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               {t("common.back")}
-              Quay lại
             </Button>
 
             {/* Hero Section */}

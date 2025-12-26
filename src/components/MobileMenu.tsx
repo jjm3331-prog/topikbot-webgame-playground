@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { 
   Menu, 
   X, 
@@ -50,8 +51,8 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
   const [showIOSGuide, setShowIOSGuide] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
-  // Prevent body scroll when menu is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -66,7 +67,6 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
   const handleLogout = async () => {
     setIsOpen(false);
     await safeSignOut();
-    // Hard reload to guarantee state reset
     window.location.href = "/";
   };
 
@@ -75,28 +75,24 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
     navigate(path);
   };
 
-  // Việc làm section
   const careerItems = [
-    { path: "/korea-career", icon: Briefcase, labelVi: "Tìm việc tại Hàn Quốc" },
-    { path: "/headhunting", icon: GraduationCap, labelVi: "Headhunting" },
+    { path: "/korea-career", icon: Briefcase, labelKey: "mobileMenu.items.koreaCareer" },
+    { path: "/headhunting", icon: GraduationCap, labelKey: "mobileMenu.items.headhunting" },
   ];
 
-  // TOPIK 학습 허브
   const topikItems = [
-    { path: "/learning-hub", icon: Sparkles, labelVi: "Trung tâm học TOPIK", isHighlight: true },
-    { path: "/board-hub", icon: MessageSquare, labelVi: "Cộng đồng", isHighlight: true },
+    { path: "/learning-hub", icon: Sparkles, labelKey: "mobileMenu.items.learningHub", isHighlight: true },
+    { path: "/board-hub", icon: MessageSquare, labelKey: "mobileMenu.items.community", isHighlight: true },
   ];
 
-  // Game items
   const gameItems = [
-    { path: "/game-hub", icon: Dice6, labelVi: "Trung tâm Game", isHighlight: true },
+    { path: "/game-hub", icon: Dice6, labelKey: "mobileMenu.items.gameHub", isHighlight: true },
   ];
 
   const menuContent = (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Full screen overlay with solid black background */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -113,7 +109,6 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
             onClick={() => setIsOpen(false)}
           />
 
-          {/* Menu Panel - absolutely positioned with solid background */}
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
@@ -133,7 +128,6 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
               boxShadow: '-10px 0 30px rgba(0, 0, 0, 0.5)',
             }}
           >
-            {/* Header */}
             <div style={{ 
               padding: '16px', 
               borderBottom: '1px solid rgba(255,255,255,0.1)',
@@ -171,7 +165,6 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
                 </button>
               </div>
 
-              {/* User Stats */}
               {isLoggedIn && userStats && (
                 <div style={{ 
                   display: 'grid', 
@@ -189,32 +182,30 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
                   </div>
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ color: '#00d4ff', fontSize: '14px', fontWeight: 'bold' }}>₩{userStats.money.toLocaleString()}</div>
-                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>Tiền</div>
+                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>{t("mobileMenu.stats.money")}</div>
                   </div>
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ color: '#4ade80', fontSize: '16px', fontWeight: 'bold' }}>{userStats.missions_completed}</div>
-                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>NV</div>
+                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>{t("mobileMenu.stats.missions")}</div>
                   </div>
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ color: '#facc15', fontSize: '16px', fontWeight: 'bold' }}>{userStats.points.toLocaleString()}</div>
-                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>Điểm</div>
+                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>{t("mobileMenu.stats.points")}</div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Scrollable Menu Items */}
             <div style={{ 
               flex: 1, 
               overflowY: 'auto', 
               padding: '16px 12px',
               backgroundColor: '#0a0a14',
             }}>
-              {/* VIỆC LÀM Section */}
               <div style={{ marginBottom: '16px' }}>
                 <div style={{ padding: '0 8px', marginBottom: '8px' }}>
                   <span style={{ fontSize: '12px', fontWeight: 600, color: '#facc15', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    💼 VIỆC LÀM
+                    💼 {t("mobileMenu.sections.career")}
                   </span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -240,7 +231,7 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
                       >
                         <IconComponent style={{ width: '20px', height: '20px', color: '#facc15' }} />
                         <div style={{ fontSize: '14px', fontWeight: 500, color: isActive ? 'white' : 'rgba(255,255,255,0.8)' }}>
-                          {item.labelVi}
+                          {t(item.labelKey)}
                         </div>
                       </button>
                     );
@@ -248,11 +239,10 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
                 </div>
               </div>
 
-              {/* HỌC TOPIK Section */}
               <div style={{ marginBottom: '16px' }}>
                 <div style={{ padding: '0 8px', marginBottom: '8px' }}>
                   <span style={{ fontSize: '12px', fontWeight: 600, color: '#a855f7', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    📚 HỌC TOPIK
+                    📚 {t("mobileMenu.sections.topik")}
                   </span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -278,7 +268,7 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
                       >
                         <IconComponent style={{ width: '20px', height: '20px', color: '#a855f7' }} />
                         <div style={{ fontSize: '14px', fontWeight: 500, color: isActive ? 'white' : 'rgba(255,255,255,0.8)' }}>
-                          {item.labelVi}
+                          {t(item.labelKey)}
                         </div>
                       </button>
                     );
@@ -286,11 +276,10 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
                 </div>
               </div>
 
-              {/* GAME Section */}
               <div style={{ marginBottom: '16px' }}>
                 <div style={{ padding: '0 8px', marginBottom: '8px' }}>
                   <span style={{ fontSize: '12px', fontWeight: 600, color: '#ec4899', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    🎮 GAME
+                    🎮 {t("mobileMenu.sections.game")}
                   </span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -316,7 +305,7 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
                       >
                         <IconComponent style={{ width: '20px', height: '20px', color: isActive ? '#00d4ff' : 'rgba(255,255,255,0.6)' }} />
                         <div style={{ fontSize: '14px', fontWeight: 500, color: isActive ? 'white' : 'rgba(255,255,255,0.8)' }}>
-                          {item.labelVi}
+                          {t(item.labelKey)}
                         </div>
                       </button>
                     );
@@ -324,15 +313,13 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
                 </div>
               </div>
 
-              {/* PWA Section */}
               <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                 <div style={{ padding: '0 8px', marginBottom: '8px' }}>
                   <span style={{ fontSize: '12px', fontWeight: 600, color: '#00d4ff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    📲 Cài đặt App
+                    📲 {t("mobileMenu.sections.installApp")}
                   </span>
                 </div>
 
-                {/* Android */}
                 <button
                   onClick={() => setShowAndroidGuide(!showAndroidGuide)}
                   style={{
@@ -350,23 +337,22 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <Smartphone style={{ width: '20px', height: '20px', color: '#4ade80' }} />
                     <div style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255,255,255,0.8)' }}>
-                      Cài đặt trên Android
+                      {t("mobileMenu.pwa.android")}
                     </div>
                   </div>
                   <ChevronDown style={{ width: '16px', height: '16px', color: 'rgba(255,255,255,0.4)', transform: showAndroidGuide ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
                 </button>
                 {showAndroidGuide && (
                   <div style={{ padding: '12px', margin: '0 8px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.05)', fontSize: '12px' }}>
-                    <p style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 500, marginBottom: '8px' }}>📱 Cách cài đặt trên Android:</p>
+                    <p style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 500, marginBottom: '8px' }}>📱 {t("mobileMenu.pwa.androidGuideTitle")}:</p>
                     <ol style={{ color: 'rgba(255,255,255,0.6)', paddingLeft: '16px', margin: 0 }}>
-                      <li>Nhấn menu Chrome (⋮) ở góc phải</li>
-                      <li>Chọn "Thêm vào màn hình chính"</li>
-                      <li>Nhấn nút "Cài đặt"</li>
+                      <li>{t("mobileMenu.pwa.androidStep1")}</li>
+                      <li>{t("mobileMenu.pwa.androidStep2")}</li>
+                      <li>{t("mobileMenu.pwa.androidStep3")}</li>
                     </ol>
                   </div>
                 )}
 
-                {/* iOS */}
                 <button
                   onClick={() => setShowIOSGuide(!showIOSGuide)}
                   style={{
@@ -385,26 +371,25 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <Apple style={{ width: '20px', height: '20px', color: 'rgba(255,255,255,0.8)' }} />
                     <div style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255,255,255,0.8)' }}>
-                      Cài đặt trên iPhone
+                      {t("mobileMenu.pwa.ios")}
                     </div>
                   </div>
                   <ChevronDown style={{ width: '16px', height: '16px', color: 'rgba(255,255,255,0.4)', transform: showIOSGuide ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
                 </button>
                 {showIOSGuide && (
                   <div style={{ padding: '12px', margin: '0 8px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.05)', fontSize: '12px' }}>
-                    <p style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 500, marginBottom: '8px' }}>🍎 Cách cài đặt trên iPhone:</p>
+                    <p style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 500, marginBottom: '8px' }}>🍎 {t("mobileMenu.pwa.iosGuideTitle")}:</p>
                     <ol style={{ color: 'rgba(255,255,255,0.6)', paddingLeft: '16px', margin: 0 }}>
-                      <li>Mở bằng trình duyệt Safari</li>
-                      <li>Nhấn nút chia sẻ (⎙) ở dưới</li>
-                      <li>Chọn "Thêm vào MH chính"</li>
-                      <li>Nhấn "Thêm" ở góc phải</li>
+                      <li>{t("mobileMenu.pwa.iosStep1")}</li>
+                      <li>{t("mobileMenu.pwa.iosStep2")}</li>
+                      <li>{t("mobileMenu.pwa.iosStep3")}</li>
+                      <li>{t("mobileMenu.pwa.iosStep4")}</li>
                     </ol>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Footer */}
             {isLoggedIn && (
               <div style={{ 
                 padding: '16px', 
@@ -412,14 +397,27 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
                 backgroundColor: '#0a0a14',
                 flexShrink: 0,
               }}>
-                <Button
-                  variant="outline"
+                <button
                   onClick={handleLogout}
-                  className="w-full border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300"
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    padding: '14px',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(239,68,68,0.3)',
+                    background: 'rgba(239,68,68,0.1)',
+                    cursor: 'pointer',
+                    color: '#ef4444',
+                    fontWeight: 600,
+                    fontSize: '14px',
+                  }}
                 >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  로그아웃 / Đăng xuất
-                </Button>
+                  <LogOut style={{ width: '18px', height: '18px' }} />
+                  {t("common.logout")}
+                </button>
               </div>
             )}
           </motion.div>
@@ -430,16 +428,15 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
 
   return (
     <>
-      {/* Hamburger Button */}
-      <button
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={() => setIsOpen(true)}
-        className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-        aria-label="Open menu"
+        className="lg:hidden"
       >
-        <Menu className="w-6 h-6 text-white" />
-      </button>
+        <Menu className="w-6 h-6" />
+      </Button>
 
-      {/* Render menu in portal to avoid z-index issues */}
       {typeof document !== 'undefined' && createPortal(menuContent, document.body)}
     </>
   );
