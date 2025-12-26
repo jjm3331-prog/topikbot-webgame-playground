@@ -785,78 +785,42 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* ========== FEATURES - PREMIUM 4 SKILLS ========== */}
-      <section id="features" className="py-16 sm:py-24 px-4 sm:px-6 relative overflow-hidden">
-        {/* Premium background */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-gradient-radial from-korean-blue/10 via-transparent to-transparent rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-gradient-radial from-korean-purple/10 via-transparent to-transparent rounded-full blur-3xl" />
-        </div>
-        
-        <div className="max-w-5xl mx-auto relative z-10">
+      {/* ========== FEATURES - 4 SKILLS ========== */}
+      <section id="features" className="py-12 sm:py-16 px-4 sm:px-6 bg-muted/30">
+        <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-10 sm:mb-14"
+            className="text-center mb-8 sm:mb-10"
           >
-            <motion.span 
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-korean-blue/20 to-korean-purple/20 border border-korean-blue/30 text-sm font-semibold text-foreground mb-6"
-            >
-              <Brain className="w-4 h-4 text-korean-blue" />
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-korean-blue/10 border border-korean-blue/20 text-xs font-semibold text-foreground mb-4">
+              <Brain className="w-3.5 h-3.5 text-korean-blue" />
               LUKATO AI
-            </motion.span>
-            <h2 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl text-foreground">
-              {t("landing.features.title")}
-              <br />
-              <span className="bg-gradient-to-r from-korean-blue via-korean-purple to-korean-pink bg-clip-text text-transparent">
-                {t("landing.features.skills")}
-              </span>
+            </span>
+            <h2 className="font-heading font-bold text-2xl sm:text-3xl text-foreground">
+              {t("landing.features.title")} <span className="text-gradient-secondary">{t("landing.features.skills")}</span>
             </h2>
           </motion.div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {coreFeatures.map((feature, i) => (
               <motion.div
                 key={feature.title}
-                initial={{ opacity: 0, y: 30, rotateY: -10 }}
-                whileInView={{ opacity: 1, y: 0, rotateY: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
-                whileHover={{ y: -8, scale: 1.02 }}
-                className="group relative"
+                transition={{ delay: i * 0.08 }}
+                whileHover={{ y: -4 }}
+                className="premium-card p-4 sm:p-5 text-center group"
               >
-                {/* Glow effect */}
-                <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-30 blur-xl transition-opacity duration-500`} />
-                
-                <div className="relative bg-card/80 backdrop-blur-sm border border-border/50 rounded-2xl p-6 sm:p-8 text-center overflow-hidden group-hover:border-primary/30 transition-all duration-300 h-full">
-                  {/* Shine effect */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                  </div>
-                  
-                  {/* Icon */}
-                  <motion.div 
-                    whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
-                    transition={{ duration: 0.4 }}
-                    className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/20 group-hover:shadow-xl transition-shadow duration-300`}
-                  >
-                    <feature.icon className="w-8 h-8 sm:w-10 sm:h-10 text-primary-foreground" />
-                  </motion.div>
-                  
-                  {/* Title */}
-                  <h3 className="font-bold text-lg sm:text-xl text-foreground mb-2 group-hover:text-primary transition-colors">
-                    {feature.title}
-                  </h3>
-                  
-                  {/* Stat */}
-                  <p className={`text-2xl sm:text-3xl font-black bg-gradient-to-r ${feature.color} bg-clip-text text-transparent`}>
-                    {feature.stat}
-                  </p>
+                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform`}>
+                  <feature.icon className="w-6 h-6 sm:w-7 sm:h-7 text-primary-foreground" />
                 </div>
+                <h3 className="font-bold text-sm sm:text-base text-foreground mb-1">{feature.title}</h3>
+                <p className={`text-lg sm:text-xl font-black bg-gradient-to-r ${feature.color} bg-clip-text text-transparent`}>
+                  {feature.stat}
+                </p>
               </motion.div>
             ))}
           </div>
