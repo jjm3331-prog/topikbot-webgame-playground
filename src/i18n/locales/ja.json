@@ -17,7 +17,8 @@
     "loading": "読み込み中...",
     "error": "エラー",
     "success": "成功",
-    "or": "または"
+    "or": "または",
+    "locale": "ja-JP"
   },
   "brand": {
     "name": "LUKATO AI",
@@ -477,25 +478,14 @@
     "actions": { "grading": "採点中...", "grade": "AIで採点", "freeGrade": "🎁 無料採点(1日1回)", "upgradeToGrade": "Premiumにアップグレードして採点" },
     "pdf": { "generatingTitle": "PDF生成中...", "generatingDesc": "少々お待ちください", "failedTitle": "PDF生成失敗", "failedDesc": "もう一度お試しください", "downloadComplete": "PDFダウンロード完了！", "fileDownloaded": "ファイルがダウンロードされました" },
     "featureName": "AI作文添削",
-    "freeUsage": {
-      "availableNow": "今すぐ使用可能",
-      "hasFreeTry": "本日1回無料添削が可能です！",
-      "freeOnceDaily": "毎日1回無料で使用できます。無制限利用はPremiumにアップグレードしてください。",
-      "usedToday": "本日の無料利用を完了しました",
-      "nextFreeAt": "次の無料利用: {{time}}。無制限利用はPremiumにアップグレードしてください。",
-      "nextFreeSimple": "次の無料利用: {{time}}"
-    },
-    "buttons": {
-      "addImage": "画像を追加",
-      "deleteAll": "すべて削除",
-      "uploadImage": "画像をアップロード",
-      "takePhoto": "写真を撮る"
-    },
-    "upload": {
-      "maxQuestionImages": "最大{{max}}枚の問題画像",
-      "maxAnswerImages": "最大{{max}}枚の答案画像",
-      "multipleSupport": "複数画像の一括アップロード対応"
-    }
+    "freeUsage": { "availableNow": "今すぐ使用可能", "hasFreeTry": "本日1回無料添削が可能です！", "freeOnceDaily": "毎日1回無料で使用できます。無制限利用はPremiumにアップグレードしてください。", "usedToday": "本日の無料利用を完了しました", "nextFreeAt": "次の無料利用: {{time}}。無制限利用はPremiumにアップグレードしてください。", "nextFreeSimple": "次の無料利用: {{time}}" },
+    "buttons": { "addImage": "画像を追加", "deleteAll": "すべて削除", "uploadImage": "画像をアップロード", "takePhoto": "写真を撮る" },
+    "upload": { "maxQuestionImages": "最大{{max}}枚の問題画像", "maxAnswerImages": "最大{{max}}枚の答案画像", "multipleSupport": "複数画像の一括アップロード対応" },
+    "scoreDetail": { "score": "点数", "excellent": "優秀", "average": "普通", "needsImprovement": "改善が必要", "grammar": { "title": "文法詳細分析", "errorsFound": "発見された文法エラー", "noErrors": "文法エラーは見つかりませんでした！" }, "vocabulary": { "title": "語彙詳細分析", "suggestions": "語彙改善の提案", "appropriate": "語彙の使用が適切です！" }, "structure": { "title": "構造詳細分析", "suggestions": "構造改善の提案", "current": "現在", "improved": "改善", "wellStructured": "文章の構造がよく整理されています！" }, "content": { "title": "内容詳細分析", "analysis": "内容分析", "doneWell": "良かった点", "toImprove": "改善点", "seeDetailedFeedback": "詳細フィードバックをご覧ください。" } },
+    "swot": { "title": "SWOT分析", "strengths": "Strengths (強み)", "weaknesses": "Weaknesses (弱み)", "opportunities": "Opportunities (機会)", "threats": "Threats (脅威)", "point": "ポイント", "evidence": "根拠/分析", "issue": "問題点", "impact": "影響", "opportunity": "機会", "action": "方法", "benefit": "効果", "threat": "脅威", "riskLevel": "リスクレベル", "prevention": "予防法", "riskHigh": "高", "riskMedium": "中", "riskLow": "低" },
+    "result": { "title": "採点結果", "uploadPrompt": "問題と答案をアップロードして詳細分析を受けましょう", "saveResult": "結果を保存", "exportPdf": "PDFエクスポート" },
+    "history": { "title": "採点履歴", "score": "点数", "viewAgain": "再確認" },
+    "ocr": { "title": "認識テキストの編集", "description": "AIが画像からテキストを認識しました。エラーがあれば編集してください：", "placeholder": "画像から認識されたテキスト...", "skipUseImage": "スキップして元の画像を使用", "confirmText": "テキストを確認" }
   },
   "interview": {
     "title": "面接シミュレーション", "description": "韓国企業面接練習",

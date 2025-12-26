@@ -17,7 +17,8 @@
     "loading": "Yuklanmoqda...",
     "error": "Xato",
     "success": "Muvaffaqiyat",
-    "or": "yoki"
+    "or": "yoki",
+    "locale": "uz-UZ"
   },
   "brand": {
     "name": "LUKATO AI",
@@ -477,25 +478,14 @@
     "actions": { "grading": "Tekshirilmoqda...", "grade": "AI bilan tekshirish", "freeGrade": "🎁 Bepul tekshirish (1/kun)", "upgradeToGrade": "Premium ga yangilang" },
     "pdf": { "generatingTitle": "PDF yaratilmoqda...", "generatingDesc": "Iltimos kuting", "failedTitle": "PDF xatosi", "failedDesc": "Qayta urinib ko'ring", "downloadComplete": "PDF yuklab olindi!", "fileDownloaded": "Fayl yuklab olindi" },
     "featureName": "AI Yozuv tekshiruvi",
-    "freeUsage": {
-      "availableNow": "Hozir foydalanish mumkin",
-      "hasFreeTry": "Bugun 1 ta bepul tekshirish imkoniyatingiz bor!",
-      "freeOnceDaily": "Kuniga 1 marta bepul foydalanish mumkin. Cheksiz foydalanish uchun Premium ga yangilang.",
-      "usedToday": "Bugungi bepul foydalanish tugadi",
-      "nextFreeAt": "Keyingi bepul foydalanish: {{time}}. Cheksiz foydalanish uchun Premium ga yangilang.",
-      "nextFreeSimple": "Keyingi bepul foydalanish: {{time}}"
-    },
-    "buttons": {
-      "addImage": "Rasm qo'shish",
-      "deleteAll": "Hammasini o'chirish",
-      "uploadImage": "Rasm yuklash",
-      "takePhoto": "Suratga olish"
-    },
-    "upload": {
-      "maxQuestionImages": "Maksimum {{max}} ta savol rasmi",
-      "maxAnswerImages": "Maksimum {{max}} ta javob rasmi",
-      "multipleSupport": "Bir nechta rasm yuklash qo'llab-quvvatlanadi"
-    }
+    "freeUsage": { "availableNow": "Hozir foydalanish mumkin", "hasFreeTry": "Bugun 1 ta bepul tekshirish imkoniyatingiz bor!", "freeOnceDaily": "Kuniga 1 marta bepul foydalanish mumkin. Cheksiz foydalanish uchun Premium ga yangilang.", "usedToday": "Bugungi bepul foydalanish tugadi", "nextFreeAt": "Keyingi bepul foydalanish: {{time}}. Cheksiz foydalanish uchun Premium ga yangilang.", "nextFreeSimple": "Keyingi bepul foydalanish: {{time}}" },
+    "buttons": { "addImage": "Rasm qo'shish", "deleteAll": "Hammasini o'chirish", "uploadImage": "Rasm yuklash", "takePhoto": "Suratga olish" },
+    "upload": { "maxQuestionImages": "Maksimum {{max}} ta savol rasmi", "maxAnswerImages": "Maksimum {{max}} ta javob rasmi", "multipleSupport": "Bir nechta rasm yuklash qo'llab-quvvatlanadi" },
+    "scoreDetail": { "score": "Ball", "excellent": "A'lo", "average": "O'rtacha", "needsImprovement": "Yaxshilash kerak", "grammar": { "title": "Grammatika batafsil tahlili", "errorsFound": "Topilgan grammatika xatolari", "noErrors": "Grammatika xatolari topilmadi!" }, "vocabulary": { "title": "Lug'at batafsil tahlili", "suggestions": "Lug'atni yaxshilash bo'yicha tavsiyalar", "appropriate": "Lug'at to'g'ri ishlatilgan!" }, "structure": { "title": "Tuzilish batafsil tahlili", "suggestions": "Tuzilishni yaxshilash bo'yicha tavsiyalar", "current": "Hozirgi", "improved": "Yaxshilangan", "wellStructured": "Yozuv tuzilishi yaxshi tartibga solingan!" }, "content": { "title": "Mazmun batafsil tahlili", "analysis": "Mazmun tahlili", "doneWell": "Yaxshi bajarilgan", "toImprove": "Yaxshilash kerak", "seeDetailedFeedback": "Batafsil fikr-mulohazani ko'ring." } },
+    "swot": { "title": "SWOT tahlili", "strengths": "Strengths (Kuchli tomonlar)", "weaknesses": "Weaknesses (Zaif tomonlar)", "opportunities": "Opportunities (Imkoniyatlar)", "threats": "Threats (Xavflar)", "point": "Nuqta", "evidence": "Dalil/Tahlil", "issue": "Muammo", "impact": "Ta'sir", "opportunity": "Imkoniyat", "action": "Usul", "benefit": "Foyda", "threat": "Xavf", "riskLevel": "Xavf darajasi", "prevention": "Oldini olish", "riskHigh": "Yuqori", "riskMedium": "O'rtacha", "riskLow": "Past" },
+    "result": { "title": "Tekshirish natijasi", "uploadPrompt": "Batafsil tahlil olish uchun topshiriq va javobni yuklang", "saveResult": "Natijani saqlash", "exportPdf": "PDF eksport" },
+    "history": { "title": "Tekshirish tarixi", "score": "Ball", "viewAgain": "Qayta ko'rish" },
+    "ocr": { "title": "Aniqlangan matnni tahrirlash", "description": "AI rasmdan matnni aniqladi. Xatolik bo'lsa tahrirlang:", "placeholder": "Rasmdan aniqlangan matn...", "skipUseImage": "O'tkazib yuborish, asl rasmni ishlatish", "confirmText": "Matnni tasdiqlash" }
   },
   "interview": {
     "title": "Intervyu simulyatsiyasi", "description": "Koreya kompaniyalari intervyu mashqi",

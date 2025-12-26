@@ -21,7 +21,8 @@
     "points": "점",
     "playNow": "지금 플레이",
     "learnNow": "지금 학습",
-    "backToDashboard": "대시보드로 돌아가기"
+    "backToDashboard": "대시보드로 돌아가기",
+    "locale": "ko-KR"
   },
   "brand": {
     "name": "LUKATO AI",
