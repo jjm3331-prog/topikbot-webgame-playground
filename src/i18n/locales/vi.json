@@ -407,6 +407,23 @@
     "loading": "Đang tải từ vựng...",
     "loadError": "Lỗi tải từ vựng"
   },
+  "landing": {
+    "hero": {
+      "badge": "Powered by TOPIK Professors 🇰🇷",
+      "headline1": "Thế giới đầu tiên.",
+      "headline2": "Việt Nam duy nhất.",
+      "sub1": "Super App học tiếng Hàn từ",
+      "sub2a": "giáo sư ra đề TOPIK",
+      "sub2b": "LUKATO RAG AI Tech",
+      "cta": "Bắt đầu MIỄN PHÍ"
+    },
+    "universities": {
+      "partner": "🤝 Đối tác chiến lược",
+      "titleHighlight": "6 trường đại học",
+      "titleRest": "hàng đầu Việt Nam",
+      "desc": "Được tin dùng bởi các trường đại học hàng đầu tại Việt Nam"
+    }
+  },
   "grammar": {
     "title": "Học ngữ pháp",
     "description": "Làm chủ ngữ pháp qua mini-game",

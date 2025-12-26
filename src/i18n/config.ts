@@ -38,15 +38,27 @@ i18n
   .init({
     resources,
     fallbackLng: 'ko',
+    supportedLngs: languages.map((l) => l.code),
     defaultNS: 'translation',
     interpolation: {
       escapeValue: false,
     },
     detection: {
-      order: ['localStorage', 'navigator'],
+      // Auto language switching order:
+      // 1) URL ?lng=xx (useful for testing/marketing)
+      // 2) persisted user choice
+      // 3) browser language
+      order: ['querystring', 'localStorage', 'navigator', 'htmlTag'],
       caches: ['localStorage'],
       lookupLocalStorage: 'i18nextLng',
     },
   });
+
+// Keep <html lang="..."> in sync for SEO/accessibility
+i18n.on('languageChanged', (lng) => {
+  if (typeof document !== 'undefined') {
+    document.documentElement.lang = lng;
+  }
+});
 
 export default i18n;

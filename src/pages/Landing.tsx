@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import CleanHeader from "@/components/CleanHeader";
@@ -155,6 +156,7 @@ const AnimatedCounter = ({ target, suffix = "", duration = 2 }: { target: number
 
 const Landing = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isLoaded, setIsLoaded] = useState(false);
   const { scrollYProgress } = useScroll();
   const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
@@ -193,34 +195,34 @@ const Landing = () => {
           >
             <div className="badge-premium text-xs sm:text-sm">
               <Crown className="w-3 h-3 sm:w-4 sm:h-4 text-korean-yellow" />
-              <span>Powered by TOPIK Professors 🇰🇷</span>
+              <span>{t("landing.hero.badge")}</span>
             </div>
           </motion.div>
 
           {/* Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 30 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight mb-4"
-          >
-            <span className="text-foreground">Thế giới đầu tiên.</span>
-            <br />
-            <span className="text-gradient-primary">Việt Nam duy nhất.</span>
-          </motion.h1>
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 30 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight mb-4"
+            >
+              <span className="text-foreground">{t("landing.hero.headline1")}</span>
+              <br />
+              <span className="text-gradient-primary">{t("landing.hero.headline2")}</span>
+            </motion.h1>
 
           {/* Sub-headline */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            className="text-muted-foreground text-xs sm:text-sm md:text-base max-w-xl mx-auto mb-6 px-2"
-          >
-            Super App học tiếng Hàn từ
-            <br />
-            <span className="text-primary font-semibold">giáo sư ra đề TOPIK</span> +{" "}
-            <span className="text-primary font-semibold">LUKATO RAG AI Tech</span>
-          </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="text-muted-foreground text-xs sm:text-sm md:text-base max-w-xl mx-auto mb-6 px-2"
+            >
+              {t("landing.hero.sub1")}
+              <br />
+              <span className="text-primary font-semibold">{t("landing.hero.sub2a")}</span> +{" "}
+              <span className="text-primary font-semibold">{t("landing.hero.sub2b")}</span>
+            </motion.p>
 
           {/* CTA */}
           <motion.div
@@ -235,7 +237,7 @@ const Landing = () => {
               className="group w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-10 btn-primary text-primary-foreground text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl"
             >
               <Rocket className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-              Bắt đầu MIỄN PHÍ
+              {t("landing.hero.cta")}
               <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </motion.div>
@@ -264,13 +266,13 @@ const Landing = () => {
             viewport={{ once: true }}
             className="text-center mb-6 sm:mb-8"
           >
-            <p className="text-xs sm:text-sm text-muted-foreground mb-2">🤝 Đối tác chiến lược</p>
-            <h2 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl text-foreground mb-2">
-              <span className="text-gradient-primary">6 trường đại học</span> hàng đầu Việt Nam
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Được tin dùng bởi các trường đại học hàng đầu tại Việt Nam
-            </p>
+             <p className="text-xs sm:text-sm text-muted-foreground mb-2">{t("landing.universities.partner")}</p>
+             <h2 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl text-foreground mb-2">
+               <span className="text-gradient-primary">{t("landing.universities.titleHighlight")}</span> {t("landing.universities.titleRest")}
+             </h2>
+             <p className="text-sm text-muted-foreground">
+               {t("landing.universities.desc")}
+             </p>
           </motion.div>
           
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-4 max-w-3xl mx-auto">
