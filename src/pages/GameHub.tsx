@@ -20,11 +20,9 @@ import AppFooter from "@/components/AppFooter";
 const gameMenus = [
   {
     id: "chat",
-    titleKey: "menu.items.qnaAgent",
-    fallbackTitle: "AI Sinh tồn",
-    subtitle: "Seoul",
+    titleKey: "gameHub.cards.chatTitle",
+    subtitleKey: "gameHub.cards.chatSubtitle",
     descriptionKey: "gameHub.cards.chatDesc",
-    fallbackDescription: "Sinh tồn tại Seoul! Nâng cao tiếng Hàn qua trò chuyện với AI!",
     emoji: "🎮",
     color: "from-red-500 to-pink-600",
     borderColor: "border-red-500/30",
@@ -34,10 +32,8 @@ const gameMenus = [
   {
     id: "dating",
     titleKey: "gameHub.cards.datingTitle",
-    fallbackTitle: "Hẹn hò",
-    subtitle: "Korean Dating",
+    subtitleKey: "gameHub.cards.datingSubtitle",
     descriptionKey: "gameHub.cards.datingDesc",
-    fallbackDescription: "Hẹn hò với người Hàn ảo và học các biểu đạt tình cảm!",
     emoji: "💕",
     color: "from-pink-500 to-rose-600",
     borderColor: "border-pink-500/30",
@@ -47,10 +43,8 @@ const gameMenus = [
   {
     id: "manager",
     titleKey: "gameHub.cards.managerTitle",
-    fallbackTitle: "Manager",
-    subtitle: "K-POP Idol",
+    subtitleKey: "gameHub.cards.managerSubtitle",
     descriptionKey: "gameHub.cards.managerDesc",
-    fallbackDescription: "Trở thành quản lý idol K-POP và đưa nhóm đến thành công!",
     emoji: "👑",
     color: "from-amber-400 to-orange-500",
     borderColor: "border-amber-500/30",
@@ -60,10 +54,8 @@ const gameMenus = [
   {
     id: "kpop",
     titleKey: "gameHub.cards.kpopTitle",
-    fallbackTitle: "K-POP Quiz",
-    subtitle: "Music",
+    subtitleKey: "gameHub.cards.kpopSubtitle",
     descriptionKey: "gameHub.cards.kpopDesc",
-    fallbackDescription: "Học tiếng Hàn thú vị qua quiz ca từ K-POP!",
     emoji: "🎵",
     color: "from-violet-500 to-purple-600",
     borderColor: "border-violet-500/30",
@@ -73,10 +65,8 @@ const gameMenus = [
   {
     id: "kdrama",
     titleKey: "gameHub.cards.kdramaTitle",
-    fallbackTitle: "K-Drama",
-    subtitle: "Lồng tiếng",
+    subtitleKey: "gameHub.cards.kdramaSubtitle",
     descriptionKey: "gameHub.cards.kdramaDesc",
-    fallbackDescription: "Luyện phát âm bằng cách lồng tiếng cảnh phim nổi tiếng!",
     emoji: "🎬",
     color: "from-cyan-500 to-blue-600",
     borderColor: "border-cyan-500/30",
@@ -86,10 +76,8 @@ const gameMenus = [
   {
     id: "wordchain",
     titleKey: "gameHub.cards.wordChainTitle",
-    fallbackTitle: "Nối từ",
-    subtitle: "끝말잇기",
+    subtitleKey: "gameHub.cards.wordChainSubtitle",
     descriptionKey: "gameHub.cards.wordChainDesc",
-    fallbackDescription: "Đấu nối từ với AI! Kiểm tra vốn từ vựng của bạn!",
     emoji: "🔗",
     color: "from-green-500 to-emerald-600",
     borderColor: "border-green-500/30",
@@ -99,10 +87,8 @@ const gameMenus = [
   {
     id: "parttime",
     titleKey: "gameHub.cards.parttimeTitle",
-    fallbackTitle: "Làm thêm",
-    subtitle: "Part-time Job",
+    subtitleKey: "gameHub.cards.parttimeSubtitle",
     descriptionKey: "gameHub.cards.parttimeDesc",
-    fallbackDescription: "Luyện hội thoại thực tế trong các tình huống làm thêm!",
     emoji: "💼",
     color: "from-slate-500 to-gray-600",
     borderColor: "border-slate-500/30",
@@ -181,9 +167,9 @@ export default function GameHub() {
             <motion.section variants={containerVariants} initial="hidden" animate="visible">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
                 {gameMenus.map((menu, index) => {
-                  const title = t(menu.titleKey as any, { defaultValue: menu.fallbackTitle });
-                  const description = t(menu.descriptionKey as any, { defaultValue: menu.fallbackDescription });
-
+                  const title = t(menu.titleKey);
+                  const subtitle = t(menu.subtitleKey);
+                  const description = t(menu.descriptionKey);
                   return (
                     <motion.div
                       key={menu.id}
@@ -219,7 +205,7 @@ export default function GameHub() {
                           <h3 className="font-bold text-foreground text-card-title-lg sm:text-2xl mb-1.5">
                             {title}
                           </h3>
-                          <p className="text-card-caption sm:text-base text-muted-foreground mb-3">{menu.subtitle}</p>
+                          <p className="text-card-caption sm:text-base text-muted-foreground mb-3">{subtitle}</p>
 
                           <p className="text-card-body sm:text-lg text-muted-foreground/90 leading-relaxed flex-1">
                             {description}

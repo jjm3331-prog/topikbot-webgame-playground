@@ -180,28 +180,15 @@
     "copyright": "© 2025 LUKATO AI. 面向全球用户的韩语学习Super App。"
   },
 "gameHub": {
-    "title": "🎮 韩语学习游戏",
-    "description": "通过有趣的互动游戏学习",
-    "games": "7款游戏",
-    "aiInteractive": "AI互动",
-    "learnPlay": "边玩边学",
-    "funLearning": "学韩语真有趣！",
-    "dailyPlay": "每天玩游戏提升韩语水平！",
-    "hot": "热门",
+    "title": "🎮 韩语学习游戏", "description": "通过有趣的互动游戏学习", "games": "7款游戏", "aiInteractive": "AI互动", "learnPlay": "边玩边学", "funLearning": "学韩语真有趣！", "dailyPlay": "每天玩游戏提升韩语水平！", "hot": "热门",
     "cards": {
-      "chatDesc": "在首尔生存！通过与AI对话提高韩语水平！",
-      "datingTitle": "恋爱模拟",
-      "datingDesc": "与虚拟韩国人约会并学习情感表达！",
-      "managerTitle": "经纪人",
-      "managerDesc": "成为K-POP偶像经纪人，带领组合走向成功！",
-      "kpopTitle": "K-POP问答",
-      "kpopDesc": "通过K-POP歌词问答快乐学习韩语！",
-      "kdramaTitle": "韩剧配音",
-      "kdramaDesc": "通过配音著名韩剧场景练习发音！",
-      "wordChainTitle": "接龙",
-      "wordChainDesc": "与AI对战接龙！测试你的词汇量！",
-      "parttimeTitle": "兼职工作",
-      "parttimeDesc": "在兼职场景中练习真实对话！"
+      "chatTitle": "AI生存", "chatSubtitle": "首尔", "chatDesc": "在首尔生存！通过与AI对话提高韩语水平！",
+      "datingTitle": "恋爱模拟", "datingSubtitle": "Korean Dating", "datingDesc": "与虚拟韩国人约会并学习情感表达！",
+      "managerTitle": "经纪人", "managerSubtitle": "K-POP Idol", "managerDesc": "成为K-POP偶像经纪人，带领组合走向成功！",
+      "kpopTitle": "K-POP问答", "kpopSubtitle": "Music", "kpopDesc": "通过K-POP歌词问答快乐学习韩语！",
+      "kdramaTitle": "韩剧配音", "kdramaSubtitle": "配音", "kdramaDesc": "通过配音著名韩剧场景练习发音！",
+      "wordChainTitle": "接龙", "wordChainSubtitle": "끝말잇기", "wordChainDesc": "与AI对战接龙！测试你的词汇量！",
+      "parttimeTitle": "兼职工作", "parttimeSubtitle": "Part-time", "parttimeDesc": "在兼职场景中练习真实对话！"
     }
   },
   "learningHub": {

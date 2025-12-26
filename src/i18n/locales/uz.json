@@ -180,28 +180,15 @@
     "copyright": "© 2025 LUKATO AI. Dunyo bo'ylab hamma uchun koreys tili o'rganish Super App."
   },
 "gameHub": {
-    "title": "🎮 Koreys tili o'rganish o'yinlari",
-    "description": "Qiziqarli o'yinlar orqali o'rganing",
-    "games": "7 ta o'yin",
-    "aiInteractive": "AI interaktiv",
-    "learnPlay": "O'ynab o'rgan",
-    "funLearning": "Koreys tilini o'rganish qiziqarli!",
-    "dailyPlay": "Har kuni o'yin o'ynab koreys tilini yaxshilang!",
-    "hot": "HOT",
+    "title": "🎮 Koreys tili o'rganish o'yinlari", "description": "Qiziqarli o'yinlar orqali o'rganing", "games": "7 ta o'yin", "aiInteractive": "AI interaktiv", "learnPlay": "O'ynab o'rgan", "funLearning": "Koreys tilini o'rganish qiziqarli!", "dailyPlay": "Har kuni o'yin o'ynab koreys tilini yaxshilang!", "hot": "HOT",
     "cards": {
-      "chatDesc": "Seulda omon qoling! AI bilan suhbat orqali koreys tilini yaxshilang!",
-      "datingTitle": "Uchrashuv simulyatori",
-      "datingDesc": "Virtual koreysliklar bilan uchrashib hissiyot ifodasini o'rganing!",
-      "managerTitle": "Menejer",
-      "managerDesc": "K-POP idol menejeri bo'lib guruhni muvaffaqiyatga olib boring!",
-      "kpopTitle": "K-POP viktorina",
-      "kpopDesc": "K-POP qo'shiq so'zlari viktorinasi orqali koreys tilini o'rganing!",
-      "kdramaTitle": "K-Drama",
-      "kdramaDesc": "Mashhur sahnalarni dublyaj qilib talaffuzni mashq qiling!",
-      "wordChainTitle": "So'z zanjiri",
-      "wordChainDesc": "AI bilan so'z zanjiri o'yini! Lug'at boyligingizni sinang!",
-      "parttimeTitle": "Qo'shimcha ish",
-      "parttimeDesc": "Qo'shimcha ish holatlarida haqiqiy suhbatlarni mashq qiling!"
+      "chatTitle": "AI Omon qolish", "chatSubtitle": "Seul", "chatDesc": "Seulda omon qoling! AI bilan suhbat orqali koreys tilini yaxshilang!",
+      "datingTitle": "Uchrashuv simulyatori", "datingSubtitle": "Korean Dating", "datingDesc": "Virtual koreysliklar bilan uchrashib hissiyot ifodasini o'rganing!",
+      "managerTitle": "Menejer", "managerSubtitle": "K-POP Idol", "managerDesc": "K-POP idol menejeri bo'lib guruhni muvaffaqiyatga olib boring!",
+      "kpopTitle": "K-POP viktorina", "kpopSubtitle": "Music", "kpopDesc": "K-POP qo'shiq so'zlari viktorinasi orqali koreys tilini o'rganing!",
+      "kdramaTitle": "K-Drama", "kdramaSubtitle": "Dublyaj", "kdramaDesc": "Mashhur sahnalarni dublyaj qilib talaffuzni mashq qiling!",
+      "wordChainTitle": "So'z zanjiri", "wordChainSubtitle": "끝말잇기", "wordChainDesc": "AI bilan so'z zanjiri o'yini! Lug'at boyligingizni sinang!",
+      "parttimeTitle": "Qo'shimcha ish", "parttimeSubtitle": "Part-time", "parttimeDesc": "Qo'shimcha ish holatlarida haqiqiy suhbatlarni mashq qiling!"
     }
   },
   "learningHub": {
