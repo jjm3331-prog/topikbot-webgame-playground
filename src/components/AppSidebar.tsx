@@ -179,7 +179,11 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => handleNavigation("/")}
           >
-            <span className="text-2xl">🇰🇷</span>
+            <img 
+              src="/favicon.png" 
+              alt="LUKATO" 
+              className="w-9 h-9 rounded-full object-cover"
+            />
             <span className="font-heading font-bold text-lg text-foreground">LUKATO</span>
           </motion.div>
         )}
