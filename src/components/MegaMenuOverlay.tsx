@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Gamepad2,
@@ -35,7 +36,7 @@ import { toast } from "sonner";
 
 interface MenuItem {
   icon: React.ElementType;
-  label: string;
+  labelKey: string;
   href: string;
   isPremium?: boolean;
   isHighlight?: boolean;
@@ -43,7 +44,7 @@ interface MenuItem {
 }
 
 interface MenuCategory {
-  title: string;
+  titleKey: string;
   emoji?: string;
   items: MenuItem[];
 }
@@ -51,53 +52,53 @@ interface MenuCategory {
 // 기본 메뉴 (로그인 전/후 공통)
 const baseMenuCategories: MenuCategory[] = [
   {
-    title: "VIỆC LÀM",
+    titleKey: "menu.categories.jobs",
     emoji: "💼",
     items: [
-      { icon: Users, label: "Headhunting", href: "/headhunting", isPremium: true },
-      { icon: Search, label: "Báo cáo Doanh nghiệp", href: "/company-report", isPremium: true },
-      { icon: Mic, label: "Phỏng vấn Mô phỏng", href: "/interview-simulation", isPremium: true },
+      { icon: Users, labelKey: "menu.items.headhunting", href: "/headhunting", isPremium: true },
+      { icon: Search, labelKey: "menu.items.companyReport", href: "/company-report", isPremium: true },
+      { icon: Mic, labelKey: "menu.items.interviewSimulation", href: "/interview-simulation", isPremium: true },
     ]
   },
   {
-    title: "HỌC TOPIK",
+    titleKey: "menu.categories.topik",
     emoji: "📚",
     items: [
-      { icon: Sparkles, label: "Trung tâm học TOPIK", href: "/learning-hub", isHighlight: true },
-      { icon: MessageSquare, label: "Cộng đồng", href: "/board-hub", isHighlight: true },
+      { icon: Sparkles, labelKey: "menu.items.learningHub", href: "/learning-hub", isHighlight: true },
+      { icon: MessageSquare, labelKey: "menu.items.community", href: "/board-hub", isHighlight: true },
     ]
   },
   {
-    title: "GAME",
+    titleKey: "menu.categories.game",
     emoji: "🎮",
     items: [
-      { icon: Gamepad2, label: "Trung tâm Game", href: "/game-hub", isHighlight: true },
-      { icon: Swords, label: "⚔️ Đấu 1:1", href: "/battle", isHighlight: true, isBattle: true },
+      { icon: Gamepad2, labelKey: "menu.items.gameHub", href: "/game-hub", isHighlight: true },
+      { icon: Swords, labelKey: "menu.items.battle", href: "/battle", isHighlight: true, isBattle: true },
     ]
   },
   {
-    title: "AI",
+    titleKey: "menu.categories.ai",
     emoji: "🤖",
     items: [
-      { icon: MessageSquare, label: "Q&A Agent", href: "/ai-chat", isHighlight: true, isPremium: true },
-      { icon: Sparkles, label: "Biến thể đề thi", href: "/question-variant", isPremium: true },
-      { icon: PenTool, label: "Chấm bài viết", href: "/writing-correction", isPremium: true },
-      { icon: Languages, label: "Roleplay Speaking", href: "/roleplay-speaking", isPremium: true },
+      { icon: MessageSquare, labelKey: "menu.items.qnaAgent", href: "/ai-chat", isHighlight: true, isPremium: true },
+      { icon: Sparkles, labelKey: "menu.items.questionVariant", href: "/question-variant", isPremium: true },
+      { icon: PenTool, labelKey: "menu.items.writingCorrection", href: "/writing-correction", isPremium: true },
+      { icon: Languages, labelKey: "menu.items.roleplaySpeaking", href: "/roleplay-speaking", isPremium: true },
     ]
   },
 ];
 
 // 로그인 후 추가되는 "CỦA TÔI" 메뉴
 const myMenuCategory: MenuCategory = {
-  title: "CỦA TÔI",
+  titleKey: "menu.categories.my",
   emoji: "👤",
   items: [
-    { icon: User, label: "Hồ sơ", href: "/profile" },
-    { icon: Trophy, label: "Bảng xếp hạng", href: "/ranking" },
-    { icon: Star, label: "Bảng giá", href: "/pricing" },
-    { icon: Headphones, label: "Trung tâm Hỗ trợ", href: "/help-center" },
-    { icon: Notebook, label: "Điều khoản", href: "/terms" },
-    { icon: HelpCircle, label: "Chính sách", href: "/privacy" },
+    { icon: User, labelKey: "menu.items.profile", href: "/profile" },
+    { icon: Trophy, labelKey: "menu.items.ranking", href: "/ranking" },
+    { icon: Star, labelKey: "menu.items.pricing", href: "/pricing" },
+    { icon: Headphones, labelKey: "menu.items.helpCenter", href: "/help-center" },
+    { icon: Notebook, labelKey: "menu.items.terms", href: "/terms" },
+    { icon: HelpCircle, labelKey: "menu.items.privacy", href: "/privacy" },
   ],
 };
 
@@ -113,10 +114,12 @@ const MobileAccordionCategory = ({
   category,
   isActive,
   onNavigate,
+  t,
 }: {
   category: MenuCategory;
   onNavigate: (href: string, isPremium?: boolean) => void;
   isActive: (href: string) => boolean;
+  t: (key: string) => string;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const hasActiveItem = category.items.some((item) => isActive(item.href));
@@ -140,7 +143,7 @@ const MobileAccordionCategory = ({
           <span className={`text-base font-bold uppercase tracking-wide ${
             hasActiveItem ? "text-primary" : "text-foreground"
           }`}>
-            {category.title}
+            {t(category.titleKey)}
           </span>
         </div>
         <motion.div
@@ -167,8 +170,9 @@ const MobileAccordionCategory = ({
               {category.items.map((item) => {
                 const active = isActive(item.href);
                 const isBattleItem = item.isBattle;
+                const label = t(item.labelKey);
                 return (
-                  <li key={item.label}>
+                  <li key={item.labelKey}>
                     <button
                       onClick={() => onNavigate(item.href, item.isPremium)}
                       className={`group flex items-center gap-3 w-full py-3 px-4 rounded-lg text-left transition-all ${
@@ -204,7 +208,7 @@ const MobileAccordionCategory = ({
                               ? 'text-primary' 
                               : 'text-foreground'
                       }`}>
-                        {item.label}
+                        {label}
                       </span>
                       
                       {item.isPremium && !active && (
@@ -236,6 +240,7 @@ export const MegaMenuOverlay = ({
 }: MegaMenuOverlayProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const currentPath = location.pathname;
   const isMobile = useIsMobile();
   const { isPremium } = useSubscription();
@@ -252,10 +257,10 @@ export const MegaMenuOverlay = ({
   const handleNavigation = (href: string, isPremiumItem?: boolean) => {
     // Pages should still be viewable; show an upsell message for premium features.
     if (isPremiumItem && premiumRoutes.includes(href) && !isPremium) {
-      toast.message("Tính năng Premium", {
-        description: "Bạn vẫn có thể xem trang, nhưng để sử dụng đầy đủ tính năng vui lòng nâng cấp Premium.",
+      toast.message(t('menu.premiumFeature'), {
+        description: t('menu.premiumDescription'),
         action: {
-          label: "Nâng cấp",
+          label: t('menu.upgrade'),
           onClick: () => {
             onClose();
             navigate("/pricing");
@@ -298,7 +303,7 @@ export const MegaMenuOverlay = ({
         >
           {/* Full Screen Header with X & Logout */}
           <div className="flex items-center justify-between px-4 md:px-8 h-14 md:h-16 border-b border-border">
-            <span className="font-heading font-bold text-lg md:text-xl text-foreground">Menu</span>
+            <span className="font-heading font-bold text-lg md:text-xl text-foreground">{t('menu.title')}</span>
             <div className="flex items-center gap-2">
               {isLoggedIn && (
                 <Button
@@ -308,7 +313,7 @@ export const MegaMenuOverlay = ({
                   className="text-destructive hover:bg-destructive hover:text-destructive-foreground transition-colors"
                 >
                   <LogOut className="w-4 h-4 mr-2" />
-                  Logout
+                  {t('menu.logout')}
                 </Button>
               )}
               <Button
@@ -330,7 +335,7 @@ export const MegaMenuOverlay = ({
                 <div className="flex-1 pt-2">
                   {menuCategories.map((category, idx) => (
                     <motion.div
-                      key={category.title}
+                      key={category.titleKey}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: idx * 0.05 }}
@@ -339,6 +344,7 @@ export const MegaMenuOverlay = ({
                         category={category}
                         isActive={isActive}
                         onNavigate={handleNavigation}
+                        t={t}
                       />
                     </motion.div>
                   ))}
@@ -357,7 +363,7 @@ export const MegaMenuOverlay = ({
                   }`}>
                   {menuCategories.map((category, categoryIndex) => (
                     <motion.div
-                      key={category.title}
+                      key={category.titleKey}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: categoryIndex * 0.05 }}
@@ -365,7 +371,7 @@ export const MegaMenuOverlay = ({
                       {/* Category Title */}
                       <h3 className="text-sm font-bold text-foreground uppercase tracking-wider mb-4 md:mb-6 flex items-center gap-3">
                         {category.emoji && <span className="text-xl">{category.emoji}</span>}
-                        {category.title}
+                        {t(category.titleKey)}
                       </h3>
 
                       {/* Menu Items */}
@@ -373,9 +379,10 @@ export const MegaMenuOverlay = ({
                         {category.items.map((item, itemIndex) => {
                           const active = isActive(item.href);
                           const isBattleItem = item.isBattle;
+                          const label = t(item.labelKey);
                           return (
                             <motion.li
-                              key={item.label}
+                              key={item.labelKey}
                               initial={{ opacity: 0, x: -10 }}
                               animate={{ opacity: 1, x: 0 }}
                               transition={{ duration: 0.2, delay: categoryIndex * 0.05 + itemIndex * 0.03 }}
@@ -430,7 +437,7 @@ export const MegaMenuOverlay = ({
                                         ? 'text-primary group-hover:text-primary-foreground' 
                                         : 'text-foreground group-hover:text-primary'
                                 }`}>
-                                  {item.label}
+                                  {label}
                                 </span>
                                 
                                 {item.isPremium && !active && (
