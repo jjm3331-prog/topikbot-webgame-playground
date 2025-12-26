@@ -1,6 +1,9 @@
 import { ExternalLink } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const AppFooter = () => {
+  const { t } = useTranslation();
+  
   return (
     <footer className="py-5 bg-[#1a1f2e] border-t border-white/5 shrink-0">
       <div className="container mx-auto px-4">
@@ -13,7 +16,7 @@ const AppFooter = () => {
               className="w-9 h-9 rounded-full"
             />
             <span className="text-white/50 text-card-caption">
-              Your Korean Mentor
+              {t('brand.tagline')}
             </span>
           </div>
 
@@ -26,7 +29,7 @@ const AppFooter = () => {
               className="flex items-center gap-2 text-card-caption text-white/60 hover:text-white/90 transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
-              Hanoi Official
+              {t('footer.hanoi')}
             </a>
             <a 
               href="https://chat-topikbot.kr" 
@@ -35,7 +38,7 @@ const AppFooter = () => {
               className="flex items-center gap-2 text-card-caption text-white/60 hover:text-white/90 transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
-              Q&A Agent
+              {t('footer.qnaAgent')}
             </a>
             <a 
               href="/admin-login" 
@@ -44,14 +47,13 @@ const AppFooter = () => {
               className="flex items-center gap-2 text-card-caption text-white/60 hover:text-white/90 transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
-              ADMIN
+              {t('footer.admin')}
             </a>
           </div>
 
           {/* Copyright */}
           <p className="text-white/40 text-card-caption">
-            © 2025 Powered by{" "}
-            <span className="text-white/60 font-medium">LUKAS Edutainment</span>
+            {t('footer.copyright')}
           </p>
         </div>
       </div>

@@ -458,5 +458,11 @@
     "loading": "문제 로딩 중...",
     "gameComplete": "게임 완료!",
     "playAgain": "다시 하기"
+  },
+  "footer": {
+    "hanoi": "하노이 공식",
+    "qnaAgent": "Q&A Agent",
+    "admin": "ADMIN",
+    "copyright": "© 2025 Powered by LUKAS Edutainment"
   }
 }

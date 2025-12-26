@@ -541,5 +541,11 @@
     "loading": "Đang tải câu hỏi...",
     "gameComplete": "Hoàn thành!",
     "playAgain": "Chơi lại"
+  },
+  "footer": {
+    "hanoi": "Hanoi Official",
+    "qnaAgent": "Q&A Agent",
+    "admin": "ADMIN",
+    "copyright": "© 2025 Powered by LUKAS Edutainment"
   }
 }

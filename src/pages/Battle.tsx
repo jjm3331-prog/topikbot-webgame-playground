@@ -14,9 +14,9 @@ import { toast } from "sonner";
 
 interface BattleGame {
   id: string;
-  name: string;
-  nameKo: string;
-  description: string;
+  nameKey: string;
+  nameKoKey: string;
+  descriptionKey: string;
   icon: React.ElementType;
   available: boolean;
   comingSoon?: boolean;
@@ -26,36 +26,36 @@ interface BattleGame {
 const battleGames: BattleGame[] = [
   {
     id: "word-chain",
-    name: "Nối từ 1:1",
-    nameKo: "끝말잇기 대결",
-    description: "Nối từ theo âm tiết cuối! 12 giây mỗi lượt.",
+    nameKey: "battle.wordChain",
+    nameKoKey: "battle.wordChainKo",
+    descriptionKey: "battle.wordChainDesc",
     icon: Link2,
     available: true,
     gradient: "from-yellow-400 to-orange-500",
   },
   {
     id: "semantic",
-    name: "Đấu Nghĩa 1:1",
-    nameKo: "의미 연결 대결",
-    description: "Nối từ theo ý nghĩa! AI chấm điểm liên quan.",
+    nameKey: "battle.semantic",
+    nameKoKey: "battle.semanticKo",
+    descriptionKey: "battle.semanticDesc",
     icon: Brain,
     available: true,
     gradient: "from-purple-500 to-pink-500",
   },
   {
     id: "speed-quiz",
-    name: "Quiz tốc độ",
-    nameKo: "스피드 퀴즈",
-    description: "Ai trả lời nhanh và đúng hơn sẽ thắng!",
+    nameKey: "battle.speedQuiz",
+    nameKoKey: "battle.speedQuizKo",
+    descriptionKey: "battle.speedQuizDesc",
     icon: Zap,
     available: false,
     comingSoon: true,
   },
   {
     id: "dictation",
-    name: "Nghe viết",
-    nameKo: "받아쓰기 대결",
-    description: "Nghe và viết lại tiếng Hàn chính xác nhất!",
+    nameKey: "battle.dictation",
+    nameKoKey: "battle.dictationKo",
+    descriptionKey: "battle.dictationDesc",
     icon: Crown,
     available: false,
     comingSoon: true,
@@ -70,6 +70,7 @@ interface RoomInfo {
 
 export default function Battle() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); // null = loading
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
@@ -142,23 +143,23 @@ export default function Battle() {
         if (error) throw error;
 
         if (!data) {
-          setRoomError("Phòng không tồn tại");
+          setRoomError(t('battle.roomNotExists'));
         } else if (data.status === "playing" || data.status === "finished") {
-          setRoomError("Phòng đã bắt đầu hoặc kết thúc");
+          setRoomError(t('battle.roomStartedOrFinished'));
         } else if (data.guest_id) {
-          setRoomError("Phòng đã đầy");
+          setRoomError(t('battle.roomFull'));
         } else {
           setRoomInfo(data);
         }
       } catch (err) {
-        setRoomError("Không thể tải thông tin phòng");
+        setRoomError(t('battle.roomNotAvailable'));
       } finally {
         setLoadingRoom(false);
       }
     };
 
     fetchRoomInfo();
-  }, [initialRoomCode, inviteGame]);
+  }, [initialRoomCode, inviteGame, t]);
 
   // Handle invite flow: redirect to auth if not logged in, show modal if logged in
   useEffect(() => {
@@ -198,15 +199,15 @@ export default function Battle() {
 
   const handleSelectGame = (game: BattleGame) => {
     if (!game.available) {
-      toast.info("Sắp ra mắt!", { description: "Tính năng này đang được phát triển." });
+      toast.info(t('battle.comingSoon'), { description: t('battle.developing') });
       return;
     }
 
     if (!isLoggedIn) {
-      toast.error("Vui lòng đăng nhập", {
-        description: "Bạn cần đăng nhập để chơi 1:1 với người khác.",
+      toast.error(t('battle.loginRequired'), {
+        description: t('battle.loginDesc'),
         action: {
-          label: "Đăng nhập",
+          label: t('common.login'),
           onClick: () => navigate("/auth"),
         },
       });
@@ -309,10 +310,10 @@ export default function Battle() {
                   </motion.div>
                   
                   <h2 className={`text-2xl sm:text-3xl font-black mb-1 bg-gradient-to-r ${inviteGame === "semantic" ? "from-purple-400 to-pink-400" : "from-yellow-400 to-orange-400"} bg-clip-text text-transparent`}>
-                    {inviteGame === "semantic" ? "Đấu Nghĩa 1:1" : "Nối từ 1:1"}
+                    {t(inviteGame === "semantic" ? 'battle.semantic' : 'battle.wordChain')}
                   </h2>
                   <p className="text-muted-foreground text-sm">
-                    {inviteGame === "semantic" ? "의미 연결 대결" : "끝말잇기 대결"}
+                    {t(inviteGame === "semantic" ? 'battle.semanticKo' : 'battle.wordChainKo')}
                   </p>
                 </div>
 
@@ -325,7 +326,7 @@ export default function Battle() {
                         transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
                         className={`w-16 h-16 rounded-full border-4 border-muted ${inviteGame === "semantic" ? "border-t-purple-500" : "border-t-orange-500"} mx-auto mb-4`}
                       />
-                      <p className="text-muted-foreground">Đang tải thông tin phòng...</p>
+                      <p className="text-muted-foreground">{t('battle.loadingRoom')}</p>
                     </div>
                   ) : roomError ? (
                     <div className="py-6 text-center">
@@ -334,14 +335,14 @@ export default function Battle() {
                       </div>
                       <p className="text-destructive font-bold text-lg mb-2">{roomError}</p>
                       <p className="text-sm text-muted-foreground mb-6">
-                        Phòng này không còn khả dụng.
+                        {t('battle.roomNotAvailable')}
                       </p>
                       <Button
                         onClick={handleCloseInviteModal}
                         variant="outline"
                         className="w-full h-12"
                       >
-                        Đóng
+                        {t('battle.close')}
                       </Button>
                     </div>
                   ) : (
@@ -354,7 +355,7 @@ export default function Battle() {
                           transition={{ delay: 0.2 }}
                           className="mb-6 p-5 bg-gradient-to-br from-muted/50 to-muted/30 rounded-2xl border border-border/50"
                         >
-                          <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">Chủ phòng đang chờ bạn</p>
+                          <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">{t('battle.hostWaiting')}</p>
                           <div className="flex items-center justify-center gap-3">
                             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
                               <Crown className="w-6 h-6 text-white" />
@@ -371,7 +372,7 @@ export default function Battle() {
                         transition={{ delay: 0.3 }}
                         className="mb-6 text-center"
                       >
-                        <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">Mã phòng</p>
+                        <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">{t('battle.roomCode')}</p>
                         <p className={`text-4xl sm:text-5xl font-mono font-black tracking-[0.3em] bg-gradient-to-r ${inviteGame === "semantic" ? "from-purple-400 to-pink-400" : "from-yellow-400 to-orange-400"} bg-clip-text text-transparent`}>
                           {initialRoomCode}
                         </p>
@@ -395,7 +396,7 @@ export default function Battle() {
                           ) : (
                             <>
                               <Play className="w-7 h-7 mr-3" />
-                              Tham gia ngay!
+                              {t('battle.joinNow')}
                             </>
                           )}
                         </Button>
@@ -410,12 +411,12 @@ export default function Battle() {
                       >
                         <div className="flex items-center gap-1.5">
                           <Timer className="w-4 h-4" />
-                          <span>12 giây/lượt</span>
+                          <span>{t('battle.secondsPerTurn')}</span>
                         </div>
                         <div className="w-1 h-1 rounded-full bg-muted-foreground" />
                         <div className="flex items-center gap-1.5">
                           <AlertTriangle className="w-4 h-4" />
-                          <span>2 cảnh báo = thua</span>
+                          <span>{t('battle.warnings')}</span>
                         </div>
                       </motion.div>
                     </>
@@ -456,13 +457,13 @@ export default function Battle() {
               {/* Title */}
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight mb-4">
                 <span className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
-                  Đấu trường 1:1
+                  {t('battle.heroTitle')}
                 </span>
               </h1>
               
               {/* Subtitle */}
               <p className="text-xl sm:text-2xl text-muted-foreground mb-8">
-                1:1 실시간 대결 / Đối đầu thời gian thực
+                {t('battle.heroSubtitle')}
               </p>
               
               {/* Points Badge */}
@@ -474,7 +475,7 @@ export default function Battle() {
               >
                 <Trophy className="w-6 h-6 text-yellow-500" />
                 <span className="text-lg font-bold text-yellow-600 dark:text-yellow-400">
-                  Thắng = +1,000 điểm!
+                  {t('battle.heroSubtitle')}
                 </span>
               </motion.div>
             </motion.div>
@@ -495,12 +496,12 @@ export default function Battle() {
                       <Users className="w-6 h-6 text-primary" />
                     </div>
                     <div>
-                      <p className="font-semibold text-lg">Đăng nhập để tham gia</p>
-                      <p className="text-sm text-muted-foreground">Đối đầu 1:1 với người chơi khác trong thời gian thực!</p>
+                      <p className="font-semibold text-lg">{t('battle.loginRequired')}</p>
+                      <p className="text-sm text-muted-foreground">{t('battle.loginToPlay')}</p>
                     </div>
                   </div>
                   <Button onClick={() => navigate("/auth")} size="lg" className="px-8">
-                    Đăng nhập
+                    {t('common.login')}
                   </Button>
                 </div>
               </Card>
@@ -547,7 +548,7 @@ export default function Battle() {
                     {game.comingSoon && (
                       <div className="absolute top-4 right-4">
                         <span className="px-3 py-1.5 text-xs font-bold bg-muted text-muted-foreground rounded-full border border-border">
-                          Sắp ra mắt
+                          {t('battle.comingSoon')}
                         </span>
                       </div>
                     )}
@@ -568,15 +569,15 @@ export default function Battle() {
 
                       <div className="flex-1 pt-1">
                         <h3 className="text-2xl sm:text-3xl font-black mb-1 group-hover:text-primary transition-colors">
-                          {game.name}
+                          {t(game.nameKey)}
                         </h3>
-                        <p className="text-sm text-muted-foreground font-medium">{game.nameKo}</p>
+                        <p className="text-sm text-muted-foreground font-medium">{t(game.nameKoKey)}</p>
                       </div>
                     </div>
 
                     {/* Description */}
                     <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                      {game.description}
+                      {t(game.descriptionKey)}
                     </p>
 
                     {/* Play Button */}
@@ -586,7 +587,7 @@ export default function Battle() {
                           className={`w-full h-14 text-lg font-bold gap-3 bg-gradient-to-r ${game.gradient || "from-yellow-500 to-orange-500"} hover:opacity-90 shadow-lg transition-all duration-300`}
                         >
                           <Swords className="w-5 h-5" />
-                          Đấu ngay
+                          {t('common.playNow')}
                         </Button>
                       </motion.div>
                     )}
@@ -614,7 +615,7 @@ export default function Battle() {
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
                     <Trophy className="w-6 h-6 text-white" />
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-black">Quy tắc đấu trường</h2>
+                  <h2 className="text-2xl sm:text-3xl font-black">{t('battle.rules')}</h2>
                 </div>
                 
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -623,8 +624,8 @@ export default function Battle() {
                       <Users className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <p className="font-semibold text-lg">Đăng nhập bắt buộc</p>
-                      <p className="text-sm text-muted-foreground">Chỉ thành viên mới tham gia được</p>
+                      <p className="font-semibold text-lg">{t('battle.loginRequired')}</p>
+                      <p className="text-sm text-muted-foreground">{t('battle.loginDesc')}</p>
                     </div>
                   </div>
                   
@@ -633,8 +634,8 @@ export default function Battle() {
                       <Zap className="w-5 h-5 text-yellow-500" />
                     </div>
                     <div>
-                      <p className="font-semibold text-lg">12 giây mỗi lượt</p>
-                      <p className="text-sm text-muted-foreground">Tốc độ là chìa khóa chiến thắng</p>
+                      <p className="font-semibold text-lg">{t('battle.secondsPerTurn')}</p>
+                      <p className="text-sm text-muted-foreground">{t('battle.howToPlay')}</p>
                     </div>
                   </div>
                   
@@ -643,8 +644,8 @@ export default function Battle() {
                       <X className="w-5 h-5 text-destructive" />
                     </div>
                     <div>
-                      <p className="font-semibold text-lg">2 cảnh báo = thua</p>
-                      <p className="text-sm text-muted-foreground">Được phép sai 1 lần duy nhất</p>
+                      <p className="font-semibold text-lg">{t('battle.warnings')}</p>
+                      <p className="text-sm text-muted-foreground">{t('battle.developing')}</p>
                     </div>
                   </div>
                   
@@ -653,8 +654,8 @@ export default function Battle() {
                       <Crown className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-bold text-lg text-yellow-600 dark:text-yellow-400">Thắng = +1,000 điểm!</p>
-                      <p className="text-sm text-muted-foreground">Tích điểm để lên hạng TOPIK</p>
+                      <p className="font-bold text-lg text-yellow-600 dark:text-yellow-400">{t('battle.winPoints')}</p>
+                      <p className="text-sm text-muted-foreground">{t('battle.heroSubtitle')}</p>
                     </div>
                   </div>
                 </div>
