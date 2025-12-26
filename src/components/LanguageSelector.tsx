@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Check, Globe } from 'lucide-react';
+import { ChevronDown, Check, Globe, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { languages, type LanguageCode } from '@/i18n/config';
 
 export const LanguageSelector = () => {
   const { i18n, t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const [hoveredLang, setHoveredLang] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
 
@@ -16,91 +18,206 @@ export const LanguageSelector = () => {
     setIsOpen(false);
   };
 
+  // Close on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
+
   return (
-    <div className="relative">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => setIsOpen(!isOpen)}
-        className="h-9 sm:h-10 px-2.5 sm:px-3 gap-1.5 sm:gap-2 rounded-full hover:bg-muted/80 border border-border/50 hover:border-border transition-all duration-200"
+    <div className="relative" ref={containerRef}>
+      {/* Trigger Button with Premium Glow Effect */}
+      <motion.div
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
       >
-        <span className="text-lg sm:text-xl drop-shadow-sm">{currentLanguage.flag}</span>
-        <span className="hidden sm:inline text-xs font-semibold text-foreground">
-          {currentLanguage.code.toUpperCase()}
-        </span>
-        <motion.span
-          animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsOpen(!isOpen)}
+          className="relative h-10 sm:h-11 px-3 sm:px-4 gap-2 rounded-xl bg-gradient-to-r from-background/80 to-muted/50 hover:from-muted/80 hover:to-muted/60 border border-border/40 hover:border-primary/30 shadow-sm hover:shadow-md hover:shadow-primary/10 transition-all duration-300 group overflow-hidden"
         >
-          <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
-        </motion.span>
-      </Button>
+          {/* Shimmer Effect */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent -skew-x-12"
+            initial={{ x: '-100%' }}
+            animate={isOpen ? { x: '200%' } : { x: '-100%' }}
+            transition={{ duration: 0.8, ease: 'easeInOut' }}
+          />
+          
+          {/* Flag with Bounce */}
+          <motion.span 
+            className="text-xl sm:text-2xl drop-shadow-md relative z-10"
+            animate={{ 
+              rotate: isOpen ? [0, -10, 10, 0] : 0,
+            }}
+            transition={{ duration: 0.4 }}
+          >
+            {currentLanguage.flag}
+          </motion.span>
+          
+          {/* Language Code Badge */}
+          <span className="hidden sm:inline text-xs font-bold text-foreground/90 bg-muted/60 px-2 py-0.5 rounded-md relative z-10">
+            {currentLanguage.code.toUpperCase()}
+          </span>
+          
+          {/* Animated Chevron */}
+          <motion.span
+            animate={{ rotate: isOpen ? 180 : 0 }}
+            transition={{ duration: 0.3, type: 'spring', stiffness: 200 }}
+            className="relative z-10"
+          >
+            <ChevronDown className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors duration-200" />
+          </motion.span>
+        </Button>
+      </motion.div>
 
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
+            {/* Backdrop with Blur */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40"
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-40 bg-background/20 backdrop-blur-sm"
               onClick={() => setIsOpen(false)}
             />
 
-            {/* Dropdown */}
+            {/* Premium Dropdown */}
             <motion.div
-              initial={{ opacity: 0, y: -10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
+              initial={{ opacity: 0, y: -15, scale: 0.9, rotateX: -10 }}
+              animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              transition={{ duration: 0.2, type: "spring", stiffness: 300, damping: 25 }}
-              className="absolute right-0 top-full mt-2 z-50 min-w-[220px] bg-popover/95 backdrop-blur-xl border border-border/50 rounded-2xl shadow-2xl overflow-hidden"
+              transition={{ 
+                duration: 0.3, 
+                type: "spring", 
+                stiffness: 400, 
+                damping: 25 
+              }}
+              className="absolute right-0 top-full mt-3 z-50 min-w-[260px] bg-gradient-to-br from-popover via-popover to-muted/30 backdrop-blur-xl border border-border/30 rounded-2xl shadow-2xl shadow-primary/5 overflow-hidden"
+              style={{ transformOrigin: 'top right' }}
             >
+              {/* Decorative Top Gradient */}
+              <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
+              
               {/* Header */}
-              <div className="px-4 py-3 border-b border-border/50 bg-muted/30">
-                <div className="flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-semibold text-foreground">{t("language.select")}</span>
+              <div className="relative px-5 py-4 border-b border-border/30">
+                <div className="flex items-center gap-2.5">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+                    className="p-2 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20"
+                  >
+                    <Globe className="w-4 h-4 text-primary" />
+                  </motion.div>
+                  <div>
+                    <span className="text-sm font-bold text-foreground">{t("language.select")}</span>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <Sparkles className="w-3 h-3 text-amber-500" />
+                      <span className="text-[10px] text-muted-foreground font-medium">7 Languages</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Language list */}
-              <div className="p-2 max-h-[320px] overflow-y-auto">
+              {/* Language List */}
+              <div className="relative p-2.5 max-h-[340px] overflow-y-auto custom-scrollbar">
                 {languages.map((lang, index) => {
                   const isActive = lang.code === i18n.language;
+                  const isHovered = hoveredLang === lang.code;
+                  
                   return (
                     <motion.button
                       key={lang.code}
-                      initial={{ opacity: 0, x: -10 }}
+                      initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.03 }}
+                      transition={{ delay: index * 0.04, type: 'spring', stiffness: 300 }}
                       onClick={() => handleLanguageChange(lang.code)}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-200 ${
+                      onMouseEnter={() => setHoveredLang(lang.code)}
+                      onMouseLeave={() => setHoveredLang(null)}
+                      className={`relative w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-left transition-all duration-300 group/item overflow-hidden ${
                         isActive
-                          ? 'bg-primary text-primary-foreground shadow-md'
-                          : 'hover:bg-muted/80'
+                          ? 'bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25'
+                          : 'hover:bg-muted/70'
                       }`}
                     >
-                      <span className="text-xl drop-shadow-sm">{lang.flag}</span>
-                      <div className="flex-1 min-w-0">
-                        <span className={`block text-sm font-semibold truncate ${
-                          isActive ? 'text-primary-foreground' : 'text-foreground'
+                      {/* Hover Glow Effect */}
+                      {!isActive && isHovered && (
+                        <motion.div
+                          layoutId="hoverGlow"
+                          className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-xl"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                        />
+                      )}
+                      
+                      {/* Active Indicator Line */}
+                      {isActive && (
+                        <motion.div
+                          layoutId="activeLine"
+                          className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary-foreground/40 rounded-r-full"
+                          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                        />
+                      )}
+                      
+                      {/* Flag with Animation */}
+                      <motion.span 
+                        className="text-2xl drop-shadow-md relative z-10"
+                        animate={isHovered && !isActive ? { 
+                          scale: [1, 1.2, 1],
+                          rotate: [0, -5, 5, 0]
+                        } : {}}
+                        transition={{ duration: 0.4 }}
+                      >
+                        {lang.flag}
+                      </motion.span>
+                      
+                      {/* Language Info */}
+                      <div className="flex-1 min-w-0 relative z-10">
+                        <span className={`block text-sm font-bold truncate transition-colors duration-200 ${
+                          isActive ? 'text-primary-foreground' : 'text-foreground group-hover/item:text-foreground'
                         }`}>
                           {lang.nativeName}
                         </span>
-                        <span className={`block text-[11px] truncate ${
+                        <span className={`block text-[11px] truncate transition-colors duration-200 ${
                           isActive ? 'text-primary-foreground/70' : 'text-muted-foreground'
                         }`}>
                           {lang.name}
                         </span>
                       </div>
+                      
+                      {/* Check Badge */}
                       {isActive && (
                         <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="flex-shrink-0 w-5 h-5 rounded-full bg-primary-foreground/20 flex items-center justify-center"
+                          initial={{ scale: 0, rotate: -180 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                          className="relative z-10 flex-shrink-0 w-6 h-6 rounded-full bg-primary-foreground/25 backdrop-blur-sm flex items-center justify-center border border-primary-foreground/20"
                         >
-                          <Check className="w-3 h-3 text-primary-foreground" />
+                          <Check className="w-3.5 h-3.5 text-primary-foreground" strokeWidth={3} />
+                        </motion.div>
+                      )}
+                      
+                      {/* Hover Arrow */}
+                      {!isActive && (
+                        <motion.div
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={isHovered ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
+                          className="relative z-10"
+                        >
+                          <ChevronDown className="w-4 h-4 text-primary -rotate-90" />
                         </motion.div>
                       )}
                     </motion.button>
@@ -108,11 +225,16 @@ export const LanguageSelector = () => {
                 })}
               </div>
 
-              {/* Footer hint */}
-              <div className="px-4 py-2 border-t border-border/50 bg-muted/20">
-                <p className="text-[10px] text-muted-foreground text-center">
+              {/* Footer */}
+              <div className="relative px-5 py-3 border-t border-border/30 bg-muted/20">
+                <motion.p 
+                  className="text-[10px] text-muted-foreground text-center font-medium"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
                   {t("language.hint")}
-                </p>
+                </motion.p>
               </div>
             </motion.div>
           </>
