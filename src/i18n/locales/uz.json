@@ -445,5 +445,95 @@
     "noQuestionsLeft": "Bugungi bepul savollar tugadi", "upgradePremiumBtn": "Premium ga yangilash", "uploadImage": "Rasm yuklash", "voiceInput": "Ovozli kiritish",
     "placeholder": "Savolingizni kiriting... 💬", "hint": "Jo'natish uchun Enter • Yangi qator uchun Shift+Enter"
   },
+  "writing": {
+    "title": "Yozuv tekshiruvi", "subtitle": "TOPIK II yozuv tekshiruvi", "premiumFeature": "Premium xususiyat",
+    "questionUpload": "Savol rasmini yuklash", "answerUpload": "Javob rasmini yuklash", "answerText": "Javobni kiriting",
+    "submit": "Tekshirish", "processing": "AI tekshirmoqda...", "save": "Saqlash", "export": "PDF eksport",
+    "overallScore": "Umumiy ball", "grammarScore": "Grammatika", "vocabularyScore": "Lug'at",
+    "structureScore": "Struktura", "contentScore": "Mazmun", "corrections": "Tuzatishlar",
+    "strengths": "Kuchli tomonlar", "improvements": "Tavsiyalar", "modelAnswer": "Namuna javob",
+    "history": "Tarix", "freeUsage": "Bepul foydalanish", "nextFree": "Keyingi bepul",
+    "uploadLimit": "Maksimum 10 ta rasm", "missingInfo": "Savol va javobni yuklang"
+  },
+  "interview": {
+    "title": "Intervyu simulyatsiyasi", "subtitle": "Koreya kompaniyalari intervyu mashqi",
+    "selectCompany": "Kompaniyani tanlang", "selectPosition": "Lavozimni tanlang", "selectInterviewer": "Intervyuer turini tanlang",
+    "friendly": "Do'stona", "strict": "Qat'iy", "pressure": "Stress", "technical": "Texnik",
+    "startInterview": "Intervyuni boshlash", "endInterview": "Tugatish", "micAccess": "Mikrofonga ruxsat bering",
+    "recording": "Yozib olmoqda...", "processing": "Qayta ishlanmoqda...", "ttsEnabled": "Ovoz yoqildi", "ttsDisabled": "Ovoz o'chirildi",
+    "evaluation": "Intervyu bahosi", "overall": "Umumiy baho", "content": "Mazmun", "communication": "Muloqot",
+    "korean": "Koreys tili", "attitude": "Munosabat", "jobFit": "Lavozimga moslik",
+    "strengths": "Kuchli tomonlar", "improvements": "Yaxshilash", "tips": "Maslahatlar", "grade": "Daraja",
+    "restart": "Qaytadan boshlash", "backToCareer": "Karyera markaziga"
+  },
+  "kdrama": {
+    "title": "K-Drama dublyaji", "subtitle": "Dublyaj orqali talaffuzni mashq qiling",
+    "genre": "Janr", "romantic": "Romantika", "action": "Ekshon", "fantasy": "Fantaziya", "thriller": "Triller",
+    "difficulty": "Qiyinlik", "easy": "Oson", "normal": "O'rtacha", "hard": "Qiyin",
+    "timer": "Taymer", "timerOn": "Taymer ON", "timerOff": "Taymer OFF",
+    "play": "Ijro etish", "record": "Yozish", "stop": "To'xtatish", "processing": "Qayta ishlanmoqda...",
+    "accuracy": "Aniqlik", "grade": "Daraja", "score": "Ball", "attempts": "Urinishlar",
+    "complete": "Dublyaj tugallandi", "avgScore": "O'rtacha ball", "playAgain": "Yana o'ynash",
+    "backToDashboard": "Bosh sahifaga", "loading": "Yuklanmoqda...", "loadError": "Yuklash xatosi"
+  },
+  "dating": {
+    "title": "Tanishuv simulyatori", "subtitle": "Uchrashuvlar orqali koreys tilini o'rganing",
+    "swipeLeft": "O'tkazib yuborish", "swipeRight": "Yoqdi", "match": "Mos keldi!",
+    "startChat": "Chatni boshlash", "affinity": "Yoqtirish", "sendMessage": "Xabar yuborish",
+    "spin": "Omad g'ildiragi", "mbti": "MBTI mosligi", "miniGame": "Mini o'yin",
+    "couplePhoto": "Juftlik surати", "generating": "Yaratilmoqda...",
+    "noProfiles": "Profillar qolmadi", "restart": "Qaytadan boshlash",
+    "ending": "Yakunlanish", "romantic": "Romantik", "dramatic": "Dramatik",
+    "tsundere": "Tsundere", "friend": "Do'stlik"
+  },
+  "manager": {
+    "title": "LUKATO menejeri", "subtitle": "K-POP menejment RPG",
+    "groupSetup": "Guruh sozlamalari", "groupName": "Guruh nomi", "gender": "Jins",
+    "male": "Erkaklar guruhi", "female": "Ayollar guruhi", "mixed": "Aralash",
+    "concept": "Konsept", "fresh": "Yangi", "crush": "Crush", "hiphop": "Hip-hop",
+    "retro": "Retro", "dark": "Qorong'i", "band": "Band",
+    "startGame": "O'yinni boshlash", "loading": "Yuklanmoqda...",
+    "chapter": "{{number}}-bob", "prologue": "Muqaddima", "dialogue": "Dialog",
+    "mission": "Vazifa", "submit": "Yuborish", "evaluating": "Baholanmoqda...",
+    "score": "Ball", "statChanges": "Statistika o'zgarishlari", "continue": "Davom etish",
+    "mental": "Mental", "chemistry": "Kimyo", "mediaTone": "Media toni", "rumor": "G'iybat",
+    "result": "Natija", "exit": "Chiqish"
+  },
+  "headhunting": {
+    "title": "Headhunting", "subtitle": "Koreya kompaniyalariga ulanish",
+    "history": "Ariza tarixi", "newApplication": "Yangi ariza", "edit": "Tahrirlash", "delete": "O'chirish",
+    "status": { "pending": "Ko'rib chiqilmoqda", "reviewing": "Tekshirilmoqda", "matched": "Mos keldi", "rejected": "Rad etildi", "hired": "Qabul qilindi" },
+    "form": {
+      "basicInfo": "Asosiy ma'lumot", "fullName": "To'liq ism", "email": "Email", "phone": "Telefon", "birthYear": "Tug'ilgan yil",
+      "education": "Ta'lim", "educationLevel": "Daraja", "university": "Universitet", "major": "Mutaxassislik", "graduationYear": "Tugatish yili",
+      "experience": "Tajriba", "yearsOfExp": "Yillar", "currentJob": "Joriy lavozim", "currentCompany": "Joriy kompaniya", "expDetails": "Tajriba tafsilotlari",
+      "preferences": "Afzalliklar", "jobType": "Ish turi", "industry": "Sanoat", "location": "Joylashuv", "salaryRange": "Maosh",
+      "introduction": "O'zini tanishtirish", "strengths": "Kuchli tomonlar", "careerGoals": "Karyera maqsadlari", "additionalSkills": "Qo'shimcha ko'nikmalar",
+      "documents": "Hujjatlar", "resume": "Rezyume", "coverLetter": "Motivatsion xat", "portfolio": "Portfolio"
+    },
+    "submit": "Ariza berish", "submitting": "Yuborilmoqda...", "submitSuccess": "Ariza yuborildi", "submitError": "Yuborish xatosi"
+  },
+  "reading": {
+    "title": "O'qish A", "subtitle": "Asosiy o'qib tushunish",
+    "grammar": "Grammatika", "vocabulary": "Lug'at/Ma'no", "topic": "Mavzuni aniqlash", "advertisement": "Reklama/E'lon",
+    "selectLevel": "Darajani tanlang", "beginner": "Boshlang'ich", "intermediate": "O'rta", "advanced": "Yuqori",
+    "question": "Savol {{current}}/{{total}}", "score": "Ball",
+    "submit": "Yuborish", "next": "Keyingi", "restart": "Qaytadan",
+    "correct": "To'g'ri", "wrong": "Noto'g'ri", "explanation": "Tushuntirish",
+    "complete": "Tugadi", "accuracy": "Aniqlik", "goBack": "Orqaga",
+    "loading": "Yuklanmoqda...", "reload": "Qayta yuklash", "noQuestions": "Savollar yo'q"
+  },
+  "listening": {
+    "title": "Tinglash mashqi", "subtitle": "AI TTS bilan tinglash mashqi",
+    "selectLevel": "Darajani tanlang", "beginner": "Boshlang'ich", "intermediate": "O'rta", "advanced": "Yuqori",
+    "speedControl": "Tezlik nazorati", "slow": "Sekin", "normal": "Oddiy",
+    "play": "Ijro etish", "pause": "Pauza", "replay": "Qayta ijro",
+    "dialogue": "Dialog", "single": "Yakka", "speaker": "Gapiruvchi",
+    "question": "Savol {{current}}/{{total}}", "score": "Ball",
+    "submit": "Yuborish", "next": "Keyingi", "restart": "Qaytadan", "newQuestions": "Yangi savollar",
+    "correct": "To'g'ri", "wrong": "Noto'g'ri", "explanation": "Tushuntirish",
+    "complete": "Tugadi", "accuracy": "Aniqlik", "goBack": "Orqaga",
+    "loading": "Yuklanmoqda...", "ttsError": "Ovoz xatosi"
+  },
   "footer": { "hanoi": "Xanoy rasmiy", "qnaAgent": "Q&A Agent", "admin": "ADMIN", "copyright": "© 2025 Powered by LUKAS Edutainment" }
 }

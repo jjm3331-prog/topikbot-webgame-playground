@@ -445,5 +445,95 @@
     "noQuestionsLeft": "本日の無料質問回数を使い切りました", "upgradePremiumBtn": "Premiumにアップグレード", "uploadImage": "画像をアップロード", "voiceInput": "音声入力",
     "placeholder": "質問を入力... 💬", "hint": "Enterで送信 • Shift+Enterで改行"
   },
+  "writing": {
+    "title": "作文添削", "subtitle": "TOPIK II 作文添削", "premiumFeature": "プレミアム機能",
+    "questionUpload": "問題画像をアップロード", "answerUpload": "答案画像をアップロード", "answerText": "答案を入力",
+    "submit": "添削を送信", "processing": "AI添削中...", "save": "結果を保存", "export": "PDFエクスポート",
+    "overallScore": "総合スコア", "grammarScore": "文法スコア", "vocabularyScore": "語彙スコア",
+    "structureScore": "構成スコア", "contentScore": "内容スコア", "corrections": "修正提案",
+    "strengths": "長所", "improvements": "改善点", "modelAnswer": "模範解答",
+    "history": "履歴", "freeUsage": "無料使用", "nextFree": "次の無料",
+    "uploadLimit": "最大10枚", "missingInfo": "問題と答案をアップロードしてください"
+  },
+  "interview": {
+    "title": "面接シミュレーション", "subtitle": "韓国企業面接練習",
+    "selectCompany": "企業を選択", "selectPosition": "職種を選択", "selectInterviewer": "面接官タイプを選択",
+    "friendly": "フレンドリー", "strict": "厳格", "pressure": "プレッシャー", "technical": "技術面接",
+    "startInterview": "面接開始", "endInterview": "面接終了", "micAccess": "マイクへのアクセスを許可してください",
+    "recording": "録音中...", "processing": "処理中...", "ttsEnabled": "音声オン", "ttsDisabled": "音声オフ",
+    "evaluation": "面接評価", "overall": "総合評価", "content": "内容", "communication": "コミュニケーション",
+    "korean": "韓国語力", "attitude": "態度", "jobFit": "職種適性",
+    "strengths": "長所", "improvements": "改善点", "tips": "アドバイス", "grade": "グレード",
+    "restart": "やり直す", "backToCareer": "キャリアセンターへ"
+  },
+  "kdrama": {
+    "title": "韓ドラ吹替", "subtitle": "吹き替えで発音練習",
+    "genre": "ジャンル", "romantic": "ロマンス", "action": "アクション", "fantasy": "ファンタジー", "thriller": "スリラー",
+    "difficulty": "難易度", "easy": "簡単", "normal": "普通", "hard": "難しい",
+    "timer": "タイマー", "timerOn": "タイマーON", "timerOff": "タイマーOFF",
+    "play": "再生", "record": "録音", "stop": "停止", "processing": "処理中...",
+    "accuracy": "正確度", "grade": "グレード", "score": "スコア", "attempts": "チャレンジ回数",
+    "complete": "吹き替え完了", "avgScore": "平均スコア", "playAgain": "もう一度",
+    "backToDashboard": "ダッシュボードへ", "loading": "読み込み中...", "loadError": "読み込み失敗"
+  },
+  "dating": {
+    "title": "恋愛シミュレーター", "subtitle": "デートで韓国語表現を学ぶ",
+    "swipeLeft": "スキップ", "swipeRight": "いいね", "match": "マッチ成功",
+    "startChat": "チャット開始", "affinity": "好感度", "sendMessage": "メッセージ送信",
+    "spin": "ラッキースピン", "mbti": "MBTI相性", "miniGame": "ミニゲーム",
+    "couplePhoto": "カップル写真", "generating": "生成中...",
+    "noProfiles": "プロフィールがありません", "restart": "最初から",
+    "ending": "エンディング", "romantic": "ロマンティック", "dramatic": "ドラマティック",
+    "tsundere": "ツンデレ", "friend": "友達エンド"
+  },
+  "manager": {
+    "title": "LUKATOマネージャー", "subtitle": "K-POPマネジメントRPG",
+    "groupSetup": "グループ設定", "groupName": "グループ名", "gender": "性別",
+    "male": "男性グループ", "female": "女性グループ", "mixed": "混合",
+    "concept": "コンセプト", "fresh": "清涼", "crush": "クラッシュ", "hiphop": "ヒップホップ",
+    "retro": "レトロ", "dark": "ダーク", "band": "バンド",
+    "startGame": "ゲーム開始", "loading": "読み込み中...",
+    "chapter": "第{{number}}章", "prologue": "プロローグ", "dialogue": "会話",
+    "mission": "ミッション", "submit": "送信", "evaluating": "評価中...",
+    "score": "スコア", "statChanges": "ステータス変化", "continue": "続ける",
+    "mental": "メンタル", "chemistry": "ケミストリー", "mediaTone": "メディア好感度", "rumor": "噂",
+    "result": "結果", "exit": "終了"
+  },
+  "headhunting": {
+    "title": "ヘッドハンティング", "subtitle": "韓国企業への接続",
+    "history": "申請履歴", "newApplication": "新規申請", "edit": "編集", "delete": "削除",
+    "status": { "pending": "審査中", "reviewing": "確認中", "matched": "マッチング済", "rejected": "不採用", "hired": "採用" },
+    "form": {
+      "basicInfo": "基本情報", "fullName": "氏名", "email": "メール", "phone": "電話", "birthYear": "生年",
+      "education": "学歴", "educationLevel": "学歴", "university": "大学", "major": "専攻", "graduationYear": "卒業年",
+      "experience": "職歴", "yearsOfExp": "経験年数", "currentJob": "現職", "currentCompany": "現在の会社", "expDetails": "職歴詳細",
+      "preferences": "希望条件", "jobType": "職種", "industry": "業界", "location": "勤務地", "salaryRange": "希望年収",
+      "introduction": "自己紹介", "strengths": "強み", "careerGoals": "キャリア目標", "additionalSkills": "その他スキル",
+      "documents": "書類アップロード", "resume": "履歴書", "coverLetter": "カバーレター", "portfolio": "ポートフォリオ"
+    },
+    "submit": "申請する", "submitting": "送信中...", "submitSuccess": "申請完了", "submitError": "送信エラー"
+  },
+  "reading": {
+    "title": "読解A", "subtitle": "基礎読解",
+    "grammar": "文法穴埋め", "vocabulary": "語彙/意味", "topic": "テーマ理解", "advertisement": "広告/案内",
+    "selectLevel": "レベル選択", "beginner": "初級", "intermediate": "中級", "advanced": "上級",
+    "question": "{{current}}/{{total}}問目", "score": "スコア",
+    "submit": "送信", "next": "次へ", "restart": "やり直す",
+    "correct": "正解", "wrong": "不正解", "explanation": "解説",
+    "complete": "完了", "accuracy": "正答率", "goBack": "戻る",
+    "loading": "読み込み中...", "reload": "再読み込み", "noQuestions": "問題がありません"
+  },
+  "listening": {
+    "title": "リスニング練習", "subtitle": "AI TTSでリスニング訓練",
+    "selectLevel": "レベル選択", "beginner": "初級", "intermediate": "中級", "advanced": "上級",
+    "speedControl": "速度調整", "slow": "ゆっくり", "normal": "通常",
+    "play": "再生", "pause": "一時停止", "replay": "リプレイ",
+    "dialogue": "会話", "single": "モノローグ", "speaker": "話者",
+    "question": "{{current}}/{{total}}問目", "score": "スコア",
+    "submit": "送信", "next": "次へ", "restart": "やり直す", "newQuestions": "新しい問題",
+    "correct": "正解", "wrong": "不正解", "explanation": "解説",
+    "complete": "完了", "accuracy": "正答率", "goBack": "戻る",
+    "loading": "読み込み中...", "ttsError": "音声再生エラー"
+  },
   "footer": { "hanoi": "ハノイ公式", "qnaAgent": "Q&A Agent", "admin": "ADMIN", "copyright": "© 2025 Powered by LUKAS Edutainment" }
 }
