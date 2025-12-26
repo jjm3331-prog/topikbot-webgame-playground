@@ -162,7 +162,7 @@ const Dashboard = () => {
       
       toast({
         title: t('dashboard.checkInSuccess'),
-        description: `+${bonusAmount} ${t('dashboard.points')}! Streak: ${newStreak} ${t('dashboard.days')}`,
+        description: `+${bonusAmount} ${t('dashboard.points')}! ${t('dashboard.streak')}: ${newStreak} ${t('dashboard.days')}`,
       });
       
     } catch (error) {
@@ -285,7 +285,7 @@ const Dashboard = () => {
                       transition={{ delay: 0.3 }}
                       className="text-2xl font-bold text-white"
                     >
-                      +{bonusPoints} điểm!
+                      +{bonusPoints} {t('dashboard.points')}!
                     </motion.p>
                   </motion.div>
                 )}
@@ -321,7 +321,7 @@ const Dashboard = () => {
                   <div className="flex items-center gap-1">
                     <Gift className="w-4 h-4 text-korean-purple" />
                     <span className="text-card-caption text-muted-foreground">
-                      +{POINTS_CONFIG.DAILY_CHECKIN}/ngày
+                      +{POINTS_CONFIG.DAILY_CHECKIN}{t('dashboard.perDay')}
                     </span>
                   </div>
                 </div>
@@ -403,23 +403,23 @@ const Dashboard = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1.5 sm:mb-2 flex-wrap">
                     <span className="text-badge px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white/25 text-white font-bold backdrop-blur-sm">
-                      ⚔️ 1:1 Real-time
+                      {t('dashboard.battle.realtime')}
                     </span>
                     <span className="text-badge px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold shadow-sm animate-pulse">
-                      HOT
+                      {t('dashboard.battle.hot')}
                     </span>
                   </div>
-                  <h3 className="font-bold text-white text-lg sm:text-xl lg:text-2xl tracking-tight">Đấu trường 1:1</h3>
+                  <h3 className="font-bold text-white text-lg sm:text-xl lg:text-2xl tracking-tight">{t('dashboard.battle.title')}</h3>
                   <p className="text-white/85 text-sm sm:text-base mt-0.5 sm:mt-1">
-                    Nối từ • Đấu nghĩa • Thắng = +1,000đ!
+                    {t('dashboard.battle.description')}
                   </p>
                 </div>
               </div>
               
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="hidden sm:flex flex-col items-end mr-2">
-                  <span className="text-card-caption text-white/80 font-medium">2 trò chơi</span>
-                  <span className="text-badge text-yellow-300 font-semibold">Thắng lấy điểm!</span>
+                  <span className="text-card-caption text-white/80 font-medium">{t('dashboard.battle.games')}</span>
+                  <span className="text-badge text-yellow-300 font-semibold">{t('dashboard.battle.winPoints')}</span>
                 </div>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/25 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/35 transition-colors shadow-lg">
                   <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:translate-x-0.5 transition-transform" />
@@ -467,23 +467,23 @@ const Dashboard = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-badge px-3 py-1 rounded-full bg-white/25 text-white font-bold backdrop-blur-sm">
-                      🎯 All-in-One
+                      {t('dashboard.topik.allInOne')}
                     </span>
                     <span className="text-badge px-2.5 py-1 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 text-white font-bold shadow-sm">
-                      NEW
+                      {t('dashboard.topik.new')}
                     </span>
                   </div>
-                  <h3 className="font-bold text-white text-card-title-lg sm:text-2xl tracking-tight">Trung tâm học TOPIK</h3>
+                  <h3 className="font-bold text-white text-card-title-lg sm:text-2xl tracking-tight">{t('dashboard.topik.title')}</h3>
                   <p className="text-white/85 text-card-body sm:text-lg mt-1">
-                    Từ vựng • Ngữ pháp • Nghe • Đọc • Viết
+                    {t('dashboard.topik.description')}
                   </p>
                 </div>
               </div>
               
               <div className="flex items-center gap-3">
                 <div className="hidden sm:flex flex-col items-end mr-2">
-                  <span className="text-card-caption text-white/80 font-medium">6 bài học</span>
-                  <span className="text-badge text-white/60">Học cùng AI</span>
+                  <span className="text-card-caption text-white/80 font-medium">{t('dashboard.topik.lessons')}</span>
+                  <span className="text-badge text-white/60">{t('dashboard.topik.learnWithAI')}</span>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/35 transition-colors shadow-lg">
                   <ChevronRight className="w-6 h-6 text-white group-hover:translate-x-0.5 transition-transform" />
@@ -529,23 +529,23 @@ const Dashboard = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-badge px-3 py-1 rounded-full bg-white/25 text-white font-bold backdrop-blur-sm">
-                      🎮 Game
+                      {t('dashboard.game.badge')}
                     </span>
                     <span className="text-badge px-2.5 py-1 rounded-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold shadow-sm">
-                      HOT
+                      {t('dashboard.game.hot')}
                     </span>
                   </div>
-                  <h3 className="font-bold text-white text-card-title-lg sm:text-2xl tracking-tight">Trung tâm Game</h3>
+                  <h3 className="font-bold text-white text-card-title-lg sm:text-2xl tracking-tight">{t('dashboard.game.title')}</h3>
                   <p className="text-white/85 text-card-body sm:text-lg mt-1">
-                    7 trò chơi học tiếng Hàn thú vị
+                    {t('dashboard.game.description')}
                   </p>
                 </div>
               </div>
               
               <div className="flex items-center gap-3">
                 <div className="hidden sm:flex flex-col items-end mr-2">
-                  <span className="text-card-caption text-white/80 font-medium">7 games</span>
-                  <span className="text-badge text-white/60">Học mà chơi</span>
+                  <span className="text-card-caption text-white/80 font-medium">{t('dashboard.game.games')}</span>
+                  <span className="text-badge text-white/60">{t('dashboard.game.learnPlay')}</span>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/35 transition-colors shadow-lg">
                   <ChevronRight className="w-6 h-6 text-white group-hover:translate-x-0.5 transition-transform" />
@@ -586,23 +586,23 @@ const Dashboard = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className="text-badge px-3 py-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold shadow-md">
-                      ⭐ All-in-One
+                      {t('dashboard.career.allInOne')}
                     </span>
                     <span className="text-badge px-2.5 py-1 rounded-full bg-white/20 text-white font-medium backdrop-blur-sm">
-                      한국 취업
+                      {t('dashboard.career.koreaJob')}
                     </span>
                   </div>
-                  <h3 className="font-bold text-white text-card-title-lg sm:text-xl tracking-tight">Korea Career Hub</h3>
+                  <h3 className="font-bold text-white text-card-title-lg sm:text-xl tracking-tight">{t('dashboard.career.title')}</h3>
                   <p className="text-white/80 text-card-body sm:text-base mt-1">
-                    Headhunting • Báo cáo DN • Phỏng vấn AI - Tất cả trong một!
+                    {t('dashboard.career.description')}
                   </p>
                 </div>
               </div>
               
               <div className="flex items-center gap-2">
                 <div className="hidden sm:flex flex-col items-end mr-2">
-                  <span className="text-badge text-white/60">1,000+ 취업 성공</span>
-                  <span className="text-badge text-white/60">98% 만족도</span>
+                  <span className="text-badge text-white/60">{t('dashboard.career.successCount')}</span>
+                  <span className="text-badge text-white/60">{t('dashboard.career.satisfaction')}</span>
                 </div>
                 <div className="w-11 h-11 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/30 transition-colors">
                   <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-0.5 transition-transform" />
@@ -628,10 +628,10 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-badge px-2.5 py-0.5 rounded-full bg-white/20 text-white font-bold">RAG AI</span>
+                    <span className="text-badge px-2.5 py-0.5 rounded-full bg-white/20 text-white font-bold">{t('dashboard.ai.badge')}</span>
                   </div>
-                  <h3 className="font-bold text-white text-card-title-lg">LUKATO Q&A Agent</h3>
-                  <p className="text-white/70 text-card-body mt-0.5">Hỏi trực tiếp các mô hình Premium với Q&A Agent hiệu suất cao nhất!</p>
+                  <h3 className="font-bold text-white text-card-title-lg">{t('dashboard.ai.title')}</h3>
+                  <p className="text-white/70 text-card-body mt-0.5">{t('dashboard.ai.description')}</p>
                 </div>
               </div>
               <ChevronRight className="w-6 h-6 text-white/70 group-hover:translate-x-1 transition-transform" />
