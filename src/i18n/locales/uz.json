@@ -82,7 +82,8 @@
   },
   "language": {
     "select": "Tilni tanlang",
-    "current": "Joriy til"
+    "current": "Joriy til",
+    "hint": "Tilni tanlash butun ilovani o'zgartiradi"
   },
   "dashboard": {
     "loading": "Yuklanmoqda...",

@@ -443,11 +443,11 @@ const Landing = () => {
             >
               <h2 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
                 <span className="bg-gradient-to-r from-korean-gold via-korean-yellow to-korean-orange bg-clip-text text-transparent drop-shadow-lg">
-                  왜 LUKATO가
+                  {t("landing.why.title1")}
                 </span>
                 <br className="sm:hidden" />
                 <span className="bg-gradient-to-r from-primary via-korean-purple to-korean-pink bg-clip-text text-transparent">
-                  {" "}최고인가요?
+                  {" "}{t("landing.why.title2")}
                 </span>
               </h2>
             </motion.div>
@@ -459,7 +459,7 @@ const Landing = () => {
               transition={{ delay: 0.6 }}
               className="text-muted-foreground text-sm sm:text-base mt-6 max-w-lg mx-auto"
             >
-              다른 앱들과는 차원이 다릅니다
+              {t("landing.why.subtitle")}
             </motion.p>
           </motion.div>
 
@@ -745,7 +745,7 @@ const Landing = () => {
           >
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-korean-blue/10 border border-korean-blue/20 text-xs font-semibold text-foreground mb-4">
               <Brain className="w-3.5 h-3.5 text-korean-blue" />
-              LUKATO AI
+              {t("landing.features.badge")}
             </span>
             <h2 className="font-heading font-bold text-2xl sm:text-3xl text-foreground">
               {t("landing.features.title")} <span className="text-gradient-secondary">{t("landing.features.skills")}</span>
@@ -787,7 +787,7 @@ const Landing = () => {
           >
             <span className="badge-premium text-xs mb-3">
               <Gamepad2 className="w-3 h-3" />
-              K-Culture
+              {t("landing.games.badge")}
             </span>
             <h2 className="font-heading font-bold text-2xl sm:text-3xl text-foreground">
               K-POP · K-Drama · <span className="text-gradient-primary">{t("landing.games.korean")}</span>
