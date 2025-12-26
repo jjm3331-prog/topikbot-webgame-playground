@@ -322,14 +322,16 @@
     "roomCode": "房间代码",
     "joinNow": "立即加入！",
     "close": "关闭",
-    "secondsPerTurn": "12秒/回合",
-    "warnings": "2次警告=失败",
-    "heroTitle": "1:1对战场",
-    "heroSubtitle": "与朋友对战，赢=+1,000分！",
-    "selectGameMode": "选择游戏模式",
+    "secondsPerTurn": "每回合12秒",
+    "warnings": "2次警告即失败",
+    "heroTitle": "1:1实时对决",
+    "heroSubtitle": "与朋友对战，获胜+1,000分！",
+    "selectGameMode": "选择模式",
     "loginToPlay": "登录参加1:1对战！",
     "howToPlay": "玩法介绍",
-    "rules": "规则"
+    "rules": "规则",
+    "twoGames": "2种模式",
+    "winPoints": "获胜赢取积分"
   },
   "vocabulary": {
     "title": "词汇学习",

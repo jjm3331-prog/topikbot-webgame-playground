@@ -322,14 +322,16 @@
     "roomCode": "ルームコード",
     "joinNow": "今すぐ参加！",
     "close": "閉じる",
-    "secondsPerTurn": "12秒/ターン",
-    "warnings": "2警告=敗北",
-    "heroTitle": "1:1バトルアリーナ",
-    "heroSubtitle": "友達とバトル、勝利=+1,000ポイント！",
-    "selectGameMode": "ゲームモードを選択",
-    "loginToPlay": "ログインして1:1バトルに参加！",
+    "secondsPerTurn": "1ターン12秒",
+    "warnings": "警告2回で敗北",
+    "heroTitle": "1:1リアルタイム対決",
+    "heroSubtitle": "友達と対決して勝てば+1,000ポイント！",
+    "selectGameMode": "モード選択",
+    "loginToPlay": "ログインして1:1対決に参加！",
     "howToPlay": "遊び方",
-    "rules": "ルール"
+    "rules": "ルール",
+    "twoGames": "2モード",
+    "winPoints": "勝利でポイント獲得"
   },
   "vocabulary": {
     "title": "語彙学習",

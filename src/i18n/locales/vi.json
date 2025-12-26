@@ -417,16 +417,16 @@
     "roomCode": "Mã phòng",
     "joinNow": "Tham gia ngay!",
     "close": "Đóng",
-    "secondsPerTurn": "12 giây/lượt",
-    "warnings": "2 cảnh báo = thua",
-    "heroTitle": "Đấu trường 1:1",
-    "heroSubtitle": "Đấu với bạn bè, thắng = +1,000 điểm!",
-    "selectGameMode": "Chọn chế độ chơi",
+    "secondsPerTurn": "Mỗi lượt 12 giây",
+    "warnings": "2 cảnh cáo là thua",
+    "heroTitle": "Đấu trường 1:1 Real-time",
+    "heroSubtitle": "Đấu với bạn bè, thắng được +1,000 điểm!",
+    "selectGameMode": "Chọn chế độ",
     "loginToPlay": "Đăng nhập để tham gia đấu 1:1!",
     "howToPlay": "Cách chơi",
     "rules": "Luật chơi",
-    "twoGames": "2 trò chơi",
-    "winPoints": "Thắng lấy điểm!"
+    "twoGames": "2 chế độ",
+    "winPoints": "Thắng nhận điểm"
   },
   "vocabulary": {
     "title": "Học từ vựng",

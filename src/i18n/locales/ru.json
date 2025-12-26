@@ -322,14 +322,16 @@
     "roomCode": "Код комнаты",
     "joinNow": "Присоединиться!",
     "close": "Закрыть",
-    "secondsPerTurn": "12 сек/ход",
+    "secondsPerTurn": "12 секунд на ход",
     "warnings": "2 предупреждения = поражение",
-    "heroTitle": "Арена 1:1",
+    "heroTitle": "1:1 Арена реального времени",
     "heroSubtitle": "Сражайтесь с друзьями, победа = +1,000 баллов!",
-    "selectGameMode": "Выберите режим игры",
+    "selectGameMode": "Выбрать режим",
     "loginToPlay": "Войдите для участия в битвах 1:1!",
     "howToPlay": "Как играть",
-    "rules": "Правила"
+    "rules": "Правила",
+    "twoGames": "2 режима",
+    "winPoints": "Победа = очки"
   },
   "vocabulary": {
     "title": "Изучение лексики",
