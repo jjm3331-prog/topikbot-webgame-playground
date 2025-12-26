@@ -213,7 +213,7 @@ const MobileAccordionCategory = ({
                       
                       {item.isPremium && !active && (
                         <span className="px-1.5 py-0.5 bg-accent text-accent-foreground text-[10px] font-bold rounded">
-                          Premium
+                          {t("common.premium")}
                         </span>
                       )}
                       
@@ -442,7 +442,7 @@ export const MegaMenuOverlay = ({
                                 
                                 {item.isPremium && !active && (
                                   <span className="px-1.5 py-0.5 bg-accent text-accent-foreground text-[10px] font-bold rounded">
-                                    Premium
+                                    {t("common.premium")}
                                   </span>
                                 )}
                                 

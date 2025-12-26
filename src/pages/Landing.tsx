@@ -104,10 +104,10 @@ const getCoreFeatures = (t: (key: string) => string) => [
 
 // Game modes - will be translated via t()
 const getGameModes = (t: (key: string) => string) => [
-  { icon: MessageCircle, name: t("landing.games.survival"), color: "from-korean-red to-korean-orange", badge: "Hot" },
+  { icon: MessageCircle, name: t("landing.games.survival"), color: "from-korean-red to-korean-orange", badge: t("landing.games.badgeHot") },
   { icon: Heart, name: t("landing.games.dating"), color: "from-korean-pink to-korean-red", badge: t("landing.games.badgeNew") },
   { icon: Gamepad2, name: t("landing.games.wordChain"), color: "from-korean-blue to-korean-purple", badge: null },
-  { icon: Music, name: t("landing.games.kpopQuiz"), color: "from-korean-purple to-korean-pink", badge: "⭐" },
+  { icon: Music, name: t("landing.games.kpopQuiz"), color: "from-korean-purple to-korean-pink", badge: t("landing.games.badgeStar") },
   { icon: Film, name: t("landing.games.dubbing"), color: "from-korean-orange to-korean-yellow", badge: null },
   { icon: Briefcase, name: t("landing.games.partTime"), color: "from-korean-teal to-korean-green", badge: null },
 ];
@@ -864,7 +864,7 @@ const Landing = () => {
               className="premium-card p-4 sm:p-6 text-center border-2 border-primary/50 relative overflow-visible flex flex-col justify-between min-h-[180px] sm:min-h-[200px]"
             >
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full whitespace-nowrap z-10">
-                HOT
+                {t("landing.games.badgeHot")}
               </div>
               <div className="pt-2">
                 <h3 className="font-bold text-base sm:text-lg text-foreground">Premium</h3>
