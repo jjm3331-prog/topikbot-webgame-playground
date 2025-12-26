@@ -32,19 +32,19 @@ interface Word {
   pronunciation?: string;
 }
 
-// TOPIK 급수 레벨
-const topikLevels = {
-  "1-2": { label: "TOPIK I (1-2급)", sublabel: "Sơ cấp", color: "from-green-500 to-emerald-500" },
-  "3-4": { label: "TOPIK II (3-4급)", sublabel: "Trung cấp", color: "from-blue-500 to-cyan-500" },
-  "5-6": { label: "TOPIK II (5-6급)", sublabel: "Cao cấp", color: "from-purple-500 to-pink-500" },
+// TOPIK 급수 레벨 - labels will be translated in component
+const topikLevelConfig = {
+  "1-2": { color: "from-green-500 to-emerald-500" },
+  "3-4": { color: "from-blue-500 to-cyan-500" },
+  "5-6": { color: "from-purple-500 to-pink-500" },
 };
 
-type TopikLevel = keyof typeof topikLevels;
+type TopikLevel = keyof typeof topikLevelConfig;
 
-// Tab types
-const tabs = [
-  { id: "racing", label: "단어 레이싱", icon: Car, description: "Đua xe từ vựng" },
-  { id: "sprint", label: "60초 스프린트", icon: Timer, description: "Chạy đua 60 giây" },
+// Tab types - labels will be translated
+const tabConfig = [
+  { id: "racing", icon: Car },
+  { id: "sprint", icon: Timer },
 ];
 
 type TabType = "racing" | "sprint";
@@ -58,6 +58,7 @@ interface SprintGameProps {
 }
 
 const SprintGame = ({ words, onComplete }: SprintGameProps) => {
+  const { t } = useTranslation();
   const [timeLeft, setTimeLeft] = useState(60);
   const [score, setScore] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -135,14 +136,14 @@ const SprintGame = ({ words, onComplete }: SprintGameProps) => {
         >
           <Timer className="w-12 h-12 text-white" />
         </motion.div>
-        <h2 className="text-2xl font-bold mb-2">60초 스프린트</h2>
-        <p className="text-muted-foreground mb-6">60초 안에 최대한 많은 단어를 맞추세요!</p>
+        <h2 className="text-2xl font-bold mb-2">{t('vocabulary.sprint')}</h2>
+        <p className="text-muted-foreground mb-6">{t('vocabulary.sprintChallenge')}</p>
         <Button 
           size="lg" 
           onClick={() => setGameStarted(true)}
           className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
         >
-          시작하기!
+          {t('vocabulary.start')}
         </Button>
       </div>
     );
@@ -156,14 +157,14 @@ const SprintGame = ({ words, onComplete }: SprintGameProps) => {
           ⏱️ {timeLeft}s
         </div>
         <div className="text-right">
-          <div className="text-xl sm:text-2xl font-bold text-primary">{score} 점</div>
+          <div className="text-xl sm:text-2xl font-bold text-primary">{score} {t('vocabulary.score')}</div>
           {streak >= 3 && (
             <motion.div 
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               className="text-xs sm:text-sm text-orange-500 flex items-center gap-1"
             >
-              <Flame className="w-3 h-3 sm:w-4 sm:h-4" /> {streak} 연속!
+              <Flame className="w-3 h-3 sm:w-4 sm:h-4" /> {streak} {t('vocabulary.combo')}
             </motion.div>
           )}
         </div>
@@ -214,6 +215,7 @@ const SprintGame = ({ words, onComplete }: SprintGameProps) => {
 // ================== MAIN COMPONENT ==================
 const Vocabulary = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
@@ -299,8 +301,8 @@ const Vocabulary = () => {
       const isAbort = error instanceof DOMException && error.name === "AbortError";
       console.error("Error fetching words:", error);
       toast({
-        title: "단어 로딩 실패",
-        description: isAbort ? "네트워크가 느려서 시간이 초과됐어요." : "잠시 후 다시 시도해주세요.",
+        title: t('vocabulary.loadError'),
+        description: isAbort ? t('vocabulary.networkTimeout') : t('vocabulary.tryAgain'),
         variant: "destructive",
       });
       setWords(getFallbackWords(level));
@@ -455,7 +457,7 @@ const Vocabulary = () => {
               className="mb-6 hover:bg-primary/10"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Quay lại
+              {t('common.back')}
             </Button>
 
             {/* Hero Section */}
@@ -479,7 +481,7 @@ const Vocabulary = () => {
                     className="inline-flex items-center gap-2 px-2 sm:px-3 py-1 rounded-full bg-white/20 text-white text-[10px] sm:text-xs font-medium mb-2"
                   >
                     <Sparkles className="w-3 h-3" />
-                    3가지 게임
+                    {t('vocabulary.gamesCount')}
                   </motion.div>
                   <motion.h1 
                     initial={{ opacity: 0, x: -20 }}
@@ -487,7 +489,7 @@ const Vocabulary = () => {
                     transition={{ delay: 0.4 }}
                     className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1"
                   >
-                    어휘 학습
+                    {t('vocabulary.title')}
                   </motion.h1>
                   <motion.p 
                     initial={{ opacity: 0, x: -20 }}
@@ -495,7 +497,7 @@ const Vocabulary = () => {
                     transition={{ delay: 0.5 }}
                     className="text-white/80 text-sm sm:text-base"
                   >
-                    Từ vựng TOPIK
+                    {t('vocabulary.description')}
                   </motion.p>
                 </div>
               </div>
@@ -503,25 +505,25 @@ const Vocabulary = () => {
 
             {/* TOPIK Level Selection */}
             <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
-              {(Object.keys(topikLevels) as TopikLevel[]).map((level) => (
+              {(Object.keys(topikLevelConfig) as TopikLevel[]).map((level) => (
                 <button
                   key={level}
                   onClick={() => handleLevelChange(level)}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap transition-all font-medium ${
                     topikLevel === level
-                      ? `bg-gradient-to-r ${topikLevels[level].color} text-white shadow-lg`
+                      ? `bg-gradient-to-r ${topikLevelConfig[level].color} text-white shadow-lg`
                       : "bg-muted hover:bg-muted/80 text-muted-foreground"
                   }`}
                 >
-                  <span className="text-sm font-bold">{level}급</span>
-                  <span className="text-xs opacity-80">{topikLevels[level].sublabel}</span>
+                  <span className="text-sm font-bold">{level}{t('vocabulary.level')}</span>
+                  <span className="text-xs opacity-80">{t(`vocabulary.${level === "1-2" ? "beginner" : level === "3-4" ? "intermediate" : "advanced"}`)}</span>
                 </button>
               ))}
             </div>
 
             {/* Tabs */}
             <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
-              {tabs.map((tab) => (
+              {tabConfig.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => handleTabChange(tab.id as TabType)}
@@ -533,8 +535,8 @@ const Vocabulary = () => {
                 >
                   <tab.icon className="w-5 h-5" />
                   <div className="text-left">
-                    <div className="text-sm font-bold">{tab.label}</div>
-                    <div className="text-xs opacity-70">{tab.description}</div>
+                    <div className="text-sm font-bold">{t(`vocabulary.${tab.id}`)}</div>
+                    <div className="text-xs opacity-70">{t(`vocabulary.${tab.id}Desc`)}</div>
                   </div>
                 </button>
               ))}
@@ -551,7 +553,7 @@ const Vocabulary = () => {
             {isLoading ? (
               <div className="text-center py-12">
                 <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
-                <p className="text-muted-foreground">단어를 불러오는 중...</p>
+                <p className="text-muted-foreground">{t('vocabulary.loading')}</p>
               </div>
             ) : gameComplete ? (
               /* Game Complete Screen */
@@ -564,40 +566,40 @@ const Vocabulary = () => {
                   <Trophy className="w-10 h-10 text-white" />
                 </motion.div>
                 
-                <h2 className="text-2xl font-bold mb-4">완료! 🎉</h2>
+                <h2 className="text-2xl font-bold mb-4">{t('vocabulary.gameComplete')} 🎉</h2>
                 
                 {gameResult?.type === "racing" && (
                   <div className="mb-6">
-                    <p className="text-3xl font-bold text-primary mb-2">{gameResult.score}점</p>
+                    <p className="text-3xl font-bold text-primary mb-2">{gameResult.score}{t('vocabulary.score')}</p>
                     <p className="text-muted-foreground">
-                      {gameResult.wordsCompleted}개 단어 완성 / {gameResult.wordsCompleted} từ hoàn thành
+                      {gameResult.wordsCompleted} {t('vocabulary.wordsCompleted')}
                     </p>
                   </div>
                 )}
                 
                 {gameResult?.type === "chain" && (
                   <div className="mb-6">
-                    <p className="text-3xl font-bold text-primary mb-2">{gameResult.score}점</p>
+                    <p className="text-3xl font-bold text-primary mb-2">{gameResult.score}{t('vocabulary.score')}</p>
                     <p className="text-muted-foreground">
-                      {gameResult.chainLength} 체인 / chuỗi
+                      {gameResult.chainLength} {t('vocabulary.chain')}
                     </p>
                   </div>
                 )}
                 
                 {gameResult?.type === "sprint" && (
                   <div className="mb-6">
-                    <p className="text-3xl font-bold text-primary">{gameResult.score}점</p>
+                    <p className="text-3xl font-bold text-primary">{gameResult.score}{t('vocabulary.score')}</p>
                   </div>
                 )}
 
                 <div className="flex justify-center gap-4">
                   <Button onClick={handleRestart} variant="outline">
                     <RotateCcw className="w-4 h-4 mr-2" />
-                    다시 하기
+                    {t('vocabulary.playAgain')}
                   </Button>
                   <Button onClick={handleNewWords}>
                     <RefreshCw className="w-4 h-4 mr-2" />
-                    새 단어
+                    {t('vocabulary.newWords')}
                   </Button>
                 </div>
               </div>
