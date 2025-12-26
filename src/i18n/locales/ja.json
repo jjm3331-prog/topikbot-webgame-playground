@@ -780,5 +780,33 @@
     "tagline": "世界No.1韓国語学習プラットフォーム",
     "loading": "読み込み中...",
     "branding": "🎮 AIと一緒にRPG韓国語学習"
+  },
+  "chat": {
+    "error": "エラー",
+    "cannotStartGame": "ゲームを開始できません。",
+    "gameOver": "💀 ゲームオーバー！",
+    "hpZero": "HPが0になりました。",
+    "missionComplete": "🎉 ミッション完了！",
+    "survivedTurns": "10ターン生存成功！",
+    "messageSendFailed": "メッセージ送信失敗",
+    "turn": "ターン",
+    "hintTitle": "💡 ヒント",
+    "hintDesc": "自然な韓国語で会話してみましょう！適切な返答は報酬、不自然な返答はペナルティになります。",
+    "inputPlaceholder": "韓国語で入力...",
+    "send": "送信",
+    "exitConfirmTitle": "本当に終了しますか？",
+    "exitConfirmDesc": "現在の進行状況は保存されません。",
+    "continueGame": "続ける",
+    "exitToDashboard": "ダッシュボードへ",
+    "feedback": {
+      "success": "いいね！👍",
+      "warning": "注意！⚠️",
+      "fail": "失敗！💔"
+    },
+    "result": {
+      "success": "✓ 成功",
+      "warning": "⚠ 注意",
+      "fail": "✗ 失敗"
+    }
   }
 }

@@ -942,5 +942,33 @@
     "tagline": "World's #1 Korean Learning Platform",
     "loading": "Loading...",
     "branding": "🎮 RPG Korean Learning with AI"
+  },
+  "chat": {
+    "error": "Error",
+    "cannotStartGame": "Cannot start the game.",
+    "gameOver": "💀 Game Over!",
+    "hpZero": "Your HP reached 0.",
+    "missionComplete": "🎉 Mission Complete!",
+    "survivedTurns": "You survived 10 turns!",
+    "messageSendFailed": "Message send failed",
+    "turn": "Turn",
+    "hintTitle": "💡 Hint",
+    "hintDesc": "Try speaking naturally in Korean! Good responses get rewards, odd responses get penalties.",
+    "inputPlaceholder": "Type in Korean...",
+    "send": "Send",
+    "exitConfirmTitle": "Are you sure you want to exit?",
+    "exitConfirmDesc": "Current progress will not be saved.",
+    "continueGame": "Continue",
+    "exitToDashboard": "To Dashboard",
+    "feedback": {
+      "success": "Nice! 👍",
+      "warning": "Caution! ⚠️",
+      "fail": "Failed! 💔"
+    },
+    "result": {
+      "success": "✓ Success",
+      "warning": "⚠ Caution",
+      "fail": "✗ Failed"
+    }
   }
 }
