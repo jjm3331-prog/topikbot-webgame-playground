@@ -1,372 +1,501 @@
-import { motion } from "framer-motion";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import CleanHeader from "@/components/CleanHeader";
-import AppFooter from "@/components/AppFooter";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { 
-  ExternalLink, 
-  MessageSquare, 
-  Brain, 
-  Zap, 
-  Clock, 
-  BookOpen,
-  Shield,
-  Database,
-  Sparkles,
-  CheckCircle2,
+  Send, 
+  Bot, 
+  User, 
+  Sparkles, 
+  Loader2, 
+  RotateCcw,
+  Crown,
+  Zap,
   AlertCircle,
-  Globe,
-  Users,
-  GraduationCap
+  CheckCircle,
+  BookOpen,
+  GraduationCap,
+  HelpCircle
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+interface Message {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: Date;
+  cached?: boolean;
+}
+
+const SUGGESTED_QUESTIONS = [
+  "TOPIK II 쓰기 51번 문제 푸는 팁이 있나요?",
+  "'-아/어서'와 '-니까'의 차이점을 알려주세요",
+  "듣기 문제에서 숫자 들을 때 팁이 있나요?",
+  "TOPIK I 급수별 합격 점수가 어떻게 되나요?",
+];
 
 const AIChat = () => {
-  const handleOpenChat = () => {
-    window.open("https://chat-topikbot.kr", "_blank");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [remainingQuestions, setRemainingQuestions] = useState<number | null>(null);
+  const [isPremium, setIsPremium] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { toast } = useToast();
+
+  // Check auth status
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setIsAuthenticated(!!user);
+      
+      if (user) {
+        const { data: sub } = await supabase
+          .from('user_subscriptions')
+          .select('plan')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        setIsPremium(sub?.plan === 'premium' || sub?.plan === 'plus');
+      }
+    };
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session?.user);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Auto scroll to bottom
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      }
+    }
+  }, [messages]);
+
+  // Parse Gemini SSE stream
+  const parseGeminiStream = async (
+    reader: ReadableStreamDefaultReader<Uint8Array>,
+    onDelta: (text: string) => void,
+    onDone: () => void
+  ) => {
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        buffer += decoder.decode(value, { stream: true });
+        
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            const jsonStr = line.slice(6).trim();
+            if (jsonStr === "[DONE]") continue;
+            
+            try {
+              const parsed = JSON.parse(jsonStr);
+              const text = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
+              if (text) onDelta(text);
+            } catch {
+              // Ignore parse errors
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Stream parsing error:", error);
+    }
+    
+    onDone();
   };
 
-  const steps = [
-    {
-      number: 1,
-      title: "Truy cập",
-      description: "Truy cập Q&A Agent và đăng nhập bằng Google hoặc email.",
-      tip: "Đăng nhập bằng email giống với tài khoản LUKATO để đồng bộ!"
-    },
-    {
-      number: 2,
-      title: "Chọn mô hình AI",
-      description: "Chọn mô hình AI phù hợp nhất với mục đích học tập của bạn.",
-      tip: "Q&A Agent được cấu thành từ nhiều mô hình AI hiệu suất cao nhất."
-    },
-    {
-      number: 3,
-      title: "Đặt câu hỏi",
-      description: "Hỏi bất cứ điều gì về ngữ pháp, từ vựng, chiến lược thi.",
-      tip: "Câu hỏi càng cụ thể, câu trả lời càng chính xác."
-    },
-    {
-      number: 4,
-      title: "Học tập",
-      description: "Học sâu hơn với giải thích chi tiết và ví dụ từ AI.",
-      tip: "Nếu không hiểu, hãy yêu cầu 'Giải thích đơn giản hơn'!"
-    }
-  ];
+  const sendMessage = useCallback(async (content?: string) => {
+    const messageText = content || input.trim();
+    if (!messageText || isLoading) return;
 
-  const features = [
-    {
-      icon: Database,
-      title: "Hệ thống RAG chuyên nghiệp",
-      description: "Dựa trên cơ sở dữ liệu khổng lồ: đề thi TOPIK, sách ngữ pháp, giáo trình"
-    },
-    {
-      icon: Brain,
-      title: "LUKATO RAG AI",
-      description: "Mô hình AI độc quyền được tối ưu hóa riêng cho việc học TOPIK"
-    },
-    {
-      icon: Zap,
-      title: "Phản hồi thời gian thực",
-      description: "Trả lời nhanh trong khoảng 10 giây, duy trì nhịp học tập"
-    },
-    {
-      icon: Clock,
-      title: "Hoạt động 24/7",
-      description: "Hỏi bất cứ lúc nào, kể cả lúc nửa đêm hay trước kỳ thi"
-    },
-    {
-      icon: BookOpen,
-      title: "Giải thích theo trình độ",
-      description: "Điều chỉnh độ khó phù hợp với trình độ của người học"
-    },
-    {
-      icon: Shield,
-      title: "Thông tin chính xác",
-      description: "Dựa trên tài liệu TOPIK đã được xác minh, giảm thiểu sai sót"
+    if (!isAuthenticated) {
+      toast({
+        title: "Vui lòng đăng nhập",
+        description: "Đăng nhập để sử dụng LUKATO AI Agent",
+        variant: "destructive"
+      });
+      return;
     }
-  ];
 
-  const whyExternal = [
-    {
-      icon: Globe,
-      title: "Hạ tầng chuyên dụng",
-      description: "Server được tối ưu riêng cho Q&A, đảm bảo phản hồi ổn định và nhanh chóng."
-    },
-    {
-      icon: Database,
-      title: "Cơ sở tri thức khổng lồ",
-      description: "Vận hành database TOPIK riêng biệt để cung cấp câu trả lời chính xác hơn."
-    },
-    {
-      icon: Users,
-      title: "Hệ sinh thái học tập tích hợp",
-      description: "Học vui qua game, thắc mắc hỏi AI - chu trình học tập hoàn hảo!"
-    },
-    {
-      icon: GraduationCap,
-      title: "Chuyên biệt cho TOPIK",
-      description: "Khác với AI thông thường, hệ thống RAG được thiết kế riêng cho kỳ thi TOPIK."
+    const userMessage: Message = {
+      id: `user-${Date.now()}`,
+      role: "user",
+      content: messageText,
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInput("");
+    setIsLoading(true);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const allMessages = [...messages, userMessage].map(m => ({
+        role: m.role,
+        content: m.content
+      }));
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-tutor`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ messages: allMessages, stream: true })
+        }
+      );
+
+      // Handle error responses
+      if (!response.ok) {
+        const errorData = await response.json();
+        
+        if (response.status === 429) {
+          if (errorData.error === "daily_limit_exceeded") {
+            setRemainingQuestions(0);
+            toast({
+              title: "Hết lượt hỏi miễn phí",
+              description: "Nâng cấp Premium để hỏi không giới hạn!",
+              variant: "destructive"
+            });
+          } else {
+            toast({
+              title: "Hệ thống bận",
+              description: "Vui lòng thử lại sau ít phút",
+              variant: "destructive"
+            });
+          }
+          setIsLoading(false);
+          return;
+        }
+        
+        throw new Error(errorData.message || "Lỗi kết nối");
+      }
+
+      // Check for remaining questions header
+      const remaining = response.headers.get("X-Remaining-Questions");
+      if (remaining) {
+        setRemainingQuestions(parseInt(remaining));
+      }
+
+      // Check if it's a cached response (JSON) or stream
+      const contentType = response.headers.get("Content-Type");
+      
+      if (contentType?.includes("application/json")) {
+        const data = await response.json();
+        const assistantMessage: Message = {
+          id: `assistant-${Date.now()}`,
+          role: "assistant",
+          content: data.response,
+          timestamp: new Date(),
+          cached: data.cached
+        };
+        setMessages(prev => [...prev, assistantMessage]);
+        if (data.remaining !== undefined) {
+          setRemainingQuestions(data.remaining);
+        }
+      } else {
+        // Stream response
+        const reader = response.body?.getReader();
+        if (!reader) throw new Error("No reader available");
+
+        const assistantMessageId = `assistant-${Date.now()}`;
+        let fullText = "";
+
+        setMessages(prev => [...prev, {
+          id: assistantMessageId,
+          role: "assistant",
+          content: "",
+          timestamp: new Date()
+        }]);
+
+        await parseGeminiStream(
+          reader,
+          (deltaText) => {
+            fullText += deltaText;
+            setMessages(prev => prev.map(m => 
+              m.id === assistantMessageId ? { ...m, content: fullText } : m
+            ));
+          },
+          () => {
+            // Stream complete
+          }
+        );
+      }
+    } catch (error) {
+      console.error("Send message error:", error);
+      toast({
+        title: "Lỗi",
+        description: error instanceof Error ? error.message : "Không thể gửi tin nhắn",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  }, [input, isLoading, isAuthenticated, messages, toast]);
 
-  const notices = [
-    "chat-topikbot.kr là dịch vụ Q&A AI chính thức của LUKATO",
-    "Thành viên miễn phí được hỏi một số lượng câu hỏi nhất định mỗi ngày",
-    "Thành viên Premium được hỏi không giới hạn và sử dụng các mô hình AI cao cấp"
-  ];
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
+  const clearChat = () => {
+    setMessages([]);
+  };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <CleanHeader />
       
-      {/* Hero Section */}
-      <section className="relative pt-24 pb-16 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
-        
-        <div className="container mx-auto px-4 relative">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center max-w-3xl mx-auto"
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-              <MessageSquare className="w-4 h-4" />
-              Q&A Agent - Dịch vụ hỏi đáp
-              <span className="px-2 py-0.5 rounded-full bg-korean-green/20 text-korean-green text-xs">
-                RAG
-              </span>
-            </div>
-            
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              <span className="text-primary">LUKATO</span>{" "}
-              <span className="bg-gradient-to-r from-korean-blue to-korean-green bg-clip-text text-transparent">
-                Q&A Agent
-              </span>
-            </h1>
-            
-            <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              Bạn có thắc mắc trong quá trình học TOPIK?<br />
-              <strong className="text-foreground">Hãy hỏi trực tiếp các mô hình Premium với LUKATO Q&A Agent hiệu suất cao nhất!</strong>
-            </p>
-            
-            <Button 
-              size="lg" 
-              onClick={handleOpenChat}
-              className="bg-gradient-to-r from-korean-blue to-korean-green hover:opacity-90 text-white gap-2 px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
-            >
-              <Sparkles className="w-5 h-5" />
-              Q&A Agent bắt đầu
-              <ExternalLink className="w-4 h-4" />
-            </Button>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Why External Section */}
-      <section className="py-16 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Tại sao cung cấp dịch vụ như một Agent độc lập?
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Để mang lại trải nghiệm học tập tốt hơn, chúng tôi vận hành dịch vụ Q&A Agent chuyên biệt
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-            {whyExternal.map((item, index) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card className="h-full border-border/50 bg-card/50 backdrop-blur hover:border-primary/30 transition-all">
-                  <CardContent className="p-6 text-center">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                      <item.icon className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="font-semibold mb-2">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground">{item.description}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+      <main className="flex-1 flex flex-col max-w-4xl mx-auto w-full px-4 pt-20 pb-4">
+        {/* Header Section */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center py-6"
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
+            <Sparkles className="w-4 h-4" />
+            LUKATO AI Agent
+            <Badge variant="secondary" className="text-xs bg-korean-green/20 text-korean-green border-0">
+              RAG
+            </Badge>
           </div>
-        </div>
-      </section>
+          
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">
+            무엇이든 물어보세요
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            TOPIK 학습에 관한 모든 질문에 AI가 정확하게 답변해드립니다
+          </p>
 
-      {/* Steps Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Cách sử dụng
-            </h2>
-            <p className="text-muted-foreground">
-              Bắt đầu đơn giản chỉ với 4 bước
-            </p>
-          </motion.div>
+          {/* Usage indicator */}
+          {isAuthenticated && !isPremium && remainingQuestions !== null && (
+            <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted text-sm">
+              <Zap className="w-4 h-4 text-korean-yellow" />
+              <span>오늘 남은 질문: <strong>{remainingQuestions}</strong>/30</span>
+            </div>
+          )}
+          
+          {isPremium && (
+            <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-korean-yellow/10 text-korean-yellow text-sm">
+              <Crown className="w-4 h-4" />
+              <span>Premium 무제한</span>
+            </div>
+          )}
+        </motion.div>
 
-          <div className="max-w-4xl mx-auto space-y-6">
-            {steps.map((step, index) => (
-              <motion.div
-                key={step.number}
-                initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card className="overflow-hidden border-border/50 hover:border-primary/30 transition-all">
-                  <CardContent className="p-6">
-                    <div className="flex gap-4 items-start">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-korean-blue to-korean-green flex items-center justify-center shrink-0">
-                        <span className="text-white font-bold">{step.number}</span>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
-                        <p className="text-muted-foreground mb-3">{step.description}</p>
-                        <div className="flex items-center gap-2 text-sm text-korean-green">
-                          <Sparkles className="w-4 h-4" />
-                          <span>{step.tip}</span>
+        {/* Chat Area */}
+        <Card className="flex-1 flex flex-col overflow-hidden border-border/50 bg-card/50 backdrop-blur">
+          {messages.length === 0 ? (
+            /* Empty State */
+            <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-korean-blue to-korean-green flex items-center justify-center mb-6">
+                <Bot className="w-8 h-8 text-white" />
+              </div>
+              
+              <h2 className="text-lg font-semibold mb-2">LUKATO AI Agent</h2>
+              <p className="text-muted-foreground text-sm mb-8 max-w-md">
+                TOPIK 문법, 어휘, 시험 전략 등 무엇이든 물어보세요. RAG 기반으로 정확한 답변을 제공합니다.
+              </p>
+
+              {/* Suggested Questions */}
+              <div className="w-full max-w-lg space-y-2">
+                <p className="text-xs text-muted-foreground mb-3">추천 질문</p>
+                <div className="grid gap-2">
+                  {SUGGESTED_QUESTIONS.map((q, i) => (
+                    <button
+                      key={i}
+                      onClick={() => sendMessage(q)}
+                      disabled={isLoading || !isAuthenticated}
+                      className="text-left px-4 py-3 rounded-xl border border-border/50 bg-background/50 hover:bg-muted/50 hover:border-primary/30 transition-all text-sm group disabled:opacity-50"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                          {i === 0 && <BookOpen className="w-4 h-4 text-primary" />}
+                          {i === 1 && <GraduationCap className="w-4 h-4 text-primary" />}
+                          {i === 2 && <HelpCircle className="w-4 h-4 text-primary" />}
+                          {i === 3 && <CheckCircle className="w-4 h-4 text-primary" />}
                         </div>
+                        <span>{q}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Messages */
+            <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
+              <div className="space-y-4">
+                <AnimatePresence mode="popLayout">
+                  {messages.map((message) => (
+                    <motion.div
+                      key={message.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                    >
+                      {message.role === "assistant" && (
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-korean-blue to-korean-green flex items-center justify-center shrink-0">
+                          <Bot className="w-4 h-4 text-white" />
+                        </div>
+                      )}
+                      
+                      <div className={`max-w-[80%] ${message.role === "user" ? "order-first" : ""}`}>
+                        <div className={`rounded-2xl px-4 py-3 ${
+                          message.role === "user" 
+                            ? "bg-primary text-primary-foreground rounded-br-md" 
+                            : "bg-muted/50 rounded-bl-md"
+                        }`}>
+                          {message.role === "assistant" ? (
+                            <div className="prose prose-sm dark:prose-invert max-w-none">
+                              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                {message.content || "..."}
+                              </ReactMarkdown>
+                            </div>
+                          ) : (
+                            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                          )}
+                        </div>
+                        
+                        {message.cached && (
+                          <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                            <Zap className="w-3 h-3" />
+                            캐시된 응답
+                          </div>
+                        )}
+                      </div>
+                      
+                      {message.role === "user" && (
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                          <User className="w-4 h-4 text-primary" />
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+
+                {isLoading && messages[messages.length - 1]?.role === "user" && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex gap-3"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-korean-blue to-korean-green flex items-center justify-center">
+                      <Loader2 className="w-4 h-4 text-white animate-spin" />
+                    </div>
+                    <div className="bg-muted/50 rounded-2xl rounded-bl-md px-4 py-3">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span>생각 중...</span>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+                  </motion.div>
+                )}
+              </div>
+            </ScrollArea>
+          )}
 
-      {/* Features Section */}
-      <section className="py-16 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Tính năng chính
-            </h2>
-            <p className="text-muted-foreground">
-              Những tính năng đặc biệt chỉ có ở Q&A Agent
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.05 }}
-              >
-                <Card className="h-full border-border/50 bg-card/50 hover:bg-card hover:border-primary/30 transition-all group">
-                  <CardContent className="p-6">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-korean-blue/20 to-korean-green/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                      <feature.icon className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="font-semibold mb-2">{feature.title}</h3>
-                    <p className="text-sm text-muted-foreground">{feature.description}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Notice Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="max-w-3xl mx-auto"
-          >
-            <Card className="border-primary/20 bg-primary/5">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <AlertCircle className="w-5 h-5 text-primary" />
-                  <h3 className="font-semibold">Lưu ý</h3>
+          {/* Input Area */}
+          <div className="p-4 border-t border-border/50">
+            {!isAuthenticated ? (
+              <div className="text-center py-4">
+                <AlertCircle className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground mb-3">로그인 후 이용 가능합니다</p>
+                <Button onClick={() => window.location.href = "/auth"} className="gap-2">
+                  로그인하기
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                {messages.length > 0 && (
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={clearChat}
+                    className="shrink-0"
+                    title="대화 초기화"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                  </Button>
+                )}
+                
+                <div className="flex-1 relative">
+                  <Textarea
+                    ref={textareaRef}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="질문을 입력하세요..."
+                    disabled={isLoading || (remainingQuestions === 0 && !isPremium)}
+                    className="min-h-[44px] max-h-32 resize-none pr-12 rounded-xl"
+                    rows={1}
+                  />
+                  <Button
+                    size="icon"
+                    onClick={() => sendMessage()}
+                    disabled={!input.trim() || isLoading || (remainingQuestions === 0 && !isPremium)}
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 w-8 rounded-lg"
+                  >
+                    {isLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Send className="w-4 h-4" />
+                    )}
+                  </Button>
                 </div>
-                <ul className="space-y-3">
-                  {notices.map((notice, index) => (
-                    <li key={index} className="flex items-start gap-3 text-sm text-muted-foreground">
-                      <CheckCircle2 className="w-4 h-4 text-korean-green shrink-0 mt-0.5" />
-                      <span>{notice}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-      </section>
+              </div>
+            )}
 
-      {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-b from-muted/50 to-background">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center max-w-2xl mx-auto"
-          >
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-korean-blue to-korean-green flex items-center justify-center mx-auto mb-6">
-              <MessageSquare className="w-8 h-8 text-white" />
-            </div>
-            
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Hãy hỏi AI ngay bây giờ!
-            </h2>
-            <p className="text-muted-foreground mb-8">
-              Học vui qua game, thắc mắc hỏi AI!<br />
-              Người bạn đồng hành hoàn hảo trong hành trình chinh phục TOPIK.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                onClick={handleOpenChat}
-                className="bg-gradient-to-r from-korean-blue to-korean-green hover:opacity-90 text-white gap-2"
+            {remainingQuestions === 0 && !isPremium && isAuthenticated && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-3 p-3 rounded-xl bg-korean-yellow/10 border border-korean-yellow/20"
               >
-                <Sparkles className="w-5 h-5" />
-                Mở Q&A Agent
-                <ExternalLink className="w-4 h-4" />
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline"
-                onClick={() => window.location.href = "/dashboard"}
-                className="gap-2"
-              >
-                <BookOpen className="w-5 h-5" />
-                Học qua game
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      <AppFooter />
+                <div className="flex items-center gap-3">
+                  <Crown className="w-5 h-5 text-korean-yellow shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">오늘 무료 질문이 모두 소진되었습니다</p>
+                    <p className="text-xs text-muted-foreground">Premium 구독으로 무제한 질문하세요</p>
+                  </div>
+                  <Button size="sm" className="bg-korean-yellow hover:bg-korean-yellow/90 text-foreground">
+                    업그레이드
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+          </div>
+        </Card>
+      </main>
     </div>
   );
 };
