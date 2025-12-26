@@ -422,10 +422,28 @@
     "gameComplete": "Tugadi!",
     "playAgain": "Qayta o'ynash"
   },
-  "footer": {
-    "hanoi": "Xanoy rasmiy",
-    "qnaAgent": "Q&A Agent",
-    "admin": "ADMIN",
-    "copyright": "© 2025 Powered by LUKAS Edutainment"
-  }
+  "handwriting": {
+    "title": "Qo'l yozuvi mashqi",
+    "subtitle": "Hangul yozish mashqi",
+    "wordsLoaded": "Yangi so'zlar yuklandi! 📚",
+    "sentencesLoaded": "Yangi gaplar yuklandi! 📝",
+    "aiGenerated": "AI {{count}} ta yangi kontent yaratdi",
+    "completed": "Bajarildi! 🎉",
+    "averageScore": "O'rtacha ball: {{score}} ball",
+    "completedCount": "{{count}}/3 Bajarildi",
+    "count": " ta",
+    "newContent": "Yangi kontent",
+    "aiGenerating": "AI yangi kontent yaratmoqda...",
+    "tabs": { "consonants": "Undoshlar·Unlilar", "consonantsSub": "Undoshlar & Unlilar", "words": "So'zlar", "wordsSub": "Lug'at", "sentences": "Gaplar", "sentencesSub": "Gaplar" },
+    "practice": { "consonants": "Undoshlar·unlilar mashqi", "words": "So'zlar mashqi", "sentences": "Gaplar mashqi", "instruction": "Kanvasga to'g'ridan-to'g'ri yozing" }
+  },
+  "aiAgent": {
+    "fileTooLarge": "Fayl juda katta", "fileSizeLimit": "5MB dan kichik rasm tanlang", "featureDeveloping": "🎤 Funksiya ishlab chiqilmoqda", "voiceComingSoon": "Ovozli kiritish tez orada!",
+    "pleaseLogin": "Tizimga kiring 🔐", "loginToUse": "LUKATO AI Agent ishlatish uchun kiring", "outOfQuestions": "Bepul savollar tugadi 😢", "upgradePremium": "Cheksiz savollar uchun Premium!",
+    "systemBusy": "Tizim band 🔄", "tryAgainLater": "Keyinroq urinib ko'ring", "cannotSend": "Xabar yuborib bo'lmadi", "clearChat": "Chatni tozalash",
+    "suggestedQuestions": "Tavsiya etilgan savollar:", "cachedResponse": "Keshlangan javob", "thinking": "O'ylamoqda...", "loginPrompt": "AI bilan suhbatlashish uchun kiring",
+    "noQuestionsLeft": "Bugungi bepul savollar tugadi", "upgradePremiumBtn": "Premium ga yangilash", "uploadImage": "Rasm yuklash", "voiceInput": "Ovozli kiritish",
+    "placeholder": "Savolingizni kiriting... 💬", "hint": "Jo'natish uchun Enter • Yangi qator uchun Shift+Enter"
+  },
+  "footer": { "hanoi": "Xanoy rasmiy", "qnaAgent": "Q&A Agent", "admin": "ADMIN", "copyright": "© 2025 Powered by LUKAS Edutainment" }
 }

@@ -498,6 +498,57 @@
     "gameComplete": "Complete!",
     "playAgain": "Play Again"
   },
+  "handwriting": {
+    "title": "Handwriting Practice",
+    "subtitle": "Practice writing Hangul",
+    "wordsLoaded": "New words loaded! 📚",
+    "sentencesLoaded": "New sentences loaded! 📝",
+    "aiGenerated": "AI generated {{count}} new content items",
+    "completed": "Completed! 🎉",
+    "averageScore": "Average score: {{score}} points",
+    "completedCount": "{{count}}/3 Completed",
+    "count": "",
+    "newContent": "New content",
+    "aiGenerating": "AI is generating new content...",
+    "tabs": {
+      "consonants": "Consonants·Vowels",
+      "consonantsSub": "Consonants & Vowels",
+      "words": "Words",
+      "wordsSub": "Vocabulary",
+      "sentences": "Sentences",
+      "sentencesSub": "Sentences"
+    },
+    "practice": {
+      "consonants": "Practice consonants & vowels",
+      "words": "Practice words",
+      "sentences": "Practice sentences",
+      "instruction": "Write directly on the canvas"
+    }
+  },
+  "aiAgent": {
+    "fileTooLarge": "File too large",
+    "fileSizeLimit": "Please select an image under 5MB",
+    "featureDeveloping": "🎤 Feature in development",
+    "voiceComingSoon": "Voice input coming soon!",
+    "pleaseLogin": "Please login 🔐",
+    "loginToUse": "Login to use LUKATO AI Agent",
+    "outOfQuestions": "Out of free questions 😢",
+    "upgradePremium": "Upgrade to Premium for unlimited questions!",
+    "systemBusy": "System is busy 🔄",
+    "tryAgainLater": "Please try again later",
+    "cannotSend": "Cannot send message",
+    "clearChat": "Clear chat",
+    "suggestedQuestions": "Suggested questions:",
+    "cachedResponse": "Cached response",
+    "thinking": "Thinking...",
+    "loginPrompt": "Login to start chatting with AI",
+    "noQuestionsLeft": "You've used all free questions today",
+    "upgradePremiumBtn": "Upgrade Premium",
+    "uploadImage": "Upload image",
+    "voiceInput": "Voice input",
+    "placeholder": "Enter your question... 💬",
+    "hint": "Press Enter to send • Shift+Enter for new line"
+  },
   "footer": {
     "hanoi": "Hanoi Official",
     "qnaAgent": "Q&A Agent",

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -93,6 +94,7 @@ const AGENT_WELCOME: Record<string, { title: string; subtitle: string }> = {
 const AIAgentChat = () => {
   const { agentId } = useParams<{ agentId: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -189,8 +191,8 @@ const AIAgentChat = () => {
     Array.from(files).forEach(file => {
       if (file.size > 5 * 1024 * 1024) {
         toast({
-          title: "File quá lớn",
-          description: "Vui lòng chọn ảnh dưới 5MB",
+          title: t("aiAgent.fileTooLarge"),
+          description: t("aiAgent.fileSizeLimit"),
           variant: "destructive"
         });
         return;
@@ -216,8 +218,8 @@ const AIAgentChat = () => {
   const toggleRecording = () => {
     if (!isRecording) {
       toast({
-        title: "🎤 Tính năng đang phát triển",
-        description: "Nhập giọng nói sẽ sớm ra mắt!"
+        title: t("aiAgent.featureDeveloping"),
+        description: t("aiAgent.voiceComingSoon")
       });
     }
     setIsRecording(!isRecording);
@@ -229,8 +231,8 @@ const AIAgentChat = () => {
 
     if (!isAuthenticated) {
       toast({
-        title: "Vui lòng đăng nhập 🔐",
-        description: "Đăng nhập để sử dụng LUKATO AI Agent",
+        title: t("aiAgent.pleaseLogin"),
+        description: t("aiAgent.loginToUse"),
         variant: "destructive"
       });
       return;
@@ -278,14 +280,14 @@ const AIAgentChat = () => {
           if (errorData.error === "daily_limit_exceeded") {
             setRemainingQuestions(0);
             toast({
-              title: "Hết lượt hỏi miễn phí 😢",
-              description: "Nâng cấp Premium để hỏi không giới hạn!",
+              title: t("aiAgent.outOfQuestions"),
+              description: t("aiAgent.upgradePremium"),
               variant: "destructive"
             });
           } else {
             toast({
-              title: "Hệ thống bận 🔄",
-              description: "Vui lòng thử lại sau ít phút",
+              title: t("aiAgent.systemBusy"),
+              description: t("aiAgent.tryAgainLater"),
               variant: "destructive"
             });
           }
@@ -349,8 +351,8 @@ const AIAgentChat = () => {
     } catch (error) {
       console.error("Send message error:", error);
       toast({
-        title: "Lỗi ❌",
-        description: error instanceof Error ? error.message : "Không thể gửi tin nhắn",
+        title: t("common.error"),
+        description: error instanceof Error ? error.message : t("aiAgent.cannotSend"),
         variant: "destructive"
       });
     } finally {
@@ -398,7 +400,7 @@ const AIAgentChat = () => {
                   variant="ghost"
                   size="icon"
                   onClick={clearChat}
-                  title="Xóa cuộc trò chuyện"
+                  title={t("aiAgent.clearChat")}
                 >
                   <RotateCcw className="w-4 h-4" />
                 </Button>
@@ -431,7 +433,7 @@ const AIAgentChat = () => {
 
               {/* Suggested Questions */}
               <div className="w-full max-w-2xl">
-                <p className="text-sm text-muted-foreground mb-4">💡 Gợi ý câu hỏi:</p>
+                <p className="text-sm text-muted-foreground mb-4">💡 {t("aiAgent.suggestedQuestions")}</p>
                 <div className="grid sm:grid-cols-2 gap-3">
                   {(AGENT_QUESTIONS[agentId || 'topik'] || AGENT_QUESTIONS.topik).map((q, i) => (
                     <motion.button
@@ -538,7 +540,7 @@ const AIAgentChat = () => {
                         {message.cached && (
                           <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
                             <Zap className="w-3 h-3" />
-                            Câu trả lời từ bộ nhớ cache ⚡
+                            {t("aiAgent.cachedResponse")} ⚡
                           </div>
                         )}
                       </div>
@@ -565,7 +567,7 @@ const AIAgentChat = () => {
                     <div className="bg-muted/60 rounded-2xl rounded-bl-sm px-5 py-4">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Đang suy nghĩ... 🤔</span>
+                        <span>{t("aiAgent.thinking")} 🤔</span>
                       </div>
                     </div>
                   </motion.div>
@@ -601,19 +603,19 @@ const AIAgentChat = () => {
               {!isAuthenticated ? (
                 <div className="text-center py-6">
                   <AlertCircle className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-                  <p className="text-sm text-muted-foreground mb-4">Đăng nhập để bắt đầu trò chuyện với AI 🔐</p>
+                  <p className="text-sm text-muted-foreground mb-4">{t("aiAgent.loginPrompt")} 🔐</p>
                   <Button onClick={() => navigate("/auth")} className="gap-2">
                     <Sparkles className="w-4 h-4" />
-                    Đăng nhập ngay
+                    {t("common.login")}
                   </Button>
                 </div>
               ) : remainingQuestions === 0 && !isPremium ? (
                 <div className="text-center py-6">
                   <Crown className="w-10 h-10 text-korean-yellow mx-auto mb-3" />
-                  <p className="text-sm text-muted-foreground mb-4">Bạn đã hết lượt hỏi miễn phí hôm nay 😢</p>
+                  <p className="text-sm text-muted-foreground mb-4">{t("aiAgent.noQuestionsLeft")} 😢</p>
                   <Button onClick={() => navigate("/pricing")} className="gap-2 bg-korean-yellow hover:bg-korean-yellow/90 text-black">
                     <Crown className="w-4 h-4" />
-                    Nâng cấp Premium
+                    {t("aiAgent.upgradePremiumBtn")}
                   </Button>
                 </div>
               ) : (
@@ -632,29 +634,27 @@ const AIAgentChat = () => {
                     size="icon"
                     onClick={() => fileInputRef.current?.click()}
                     className="shrink-0 h-11 w-11"
-                    title="Tải ảnh lên"
+                    title={t("aiAgent.uploadImage")}
                   >
                     <ImagePlus className="w-5 h-5" />
                   </Button>
 
-                  {/* Voice input */}
                   <Button
                     variant={isRecording ? "destructive" : "outline"}
                     size="icon"
                     onClick={toggleRecording}
                     className="shrink-0 h-11 w-11"
-                    title="Nhập giọng nói"
+                    title={t("aiAgent.voiceInput")}
                   >
                     {isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                   </Button>
-                  
                   <div className="flex-1 relative">
                     <Textarea
                       ref={textareaRef}
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyDown}
-                      placeholder="Nhập câu hỏi của bạn... 💬"
+                      placeholder={t("aiAgent.placeholder")}
                       disabled={isLoading}
                       className="min-h-[44px] max-h-40 resize-none pr-14 rounded-xl text-base"
                       rows={1}
@@ -675,10 +675,9 @@ const AIAgentChat = () => {
                 </div>
               )}
 
-              {/* Hints */}
               {isAuthenticated && (
                 <p className="text-xs text-center text-muted-foreground mt-3">
-                  Nhấn Enter để gửi • Shift+Enter để xuống dòng 📝
+                  {t("aiAgent.hint")} 📝
                 </p>
               )}
             </div>

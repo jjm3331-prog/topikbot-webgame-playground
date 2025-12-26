@@ -422,10 +422,28 @@
     "gameComplete": "完了！",
     "playAgain": "もう一度プレイ"
   },
-  "footer": {
-    "hanoi": "ハノイ公式",
-    "qnaAgent": "Q&A Agent",
-    "admin": "ADMIN",
-    "copyright": "© 2025 Powered by LUKAS Edutainment"
-  }
+  "handwriting": {
+    "title": "手書き練習",
+    "subtitle": "ハングル書き練習",
+    "wordsLoaded": "新しい単語をロードしました！📚",
+    "sentencesLoaded": "新しい文章をロードしました！📝",
+    "aiGenerated": "AIが{{count}}個の新しいコンテンツを生成しました",
+    "completed": "完了！🎉",
+    "averageScore": "平均スコア：{{score}}点",
+    "completedCount": "{{count}}/3 完了",
+    "count": "個",
+    "newContent": "新しいコンテンツ",
+    "aiGenerating": "AIが新しいコンテンツを生成中...",
+    "tabs": { "consonants": "子音·母音", "consonantsSub": "子音 & 母音", "words": "単語", "wordsSub": "語彙", "sentences": "文章", "sentencesSub": "文章" },
+    "practice": { "consonants": "子音·母音の練習", "words": "単語の練習", "sentences": "文章の練習", "instruction": "キャンバスに直接書いてください" }
+  },
+  "aiAgent": {
+    "fileTooLarge": "ファイルが大きすぎます", "fileSizeLimit": "5MB以下の画像を選択してください", "featureDeveloping": "🎤 開発中の機能", "voiceComingSoon": "音声入力は近日公開！",
+    "pleaseLogin": "ログインしてください 🔐", "loginToUse": "LUKATO AI Agentを使用するにはログインしてください", "outOfQuestions": "無料質問回数を使い切りました 😢", "upgradePremium": "Premiumにアップグレードで無制限！",
+    "systemBusy": "システムが混雑しています 🔄", "tryAgainLater": "しばらくしてからお試しください", "cannotSend": "メッセージを送信できません", "clearChat": "チャットをクリア",
+    "suggestedQuestions": "おすすめの質問：", "cachedResponse": "キャッシュされた回答", "thinking": "考え中...", "loginPrompt": "AIとチャットするにはログインしてください",
+    "noQuestionsLeft": "本日の無料質問回数を使い切りました", "upgradePremiumBtn": "Premiumにアップグレード", "uploadImage": "画像をアップロード", "voiceInput": "音声入力",
+    "placeholder": "質問を入力... 💬", "hint": "Enterで送信 • Shift+Enterで改行"
+  },
+  "footer": { "hanoi": "ハノイ公式", "qnaAgent": "Q&A Agent", "admin": "ADMIN", "copyright": "© 2025 Powered by LUKAS Edutainment" }
 }

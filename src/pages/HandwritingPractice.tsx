@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
@@ -58,6 +59,7 @@ const fallbackSentences: CharacterItem[] = [
 const HandwritingPractice = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<TabType>("consonants");
   const [completedTabs, setCompletedTabs] = useState<TabType[]>([]);
@@ -118,8 +120,8 @@ const HandwritingPractice = () => {
         
         if (data.source === 'rag') {
           toast({
-            title: type === 'words' ? "새 단어 로드 완료! 📚" : "새 문장 로드 완료! 📝",
-            description: `AI가 ${contentItems.length}개의 새로운 콘텐츠를 생성했습니다`,
+            title: type === 'words' ? t("handwriting.wordsLoaded") : t("handwriting.sentencesLoaded"),
+            description: t("handwriting.aiGenerated", { count: contentItems.length }),
           });
         }
       } else {
@@ -176,8 +178,8 @@ const HandwritingPractice = () => {
     }
     
     toast({
-      title: "Hoàn thành! 🎉",
-      description: `Điểm trung bình: ${avg} điểm`,
+      title: t("handwriting.completed"),
+      description: t("handwriting.averageScore", { score: avg }),
     });
 
     // Auto-refresh content after completion for words/sentences
@@ -193,16 +195,16 @@ const HandwritingPractice = () => {
   const tabConfig = [
     { 
       id: "consonants" as TabType, 
-      label: "자음·모음", 
-      sublabel: "Phụ âm & Nguyên âm",
+      label: t("handwriting.tabs.consonants"), 
+      sublabel: t("handwriting.tabs.consonantsSub"),
       icon: Type,
       count: consonantsData.basic.length + consonantsData.vowels.length,
       color: "from-violet-500 to-purple-600"
     },
     { 
       id: "words" as TabType, 
-      label: "단어", 
-      sublabel: "Từ vựng",
+      label: t("handwriting.tabs.words"), 
+      sublabel: t("handwriting.tabs.wordsSub"),
       icon: BookOpen,
       count: wordsData.length,
       color: "from-blue-500 to-cyan-500",
@@ -210,8 +212,8 @@ const HandwritingPractice = () => {
     },
     { 
       id: "sentences" as TabType, 
-      label: "문장", 
-      sublabel: "Câu",
+      label: t("handwriting.tabs.sentences"), 
+      sublabel: t("handwriting.tabs.sentencesSub"),
       icon: FileText,
       count: sentencesData.length,
       color: "from-emerald-500 to-teal-500",
@@ -234,10 +236,11 @@ const HandwritingPractice = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate("/learning-hub")}
               className="mb-6 hover:bg-primary/10"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
+              {t("common.back")}
               Quay lại
             </Button>
 
@@ -261,7 +264,7 @@ const HandwritingPractice = () => {
                     transition={{ delay: 0.3 }}
                     className="text-3xl sm:text-4xl font-bold text-white mb-2"
                   >
-                    손글씨 연습
+                    {t("handwriting.title")}
                   </motion.h1>
                   <motion.p 
                     initial={{ opacity: 0, x: -20 }}
@@ -269,7 +272,7 @@ const HandwritingPractice = () => {
                     transition={{ delay: 0.4 }}
                     className="text-white/80 text-lg"
                   >
-                    Luyện viết tay chữ Hàn
+                    {t("handwriting.subtitle")}
                   </motion.p>
                 </div>
               </div>
@@ -283,7 +286,7 @@ const HandwritingPractice = () => {
               >
                 <div className="flex items-center gap-2 text-white/90">
                   <Trophy className="w-5 h-5" />
-                  <span className="text-sm">{completedTabs.length}/3 Hoàn thành</span>
+                  <span className="text-sm">{t("handwriting.completedCount", { count: completedTabs.length })}</span>
                 </div>
                 <div className="flex items-center gap-2 text-white/90">
                   <Star className="w-5 h-5" />
@@ -346,14 +349,13 @@ const HandwritingPractice = () => {
                         </h3>
                         <p className="text-xs text-muted-foreground hidden sm:block">{tab.sublabel}</p>
 
-                        {/* Count badge */}
                         <div className="mt-2 flex items-center gap-2">
                           <span className={`text-xs px-2 py-0.5 rounded-full ${
                             isActive 
                               ? "bg-primary/20 text-primary" 
                               : "bg-muted text-muted-foreground"
                           }`}>
-                            {tab.count}개
+                            {tab.count}{t("handwriting.count")}
                           </span>
                           
                           {/* RAG badge */}
@@ -407,12 +409,12 @@ const HandwritingPractice = () => {
                             </div>
                             <div>
                               <h2 className="font-bold text-foreground">
-                                {activeTab === "consonants" && "자음·모음 따라쓰기 / Viết theo phụ âm·nguyên âm"}
-                                {activeTab === "words" && "단어 따라쓰기 / Viết theo từ vựng"}
-                                {activeTab === "sentences" && "문장 따라쓰기 / Viết theo câu"}
+                                {activeTab === "consonants" && t("handwriting.practice.consonants")}
+                                {activeTab === "words" && t("handwriting.practice.words")}
+                                {activeTab === "sentences" && t("handwriting.practice.sentences")}
                               </h2>
                               <p className="text-sm text-muted-foreground">
-                                Hãy viết trực tiếp trên canvas
+                                {t("handwriting.practice.instruction")}
                               </p>
                             </div>
                           </div>
@@ -432,17 +434,16 @@ const HandwritingPractice = () => {
                                 <RefreshCw className="w-4 h-4" />
                               )}
                               <span className="hidden sm:inline">
-                                {isLoading ? "Đang tải..." : "Nội dung mới"}
+                                {isLoading ? t("common.loading") : t("handwriting.newContent")}
                               </span>
                             </Button>
                           )}
                         </div>
 
-                        {/* Loading state */}
                         {isLoading ? (
                           <div className="flex flex-col items-center justify-center py-20 gap-4">
                             <Loader2 className="w-10 h-10 animate-spin text-primary" />
-                            <p className="text-muted-foreground">AI đang tạo nội dung mới...</p>
+                            <p className="text-muted-foreground">{t("handwriting.aiGenerating")}</p>
                           </div>
                         ) : (
                           <HangulTracing

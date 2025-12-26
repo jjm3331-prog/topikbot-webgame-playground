@@ -498,6 +498,57 @@
     "gameComplete": "게임 완료!",
     "playAgain": "다시 하기"
   },
+  "handwriting": {
+    "title": "손글씨 연습",
+    "subtitle": "한글 글씨 연습",
+    "wordsLoaded": "새 단어 로드 완료! 📚",
+    "sentencesLoaded": "새 문장 로드 완료! 📝",
+    "aiGenerated": "AI가 {{count}}개의 새로운 콘텐츠를 생성했습니다",
+    "completed": "완료! 🎉",
+    "averageScore": "평균 점수: {{score}}점",
+    "completedCount": "{{count}}/3 완료",
+    "count": "개",
+    "newContent": "새 콘텐츠",
+    "aiGenerating": "AI가 새 콘텐츠를 생성 중...",
+    "tabs": {
+      "consonants": "자음·모음",
+      "consonantsSub": "자음 & 모음",
+      "words": "단어",
+      "wordsSub": "어휘",
+      "sentences": "문장",
+      "sentencesSub": "문장"
+    },
+    "practice": {
+      "consonants": "자음·모음 따라쓰기",
+      "words": "단어 따라쓰기",
+      "sentences": "문장 따라쓰기",
+      "instruction": "캔버스에 직접 써보세요"
+    }
+  },
+  "aiAgent": {
+    "fileTooLarge": "파일이 너무 큽니다",
+    "fileSizeLimit": "5MB 이하의 이미지를 선택해주세요",
+    "featureDeveloping": "🎤 개발 중인 기능",
+    "voiceComingSoon": "음성 입력 곧 출시!",
+    "pleaseLogin": "로그인해주세요 🔐",
+    "loginToUse": "LUKATO AI Agent를 사용하려면 로그인하세요",
+    "outOfQuestions": "무료 질문 횟수 소진 😢",
+    "upgradePremium": "프리미엄으로 업그레이드하여 무제한 이용!",
+    "systemBusy": "시스템 사용량 많음 🔄",
+    "tryAgainLater": "잠시 후 다시 시도해주세요",
+    "cannotSend": "메시지를 보낼 수 없습니다",
+    "clearChat": "대화 삭제",
+    "suggestedQuestions": "추천 질문:",
+    "cachedResponse": "캐시된 응답",
+    "thinking": "생각 중...",
+    "loginPrompt": "AI와 대화하려면 로그인하세요",
+    "noQuestionsLeft": "오늘 무료 질문 횟수를 모두 사용했습니다",
+    "upgradePremiumBtn": "프리미엄 업그레이드",
+    "uploadImage": "이미지 업로드",
+    "voiceInput": "음성 입력",
+    "placeholder": "질문을 입력하세요... 💬",
+    "hint": "Enter로 전송 • Shift+Enter로 줄바꿈"
+  },
   "footer": {
     "hanoi": "하노이 공식",
     "qnaAgent": "Q&A Agent",
