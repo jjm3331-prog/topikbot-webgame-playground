@@ -4,18 +4,59 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Check, Globe, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { languages, type LanguageCode } from '@/i18n/config';
+import { toast } from '@/hooks/use-toast';
 
 export const LanguageSelector = () => {
   const { i18n, t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [hoveredLang, setHoveredLang] = useState<string | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
 
-  const handleLanguageChange = (code: LanguageCode) => {
-    i18n.changeLanguage(code);
+  const handleLanguageChange = async (code: LanguageCode) => {
+    if (code === i18n.language) {
+      setIsOpen(false);
+      return;
+    }
+
+    const selectedLang = languages.find(lang => lang.code === code);
+    if (!selectedLang) return;
+
+    // Start transition effect
+    setIsTransitioning(true);
     setIsOpen(false);
+
+    // Small delay for visual effect
+    await new Promise(resolve => setTimeout(resolve, 150));
+    
+    // Change language
+    await i18n.changeLanguage(code);
+    
+    // Show toast notification
+    toast({
+      title: `${selectedLang.flag} ${selectedLang.nativeName}`,
+      description: getLanguageChangeMessage(code),
+      duration: 3000,
+    });
+
+    // End transition effect
+    await new Promise(resolve => setTimeout(resolve, 300));
+    setIsTransitioning(false);
+  };
+
+  const getLanguageChangeMessage = (code: LanguageCode): string => {
+    const messages: Record<LanguageCode, string> = {
+      ko: '언어가 한국어로 변경되었습니다',
+      vi: 'Ngôn ngữ đã được chuyển sang Tiếng Việt',
+      en: 'Language changed to English',
+      ja: '言語が日本語に変更されました',
+      zh: '语言已切换为中文',
+      ru: 'Язык изменен на русский',
+      uz: "Til o'zbek tiliga o'zgartirildi",
+    };
+    return messages[code];
   };
 
   // Close on click outside
@@ -33,8 +74,43 @@ export const LanguageSelector = () => {
   }, [isOpen]);
 
   return (
-    <div className="relative" ref={containerRef}>
-      {/* Trigger Button with Premium Glow Effect */}
+    <>
+      {/* Page Transition Overlay */}
+      <AnimatePresence>
+        {isTransitioning && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[100] pointer-events-none flex items-center justify-center bg-background/60 backdrop-blur-md"
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 1.1, opacity: 0 }}
+              transition={{ duration: 0.3, type: 'spring' }}
+              className="flex flex-col items-center gap-4"
+            >
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                className="w-16 h-16 rounded-full border-4 border-primary/30 border-t-primary"
+              />
+              <motion.span
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-5xl"
+              >
+                {currentLanguage.flag}
+              </motion.span>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="relative" ref={containerRef}>
+        {/* Trigger Button with Premium Glow Effect */}
       <motion.div
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
@@ -240,7 +316,8 @@ export const LanguageSelector = () => {
           </>
         )}
       </AnimatePresence>
-    </div>
+      </div>
+    </>
   );
 };
 
