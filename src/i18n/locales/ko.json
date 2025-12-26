@@ -469,16 +469,20 @@
     "pricing": { "title1": "합리적인 가격,", "local": "현지", "title2": "글로벌 품질", "free": "무료", "forever": "평생 무료", "start": "시작하기", "month": "월", "upgrade": "업그레이드" },
     "finalCta": { "title1": "TOPIK", "title2": "정복", "desc": "TOPIK 출제 교수 + LUKATO AI =", "noRival": "최강 조합", "cta": "지금 시작하기" }
   },
-  "grammar": {
+"grammar": {
     "title": "문법 학습",
     "description": "미니 게임으로 문법을 마스터하세요",
     "assembly": "문장 조립",
-    "tetris": "문법 테트리스",
+    "assemblyShort": "조립",
+    "tetris": "테트리스",
     "tower": "타워 디펜스",
+    "towerShort": "타워",
     "selectLevel": "레벨 선택",
-    "beginner": "초급 (1-2급)",
-    "intermediate": "중급 (3-4급)",
-    "advanced": "고급 (5-6급)",
+    "levels": {
+      "beginner": "초급 (1-2급)",
+      "intermediate": "중급 (3-4급)",
+      "advanced": "고급 (5-6급)"
+    },
     "arrangeWords": "단어를 올바른 순서로 배열하세요",
     "dragHere": "여기에 단어를 배치하세요",
     "grammarPoint": "문법 포인트",

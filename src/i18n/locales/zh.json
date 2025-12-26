@@ -393,16 +393,20 @@
     "pricing": { "title1": "合理价格，", "local": "本地", "title2": "全球品质", "free": "免费", "forever": "永久免费", "start": "开始", "month": "月", "upgrade": "升级" },
     "finalCta": { "title1": "TOPIK", "title2": "征服", "desc": "TOPIK教授 + LUKATO AI =", "noRival": "无敌组合", "cta": "立即开始" }
   },
-  "grammar": {
+"grammar": {
     "title": "语法学习",
     "description": "通过迷你游戏掌握语法",
     "assembly": "句子组装",
-    "tetris": "语法俄罗斯方块",
+    "assemblyShort": "组装",
+    "tetris": "俄罗斯方块",
     "tower": "塔防",
+    "towerShort": "塔防",
     "selectLevel": "选择级别",
-    "beginner": "初级 (1-2级)",
-    "intermediate": "中级 (3-4级)",
-    "advanced": "高级 (5-6级)",
+    "levels": {
+      "beginner": "初级 (1-2级)",
+      "intermediate": "中级 (3-4级)",
+      "advanced": "高级 (5-6级)"
+    },
     "arrangeWords": "按正确顺序排列单词",
     "dragHere": "将单词拖到这里",
     "grammarPoint": "语法点",
@@ -417,5 +421,11 @@
     "loading": "加载问题中...",
     "gameComplete": "完成！",
     "playAgain": "再玩一次"
+  },
+  "footer": {
+    "hanoi": "河内官方",
+    "qnaAgent": "Q&A Agent",
+    "admin": "ADMIN",
+    "copyright": "© 2025 Powered by LUKAS Edutainment"
   }
 }

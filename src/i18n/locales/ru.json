@@ -393,16 +393,20 @@
     "pricing": { "title1": "Справедливая цена,", "local": "местная", "title2": "глобальное качество", "free": "Бесплатно", "forever": "Бесплатно навсегда", "start": "Начать", "month": "месяц", "upgrade": "Улучшить" },
     "finalCta": { "title1": "TOPIK", "title2": "покорение", "desc": "Профессора TOPIK + LUKATO AI =", "noRival": "Непобедимая комбинация", "cta": "Начать сейчас" }
   },
-  "grammar": {
+"grammar": {
     "title": "Изучение грамматики",
     "description": "Освойте грамматику через мини-игры",
     "assembly": "Сборка предложений",
-    "tetris": "Грамматический тетрис",
+    "assemblyShort": "Сборка",
+    "tetris": "Тетрис",
     "tower": "Защита башни",
+    "towerShort": "Башня",
     "selectLevel": "Выберите уровень",
-    "beginner": "Начальный (1-2 уровень)",
-    "intermediate": "Средний (3-4 уровень)",
-    "advanced": "Продвинутый (5-6 уровень)",
+    "levels": {
+      "beginner": "Начальный (1-2 уровень)",
+      "intermediate": "Средний (3-4 уровень)",
+      "advanced": "Продвинутый (5-6 уровень)"
+    },
     "arrangeWords": "Расположите слова в правильном порядке",
     "dragHere": "Перетащите слова сюда",
     "grammarPoint": "Грамматическая тема",
@@ -417,5 +421,11 @@
     "loading": "Загрузка вопросов...",
     "gameComplete": "Завершено!",
     "playAgain": "Играть снова"
+  },
+  "footer": {
+    "hanoi": "Ханой официальный",
+    "qnaAgent": "Q&A Agent",
+    "admin": "ADMIN",
+    "copyright": "© 2025 Powered by LUKAS Edutainment"
   }
 }

@@ -393,16 +393,20 @@
     "pricing": { "title1": "リーズナブルな価格、", "local": "ローカル", "title2": "グローバル品質", "free": "無料", "forever": "永久無料", "start": "始める", "month": "月", "upgrade": "アップグレード" },
     "finalCta": { "title1": "TOPIK", "title2": "制覇", "desc": "TOPIK教授 + LUKATO AI =", "noRival": "最強の組み合わせ", "cta": "今すぐ始める" }
   },
-  "grammar": {
+"grammar": {
     "title": "文法学習",
     "description": "ミニゲームで文法をマスター",
     "assembly": "文組み立て",
-    "tetris": "文法テトリス",
+    "assemblyShort": "組立",
+    "tetris": "テトリス",
     "tower": "タワーディフェンス",
+    "towerShort": "タワー",
     "selectLevel": "レベル選択",
-    "beginner": "初級（1-2級）",
-    "intermediate": "中級（3-4級）",
-    "advanced": "上級（5-6級）",
+    "levels": {
+      "beginner": "初級（1-2級）",
+      "intermediate": "中級（3-4級）",
+      "advanced": "上級（5-6級）"
+    },
     "arrangeWords": "正しい順序で単語を並べる",
     "dragHere": "ここに単語をドラッグ",
     "grammarPoint": "文法ポイント",
@@ -417,5 +421,11 @@
     "loading": "問題を読み込み中...",
     "gameComplete": "完了！",
     "playAgain": "もう一度プレイ"
+  },
+  "footer": {
+    "hanoi": "ハノイ公式",
+    "qnaAgent": "Q&A Agent",
+    "admin": "ADMIN",
+    "copyright": "© 2025 Powered by LUKAS Edutainment"
   }
 }

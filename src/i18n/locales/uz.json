@@ -393,16 +393,20 @@
     "pricing": { "title1": "Adolatli narx,", "local": "mahalliy", "title2": "global sifat", "free": "Bepul", "forever": "Abadiy bepul", "start": "Boshlash", "month": "oy", "upgrade": "Yangilash" },
     "finalCta": { "title1": "TOPIK", "title2": "zabt etish", "desc": "TOPIK professorlari + LUKATO AI =", "noRival": "Yengilmas kombinatsiya", "cta": "Hozir boshlash" }
   },
-  "grammar": {
+"grammar": {
     "title": "Grammatika o'rganish",
     "description": "Mini-o'yinlar orqali grammatikani o'zlashtirang",
     "assembly": "Jumla yig'ish",
-    "tetris": "Grammatika tetris",
+    "assemblyShort": "Yig'ish",
+    "tetris": "Tetris",
     "tower": "Minora himoyasi",
+    "towerShort": "Minora",
     "selectLevel": "Darajani tanlang",
-    "beginner": "Boshlang'ich (1-2 daraja)",
-    "intermediate": "O'rta (3-4 daraja)",
-    "advanced": "Yuqori (5-6 daraja)",
+    "levels": {
+      "beginner": "Boshlang'ich (1-2 daraja)",
+      "intermediate": "O'rta (3-4 daraja)",
+      "advanced": "Yuqori (5-6 daraja)"
+    },
     "arrangeWords": "So'zlarni to'g'ri tartibda joylashtiring",
     "dragHere": "So'zlarni bu yerga torting",
     "grammarPoint": "Grammatika nuqtasi",
@@ -417,5 +421,11 @@
     "loading": "Savollar yuklanmoqda...",
     "gameComplete": "Tugadi!",
     "playAgain": "Qayta o'ynash"
+  },
+  "footer": {
+    "hanoi": "Xanoy rasmiy",
+    "qnaAgent": "Q&A Agent",
+    "admin": "ADMIN",
+    "copyright": "© 2025 Powered by LUKAS Edutainment"
   }
 }

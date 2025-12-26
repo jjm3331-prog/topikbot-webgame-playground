@@ -552,16 +552,20 @@
       "cta": "Bắt đầu ngay"
     }
   },
-  "grammar": {
+"grammar": {
     "title": "Học ngữ pháp",
     "description": "Làm chủ ngữ pháp qua mini-game",
     "assembly": "Ghép câu",
-    "tetris": "Tetris ngữ pháp",
+    "assemblyShort": "Ghép",
+    "tetris": "Tetris",
     "tower": "Tower Defense",
+    "towerShort": "Tower",
     "selectLevel": "Chọn cấp độ",
-    "beginner": "Sơ cấp (1-2급)",
-    "intermediate": "Trung cấp (3-4급)",
-    "advanced": "Cao cấp (5-6급)",
+    "levels": {
+      "beginner": "Sơ cấp (1-2급)",
+      "intermediate": "Trung cấp (3-4급)",
+      "advanced": "Cao cấp (5-6급)"
+    },
     "arrangeWords": "Sắp xếp các từ theo đúng thứ tự",
     "dragHere": "Kéo từ vào đây",
     "grammarPoint": "Điểm ngữ pháp",

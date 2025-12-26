@@ -47,10 +47,11 @@ function BilingualText({
 
 // Custom Level Selector for Grammar
 function GrammarLevelSelector({ value, onChange }: { value: TopikLevel; onChange: (v: TopikLevel) => void }) {
-  const levels: { id: TopikLevel; label_vi: string; label_ko: string; color: string }[] = [
-    { id: "1-2", label_vi: "Cấp 1–2 (Sơ cấp)", label_ko: "1-2급 (초급)", color: "from-green-400 to-emerald-500" },
-    { id: "3-4", label_vi: "Cấp 3–4 (Trung cấp)", label_ko: "3-4급 (중급)", color: "from-blue-400 to-cyan-500" },
-    { id: "5-6", label_vi: "Cấp 5–6 (Cao cấp)", label_ko: "5-6급 (고급)", color: "from-purple-400 to-pink-500" },
+  const { t } = useTranslation();
+  const levels: { id: TopikLevel; labelKey: string; color: string }[] = [
+    { id: "1-2", labelKey: "grammar.levels.beginner", color: "from-green-400 to-emerald-500" },
+    { id: "3-4", labelKey: "grammar.levels.intermediate", color: "from-blue-400 to-cyan-500" },
+    { id: "5-6", labelKey: "grammar.levels.advanced", color: "from-purple-400 to-pink-500" },
   ];
 
   return (
@@ -62,8 +63,7 @@ function GrammarLevelSelector({ value, onChange }: { value: TopikLevel; onChange
           onClick={() => onChange(level.id)}
           className={value === level.id ? `bg-gradient-to-r ${level.color} text-white border-0` : ""}
         >
-          <span className="mr-2">{level.label_vi}</span>
-          <span className="text-xs opacity-80">{level.label_ko}</span>
+          {t(level.labelKey)}
         </Button>
       ))}
     </div>
@@ -407,6 +407,7 @@ function getFallbackQuestions(level: TopikLevel, type: string): GrammarQuestion[
 
 // ==================== Main Component ====================
 export default function Grammar() {
+  const { t } = useTranslation();
   const [level, setLevel] = useState<TopikLevel>("1-2");
   const [activeTab, setActiveTab] = useState("assembly");
 
@@ -419,8 +420,8 @@ export default function Grammar() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">Ngữ pháp / 문법</h1>
-            <p className="text-muted-foreground">Học ngữ pháp tiếng Hàn qua mini-game (VN ưu tiên) / 재미있는 게임으로 한국어 문법 마스터!</p>
+            <h1 className="text-2xl font-bold">{t("grammar.title")}</h1>
+            <p className="text-muted-foreground">{t("grammar.description")}</p>
           </div>
         </div>
 
@@ -432,17 +433,17 @@ export default function Grammar() {
           <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="assembly" className="gap-2">
               <Puzzle className="w-4 h-4" />
-              <span className="hidden sm:inline">Ghép / 조립</span>
-              <span className="sm:hidden">Ghép</span>
+              <span className="hidden sm:inline">{t("grammar.assembly")}</span>
+              <span className="sm:hidden">{t("grammar.assemblyShort")}</span>
             </TabsTrigger>
             <TabsTrigger value="tetris" className="gap-2">
               <Gamepad2 className="w-4 h-4" />
-              <span>Tetris</span>
+              <span>{t("grammar.tetris")}</span>
             </TabsTrigger>
             <TabsTrigger value="tower" className="gap-2">
               <Shield className="w-4 h-4" />
-              <span className="hidden sm:inline">Tower / 타워</span>
-              <span className="sm:hidden">Tower</span>
+              <span className="hidden sm:inline">{t("grammar.tower")}</span>
+              <span className="sm:hidden">{t("grammar.towerShort")}</span>
             </TabsTrigger>
           </TabsList>
 
