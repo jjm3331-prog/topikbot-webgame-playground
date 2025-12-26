@@ -1236,5 +1236,159 @@
         "Điểm chuẩn đậu HSK 5 là bao nhiêu?"
       ]
     }
+  },
+  "terms": {
+    "title": "Điều Khoản Sử Dụng (Terms of Use)",
+    "lastUpdated": "Cập nhật lần cuối: Tháng 1, 2025",
+    "article1": {
+      "title": "Điều 1. Mục Đích",
+      "content": "Điều khoản sử dụng này có mục đích quy định các điều kiện và quy tắc vận hành dịch vụ của \"LUKATO AI\" (sau đây gọi là \"Trang Web\"). Bằng việc truy cập hoặc sử dụng dịch vụ, người sử dụng đồng ý đã đọc, hiểu và chịu sự ràng buộc bởi các điều khoản này."
+    },
+    "article2": {
+      "title": "Điều 2. Định Nghĩa Thuật Ngữ",
+      "intro": "Các thuật ngữ chính được sử dụng trong điều khoản này được định nghĩa như sau:",
+      "item1": "\"Dịch vụ\" là các dịch vụ mà thành viên có thể sử dụng trên Trang Web.",
+      "item2": "\"Người sử dụng\" là các thành viên và không thành viên truy cập và sử dụng dịch vụ theo điều khoản này.",
+      "item3": "\"Thành viên\" là khách hàng đã đăng ký và ký kết hợp đồng sử dụng dịch vụ với công ty.",
+      "item4": "\"Không thành viên\" là người sử dụng dịch vụ mà không đăng ký thành viên.",
+      "item5": "\"Hợp đồng sử dụng\" là hợp đồng ký kết giữa Trang Web và thành viên liên quan đến việc sử dụng dịch vụ.",
+      "item6": "\"ID thành viên\" là chuỗi ký tự và số duy nhất được cung cấp để nhận diện và sử dụng dịch vụ.",
+      "item7": "\"Mật khẩu\" là ký tự, số hoặc kết hợp do thành viên tự thiết lập để xác nhận và bảo mật tài khoản.",
+      "item8": "\"Người vận hành\" là người mở và quản lý trang web dịch vụ.",
+      "item9": "\"Chấm dứt\" là việc thành viên hủy bỏ hợp đồng sử dụng."
+    },
+    "article3": {
+      "title": "Điều 3. Quy Định Ngoài Điều Khoản",
+      "content": "Người vận hành có thể ban hành thêm các chính sách vận hành khi cần thiết và trong trường hợp có sự chồng lấn, chính sách vận hành được ưu tiên áp dụng."
+    },
+    "article4": {
+      "title": "Điều 4. Ký Kết Hợp Đồng Sử Dụng",
+      "item1": "Hợp đồng sử dụng được hình thành khi người đăng ký làm thành viên đồng ý với điều khoản này và được người vận hành chấp thuận.",
+      "item2": "Người muốn đăng ký làm thành viên đồng ý với các điều khoản khi hoàn tất đăng ký sử dụng dịch vụ trên Trang Web."
+    },
+    "article5": {
+      "title": "Điều 5. Đăng Ký Thành Viên",
+      "item1": "Người sử dụng có thể đăng ký thành viên miễn phí bằng cách điền thông tin theo mẫu do công ty cung cấp và đồng ý với các điều khoản.",
+      "item2": "Tất cả thông tin thành viên ghi trong mẫu đăng ký phải là thông tin thật và chính xác; người cung cấp thông tin sai có thể không được bảo vệ pháp luật.",
+      "item3": "Hợp đồng sử dụng hình thành khi công ty chấp nhận đơn đăng ký; công ty có quyền từ chối hoặc hủy bỏ hợp đồng trong một số trường hợp.",
+      "item4": "Thành viên phải cập nhật thông tin khi có thay đổi trong thời gian hợp lý."
+    },
+    "article6": {
+      "title": "Điều 6. Nghĩa Vụ Của Công Ty",
+      "item1": "Công ty phải giải quyết nhanh chóng các khiếu nại hợp lý của thành viên.",
+      "item2": "Người vận hành phải đảm bảo sự vận hành ổn định và nhanh chóng khắc phục sự cố liên quan đến trang web.",
+      "item3": "Công ty không chịu trách nhiệm các sự cố do lỗi thành viên hoặc gián đoạn truyền thông."
+    },
+    "article7": {
+      "title": "Điều 7. Nghĩa Vụ Của Thành Viên",
+      "item1": "Thành viên phải tuân thủ các quy định trong điều khoản, chính sách vận hành, thông báo và pháp luật liên quan.",
+      "item2": "Không được chuyển quyền sử dụng dịch vụ hoặc địa vị hợp đồng cho người khác mà không có sự đồng ý của Trang Web.",
+      "item3": "Thành viên phải bảo mật ID và mật khẩu, không được cung cấp cho bên thứ ba khi chưa có đồng ý.",
+      "item4": "Không được xâm phạm quyền sở hữu trí tuệ hoặc quyền khác của người vận hành hoặc bên thứ ba."
+    },
+    "article8": {
+      "title": "Điều 8. Thời Gian Sử Dụng Dịch Vụ",
+      "item1": "Dịch vụ được cung cấp 24/7 trừ khi có sự cố hoặc bảo trì; thời gian bảo trì sẽ được thông báo trước.",
+      "item2": "Dịch vụ có thể bị gián đoạn đột xuất trong các trường hợp: kiểm tra/nâng cấp hệ thống khẩn cấp, tình trạng khẩn cấp quốc gia/thiên tai, đóng dịch vụ viễn thông, quá tải.",
+      "item3": "Trong trường hợp gián đoạn, Trang Web sẽ thông báo cho thành viên; nếu không thể thông báo trước sẽ thông báo sau."
+    },
+    "article9": {
+      "title": "Điều 9. Rút Khỏi Thành Viên và Mất Tư Cách",
+      "item1": "Thành viên có thể yêu cầu hủy hợp đồng bất cứ lúc nào; công ty sẽ xử lý theo quy định pháp luật.",
+      "item2": "Công ty có quyền hủy hợp đồng hoặc đình chỉ dịch vụ mà không cần thông báo trong một số trường hợp: sử dụng trái mục đích, cung cấp thông tin sai, gây trở ngại/chiếm đoạt thông tin, vi phạm pháp luật."
+    },
+    "article10": {
+      "title": "Điều 10. Giới Hạn Sử Dụng Dịch Vụ",
+      "intro": "Thành viên không được thực hiện các hành vi sau và công ty có quyền hạn chế, đình chỉ hoặc hủy hợp đồng nếu phát hiện:",
+      "item1": "Khai báo thông tin sai khi đăng ký hoặc chỉnh sửa",
+      "item2": "Phá hoại hoặc chiếm đoạt dịch vụ người khác",
+      "item3": "Giả mạo nhân viên hoặc người liên quan của Trang Web",
+      "item4": "Xâm phạm quyền nhân cách hoặc sở hữu trí tuệ người khác",
+      "item5": "Sử dụng ID người khác trái phép",
+      "item6": "Thu thập, lưu trữ, công khai thông tin cá nhân người khác không đồng ý",
+      "item7": "Hành vi bị đánh giá liên quan đến tội phạm",
+      "item8": "Các hành vi vi phạm pháp luật khác"
+    },
+    "article11": {
+      "title": "Điều 11. Quản Lý Bài Viết",
+      "item1": "Bài viết gồm hình ảnh, văn bản, video, âm thanh do thành viên đăng trên trang web.",
+      "item2": "Công ty không chịu trách nhiệm các thiệt hại do bài viết gây ra, trừ khi có cố ý hoặc sơ suất lớn.",
+      "item3": "Thành viên không được đăng nội dung vi phạm trật tự công cộng, quyền sở hữu trí tuệ hoặc quyền khác của người khác.",
+      "item4": "Công ty có quyền xoá nội dung vi phạm mà không cần đồng ý thành viên.",
+      "item5": "Công ty có thể xoá hoặc di chuyển bài viết theo yêu cầu của cơ quan công quyền mà không cần đồng ý thành viên."
+    },
+    "article12": {
+      "title": "Điều 12. Quyền Sở Hữu Bài Viết",
+      "item1": "Bản quyền các tác phẩm do công ty tạo ra thuộc về công ty.",
+      "item2": "Bản quyền bài viết do thành viên đăng thuộc về tác giả.",
+      "item3": "Bài viết có thể được chỉnh sửa, sao chép hoặc biên tập trong phạm vi cần thiết để hiển thị trên kết quả tìm kiếm, dịch vụ hoặc quảng bá.",
+      "item4": "Công ty phải xin phép thành viên nếu muốn sử dụng bài viết theo cách khác ngoài mục đích trên."
+    },
+    "article13": {
+      "title": "Điều 13. Bồi Thường Thiệt Hại",
+      "item1": "Mọi trách nhiệm dân sự, hình sự phát sinh từ việc sử dụng trang web thuộc về thành viên trước tiên.",
+      "item2": "Công ty không chịu trách nhiệm bồi thường khi thiệt hại phát sinh do thiên tai hoặc lỗi cố ý, vô ý của thành viên."
+    },
+    "article14": {
+      "title": "Điều 14. Miễn Trừ Trách Nhiệm",
+      "content": "Người vận hành không chịu trách nhiệm trong các trường hợp: thành viên không đạt được lợi ích mong đợi; lỗi do hệ thống dịch vụ/nhà cung cấp viễn thông; dữ liệu do thành viên đăng tải; hoạt động giữa thành viên hoặc với bên thứ ba; độ xác thực/độ tin cậy của dữ liệu; giao dịch hàng hóa; tranh chấp do lỗi người dùng; virus hoặc nguyên nhân bất khả kháng."
+    },
+    "article15": {
+      "title": "Điều 15. Giải Quyết Tranh Chấp",
+      "item1": "Công ty và thành viên phải nỗ lực giải quyết tranh chấp phát sinh liên quan đến dịch vụ một cách hoà bình.",
+      "item2": "Mọi tranh chấp đều áp dụng luật pháp Hàn Quốc.",
+      "item3": "Tòa án giải quyết tranh chấp là tòa án theo luật tố tụng dân sự Hàn Quốc.",
+      "item4": "Trường hợp thành viên có địa chỉ ở nước ngoài, tòa án có thẩm quyền là Tòa án Trung tâm Seoul, Hàn Quốc."
+    }
+  },
+  "privacy": {
+    "title": "Chính Sách Bảo Mật Thông Tin Cá Nhân (Privacy Policy)",
+    "lastUpdated": "Cập nhật lần cuối: Tháng 1, 2025",
+    "contactTitle": "Người phụ trách bảo vệ thông tin cá nhân",
+    "section1": {
+      "title": "■ Các mục thông tin cá nhân thu thập",
+      "intro": "Công ty thu thập các thông tin cá nhân sau đây nhằm phục vụ đăng ký thành viên, tư vấn, đăng ký dịch vụ:",
+      "itemsTitle": "Các mục thu thập:",
+      "items": "Họ tên, ngày sinh, giới tính, ID đăng nhập, mật khẩu, câu hỏi bảo mật và câu trả lời, số điện thoại nhà riêng, địa chỉ nhà riêng, số điện thoại di động, email, nghề nghiệp, tên công ty, phòng ban, chức vụ, điện thoại công ty, sở thích, tình trạng hôn nhân, ngày kỷ niệm, thông tin người giám hộ hợp pháp, số định danh cá nhân, lịch sử sử dụng dịch vụ, nhật ký truy cập, địa chỉ IP truy cập, lịch sử thanh toán",
+      "methodTitle": "Phương thức thu thập:",
+      "method": "Website (đăng ký thành viên), biểu mẫu giấy"
+    },
+    "section2": {
+      "title": "■ Mục đích thu thập và sử dụng thông tin cá nhân",
+      "intro": "Công ty sử dụng thông tin cá nhân đã thu thập cho các mục đích sau:",
+      "item1": "Thực hiện hợp đồng cung cấp dịch vụ và thanh toán phí dịch vụ, cung cấp nội dung, mua bán và giao nhận hàng hóa, gửi hóa đơn và các tài liệu liên quan",
+      "item2": "Quản lý thành viên: Xác minh danh tính, định danh cá nhân, xác nhận độ tuổi, kiểm tra việc đồng ý của người giám hộ khi thu thập thông tin trẻ em dưới 14 tuổi, truyền đạt các thông báo, sử dụng cho mục đích marketing và quảng cáo",
+      "item3": "Phân tích tần suất truy cập hoặc thống kê việc sử dụng dịch vụ của thành viên"
+    },
+    "section3": {
+      "title": "■ Thời gian lưu trữ và sử dụng thông tin cá nhân",
+      "content": "Công ty sẽ hủy bỏ thông tin cá nhân ngay khi mục đích thu thập và sử dụng được hoàn thành mà không có ngoại lệ."
+    },
+    "section4": {
+      "title": "■ Quy trình và phương thức hủy bỏ thông tin cá nhân",
+      "content": "Sau khi hoàn thành mục đích thu thập và sử dụng, thông tin cá nhân sẽ được hủy ngay lập tức theo quy trình và phương thức."
+    },
+    "section5": {
+      "title": "■ Việc cung cấp thông tin cá nhân",
+      "intro": "Công ty không cung cấp thông tin cá nhân của người dùng cho bên ngoài, trừ các trường hợp:",
+      "item1": "Có sự đồng ý trước của người dùng",
+      "item2": "Theo quy định pháp luật hoặc theo yêu cầu của cơ quan điều tra"
+    },
+    "section6": {
+      "title": "■ Ủy thác xử lý thông tin cá nhân",
+      "content": "Công ty không ủy thác thông tin cá nhân của khách hàng cho bên thứ ba khi chưa có sự đồng ý."
+    },
+    "section7": {
+      "title": "■ Quyền và cách thức thực hiện quyền của người dùng",
+      "content": "Người dùng có quyền truy cập/sửa đổi thông tin cá nhân, và yêu cầu hủy đăng ký theo quy định."
+    },
+    "section8": {
+      "title": "■ Cookie",
+      "content": "Công ty vận hành cookie để cải thiện dịch vụ. Người dùng có thể từ chối cookie trong cài đặt trình duyệt."
+    },
+    "section9": {
+      "title": "■ Dịch vụ xử lý khiếu nại liên quan đến thông tin cá nhân",
+      "content": "Công ty chỉ định bộ phận liên quan và người phụ trách bảo vệ thông tin cá nhân."
+    }
   }
 }

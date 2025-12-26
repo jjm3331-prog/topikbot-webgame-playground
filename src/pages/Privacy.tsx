@@ -1,67 +1,12 @@
-import { useMemo } from "react";
 import { ChevronLeft, Mail, Phone, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
-import { useAutoTranslate } from "@/hooks/useAutoTranslate";
-
-const PRIVACY_MD_VI = `# Chính Sách Bảo Mật Thông Tin Cá Nhân (Privacy Policy)
-
-*Cập nhật lần cuối: Tháng 1, 2025*
-
-## ■ Các mục thông tin cá nhân thu thập
-Công ty thu thập các thông tin cá nhân sau đây nhằm phục vụ đăng ký thành viên, tư vấn, đăng ký dịch vụ, v.v.:
-
-**Các mục thu thập:**
-Họ tên, ngày sinh, giới tính, ID đăng nhập, mật khẩu, câu hỏi bảo mật và câu trả lời, số điện thoại nhà riêng, địa chỉ nhà riêng, số điện thoại di động, email, nghề nghiệp, tên công ty, phòng ban, chức vụ, điện thoại công ty, sở thích, tình trạng hôn nhân, ngày kỷ niệm, thông tin người giám hộ hợp pháp, số định danh cá nhân (CMND/CCCD), lịch sử sử dụng dịch vụ, nhật ký truy cập, địa chỉ IP truy cập, lịch sử thanh toán
-
-**Phương thức thu thập:** Website (đăng ký thành viên), biểu mẫu giấy
-
-## ■ Mục đích thu thập và sử dụng thông tin cá nhân
-Công ty sử dụng thông tin cá nhân đã thu thập cho các mục đích sau:
-- Thực hiện hợp đồng cung cấp dịch vụ và thanh toán phí dịch vụ, cung cấp nội dung, mua bán và giao nhận hàng hóa, gửi hóa đơn và các tài liệu liên quan
-- Quản lý thành viên: Xác minh danh tính, định danh cá nhân, xác nhận độ tuổi, kiểm tra việc đồng ý của người giám hộ hợp pháp khi thu thập thông tin trẻ em dưới 14 tuổi, truyền đạt các thông báo, sử dụng cho mục đích marketing và quảng cáo
-- Phân tích tần suất truy cập hoặc thống kê việc sử dụng dịch vụ của thành viên
-
-## ■ Thời gian lưu trữ và sử dụng thông tin cá nhân
-Công ty sẽ hủy bỏ thông tin cá nhân ngay khi mục đích thu thập và sử dụng được hoàn thành mà không có ngoại lệ.
-
-## ■ Quy trình và phương thức hủy bỏ thông tin cá nhân
-Sau khi hoàn thành mục đích thu thập và sử dụng, thông tin cá nhân sẽ được hủy ngay lập tức theo quy trình và phương thức.
-
-## ■ Việc cung cấp thông tin cá nhân
-Công ty không cung cấp thông tin cá nhân của người dùng cho bên ngoài, trừ các trường hợp:
-- Có sự đồng ý trước của người dùng
-- Theo quy định pháp luật hoặc theo yêu cầu của cơ quan điều tra
-
-## ■ Ủy thác xử lý thông tin cá nhân
-Công ty không ủy thác thông tin cá nhân của khách hàng cho bên thứ ba khi chưa có sự đồng ý.
-
-## ■ Quyền và cách thức thực hiện quyền của người dùng
-Người dùng có quyền truy cập/sửa đổi thông tin cá nhân, và yêu cầu hủy đăng ký theo quy định.
-
-## ■ Cookie
-Công ty vận hành cookie để cải thiện dịch vụ. Người dùng có thể từ chối cookie trong cài đặt trình duyệt.
-
-## ■ Dịch vụ xử lý khiếu nại liên quan đến thông tin cá nhân
-Công ty chỉ định bộ phận liên quan và người phụ trách bảo vệ thông tin cá nhân.
-
-### Người phụ trách bảo vệ thông tin cá nhân
-- Tên: Jang Jinmin (장진민)
-- Điện thoại: (+82) 10-8647-0485
-- Email: jjm3331@naver.com
-`;
 
 const Privacy = () => {
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
-
-  const { text: translated } = useAutoTranslate(PRIVACY_MD_VI, { sourceLanguage: "vi" });
-
-  const md = useMemo(() => (i18n.language === "vi" ? PRIVACY_MD_VI : translated), [i18n.language, translated]);
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -79,12 +24,64 @@ const Privacy = () => {
         </nav>
 
         <article className="prose prose-lg dark:prose-invert max-w-none">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{md}</ReactMarkdown>
+          <h1 className="font-heading text-4xl font-bold mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+            {t("privacy.title")}
+          </h1>
+          <p className="text-muted-foreground italic mb-8">{t("privacy.lastUpdated")}</p>
 
+          {/* Section 1 */}
+          <h2 className="text-2xl font-bold mt-8 mb-4">{t("privacy.section1.title")}</h2>
+          <p className="mb-4">{t("privacy.section1.intro")}</p>
+          <p className="font-semibold">{t("privacy.section1.itemsTitle")}</p>
+          <p className="mb-4">{t("privacy.section1.items")}</p>
+          <p><strong>{t("privacy.section1.methodTitle")}</strong> {t("privacy.section1.method")}</p>
+
+          {/* Section 2 */}
+          <h2 className="text-2xl font-bold mt-8 mb-4">{t("privacy.section2.title")}</h2>
+          <p className="mb-4">{t("privacy.section2.intro")}</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>{t("privacy.section2.item1")}</li>
+            <li>{t("privacy.section2.item2")}</li>
+            <li>{t("privacy.section2.item3")}</li>
+          </ul>
+
+          {/* Section 3 */}
+          <h2 className="text-2xl font-bold mt-8 mb-4">{t("privacy.section3.title")}</h2>
+          <p>{t("privacy.section3.content")}</p>
+
+          {/* Section 4 */}
+          <h2 className="text-2xl font-bold mt-8 mb-4">{t("privacy.section4.title")}</h2>
+          <p>{t("privacy.section4.content")}</p>
+
+          {/* Section 5 */}
+          <h2 className="text-2xl font-bold mt-8 mb-4">{t("privacy.section5.title")}</h2>
+          <p className="mb-4">{t("privacy.section5.intro")}</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>{t("privacy.section5.item1")}</li>
+            <li>{t("privacy.section5.item2")}</li>
+          </ul>
+
+          {/* Section 6 */}
+          <h2 className="text-2xl font-bold mt-8 mb-4">{t("privacy.section6.title")}</h2>
+          <p>{t("privacy.section6.content")}</p>
+
+          {/* Section 7 */}
+          <h2 className="text-2xl font-bold mt-8 mb-4">{t("privacy.section7.title")}</h2>
+          <p>{t("privacy.section7.content")}</p>
+
+          {/* Section 8 */}
+          <h2 className="text-2xl font-bold mt-8 mb-4">{t("privacy.section8.title")}</h2>
+          <p>{t("privacy.section8.content")}</p>
+
+          {/* Section 9 */}
+          <h2 className="text-2xl font-bold mt-8 mb-4">{t("privacy.section9.title")}</h2>
+          <p>{t("privacy.section9.content")}</p>
+
+          {/* Contact Card */}
           <section className="mt-10 not-prose">
             <div className="bg-gradient-to-br from-primary/10 to-korean-purple/10 p-6 rounded-2xl border border-border">
               <h2 className="font-heading font-bold text-lg mb-4 text-foreground">
-                {t("privacy.contactTitle", { defaultValue: "Người phụ trách bảo vệ thông tin cá nhân" })}
+                {t("privacy.contactTitle")}
               </h2>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
