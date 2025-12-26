@@ -7,7 +7,11 @@ const CommonFooter = () => {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
           {/* Logo */}
           <div className="flex items-center gap-3 shrink-0">
-            <span className="text-2xl sm:text-3xl leading-none" style={{ lineHeight: 1.2 }}>🇰🇷</span>
+            <img 
+              src="/favicon.png" 
+              alt="LUKATO" 
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
+            />
             <div className="flex flex-col">
               <span className="font-heading font-bold text-lg sm:text-xl text-foreground leading-tight">LUKATO AI</span>
               <span className="text-xs text-muted-foreground leading-tight">Học tiếng Hàn #1 VN</span>

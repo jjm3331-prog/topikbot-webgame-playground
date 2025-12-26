@@ -56,7 +56,7 @@ const SplashScreen = ({ progress = 0 }: SplashScreenProps) => {
         
         {/* Logo */}
         <motion.div
-          className="w-32 h-32 md:w-40 md:h-40 rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/60 shadow-2xl relative z-10 flex items-center justify-center"
+          className="w-32 h-32 md:w-40 md:h-40 rounded-full shadow-2xl relative z-10 flex items-center justify-center overflow-hidden"
           animate={{
             boxShadow: [
               "0 0 30px rgba(59, 130, 246, 0.4)",
@@ -70,7 +70,11 @@ const SplashScreen = ({ progress = 0 }: SplashScreenProps) => {
             ease: "easeInOut",
           }}
         >
-          <span className="text-6xl md:text-7xl">🇰🇷</span>
+          <img 
+            src="/favicon.png" 
+            alt="LUKATO" 
+            className="w-full h-full object-cover"
+          />
         </motion.div>
       </motion.div>
 

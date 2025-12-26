@@ -105,7 +105,11 @@ export const CleanHeader = ({ isLoggedIn, username }: CleanHeaderProps) => {
             }}
             aria-label="Go to home"
           >
-            <span className="text-base sm:text-xl md:text-2xl shrink-0">🇰🇷</span>
+            <img 
+              src="/favicon.png" 
+              alt="LUKATO" 
+              className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full shrink-0 object-cover"
+            />
             <span className="font-heading font-bold text-sm sm:text-lg md:text-xl text-foreground whitespace-nowrap">LUKATO AI</span>
           </div>
 

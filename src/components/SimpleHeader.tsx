@@ -25,7 +25,11 @@ export const SimpleHeader = () => {
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => navigate("/")}
           >
-            <span className="text-xl sm:text-2xl">🇰🇷</span>
+            <img 
+              src="/favicon.png" 
+              alt="LUKATO" 
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover"
+            />
             <span className="font-heading font-bold text-base sm:text-lg text-foreground whitespace-nowrap">LUKATO AI</span>
           </motion.div>
 

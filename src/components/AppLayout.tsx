@@ -80,7 +80,11 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
               className="flex items-center gap-2 lg:hidden cursor-pointer"
               onClick={() => navigate("/")}
             >
-              <span className="text-xl">🇰🇷</span>
+              <img 
+                src="/favicon.png" 
+                alt="LUKATO" 
+                className="w-8 h-8 rounded-full object-cover"
+              />
               <span className="font-heading font-bold text-foreground">LUKATO</span>
             </div>
           </div>
