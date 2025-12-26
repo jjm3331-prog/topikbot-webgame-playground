@@ -751,5 +751,25 @@
     "hintUsed": "提示！", "halfScore": "减半分", "error": "错误",
     "types": { "idiom": "惯用语", "proverb": "谚语", "slang": "俗语", "internet": "网络用语" }
   },
-  "footer": { "hanoi": "河内官方", "qnaAgent": "Q&A Agent", "admin": "ADMIN", "copyright": "© 2025 Powered by LUKAS Edutainment" }
+  "footer": { "hanoi": "河内官方", "qnaAgent": "Q&A Agent", "admin": "ADMIN", "copyright": "© 2025 Powered by LUKAS Edutainment" },
+  "stickyCta": {
+    "title": "免费AI学韩语",
+    "subtitle": "50,000+学员信赖",
+    "button": "开始"
+  },
+  "pwa": {
+    "title": "安装LUKATO游戏",
+    "description1": "添加到主屏幕，更快访问！",
+    "description2": "体验真正的应用程序！",
+    "fastLaunch": "快速启动",
+    "offline": "离线使用",
+    "notifications": "接收通知",
+    "later": "稍后",
+    "installNow": "立即安装"
+  },
+  "splash": {
+    "tagline": "越南第一韩语学习平台",
+    "loading": "加载中...",
+    "branding": "🎮 AI韩语RPG学习"
+  }
 }

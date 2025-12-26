@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Rocket, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const StickyCTA = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
 
@@ -40,7 +42,7 @@ const StickyCTA = () => {
             <button
               onClick={handleDismiss}
               className="p-1.5 rounded-full hover:bg-muted transition-colors flex-shrink-0"
-              aria-label="Đóng"
+              aria-label={t("common.close")}
             >
               <X className="w-4 h-4 text-muted-foreground" />
             </button>
@@ -48,10 +50,10 @@ const StickyCTA = () => {
             {/* Text */}
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-foreground truncate">
-                Học tiếng Hàn miễn phí với AI
+                {t("stickyCta.title")}
               </p>
               <p className="text-[10px] text-muted-foreground truncate">
-                50,000+ học viên tin dùng
+                {t("stickyCta.subtitle")}
               </p>
             </div>
 
@@ -62,7 +64,7 @@ const StickyCTA = () => {
               className="flex-shrink-0 h-9 px-4 btn-primary text-primary-foreground font-bold rounded-lg text-xs whitespace-nowrap"
             >
               <Rocket className="w-3.5 h-3.5 mr-1" />
-              Bắt đầu
+              {t("stickyCta.button")}
             </Button>
           </div>
         </motion.div>

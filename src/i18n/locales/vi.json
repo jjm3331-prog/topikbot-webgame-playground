@@ -1064,5 +1064,25 @@
     "qnaAgent": "Q&A Agent",
     "admin": "ADMIN",
     "copyright": "© 2025 Powered by LUKAS Edutainment"
+  },
+  "stickyCta": {
+    "title": "Học tiếng Hàn miễn phí với AI",
+    "subtitle": "50,000+ học viên tin dùng",
+    "button": "Bắt đầu"
+  },
+  "pwa": {
+    "title": "Cài đặt Game LUKATO",
+    "description1": "Thêm vào màn hình chính để truy cập nhanh hơn!",
+    "description2": "Trải nghiệm như ứng dụng thực thụ!",
+    "fastLaunch": "Khởi động nhanh",
+    "offline": "Dùng offline",
+    "notifications": "Nhận thông báo",
+    "later": "Để sau",
+    "installNow": "Cài đặt ngay"
+  },
+  "splash": {
+    "tagline": "Học tiếng Hàn #1 Việt Nam",
+    "loading": "Đang tải...",
+    "branding": "🎮 RPG học tiếng Hàn với AI"
   }
 }
