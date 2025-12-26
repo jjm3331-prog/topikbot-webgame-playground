@@ -1,14 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
   Puzzle, 
-  Gamepad2, 
-  Shield, 
   RefreshCw, 
   Check, 
   X, 
@@ -21,8 +19,6 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AppLayout from "@/components/AppLayout";
-import GrammarTetris from "@/components/grammar/GrammarTetris";
-import TowerDefenseGame from "@/components/grammar/TowerDefenseGame";
 
 type TopikLevel = "1-2" | "3-4" | "5-6";
 
@@ -409,7 +405,6 @@ function getFallbackQuestions(level: TopikLevel, type: string): GrammarQuestion[
 export default function Grammar() {
   const { t } = useTranslation();
   const [level, setLevel] = useState<TopikLevel>("1-2");
-  const [activeTab, setActiveTab] = useState("assembly");
 
   return (
     <AppLayout>
@@ -428,37 +423,10 @@ export default function Grammar() {
         {/* Level Selector */}
         <GrammarLevelSelector value={level} onChange={setLevel} />
 
-        {/* Game Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
-            <TabsTrigger value="assembly" className="gap-2">
-              <Puzzle className="w-4 h-4" />
-              <span className="hidden sm:inline">{t("grammar.assembly")}</span>
-              <span className="sm:hidden">{t("grammar.assemblyShort")}</span>
-            </TabsTrigger>
-            <TabsTrigger value="tetris" className="gap-2">
-              <Gamepad2 className="w-4 h-4" />
-              <span>{t("grammar.tetris")}</span>
-            </TabsTrigger>
-            <TabsTrigger value="tower" className="gap-2">
-              <Shield className="w-4 h-4" />
-              <span className="hidden sm:inline">{t("grammar.tower")}</span>
-              <span className="sm:hidden">{t("grammar.towerShort")}</span>
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="assembly">
-            <AssemblyGame level={level} />
-          </TabsContent>
-          
-          <TabsContent value="tetris">
-            <GrammarTetris level={level} />
-          </TabsContent>
-          
-          <TabsContent value="tower">
-            <TowerDefenseGame level={level} />
-          </TabsContent>
-        </Tabs>
+        {/* Assembly Game - Only Game Mode */}
+        <div className="mt-6">
+          <AssemblyGame level={level} />
+        </div>
       </div>
     </AppLayout>
   );
