@@ -134,11 +134,11 @@
     },
     "career": {
       "allInOne": "⭐ All-in-One",
-      "koreaJob": "한국 취업",
+      "koreaJob": "Việc làm Hàn Quốc",
       "title": "Korea Career Hub",
       "description": "Headhunting • Báo cáo DN • Phỏng vấn AI - Tất cả trong một!",
-      "successCount": "1,000+ 취업 성공",
-      "satisfaction": "98% 만족도"
+      "successCount": "1,000+ việc làm thành công",
+      "satisfaction": "98% hài lòng"
     },
     "ai": {
       "badge": "RAG AI",
@@ -535,7 +535,9 @@
       "dubbing": "Lồng tiếng",
       "kpopQuiz": "K‑POP Quiz",
       "partTime": "Việc làm thêm",
-      "badgeNew": "Mới"
+      "badgeNew": "Mới",
+      "badgeHot": "Hot",
+      "badgeStar": "⭐"
     },
     "testimonials": {
       "title": "Phản hồi thật từ người học"

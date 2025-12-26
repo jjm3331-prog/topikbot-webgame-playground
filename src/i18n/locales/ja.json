@@ -388,8 +388,8 @@
     "comparison": { "feature": "機能", "others": "他のアプリ", "feature1": "公式TOPIK出題教授", "feature2": "LUKATO RAG AI Tech（独占AI技術）", "feature3": "10,000+ TOPIK試験＆資料", "feature4": "ネイティブAI STT/TTS発音", "feature5": "AI作文＆履歴書超精密採点", "feature6": "ヘッドハンティング＆韓国就職コンサルティング", "feature7": "K-Culture統合（K-POP、K-Drama）" },
     "challenge": { "headline1": "実力があるなら", "headline2": "ついてきな。", "subtitle": "すべての韓国語アプリ、ウェブサイト、学院へ。", "line1": "君たちがやることは、私たちがもっとうまくやる。", "line2": "君たちが夢にも思わないことを、私たちはすでにやった。", "point1Title": "TOPIK出題？", "point1Desc": "公式TOPIK出題教授がいる", "point2Title": "AIチャットボット？", "point2Desc": "LUKATO RAG AI Tech 99.7%精度", "point3Title": "学習ゲーム？", "point3Desc": "K-Cultureまで統合した", "final": "好きにコピーして。でもついてこれる？" },
     "headhunting": { "badge": "Premium独占サービス", "title1": "直接つながる", "title2": "韓国企業", "desc1": "専門ヘッドハンターチームが就職支援", "free": "100%無料", "desc2": "現地韓国企業からソウル就職機会まで！", "tag1": "500+企業", "tag2": "履歴書コンサルティング", "tag3": "ビザサポート", "cta": "今すぐ申請", "ctaSub": "完全無料" },
-    "features": { "title": "4スキル完全学習", "skills": "4スキル", "listen": "リスニング", "read": "リーディング", "write": "ライティング", "speak": "スピーキング" },
-    "games": { "korean": "韓国語", "survival": "AIサバイバル", "dating": "ソウルデート", "wordChain": "しりとり", "dubbing": "アフレコ", "kpopQuiz": "K-POPクイズ", "partTime": "アルバイト", "badgeNew": "New" },
+    "features": { "badge": "LUKATO AI", "title": "4スキル完全学習", "skills": "4スキル", "listen": "リスニング", "read": "リーディング", "write": "ライティング", "speak": "スピーキング" },
+    "games": { "badge": "K-Culture", "korean": "韓国語", "survival": "AIサバイバル", "dating": "ソウルデート", "wordChain": "しりとり", "dubbing": "アフレコ", "kpopQuiz": "K-POPクイズ", "partTime": "アルバイト", "badgeNew": "New", "badgeHot": "Hot", "badgeStar": "⭐" },
     "testimonials": { "title": "学習者のリアルなレビュー" },
     "pricing": { "title1": "リーズナブルな価格、", "local": "ローカル", "title2": "グローバル品質", "free": "無料", "forever": "永久無料", "start": "始める", "month": "月", "upgrade": "アップグレード" },
     "finalCta": { "title1": "TOPIK", "title2": "制覇", "desc": "TOPIK教授 + LUKATO AI =", "noRival": "最強の組み合わせ", "cta": "今すぐ始める" }

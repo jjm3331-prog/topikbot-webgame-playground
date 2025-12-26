@@ -388,8 +388,8 @@
     "comparison": { "feature": "功能", "others": "其他App", "feature1": "官方TOPIK出题教授", "feature2": "LUKATO RAG AI Tech (独家AI技术)", "feature3": "10,000+ TOPIK考试和资料", "feature4": "母语AI STT/TTS发音", "feature5": "AI写作和简历超精准评分", "feature6": "猎头和韩国就业咨询", "feature7": "K-Culture整合 (K-POP, K-Drama)" },
     "challenge": { "headline1": "有本事", "headline2": "就来追。", "subtitle": "致所有韩语应用、网站和培训机构。", "line1": "你们做的，我们做得更好。", "line2": "你们不敢想的，我们已经实现。", "point1Title": "TOPIK出题?", "point1Desc": "我们有官方TOPIK出题教授", "point2Title": "AI聊天机器人?", "point2Desc": "LUKATO RAG AI Tech 99.7%准确率", "point3Title": "学习游戏?", "point3Desc": "我们还整合了K-Culture", "final": "随便抄。但你能追上吗？" },
     "headhunting": { "badge": "Premium专属服务", "title1": "直连", "title2": "韩国企业", "desc1": "专业猎头团队求职支持", "free": "100%免费", "desc2": "从本地韩企到首尔工作机会！", "tag1": "500+企业", "tag2": "简历咨询", "tag3": "签证支持", "cta": "立即申请", "ctaSub": "完全免费" },
-    "features": { "title": "4项技能完整学习", "skills": "4项技能", "listen": "听力", "read": "阅读", "write": "写作", "speak": "口语" },
-    "games": { "korean": "韩语", "survival": "AI生存", "dating": "首尔约会", "wordChain": "接龙", "dubbing": "配音", "kpopQuiz": "K-POP问答", "partTime": "兼职工作", "badgeNew": "新" },
+    "features": { "badge": "LUKATO AI", "title": "4项技能完整学习", "skills": "4项技能", "listen": "听力", "read": "阅读", "write": "写作", "speak": "口语" },
+    "games": { "badge": "K-Culture", "korean": "韩语", "survival": "AI生存", "dating": "首尔约会", "wordChain": "接龙", "dubbing": "配音", "kpopQuiz": "K-POP问答", "partTime": "兼职工作", "badgeNew": "新", "badgeHot": "热门", "badgeStar": "⭐" },
     "testimonials": { "title": "学员真实评价" },
     "pricing": { "title1": "合理价格，", "local": "本地", "title2": "全球品质", "free": "免费", "forever": "永久免费", "start": "开始", "month": "月", "upgrade": "升级" },
     "finalCta": { "title1": "TOPIK", "title2": "征服", "desc": "TOPIK教授 + LUKATO AI =", "noRival": "无敌组合", "cta": "立即开始" }
