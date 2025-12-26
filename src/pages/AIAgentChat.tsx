@@ -391,6 +391,25 @@ const AIAgentChat = () => {
                 <h1 className="text-2xl md:text-3xl font-black tracking-tight">{agentId?.toUpperCase()} Agent</h1>
               </div>
 
+              {/* Question counter for free users */}
+              {isAuthenticated && !isPremium && remainingQuestions !== null && (
+                <Badge 
+                  variant={remainingQuestions <= 3 ? "destructive" : "secondary"} 
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold"
+                >
+                  <Zap className="w-4 h-4" />
+                  <span>{remainingQuestions}/10</span>
+                </Badge>
+              )}
+
+              {/* Unlimited badge for premium users */}
+              {isAuthenticated && isPremium && (
+                <Badge className="flex items-center gap-1.5 px-3 py-1.5 bg-korean-gold/20 text-korean-gold border-korean-gold/30">
+                  <Crown className="w-4 h-4" />
+                  <span>{t("aiChat.unlimited")}</span>
+                </Badge>
+              )}
+
               {messages.length > 0 && (
                 <Button variant="ghost" size="icon" onClick={clearChat} title={t("aiAgent.clearChat")}>
                   <RotateCcw className="w-4 h-4" />

@@ -993,6 +993,7 @@
     "title": "AI Language Learning Assistant 🤖",
     "description": "Choose the Agent that matches your language. AI will answer all your questions! ✨",
     "premiumUnlimited": "Premium - Unlimited questions",
+    "unlimited": "Unlimited",
     "startChat": "Start chat",
     "comingSoon": "Coming soon",
     "active": "Active",
@@ -1232,7 +1233,7 @@
       "referral": { "title": "Invite Friends", "description": "Invite friends and get bonus when they sign up" },
       "weeklyGoal": { "title": "Weekly Goal", "description": "Complete weekly learning goals" }
     },
-    "freeItems": { "aiQuestions": "AI {{count}} questions/day", "topik": "TOPIK I & II Study", "allGames": "All Korean Games", "savedVocab": "Save up to {{count}} vocabulary", "ranking": "View Ranking" },
+    "freeItems": { "aiQuestions": "AI {{count}} questions/day", "topik": "TOPIK I & II Study", "allGames": "All Korean Games", "ranking": "View Ranking" },
     "premiumItems": { "allFree": "All free features included" },
     "tips": { "title": "Quick Points Tips", "item1": "Check in daily to maintain streak and earn bonus", "item2": "Complete quiz with perfect score for +{{points}} points", "item3": "Invite friends so both get bonus", "item4": "Set and complete weekly learning goals" }
   },

@@ -1167,6 +1167,7 @@
     "title": "Trợ lý học ngôn ngữ AI 🤖",
     "description": "Chọn Agent phù hợp với ngôn ngữ bạn đang học. AI sẽ giải đáp mọi thắc mắc của bạn! ✨",
     "premiumUnlimited": "Premium - Không giới hạn câu hỏi",
+    "unlimited": "Không giới hạn",
     "startChat": "Bắt đầu trò chuyện",
     "comingSoon": "Sắp ra mắt",
     "active": "Hoạt động",
@@ -1406,7 +1407,7 @@
       "referral": { "title": "Mời bạn bè", "description": "Mời bạn bè tham gia và nhận thưởng khi họ đăng ký" },
       "weeklyGoal": { "title": "Mục tiêu tuần", "description": "Hoàn thành mục tiêu học tập hàng tuần" }
     },
-    "freeItems": { "aiQuestions": "Hỏi AI {{count}} lần/ngày", "topik": "Học TOPIK I & II", "allGames": "Tất cả Game học tiếng Hàn", "savedVocab": "Lưu tối đa {{count}} từ vựng", "ranking": "Xem bảng xếp hạng" },
+    "freeItems": { "aiQuestions": "Hỏi AI {{count}} lần/ngày", "topik": "Học TOPIK I & II", "allGames": "Tất cả Game học tiếng Hàn", "ranking": "Xem bảng xếp hạng" },
     "premiumItems": { "allFree": "Tất cả tính năng miễn phí" },
     "tips": { "title": "Mẹo kiếm điểm nhanh", "item1": "Điểm danh mỗi ngày để duy trì streak và nhận điểm thưởng", "item2": "Hoàn thành quiz với điểm tuyệt đối để nhận +{{points}} điểm", "item3": "Mời bạn bè tham gia để cả hai cùng nhận thưởng", "item4": "Đặt và hoàn thành mục tiêu học tập hàng tuần" }
   },

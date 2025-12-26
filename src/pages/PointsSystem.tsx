@@ -220,12 +220,6 @@ const PointsSystem = () => {
                   </li>
                   <li className="flex items-start gap-2 text-card-body">
                     <CheckCircle2 className="w-5 h-5 text-korean-green shrink-0 mt-0.5" />
-                    <span className="text-muted-foreground">
-                      {t("pointsSystem.freeItems.savedVocab", { count: FREE_LIMITS.SAVED_VOCABULARY })}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2 text-card-body">
-                    <CheckCircle2 className="w-5 h-5 text-korean-green shrink-0 mt-0.5" />
                     <span className="text-muted-foreground">{t("pointsSystem.freeItems.ranking")}</span>
                   </li>
                 </ul>
@@ -247,7 +241,7 @@ const PointsSystem = () => {
                   {PREMIUM_FEATURES.map((feature) => (
                     <li key={feature.id} className="flex items-start gap-2 text-card-body">
                       <CheckCircle2 className="w-5 h-5 text-korean-green shrink-0 mt-0.5" />
-                      <span className="text-muted-foreground">{feature.name}</span>
+                      <span className="text-muted-foreground">{feature.nameKo}</span>
                     </li>
                   ))}
                 </ul>
