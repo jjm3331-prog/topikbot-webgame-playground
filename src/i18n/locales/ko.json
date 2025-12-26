@@ -182,7 +182,7 @@
     "freeForever": "영원히 무료",
     "copyright": "© 2025 LUKATO AI. 베트남인을 위한 한국어 학습 플랫폼."
   },
-  "gameHub": {
+"gameHub": {
     "title": "🎮 한국어 학습 게임",
     "description": "인터랙티브 게임으로 재미있게 학습하세요",
     "games": "7개 게임",
@@ -190,7 +190,22 @@
     "learnPlay": "놀면서 배우기",
     "funLearning": "재미있는 한국어 학습!",
     "dailyPlay": "매일 게임을 플레이하며 한국어 실력을 키우세요!",
-    "hot": "HOT"
+    "hot": "HOT",
+    "cards": {
+      "chatDesc": "서울에서 생존하라! AI와 대화하며 한국어 실력을 키워보세요!",
+      "datingTitle": "연애 시뮬레이션",
+      "datingDesc": "가상 한국인과 데이트하며 감정 표현을 배워보세요!",
+      "managerTitle": "매니저",
+      "managerDesc": "K-POP 아이돌 매니저가 되어 그룹을 성공으로 이끌어보세요!",
+      "kpopTitle": "K-POP 퀴즈",
+      "kpopDesc": "K-POP 가사 퀴즈로 재미있게 한국어를 배워보세요!",
+      "kdramaTitle": "K-Drama",
+      "kdramaDesc": "유명 드라마 명장면을 더빙하며 발음을 연습하세요!",
+      "wordChainTitle": "끝말잇기",
+      "wordChainDesc": "AI와 끝말잇기 대결! 어휘력을 테스트해보세요!",
+      "parttimeTitle": "알바생",
+      "parttimeDesc": "알바 상황에서 실전 대화를 연습하세요!"
+    }
   },
   "learningHub": {
     "title": "📚 TOPIK 학습 센터",
@@ -200,7 +215,27 @@
     "systematicLearning": "체계적 학습",
     "conquestTitle": "오늘부터 TOPIK 정복!",
     "conquestDesc": "TOPIK 자격증 취득에 도전하세요!",
-    "new": "NEW"
+    "new": "NEW",
+    "cards": {
+      "vocabularyTitle": "어휘",
+      "vocabularySubtitle": "어휘 학습",
+      "vocabularyDesc": "플래시카드, 메모리 게임, 60초 스프린트로 재미있게 단어를 암기하세요!",
+      "grammarTitle": "문법",
+      "grammarSubtitle": "문법 학습",
+      "grammarDesc": "문장 조합, 오류 수정, 그래머 배틀로 한국어 문법을 마스터하세요!",
+      "handwritingTitle": "손글씨 연습",
+      "handwritingSubtitle": "손글씨 연습",
+      "handwritingDesc": "한글 자모와 단어를 손으로 직접 써보며 연습하세요!",
+      "listeningTitle": "듣기 연습",
+      "listeningSubtitle": "듣기 연습",
+      "listeningDesc": "실제 TOPIK 기출문제로 듣기 능력을 향상시키세요!",
+      "readingATitle": "읽기 A",
+      "readingASubtitle": "읽기A",
+      "readingADesc": "짧은 대화와 공지문으로 기본 읽기 능력을 향상시키세요!",
+      "readingBTitle": "읽기 B",
+      "readingBSubtitle": "읽기B",
+      "readingBDesc": "신문 기사, 에세이, 학술 텍스트로 고급 읽기를 연습하세요!"
+    }
   },
   "profile": {
     "title": "내 프로필",

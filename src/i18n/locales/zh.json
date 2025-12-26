@@ -178,7 +178,7 @@
     "freeForever": "永久免费",
     "copyright": "© 2025 LUKATO AI. 为越南人打造的韩语学习平台。"
   },
-  "gameHub": {
+"gameHub": {
     "title": "🎮 韩语学习游戏",
     "description": "通过有趣的互动游戏学习",
     "games": "7款游戏",
@@ -186,7 +186,22 @@
     "learnPlay": "边玩边学",
     "funLearning": "学韩语真有趣！",
     "dailyPlay": "每天玩游戏提升韩语水平！",
-    "hot": "热门"
+    "hot": "热门",
+    "cards": {
+      "chatDesc": "在首尔生存！通过与AI对话提高韩语水平！",
+      "datingTitle": "恋爱模拟",
+      "datingDesc": "与虚拟韩国人约会并学习情感表达！",
+      "managerTitle": "经纪人",
+      "managerDesc": "成为K-POP偶像经纪人，带领组合走向成功！",
+      "kpopTitle": "K-POP问答",
+      "kpopDesc": "通过K-POP歌词问答快乐学习韩语！",
+      "kdramaTitle": "韩剧配音",
+      "kdramaDesc": "通过配音著名韩剧场景练习发音！",
+      "wordChainTitle": "接龙",
+      "wordChainDesc": "与AI对战接龙！测试你的词汇量！",
+      "parttimeTitle": "兼职工作",
+      "parttimeDesc": "在兼职场景中练习真实对话！"
+    }
   },
   "learningHub": {
     "title": "📚 TOPIK学习中心",
@@ -196,7 +211,27 @@
     "systematicLearning": "系统学习",
     "conquestTitle": "今天就征服TOPIK！",
     "conquestDesc": "挑战自己获得TOPIK证书！",
-    "new": "新"
+    "new": "新",
+    "cards": {
+      "vocabularyTitle": "词汇",
+      "vocabularySubtitle": "词汇学习",
+      "vocabularyDesc": "闪卡、记忆游戏和60秒冲刺帮你记忆词汇！",
+      "grammarTitle": "语法",
+      "grammarSubtitle": "语法学习",
+      "grammarDesc": "组句、纠错和语法对战帮你掌握韩语语法！",
+      "handwritingTitle": "手写练习",
+      "handwritingSubtitle": "手写练习",
+      "handwritingDesc": "手写练习韩语字母和词汇！",
+      "listeningTitle": "听力练习",
+      "listeningSubtitle": "听力练习",
+      "listeningDesc": "用真题TOPIK提高听力能力！",
+      "readingATitle": "阅读A",
+      "readingASubtitle": "阅读A",
+      "readingADesc": "通过短对话和通知提高基础阅读能力！",
+      "readingBTitle": "阅读B",
+      "readingBSubtitle": "阅读B",
+      "readingBDesc": "通过文章、散文和学术文本进行高级阅读练习！"
+    }
   },
   "profile": {
     "title": "我的资料",
