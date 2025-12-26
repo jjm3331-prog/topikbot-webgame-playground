@@ -86,7 +86,8 @@
   },
   "language": {
     "select": "Chọn ngôn ngữ",
-    "current": "Ngôn ngữ hiện tại"
+    "current": "Ngôn ngữ hiện tại",
+    "hint": "Chọn ngôn ngữ để chuyển toàn bộ ứng dụng"
   },
   "dashboard": {
     "loading": "Đang tải...",
@@ -465,6 +466,9 @@
       "aiSupport": "Hỗ trợ AI"
     },
     "why": {
+      "title1": "Tại sao",
+      "title2": "LUKATO là tốt nhất?",
+      "subtitle": "Khác biệt ở đẳng cấp hoàn toàn khác",
       "title": "Vì sao",
       "item1Title": "Giáo sư ra đề TOPIK",
       "item1Desc": "Đội ngũ từng tham gia ra đề TOPIK chính thức tại Seoul",
@@ -514,6 +518,7 @@
       "ctaSub": "Hoàn toàn miễn phí"
     },
     "features": {
+      "badge": "LUKATO AI",
       "title": "Học trọn 4 kỹ năng",
       "skills": "4 kỹ năng",
       "listen": "Nghe",
@@ -522,6 +527,7 @@
       "speak": "Nói"
     },
     "games": {
+      "badge": "K-Culture",
       "korean": "K‑Culture • Tiếng Hàn",
       "survival": "AI Survival",
       "dating": "Hẹn hò Seoul",
