@@ -780,5 +780,33 @@
     "tagline": "Dunyoda #1 Koreys tili o'rganish platformasi",
     "loading": "Yuklanmoqda...",
     "branding": "🎮 AI bilan RPG koreys tili o'rganish"
+  },
+  "chat": {
+    "error": "Xato",
+    "cannotStartGame": "O'yinni boshlash imkoni yo'q.",
+    "gameOver": "💀 O'yin tugadi!",
+    "hpZero": "HP 0 ga tushdi.",
+    "missionComplete": "🎉 Vazifa bajarildi!",
+    "survivedTurns": "10 navbat omon qoldingiz!",
+    "messageSendFailed": "Xabar yuborilmadi",
+    "turn": "Navbat",
+    "hintTitle": "💡 Maslahat",
+    "hintDesc": "Koreys tilida tabiiy gaplashing! Yaxshi javoblar rag'batlantiriladi, g'alati javoblar jazolanadi.",
+    "inputPlaceholder": "Koreys tilida yozing...",
+    "send": "Yuborish",
+    "exitConfirmTitle": "Chiqishni xohlaysizmi?",
+    "exitConfirmDesc": "Joriy jarayon saqlanmaydi.",
+    "continueGame": "Davom etish",
+    "exitToDashboard": "Bosh sahifaga",
+    "feedback": {
+      "success": "Zo'r! 👍",
+      "warning": "Ehtiyot! ⚠️",
+      "fail": "Muvaffaqiyatsiz! 💔"
+    },
+    "result": {
+      "success": "✓ Muvaffaqiyat",
+      "warning": "⚠ Ehtiyot",
+      "fail": "✗ Muvaffaqiyatsiz"
+    }
   }
 }

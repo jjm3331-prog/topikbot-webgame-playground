@@ -780,5 +780,33 @@
     "tagline": "全球第一韩语学习平台",
     "loading": "加载中...",
     "branding": "🎮 AI韩语RPG学习"
+  },
+  "chat": {
+    "error": "错误",
+    "cannotStartGame": "无法开始游戏。",
+    "gameOver": "💀 游戏结束！",
+    "hpZero": "HP已归零。",
+    "missionComplete": "🎉 任务完成！",
+    "survivedTurns": "成功存活10回合！",
+    "messageSendFailed": "消息发送失败",
+    "turn": "回合",
+    "hintTitle": "💡 提示",
+    "hintDesc": "用韩语自然对话！正确回答有奖励，奇怪回答有惩罚。",
+    "inputPlaceholder": "请输入韩语...",
+    "send": "发送",
+    "exitConfirmTitle": "确定要退出吗？",
+    "exitConfirmDesc": "当前进度将不会保存。",
+    "continueGame": "继续",
+    "exitToDashboard": "返回主页",
+    "feedback": {
+      "success": "不错！👍",
+      "warning": "注意！⚠️",
+      "fail": "失败！💔"
+    },
+    "result": {
+      "success": "✓ 成功",
+      "warning": "⚠ 注意",
+      "fail": "✗ 失败"
+    }
   }
 }

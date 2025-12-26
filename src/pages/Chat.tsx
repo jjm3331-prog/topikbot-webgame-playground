@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +43,7 @@ interface FeedbackPopup {
 }
 
 const Chat = () => {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -159,8 +161,8 @@ const Chat = () => {
     } catch (error: any) {
       console.error("Start game error:", error);
       toast({
-        title: "오류 (Lỗi)",
-        description: error.message || "게임을 시작할 수 없습니다.",
+        title: t("chat.error"),
+        description: error.message || t("chat.cannotStartGame"),
         variant: "destructive",
       });
     } finally {
@@ -232,16 +234,16 @@ const Chat = () => {
       // Check game over conditions
       if (data.game_over || newHp <= 0) {
         toast({
-          title: "💀 게임 오버! (Game Over!)",
-          description: "HP가 0이 되었습니다. (HP đã về 0.)",
+          title: t("chat.gameOver"),
+          description: t("chat.hpZero"),
           variant: "destructive",
         });
         await updateProfile(newHp, newMoney);
         setTimeout(() => navigate("/dashboard"), 3000);
       } else if (data.mission_complete || nextTurn >= gameState.maxTurns) {
         toast({
-          title: "🎉 미션 성공! (Mission Complete!)",
-          description: "10턴 생존에 성공했습니다! (Bạn đã sống sót 10 lượt!)",
+          title: t("chat.missionComplete"),
+          description: t("chat.survivedTurns"),
         });
         await updateProfile(newHp, newMoney, true);
         setTimeout(() => navigate("/dashboard"), 3000);
@@ -249,8 +251,8 @@ const Chat = () => {
     } catch (error: any) {
       console.error("Send message error:", error);
       toast({
-        title: "오류 (Lỗi)",
-        description: error.message || "메시지 전송 실패",
+        title: t("chat.error"),
+        description: error.message || t("chat.messageSendFailed"),
         variant: "destructive",
       });
     } finally {
@@ -325,8 +327,8 @@ const Chat = () => {
             {feedback.type === "fail" && <TrendingDown className="w-6 h-6" />}
             <div className="flex flex-col">
               <span className="text-xl">
-                {feedback.type === "success" ? "좋아요! 👍" : 
-                 feedback.type === "warning" ? "주의! ⚠️" : "실패! 💔"}
+                {feedback.type === "success" ? t("chat.feedback.success") : 
+                 feedback.type === "warning" ? t("chat.feedback.warning") : t("chat.feedback.fail")}
               </span>
               <div className="flex gap-4 text-sm">
                 {feedback.hpChange !== 0 && (
@@ -383,7 +385,7 @@ const Chat = () => {
           {/* Turn Counter */}
           <div className="flex items-center gap-2 bg-purple-500/20 px-3 py-1 rounded-full">
             <span className="text-purple-300 font-bold text-sm">
-              턴 {gameState.turn}/{gameState.maxTurns}
+              {t("chat.turn")} {gameState.turn}/{gameState.maxTurns}
             </span>
           </div>
         </div>
@@ -420,9 +422,9 @@ const Chat = () => {
                       message.turnResult === "warning" ? "bg-yellow-500/30 text-yellow-300" :
                       "bg-red-500/30 text-red-300"
                     }`}>
-                      {message.turnResult === "success" ? "✓ 성공" :
-                       message.turnResult === "warning" ? "⚠ 주의" :
-                       "✗ 실패"}
+                      {message.turnResult === "success" ? t("chat.result.success") :
+                       message.turnResult === "warning" ? t("chat.result.warning") :
+                       t("chat.result.fail")}
                     </span>
                   )}
                 </div>
@@ -478,12 +480,12 @@ const Chat = () => {
             variant="outline"
             size="icon"
             className="border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/20 shrink-0"
-            onClick={() => toast({ title: "💡 힌트 (Gợi ý)", description: "자연스럽게 한국어로 대화해보세요! 적절한 응답은 보상을, 이상한 응답은 패널티를 받습니다." })}
+            onClick={() => toast({ title: t("chat.hintTitle"), description: t("chat.hintDesc") })}
           >
             <Lightbulb className="w-5 h-5" />
           </Button>
           <Input
-            placeholder="한국어로 입력하세요..."
+            placeholder={t("chat.inputPlaceholder")}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
@@ -496,7 +498,7 @@ const Chat = () => {
             className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shrink-0 h-12 px-6"
           >
             <Send className="w-5 h-5" />
-            <span className="ml-2">전송</span>
+            <span className="ml-2">{t("chat.send")}</span>
           </Button>
         </div>
         <p className="text-center text-white/30 text-xs mt-3">
@@ -514,21 +516,21 @@ const Chat = () => {
               </div>
             </div>
             <AlertDialogTitle className="text-center text-xl text-gray-900 font-bold">
-              정말 나가시겠습니까? (Bạn có chắc muốn thoát?)
+              {t("chat.exitConfirmTitle")}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-center text-gray-600">
-              현재 진행 상황이 저장되지 않습니다. (Tiến trình hiện tại sẽ không được lưu.)
+              {t("chat.exitConfirmDesc")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex gap-3 sm:justify-center mt-4">
             <AlertDialogCancel className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100">
-              계속 하기 (Tiếp tục)
+              {t("chat.continueGame")}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmExit}
               className="flex-1 bg-red-500 hover:bg-red-600 text-white"
             >
-              대시보드로 / Về Dashboard
+              {t("chat.exitToDashboard")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

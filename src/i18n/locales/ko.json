@@ -1040,5 +1040,33 @@
     "tagline": "글로벌 1위 한국어 학습 플랫폼",
     "loading": "로딩 중...",
     "branding": "🎮 AI와 함께하는 RPG 한국어 학습"
+  },
+  "chat": {
+    "error": "오류",
+    "cannotStartGame": "게임을 시작할 수 없습니다.",
+    "gameOver": "💀 게임 오버!",
+    "hpZero": "HP가 0이 되었습니다.",
+    "missionComplete": "🎉 미션 성공!",
+    "survivedTurns": "10턴 생존에 성공했습니다!",
+    "messageSendFailed": "메시지 전송 실패",
+    "turn": "턴",
+    "hintTitle": "💡 힌트",
+    "hintDesc": "자연스럽게 한국어로 대화해보세요! 적절한 응답은 보상을, 이상한 응답은 패널티를 받습니다.",
+    "inputPlaceholder": "한국어로 입력하세요...",
+    "send": "전송",
+    "exitConfirmTitle": "정말 나가시겠습니까?",
+    "exitConfirmDesc": "현재 진행 상황이 저장되지 않습니다.",
+    "continueGame": "계속 하기",
+    "exitToDashboard": "대시보드로",
+    "feedback": {
+      "success": "좋아요! 👍",
+      "warning": "주의! ⚠️",
+      "fail": "실패! 💔"
+    },
+    "result": {
+      "success": "✓ 성공",
+      "warning": "⚠ 주의",
+      "fail": "✗ 실패"
+    }
   }
 }

@@ -1130,5 +1130,33 @@
     "tagline": "Nền tảng học tiếng Hàn #1 Thế giới",
     "loading": "Đang tải...",
     "branding": "🎮 RPG học tiếng Hàn với AI"
+  },
+  "chat": {
+    "error": "Lỗi",
+    "cannotStartGame": "Không thể bắt đầu trò chơi.",
+    "gameOver": "💀 Game Over!",
+    "hpZero": "HP đã về 0.",
+    "missionComplete": "🎉 Nhiệm vụ hoàn thành!",
+    "survivedTurns": "Bạn đã sống sót 10 lượt!",
+    "messageSendFailed": "Gửi tin nhắn thất bại",
+    "turn": "Lượt",
+    "hintTitle": "💡 Gợi ý",
+    "hintDesc": "Hãy nói chuyện tự nhiên bằng tiếng Hàn! Phản hồi phù hợp sẽ được thưởng, phản hồi lạ sẽ bị phạt.",
+    "inputPlaceholder": "Nhập bằng tiếng Hàn...",
+    "send": "Gửi",
+    "exitConfirmTitle": "Bạn có chắc muốn thoát?",
+    "exitConfirmDesc": "Tiến trình hiện tại sẽ không được lưu.",
+    "continueGame": "Tiếp tục",
+    "exitToDashboard": "Về Dashboard",
+    "feedback": {
+      "success": "Tốt lắm! 👍",
+      "warning": "Cẩn thận! ⚠️",
+      "fail": "Thất bại! 💔"
+    },
+    "result": {
+      "success": "✓ Thành công",
+      "warning": "⚠ Cẩn thận",
+      "fail": "✗ Thất bại"
+    }
   }
 }
