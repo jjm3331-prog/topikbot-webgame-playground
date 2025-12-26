@@ -1390,5 +1390,61 @@
       "title": "■ Dịch vụ xử lý khiếu nại liên quan đến thông tin cá nhân",
       "content": "Công ty chỉ định bộ phận liên quan và người phụ trách bảo vệ thông tin cá nhân."
     }
+  },
+  "footer": { "commonCopyright": "© 2025 LUKATO Vietnam. All rights reserved." },
+  "pointsSystem": {
+    "title": "Hệ thống điểm thưởng", "subtitle": "Học tiếng Hàn, kiếm điểm, nâng cấp level!",
+    "howToEarn": "Cách kiếm điểm", "levelSystem": "Hệ thống cấp bậc TOPIK", "freeVsPremium": "Tính năng miễn phí vs Premium",
+    "free": "Miễn phí", "premium": "Premium", "max": "MAX", "viewPricing": "Xem bảng giá",
+    "earnMethods": {
+      "daily": { "title": "Điểm danh hàng ngày", "description": "Đăng nhập mỗi ngày để nhận điểm thưởng" },
+      "streak": { "title": "7 ngày liên tiếp", "description": "Điểm danh 7 ngày liên tiếp để nhận thưởng lớn" },
+      "quiz": { "title": "Hoàn thành Quiz", "description": "Trả lời đúng cả 5 câu để nhận điểm tối đa" },
+      "game": { "title": "Hoàn thành Game", "description": "Chơi và hoàn thành các game học tiếng Hàn" },
+      "referral": { "title": "Mời bạn bè", "description": "Mời bạn bè tham gia và nhận thưởng khi họ đăng ký" },
+      "weeklyGoal": { "title": "Mục tiêu tuần", "description": "Hoàn thành mục tiêu học tập hàng tuần" }
+    },
+    "freeItems": { "aiQuestions": "Hỏi AI {{count}} lần/ngày", "topik": "Học TOPIK I & II", "allGames": "Tất cả Game học tiếng Hàn", "savedVocab": "Lưu tối đa {{count}} từ vựng", "ranking": "Xem bảng xếp hạng" },
+    "premiumItems": { "allFree": "Tất cả tính năng miễn phí" },
+    "tips": { "title": "Mẹo kiếm điểm nhanh", "item1": "Điểm danh mỗi ngày để duy trì streak và nhận điểm thưởng", "item2": "Hoàn thành quiz với điểm tuyệt đối để nhận +{{points}} điểm", "item3": "Mời bạn bè tham gia để cả hai cùng nhận thưởng", "item4": "Đặt và hoàn thành mục tiêu học tập hàng tuần" }
+  },
+  "pricing": {
+    "title": "Chọn gói phù hợp", "subtitle": "Bắt đầu miễn phí, nâng cấp khi cần thiết",
+    "period": { "1month": "1 tháng", "6months": "6 tháng", "12months": "12 tháng" },
+    "perMonth": "tháng", "save": "Tiết kiệm",
+    "features": {
+      "games": { "name": "Game học TOPIK (tất cả)", "desc": "8 game học tiếng Hàn" },
+      "topik": { "name": "TOPIK I & II học tập", "desc": "Bài học theo cấp độ" },
+      "headhunting": { "name": "Headhunting 1:1", "desc": "Tư vấn việc làm cá nhân" },
+      "writing": { "name": "Chấm Writing TOPIK AI", "desc": "AI chấm bài viết chi tiết" },
+      "variant": { "name": "Biến thể đề thi AI", "desc": "Tạo đề thi mới từ AI" }
+    },
+    "free": { "badge": "Miễn phí", "forever": "Miễn phí mãi mãi", "feature1": "Game học TOPIK (tất cả)", "feature2": "TOPIK I & II học tập", "feature3": "Roleplay Speaking", "currentPlan": "Đang sử dụng", "startFree": "Bắt đầu miễn phí" },
+    "premium": { "badge": "Phổ biến nhất", "feature1": "Tất cả tính năng Miễn phí", "feature2": "Headhunting 1:1", "feature3": "Chấm Writing TOPIK AI", "feature4": "Biến thể đề thi AI", "upgrade": "Nâng cấp Premium" },
+    "comparison": { "title": "So sánh chi tiết", "feature": "Tính năng" },
+    "process": { "title": "Quy trình thanh toán", "subtitle": "Đơn giản, nhanh chóng, an toàn", "step1": { "title": "Chọn gói", "desc": "Chọn gói phù hợp với nhu cầu" }, "step2": { "title": "Thanh toán", "desc": "ZaloPay, MoMo, chuyển khoản" }, "step3": { "title": "Kích hoạt", "desc": "Tự động ngay sau thanh toán" } },
+    "security": { "title": "Thanh toán an toàn 100%", "desc": "Mã hóa SSL • Bảo mật PCI-DSS • Hoàn tiền 7 ngày" },
+    "faqTitle": "Câu hỏi thường gặp", "faqSubtitle": "Giải đáp thắc mắc về gói dịch vụ",
+    "faq": {
+      "cancel": { "question": "Tôi có thể hủy gói bất cứ lúc nào không?", "answer": "Có, bạn có thể hủy gói đăng ký bất cứ lúc nào. Sau khi hủy, bạn vẫn có thể sử dụng các tính năng Premium cho đến khi hết thời hạn đã thanh toán." },
+      "payment": { "question": "Phương thức thanh toán nào được hỗ trợ?", "answer": "Chúng tôi hỗ trợ thanh toán qua ZaloPay, MoMo, VNPay, và chuyển khoản ngân hàng. Tất cả các giao dịch đều được mã hóa SSL an toàn." },
+      "includes": { "question": "Premium bao gồm những gì?", "answer": "Premium bao gồm: Dịch vụ Headhunting 1:1, AI chấm bài viết TOPIK, và Biến thể đề thi AI." },
+      "refund": { "question": "Có được hoàn tiền không?", "answer": "Chúng tôi hoàn tiền 100% trong vòng 7 ngày đầu tiên nếu bạn không hài lòng với dịch vụ. Liên hệ support để được hỗ trợ." },
+      "student": { "question": "Học sinh có được giảm giá không?", "answer": "Có! Học sinh và sinh viên được giảm 20% khi đăng ký gói 6 tháng hoặc 12 tháng. Vui lòng liên hệ support để được hỗ trợ xác minh." }
+    },
+    "paymentVia": "Thanh toán an toàn qua ZaloPay"
+  },
+  "aiTutor": {
+    "badge": "AI Chat - Hỏi đáp thông minh", "title": "LUKATO AI Chat", "description": "Hệ thống AI thầy giáo thông minh nhất Việt Nam. Hỏi đáp 24/7 cho tất cả môn học TOPIK, HSA, TSA, API.",
+    "openChat": "Mở LUKATO AI Chat", "supportAt": "Hỗ trợ toàn bộ tại chat-topikbot.kr",
+    "features": { "qa": { "title": "Hỏi đáp không giới hạn", "desc": "Hỏi bất kỳ câu hỏi nào về kiến thức TOPIK. AI sẽ giải đáp chi tiết và dễ hiểu." }, "support": { "title": "Hỗ trợ 24/7", "desc": "Chatbot AI hoạt động liên tục, sẵn sàng trả lời bất cứ lúc nào." }, "subjects": { "title": "Đa dạng môn học", "desc": "Toán, Lý, Hóa, Sinh, Anh, Địa, Lịch sử, Ngữ văn - tất cả trong một nền tảng duy nhất." }, "ai": { "title": "AI tiên tiến nhất", "desc": "Sử dụng công nghệ Compound AI với Chatbot Chuyên gia đầu tiên Việt Nam." } },
+    "howToUse": { "title": "Hướng dẫn sử dụng chi tiết", "subtitle": "Làm theo 4 bước đơn giản để bắt đầu" },
+    "steps": { "step1": { "title": "Đăng nhập / Đăng ký", "desc": "Truy cập LUKATO AI Chat và đăng nhập bằng Google hoặc đăng ký tài khoản mới.", "highlight": "Hội viên LUKATO (Basic/Premium) sẽ được cấp quyền truy cập ngay sau khi đăng nhập." }, "step2": { "title": "Chọn mô hình AI", "desc": "Click vào tên mô hình ở góc trái trên để xem danh sách các mô hình AI. Chọn mô hình phù hợp với môn học bạn cần.", "highlight": "Click 'Thử tìm mô hình' để lưu mô hình yêu thích." }, "step3": { "title": "Cài đặt cá nhân", "desc": "Click vào avatar góc phải trên → Cài đặt để tùy chỉnh ngôn ngữ, giao diện và các tùy chọn khác.", "highlight": "Giao diện trực quan, dễ sử dụng!" }, "step4": { "title": "Bắt đầu hỏi đáp", "desc": "Viết câu hỏi về bất kỳ kiến thức nào. AI sẽ giải đáp chi tiết như một thầy giáo riêng!", "highlight": "Hỗ trợ giọng nói và upload file." } },
+    "modelsTitle": "Các mô hình AI chuyên biệt", "modelsSubtitle": "LUKATO AI cung cấp nhiều mô hình AI chuyên biệt cho từng môn học",
+    "models": { "thpt": { "name": "All About TOPIK", "subtitle": "Mô hình tổng hợp", "desc": "Giải đáp mọi câu hỏi TOPIK từ Toán, Lý, Hóa, Sinh, Anh, Sử, Địa." }, "dgnl": { "name": "ĐGNL & ĐGTD", "subtitle": "AI Chuyên gia", "desc": "AI Chuyên gia cho TSA ĐGNL, Đ.TĐ, APT-O, ĐGTD TSA-HQ." }, "math": { "name": "TOPIK for Math", "subtitle": "Chuyên Toán", "desc": "Công thức và giải thuật Toán cấp 3." }, "english": { "name": "TOPIK for English", "subtitle": "Chuyên Anh", "desc": "Từ vựng, ngữ pháp tiếng Anh." } },
+    "modelsHint": "Sau khi được cấp quyền, bạn có thể chọn bất kỳ mô hình nào!",
+    "featuresTitle": "Tính năng nổi bật", "noticesTitle": "Lưu ý quan trọng cho hội viên",
+    "notices": { "item1": "Quyền truy cập AI được cấp ngay lập tức sau khi nâng cấp thành công.", "item2": "Đăng nhập bằng cùng email đã đăng ký tại LUKATO để đồng bộ.", "item3": "Các mô hình AI sẽ tự động hiển thị sau khi được cấp quyền.", "item4": "Sử dụng LUKATO RAG AI - đặt câu hỏi và nhận trả lời chi tiết!" },
+    "cta": { "title": "Sẵn sàng học tập cùng AI?", "desc": "LUKATO AI Chat giúp bạn giải đáp mọi thắc mắc và chinh phục kỳ thi!", "practice": "Làm bài tập" }
   }
 }

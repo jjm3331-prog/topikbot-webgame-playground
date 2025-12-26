@@ -1,11 +1,12 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { 
-  MessageCircle, 
-  ExternalLink, 
-  Sparkles, 
-  Clock, 
-  Globe, 
+import {
+  MessageCircle,
+  ExternalLink,
+  Sparkles,
+  Clock,
+  Globe,
   BookOpen,
   Users,
   CheckCircle,
@@ -19,92 +20,93 @@ import AppFooter from "@/components/AppFooter";
 
 const LUKATO_AI_CHAT_URL = "https://chat-topikbot.kr";
 
-const features = [
-  {
-    icon: MessageCircle,
-    title: "Hỏi đáp không giới hạn",
-    description: "Hỏi bất kỳ câu hỏi nào về kiến thức TOPIK, HSA, TSA, API. AI sẽ giải đáp chi tiết và dễ hiểu."
-  },
-  {
-    icon: Clock,
-    title: "Hỗ trợ 24/7",
-    description: "Chatbot AI hoạt động liên tục, sẵn sàng AI trả lời bất cứ lúc nào."
-  },
-  {
-    icon: BookOpen,
-    title: "Đa dạng môn học",
-    description: "Toán Lý, Hóa, Sinh, Anh, Địa, Lịch sử, Ngữ văn - tất cả trong một nền tảng duy nhất."
-  },
-  {
-    icon: Sparkles,
-    title: "AI tiên tiến nhất",
-    description: "Sử dụng công nghệ Compound AI với Chatbot Chuyên gia đầu tiên Việt Nam."
-  }
-];
-
-const aiModels = [
-  {
-    name: "All About THPTQG",
-    subtitle: "Mô hình tổng hợp",
-    description: "Giải đáp mọi câu hỏi THPT từ Toán, Lý, Hóa, Sinh, Anh, Sử, Địa.",
-    icon: "🇻🇳"
-  },
-  {
-    name: "ĐGNL & ĐGTD",
-    subtitle: "AI Chuyên gia",
-    description: "AI Chuyên gia cho TSA ĐGNL, Đ.TĐ, APT-O, ĐGTD TSA-HQ.",
-    icon: "⭐"
-  },
-  {
-    name: "THPT for Math",
-    subtitle: "Chuyên Toán",
-    description: "Công thức và giải thuật Toán cấp 3.",
-    icon: "📐"
-  },
-  {
-    name: "THPT for English",
-    subtitle: "Chuyên Anh",
-    description: "Từ vựng, ngữ pháp tiếng Anh.",
-    icon: "🇬🇧"
-  }
-];
-
-const steps = [
-  {
-    number: 1,
-    title: "Đăng nhập / Đăng ký",
-    description: "Truy cập LUKATO AI Chat và đăng nhập bằng Google hoặc đăng ký tài khoản mới.",
-    highlight: "Hội viên LUKATO (Basic/Premium) sẽ được cấp quyền truy cập ngay sau khi đăng nhập."
-  },
-  {
-    number: 2,
-    title: "Chọn mô hình AI",
-    description: "Click vào tên mô hình ở góc trái trên để xem danh sách các mô hình AI. Chọn mô hình phù hợp với môn học bạn cần.",
-    highlight: "Click \"Thử tìm mô hình\" để lưu mô hình yêu thích vào bên."
-  },
-  {
-    number: 3,
-    title: "Cài đặt cá nhân",
-    description: "Click vào avatar góc phải trên → Cài đặt để tùy chỉnh ngôn ngữ, giao diện và các tùy chọn khác.",
-    highlight: "Giao diện trực quan, dễ sử dụng!"
-  },
-  {
-    number: 4,
-    title: "Bắt đầu hỏi đáp",
-    description: "Viết câu hỏi về bất kỳ kiến thức nào. AI sẽ giải đáp chi tiết như một thầy giáo riêng!",
-    highlight: "Hỗ trợ gọng nói và upload file."
-  }
-];
-
-const notices = [
-  "Quyền truy cập AI được cấp ngay lập tức sau khi nâng cấp thành công.",
-  "Đăng nhập bằng cùng email Có đăng ký tại LUKATO để nộc nhật.",
-  "Các mô hình AI sẽ tự động hiển thị sau khi được cấp quyền.",
-  "Sử dụng LUKATO RAG AI - đặt câu hỏi và nhận trả lời chi tiết!"
-];
-
 const AITutor = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const features = [
+    {
+      icon: MessageCircle,
+      title: t("aiTutor.features.qa.title"),
+      description: t("aiTutor.features.qa.desc"),
+    },
+    {
+      icon: Clock,
+      title: t("aiTutor.features.support.title"),
+      description: t("aiTutor.features.support.desc"),
+    },
+    {
+      icon: BookOpen,
+      title: t("aiTutor.features.subjects.title"),
+      description: t("aiTutor.features.subjects.desc"),
+    },
+    {
+      icon: Sparkles,
+      title: t("aiTutor.features.ai.title"),
+      description: t("aiTutor.features.ai.desc"),
+    },
+  ];
+
+  const aiModels = [
+    {
+      name: t("aiTutor.models.thpt.name"),
+      subtitle: t("aiTutor.models.thpt.subtitle"),
+      description: t("aiTutor.models.thpt.desc"),
+      icon: "🇻🇳",
+    },
+    {
+      name: t("aiTutor.models.dgnl.name"),
+      subtitle: t("aiTutor.models.dgnl.subtitle"),
+      description: t("aiTutor.models.dgnl.desc"),
+      icon: "⭐",
+    },
+    {
+      name: t("aiTutor.models.math.name"),
+      subtitle: t("aiTutor.models.math.subtitle"),
+      description: t("aiTutor.models.math.desc"),
+      icon: "📐",
+    },
+    {
+      name: t("aiTutor.models.english.name"),
+      subtitle: t("aiTutor.models.english.subtitle"),
+      description: t("aiTutor.models.english.desc"),
+      icon: "🇬🇧",
+    },
+  ];
+
+  const steps = [
+    {
+      number: 1,
+      title: t("aiTutor.steps.step1.title"),
+      description: t("aiTutor.steps.step1.desc"),
+      highlight: t("aiTutor.steps.step1.highlight"),
+    },
+    {
+      number: 2,
+      title: t("aiTutor.steps.step2.title"),
+      description: t("aiTutor.steps.step2.desc"),
+      highlight: t("aiTutor.steps.step2.highlight"),
+    },
+    {
+      number: 3,
+      title: t("aiTutor.steps.step3.title"),
+      description: t("aiTutor.steps.step3.desc"),
+      highlight: t("aiTutor.steps.step3.highlight"),
+    },
+    {
+      number: 4,
+      title: t("aiTutor.steps.step4.title"),
+      description: t("aiTutor.steps.step4.desc"),
+      highlight: t("aiTutor.steps.step4.highlight"),
+    },
+  ];
+
+  const notices = [
+    t("aiTutor.notices.item1"),
+    t("aiTutor.notices.item2"),
+    t("aiTutor.notices.item3"),
+    t("aiTutor.notices.item4"),
+  ];
 
   const handleOpenChat = () => {
     window.open(LUKATO_AI_CHAT_URL, "_blank");
@@ -115,34 +117,25 @@ const AITutor = () => {
       <CleanHeader />
 
       <main className="pt-8">
-
         {/* Hero Section */}
         <section className="relative py-16 px-4 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
-          
+
           <div className="max-w-4xl mx-auto text-center relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-6"
-            >
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
                 <MessageCircle className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-primary">AI Chat - Hỏi đáp thông minh</span>
+                <span className="text-sm font-medium text-primary">{t("aiTutor.badge")}</span>
                 <span className="px-2 py-0.5 text-xs font-bold bg-gradient-to-r from-korean-orange to-korean-pink text-white rounded-full">
                   Basic & Premium
                 </span>
               </div>
 
               {/* Title */}
-              <h1 className="text-4xl md:text-5xl font-heading font-bold text-foreground">
-                LUKATO AI Chat
-              </h1>
-              
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Hệ thống AI thầy giáo thông minh nhất Việt Nam. Hỏi đáp 24/7 cho tất cả môn học THPT Quốc gia, HSA, TSA, API.
-              </p>
+              <h1 className="text-4xl md:text-5xl font-heading font-bold text-foreground">{t("aiTutor.title")}</h1>
+
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{t("aiTutor.description")}</p>
 
               {/* CTA Button */}
               <div className="flex flex-col items-center gap-4">
@@ -152,12 +145,12 @@ const AITutor = () => {
                   className="bg-gradient-to-r from-korean-orange to-korean-pink hover:from-korean-orange/90 hover:to-korean-pink/90 text-white font-bold px-8 py-6 text-lg rounded-xl shadow-lg"
                 >
                   <Sparkles className="w-5 h-5 mr-2" />
-                  Mở LUKATO AI Chat
+                  {t("aiTutor.openChat")}
                   <ExternalLink className="w-5 h-5 ml-2" />
                 </Button>
                 <p className="text-sm text-muted-foreground flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-korean-green" />
-                  Hỗ trợ toàn bộ tại chat-topikbot.kr
+                  {t("aiTutor.supportAt")}
                 </p>
               </div>
             </motion.div>
@@ -168,12 +161,8 @@ const AITutor = () => {
         <section className="py-16 px-4">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-2xl md:text-3xl font-heading font-bold text-primary mb-4">
-                Hướng dẫn sử dụng chi tiết
-              </h2>
-              <p className="text-muted-foreground">
-                Làm theo 4 bước đơn giản để bắt đầu
-              </p>
+              <h2 className="text-2xl md:text-3xl font-heading font-bold text-primary mb-4">{t("aiTutor.howToUse.title")}</h2>
+              <p className="text-muted-foreground">{t("aiTutor.howToUse.subtitle")}</p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8">
@@ -210,12 +199,8 @@ const AITutor = () => {
         <section className="py-16 px-4 bg-muted/30">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-2xl md:text-3xl font-heading font-bold text-foreground mb-4">
-                Các mô hình AI chuyên biệt
-              </h2>
-              <p className="text-muted-foreground">
-                LUKATO AI cung cấp nhiều mô hình AI chuyên biệt cho từng môn học
-              </p>
+              <h2 className="text-2xl md:text-3xl font-heading font-bold text-foreground mb-4">{t("aiTutor.modelsTitle")}</h2>
+              <p className="text-muted-foreground">{t("aiTutor.modelsSubtitle")}</p>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -241,9 +226,7 @@ const AITutor = () => {
               ))}
             </div>
 
-            <p className="text-center text-sm text-muted-foreground mt-6">
-              💡 Sau khi được cấp quyền, bạn có thể chọn tất kỳ mô hình nào!
-            </p>
+            <p className="text-center text-sm text-muted-foreground mt-6">💡 {t("aiTutor.modelsHint")}</p>
           </div>
         </section>
 
@@ -251,9 +234,7 @@ const AITutor = () => {
         <section className="py-16 px-4">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-2xl md:text-3xl font-heading font-bold text-foreground mb-4">
-                Tính năng nổi bật
-              </h2>
+              <h2 className="text-2xl md:text-3xl font-heading font-bold text-foreground mb-4">{t("aiTutor.featuresTitle")}</h2>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -284,7 +265,7 @@ const AITutor = () => {
             <Card className="p-6 bg-muted/50 border-border">
               <div className="flex items-center gap-2 mb-4">
                 <Globe className="w-5 h-5 text-primary" />
-                <h3 className="font-semibold text-foreground">Lưu ý quan trọng cho hội viên</h3>
+                <h3 className="font-semibold text-foreground">{t("aiTutor.noticesTitle")}</h3>
               </div>
               <ul className="space-y-2">
                 {notices.map((notice, index) => (
@@ -306,12 +287,8 @@ const AITutor = () => {
                 <Brain className="w-6 h-6 text-primary" />
                 <Sparkles className="w-5 h-5 text-korean-yellow" />
               </div>
-              <h2 className="text-2xl font-heading font-bold text-foreground mb-3">
-                Sẵn sàng học tập cùng AI?
-              </h2>
-              <p className="text-muted-foreground mb-6">
-                LUKATO AI Chat giúp bạn giải đáp mọi thắc mắc và chinh phục kỳ thi!
-              </p>
+              <h2 className="text-2xl font-heading font-bold text-foreground mb-3">{t("aiTutor.cta.title")}</h2>
+              <p className="text-muted-foreground mb-6">{t("aiTutor.cta.desc")}</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Button
                   onClick={handleOpenChat}
@@ -319,16 +296,12 @@ const AITutor = () => {
                   className="bg-gradient-to-r from-korean-orange to-korean-pink hover:from-korean-orange/90 hover:to-korean-pink/90 text-white font-bold"
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Mở LUKATO AI Chat
+                  {t("aiTutor.openChat")}
                   <ExternalLink className="w-4 h-4 ml-2" />
                 </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => navigate("/pricing")}
-                >
+                <Button variant="outline" size="lg" onClick={() => navigate("/pricing")}>
                   <Users className="w-4 h-4 mr-2" />
-                  Làm bài tập
+                  {t("aiTutor.cta.practice")}
                 </Button>
               </div>
             </Card>
