@@ -886,5 +886,159 @@
         "HSK 5 uchun o'tish bali qancha?"
       ]
     }
+  },
+  "terms": {
+    "title": "Foydalanish shartlari",
+    "lastUpdated": "Oxirgi yangilanish: 2025-yil yanvar",
+    "article1": {
+      "title": "1-modda. Maqsad",
+      "content": "Ushbu Foydalanish shartlari \"LUKATO AI\" (bundan keyin \"Sayt\") xizmatlaridan foydalanish shartlari va ishlash qoidalarini belgilashga qaratilgan. Xizmatga kirish yoki undan foydalanish orqali siz ushbu shartlarni o'qib chiqqaningizni, tushunganingizni va ularga rioya qilishga rozilik bildirasiz."
+    },
+    "article2": {
+      "title": "2-modda. Atamalar ta'rifi",
+      "intro": "Ushbu shartlarda ishlatiladigan asosiy atamalar quyidagicha ta'riflanadi:",
+      "item1": "\"Xizmat\" — a'zolar Saytda foydalanishi mumkin bo'lgan barcha xizmatlarni anglatadi.",
+      "item2": "\"Foydalanuvchi\" — ushbu shartlarga muvofiq xizmatlarga kiruvchi va foydalanuvchi a'zolar va noa'zolarni anglatadi.",
+      "item3": "\"A'zo\" — ro'yxatdan o'tgan va kompaniya bilan xizmatdan foydalanish shartnomasi tuzgan mijozni anglatadi.",
+      "item4": "\"Noa'zo\" — a'zo sifatida ro'yxatdan o'tmasdan xizmatlardan foydalanuvchi foydalanuvchini anglatadi.",
+      "item5": "\"Xizmat shartnomasi\" — Sayt va a'zo o'rtasida xizmatlardan foydalanish bo'yicha tuzilgan shartnomani anglatadi.",
+      "item6": "\"A'zo ID\" — identifikatsiya va xizmatdan foydalanish uchun taqdim etiladigan noyob belgilar qatori.",
+      "item7": "\"Parol\" — a'zo tomonidan hisob tasdiqlash va xavfsizlik uchun o'rnatilgan belgilar va raqamlar kombinatsiyasi.",
+      "item8": "\"Operator\" — xizmat saytini ochgan va boshqaruvchi shaxsni anglatadi.",
+      "item9": "\"Bekor qilish\" — a'zoning xizmat shartnomasini bekor qilishini anglatadi."
+    },
+    "article3": {
+      "title": "3-modda. Shartlardan tashqari qoidalar",
+      "content": "Operator zarur bo'lganda qo'shimcha ishlash siyosatlarini chiqarishi mumkin va ziddiyat yuzaga kelganda ishlash siyosati ustunlik qiladi."
+    },
+    "article4": {
+      "title": "4-modda. Xizmat shartnomasini tuzish",
+      "item1": "Xizmat shartnomasi ariza beruvchi ushbu shartlarga rozi bo'lganda va operator tasdiqlanganda tuziladi.",
+      "item2": "A'zo sifatida ro'yxatdan o'tishni istovchilar Saytda xizmat ro'yxatidan o'tishni yakunlaganda shartlarga rozilik bildirgan hisoblanadi."
+    },
+    "article5": {
+      "title": "5-modda. A'zo ro'yxatdan o'tish",
+      "item1": "Foydalanuvchilar kompaniya taqdim etgan shaklni to'ldirish va shartlarga rozilik bildirish orqali bepul ro'yxatdan o'tishlari mumkin.",
+      "item2": "Ro'yxatdan o'tish shaklidagi barcha a'zo ma'lumotlari haqiqiy va aniq bo'lishi kerak. Yolg'on ma'lumot berganlar qonuniy himoya olmasligi mumkin.",
+      "item3": "Kompaniya ro'yxatdan o'tish arizasini qabul qilganda xizmat shartnomasi tuziladi. Kompaniya ma'lum hollarda ro'yxatdan o'tishni rad etishi yoki shartnomani bekor qilishi mumkin.",
+      "item4": "A'zolar o'zgarishlar yuz berganda ma'lumotlarni oqilona muddatda yangilashlari kerak."
+    },
+    "article6": {
+      "title": "6-modda. Kompaniya majburiyatlari",
+      "item1": "Kompaniya a'zolarning asosli shikoyatlarini tezda hal qilishi kerak.",
+      "item2": "Operator barqaror ishlashni ta'minlashi va sayt bilan bog'liq muammolarni tezda hal qilishi kerak.",
+      "item3": "Kompaniya a'zo e'tiborsizligi yoki aloqa uzilishi tufayli yuzaga kelgan muammolar uchun javobgar emas."
+    },
+    "article7": {
+      "title": "7-modda. A'zo majburiyatlari",
+      "item1": "A'zolar shartlar, ishlash siyosatlari, bildirishnomalar va tegishli qonunlar qoidalariga rioya qilishlari kerak.",
+      "item2": "Sayt roziligi bo'lmasa, xizmatdan foydalanish huquqlari yoki shartnoma maqomini boshqalarga o'tkazib bo'lmaydi.",
+      "item3": "A'zolar ID va parolni xavfsiz saqlashlari va roziliksiz uchinchi shaxslarga bermasliklari kerak.",
+      "item4": "Operator yoki uchinchi shaxslarning intellektual mulk huquqlari yoki boshqa huquqlarini buzish mumkin emas."
+    },
+    "article8": {
+      "title": "8-modda. Xizmat vaqti",
+      "item1": "Hodisalar yoki texnik xizmat ko'rsatish bo'lmasa, xizmatlar 24/7 taqdim etiladi; texnik xizmat jadvali oldindan e'lon qilinadi.",
+      "item2": "Quyidagi hollarda xizmatlar oldindan xabarsiz to'xtatilishi mumkin: shoshilinch tizim tekshiruvi/yangilanishi, favqulodda holat/tabiiy ofat, telekommunikatsiya xizmatlari to'xtatilishi, ortiqcha yuklash.",
+      "item3": "To'xtatish holatida Sayt a'zolarga xabar beradi; oldindan xabar berish imkoni bo'lmasa, keyinroq xabar beriladi."
+    },
+    "article9": {
+      "title": "9-modda. A'zo chiqishi va malakani yo'qotish",
+      "item1": "A'zolar istalgan vaqtda shartnomani bekor qilishni so'rashlari mumkin; kompaniya qonun qoidalariga muvofiq ishlaydi.",
+      "item2": "Quyidagi hollarda kompaniya xabarsiz shartnomani bekor qilishi yoki xizmatlarni to'xtatishi mumkin: maqsadga zid xizmatlardan foydalanish, yolg'on ma'lumot berish, ma'lumotlarni to'sish/o'g'irlash, qonun buzish."
+    },
+    "article10": {
+      "title": "10-modda. Xizmatdan foydalanish cheklovlari",
+      "intro": "A'zolar quyidagi harakatlarni amalga oshirmasliklari kerak va aniqlangan taqdirda kompaniya cheklashi, to'xtatishi yoki shartnomani bekor qilishi mumkin:",
+      "item1": "Ro'yxatdan o'tish yoki o'zgartirish vaqtida yolg'on ma'lumot berish",
+      "item2": "Boshqalarning xizmatlarini buzish yoki o'g'irlash",
+      "item3": "Sayt xodimlari yoki tegishli shaxslarni o'ziga nisbat berish",
+      "item4": "Boshqalarning shaxsiy huquqlari yoki intellektual mulkini buzish",
+      "item5": "Boshqalarning ID-sidan ruxsatsiz foydalanish",
+      "item6": "Roziliksiz boshqalarning shaxsiy ma'lumotlarini to'plash, saqlash yoki oshkor qilish",
+      "item7": "Jinoyat bilan bog'liq harakatlar",
+      "item8": "Boshqa qonunbuzarlik harakatlari"
+    },
+    "article11": {
+      "title": "11-modda. Post boshqaruvi",
+      "item1": "Postlar a'zolar tomonidan saytda joylashtirilgan rasmlar, matn, video va audioni o'z ichiga oladi.",
+      "item2": "Qasddan yoki og'ir e'tiborsizlik bo'lmasa, kompaniya postlar sababli etkazilgan zarar uchun javobgar emas.",
+      "item3": "A'zolar jamoat tartibini, intellektual mulkni yoki boshqalarning huquqlarini buzuvchi kontentni joylashtirmasliklari kerak.",
+      "item4": "Kompaniya a'zo roziligi bo'lmasa ham buzuvchi kontentni o'chirish huquqiga ega.",
+      "item5": "Kompaniya davlat organlarining so'roviga binoan a'zo roziligi bo'lmasa ham postlarni o'chirishi yoki ko'chirishi mumkin."
+    },
+    "article12": {
+      "title": "12-modda. Post mulkchilik huquqi",
+      "item1": "Kompaniya tomonidan yaratilgan asarlar uchun mualliflik huquqi kompaniyaga tegishli.",
+      "item2": "A'zolar tomonidan joylashtirilgan postlar uchun mualliflik huquqi muallifga tegishli.",
+      "item3": "Postlar qidiruv natijalarida, xizmatlarda yoki reklama aksiyalarida ko'rsatish uchun zarur darajada tahrirlangan, nusxalangan yoki o'zgartirilgan bo'lishi mumkin.",
+      "item4": "Agar kompaniya postlarni yuqoridagilardan boshqa maqsadlarda foydalanmoqchi bo'lsa, a'zo ruxsatini olishi kerak."
+    },
+    "article13": {
+      "title": "13-modda. Zarar uchun kompensatsiya",
+      "item1": "Saytdan foydalanishdan kelib chiqadigan barcha fuqarolik va jinoiy javobgarlik birinchi navbatda a'zoga tegishli.",
+      "item2": "Kompaniya tabiiy ofatlar yoki a'zoning qasddan/e'tiborsiz harakatlari tufayli yetkazilgan zarar uchun javobgar emas."
+    },
+    "article14": {
+      "title": "14-modda. Javobgarlikdan voz kechish",
+      "content": "Operator quyidagi holatlar uchun javobgar emas: a'zolar kutilgan foyda olmagan holat; xizmat tizimlari/telekommunikatsiya provayderlari xatolari; a'zolar tomonidan joylashtirilgan ma'lumotlar; a'zolar o'rtasidagi yoki uchinchi shaxslar bilan faoliyat; ma'lumotlarning to'g'riligi/ishonchliligi; tovar operatsiyalari; foydalanuvchi xatolari tufayli nizolar; viruslar yoki fors-major."
+    },
+    "article15": {
+      "title": "15-modda. Nizolarni hal qilish",
+      "item1": "Kompaniya va a'zolar xizmatlar bilan bog'liq nizolarni tinch yo'l bilan hal qilishga harakat qilishlari kerak.",
+      "item2": "Barcha nizolarga Koreya qonunlari qo'llaniladi.",
+      "item3": "Nizolarni hal qilish sudi Koreya fuqarolik protsessual qonuni bo'yicha suddir.",
+      "item4": "Chet el manzillari bo'lgan a'zolar uchun vakolatli sud Koreya, Seul Markaziy tuman sudidir."
+    }
+  },
+  "privacy": {
+    "title": "Maxfiylik siyosati",
+    "lastUpdated": "Oxirgi yangilanish: 2025-yil yanvar",
+    "contactTitle": "Shaxsiy ma'lumotlarni himoya qilish mas'uli",
+    "section1": {
+      "title": "■ To'planadigan shaxsiy ma'lumotlar",
+      "intro": "Kompaniya a'zo ro'yxatdan o'tish, maslahat va xizmat ro'yxatdan o'tish uchun quyidagi shaxsiy ma'lumotlarni to'playdi:",
+      "itemsTitle": "To'planadigan ma'lumotlar:",
+      "items": "Ism, tug'ilgan sana, jins, kirish ID, parol, xavfsizlik savollari va javoblari, uy telefoni, uy manzili, mobil telefon, elektron pochta, kasb, kompaniya nomi, bo'lim, lavozim, ish telefoni, sevimli mashg'ulotlar, oilaviy holat, yilliklar, qonuniy vakil ma'lumotlari, ID raqami, xizmatdan foydalanish tarixi, kirish jurnallari, kirish IP, to'lov tarixi",
+      "methodTitle": "To'plash usuli:",
+      "method": "Veb-sayt (a'zo ro'yxatdan o'tish), qog'oz shakllari"
+    },
+    "section2": {
+      "title": "■ To'plash va foydalanish maqsadi",
+      "intro": "Kompaniya to'plangan shaxsiy ma'lumotlardan quyidagi maqsadlarda foydalanadi:",
+      "item1": "Xizmat shartnomalarini bajarish va xizmat to'lovlarini to'lash, kontent taqdim etish, tovarlarni sotib olish va yetkazib berish, hisob-fakturalar va tegishli hujjatlarni yuborish",
+      "item2": "A'zolarni boshqarish: shaxsni tasdiqlash, identifikatsiya, yosh tekshiruvi, 14 yoshdan kichik bolalar ma'lumotlarini to'plashda qonuniy vakil roziligini tekshirish, bildirishnomalarni yetkazish, marketing va reklama maqsadlari",
+      "item3": "A'zolarning kirish chastotasini tahlil qilish yoki xizmatdan foydalanish statistikasi"
+    },
+    "section3": {
+      "title": "■ Shaxsiy ma'lumotlarni saqlash va foydalanish muddati",
+      "content": "Kompaniya to'plash va foydalanish maqsadlari bajarilgandan so'ng, istisnosiz shaxsiy ma'lumotlarni darhol yo'q qiladi."
+    },
+    "section4": {
+      "title": "■ Shaxsiy ma'lumotlarni yo'q qilish tartibi va usuli",
+      "content": "To'plash va foydalanish maqsadlari bajarilgandan so'ng, shaxsiy ma'lumotlar tartib va usullarga muvofiq darhol yo'q qilinadi."
+    },
+    "section5": {
+      "title": "■ Shaxsiy ma'lumotlarni taqdim etish",
+      "intro": "Kompaniya foydalanuvchilarning shaxsiy ma'lumotlarini uchinchi shaxslarga taqdim etmaydi, quyidagi holatlar bundan mustasno:",
+      "item1": "Foydalanuvchining oldindan roziligi",
+      "item2": "Qonun talablari yoki tergov organlarining so'rovlari bo'yicha"
+    },
+    "section6": {
+      "title": "■ Shaxsiy ma'lumotlarni qayta ishlashni topshirish",
+      "content": "Kompaniya roziliksiz mijozlarning shaxsiy ma'lumotlarini uchinchi shaxslarga topshirmaydi."
+    },
+    "section7": {
+      "title": "■ Foydalanuvchi huquqlari va amalga oshirish usullari",
+      "content": "Foydalanuvchilar qoidalarga muvofiq shaxsiy ma'lumotlarga kirish/o'zgartirish va ro'yxatdan chiqishni so'rash huquqiga ega."
+    },
+    "section8": {
+      "title": "■ Cookie",
+      "content": "Kompaniya xizmatlarni yaxshilash uchun cookie-fayllardan foydalanadi. Foydalanuvchilar brauzer sozlamalarida cookie-fayllarni rad etishlari mumkin."
+    },
+    "section9": {
+      "title": "■ Shaxsiy ma'lumotlar bo'yicha shikoyat xizmati",
+      "content": "Kompaniya tegishli bo'limlarni va shaxsiy ma'lumotlarni himoya qilish mas'ullarini tayinlaydi."
+    }
   }
 }
