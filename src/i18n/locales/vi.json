@@ -1158,5 +1158,83 @@
       "warning": "⚠ Cẩn thận",
       "fail": "✗ Thất bại"
     }
+  },
+  "aiChat": {
+    "badge": "LUKATO AI Agent",
+    "rag": "RAG",
+    "title": "Trợ lý học ngôn ngữ AI 🤖",
+    "description": "Chọn Agent phù hợp với ngôn ngữ bạn đang học. AI sẽ giải đáp mọi thắc mắc của bạn! ✨",
+    "premiumUnlimited": "Premium - Không giới hạn câu hỏi",
+    "startChat": "Bắt đầu trò chuyện",
+    "comingSoon": "Sắp ra mắt",
+    "active": "Hoạt động",
+    "whatIsTitle": "LUKATO RAG AI là gì? 🧠",
+    "whatIsDesc": "Hệ thống AI thông minh sử dụng công nghệ RAG (Retrieval-Augmented Generation) để cung cấp câu trả lời chính xác dựa trên cơ sở dữ liệu kiến thức ngôn ngữ chuyên sâu. Mỗi Agent được tối ưu hóa cho từng ngôn ngữ cụ thể! 🎯",
+    "agent": {
+      "topik": {
+        "subtitle": "Chuyên gia TOPIK I & II 🇰🇷",
+        "description": "Giải đáp mọi thắc mắc về tiếng Hàn, ngữ pháp, từ vựng và chiến lược luyện thi TOPIK.",
+        "features": ["Ngữ pháp tiếng Hàn", "Từ vựng TOPIK", "Chiến lược thi", "Luyện viết"]
+      },
+      "ielts": {
+        "subtitle": "Tiếng Anh IELTS 🇬🇧",
+        "description": "Luyện thi IELTS 4 kỹ năng: Listening, Reading, Writing, Speaking.",
+        "features": ["Writing Task 1&2", "Speaking Practice", "Reading Skills", "Listening Tips"]
+      },
+      "jlpt": {
+        "subtitle": "Tiếng Nhật N1-N5 🇯🇵",
+        "description": "Hỗ trợ học tiếng Nhật và luyện thi JLPT các cấp độ.",
+        "features": ["Ngữ pháp tiếng Nhật", "Kanji & Từ vựng", "Nghe hiểu", "Đọc hiểu"]
+      },
+      "hsk": {
+        "subtitle": "Tiếng Trung HSK 1-6 🇨🇳",
+        "description": "Học tiếng Trung và chuẩn bị thi HSK hiệu quả.",
+        "features": ["Ngữ pháp tiếng Trung", "Hán tự", "Luyện nghe", "Luyện viết"]
+      }
+    },
+    "welcome": {
+      "topik": {
+        "title": "Xin chào! 👋",
+        "subtitle": "Mình là LUKATO AI Agent - chuyên gia tư vấn tiếng Hàn và luyện thi TOPIK. Hãy hỏi mình bất cứ điều gì nhé! 🎓✨"
+      },
+      "ielts": {
+        "title": "Hello! 👋",
+        "subtitle": "Mình là LUKATO AI Agent - chuyên gia luyện thi IELTS 4 kỹ năng. Hãy hỏi mình về Speaking, Writing, Reading, Listening nhé! 🇬🇧✨"
+      },
+      "jlpt": {
+        "title": "こんにちは! 👋",
+        "subtitle": "Mình là LUKATO AI Agent - chuyên gia tư vấn tiếng Nhật và luyện thi JLPT. Hãy hỏi mình bất cứ điều gì nhé! 🇯🇵✨"
+      },
+      "hsk": {
+        "title": "你好! 👋",
+        "subtitle": "Mình là LUKATO AI Agent - chuyên gia tư vấn tiếng Trung và luyện thi HSK. Hãy hỏi mình bất cứ điều gì nhé! 🇨🇳✨"
+      }
+    },
+    "questions": {
+      "topik": [
+        "Phân biệt '-아/어서' và '-니까' trong tiếng Hàn?",
+        "Cách viết TOPIK II bài luận 54 đạt điểm cao?",
+        "Làm sao nghe số tiếng Hàn nhanh hơn?",
+        "Điểm chuẩn đậu TOPIK I cấp 2 là bao nhiêu?"
+      ],
+      "ielts": [
+        "Cách viết IELTS Writing Task 2 đạt band 7+?",
+        "Chiến lược làm bài IELTS Reading hiệu quả?",
+        "Làm sao cải thiện phát âm tiếng Anh?",
+        "Cấu trúc bài IELTS Speaking Part 2?"
+      ],
+      "jlpt": [
+        "Phân biệt は và が trong tiếng Nhật?",
+        "Cách học Kanji N2 hiệu quả?",
+        "Chiến lược làm bài đọc JLPT N3?",
+        "Thời gian ôn thi JLPT N2 cần bao lâu?"
+      ],
+      "hsk": [
+        "Cách phân biệt thanh điệu tiếng Trung?",
+        "Chiến lược học Hán tự HSK 4?",
+        "Làm sao nghe tiếng Trung tốt hơn?",
+        "Điểm chuẩn đậu HSK 5 là bao nhiêu?"
+      ]
+    }
   }
 }

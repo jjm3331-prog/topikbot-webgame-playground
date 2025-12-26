@@ -808,5 +808,83 @@
       "warning": "⚠ 注意",
       "fail": "✗ 失败"
     }
+  },
+  "aiChat": {
+    "badge": "LUKATO AI Agent",
+    "rag": "RAG",
+    "title": "AI语言学习助手 🤖",
+    "description": "选择适合您正在学习的语言的Agent。AI将解答您的所有问题！ ✨",
+    "premiumUnlimited": "Premium - 无限提问",
+    "startChat": "开始对话",
+    "comingSoon": "即将推出",
+    "active": "在线",
+    "whatIsTitle": "什么是LUKATO RAG AI？ 🧠",
+    "whatIsDesc": "一个利用RAG（检索增强生成）技术的智能AI系统，基于语言知识数据库提供准确答案。每个Agent都针对特定语言进行了优化！ 🎯",
+    "agent": {
+      "topik": {
+        "subtitle": "TOPIK I & II 专家 🇰🇷",
+        "description": "解答关于韩语语法、词汇和TOPIK考试策略的所有问题。",
+        "features": ["韩语语法", "TOPIK词汇", "考试策略", "写作练习"]
+      },
+      "ielts": {
+        "subtitle": "IELTS英语 🇬🇧",
+        "description": "练习IELTS四项技能：听力、阅读、写作、口语。",
+        "features": ["Writing Task 1&2", "口语练习", "阅读技巧", "听力技巧"]
+      },
+      "jlpt": {
+        "subtitle": "日语 N1-N5 🇯🇵",
+        "description": "支持日语学习和各级JLPT考试准备。",
+        "features": ["日语语法", "汉字 & 词汇", "听力", "阅读"]
+      },
+      "hsk": {
+        "subtitle": "中文 HSK 1-6 🇨🇳",
+        "description": "学习中文并高效准备HSK考试。",
+        "features": ["中文语法", "汉字", "听力练习", "写作练习"]
+      }
+    },
+    "welcome": {
+      "topik": {
+        "title": "你好！ 👋",
+        "subtitle": "我是LUKATO AI Agent - 韩语和TOPIK专业顾问。随时问我任何问题！ 🎓✨"
+      },
+      "ielts": {
+        "title": "Hello! 👋",
+        "subtitle": "我是LUKATO AI Agent - IELTS四项技能专家。随时问我关于Speaking, Writing, Reading, Listening的问题！ 🇬🇧✨"
+      },
+      "jlpt": {
+        "title": "こんにちは! 👋",
+        "subtitle": "我是LUKATO AI Agent - 日语和JLPT专业顾问。随时问我任何问题！ 🇯🇵✨"
+      },
+      "hsk": {
+        "title": "你好！ 👋",
+        "subtitle": "我是LUKATO AI Agent - 中文和HSK专业顾问。随时问我任何问题！ 🇨🇳✨"
+      }
+    },
+    "questions": {
+      "topik": [
+        "'-아/어서'和'-니까'有什么区别？",
+        "如何在TOPIK II第54题论述中取得高分？",
+        "如何更快地听懂韩语数字？",
+        "TOPIK I 2级的及格分是多少？"
+      ],
+      "ielts": [
+        "如何在IELTS Writing Task 2中获得7+分？",
+        "IELTS阅读的有效策略是什么？",
+        "如何提高英语发音？",
+        "IELTS Speaking Part 2的结构是什么？"
+      ],
+      "jlpt": [
+        "「は」和「が」有什么区别？",
+        "如何有效学习N2汉字？",
+        "JLPT N3阅读的策略是什么？",
+        "准备JLPT N2需要多长时间？"
+      ],
+      "hsk": [
+        "如何区分中文声调？",
+        "HSK 4级汉字学习策略是什么？",
+        "如何提高中文听力？",
+        "HSK 5级的及格分是多少？"
+      ]
+    }
   }
 }

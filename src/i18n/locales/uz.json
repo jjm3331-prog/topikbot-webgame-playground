@@ -808,5 +808,83 @@
       "warning": "⚠ Ehtiyot",
       "fail": "✗ Muvaffaqiyatsiz"
     }
+  },
+  "aiChat": {
+    "badge": "LUKATO AI Agent",
+    "rag": "RAG",
+    "title": "AI Til O'rganish Yordamchisi 🤖",
+    "description": "O'rganayotgan tilingizga mos Agentni tanlang. AI barcha savollaringizga javob beradi! ✨",
+    "premiumUnlimited": "Premium - Cheksiz savollar",
+    "startChat": "Suhbatni boshlash",
+    "comingSoon": "Tez orada",
+    "active": "Faol",
+    "whatIsTitle": "LUKATO RAG AI nima? 🧠",
+    "whatIsDesc": "RAG (Retrieval-Augmented Generation) texnologiyasidan foydalanadigan aqlli AI tizimi bo'lib, til bilim bazasi asosida aniq javoblar beradi. Har bir Agent muayyan til uchun optimallashtirilgan! 🎯",
+    "agent": {
+      "topik": {
+        "subtitle": "TOPIK I & II Mutaxassisi 🇰🇷",
+        "description": "Koreys grammatikasi, lug'at va TOPIK imtihon strategiyalari haqida barcha savollarga javob beradi.",
+        "features": ["Koreys grammatikasi", "TOPIK lug'at", "Imtihon strategiyasi", "Yozuv mashqi"]
+      },
+      "ielts": {
+        "subtitle": "IELTS Ingliz tili 🇬🇧",
+        "description": "IELTS 4 ko'nikmasini mashq qilish: Listening, Reading, Writing, Speaking.",
+        "features": ["Writing Task 1&2", "Speaking mashqi", "Reading ko'nikmalari", "Listening maslahatlari"]
+      },
+      "jlpt": {
+        "subtitle": "Yapon tili N1-N5 🇯🇵",
+        "description": "Yapon tilini o'rganish va barcha darajadagi JLPT tayyorgarligini qo'llab-quvvatlash.",
+        "features": ["Yapon grammatikasi", "Kanji & Lug'at", "Tinglash", "O'qish"]
+      },
+      "hsk": {
+        "subtitle": "Xitoy tili HSK 1-6 🇨🇳",
+        "description": "Xitoy tilini o'rganing va HSK imtihonlariga samarali tayyorlaning.",
+        "features": ["Xitoy grammatikasi", "Hieroglif", "Tinglash mashqi", "Yozuv mashqi"]
+      }
+    },
+    "welcome": {
+      "topik": {
+        "title": "Salom! 👋",
+        "subtitle": "Men LUKATO AI Agent - koreys tili va TOPIK mutaxassisiman. Hamma narsani so'rang! 🎓✨"
+      },
+      "ielts": {
+        "title": "Hello! 👋",
+        "subtitle": "Men LUKATO AI Agent - IELTS 4 ko'nikma mutaxassisiman. Speaking, Writing, Reading, Listening haqida so'rang! 🇬🇧✨"
+      },
+      "jlpt": {
+        "title": "こんにちは! 👋",
+        "subtitle": "Men LUKATO AI Agent - yapon tili va JLPT mutaxassisiman. Hamma narsani so'rang! 🇯🇵✨"
+      },
+      "hsk": {
+        "title": "你好! 👋",
+        "subtitle": "Men LUKATO AI Agent - xitoy tili va HSK mutaxassisiman. Hamma narsani so'rang! 🇨🇳✨"
+      }
+    },
+    "questions": {
+      "topik": [
+        "'-아/어서' va '-니까' orasidagi farq nima?",
+        "TOPIK II 54-insho uchun yuqori ball olish usuli?",
+        "Koreys raqamlarini tezroq eshitish uchun nima qilish kerak?",
+        "TOPIK I 2-daraja uchun o'tish bali qancha?"
+      ],
+      "ielts": [
+        "IELTS Writing Task 2 da band 7+ olish usuli?",
+        "IELTS Reading uchun samarali strategiyalar?",
+        "Inglizcha talaffuzni yaxshilash usuli?",
+        "IELTS Speaking Part 2 tuzilishi qanday?"
+      ],
+      "jlpt": [
+        "は va が orasidagi farq nima?",
+        "N2 Kanjini samarali o'rganish usuli?",
+        "JLPT N3 o'qish strategiyalari?",
+        "JLPT N2 ga tayyorgarlik qancha vaqt oladi?"
+      ],
+      "hsk": [
+        "Xitoy ohanglarini qanday farqlash mumkin?",
+        "HSK 4 hieroglif o'rganish strategiyasi?",
+        "Xitoycha tinglash qobiliyatini yaxshilash usuli?",
+        "HSK 5 uchun o'tish bali qancha?"
+      ]
+    }
   }
 }
