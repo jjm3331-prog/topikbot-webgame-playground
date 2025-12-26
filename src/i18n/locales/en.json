@@ -1048,5 +1048,159 @@
         "What's the passing score for HSK 5?"
       ]
     }
+  },
+  "terms": {
+    "title": "Terms of Use",
+    "lastUpdated": "Last updated: January 2025",
+    "article1": {
+      "title": "Article 1. Purpose",
+      "content": "These Terms of Use aim to establish the conditions and operating rules for the services of \"LUKATO AI\" (hereinafter referred to as the \"Website\"). By accessing or using the service, you agree to have read, understood, and be bound by these terms."
+    },
+    "article2": {
+      "title": "Article 2. Definition of Terms",
+      "intro": "The main terms used in these terms are defined as follows:",
+      "item1": "\"Service\" refers to all services that members can use on the Website.",
+      "item2": "\"User\" refers to members and non-members who access and use services according to these terms.",
+      "item3": "\"Member\" refers to a customer who has registered and entered into a service agreement with the company.",
+      "item4": "\"Non-member\" refers to a user who uses services without registering as a member.",
+      "item5": "\"Service Agreement\" refers to the contract between the Website and member regarding the use of services.",
+      "item6": "\"Member ID\" is a unique string of characters and numbers provided for identification and service use.",
+      "item7": "\"Password\" is a combination of characters and numbers set by the member for account verification and security.",
+      "item8": "\"Operator\" refers to the person who opens and manages the service website.",
+      "item9": "\"Termination\" refers to the member canceling the service agreement."
+    },
+    "article3": {
+      "title": "Article 3. Provisions Outside Terms",
+      "content": "The operator may issue additional operating policies when necessary, and in case of conflict, the operating policy takes precedence."
+    },
+    "article4": {
+      "title": "Article 4. Conclusion of Service Agreement",
+      "item1": "The service agreement is formed when the applicant agrees to these terms and the operator approves.",
+      "item2": "Those wishing to register as members agree to the terms when completing service registration on the Website."
+    },
+    "article5": {
+      "title": "Article 5. Member Registration",
+      "item1": "Users can register for free by filling in information provided by the company and agreeing to the terms.",
+      "item2": "All member information in the registration form must be true and accurate. Those providing false information may not be legally protected.",
+      "item3": "The service agreement is formed when the company accepts the registration application. The company may refuse or cancel the contract in certain cases.",
+      "item4": "Members must update their information within a reasonable time when changes occur."
+    },
+    "article6": {
+      "title": "Article 6. Company Obligations",
+      "item1": "The company must promptly resolve reasonable complaints from members.",
+      "item2": "The operator must ensure stable operation and quickly resolve issues related to the website.",
+      "item3": "The company is not responsible for issues caused by member negligence or communication interruptions."
+    },
+    "article7": {
+      "title": "Article 7. Member Obligations",
+      "item1": "Members must comply with regulations in the terms, operating policies, notices, and related laws.",
+      "item2": "Service usage rights or contractual status cannot be transferred to others without Website consent.",
+      "item3": "Members must keep their ID and password secure and not provide them to third parties without consent.",
+      "item4": "Intellectual property rights or other rights of the operator or third parties must not be infringed."
+    },
+    "article8": {
+      "title": "Article 8. Service Hours",
+      "item1": "Services are provided 24/7 unless there are incidents or maintenance; maintenance schedules will be announced in advance.",
+      "item2": "Services may be interrupted without prior notice in cases of: emergency system check/upgrade, national emergency/natural disaster, telecom service closure, overload.",
+      "item3": "In case of interruption, the Website will notify members; if prior notice is not possible, notification will be given afterward."
+    },
+    "article9": {
+      "title": "Article 9. Member Withdrawal and Loss of Qualification",
+      "item1": "Members can request contract cancellation at any time; the company will process according to legal regulations.",
+      "item2": "The company may cancel contracts or suspend services without notice in certain cases: using services contrary to purpose, providing false information, obstructing/misappropriating information, violating laws."
+    },
+    "article10": {
+      "title": "Article 10. Service Usage Restrictions",
+      "intro": "Members must not engage in the following actions, and the company may restrict, suspend, or cancel contracts if discovered:",
+      "item1": "Providing false information during registration or modification",
+      "item2": "Sabotaging or misappropriating others' services",
+      "item3": "Impersonating Website employees or related persons",
+      "item4": "Infringing on others' personality rights or intellectual property",
+      "item5": "Unauthorized use of others' IDs",
+      "item6": "Collecting, storing, or disclosing others' personal information without consent",
+      "item7": "Actions deemed related to crimes",
+      "item8": "Other law-violating actions"
+    },
+    "article11": {
+      "title": "Article 11. Post Management",
+      "item1": "Posts include images, text, video, and audio posted by members on the website.",
+      "item2": "The company is not responsible for damages caused by posts, except in cases of intent or gross negligence.",
+      "item3": "Members must not post content violating public order, intellectual property, or others' rights.",
+      "item4": "The company has the right to delete violating content without member consent.",
+      "item5": "The company may delete or move posts at the request of public authorities without member consent."
+    },
+    "article12": {
+      "title": "Article 12. Post Ownership",
+      "item1": "Copyright for works created by the company belongs to the company.",
+      "item2": "Copyright for posts by members belongs to the author.",
+      "item3": "Posts may be edited, copied, or modified as necessary to display in search results, services, or promotions.",
+      "item4": "The company must obtain member permission to use posts for purposes other than the above."
+    },
+    "article13": {
+      "title": "Article 13. Compensation for Damages",
+      "item1": "All civil and criminal liability arising from website use primarily belongs to the member.",
+      "item2": "The company is not liable for damages caused by natural disasters or member's intentional or negligent actions."
+    },
+    "article14": {
+      "title": "Article 14. Disclaimer",
+      "content": "The operator is not responsible for: members not achieving expected benefits; errors from service systems/telecom providers; data posted by members; activities between members or with third parties; accuracy/reliability of data; product transactions; disputes caused by user errors; viruses or force majeure."
+    },
+    "article15": {
+      "title": "Article 15. Dispute Resolution",
+      "item1": "The company and members must make efforts to peacefully resolve disputes related to services.",
+      "item2": "Korean law applies to all disputes.",
+      "item3": "The dispute resolution court is the court according to Korean civil procedure law.",
+      "item4": "For members with overseas addresses, the competent court is Seoul Central District Court, Korea."
+    }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: January 2025",
+    "contactTitle": "Privacy Protection Officer",
+    "section1": {
+      "title": "■ Personal Information Collected",
+      "intro": "The company collects the following personal information for member registration, consultation, and service registration:",
+      "itemsTitle": "Items collected:",
+      "items": "Name, date of birth, gender, login ID, password, security questions and answers, home phone, home address, mobile phone, email, occupation, company name, department, position, company phone, hobbies, marital status, anniversaries, legal guardian information, ID number, service usage history, access logs, access IP, payment history",
+      "methodTitle": "Collection method:",
+      "method": "Website (member registration), paper forms"
+    },
+    "section2": {
+      "title": "■ Purpose of Collection and Use",
+      "intro": "The company uses collected personal information for the following purposes:",
+      "item1": "Fulfilling service contracts and payment of service fees, providing content, buying and delivering goods, sending invoices and related documents",
+      "item2": "Member management: identity verification, personal identification, age verification, checking legal guardian consent when collecting children's information under 14, delivering notices, marketing and advertising purposes",
+      "item3": "Analyzing access frequency or statistics on service usage by members"
+    },
+    "section3": {
+      "title": "■ Retention and Use Period",
+      "content": "The company will destroy personal information immediately when the collection and use purposes are completed without exception."
+    },
+    "section4": {
+      "title": "■ Destruction Procedure and Method",
+      "content": "After collection and use purposes are completed, personal information is destroyed immediately according to procedures and methods."
+    },
+    "section5": {
+      "title": "■ Provision of Personal Information",
+      "intro": "The company does not provide users' personal information to third parties except in the following cases:",
+      "item1": "Prior consent from the user",
+      "item2": "According to legal regulations or requests from investigative agencies"
+    },
+    "section6": {
+      "title": "■ Entrustment of Personal Information Processing",
+      "content": "The company does not entrust customer personal information to third parties without consent."
+    },
+    "section7": {
+      "title": "■ User Rights and Exercise Methods",
+      "content": "Users have the right to access/modify personal information and request deregistration according to regulations."
+    },
+    "section8": {
+      "title": "■ Cookies",
+      "content": "The company operates cookies to improve services. Users can refuse cookies in browser settings."
+    },
+    "section9": {
+      "title": "■ Personal Information Complaint Service",
+      "content": "The company designates related departments and privacy protection officers."
+    }
   }
 }
