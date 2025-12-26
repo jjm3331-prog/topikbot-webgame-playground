@@ -311,7 +311,7 @@
     "speedQuiz": "スピードクイズ",
     "dictation": "ディクテーションバトル",
     "comingSoon": "近日公開！",
-    "developing": "この機能は開発中です。",
+    "developing": "間違い = 警告1回",
     "loginRequired": "ログインが必要です",
     "loginDesc": "1:1バトルにはログインが必要です。",
     "roomNotExists": "ルームが存在しません",

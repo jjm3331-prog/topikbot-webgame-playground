@@ -405,7 +405,7 @@
     "dictationKo": "받아쓰기 대결",
     "dictationDesc": "Listen and write Korean most accurately!",
     "comingSoon": "Coming Soon!",
-    "developing": "This feature is under development.",
+    "developing": "Wrong answer = 1 warning",
     "loginRequired": "Please login",
     "loginDesc": "You need to login to play 1:1 with others.",
     "roomNotExists": "Room does not exist",

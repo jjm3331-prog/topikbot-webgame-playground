@@ -405,7 +405,7 @@
     "dictationKo": "받아쓰기 대결",
     "dictationDesc": "한국어를 가장 정확하게 듣고 쓰세요!",
     "comingSoon": "곧 출시!",
-    "developing": "이 기능은 개발 중입니다.",
+    "developing": "틀리면 경고 1회 부여",
     "loginRequired": "로그인이 필요합니다",
     "loginDesc": "1:1 배틀을 하려면 로그인이 필요합니다.",
     "roomNotExists": "방이 존재하지 않습니다",
