@@ -628,6 +628,45 @@
     "gradingError": "채점에 실패했습니다. 다시 시도해주세요.",
     "saveError": "저장에 실패했습니다. 다시 시도해주세요."
   },
+  "roleplay": {
+    "badge": "AI 역할극 스피킹",
+    "title": "AI 역할극 스피킹",
+    "subtitle": "실전 상황으로 말하기 연습 • 문법 피드백 • TOPIK 퀴즈 생성",
+    "labels": { "scenario": "상황:", "suggestions": "추천 답변" },
+    "empty": { "title": "말하기를 시작해보세요!", "desc": "AI가 상황을 제시하면, 한국어로 자연스럽게 대화 연습을 할 수 있어요." },
+    "actions": { "start": "Roleplay 시작", "listen": "듣기", "newScenario": "새 상황", "makeQuiz": "TOPIK 퀴즈 만들기", "prev": "이전", "next": "다음", "showResults": "결과 보기", "closeQuiz": "퀴즈 닫기" },
+    "placeholders": { "input": "한국어로 답변을 입력하세요..." },
+    "feedback": { "good": "좋아요!", "needsFix": "수정 필요" },
+    "tips": { "title": "사용 방법", "step1": "‘Roleplay 시작’을 눌러 랜덤 상황을 받기", "step2": "한국어로 답변하기(키보드 또는 음성)", "step3": "AI의 교정과 문법 설명 확인하기", "step4": "대화 내용으로 TOPIK 퀴즈 만들기", "tipLabel": "팁:", "tipText": "추천 답변을 참고해서 말문이 막힐 때 도움을 받으세요." },
+    "stats": { "title": "이번 세션", "spoken": "내가 말한 문장", "correct": "정답 문장" },
+    "quiz": {
+      "progress": "{{current}}/{{total}}문항",
+      "yourScore": "내 점수",
+      "correctAnswer": "정답: {{answer}}"
+    },
+    "toast": {
+      "started": "새 상황이 시작되었습니다.",
+      "startFailed": "시작에 실패했습니다. 잠시 후 다시 시도해주세요.",
+      "needConversation": "퀴즈를 만들려면 최소 1회 이상 대화가 필요합니다.",
+      "quizCreated": "퀴즈가 생성되었습니다.",
+      "quizFailed": "퀴즈 생성에 실패했습니다.",
+      "audioFailed": "오디오 재생에 실패했습니다.",
+      "sttSuccess": "음성이 텍스트로 변환되었습니다.",
+      "sttFailed": "음성 인식에 실패했습니다.",
+      "recording": "녹음 중...",
+      "micDenied": "마이크 접근 권한이 필요합니다."
+    }
+  },
+  "writingPage": {
+    "header": { "title": "TOPIK II 쓰기(51~54) 첨삭", "subtitle": "AI가 점수와 피드백을 상세하게 제공합니다", "history": "이력" },
+    "notice": { "title": "중요 안내" },
+    "steps": { "question": "원문 문제 업로드", "answer": "내 답안" },
+    "answerMode": { "text": "텍스트 입력", "image": "이미지 업로드" },
+    "placeholders": { "answerText": "여기에 답안을 붙여넣거나 입력하세요..." },
+    "tip": { "copyPaste": "팁: 워드/메모장 내용을 복사해 붙여넣으면 더 정확해요." },
+    "actions": { "grading": "채점 중...", "grade": "AI 채점하기", "freeGrade": "🎁 무료 채점(하루 1회)", "upgradeToGrade": "프리미엄으로 업그레이드하고 채점하기" },
+    "pdf": { "generatingTitle": "PDF 생성 중...", "generatingDesc": "잠시만 기다려주세요", "failedTitle": "PDF 생성 실패", "failedDesc": "다시 시도해주세요" }
+  }
   "interview": {
     "title": "면접 시뮬레이션",
     "description": "한국 기업 면접을 연습하세요",
