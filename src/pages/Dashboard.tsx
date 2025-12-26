@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -47,6 +48,7 @@ const Dashboard = () => {
   const [showCheckInSuccess, setShowCheckInSuccess] = useState(false);
   const [bonusPoints, setBonusPoints] = useState(0);
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
 
   useEffect(() => {
@@ -159,15 +161,15 @@ const Dashboard = () => {
       setTimeout(() => setShowCheckInSuccess(false), 3000);
       
       toast({
-        title: "Điểm danh thành công! 🎉",
-        description: `+${bonusAmount} điểm! Streak: ${newStreak} ngày`,
+        title: t('dashboard.checkInSuccess'),
+        description: `+${bonusAmount} ${t('dashboard.points')}! Streak: ${newStreak} ${t('dashboard.days')}`,
       });
       
     } catch (error) {
       console.error("Error checking in:", error);
       toast({
-        title: "Lỗi",
-        description: "Không thể điểm danh. Vui lòng thử lại.",
+        title: t('dashboard.error'),
+        description: t('dashboard.checkInError'),
         variant: "destructive",
       });
     } finally {
@@ -182,7 +184,7 @@ const Dashboard = () => {
       <div className="min-h-[100dvh] bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <img src="/favicon.png" alt="LUKATO" className="w-16 h-16 rounded-full animate-pulse" />
-          <div className="text-muted-foreground text-sm">Đang tải...</div>
+          <div className="text-muted-foreground text-sm">{t('dashboard.loading')}</div>
         </div>
       </div>
     );
@@ -202,9 +204,9 @@ const Dashboard = () => {
               <span className="text-4xl sm:text-5xl">👋</span>
               <div>
                 <h1 className="text-title font-bold text-foreground">
-                  Xin chào, {profile?.username || 'User'}!
+                  {t('dashboard.welcome', { name: profile?.username || 'User' })}
                 </h1>
-                <p className="text-body text-muted-foreground mt-1">Hôm nay bạn muốn học gì?</p>
+                <p className="text-body text-muted-foreground mt-1">{t('dashboard.whatToLearn')}</p>
               </div>
             </div>
           </motion.div>
@@ -227,7 +229,7 @@ const Dashboard = () => {
                     <Star className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <p className="text-card-caption text-muted-foreground">Điểm tích lũy</p>
+                    <p className="text-card-caption text-muted-foreground">{t('dashboard.totalPoints')}</p>
                     <p className="text-2xl font-bold text-foreground">{profile?.points?.toLocaleString() || 0}</p>
                   </div>
                 </div>
@@ -252,7 +254,7 @@ const Dashboard = () => {
                   />
                   {levelInfo.level < 6 && (
                     <p className="text-badge text-muted-foreground">
-                      Còn {(levelInfo.nextLevelPoints - (profile?.points || 0)).toLocaleString()} điểm để lên level tiếp
+                      {t('dashboard.pointsToNextLevel', { points: (levelInfo.nextLevelPoints - (profile?.points || 0)).toLocaleString() })}
                     </p>
                   )}
                 </div>
@@ -300,10 +302,10 @@ const Dashboard = () => {
                       <Calendar className={`w-6 h-6 ${canCheckIn ? 'text-white' : 'text-muted-foreground'}`} />
                     </div>
                     <div>
-                      <p className="text-card-caption text-muted-foreground">Điểm danh hàng ngày</p>
+                      <p className="text-card-caption text-muted-foreground">{t('dashboard.dailyCheckIn')}</p>
                       <div className="flex items-center gap-2">
                         <Flame className="w-4 h-4 text-korean-orange" />
-                        <span className="text-lg font-bold text-foreground">{profile?.current_streak || 0} ngày</span>
+                        <span className="text-lg font-bold text-foreground">{profile?.current_streak || 0} {t('dashboard.days')}</span>
                       </div>
                     </div>
                   </div>
@@ -313,7 +315,7 @@ const Dashboard = () => {
                   <div className="flex items-center gap-2">
                     <Trophy className="w-4 h-4 text-korean-orange" />
                     <span className="text-card-caption text-muted-foreground">
-                      Kỷ lục: {profile?.longest_streak || 0} ngày
+                      {t('dashboard.record')}: {profile?.longest_streak || 0} {t('dashboard.days')}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
@@ -336,17 +338,17 @@ const Dashboard = () => {
                   {checkingIn ? (
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Đang xử lý...
+                      {t('dashboard.processing')}
                     </div>
                   ) : canCheckIn ? (
                     <div className="flex items-center gap-2">
                       <Zap className="w-4 h-4" />
-                      Điểm danh ngay!
+                      {t('dashboard.checkInNow')}
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
                       <CheckCircle className="w-4 h-4" />
-                      Đã điểm danh hôm nay
+                      {t('dashboard.alreadyCheckedIn')}
                     </div>
                   )}
                 </Button>
@@ -354,7 +356,7 @@ const Dashboard = () => {
                 {/* 7-day streak bonus hint */}
                 {canCheckIn && profile && (profile.current_streak + 1) % 7 === 0 && (
                   <p className="text-center text-badge text-korean-green mt-2">
-                    🎁 Điểm danh hôm nay để nhận thưởng 7 ngày liên tiếp!
+                    🎁 {t('dashboard.weeklyBonusHint')}
                   </p>
                 )}
               </div>
