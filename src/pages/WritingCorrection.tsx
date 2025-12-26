@@ -995,10 +995,10 @@ const WritingCorrection = () => {
                       >
                         <div className="flex items-center justify-between mb-3">
                           <h5 className="font-semibold text-foreground flex items-center gap-2">
-                            {selectedScoreArea === "grammar" && "🔴 문법 (Ngữ pháp) 상세 분석"}
-                            {selectedScoreArea === "vocabulary" && "🟡 어휘 (Từ vựng) 상세 분석"}
-                            {selectedScoreArea === "structure" && "🟢 구조 (Cấu trúc) 상세 분석"}
-                            {selectedScoreArea === "content" && "🔵 내용 (Nội dung) 상세 분석"}
+                            {selectedScoreArea === "grammar" && `🔴 ${t("writingPage.scoreDetail.grammar.title")}`}
+                            {selectedScoreArea === "vocabulary" && `🟡 ${t("writingPage.scoreDetail.vocabulary.title")}`}
+                            {selectedScoreArea === "structure" && `🟢 ${t("writingPage.scoreDetail.structure.title")}`}
+                            {selectedScoreArea === "content" && `🔵 ${t("writingPage.scoreDetail.content.title")}`}
                           </h5>
                           <Button variant="ghost" size="sm" onClick={() => setSelectedScoreArea(null)}>
                             <X className="w-4 h-4" />
@@ -1009,16 +1009,16 @@ const WritingCorrection = () => {
                         {selectedScoreArea === "grammar" && (
                           <div className="space-y-3">
                             <div className="flex items-center gap-2 text-sm">
-                              <span className="font-medium text-foreground">점수:</span>
+                              <span className="font-medium text-foreground">{t("writingPage.scoreDetail.score")}:</span>
                               <span className={`font-bold ${result.grammar_score >= 20 ? 'text-green-500' : result.grammar_score >= 15 ? 'text-yellow-500' : 'text-red-500'}`}>
                                 {result.grammar_score}/25
                               </span>
                               <span className="text-muted-foreground">
-                                ({result.grammar_score >= 20 ? '우수' : result.grammar_score >= 15 ? '보통' : '개선 필요'})
+                                ({result.grammar_score >= 20 ? t("writingPage.scoreDetail.excellent") : result.grammar_score >= 15 ? t("writingPage.scoreDetail.average") : t("writingPage.scoreDetail.needsImprovement")})
                               </span>
                             </div>
                             <div className="space-y-2">
-                              <p className="text-xs font-medium text-muted-foreground">발견된 문법 오류:</p>
+                              <p className="text-xs font-medium text-muted-foreground">{t("writingPage.scoreDetail.grammar.errorsFound")}:</p>
                               {result.corrections.filter(c => c.type === 'grammar' || c.type === 'spelling').length > 0 ? (
                                 result.corrections.filter(c => c.type === 'grammar' || c.type === 'spelling').slice(0, 3).map((c, i) => (
                                   <div key={i} className="text-xs p-2 bg-red-500/10 rounded-lg border border-red-500/20">
@@ -1031,7 +1031,7 @@ const WritingCorrection = () => {
                                   </div>
                                 ))
                               ) : (
-                                <p className="text-xs text-green-500">문법 오류가 발견되지 않았습니다! ✨</p>
+                                <p className="text-xs text-green-500">{t("writingPage.scoreDetail.grammar.noErrors")} ✨</p>
                               )}
                             </div>
                           </div>
@@ -1041,16 +1041,16 @@ const WritingCorrection = () => {
                         {selectedScoreArea === "vocabulary" && (
                           <div className="space-y-3">
                             <div className="flex items-center gap-2 text-sm">
-                              <span className="font-medium text-foreground">점수:</span>
+                              <span className="font-medium text-foreground">{t("writingPage.scoreDetail.score")}:</span>
                               <span className={`font-bold ${result.vocabulary_score >= 20 ? 'text-green-500' : result.vocabulary_score >= 15 ? 'text-yellow-500' : 'text-red-500'}`}>
                                 {result.vocabulary_score}/25
                               </span>
                               <span className="text-muted-foreground">
-                                ({result.vocabulary_score >= 20 ? '우수' : result.vocabulary_score >= 15 ? '보통' : '개선 필요'})
+                                ({result.vocabulary_score >= 20 ? t("writingPage.scoreDetail.excellent") : result.vocabulary_score >= 15 ? t("writingPage.scoreDetail.average") : t("writingPage.scoreDetail.needsImprovement")})
                               </span>
                             </div>
                             <div className="space-y-2">
-                              <p className="text-xs font-medium text-muted-foreground">어휘 개선 제안:</p>
+                              <p className="text-xs font-medium text-muted-foreground">{t("writingPage.scoreDetail.vocabulary.suggestions")}:</p>
                               {result.vocabulary_upgrades && result.vocabulary_upgrades.length > 0 ? (
                                 result.vocabulary_upgrades.slice(0, 3).map((v, i) => (
                                   <div key={i} className="text-xs p-2 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
@@ -1063,7 +1063,7 @@ const WritingCorrection = () => {
                                   </div>
                                 ))
                               ) : (
-                                <p className="text-xs text-green-500">어휘 사용이 적절합니다! ✨</p>
+                                <p className="text-xs text-green-500">{t("writingPage.scoreDetail.vocabulary.appropriate")} ✨</p>
                               )}
                             </div>
                           </div>
@@ -1073,26 +1073,26 @@ const WritingCorrection = () => {
                         {selectedScoreArea === "structure" && (
                           <div className="space-y-3">
                             <div className="flex items-center gap-2 text-sm">
-                              <span className="font-medium text-foreground">점수:</span>
+                              <span className="font-medium text-foreground">{t("writingPage.scoreDetail.score")}:</span>
                               <span className={`font-bold ${result.structure_score >= 20 ? 'text-green-500' : result.structure_score >= 15 ? 'text-yellow-500' : 'text-red-500'}`}>
                                 {result.structure_score}/25
                               </span>
                               <span className="text-muted-foreground">
-                                ({result.structure_score >= 20 ? '우수' : result.structure_score >= 15 ? '보통' : '개선 필요'})
+                                ({result.structure_score >= 20 ? t("writingPage.scoreDetail.excellent") : result.structure_score >= 15 ? t("writingPage.scoreDetail.average") : t("writingPage.scoreDetail.needsImprovement")})
                               </span>
                             </div>
                             <div className="space-y-2">
-                              <p className="text-xs font-medium text-muted-foreground">구조 개선 제안:</p>
+                              <p className="text-xs font-medium text-muted-foreground">{t("writingPage.scoreDetail.structure.suggestions")}:</p>
                               {result.structure_improvements && result.structure_improvements.length > 0 ? (
                                 result.structure_improvements.slice(0, 2).map((s, i) => (
                                   <div key={i} className="text-xs p-2 bg-green-500/10 rounded-lg border border-green-500/20">
-                                    <p className="text-muted-foreground mb-1">현재: {s.current}</p>
-                                    <p className="text-green-500 font-medium">개선: {s.improved}</p>
+                                    <p className="text-muted-foreground mb-1">{t("writingPage.scoreDetail.structure.current")}: {s.current}</p>
+                                    <p className="text-green-500 font-medium">{t("writingPage.scoreDetail.structure.improved")}: {s.improved}</p>
                                     <p className="text-muted-foreground mt-1 italic">{s.reason}</p>
                                   </div>
                                 ))
                               ) : (
-                                <p className="text-xs text-green-500">글의 구조가 잘 짜여져 있습니다! ✨</p>
+                                <p className="text-xs text-green-500">{t("writingPage.scoreDetail.structure.wellStructured")} ✨</p>
                               )}
                             </div>
                           </div>
@@ -1102,19 +1102,19 @@ const WritingCorrection = () => {
                         {selectedScoreArea === "content" && (
                           <div className="space-y-3">
                             <div className="flex items-center gap-2 text-sm">
-                              <span className="font-medium text-foreground">점수:</span>
+                              <span className="font-medium text-foreground">{t("writingPage.scoreDetail.score")}:</span>
                               <span className={`font-bold ${result.content_score >= 20 ? 'text-green-500' : result.content_score >= 15 ? 'text-yellow-500' : 'text-red-500'}`}>
                                 {result.content_score}/25
                               </span>
                               <span className="text-muted-foreground">
-                                ({result.content_score >= 20 ? '우수' : result.content_score >= 15 ? '보통' : '개선 필요'})
+                                ({result.content_score >= 20 ? t("writingPage.scoreDetail.excellent") : result.content_score >= 15 ? t("writingPage.scoreDetail.average") : t("writingPage.scoreDetail.needsImprovement")})
                               </span>
                             </div>
                             <div className="space-y-2">
-                              <p className="text-xs font-medium text-muted-foreground">내용 분석:</p>
+                              <p className="text-xs font-medium text-muted-foreground">{t("writingPage.scoreDetail.content.analysis")}:</p>
                               {result.swot_analysis?.strengths && result.swot_analysis.strengths.length > 0 && (
                                 <div className="text-xs p-2 bg-blue-500/10 rounded-lg border border-blue-500/20">
-                                  <p className="font-medium text-blue-500 mb-1">✅ 잘된 점:</p>
+                                  <p className="font-medium text-blue-500 mb-1">✅ {t("writingPage.scoreDetail.content.doneWell")}:</p>
                                   {result.swot_analysis.strengths.slice(0, 2).map((s, i) => (
                                     <p key={i} className="text-muted-foreground">• {s.title}</p>
                                   ))}
@@ -1122,14 +1122,14 @@ const WritingCorrection = () => {
                               )}
                               {result.swot_analysis?.weaknesses && result.swot_analysis.weaknesses.length > 0 && (
                                 <div className="text-xs p-2 bg-orange-500/10 rounded-lg border border-orange-500/20">
-                                  <p className="font-medium text-orange-500 mb-1">⚠️ 개선할 점:</p>
+                                  <p className="font-medium text-orange-500 mb-1">⚠️ {t("writingPage.scoreDetail.content.toImprove")}:</p>
                                   {result.swot_analysis.weaknesses.slice(0, 2).map((w, i) => (
                                     <p key={i} className="text-muted-foreground">• {w.title}</p>
                                   ))}
                                 </div>
                               )}
                               {!result.swot_analysis?.strengths?.length && !result.swot_analysis?.weaknesses?.length && (
-                                <p className="text-xs text-muted-foreground">상세 피드백을 참고해 주세요.</p>
+                                <p className="text-xs text-muted-foreground">{t("writingPage.scoreDetail.content.seeDetailedFeedback")}</p>
                               )}
                             </div>
                           </div>
@@ -1142,21 +1142,21 @@ const WritingCorrection = () => {
                   {result.swot_analysis && (
                     <Card className="p-5 bg-card border-border shadow-sm">
                       <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 text-base">
-                        📊 SWOT 분석
+                        📊 {t("writingPage.swot.title")}
                       </h4>
                       <Accordion type="multiple" defaultValue={["strengths"]} className="space-y-3">
                         {/* Strengths */}
                         <AccordionItem value="strengths" className="border rounded-lg bg-green-500/10 border-green-500/30 px-3">
                           <AccordionTrigger className="text-sm font-medium text-green-600 dark:text-green-400 hover:no-underline py-3">
-                            ✅ Strengths (강점) ({result.swot_analysis.strengths?.length || 0})
+                            ✅ {t("writingPage.swot.strengths")} ({result.swot_analysis.strengths?.length || 0})
                           </AccordionTrigger>
                           <AccordionContent className="pb-3">
                             <div className="overflow-x-auto">
                               <table className="w-full text-xs border-collapse">
                                 <thead>
                                   <tr className="bg-green-500/20">
-                                    <th className="py-2 px-2 text-left font-medium text-green-700 dark:text-green-300 border-b border-green-500/30">💡 포인트</th>
-                                    <th className="py-2 px-2 text-left font-medium text-green-700 dark:text-green-300 border-b border-green-500/30">📝 근거/분석</th>
+                                    <th className="py-2 px-2 text-left font-medium text-green-700 dark:text-green-300 border-b border-green-500/30">💡 {t("writingPage.swot.point")}</th>
+                                    <th className="py-2 px-2 text-left font-medium text-green-700 dark:text-green-300 border-b border-green-500/30">📝 {t("writingPage.swot.evidence")}</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -1178,15 +1178,15 @@ const WritingCorrection = () => {
                         {/* Weaknesses */}
                         <AccordionItem value="weaknesses" className="border rounded-lg bg-red-500/10 border-red-500/30 px-3">
                           <AccordionTrigger className="text-sm font-medium text-red-600 dark:text-red-400 hover:no-underline py-3">
-                            ⚠️ Weaknesses (약점) ({result.swot_analysis.weaknesses?.length || 0})
+                            ⚠️ {t("writingPage.swot.weaknesses")} ({result.swot_analysis.weaknesses?.length || 0})
                           </AccordionTrigger>
                           <AccordionContent className="pb-3">
                             <div className="overflow-x-auto">
                               <table className="w-full text-xs border-collapse">
                                 <thead>
                                   <tr className="bg-red-500/20">
-                                    <th className="py-2 px-2 text-left font-medium text-red-700 dark:text-red-300 border-b border-red-500/30">❌ 문제점</th>
-                                    <th className="py-2 px-2 text-left font-medium text-red-700 dark:text-red-300 border-b border-red-500/30">⚡ 영향</th>
+                                    <th className="py-2 px-2 text-left font-medium text-red-700 dark:text-red-300 border-b border-red-500/30">❌ {t("writingPage.swot.issue")}</th>
+                                    <th className="py-2 px-2 text-left font-medium text-red-700 dark:text-red-300 border-b border-red-500/30">⚡ {t("writingPage.swot.impact")}</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -1208,16 +1208,16 @@ const WritingCorrection = () => {
                         {/* Opportunities */}
                         <AccordionItem value="opportunities" className="border rounded-lg bg-blue-500/10 border-blue-500/30 px-3">
                           <AccordionTrigger className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:no-underline py-3">
-                            🌟 Opportunities (기회) ({result.swot_analysis.opportunities?.length || 0})
+                            🌟 {t("writingPage.swot.opportunities")} ({result.swot_analysis.opportunities?.length || 0})
                           </AccordionTrigger>
                           <AccordionContent className="pb-3">
                             <div className="overflow-x-auto">
                               <table className="w-full text-xs border-collapse">
                                 <thead>
                                   <tr className="bg-blue-500/20">
-                                    <th className="py-2 px-2 text-left font-medium text-blue-700 dark:text-blue-300 border-b border-blue-500/30">🎯 기회</th>
-                                    <th className="py-2 px-2 text-left font-medium text-blue-700 dark:text-blue-300 border-b border-blue-500/30">🚀 방법</th>
-                                    <th className="py-2 px-2 text-left font-medium text-blue-700 dark:text-blue-300 border-b border-blue-500/30">✨ 효과</th>
+                                    <th className="py-2 px-2 text-left font-medium text-blue-700 dark:text-blue-300 border-b border-blue-500/30">🎯 {t("writingPage.swot.opportunity")}</th>
+                                    <th className="py-2 px-2 text-left font-medium text-blue-700 dark:text-blue-300 border-b border-blue-500/30">🚀 {t("writingPage.swot.action")}</th>
+                                    <th className="py-2 px-2 text-left font-medium text-blue-700 dark:text-blue-300 border-b border-blue-500/30">✨ {t("writingPage.swot.benefit")}</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -1237,34 +1237,32 @@ const WritingCorrection = () => {
                         {/* Threats */}
                         <AccordionItem value="threats" className="border rounded-lg bg-orange-500/10 border-orange-500/30 px-3">
                           <AccordionTrigger className="text-sm font-medium text-orange-600 dark:text-orange-400 hover:no-underline py-3">
-                            🚧 Threats (위협) ({result.swot_analysis.threats?.length || 0})
+                            🚧 {t("writingPage.swot.threats")} ({result.swot_analysis.threats?.length || 0})
                           </AccordionTrigger>
                           <AccordionContent className="pb-3">
                             <div className="overflow-x-auto">
                               <table className="w-full text-xs border-collapse">
                                 <thead>
                                   <tr className="bg-orange-500/20">
-                                    <th className="py-2 px-2 text-left font-medium text-orange-700 dark:text-orange-300 border-b border-orange-500/30">⚠️ 위협</th>
-                                    <th className="py-2 px-2 text-left font-medium text-orange-700 dark:text-orange-300 border-b border-orange-500/30 w-20">🔥 위험도</th>
-                                    <th className="py-2 px-2 text-left font-medium text-orange-700 dark:text-orange-300 border-b border-orange-500/30">🛡️ 예방법</th>
+                                    <th className="py-2 px-2 text-left font-medium text-orange-700 dark:text-orange-300 border-b border-orange-500/30">⚠️ {t("writingPage.swot.threat")}</th>
+                                    <th className="py-2 px-2 text-left font-medium text-orange-700 dark:text-orange-300 border-b border-orange-500/30 w-20">🔥 {t("writingPage.swot.riskLevel")}</th>
+                                    <th className="py-2 px-2 text-left font-medium text-orange-700 dark:text-orange-300 border-b border-orange-500/30">🛡️ {t("writingPage.swot.prevention")}</th>
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {result.swot_analysis.threats?.map((t, i) => (
+                                  {result.swot_analysis.threats?.map((th, i) => (
                                     <tr key={i} className={i % 2 === 0 ? 'bg-background/50' : 'bg-background/30'}>
-                                      <td className="py-2 px-2 font-medium text-foreground border-r border-orange-500/20">{cleanMarkdown(t.title)}</td>
-                                      <td className="py-2 px-2 border-r border-orange-500/20">
-                                        {t.risk_level && (
-                                          <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                                            t.risk_level === '상' ? 'bg-red-500/20 text-red-600' :
-                                            t.risk_level === '중' ? 'bg-orange-500/20 text-orange-600' :
-                                            'bg-green-500/20 text-green-600'
-                                          }`}>
-                                            {t.risk_level}
-                                          </span>
-                                        )}
+                                      <td className="py-2 px-2 font-medium text-foreground border-r border-orange-500/20">{cleanMarkdown(th.title)}</td>
+                                      <td className="py-2 px-2 text-center">
+                                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
+                                          th.risk_level === 'high' ? 'bg-red-500/20 text-red-600 dark:text-red-400' :
+                                          th.risk_level === 'medium' ? 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400' :
+                                          'bg-green-500/20 text-green-600 dark:text-green-400'
+                                        }`}>
+                                          {th.risk_level === 'high' ? t("writingPage.swot.riskHigh") : th.risk_level === 'medium' ? t("writingPage.swot.riskMedium") : t("writingPage.swot.riskLow")}
+                                        </span>
                                       </td>
-                                      <td className="py-2 px-2 text-muted-foreground">{t.prevention && cleanMarkdown(t.prevention)}</td>
+                                      <td className="py-2 px-2 text-muted-foreground">{th.prevention && cleanMarkdown(th.prevention)}</td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -1512,14 +1510,14 @@ const WritingCorrection = () => {
                       ) : (
                         <Save className="w-4 h-4 mr-2" />
                       )}
-                      Lưu kết quả
+                      {t("writingPage.result.saveResult")}
                     </Button>
                     <Button
                       onClick={handleExportPDF}
                       className="flex-1 btn-primary text-primary-foreground"
                     >
                       <Download className="w-4 h-4 mr-2" />
-                      Xuất PDF
+                      {t("writingPage.result.exportPdf")}
                     </Button>
                   </div>
                 </motion.div>
@@ -1530,9 +1528,9 @@ const WritingCorrection = () => {
                       <PenTool className="w-8 h-8 text-primary" />
                     </div>
                     <div>
-                      <p className="font-semibold text-foreground">Kết quả chấm điểm</p>
+                      <p className="font-semibold text-foreground">{t("writingPage.result.title")}</p>
                       <p className="text-sm text-muted-foreground">
-                        Upload đề bài và bài làm để nhận phân tích chi tiết
+                        {t("writingPage.result.uploadPrompt")}
                       </p>
                     </div>
                   </div>
@@ -1549,7 +1547,7 @@ const WritingCorrection = () => {
             >
               <Card className="p-6 bg-card border-border">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-lg text-foreground">📚 Lịch sử chấm điểm</h3>
+                  <h3 className="font-semibold text-lg text-foreground">📚 {t("writingPage.history.title")}</h3>
                   <Button variant="ghost" size="sm" onClick={() => setShowHistory(false)}>
                     <X className="w-4 h-4" />
                   </Button>
@@ -1566,10 +1564,10 @@ const WritingCorrection = () => {
                     >
                       <div>
                         <p className="font-medium text-foreground">
-                          Điểm: {item.score}/100
+                          {t("writingPage.history.score")}: {item.score}/100
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {new Date(item.created_at).toLocaleDateString("vi-VN", {
+                          {new Date(item.created_at).toLocaleDateString(t("common.locale"), {
                             year: "numeric",
                             month: "long",
                             day: "numeric",
@@ -1579,7 +1577,7 @@ const WritingCorrection = () => {
                         </p>
                       </div>
                       <Button variant="ghost" size="sm">
-                        Xem lại
+                        {t("writingPage.history.viewAgain")}
                       </Button>
                     </div>
                   ))}
@@ -1605,7 +1603,7 @@ const WritingCorrection = () => {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
                     <Edit3 className="w-5 h-5 text-primary" />
-                    Chỉnh sửa văn bản nhận dạng
+                    {t("writingPage.ocr.title")}
                   </h3>
                   <Button variant="ghost" size="sm" onClick={handleOcrCancel}>
                     <X className="w-4 h-4" />
@@ -1613,13 +1611,13 @@ const WritingCorrection = () => {
                 </div>
                 
                 <p className="text-sm text-muted-foreground mb-4">
-                  AI đã nhận dạng văn bản từ hình ảnh. Vui lòng kiểm tra và chỉnh sửa nếu có lỗi:
+                  {t("writingPage.ocr.description")}
                 </p>
                 
                 <Textarea
                   value={ocrRecognizedText}
                   onChange={(e) => setOcrRecognizedText(e.target.value)}
-                  placeholder="Văn bản nhận dạng từ hình ảnh..."
+                  placeholder={t("writingPage.ocr.placeholder")}
                   className="min-h-[200px] resize-none mb-4"
                 />
                 
@@ -1629,7 +1627,7 @@ const WritingCorrection = () => {
                     className="flex-1"
                     onClick={handleOcrCancel}
                   >
-                    Bỏ qua, dùng ảnh gốc
+                    {t("writingPage.ocr.skipUseImage")}
                   </Button>
                   <Button
                     className="flex-1 btn-primary text-primary-foreground"
@@ -1637,7 +1635,7 @@ const WritingCorrection = () => {
                     disabled={!ocrRecognizedText.trim()}
                   >
                     <CheckCircle className="w-4 h-4 mr-2" />
-                    Xác nhận văn bản
+                    {t("writingPage.ocr.confirmText")}
                   </Button>
                 </div>
               </motion.div>
