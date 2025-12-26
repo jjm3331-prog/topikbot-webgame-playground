@@ -41,6 +41,12 @@ export const LanguageSelector = () => {
       duration: 3000,
     });
 
+    // Smooth scroll to top
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+
     // End transition effect
     await new Promise(resolve => setTimeout(resolve, 300));
     setIsTransitioning(false);
