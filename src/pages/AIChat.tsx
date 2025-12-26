@@ -25,7 +25,7 @@ const AI_AGENTS = [
   {
     id: "topik",
     title: "TOPIK Agent",
-    subtitle: "Chuyên gia TOPIK I & II",
+    subtitle: "Chuyên gia TOPIK I & II 🇰🇷",
     description: "Giải đáp mọi thắc mắc về tiếng Hàn, ngữ pháp, từ vựng và chiến lược luyện thi TOPIK.",
     icon: GraduationCap,
     available: true,
@@ -34,9 +34,20 @@ const AI_AGENTS = [
     path: "/ai-chat/topik"
   },
   {
+    id: "ielts",
+    title: "IELTS Agent",
+    subtitle: "Tiếng Anh IELTS 🇬🇧",
+    description: "Luyện thi IELTS 4 kỹ năng: Listening, Reading, Writing, Speaking.",
+    icon: Globe,
+    available: true,
+    features: ["Writing Task 1&2", "Speaking Practice", "Reading Skills", "Listening Tips"],
+    gradient: "from-blue-500 to-indigo-500",
+    path: "/ai-chat/ielts"
+  },
+  {
     id: "jlpt",
     title: "JLPT Agent",
-    subtitle: "Tiếng Nhật N1-N5",
+    subtitle: "Tiếng Nhật N1-N5 🇯🇵",
     description: "Hỗ trợ học tiếng Nhật và luyện thi JLPT các cấp độ.",
     icon: BookOpen,
     available: false,
@@ -47,7 +58,7 @@ const AI_AGENTS = [
   {
     id: "hsk",
     title: "HSK Agent", 
-    subtitle: "Tiếng Trung HSK 1-6",
+    subtitle: "Tiếng Trung HSK 1-6 🇨🇳",
     description: "Học tiếng Trung và chuẩn bị thi HSK hiệu quả.",
     icon: Globe,
     available: false,
