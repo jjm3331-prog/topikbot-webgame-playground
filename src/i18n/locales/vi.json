@@ -409,19 +409,112 @@
   },
   "landing": {
     "hero": {
-      "badge": "Powered by TOPIK Professors 🇰🇷",
+      "badge": "Đội ngũ ra đề TOPIK chính thức 🇰🇷",
       "headline1": "Thế giới đầu tiên.",
-      "headline2": "Việt Nam duy nhất.",
-      "sub1": "Super App học tiếng Hàn từ",
-      "sub2a": "giáo sư ra đề TOPIK",
-      "sub2b": "LUKATO RAG AI Tech",
-      "cta": "Bắt đầu MIỄN PHÍ"
+      "headline2": "Duy nhất toàn cầu.",
+      "sub1": "Siêu ứng dụng học tiếng Hàn",
+      "sub2a": "Giáo sư ra đề TOPIK",
+      "sub2b": "Công nghệ RAG AI của LUKATO",
+      "cta": "Bắt đầu miễn phí"
     },
     "universities": {
-      "partner": "🤝 Đối tác chiến lược",
-      "titleHighlight": "6 trường đại học",
-      "titleRest": "hàng đầu Việt Nam",
-      "desc": "Được tin dùng bởi các trường đại học hàng đầu tại Việt Nam"
+      "partner": "🤝 Đối tác toàn cầu",
+      "titleHighlight": "Đại học toàn cầu",
+      "titleRest": "đối tác chính thức",
+      "desc": "AI được các trường đại học hàng đầu thế giới chứng nhận"
+    },
+    "stats": {
+      "students": "Học viên",
+      "aiAccuracy": "Độ chính xác AI",
+      "topikApp": "TOPIK App",
+      "aiSupport": "Hỗ trợ AI"
+    },
+    "why": {
+      "title": "Vì sao",
+      "item1Title": "Giáo sư ra đề TOPIK",
+      "item1Desc": "Đội ngũ từng tham gia ra đề TOPIK chính thức tại Seoul",
+      "item2Title": "RAG AI độc quyền",
+      "item2Desc": "10.000+ tài liệu TOPIK & chuyên khảo tiếng Hàn",
+      "item3Title": "STT/TTS thế hệ mới",
+      "item3Desc": "Luyện nghe – nói với chuẩn phát âm người bản xứ (99%)",
+      "item4Title": "AI Headhunting",
+      "item4Desc": "Chấm CV & thư tự giới thiệu siêu chi tiết"
+    },
+    "comparison": {
+      "feature": "Tính năng",
+      "others": "Ứng dụng khác",
+      "feature1": "Giáo sư ra đề TOPIK chính thức",
+      "feature2": "Công nghệ RAG AI LUKATO (độc quyền)",
+      "feature3": "10.000+ đề thi & tài liệu TOPIK",
+      "feature4": "AI STT/TTS chuẩn phát âm bản xứ",
+      "feature5": "AI chấm viết & chấm CV siêu chính xác",
+      "feature6": "Headhunting & tư vấn việc làm tại Hàn Quốc",
+      "feature7": "Tích hợp K-Culture (K-POP, K-Drama)"
+    },
+    "challenge": {
+      "headline1": "Giỏi thì",
+      "headline2": "theo kịp đi.",
+      "subtitle": "Gửi tới mọi app, website, trung tâm học tiếng Hàn.",
+      "line1": "Thứ bạn đang làm—bọn mình làm tốt hơn.",
+      "line2": "Thứ bạn còn chưa dám nghĩ—bọn mình đã làm rồi.",
+      "point1Title": "Ra đề TOPIK?",
+      "point1Desc": "Bọn mình có đội ngũ giáo sư ra đề TOPIK chính thức",
+      "point2Title": "Chatbot AI?",
+      "point2Desc": "RAG AI LUKATO với độ chính xác 99,7%",
+      "point3Title": "Học qua game?",
+      "point3Desc": "Bọn mình còn tích hợp cả K‑Culture",
+      "final": "Cứ học hỏi thoải mái—nhưng liệu có theo kịp không?"
+    },
+    "headhunting": {
+      "badge": "Dịch vụ độc quyền Premium",
+      "title1": "Kết nối trực tiếp",
+      "title2": "doanh nghiệp Hàn Quốc",
+      "desc1": "Đội ngũ headhunter hỗ trợ bạn chinh phục công việc",
+      "free": "100% miễn phí",
+      "desc2": "Từ doanh nghiệp tại Việt Nam đến cơ hội làm việc tại Seoul!",
+      "tag1": "500+ doanh nghiệp",
+      "tag2": "Tư vấn CV",
+      "tag3": "Hỗ trợ visa",
+      "cta": "Đăng ký ngay",
+      "ctaSub": "Hoàn toàn miễn phí"
+    },
+    "features": {
+      "title": "Học trọn 4 kỹ năng",
+      "skills": "4 kỹ năng",
+      "listen": "Nghe",
+      "read": "Đọc",
+      "write": "Viết",
+      "speak": "Nói"
+    },
+    "games": {
+      "korean": "K‑Culture • Tiếng Hàn",
+      "survival": "AI Survival",
+      "dating": "Hẹn hò Seoul",
+      "wordChain": "Nối từ",
+      "dubbing": "Lồng tiếng",
+      "kpopQuiz": "K‑POP Quiz",
+      "partTime": "Việc làm thêm",
+      "badgeNew": "Mới"
+    },
+    "testimonials": {
+      "title": "Phản hồi thật từ người học"
+    },
+    "pricing": {
+      "title1": "Giá hợp túi tiền,",
+      "local": "chuẩn địa phương",
+      "title2": "chất lượng đẳng cấp quốc tế",
+      "free": "Miễn phí",
+      "forever": "Miễn phí trọn đời",
+      "start": "Bắt đầu",
+      "month": "tháng",
+      "upgrade": "Nâng cấp"
+    },
+    "finalCta": {
+      "title1": "TOPIK",
+      "title2": "chinh phục",
+      "desc": "Giáo sư ra đề TOPIK + AI LUKATO =",
+      "noRival": "cặp bài trùng không đối thủ",
+      "cta": "Bắt đầu ngay"
     }
   },
   "grammar": {

@@ -429,7 +429,7 @@
     "challenge": { "headline1": "실력 되면", "headline2": "따라와 봐.", "subtitle": "모든 한국어 앱, 웹사이트, 학원에게.", "line1": "너희가 하는 건, 우리가 더 잘해.", "line2": "너희가 꿈도 못 꾸는 건, 우린 이미 했어.", "point1Title": "TOPIK 출제?", "point1Desc": "우린 공식 TOPIK 출제 교수가 있어", "point2Title": "AI 챗봇?", "point2Desc": "LUKATO RAG AI Tech 99.7% 정확도", "point3Title": "학습 게임?", "point3Desc": "K-Culture까지 통합했어", "final": "마음껏 베껴. 근데 따라올 수 있을까?" },
     "headhunting": { "badge": "프리미엄 독점 서비스", "title1": "직접 연결", "title2": "한국 기업", "desc1": "전문 헤드헌터 팀이 취업 지원", "free": "100% 무료", "desc2": "현지 한국 기업부터 서울 취업 기회까지!", "tag1": "500+ 기업", "tag2": "이력서 컨설팅", "tag3": "비자 지원", "cta": "지금 신청", "ctaSub": "완전 무료" },
     "features": { "title": "4가지 스킬 완전 학습", "skills": "4 스킬", "listen": "듣기", "read": "읽기", "write": "쓰기", "speak": "말하기" },
-    "games": { "korean": "한국어", "survival": "AI 서바이벌", "dating": "서울 데이트", "wordChain": "끝말잇기", "dubbing": "더빙", "badgeNew": "New" },
+    "games": { "korean": "한국어", "survival": "AI 서바이벌", "dating": "서울 데이트", "wordChain": "끝말잇기", "dubbing": "더빙", "kpopQuiz": "K-POP 퀴즈", "partTime": "알바", "badgeNew": "New" },
     "testimonials": { "title": "학습자들의 생생한 후기" },
     "pricing": { "title1": "합리적인 가격,", "local": "현지", "title2": "글로벌 품질", "free": "무료", "forever": "평생 무료", "start": "시작하기", "month": "월", "upgrade": "업그레이드" },
     "finalCta": { "title1": "TOPIK", "title2": "정복", "desc": "TOPIK 출제 교수 + LUKATO AI =", "noRival": "최강 조합", "cta": "지금 시작하기" }

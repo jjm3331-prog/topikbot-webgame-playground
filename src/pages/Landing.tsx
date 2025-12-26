@@ -107,9 +107,9 @@ const getGameModes = (t: (key: string) => string) => [
   { icon: MessageCircle, name: t("landing.games.survival"), color: "from-korean-red to-korean-orange", badge: "Hot" },
   { icon: Heart, name: t("landing.games.dating"), color: "from-korean-pink to-korean-red", badge: t("landing.games.badgeNew") },
   { icon: Gamepad2, name: t("landing.games.wordChain"), color: "from-korean-blue to-korean-purple", badge: null },
-  { icon: Music, name: "K-POP Quiz", color: "from-korean-purple to-korean-pink", badge: "⭐" },
+  { icon: Music, name: t("landing.games.kpopQuiz"), color: "from-korean-purple to-korean-pink", badge: "⭐" },
   { icon: Film, name: t("landing.games.dubbing"), color: "from-korean-orange to-korean-yellow", badge: null },
-  { icon: Briefcase, name: "Part-time", color: "from-korean-teal to-korean-green", badge: null },
+  { icon: Briefcase, name: t("landing.games.partTime"), color: "from-korean-teal to-korean-green", badge: null },
 ];
 
 // Comparison with competitors - will be translated via t()
