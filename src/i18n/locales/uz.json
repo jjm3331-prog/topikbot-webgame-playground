@@ -322,14 +322,16 @@
     "roomCode": "Xona kodi",
     "joinNow": "Hozir qo'shiling!",
     "close": "Yopish",
-    "secondsPerTurn": "12 soniya/navbat",
-    "warnings": "2 ogohlantirish = yutqazish",
-    "heroTitle": "1:1 Jang maydoni",
-    "heroSubtitle": "Do'stlar bilan jang, g'alaba = +1,000 ball!",
-    "selectGameMode": "O'yin rejimini tanlang",
+    "secondsPerTurn": "Har navbat 12 soniya",
+    "warnings": "2 ogohlantirish = mag'lubiyat",
+    "heroTitle": "1:1 Real vaqt maydoni",
+    "heroSubtitle": "Do'stlar bilan bellashing, g'alaba = +1,000 ball!",
+    "selectGameMode": "Rejim tanlash",
     "loginToPlay": "1:1 jangda qatnashish uchun tizimga kiring!",
     "howToPlay": "Qanday o'ynash",
-    "rules": "Qoidalar"
+    "rules": "Qoidalar",
+    "twoGames": "2 ta rejim",
+    "winPoints": "G'alaba = ball"
   },
   "vocabulary": {
     "title": "Lug'at o'rganish",

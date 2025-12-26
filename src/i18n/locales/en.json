@@ -417,16 +417,16 @@
     "roomCode": "Room Code",
     "joinNow": "Join Now!",
     "close": "Close",
-    "secondsPerTurn": "12 sec/turn",
-    "warnings": "2 warnings = lose",
-    "heroTitle": "1:1 Battle Arena",
-    "heroSubtitle": "Battle friends, win = +1,000 points!",
-    "selectGameMode": "Select game mode",
+    "secondsPerTurn": "12 seconds per turn",
+    "warnings": "2 warnings = defeat",
+    "heroTitle": "1:1 Real-time Arena",
+    "heroSubtitle": "Challenge friends and win +1,000 points!",
+    "selectGameMode": "Choose mode",
     "loginToPlay": "Login to join 1:1 battles!",
     "howToPlay": "How to Play",
     "rules": "Rules",
-    "twoGames": "2 games",
-    "winPoints": "Win for points!"
+    "twoGames": "2 modes",
+    "winPoints": "Win to earn points"
   },
   "vocabulary": {
     "title": "Vocabulary Learning",
