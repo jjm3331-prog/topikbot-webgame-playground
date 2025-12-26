@@ -742,25 +742,14 @@
     "actions": { "grading": "Đang chấm...", "grade": "Chấm điểm với AI", "freeGrade": "🎁 Chấm miễn phí (1 lần/ngày)", "upgradeToGrade": "Nâng cấp Premium để chấm" },
     "pdf": { "generatingTitle": "Đang tạo PDF...", "generatingDesc": "Vui lòng chờ", "failedTitle": "Tạo PDF thất bại", "failedDesc": "Vui lòng thử lại", "downloadComplete": "Tải PDF hoàn tất!", "fileDownloaded": "File đã được tải về" },
     "featureName": "Chấm bài viết AI",
-    "freeUsage": {
-      "availableNow": "Có thể sử dụng ngay",
-      "hasFreeTry": "Bạn có 1 lượt chấm miễn phí hôm nay!",
-      "freeOnceDaily": "Mỗi ngày bạn được sử dụng 1 lần miễn phí. Nâng cấp Premium để không giới hạn.",
-      "usedToday": "Đã sử dụng lượt miễn phí hôm nay",
-      "nextFreeAt": "Lượt miễn phí tiếp theo: {{time}}. Nâng cấp Premium để không giới hạn.",
-      "nextFreeSimple": "Lượt miễn phí tiếp theo: {{time}}"
-    },
-    "buttons": {
-      "addImage": "Thêm ảnh",
-      "deleteAll": "Xóa tất cả",
-      "uploadImage": "Upload ảnh",
-      "takePhoto": "Chụp ảnh"
-    },
-    "upload": {
-      "maxQuestionImages": "Tối đa {{max}} ảnh đề bài",
-      "maxAnswerImages": "Tối đa {{max}} ảnh bài làm",
-      "multipleSupport": "Hỗ trợ upload nhiều ảnh cùng lúc"
-    }
+    "freeUsage": { "availableNow": "Có thể sử dụng ngay", "hasFreeTry": "Bạn có 1 lượt chấm miễn phí hôm nay!", "freeOnceDaily": "Mỗi ngày bạn được sử dụng 1 lần miễn phí. Nâng cấp Premium để không giới hạn.", "usedToday": "Đã sử dụng lượt miễn phí hôm nay", "nextFreeAt": "Lượt miễn phí tiếp theo: {{time}}. Nâng cấp Premium để không giới hạn.", "nextFreeSimple": "Lượt miễn phí tiếp theo: {{time}}" },
+    "buttons": { "addImage": "Thêm ảnh", "deleteAll": "Xóa tất cả", "uploadImage": "Upload ảnh", "takePhoto": "Chụp ảnh" },
+    "upload": { "maxQuestionImages": "Tối đa {{max}} ảnh đề bài", "maxAnswerImages": "Tối đa {{max}} ảnh bài làm", "multipleSupport": "Hỗ trợ upload nhiều ảnh cùng lúc" },
+    "scoreDetail": { "score": "Điểm", "excellent": "Xuất sắc", "average": "Trung bình", "needsImprovement": "Cần cải thiện", "grammar": { "title": "Phân tích ngữ pháp chi tiết", "errorsFound": "Lỗi ngữ pháp phát hiện", "noErrors": "Không phát hiện lỗi ngữ pháp!" }, "vocabulary": { "title": "Phân tích từ vựng chi tiết", "suggestions": "Gợi ý cải thiện từ vựng", "appropriate": "Sử dụng từ vựng phù hợp!" }, "structure": { "title": "Phân tích cấu trúc chi tiết", "suggestions": "Gợi ý cải thiện cấu trúc", "current": "Hiện tại", "improved": "Cải thiện", "wellStructured": "Cấu trúc bài viết tốt!" }, "content": { "title": "Phân tích nội dung chi tiết", "analysis": "Phân tích nội dung", "doneWell": "Điểm tốt", "toImprove": "Cần cải thiện", "seeDetailedFeedback": "Xem phản hồi chi tiết." } },
+    "swot": { "title": "Phân tích SWOT", "strengths": "Strengths (Điểm mạnh)", "weaknesses": "Weaknesses (Điểm yếu)", "opportunities": "Opportunities (Cơ hội)", "threats": "Threats (Rủi ro)", "point": "Điểm", "evidence": "Bằng chứng/Phân tích", "issue": "Vấn đề", "impact": "Ảnh hưởng", "opportunity": "Cơ hội", "action": "Phương pháp", "benefit": "Lợi ích", "threat": "Rủi ro", "riskLevel": "Mức rủi ro", "prevention": "Phòng ngừa", "riskHigh": "Cao", "riskMedium": "Trung bình", "riskLow": "Thấp" },
+    "result": { "title": "Kết quả chấm điểm", "uploadPrompt": "Upload đề bài và bài làm để nhận phân tích chi tiết", "saveResult": "Lưu kết quả", "exportPdf": "Xuất PDF" },
+    "history": { "title": "Lịch sử chấm điểm", "score": "Điểm", "viewAgain": "Xem lại" },
+    "ocr": { "title": "Chỉnh sửa văn bản nhận dạng", "description": "AI đã nhận dạng văn bản từ hình ảnh. Vui lòng kiểm tra và chỉnh sửa nếu có lỗi:", "placeholder": "Văn bản nhận dạng từ hình ảnh...", "skipUseImage": "Bỏ qua, dùng ảnh gốc", "confirmText": "Xác nhận văn bản" }
   },
   "interview": {
     "title": "Mô phỏng phỏng vấn",

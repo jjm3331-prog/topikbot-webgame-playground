@@ -686,6 +686,74 @@
       "maxQuestionImages": "최대 {{max}}장의 문제 이미지",
       "maxAnswerImages": "최대 {{max}}장의 답안 이미지",
       "multipleSupport": "여러 이미지 동시 업로드 지원"
+    },
+    "scoreDetail": {
+      "score": "점수",
+      "excellent": "우수",
+      "average": "보통",
+      "needsImprovement": "개선 필요",
+      "grammar": {
+        "title": "문법 상세 분석",
+        "errorsFound": "발견된 문법 오류",
+        "noErrors": "문법 오류가 발견되지 않았습니다!"
+      },
+      "vocabulary": {
+        "title": "어휘 상세 분석",
+        "suggestions": "어휘 개선 제안",
+        "appropriate": "어휘 사용이 적절합니다!"
+      },
+      "structure": {
+        "title": "구조 상세 분석",
+        "suggestions": "구조 개선 제안",
+        "current": "현재",
+        "improved": "개선",
+        "wellStructured": "글의 구조가 잘 짜여져 있습니다!"
+      },
+      "content": {
+        "title": "내용 상세 분석",
+        "analysis": "내용 분석",
+        "doneWell": "잘된 점",
+        "toImprove": "개선할 점",
+        "seeDetailedFeedback": "상세 피드백을 참고해 주세요."
+      }
+    },
+    "swot": {
+      "title": "SWOT 분석",
+      "strengths": "Strengths (강점)",
+      "weaknesses": "Weaknesses (약점)",
+      "opportunities": "Opportunities (기회)",
+      "threats": "Threats (위협)",
+      "point": "포인트",
+      "evidence": "근거/분석",
+      "issue": "문제점",
+      "impact": "영향",
+      "opportunity": "기회",
+      "action": "방법",
+      "benefit": "효과",
+      "threat": "위협",
+      "riskLevel": "위험도",
+      "prevention": "예방법",
+      "riskHigh": "높음",
+      "riskMedium": "중간",
+      "riskLow": "낮음"
+    },
+    "result": {
+      "title": "채점 결과",
+      "uploadPrompt": "문제와 답안을 업로드하면 상세 분석을 받을 수 있습니다",
+      "saveResult": "결과 저장",
+      "exportPdf": "PDF 내보내기"
+    },
+    "history": {
+      "title": "채점 이력",
+      "score": "점수",
+      "viewAgain": "다시 보기"
+    },
+    "ocr": {
+      "title": "인식된 텍스트 수정",
+      "description": "AI가 이미지에서 텍스트를 인식했습니다. 오류가 있으면 수정해주세요:",
+      "placeholder": "이미지에서 인식된 텍스트...",
+      "skipUseImage": "건너뛰고 원본 이미지 사용",
+      "confirmText": "텍스트 확인"
     }
   },
   "interview": {
