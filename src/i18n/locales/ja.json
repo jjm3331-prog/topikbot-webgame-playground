@@ -717,5 +717,39 @@
     "tips": "ヒント",
     "forbidden": "禁止"
   },
+  "parttime": {
+    "title": "アルバイト",
+    "statsTitle": "バイト",
+    "turn": "ターン",
+    "selectJob": "どこで働きますか？",
+    "selectDifficulty": "難易度を選択",
+    "jobs": { "convenience_store": "コンビニ", "cafe": "カフェ", "restaurant": "レストラン", "pc_bang": "ネットカフェ", "bookstore": "本屋" },
+    "difficulty": { "easy": "やさしい", "easyDesc": "ゆっくり、基本状況", "medium": "ふつう", "mediumDesc": "通常速度、様々なリクエスト", "hard": "むずかしい", "hardDesc": "難しいお客様、クレーム" },
+    "back": "戻る", "customerType": "お客様タイプ", "situation": "状況", "customer": "お客様",
+    "showHint": "ヒント表示", "hideHint": "ヒント非表示", "hint": "ヒント", "respond": "対応する", "placeholder": "お客様に対応...",
+    "errorTitle": "エラー発生", "errorDesc": "シナリオの読み込みに失敗しました。", "evalError": "評価エラー", "evalErrorDesc": "応答の評価に失敗しました。",
+    "score": "点", "customerReaction": "お客様の反応", "feedback": "フィードバック", "betterResponse": "より良い対応", "languageCorrection": "言語修正",
+    "viewResult": "結果を見る", "nextCustomer": "次のお客様", "workDone": "退勤！", "todayIncome": "今日の収入",
+    "restart": "もう一度", "backToDashboard": "ダッシュボードへ", "loading": "お客様が来ます..."
+  },
+  "wordChain": {
+    "title": "しりとり", "score": "点", "seconds": "秒", "nextChar": "次の文字", "anyWord": "どんな単語でも！", "me": "私",
+    "reward": "報酬獲得！", "timeout": "時間切れ！", "timeoutDesc": "15秒以内に単語を入力できませんでした！", "defeat": "敗北！", "victory": "勝利！",
+    "aiLost": "AIが単語を見つけられませんでした！", "error": "エラーが発生しました", "tryAgain": "もう一度お試しください", "startWith": "で始まる...", "firstWord": "最初の単語を入力...",
+    "again": "もう一度", "backToDashboard": "ダッシュボードへ", "koreanNounOnly": "韓国語名詞のみ"
+  },
+  "kpop": {
+    "title": "K-POP MVクイズ", "complete": "ゲーム完了！", "score": "点", "backToDashboard": "ダッシュボードへ", "playAgain": "もう一度",
+    "loadFailed": "読み込み失敗", "timer": "タイマー", "all": "全て", "easy": "やさしい", "medium": "ふつう", "hard": "むずかしい",
+    "timeout": "時間切れ！", "answer": "答え", "correct": "正解！", "wrong": "不正解！", "hint": "ヒント", "submit": "送信",
+    "blankAnswer": "答えを入力...", "next": "次の問題", "viewResult": "結果を見る", "highlightPlaying": "正解ハイライト再生中！"
+  },
+  "quiz": {
+    "title": "慣用句クイズ", "easy": "やさしい", "medium": "ふつう", "hard": "むずかしい", "loading": "生成中...", "questionMeaning": "この意味は？",
+    "hintHalf": "ヒント（½点）", "noHint": "ヒントなし", "explanation": "解説", "example": "例文", "next": "次の問題",
+    "questions": "問", "accuracy": "正答率", "streak": "連続", "correct": "正解！", "wrong": "不正解！", "nextTime": "もう一度！",
+    "hintUsed": "ヒント！", "halfScore": "半分の点数", "error": "エラー",
+    "types": { "idiom": "慣用句", "proverb": "ことわざ", "slang": "俗語", "internet": "ネット用語" }
+  },
   "footer": { "hanoi": "ハノイ公式", "qnaAgent": "Q&A Agent", "admin": "ADMIN", "copyright": "© 2025 Powered by LUKAS Edutainment" }
 }

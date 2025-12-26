@@ -717,5 +717,39 @@
     "tips": "Maslahatlar",
     "forbidden": "Taqiqlangan"
   },
+  "parttime": {
+    "title": "Part-time ish",
+    "statsTitle": "Part-time",
+    "turn": "Tur",
+    "selectJob": "Qayerda ishlashni xohlaysiz?",
+    "selectDifficulty": "Qiyinlikni tanlang",
+    "jobs": { "convenience_store": "Oziq-ovqat do'koni", "cafe": "Qahvaxona", "restaurant": "Restoran", "pc_bang": "Internet-kafe", "bookstore": "Kitob do'koni" },
+    "difficulty": { "easy": "Oson", "easyDesc": "Sekin, oddiy vaziyatlar", "medium": "O'rtacha", "mediumDesc": "Oddiy tezlik, turli so'rovlar", "hard": "Qiyin", "hardDesc": "Qiyin mijozlar, shikoyatlar" },
+    "back": "Orqaga", "customerType": "Mijoz turi", "situation": "Vaziyat", "customer": "Mijoz",
+    "showHint": "Maslahat ko'rsat", "hideHint": "Maslahat yashir", "hint": "Maslahat", "respond": "Javob berish", "placeholder": "Mijozga javob bering...",
+    "errorTitle": "Xato yuz berdi", "errorDesc": "Senariyni yuklab bo'lmadi.", "evalError": "Baholash xatosi", "evalErrorDesc": "Javobni baholab bo'lmadi.",
+    "score": "ball", "customerReaction": "Mijoz reaktsiyasi", "feedback": "Fikr-mulohaza", "betterResponse": "Yaxshiroq javob", "languageCorrection": "Til tuzatish",
+    "viewResult": "Natijani ko'rish", "nextCustomer": "Keyingi mijoz", "workDone": "Ish tugadi!", "todayIncome": "Bugungi daromad",
+    "restart": "Qayta o'ynash", "backToDashboard": "Bosh sahifaga", "loading": "Mijoz kelmoqda..."
+  },
+  "wordChain": {
+    "title": "So'z zanjiri", "score": "ball", "seconds": "soniya", "nextChar": "Keyingi harf", "anyWord": "Istalgan so'z!", "me": "Men",
+    "reward": "Mukofot olindi!", "timeout": "Vaqt tugadi!", "timeoutDesc": "15 soniyada so'z kiritilmadi!", "defeat": "Mag'lubiyat!", "victory": "G'alaba!",
+    "aiLost": "AI so'z topa olmadi!", "error": "Xato yuz berdi", "tryAgain": "Qayta urinib ko'ring", "startWith": "bilan boshlanadi...", "firstWord": "Birinchi so'zni kiriting...",
+    "again": "Yana", "backToDashboard": "Bosh sahifaga", "koreanNounOnly": "Faqat koreys ot so'zlari"
+  },
+  "kpop": {
+    "title": "K-POP MV Test", "complete": "O'yin tugadi!", "score": "ball", "backToDashboard": "Bosh sahifaga", "playAgain": "Qayta o'ynash",
+    "loadFailed": "Yuklab bo'lmadi", "timer": "Taymer", "all": "Hammasi", "easy": "Oson", "medium": "O'rtacha", "hard": "Qiyin",
+    "timeout": "Vaqt tugadi!", "answer": "Javob", "correct": "To'g'ri!", "wrong": "Noto'g'ri!", "hint": "Maslahat", "submit": "Yuborish",
+    "blankAnswer": "Javob kiriting...", "next": "Keyingi savol", "viewResult": "Natijani ko'rish", "highlightPlaying": "Javob qismi ijro etilmoqda!"
+  },
+  "quiz": {
+    "title": "Idioma testi", "easy": "Oson", "medium": "O'rtacha", "hard": "Qiyin", "loading": "Yaratilmoqda...", "questionMeaning": "Bu nima degani?",
+    "hintHalf": "Maslahat (½ ball)", "noHint": "Maslahat yo'q", "explanation": "Tushuntirish", "example": "Misol", "next": "Keyingi savol",
+    "questions": "Savol", "accuracy": "Aniqlik", "streak": "Ketma-ket", "correct": "To'g'ri!", "wrong": "Noto'g'ri!", "nextTime": "Qayta urinib ko'ring!",
+    "hintUsed": "Maslahat!", "halfScore": "Yarim ball", "error": "Xato",
+    "types": { "idiom": "Idioma", "proverb": "Maqol", "slang": "Sleng", "internet": "Internet" }
+  },
   "footer": { "hanoi": "Xanoy rasmiy", "qnaAgent": "Q&A Agent", "admin": "ADMIN", "copyright": "© 2025 Powered by LUKAS Edutainment" }
 }

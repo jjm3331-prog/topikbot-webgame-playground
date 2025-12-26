@@ -717,5 +717,39 @@
     "tips": "Советы",
     "forbidden": "Запрещено"
   },
+  "parttime": {
+    "title": "Подработка",
+    "statsTitle": "Подработка",
+    "turn": "Ход",
+    "selectJob": "Где вы хотите работать?",
+    "selectDifficulty": "Выберите сложность",
+    "jobs": { "convenience_store": "Магазин", "cafe": "Кафе", "restaurant": "Ресторан", "pc_bang": "Интернет-кафе", "bookstore": "Книжный" },
+    "difficulty": { "easy": "Легко", "easyDesc": "Медленно, базовые ситуации", "medium": "Средне", "mediumDesc": "Обычная скорость, разные запросы", "hard": "Сложно", "hardDesc": "Сложные клиенты, жалобы" },
+    "back": "Назад", "customerType": "Тип клиента", "situation": "Ситуация", "customer": "Клиент",
+    "showHint": "Показать подсказку", "hideHint": "Скрыть подсказку", "hint": "Подсказка", "respond": "Ответить", "placeholder": "Ответьте клиенту...",
+    "errorTitle": "Произошла ошибка", "errorDesc": "Не удалось загрузить сценарий.", "evalError": "Ошибка оценки", "evalErrorDesc": "Не удалось оценить ответ.",
+    "score": "очков", "customerReaction": "Реакция клиента", "feedback": "Отзыв", "betterResponse": "Лучший ответ", "languageCorrection": "Языковая правка",
+    "viewResult": "Результат", "nextCustomer": "След. клиент", "workDone": "Смена окончена!", "todayIncome": "Сегодняшний заработок",
+    "restart": "Ещё раз", "backToDashboard": "На главную", "loading": "Клиент подходит..."
+  },
+  "wordChain": {
+    "title": "Цепочка слов", "score": "очк", "seconds": "сек", "nextChar": "След. буква", "anyWord": "Любое слово!", "me": "Я",
+    "reward": "Награда!", "timeout": "Время вышло!", "timeoutDesc": "Не успели ввести слово за 15 секунд!", "defeat": "Поражение!", "victory": "Победа!",
+    "aiLost": "AI не нашёл слово!", "error": "Произошла ошибка", "tryAgain": "Попробуйте снова", "startWith": "начинается с...", "firstWord": "Введите первое слово...",
+    "again": "Снова", "backToDashboard": "На главную", "koreanNounOnly": "Только корейские существительные"
+  },
+  "kpop": {
+    "title": "K-POP MV Викторина", "complete": "Игра окончена!", "score": "очк", "backToDashboard": "На главную", "playAgain": "Ещё раз",
+    "loadFailed": "Ошибка загрузки", "timer": "Таймер", "all": "Все", "easy": "Легко", "medium": "Средне", "hard": "Сложно",
+    "timeout": "Время вышло!", "answer": "Ответ", "correct": "Правильно!", "wrong": "Неправильно!", "hint": "Подсказка", "submit": "Отправить",
+    "blankAnswer": "Введите ответ...", "next": "Следующий вопрос", "viewResult": "Результат", "highlightPlaying": "Воспроизведение ответа!"
+  },
+  "quiz": {
+    "title": "Викторина идиом", "easy": "Легко", "medium": "Средне", "hard": "Сложно", "loading": "Генерация...", "questionMeaning": "Что это значит?",
+    "hintHalf": "Подсказка (½ очков)", "noHint": "Нет подсказки", "explanation": "Объяснение", "example": "Пример", "next": "Следующий вопрос",
+    "questions": "Вопр", "accuracy": "Точн", "streak": "Серия", "correct": "Правильно!", "wrong": "Неправильно!", "nextTime": "Попробуйте снова!",
+    "hintUsed": "Подсказка!", "halfScore": "Половина очков", "error": "Ошибка",
+    "types": { "idiom": "Идиома", "proverb": "Пословица", "slang": "Сленг", "internet": "Интернет" }
+  },
   "footer": { "hanoi": "Ханой официальный", "qnaAgent": "Q&A Agent", "admin": "ADMIN", "copyright": "© 2025 Powered by LUKAS Edutainment" }
 }

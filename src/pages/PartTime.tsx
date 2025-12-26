@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -75,6 +76,7 @@ const DIFFICULTIES = [
 const MAX_TURNS = 5;
 
 const PartTime = () => {
+  const { t } = useTranslation();
   const [gameState, setGameState] = useState<GameState>('select_job');
   const [selectedJob, setSelectedJob] = useState<JobType | null>(null);
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
