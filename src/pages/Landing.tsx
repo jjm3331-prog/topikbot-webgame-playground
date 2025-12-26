@@ -275,8 +275,8 @@ const Landing = () => {
       </motion.section>
 
 
-      <section id="universities" className="py-10 sm:py-16 px-4 sm:px-6 bg-muted/30">
-        <div className="max-w-5xl mx-auto">
+      <section id="universities" className="py-10 sm:py-16 px-4 sm:px-6 bg-muted/30 overflow-hidden">
+        <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -292,25 +292,33 @@ const Landing = () => {
              </p>
           </motion.div>
           
-          <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-11 gap-2 sm:gap-3 max-w-5xl mx-auto">
-            {partnerUniversities.map((uni, i) => (
-              <motion.div
-                key={uni.name}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.03 }}
-                whileHover={{ scale: 1.1, y: -4 }}
-                className="group flex flex-col items-center"
-              >
-                <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 bg-white rounded-xl p-1.5 shadow-md group-hover:shadow-xl transition-all duration-300 flex items-center justify-center border border-border/20 group-hover:border-primary/40">
-                  <img src={uni.logo} alt={uni.name} className="w-full h-full object-contain" />
-                </div>
-                <span className="mt-1 text-[9px] sm:text-[10px] text-muted-foreground group-hover:text-foreground text-center truncate max-w-full">
-                  {uni.name}
-                </span>
-              </motion.div>
-            ))}
+          {/* Horizontal sliding carousel */}
+          <div className="relative">
+            <motion.div
+              animate={{ x: [0, -1400, 0] }}
+              transition={{ 
+                duration: 25, 
+                repeat: Infinity, 
+                ease: "linear"
+              }}
+              className="flex gap-4 sm:gap-6"
+            >
+              {/* Duplicate for seamless loop */}
+              {[...partnerUniversities, ...partnerUniversities].map((uni, i) => (
+                <motion.div
+                  key={`${uni.name}-${i}`}
+                  whileHover={{ scale: 1.1, y: -4 }}
+                  className="group flex flex-col items-center flex-shrink-0"
+                >
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-white rounded-xl p-2 shadow-md group-hover:shadow-xl transition-all duration-300 flex items-center justify-center border border-border/20 group-hover:border-primary/40">
+                    <img src={uni.logo} alt={uni.name} className="w-full h-full object-contain" />
+                  </div>
+                  <span className="mt-2 text-[10px] sm:text-xs text-muted-foreground group-hover:text-foreground text-center">
+                    {uni.name}
+                  </span>
+                </motion.div>
+              ))}
+            </motion.div>
           </div>
         </div>
       </section>
@@ -932,7 +940,7 @@ const Landing = () => {
             className="text-center mb-6 sm:mb-8"
           >
             <h2 className="font-heading font-bold text-2xl sm:text-3xl text-foreground mb-2">
-              {t("landing.pricing.title1")} <span className="text-gradient-primary">{t("landing.pricing.local")}</span>, {t("landing.pricing.title2")} <span className="text-gradient-secondary">World-class</span>
+              {t("landing.pricing.title1")} <span className="text-gradient-secondary">{t("landing.pricing.title2")}</span>
             </h2>
           </motion.div>
 
@@ -987,7 +995,7 @@ const Landing = () => {
           className="max-w-xl mx-auto text-center"
         >
           <h2 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl text-foreground mb-4">
-            {t("landing.finalCta.title1")} <span className="text-gradient-primary">{t("landing.finalCta.title2")}</span> TOPIK?
+            <span className="text-gradient-primary">{t("landing.finalCta.title1")}</span> {t("landing.finalCta.title2")}!
           </h2>
           <p className="text-muted-foreground text-sm sm:text-base mb-6">
             {t("landing.finalCta.desc")} <span className="text-foreground font-semibold">{t("landing.finalCta.noRival")}</span>
