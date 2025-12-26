@@ -666,7 +666,7 @@
     "tip": { "copyPaste": "팁: 워드/메모장 내용을 복사해 붙여넣으면 더 정확해요." },
     "actions": { "grading": "채점 중...", "grade": "AI 채점하기", "freeGrade": "🎁 무료 채점(하루 1회)", "upgradeToGrade": "프리미엄으로 업그레이드하고 채점하기" },
     "pdf": { "generatingTitle": "PDF 생성 중...", "generatingDesc": "잠시만 기다려주세요", "failedTitle": "PDF 생성 실패", "failedDesc": "다시 시도해주세요" }
-  }
+  },
   "interview": {
     "title": "면접 시뮬레이션",
     "description": "한국 기업 면접을 연습하세요",

@@ -476,7 +476,7 @@
     "tip": { "copyPaste": "提示：从Word/笔记复制粘贴，准确度更高。" },
     "actions": { "grading": "批改中...", "grade": "AI批改", "freeGrade": "🎁 免费批改(1/天)", "upgradeToGrade": "升级Premium进行批改" },
     "pdf": { "generatingTitle": "正在生成PDF...", "generatingDesc": "请稍候", "failedTitle": "PDF生成失败", "failedDesc": "请重试" }
-  }
+  },
   "interview": {
     "title": "面试模拟", "description": "韩国企业面试练习",
     "featureName": "面试模拟", "heroTitle": "面试练习", "heroDescription": "与韩国顶尖企业进行面试练习", "supportVoiceText": "支持语音和文字",
