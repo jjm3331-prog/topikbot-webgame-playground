@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const SYSTEM_PROMPT = `Bạn là LUKATO AI Agent - chuyên gia tư vấn học tiếng Hàn và thi TOPIK hàng đầu Việt Nam.
+const SYSTEM_PROMPT = `Bạn là LUKATO AI Agent 🤖 - chuyên gia tư vấn học tiếng Hàn và thi TOPIK hàng đầu Việt Nam!
 
 **Vai trò chính:**
 - Giải đáp mọi thắc mắc về tiếng Hàn: ngữ pháp, từ vựng, phát âm, cấu trúc câu
@@ -19,20 +19,38 @@ const SYSTEM_PROMPT = `Bạn là LUKATO AI Agent - chuyên gia tư vấn học t
 2. Ưu tiên thông tin từ ngữ cảnh RAG nếu có
 3. Đưa ví dụ cụ thể với tiếng Hàn + phiên âm + nghĩa tiếng Việt
 4. Giải thích từng bước, dễ hiểu
-5. Khuyến khích và động viên người học
+5. Khuyến khích và động viên người học 💪
 
-**Format trả lời:**
-- Sử dụng emoji phù hợp (không quá nhiều)
-- Chia nhỏ nội dung rõ ràng
-- Đưa ví dụ thực tế từ K-Drama, K-Pop khi phù hợp
-- Nếu không chắc chắn, nói rõ và đề xuất tìm hiểu thêm`;
+**Format trả lời (RẤT QUAN TRỌNG):**
+- Sử dụng emoji phù hợp để tạo không khí thân thiện 😊✨🎯📝
+- Sử dụng **bold** cho từ khóa quan trọng
+- Sử dụng bảng markdown khi so sánh ngữ pháp/từ vựng
+- Sử dụng danh sách có đánh số hoặc bullet points
+- Chia nhỏ nội dung thành các phần rõ ràng với tiêu đề
+- Đưa ví dụ thực tế từ K-Drama, K-Pop khi phù hợp 🎬🎵
+- Nếu không chắc chắn, nói rõ và đề xuất tìm hiểu thêm
+
+**Ví dụ format tốt:**
+
+## 📚 So sánh -아/어서 và -니까
+
+| Ngữ pháp | Ý nghĩa | Ví dụ |
+|----------|---------|-------|
+| -아/어서 | Nguyên nhân/lý do | 배가 고파서 밥을 먹었어요 |
+| -니까 | Lý do (chủ quan hơn) | 시간이 없으니까 빨리 가세요 |
+
+### ✨ Mẹo phân biệt:
+1. **-아/어서** không dùng với mệnh lệnh/đề nghị
+2. **-니까** có thể dùng với mệnh lệnh
+
+Cứ hỏi thêm nếu cần nhé! 화이팅! 🇰🇷`;
 
 const FREE_DAILY_LIMIT = 30;
 
 // Generate cache key from question
 function generateCacheKey(question: string): string {
   const normalized = question.toLowerCase().trim().replace(/\s+/g, ' ');
-  return `ai_tutor_${normalized.substring(0, 200)}`;
+  return `ai_tutor_v3_${normalized.substring(0, 200)}`;
 }
 
 // Check and update daily usage
@@ -248,7 +266,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: "daily_limit_exceeded",
-          message: "Bạn đã hết lượt hỏi miễn phí hôm nay. Nâng cấp Premium để hỏi không giới hạn!",
+          message: "Bạn đã hết lượt hỏi miễn phí hôm nay 😢 Nâng cấp Premium để hỏi không giới hạn!",
           remaining: 0
         }),
         { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -272,7 +290,7 @@ serve(async (req) => {
     // Build system prompt with RAG context
     let enhancedSystemPrompt = SYSTEM_PROMPT;
     if (ragContext) {
-      enhancedSystemPrompt += `\n\n**Ngữ cảnh tham khảo (RAG):**\n${ragContext}\n\nHãy ưu tiên sử dụng thông tin từ ngữ cảnh trên nếu liên quan đến câu hỏi.`;
+      enhancedSystemPrompt += `\n\n**📖 Ngữ cảnh tham khảo (RAG):**\n${ragContext}\n\nHãy ưu tiên sử dụng thông tin từ ngữ cảnh trên nếu liên quan đến câu hỏi.`;
     }
 
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
@@ -288,30 +306,33 @@ serve(async (req) => {
 
     const contents = [
       { role: "user", parts: [{ text: enhancedSystemPrompt }] },
-      { role: "model", parts: [{ text: "Tôi hiểu. Tôi là LUKATO AI Agent - chuyên gia tư vấn học tiếng Hàn. Tôi sẽ giúp bạn học và luyện thi TOPIK hiệu quả nhất! 🇰🇷" }] },
+      { role: "model", parts: [{ text: "Hiểu rồi! Mình là LUKATO AI Agent - chuyên gia tư vấn tiếng Hàn và luyện thi TOPIK! 🤖✨ Mình sẽ giúp bạn học tiếng Hàn hiệu quả nhất! 화이팅! 🇰🇷💪" }] },
       ...geminiMessages
     ];
 
-    // Streaming mode
+    // Streaming mode with Gemini 2.5 Flash
     if (stream) {
-      console.log("Streaming with gemini-2.5-flash-lite, RAG context:", ragContext.length > 0);
+      console.log("Streaming with gemini-2.5-flash, thinking_budget enabled, RAG context:", ragContext.length > 0);
 
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:streamGenerateContent?alt=sse&key=${GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse&key=${GEMINI_API_KEY}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             contents,
             generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 2048,
+              temperature: 0.8,
+              maxOutputTokens: 8192,
+              thinkingConfig: {
+                thinkingBudget: 2048
+              }
             },
             safetySettings: [
-              { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-              { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-              { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-              { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" }
+              { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_ONLY_HIGH" },
+              { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_ONLY_HIGH" },
+              { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_ONLY_HIGH" },
+              { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" }
             ]
           }),
         }
@@ -323,7 +344,7 @@ serve(async (req) => {
         
         if (response.status === 429) {
           return new Response(
-            JSON.stringify({ error: "rate_limit", message: "Hệ thống đang bận. Vui lòng thử lại sau ít phút." }),
+            JSON.stringify({ error: "rate_limit", message: "Hệ thống đang bận 🔄 Vui lòng thử lại sau ít phút." }),
             { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
@@ -343,24 +364,27 @@ serve(async (req) => {
     }
 
     // Non-streaming mode
-    console.log("Non-streaming with gemini-2.5-flash-lite, RAG context:", ragContext.length > 0);
+    console.log("Non-streaming with gemini-2.5-flash, thinking_budget enabled, RAG context:", ragContext.length > 0);
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents,
           generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 2048,
+            temperature: 0.8,
+            maxOutputTokens: 8192,
+            thinkingConfig: {
+              thinkingBudget: 2048
+            }
           },
           safetySettings: [
-            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" }
+            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_ONLY_HIGH" },
+            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_ONLY_HIGH" },
+            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_ONLY_HIGH" },
+            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" }
           ]
         }),
       }
@@ -372,7 +396,7 @@ serve(async (req) => {
       
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: "rate_limit", message: "Hệ thống đang bận. Vui lòng thử lại sau ít phút." }),
+          JSON.stringify({ error: "rate_limit", message: "Hệ thống đang bận 🔄 Vui lòng thử lại sau ít phút." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -381,7 +405,7 @@ serve(async (req) => {
 
     const data = await response.json();
     const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 
-      "Xin lỗi, tôi không thể trả lời câu hỏi này. Vui lòng thử lại.";
+      "Xin lỗi, mình không thể trả lời câu hỏi này 😅 Vui lòng thử lại nhé!";
 
     // Save to cache
     await saveToCache(supabase, cacheKey, aiResponse, lastUserMessage);

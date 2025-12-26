@@ -1,58 +1,67 @@
-import { useState, useRef, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import CleanHeader from "@/components/CleanHeader";
+import CommonFooter from "@/components/CommonFooter";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import { 
-  Send, 
-  Bot, 
-  User, 
   Sparkles, 
-  Loader2, 
-  RotateCcw,
+  Bot, 
+  MessageSquare, 
+  Zap, 
+  ArrowRight,
   Crown,
-  Zap,
-  AlertCircle,
-  CheckCircle,
   BookOpen,
   GraduationCap,
-  HelpCircle
+  Globe,
+  Lock
 } from "lucide-react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  timestamp: Date;
-  cached?: boolean;
-}
-
-const SUGGESTED_QUESTIONS = [
-  "TOPIK II 쓰기 51번 문제 푸는 팁이 있나요?",
-  "'-아/어서'와 '-니까'의 차이점을 알려주세요",
-  "듣기 문제에서 숫자 들을 때 팁이 있나요?",
-  "TOPIK I 급수별 합격 점수가 어떻게 되나요?",
+// Agent card data
+const AI_AGENTS = [
+  {
+    id: "topik",
+    title: "TOPIK Agent",
+    subtitle: "Chuyên gia TOPIK I & II",
+    description: "Giải đáp mọi thắc mắc về tiếng Hàn, ngữ pháp, từ vựng và chiến lược luyện thi TOPIK.",
+    icon: GraduationCap,
+    available: true,
+    features: ["Ngữ pháp tiếng Hàn", "Từ vựng TOPIK", "Chiến lược thi", "Luyện viết"],
+    gradient: "from-korean-blue to-korean-green",
+    path: "/ai-chat/topik"
+  },
+  {
+    id: "jlpt",
+    title: "JLPT Agent",
+    subtitle: "Tiếng Nhật N1-N5",
+    description: "Hỗ trợ học tiếng Nhật và luyện thi JLPT các cấp độ.",
+    icon: BookOpen,
+    available: false,
+    features: ["Ngữ pháp tiếng Nhật", "Kanji & Từ vựng", "Nghe hiểu", "Đọc hiểu"],
+    gradient: "from-red-500 to-pink-500",
+    path: "/ai-chat/jlpt"
+  },
+  {
+    id: "hsk",
+    title: "HSK Agent", 
+    subtitle: "Tiếng Trung HSK 1-6",
+    description: "Học tiếng Trung và chuẩn bị thi HSK hiệu quả.",
+    icon: Globe,
+    available: false,
+    features: ["Ngữ pháp tiếng Trung", "Hán tự", "Luyện nghe", "Luyện viết"],
+    gradient: "from-yellow-500 to-red-500",
+    path: "/ai-chat/hsk"
+  }
 ];
 
 const AIChat = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [remainingQuestions, setRemainingQuestions] = useState<number | null>(null);
   const [isPremium, setIsPremium] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { toast } = useToast();
+  const navigate = useNavigate();
 
-  // Check auth status
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -68,434 +77,152 @@ const AIChat = () => {
       }
     };
     checkAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setIsAuthenticated(!!session?.user);
-    });
-
-    return () => subscription.unsubscribe();
   }, []);
 
-  // Auto scroll to bottom
-  useEffect(() => {
-    if (scrollAreaRef.current) {
-      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-      if (scrollContainer) {
-        scrollContainer.scrollTop = scrollContainer.scrollHeight;
-      }
-    }
-  }, [messages]);
-
-  // Parse Gemini SSE stream
-  const parseGeminiStream = async (
-    reader: ReadableStreamDefaultReader<Uint8Array>,
-    onDelta: (text: string) => void,
-    onDone: () => void
-  ) => {
-    const decoder = new TextDecoder();
-    let buffer = "";
-
-    try {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        
-        buffer += decoder.decode(value, { stream: true });
-        
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || "";
-
-        for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            const jsonStr = line.slice(6).trim();
-            if (jsonStr === "[DONE]") continue;
-            
-            try {
-              const parsed = JSON.parse(jsonStr);
-              const text = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
-              if (text) onDelta(text);
-            } catch {
-              // Ignore parse errors
-            }
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Stream parsing error:", error);
-    }
-    
-    onDone();
-  };
-
-  const sendMessage = useCallback(async (content?: string) => {
-    const messageText = content || input.trim();
-    if (!messageText || isLoading) return;
-
-    if (!isAuthenticated) {
-      toast({
-        title: "Vui lòng đăng nhập",
-        description: "Đăng nhập để sử dụng LUKATO AI Agent",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const userMessage: Message = {
-      id: `user-${Date.now()}`,
-      role: "user",
-      content: messageText,
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInput("");
-    setIsLoading(true);
-
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const allMessages = [...messages, userMessage].map(m => ({
-        role: m.role,
-        content: m.content
-      }));
-
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-tutor`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({ messages: allMessages, stream: true })
-        }
-      );
-
-      // Handle error responses
-      if (!response.ok) {
-        const errorData = await response.json();
-        
-        if (response.status === 429) {
-          if (errorData.error === "daily_limit_exceeded") {
-            setRemainingQuestions(0);
-            toast({
-              title: "Hết lượt hỏi miễn phí",
-              description: "Nâng cấp Premium để hỏi không giới hạn!",
-              variant: "destructive"
-            });
-          } else {
-            toast({
-              title: "Hệ thống bận",
-              description: "Vui lòng thử lại sau ít phút",
-              variant: "destructive"
-            });
-          }
-          setIsLoading(false);
-          return;
-        }
-        
-        throw new Error(errorData.message || "Lỗi kết nối");
-      }
-
-      // Check for remaining questions header
-      const remaining = response.headers.get("X-Remaining-Questions");
-      if (remaining) {
-        setRemainingQuestions(parseInt(remaining));
-      }
-
-      // Check if it's a cached response (JSON) or stream
-      const contentType = response.headers.get("Content-Type");
-      
-      if (contentType?.includes("application/json")) {
-        const data = await response.json();
-        const assistantMessage: Message = {
-          id: `assistant-${Date.now()}`,
-          role: "assistant",
-          content: data.response,
-          timestamp: new Date(),
-          cached: data.cached
-        };
-        setMessages(prev => [...prev, assistantMessage]);
-        if (data.remaining !== undefined) {
-          setRemainingQuestions(data.remaining);
-        }
-      } else {
-        // Stream response
-        const reader = response.body?.getReader();
-        if (!reader) throw new Error("No reader available");
-
-        const assistantMessageId = `assistant-${Date.now()}`;
-        let fullText = "";
-
-        setMessages(prev => [...prev, {
-          id: assistantMessageId,
-          role: "assistant",
-          content: "",
-          timestamp: new Date()
-        }]);
-
-        await parseGeminiStream(
-          reader,
-          (deltaText) => {
-            fullText += deltaText;
-            setMessages(prev => prev.map(m => 
-              m.id === assistantMessageId ? { ...m, content: fullText } : m
-            ));
-          },
-          () => {
-            // Stream complete
-          }
-        );
-      }
-    } catch (error) {
-      console.error("Send message error:", error);
-      toast({
-        title: "Lỗi",
-        description: error instanceof Error ? error.message : "Không thể gửi tin nhắn",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [input, isLoading, isAuthenticated, messages, toast]);
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-
-  const clearChat = () => {
-    setMessages([]);
+  const handleAgentClick = (agent: typeof AI_AGENTS[0]) => {
+    if (!agent.available) return;
+    navigate(agent.path);
   };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <CleanHeader />
       
-      <main className="flex-1 flex flex-col max-w-4xl mx-auto w-full px-4 pt-20 pb-4">
-        {/* Header Section */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center py-6"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-            <Sparkles className="w-4 h-4" />
-            LUKATO AI Agent
-            <Badge variant="secondary" className="text-xs bg-korean-green/20 text-korean-green border-0">
-              RAG
-            </Badge>
-          </div>
-          
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">
-            무엇이든 물어보세요
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            TOPIK 학습에 관한 모든 질문에 AI가 정확하게 답변해드립니다
-          </p>
-
-          {/* Usage indicator */}
-          {isAuthenticated && !isPremium && remainingQuestions !== null && (
-            <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted text-sm">
-              <Zap className="w-4 h-4 text-korean-yellow" />
-              <span>오늘 남은 질문: <strong>{remainingQuestions}</strong>/30</span>
+      <main className="flex-1 pt-20 pb-8">
+        <div className="max-w-6xl mx-auto px-4">
+          {/* Hero Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-12"
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+              <Sparkles className="w-4 h-4" />
+              LUKATO AI Agent
+              <Badge variant="secondary" className="text-xs bg-korean-green/20 text-korean-green border-0">
+                RAG
+              </Badge>
             </div>
-          )}
-          
-          {isPremium && (
-            <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-korean-yellow/10 text-korean-yellow text-sm">
-              <Crown className="w-4 h-4" />
-              <span>Premium 무제한</span>
-            </div>
-          )}
-        </motion.div>
+            
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-korean-blue to-korean-green bg-clip-text text-transparent">
+              Trợ lý học ngôn ngữ AI 🤖
+            </h1>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Chọn Agent phù hợp với ngôn ngữ bạn đang học. AI sẽ giải đáp mọi thắc mắc của bạn! ✨
+            </p>
 
-        {/* Chat Area */}
-        <Card className="flex-1 flex flex-col overflow-hidden border-border/50 bg-card/50 backdrop-blur">
-          {messages.length === 0 ? (
-            /* Empty State */
-            <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-korean-blue to-korean-green flex items-center justify-center mb-6">
-                <Bot className="w-8 h-8 text-white" />
-              </div>
-              
-              <h2 className="text-lg font-semibold mb-2">LUKATO AI Agent</h2>
-              <p className="text-muted-foreground text-sm mb-8 max-w-md">
-                TOPIK 문법, 어휘, 시험 전략 등 무엇이든 물어보세요. RAG 기반으로 정확한 답변을 제공합니다.
-              </p>
-
-              {/* Suggested Questions */}
-              <div className="w-full max-w-lg space-y-2">
-                <p className="text-xs text-muted-foreground mb-3">추천 질문</p>
-                <div className="grid gap-2">
-                  {SUGGESTED_QUESTIONS.map((q, i) => (
-                    <button
-                      key={i}
-                      onClick={() => sendMessage(q)}
-                      disabled={isLoading || !isAuthenticated}
-                      className="text-left px-4 py-3 rounded-xl border border-border/50 bg-background/50 hover:bg-muted/50 hover:border-primary/30 transition-all text-sm group disabled:opacity-50"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
-                          {i === 0 && <BookOpen className="w-4 h-4 text-primary" />}
-                          {i === 1 && <GraduationCap className="w-4 h-4 text-primary" />}
-                          {i === 2 && <HelpCircle className="w-4 h-4 text-primary" />}
-                          {i === 3 && <CheckCircle className="w-4 h-4 text-primary" />}
-                        </div>
-                        <span>{q}</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ) : (
-            /* Messages */
-            <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
-              <div className="space-y-4">
-                <AnimatePresence mode="popLayout">
-                  {messages.map((message) => (
-                    <motion.div
-                      key={message.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
-                    >
-                      {message.role === "assistant" && (
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-korean-blue to-korean-green flex items-center justify-center shrink-0">
-                          <Bot className="w-4 h-4 text-white" />
-                        </div>
-                      )}
-                      
-                      <div className={`max-w-[80%] ${message.role === "user" ? "order-first" : ""}`}>
-                        <div className={`rounded-2xl px-4 py-3 ${
-                          message.role === "user" 
-                            ? "bg-primary text-primary-foreground rounded-br-md" 
-                            : "bg-muted/50 rounded-bl-md"
-                        }`}>
-                          {message.role === "assistant" ? (
-                            <div className="prose prose-sm dark:prose-invert max-w-none">
-                              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                {message.content || "..."}
-                              </ReactMarkdown>
-                            </div>
-                          ) : (
-                            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                          )}
-                        </div>
-                        
-                        {message.cached && (
-                          <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-                            <Zap className="w-3 h-3" />
-                            캐시된 응답
-                          </div>
-                        )}
-                      </div>
-                      
-                      {message.role === "user" && (
-                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                          <User className="w-4 h-4 text-primary" />
-                        </div>
-                      )}
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-
-                {isLoading && messages[messages.length - 1]?.role === "user" && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex gap-3"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-korean-blue to-korean-green flex items-center justify-center">
-                      <Loader2 className="w-4 h-4 text-white animate-spin" />
-                    </div>
-                    <div className="bg-muted/50 rounded-2xl rounded-bl-md px-4 py-3">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span>생각 중...</span>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </div>
-            </ScrollArea>
-          )}
-
-          {/* Input Area */}
-          <div className="p-4 border-t border-border/50">
-            {!isAuthenticated ? (
-              <div className="text-center py-4">
-                <AlertCircle className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground mb-3">로그인 후 이용 가능합니다</p>
-                <Button onClick={() => window.location.href = "/auth"} className="gap-2">
-                  로그인하기
-                </Button>
-              </div>
-            ) : (
-              <div className="flex gap-2">
-                {messages.length > 0 && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={clearChat}
-                    className="shrink-0"
-                    title="대화 초기화"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                  </Button>
-                )}
-                
-                <div className="flex-1 relative">
-                  <Textarea
-                    ref={textareaRef}
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="질문을 입력하세요..."
-                    disabled={isLoading || (remainingQuestions === 0 && !isPremium)}
-                    className="min-h-[44px] max-h-32 resize-none pr-12 rounded-xl"
-                    rows={1}
-                  />
-                  <Button
-                    size="icon"
-                    onClick={() => sendMessage()}
-                    disabled={!input.trim() || isLoading || (remainingQuestions === 0 && !isPremium)}
-                    className="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 w-8 rounded-lg"
-                  >
-                    {isLoading ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Send className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
+            {/* Premium badge */}
+            {isPremium && (
+              <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-korean-yellow/10 text-korean-yellow text-sm font-medium">
+                <Crown className="w-4 h-4" />
+                Premium - Không giới hạn câu hỏi
               </div>
             )}
+          </motion.div>
 
-            {remainingQuestions === 0 && !isPremium && isAuthenticated && (
+          {/* Agent Cards Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {AI_AGENTS.map((agent, index) => (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
+                key={agent.id}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-3 p-3 rounded-xl bg-korean-yellow/10 border border-korean-yellow/20"
+                transition={{ delay: index * 0.1 }}
               >
-                <div className="flex items-center gap-3">
-                  <Crown className="w-5 h-5 text-korean-yellow shrink-0" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">오늘 무료 질문이 모두 소진되었습니다</p>
-                    <p className="text-xs text-muted-foreground">Premium 구독으로 무제한 질문하세요</p>
-                  </div>
-                  <Button size="sm" className="bg-korean-yellow hover:bg-korean-yellow/90 text-foreground">
-                    업그레이드
-                  </Button>
-                </div>
+                <Card 
+                  className={`h-full overflow-hidden transition-all duration-300 group ${
+                    agent.available 
+                      ? "cursor-pointer hover:shadow-xl hover:border-primary/50 hover:-translate-y-1" 
+                      : "opacity-60 cursor-not-allowed"
+                  }`}
+                  onClick={() => handleAgentClick(agent)}
+                >
+                  {/* Gradient Header */}
+                  <div className={`h-2 bg-gradient-to-r ${agent.gradient}`} />
+                  
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${agent.gradient} flex items-center justify-center shadow-lg`}>
+                        <agent.icon className="w-7 h-7 text-white" />
+                      </div>
+                      
+                      {!agent.available && (
+                        <Badge variant="outline" className="text-xs gap-1">
+                          <Lock className="w-3 h-3" />
+                          Sắp ra mắt
+                        </Badge>
+                      )}
+                      
+                      {agent.available && (
+                        <Badge className="bg-korean-green/20 text-korean-green border-0 text-xs">
+                          <Zap className="w-3 h-3 mr-1" />
+                          Hoạt động
+                        </Badge>
+                      )}
+                    </div>
+
+                    <h3 className="text-xl font-bold mb-1">{agent.title}</h3>
+                    <p className="text-sm text-primary font-medium mb-3">{agent.subtitle}</p>
+                    <p className="text-muted-foreground text-sm mb-4">{agent.description}</p>
+
+                    {/* Features */}
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {agent.features.map((feature, i) => (
+                        <span 
+                          key={i}
+                          className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground"
+                        >
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* CTA Button */}
+                    <Button 
+                      className={`w-full gap-2 ${agent.available ? "" : "opacity-50"}`}
+                      disabled={!agent.available}
+                      variant={agent.available ? "default" : "outline"}
+                    >
+                      {agent.available ? (
+                        <>
+                          <MessageSquare className="w-4 h-4" />
+                          Bắt đầu trò chuyện
+                          <ArrowRight className="w-4 h-4 ml-auto group-hover:translate-x-1 transition-transform" />
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="w-4 h-4" />
+                          Sắp ra mắt
+                        </>
+                      )}
+                    </Button>
+                  </CardContent>
+                </Card>
               </motion.div>
-            )}
+            ))}
           </div>
-        </Card>
+
+          {/* Info Section */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="mt-12 text-center"
+          >
+            <Card className="max-w-2xl mx-auto bg-muted/30 border-dashed">
+              <CardContent className="p-6">
+                <Bot className="w-10 h-10 text-primary mx-auto mb-4" />
+                <h3 className="font-semibold mb-2">LUKATO RAG AI là gì? 🧠</h3>
+                <p className="text-sm text-muted-foreground">
+                  Hệ thống AI thông minh sử dụng công nghệ RAG (Retrieval-Augmented Generation) để cung cấp câu trả lời chính xác dựa trên cơ sở dữ liệu kiến thức ngôn ngữ chuyên sâu. Mỗi Agent được tối ưu hóa cho từng ngôn ngữ cụ thể! 🎯
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
       </main>
+
+      <CommonFooter />
     </div>
   );
 };
