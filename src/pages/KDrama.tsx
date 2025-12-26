@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Mic, MicOff, RotateCcw, ChevronRight, Volume2, RefreshCw, Loader2, Trophy, Youtube, Timer, Zap } from "lucide-react";
