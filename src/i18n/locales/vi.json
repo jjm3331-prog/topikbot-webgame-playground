@@ -581,6 +581,57 @@
     "gameComplete": "Hoàn thành!",
     "playAgain": "Chơi lại"
   },
+  "handwriting": {
+    "title": "Luyện viết tay",
+    "subtitle": "Luyện viết chữ Hangul",
+    "wordsLoaded": "Đã tải từ mới! 📚",
+    "sentencesLoaded": "Đã tải câu mới! 📝",
+    "aiGenerated": "AI đã tạo {{count}} nội dung mới",
+    "completed": "Hoàn thành! 🎉",
+    "averageScore": "Điểm trung bình: {{score}} điểm",
+    "completedCount": "{{count}}/3 Hoàn thành",
+    "count": "",
+    "newContent": "Nội dung mới",
+    "aiGenerating": "AI đang tạo nội dung mới...",
+    "tabs": {
+      "consonants": "Phụ âm·Nguyên âm",
+      "consonantsSub": "Phụ âm & Nguyên âm",
+      "words": "Từ vựng",
+      "wordsSub": "Từ vựng",
+      "sentences": "Câu",
+      "sentencesSub": "Câu"
+    },
+    "practice": {
+      "consonants": "Viết theo phụ âm·nguyên âm",
+      "words": "Viết theo từ vựng",
+      "sentences": "Viết theo câu",
+      "instruction": "Hãy viết trực tiếp trên canvas"
+    }
+  },
+  "aiAgent": {
+    "fileTooLarge": "File quá lớn",
+    "fileSizeLimit": "Vui lòng chọn ảnh dưới 5MB",
+    "featureDeveloping": "🎤 Tính năng đang phát triển",
+    "voiceComingSoon": "Nhập giọng nói sẽ sớm ra mắt!",
+    "pleaseLogin": "Vui lòng đăng nhập 🔐",
+    "loginToUse": "Đăng nhập để sử dụng LUKATO AI Agent",
+    "outOfQuestions": "Hết lượt hỏi miễn phí 😢",
+    "upgradePremium": "Nâng cấp Premium để hỏi không giới hạn!",
+    "systemBusy": "Hệ thống đang bận 🔄",
+    "tryAgainLater": "Vui lòng thử lại sau ít phút",
+    "cannotSend": "Không thể gửi tin nhắn",
+    "clearChat": "Xóa cuộc trò chuyện",
+    "suggestedQuestions": "Gợi ý câu hỏi:",
+    "cachedResponse": "Câu trả lời từ bộ nhớ cache",
+    "thinking": "Đang suy nghĩ...",
+    "loginPrompt": "Đăng nhập để bắt đầu trò chuyện với AI",
+    "noQuestionsLeft": "Bạn đã hết lượt hỏi miễn phí hôm nay",
+    "upgradePremiumBtn": "Nâng cấp Premium",
+    "uploadImage": "Tải ảnh lên",
+    "voiceInput": "Nhập giọng nói",
+    "placeholder": "Nhập câu hỏi của bạn... 💬",
+    "hint": "Nhấn Enter để gửi • Shift+Enter để xuống dòng"
+  },
   "footer": {
     "hanoi": "Hanoi Official",
     "qnaAgent": "Q&A Agent",

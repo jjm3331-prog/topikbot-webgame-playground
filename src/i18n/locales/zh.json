@@ -422,10 +422,28 @@
     "gameComplete": "完成！",
     "playAgain": "再玩一次"
   },
-  "footer": {
-    "hanoi": "河内官方",
-    "qnaAgent": "Q&A Agent",
-    "admin": "ADMIN",
-    "copyright": "© 2025 Powered by LUKAS Edutainment"
-  }
+  "handwriting": {
+    "title": "手写练习",
+    "subtitle": "练习韩文书写",
+    "wordsLoaded": "新单词已加载！📚",
+    "sentencesLoaded": "新句子已加载！📝",
+    "aiGenerated": "AI生成了{{count}}个新内容",
+    "completed": "完成！🎉",
+    "averageScore": "平均分：{{score}}分",
+    "completedCount": "{{count}}/3 完成",
+    "count": "个",
+    "newContent": "新内容",
+    "aiGenerating": "AI正在生成新内容...",
+    "tabs": { "consonants": "辅音·元音", "consonantsSub": "辅音 & 元音", "words": "单词", "wordsSub": "词汇", "sentences": "句子", "sentencesSub": "句子" },
+    "practice": { "consonants": "练习辅音·元音", "words": "练习单词", "sentences": "练习句子", "instruction": "在画布上直接书写" }
+  },
+  "aiAgent": {
+    "fileTooLarge": "文件太大", "fileSizeLimit": "请选择5MB以下的图片", "featureDeveloping": "🎤 功能开发中", "voiceComingSoon": "语音输入即将推出！",
+    "pleaseLogin": "请登录 🔐", "loginToUse": "登录使用LUKATO AI Agent", "outOfQuestions": "免费提问次数已用完 😢", "upgradePremium": "升级Premium无限提问！",
+    "systemBusy": "系统繁忙 🔄", "tryAgainLater": "请稍后重试", "cannotSend": "无法发送消息", "clearChat": "清除对话",
+    "suggestedQuestions": "推荐问题：", "cachedResponse": "缓存回复", "thinking": "思考中...", "loginPrompt": "登录开始与AI对话",
+    "noQuestionsLeft": "今日免费提问次数已用完", "upgradePremiumBtn": "升级Premium", "uploadImage": "上传图片", "voiceInput": "语音输入",
+    "placeholder": "输入您的问题... 💬", "hint": "按Enter发送 • Shift+Enter换行"
+  },
+  "footer": { "hanoi": "河内官方", "qnaAgent": "Q&A Agent", "admin": "ADMIN", "copyright": "© 2025 Powered by LUKAS Edutainment" }
 }
