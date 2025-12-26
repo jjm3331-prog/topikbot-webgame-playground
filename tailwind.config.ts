@@ -58,6 +58,7 @@ export default {
           teal: "hsl(var(--korean-teal))",
           cyan: "hsl(var(--korean-cyan))",
           indigo: "hsl(var(--korean-indigo))",
+          gold: "hsl(var(--korean-gold))",
         },
       },
       fontFamily: {

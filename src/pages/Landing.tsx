@@ -416,36 +416,101 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* ========== WHY DIFFERENT - COMPACT ========== */}
-      <section id="why-different" className="py-10 sm:py-16 px-4 sm:px-6 bg-muted/30">
-        <div className="max-w-5xl mx-auto">
+      {/* ========== WHY DIFFERENT - PREMIUM ========== */}
+      <section id="why-different" className="py-16 sm:py-24 px-4 sm:px-6 relative overflow-hidden">
+        {/* Background effects */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-primary/5 via-transparent to-transparent rounded-full blur-3xl" />
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-radial from-korean-purple/10 via-transparent to-transparent rounded-full blur-2xl" />
+          <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-gradient-radial from-korean-blue/10 via-transparent to-transparent rounded-full blur-2xl" />
+        </div>
+
+        <div className="max-w-5xl mx-auto relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-8 sm:mb-10"
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12 sm:mb-16"
           >
-            <h2 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl text-foreground">
-              {t("landing.why.title")}
-            </h2>
+            {/* Premium animated title */}
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="inline-block"
+            >
+              <h2 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl relative">
+                <span className="bg-gradient-to-r from-korean-gold via-korean-yellow to-korean-orange bg-clip-text text-transparent drop-shadow-lg">
+                  왜 LUKATO가
+                </span>
+                <br className="sm:hidden" />
+                <span className="bg-gradient-to-r from-primary via-korean-purple to-korean-pink bg-clip-text text-transparent">
+                  {" "}최고인가요?
+                </span>
+                {/* Decorative underline */}
+                <motion.div 
+                  initial={{ scaleX: 0 }}
+                  whileInView={{ scaleX: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.5 }}
+                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-32 sm:w-48 h-1 bg-gradient-to-r from-korean-gold via-primary to-korean-purple rounded-full origin-center"
+                />
+              </h2>
+            </motion.div>
+            
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.6 }}
+              className="text-muted-foreground text-sm sm:text-base mt-6 max-w-lg mx-auto"
+            >
+              다른 앱들과는 차원이 다릅니다
+            </motion.p>
           </motion.div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {keyDifferentiators.map((item, i) => (
               <motion.div
                 key={item.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 40, rotateX: -15 }}
+                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-                whileHover={{ y: -4 }}
-                className="premium-card p-4 sm:p-5 text-center group cursor-pointer"
+                transition={{ delay: i * 0.1, duration: 0.5, type: "spring", stiffness: 100 }}
+                whileHover={{ 
+                  y: -8, 
+                  scale: 1.02,
+                  transition: { duration: 0.2 }
+                }}
+                className="group relative"
               >
-                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform`}>
-                  <item.icon className="w-6 h-6 sm:w-7 sm:h-7 text-primary-foreground" />
+                {/* Glow effect on hover */}
+                <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500`} />
+                
+                <div className="relative bg-card/80 backdrop-blur-sm border border-border/50 rounded-2xl p-5 sm:p-6 text-center overflow-hidden group-hover:border-primary/30 transition-all duration-300 h-full">
+                  {/* Shine effect */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                  </div>
+                  
+                  {/* Icon with enhanced styling */}
+                  <motion.div 
+                    whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
+                    transition={{ duration: 0.4 }}
+                    className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/20 group-hover:shadow-xl group-hover:shadow-primary/30 transition-shadow duration-300`}
+                  >
+                    <item.icon className="w-7 h-7 sm:w-8 sm:h-8 text-primary-foreground" />
+                  </motion.div>
+                  
+                  <h3 className="font-bold text-sm sm:text-base text-foreground mb-2 group-hover:text-primary transition-colors duration-300">
+                    {item.title}
+                  </h3>
+                  <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed whitespace-pre-line group-hover:text-foreground/80 transition-colors duration-300">
+                    {item.desc}
+                  </p>
                 </div>
-                <h3 className="font-bold text-sm sm:text-base text-foreground mb-1">{item.title}</h3>
-                <p className="text-muted-foreground text-xs sm:text-sm leading-snug whitespace-pre-line">{item.desc}</p>
               </motion.div>
             ))}
           </div>

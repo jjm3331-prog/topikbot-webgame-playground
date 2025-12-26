@@ -59,6 +59,7 @@
     --korean-teal: 172 66% 40%;
     --korean-cyan: 187 85% 53%;
     --korean-indigo: 239 84% 67%;
+    --korean-gold: 43 96% 56%;
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(4 90% 58%), hsl(24 95% 53%));
@@ -167,6 +168,7 @@
     --korean-teal: 172 66% 50%;
     --korean-cyan: 187 85% 58%;
     --korean-indigo: 239 84% 72%;
+    --korean-gold: 43 96% 62%;
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(4 90% 62%), hsl(24 95% 58%));
