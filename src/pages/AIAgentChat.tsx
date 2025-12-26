@@ -333,10 +333,10 @@ const AIAgentChat = () => {
       <CleanHeader />
       
       <main className="flex-1 flex flex-col pt-16">
-        {/* Chat Header */}
+        {/* Chat Header - Simple without logo */}
         <div className="border-b border-border/50 bg-background/80 backdrop-blur sticky top-16 z-10">
-          <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
+          <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -346,36 +346,11 @@ const AIAgentChat = () => {
                 <ArrowLeft className="w-5 h-5" />
               </Button>
               
-              <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-primary/20">
-                <img src={lukasLogo} alt="LUKATO AI" className="w-full h-full object-cover" />
-              </div>
-              
-              <div>
-                <h1 className="font-bold flex items-center gap-2">
-                  LUKATO AI Agent
-                  <Badge variant="secondary" className="text-xs bg-korean-green/20 text-korean-green border-0">
-                    TOPIK
-                  </Badge>
+              <div className="text-center flex-1">
+                <h1 className="text-2xl md:text-3xl font-black tracking-tight">
+                  {agentId?.toUpperCase()} Agent
                 </h1>
-                <p className="text-xs text-muted-foreground">Chuyên gia tư vấn tiếng Hàn & TOPIK 🇰🇷</p>
               </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              {/* Usage indicator */}
-              {isAuthenticated && !isPremium && remainingQuestions !== null && (
-                <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted text-sm">
-                  <Zap className="w-4 h-4 text-korean-yellow" />
-                  <span className="text-xs">{remainingQuestions}/30</span>
-                </div>
-              )}
-              
-              {isPremium && (
-                <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-korean-yellow/10 text-korean-yellow text-xs">
-                  <Crown className="w-4 h-4" />
-                  <span>Premium</span>
-                </div>
-              )}
 
               {messages.length > 0 && (
                 <Button
