@@ -68,15 +68,14 @@ export const LEVEL_THRESHOLDS = {
 };
 
 export const FREE_LIMITS = {
-  AI_QUESTIONS_PER_DAY: 30,
-  SAVED_VOCABULARY: 50,
+  AI_QUESTIONS_PER_DAY: 10,
 };
 
 export const PREMIUM_FEATURES = [
-  { id: "unlimited_ai", name: "AI không giới hạn", nameKo: "AI 무제한" },
-  { id: "writing_correction", name: "Chấm bài viết", nameKo: "Writing 첨삭" },
-  { id: "progress_analysis", name: "Tiến độ học tập AI", nameKo: "학습진도 분석" },
-  { id: "mistake_analysis", name: "Sổ lỗi sai AI phân tích", nameKo: "오답노트 AI분석" },
+  { id: "unlimited_ai", nameKo: "AI 질문 무제한" },
+  { id: "writing_correction", nameKo: "작문 첨삭" },
+  { id: "progress_analysis", nameKo: "학습진도 AI" },
+  { id: "mistake_analysis", nameKo: "오답노트 AI 분석" },
 ];
 
 /**
