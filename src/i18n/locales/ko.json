@@ -654,18 +654,39 @@
       "sttSuccess": "음성이 텍스트로 변환되었습니다.",
       "sttFailed": "음성 인식에 실패했습니다.",
       "recording": "녹음 중...",
-      "micDenied": "마이크 접근 권한이 필요합니다."
+      "micDenied": "마이크 접근 권한이 필요합니다.",
+      "sendFailed": "메시지 전송에 실패했습니다. 다시 시도해주세요."
     }
   },
   "writingPage": {
     "header": { "title": "TOPIK II 쓰기(51~54) 첨삭", "subtitle": "AI가 점수와 피드백을 상세하게 제공합니다", "history": "이력" },
-    "notice": { "title": "중요 안내" },
+    "notice": { "title": "중요 안내", "handwritingWarning": "한국어 손글씨는 인식이 어려워 결과에 영향을 줄 수 있습니다. 가장 정확한 결과를 위해 텍스트 입력 방식을 권장합니다." },
     "steps": { "question": "원문 문제 업로드", "answer": "내 답안" },
     "answerMode": { "text": "텍스트 입력", "image": "이미지 업로드" },
     "placeholders": { "answerText": "여기에 답안을 붙여넣거나 입력하세요..." },
     "tip": { "copyPaste": "팁: 워드/메모장 내용을 복사해 붙여넣으면 더 정확해요." },
     "actions": { "grading": "채점 중...", "grade": "AI 채점하기", "freeGrade": "🎁 무료 채점(하루 1회)", "upgradeToGrade": "프리미엄으로 업그레이드하고 채점하기" },
-    "pdf": { "generatingTitle": "PDF 생성 중...", "generatingDesc": "잠시만 기다려주세요", "failedTitle": "PDF 생성 실패", "failedDesc": "다시 시도해주세요" }
+    "pdf": { "generatingTitle": "PDF 생성 중...", "generatingDesc": "잠시만 기다려주세요", "failedTitle": "PDF 생성 실패", "failedDesc": "다시 시도해주세요", "downloadComplete": "PDF 다운로드 완료!", "fileDownloaded": "파일이 다운로드되었습니다" },
+    "featureName": "AI 작문 첨삭",
+    "freeUsage": {
+      "availableNow": "지금 사용 가능",
+      "hasFreeTry": "오늘 1회 무료 첨삭이 가능합니다!",
+      "freeOnceDaily": "매일 1회 무료 사용 가능합니다. 무제한 이용은 프리미엄으로 업그레이드하세요.",
+      "usedToday": "오늘 무료 사용을 완료했습니다",
+      "nextFreeAt": "다음 무료 사용: {{time}}. 무제한 이용은 프리미엄으로 업그레이드하세요.",
+      "nextFreeSimple": "다음 무료 사용: {{time}}"
+    },
+    "buttons": {
+      "addImage": "이미지 추가",
+      "deleteAll": "전체 삭제",
+      "uploadImage": "이미지 업로드",
+      "takePhoto": "사진 촬영"
+    },
+    "upload": {
+      "maxQuestionImages": "최대 {{max}}장의 문제 이미지",
+      "maxAnswerImages": "최대 {{max}}장의 답안 이미지",
+      "multipleSupport": "여러 이미지 동시 업로드 지원"
+    }
   },
   "interview": {
     "title": "면접 시뮬레이션",

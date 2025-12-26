@@ -190,7 +190,7 @@ export default function RoleplaySpeaking() {
 
     } catch (error: any) {
       console.error("Send message error:", error);
-      toast.error(error.message || "Lỗi gửi tin nhắn");
+      toast.error(error.message || t("roleplay.toast.sendFailed"));
       // Remove user message on error
       setMessages(prev => prev.filter(m => m.id !== userMessage.id));
     } finally {

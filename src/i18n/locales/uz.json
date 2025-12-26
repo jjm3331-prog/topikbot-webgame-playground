@@ -465,17 +465,37 @@
     "tips": { "title": "Ko'rsatmalar", "step1": "Tasodifiy vaziyat olish uchun 'Roleplay boshlash'ni bosing", "step2": "Koreys tilida javob bering (matn yoki ovoz)", "step3": "AI tuzatishlari va grammatika izohlarini ko'ring", "step4": "Suhbatdan TOPIK test yarating", "tipLabel": "Maslahat:", "tipText": "Nima deyishni bilmasangiz tavsiyalardan foydalaning." },
     "stats": { "title": "Bu raund", "spoken": "Aytilgan", "correct": "To'g'ri" },
     "quiz": { "progress": "{{current}}/{{total}}", "yourScore": "Sizning balingiz", "correctAnswer": "To'g'ri javob: {{answer}}" },
-    "toast": { "started": "Yangi vaziyat boshlandi.", "startFailed": "Boshlab bo'lmadi. Qayta urinib ko'ring.", "needConversation": "Test yaratish uchun kamida bitta suhbat kerak.", "quizCreated": "Test yaratildi.", "quizFailed": "Test yaratib bo'lmadi.", "audioFailed": "Audio ijro etib bo'lmadi.", "sttSuccess": "Ovoz aniqlandi.", "sttFailed": "Ovoz aniqlash xatosi.", "recording": "Yozish...", "micDenied": "Mikrofon ruxsati kerak." }
+    "toast": { "started": "Yangi vaziyat boshlandi.", "startFailed": "Boshlab bo'lmadi. Qayta urinib ko'ring.", "needConversation": "Test yaratish uchun kamida bitta suhbat kerak.", "quizCreated": "Test yaratildi.", "quizFailed": "Test yaratib bo'lmadi.", "audioFailed": "Audio ijro etib bo'lmadi.", "sttSuccess": "Ovoz aniqlandi.", "sttFailed": "Ovoz aniqlash xatosi.", "recording": "Yozish...", "micDenied": "Mikrofon ruxsati kerak.", "sendFailed": "Xabar yuborib bo'lmadi. Qayta urinib ko'ring." }
   },
   "writingPage": {
     "header": { "title": "TOPIK II Yozuv (51–54) tekshiruvi", "subtitle": "AI ball qo'yadi va batafsil fikr bildiradi", "history": "Tarix" },
-    "notice": { "title": "Muhim eslatma" },
+    "notice": { "title": "Muhim eslatma", "handwritingWarning": "Qo'l yozuvi koreys tilini aniqlash qiyin bo'lishi mumkin va natijaga ta'sir qilishi mumkin. Eng aniq natija uchun matn kiritishni tavsiya qilamiz." },
     "steps": { "question": "Topshiriqni yuklang", "answer": "Sizning javobingiz" },
     "answerMode": { "text": "Matn", "image": "Rasmlar" },
     "placeholders": { "answerText": "Javobingizni bu yerga qo'ying yoki yozing..." },
     "tip": { "copyPaste": "Maslahat: Aniqlikni oshirish uchun Word yoki eslatmalardan nusxa oling." },
     "actions": { "grading": "Tekshirilmoqda...", "grade": "AI bilan tekshirish", "freeGrade": "🎁 Bepul tekshirish (1/kun)", "upgradeToGrade": "Premium ga yangilang" },
-    "pdf": { "generatingTitle": "PDF yaratilmoqda...", "generatingDesc": "Iltimos kuting", "failedTitle": "PDF xatosi", "failedDesc": "Qayta urinib ko'ring" }
+    "pdf": { "generatingTitle": "PDF yaratilmoqda...", "generatingDesc": "Iltimos kuting", "failedTitle": "PDF xatosi", "failedDesc": "Qayta urinib ko'ring", "downloadComplete": "PDF yuklab olindi!", "fileDownloaded": "Fayl yuklab olindi" },
+    "featureName": "AI Yozuv tekshiruvi",
+    "freeUsage": {
+      "availableNow": "Hozir foydalanish mumkin",
+      "hasFreeTry": "Bugun 1 ta bepul tekshirish imkoniyatingiz bor!",
+      "freeOnceDaily": "Kuniga 1 marta bepul foydalanish mumkin. Cheksiz foydalanish uchun Premium ga yangilang.",
+      "usedToday": "Bugungi bepul foydalanish tugadi",
+      "nextFreeAt": "Keyingi bepul foydalanish: {{time}}. Cheksiz foydalanish uchun Premium ga yangilang.",
+      "nextFreeSimple": "Keyingi bepul foydalanish: {{time}}"
+    },
+    "buttons": {
+      "addImage": "Rasm qo'shish",
+      "deleteAll": "Hammasini o'chirish",
+      "uploadImage": "Rasm yuklash",
+      "takePhoto": "Suratga olish"
+    },
+    "upload": {
+      "maxQuestionImages": "Maksimum {{max}} ta savol rasmi",
+      "maxAnswerImages": "Maksimum {{max}} ta javob rasmi",
+      "multipleSupport": "Bir nechta rasm yuklash qo'llab-quvvatlanadi"
+    }
   },
   "interview": {
     "title": "Intervyu simulyatsiyasi", "description": "Koreya kompaniyalari intervyu mashqi",
