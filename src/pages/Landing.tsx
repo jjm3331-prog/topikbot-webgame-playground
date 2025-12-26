@@ -277,7 +277,7 @@ const Landing = () => {
       </motion.section>
 
 
-      <section id="universities" className="py-10 sm:py-16 px-4 sm:px-6 bg-muted/30 overflow-hidden">
+      <section id="universities" className="py-16 sm:py-20 px-4 sm:px-6 bg-muted/30 overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -326,7 +326,7 @@ const Landing = () => {
       </section>
 
       {/* ========== STATS SECTION WITH ANIMATED COUNTERS ========== */}
-      <section className="py-10 sm:py-16 px-4 sm:px-6">
+      <section className="py-16 sm:py-20 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
             <motion.div
@@ -417,7 +417,7 @@ const Landing = () => {
       </section>
 
       {/* ========== WHY DIFFERENT - PREMIUM ========== */}
-      <section id="why-different" className="py-16 sm:py-24 px-4 sm:px-6 relative overflow-hidden">
+      <section id="why-different" className="py-16 sm:py-20 px-4 sm:px-6 relative overflow-hidden">
         {/* Background effects */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-primary/5 via-transparent to-transparent rounded-full blur-3xl" />
@@ -510,7 +510,7 @@ const Landing = () => {
       </section>
 
       {/* ========== COMPARISON - COMPACT ========== */}
-      <section className="py-10 sm:py-16 px-4 sm:px-6">
+      <section className="py-16 sm:py-20 px-4 sm:px-6">
         <div className="max-w-2xl mx-auto">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -556,7 +556,7 @@ const Landing = () => {
       </section>
 
       {/* ========== CHALLENGE SECTION - 프리미엄 도발적 자신감 ========== */}
-      <section className="py-16 sm:py-24 px-4 sm:px-6 relative overflow-hidden bg-gradient-to-b from-background via-muted/20 to-background">
+      <section className="py-16 sm:py-20 px-4 sm:px-6 relative overflow-hidden bg-gradient-to-b from-background via-muted/20 to-background">
         {/* Premium background effects */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-gradient-radial from-korean-gold/10 via-transparent to-transparent rounded-full blur-3xl" />
@@ -668,7 +668,7 @@ const Landing = () => {
 
 
       {/* ========== HEADHUNTING PROMO BANNER ========== */}
-      <section className="py-12 sm:py-16 px-4 sm:px-6">
+      <section className="py-16 sm:py-20 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -735,7 +735,7 @@ const Landing = () => {
       </section>
 
       {/* ========== FEATURES - 4 SKILLS ========== */}
-      <section id="features" className="py-12 sm:py-16 px-4 sm:px-6 bg-muted/30">
+      <section id="features" className="py-16 sm:py-20 px-4 sm:px-6 bg-muted/30">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -777,7 +777,7 @@ const Landing = () => {
       </section>
 
       {/* ========== GAMES - COMPACT ========== */}
-      <section id="games" className="py-10 sm:py-16 px-4 sm:px-6">
+      <section id="games" className="py-16 sm:py-20 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -824,7 +824,7 @@ const Landing = () => {
       <TestimonialsSection t={t} />
 
       {/* ========== PRICING - COMPACT ========== */}
-      <section id="pricing" className="py-10 sm:py-16 px-4 sm:px-6">
+      <section id="pricing" className="py-16 sm:py-20 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -880,7 +880,7 @@ const Landing = () => {
       </section>
 
       {/* ========== FINAL CTA ========== */}
-      <section className="py-12 sm:py-20 px-4 sm:px-6 bg-muted/30">
+      <section className="py-16 sm:py-20 px-4 sm:px-6 bg-muted/30">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
