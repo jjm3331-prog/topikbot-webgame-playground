@@ -1,0 +1,82 @@
+{
+  "common": {
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "menu": "メニュー",
+    "profile": "プロフィール",
+    "settings": "設定",
+    "premium": "プレミアム",
+    "startFree": "無料で始める",
+    "noCardRequired": "クレジットカード不要 • 30秒で開始",
+    "close": "閉じる",
+    "back": "戻る",
+    "next": "次へ",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "confirm": "確認",
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "success": "成功"
+  },
+  "brand": {
+    "name": "LUKATO AI",
+    "tagline": "Your Korean Mentor",
+    "badge": "ベトナム初の韓国語学習ゲーム"
+  },
+  "index": {
+    "badge": "ベトナム初の韓国語学習ゲーム",
+    "title1": "韓国語を",
+    "title2": "マスター",
+    "title3": "&",
+    "title4": "文化を学ぶ",
+    "description": "より速く、よりスマートに。AIがあなたの弱点を正確に分析し、あなただけの勝利へのロードマップを作成します。",
+    "winningRoadmap": "勝利へのロードマップ",
+    "ctaButton": "無料で始める"
+  },
+  "header": {
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "logoutSuccess": "ログアウトしました",
+    "logoutMessage": "また会いましょう！",
+    "menu": "メニュー"
+  },
+  "menu": {
+    "title": "メニュー",
+    "logout": "ログアウト",
+    "categories": {
+      "jobs": "就職",
+      "topik": "TOPIK学習",
+      "game": "ゲーム",
+      "ai": "AI",
+      "my": "マイページ"
+    },
+    "items": {
+      "headhunting": "ヘッドハンティング",
+      "companyReport": "企業レポート",
+      "interviewSimulation": "面接シミュレーション",
+      "learningHub": "TOPIK学習センター",
+      "community": "コミュニティ",
+      "gameHub": "ゲームセンター",
+      "battle": "⚔️ 1対1バトル",
+      "qnaAgent": "Q&Aエージェント",
+      "questionVariant": "問題バリエーション",
+      "writingCorrection": "作文添削",
+      "roleplaySpeaking": "ロールプレイスピーキング",
+      "profile": "プロフィール",
+      "ranking": "ランキング",
+      "pricing": "料金",
+      "helpCenter": "ヘルプセンター",
+      "terms": "利用規約",
+      "privacy": "プライバシー"
+    }
+  },
+  "toast": {
+    "premiumFeature": "プレミアム機能",
+    "premiumDescription": "ページは閲覧できますが、全機能を利用するにはプレミアムにアップグレードしてください。",
+    "upgrade": "アップグレード"
+  },
+  "language": {
+    "select": "言語を選択",
+    "current": "現在の言語"
+  }
+}
