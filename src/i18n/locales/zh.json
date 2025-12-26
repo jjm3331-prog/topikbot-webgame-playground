@@ -311,7 +311,7 @@
     "speedQuiz": "速度测验",
     "dictation": "听写对战",
     "comingSoon": "即将推出！",
-    "developing": "此功能正在开发中。",
+    "developing": "答错将获得1次警告",
     "loginRequired": "请登录",
     "loginDesc": "您需要登录才能与他人进行1:1对战。",
     "roomNotExists": "房间不存在",
