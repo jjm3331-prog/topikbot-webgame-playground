@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { 
@@ -37,6 +38,7 @@ interface QuizQuestion {
 }
 
 const Quiz = () => {
+  const { t } = useTranslation();
   const [question, setQuestion] = useState<QuizQuestion | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);

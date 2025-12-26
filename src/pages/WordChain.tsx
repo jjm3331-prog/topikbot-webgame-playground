@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,7 @@ interface WordEntry {
 }
 
 const WordChain = () => {
+  const { t } = useTranslation();
   const [words, setWords] = useState<WordEntry[]>([]);
   const [inputWord, setInputWord] = useState("");
   const [isLoading, setIsLoading] = useState(false);

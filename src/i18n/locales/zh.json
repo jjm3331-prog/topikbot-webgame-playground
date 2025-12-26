@@ -717,5 +717,39 @@
     "tips": "提示",
     "forbidden": "禁止"
   },
+  "parttime": {
+    "title": "打工",
+    "statsTitle": "打工",
+    "turn": "回合",
+    "selectJob": "你想在哪里工作？",
+    "selectDifficulty": "选择难度",
+    "jobs": { "convenience_store": "便利店", "cafe": "咖啡馆", "restaurant": "餐厅", "pc_bang": "网吧", "bookstore": "书店" },
+    "difficulty": { "easy": "简单", "easyDesc": "慢节奏，基础情况", "medium": "中等", "mediumDesc": "正常速度，多样请求", "hard": "困难", "hardDesc": "难缠顾客，投诉" },
+    "back": "返回", "customerType": "顾客类型", "situation": "情况", "customer": "顾客",
+    "showHint": "显示提示", "hideHint": "隐藏提示", "hint": "提示", "respond": "回应", "placeholder": "回应顾客...",
+    "errorTitle": "发生错误", "errorDesc": "加载场景失败。", "evalError": "评估错误", "evalErrorDesc": "评估回应失败。",
+    "score": "分", "customerReaction": "顾客反应", "feedback": "反馈", "betterResponse": "更好的回应", "languageCorrection": "语言纠正",
+    "viewResult": "查看结果", "nextCustomer": "下一位顾客", "workDone": "下班了！", "todayIncome": "今日收入",
+    "restart": "重新开始", "backToDashboard": "返回主页", "loading": "顾客来了..."
+  },
+  "wordChain": {
+    "title": "接龙", "score": "分", "seconds": "秒", "nextChar": "下一个字", "anyWord": "任意词！", "me": "我",
+    "reward": "获得奖励！", "timeout": "时间到！", "timeoutDesc": "15秒内未输入单词！", "defeat": "失败！", "victory": "胜利！",
+    "aiLost": "AI找不到单词！", "error": "发生错误", "tryAgain": "请重试", "startWith": "开头...", "firstWord": "输入第一个词...",
+    "again": "再来", "backToDashboard": "返回主页", "koreanNounOnly": "仅韩语名词"
+  },
+  "kpop": {
+    "title": "K-POP MV测验", "complete": "游戏完成！", "score": "分", "backToDashboard": "返回主页", "playAgain": "再玩一次",
+    "loadFailed": "加载失败", "timer": "计时器", "all": "全部", "easy": "简单", "medium": "中等", "hard": "困难",
+    "timeout": "时间到！", "answer": "答案", "correct": "正确！", "wrong": "错误！", "hint": "提示", "submit": "提交",
+    "blankAnswer": "输入答案...", "next": "下一题", "viewResult": "查看结果", "highlightPlaying": "正在播放答案片段！"
+  },
+  "quiz": {
+    "title": "成语测验", "easy": "简单", "medium": "中等", "hard": "困难", "loading": "生成中...", "questionMeaning": "这是什么意思？",
+    "hintHalf": "提示（½分）", "noHint": "无提示", "explanation": "解释", "example": "例句", "next": "下一题",
+    "questions": "题", "accuracy": "正确率", "streak": "连胜", "correct": "正确！", "wrong": "错误！", "nextTime": "再试一次！",
+    "hintUsed": "提示！", "halfScore": "减半分", "error": "错误",
+    "types": { "idiom": "惯用语", "proverb": "谚语", "slang": "俗语", "internet": "网络用语" }
+  },
   "footer": { "hanoi": "河内官方", "qnaAgent": "Q&A Agent", "admin": "ADMIN", "copyright": "© 2025 Powered by LUKAS Edutainment" }
 }
