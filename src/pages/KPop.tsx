@@ -76,7 +76,7 @@ const KPop = () => {
         .eq('id', session.user.id);
       
       setScoreSaved(true);
-      toast.success(`💰 +${finalScore}점, ₩${moneyEarned.toLocaleString()} 획득!`);
+      toast.success(`💰 +${finalScore}${t('kpop.score')}, ₩${moneyEarned.toLocaleString()}`);
     }
   };
 
@@ -118,7 +118,7 @@ const KPop = () => {
       setTimeLeft(TIMER_DURATION);
       setVideoKey(prev => prev + 1);
     } catch (error) {
-      toast.error('로딩 실패');
+      toast.error(t('kpop.loadFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -144,7 +144,7 @@ const KPop = () => {
     setIsAnswered(true);
     setStreak(0);
     if (currentQuestion) setUsedIds(prev => [...prev, currentQuestion.id]);
-    toast.error(`⏰ 시간 초과! 정답: ${currentQuestion?.answer}`);
+    toast.error(`⏰ ${t('kpop.timeout')} ${t('kpop.answer')}: ${currentQuestion?.answer}`);
   }, [currentQuestion]);
 
   useEffect(() => {
@@ -165,12 +165,12 @@ const KPop = () => {
       const points = Math.floor((currentQuestion.points + timerBonus) * (showHint ? 0.5 : 1));
       setScore(prev => prev + points);
       setStreak(prev => prev + 1);
-      toast.success(`정답! +${points}점 🎉`);
+      toast.success(`${t('kpop.correct')} +${points}${t('kpop.score')} 🎉`);
       // Replay video highlight
       setVideoKey(prev => prev + 1);
     } else {
       setStreak(0);
-      toast.error(`오답! 정답: ${currentQuestion.answer}`);
+      toast.error(`${t('kpop.wrong')} ${t('kpop.answer')}: ${currentQuestion.answer}`);
     }
   };
 
@@ -211,13 +211,13 @@ const KPop = () => {
         <div className="flex-1 flex items-center justify-center p-4">
           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="bg-black/60 backdrop-blur-xl rounded-3xl p-8 text-center max-w-md w-full border border-pink-500/30">
             <Trophy className="w-20 h-20 text-yellow-400 mx-auto mb-4" />
-            <h2 className="text-3xl font-bold text-white mb-2">게임 완료! 🎉</h2>
+            <h2 className="text-3xl font-bold text-white mb-2">{t('kpop.complete')} 🎉</h2>
             <div className="bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-xl p-6 mb-6">
-              <p className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400">{score}점</p>
+              <p className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400">{score}{t('kpop.score')}</p>
             </div>
             <div className="flex gap-3">
-              <Button onClick={() => navigate('/dashboard')} variant="outline" className="flex-1 border-gray-600"><ArrowLeft className="w-4 h-4 mr-2" />대시보드로 / Về Dashboard</Button>
-              <Button onClick={() => { setScore(0); setStreak(0); setScoreSaved(false); setGameComplete(false); loadQuestions(difficulty); }} className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500"><RotateCcw className="w-4 h-4 mr-2" />다시하기 / Chơi lại</Button>
+              <Button onClick={() => navigate('/dashboard')} variant="outline" className="flex-1 border-gray-600"><ArrowLeft className="w-4 h-4 mr-2" />{t('kpop.backToDashboard')}</Button>
+              <Button onClick={() => { setScore(0); setStreak(0); setScoreSaved(false); setGameComplete(false); loadQuestions(difficulty); }} className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500"><RotateCcw className="w-4 h-4 mr-2" />{t('kpop.playAgain')}</Button>
             </div>
           </motion.div>
         </div>
@@ -232,7 +232,7 @@ const KPop = () => {
       
       {/* Stats Bar */}
       <div className="px-4 py-3 flex items-center justify-between border-b border-pink-500/20 bg-black/40 backdrop-blur-xl">
-        <div className="flex items-center gap-2"><Music className="w-5 h-5 text-pink-400" /><span className="text-white font-bold">K-POP MV 퀴즈</span></div>
+        <div className="flex items-center gap-2"><Music className="w-5 h-5 text-pink-400" /><span className="text-white font-bold">{t('kpop.title')}</span></div>
         <div className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-yellow-400" /><span className="text-yellow-400 font-bold">{score}</span></div>
       </div>
       
@@ -249,7 +249,7 @@ const KPop = () => {
 
         <div className="flex items-center justify-between mb-3">
           <button onClick={() => setTimerMode(!timerMode)} className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${timerMode ? 'bg-cyan-500 text-white' : 'bg-white/10 text-gray-300'}`}>
-            <Zap className="w-3 h-3" /> 타이머 {timerMode ? 'ON' : 'OFF'}
+            <Zap className="w-3 h-3" /> {t('kpop.timer')} {timerMode ? 'ON' : 'OFF'}
           </button>
           {timerMode && !isAnswered && (
             <div className={`flex items-center gap-1 px-3 py-1.5 rounded-full bg-black/50 ${timeLeft <= 5 ? 'text-red-400 animate-pulse' : timeLeft <= 10 ? 'text-yellow-400' : 'text-green-400'}`}>
@@ -259,10 +259,10 @@ const KPop = () => {
         </div>
 
         <div className="flex gap-1.5 mb-4">
-          {[null, '쉬움', '보통', '어려움'].map((d) => (
+          {[null, 'easy', 'medium', 'hard'].map((d) => (
             <button key={d || 'all'} onClick={() => { setDifficulty(d); setScore(0); setStreak(0); setUsedIds([]); loadQuestions(d); }}
-              className={`flex-1 py-1.5 rounded-lg text-xs font-medium ${difficulty === d ? (d === '쉬움' ? 'bg-green-500 text-white' : d === '보통' ? 'bg-yellow-500 text-black' : d === '어려움' ? 'bg-red-500 text-white' : 'bg-purple-500 text-white') : 'bg-white/10 text-gray-300'}`}>
-              {d || '전체'}
+              className={`flex-1 py-1.5 rounded-lg text-xs font-medium ${difficulty === d ? (d === 'easy' ? 'bg-green-500 text-white' : d === 'medium' ? 'bg-yellow-500 text-black' : d === 'hard' ? 'bg-red-500 text-white' : 'bg-purple-500 text-white') : 'bg-white/10 text-gray-300'}`}>
+              {d === null ? t('kpop.all') : d === 'easy' ? t('kpop.easy') : d === 'medium' ? t('kpop.medium') : t('kpop.hard')}
             </button>
           ))}
         </div>
@@ -283,7 +283,7 @@ const KPop = () => {
               />
               {isAnswered && isCorrect && (
                 <motion.div initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} className="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                  🎵 정답 하이라이트 재생중!
+                  🎵 {t('kpop.highlightPlaying')}
                 </motion.div>
               )}
               <button onClick={() => window.open(`https://youtube.com/watch?v=${currentQuestion.youtubeId}&t=${currentQuestion.timestamp}`, '_blank')} className="absolute bottom-3 right-3 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5">
@@ -295,7 +295,7 @@ const KPop = () => {
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-11 h-11 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-xl">🎤</div>
                 <div><h3 className="text-white font-bold">{currentQuestion.artist}</h3><p className="text-pink-400 text-sm">"{currentQuestion.song}"</p></div>
-                <span className={`ml-auto px-3 py-1 rounded-full text-xs font-medium ${currentQuestion.difficulty === '쉬움' ? 'bg-green-500/20 text-green-400' : currentQuestion.difficulty === '보통' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'}`}>{currentQuestion.points}점</span>
+                <span className={`ml-auto px-3 py-1 rounded-full text-xs font-medium ${currentQuestion.difficulty === 'easy' ? 'bg-green-500/20 text-green-400' : currentQuestion.difficulty === 'medium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'}`}>{currentQuestion.points}{t('kpop.score')}</span>
               </div>
 
               <div className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 rounded-xl p-4 mb-4">
@@ -313,8 +313,8 @@ const KPop = () => {
                   <div className="flex items-center gap-3">
                     {isCorrect ? <Check className="w-6 h-6 text-green-400" /> : <X className="w-6 h-6 text-red-400" />}
                     <div>
-                      <p className={`font-bold ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>{isCorrect ? '정답! 🎉' : '오답!'}</p>
-                      {!isCorrect && <p className="text-gray-300 text-sm">정답: <span className="text-pink-400 font-bold">{currentQuestion.answer}</span></p>}
+                      <p className={`font-bold ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>{isCorrect ? `${t('kpop.correct')} 🎉` : `${t('kpop.wrong')}!`}</p>
+                      {!isCorrect && <p className="text-gray-300 text-sm">{t('kpop.answer')}: <span className="text-pink-400 font-bold">{currentQuestion.answer}</span></p>}
                     </div>
                   </div>
                 </motion.div>
@@ -322,14 +322,14 @@ const KPop = () => {
 
               {!isAnswered ? (
                 <div className="space-y-3">
-                  <Input ref={inputRef} value={userAnswer} onChange={(e) => setUserAnswer(e.target.value)} onKeyPress={handleKeyPress} placeholder="빈칸 정답 입력..." className="bg-white/10 border-pink-500/30 text-white text-center text-lg py-5" />
+                  <Input ref={inputRef} value={userAnswer} onChange={(e) => setUserAnswer(e.target.value)} onKeyPress={handleKeyPress} placeholder={t('kpop.blankAnswer')} className="bg-white/10 border-pink-500/30 text-white text-center text-lg py-5" />
                   <div className="flex gap-2">
-                    {!showHint && <Button onClick={() => setShowHint(true)} variant="outline" size="sm" className="flex-1 border-yellow-500/50 text-yellow-400"><Lightbulb className="w-4 h-4 mr-1" />힌트</Button>}
-                    <Button onClick={handleSubmit} disabled={!userAnswer.trim()} className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500">제출</Button>
+                    {!showHint && <Button onClick={() => setShowHint(true)} variant="outline" size="sm" className="flex-1 border-yellow-500/50 text-yellow-400"><Lightbulb className="w-4 h-4 mr-1" />{t('kpop.hint')}</Button>}
+                    <Button onClick={handleSubmit} disabled={!userAnswer.trim()} className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500">{t('kpop.submit')}</Button>
                   </div>
                 </div>
               ) : (
-                <Button onClick={handleNext} className="w-full bg-gradient-to-r from-cyan-500 to-blue-500">{currentIndex < questions.length - 1 ? '다음 문제 →' : '결과 보기 🏆'}</Button>
+                <Button onClick={handleNext} className="w-full bg-gradient-to-r from-cyan-500 to-blue-500">{currentIndex < questions.length - 1 ? `${t('kpop.next')} →` : `${t('kpop.viewResult')} 🏆`}</Button>
               )}
             </div>
           </motion.div>
