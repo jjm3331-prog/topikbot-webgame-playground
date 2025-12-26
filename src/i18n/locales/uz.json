@@ -453,6 +453,30 @@
     "history": "Tarix", "freeUsage": "Bepul foydalanish", "nextFree": "Keyingi bepul",
     "uploadLimit": "Maksimum 10 ta rasm", "missingInfo": "Savol va javobni yuklang"
   },
+  "roleplay": {
+    "badge": "AI Roleplay Speaking",
+    "title": "AI Roleplay Speaking",
+    "subtitle": "Haqiqiy vaziyatlarda tabiiy koreys tilida gapirish mashqi",
+    "labels": { "scenario": "Vaziyat:", "suggestions": "Tavsiya etilgan javoblar" },
+    "empty": { "title": "Gapirishni boshlang!", "desc": "AI vaziyat taklif qiladi, siz tabiiy koreys tilida suhbat qilasiz." },
+    "actions": { "start": "Roleplay boshlash", "listen": "Tinglash", "newScenario": "Yangi vaziyat", "makeQuiz": "TOPIK test yaratish", "prev": "Oldingi", "next": "Keyingi", "showResults": "Natijalar", "closeQuiz": "Testni yopish" },
+    "placeholders": { "input": "Koreys tilida javob kiriting..." },
+    "feedback": { "good": "Ajoyib!", "needsFix": "Tuzatish kerak" },
+    "tips": { "title": "Ko'rsatmalar", "step1": "Tasodifiy vaziyat olish uchun 'Roleplay boshlash'ni bosing", "step2": "Koreys tilida javob bering (matn yoki ovoz)", "step3": "AI tuzatishlari va grammatika izohlarini ko'ring", "step4": "Suhbatdan TOPIK test yarating", "tipLabel": "Maslahat:", "tipText": "Nima deyishni bilmasangiz tavsiyalardan foydalaning." },
+    "stats": { "title": "Bu raund", "spoken": "Aytilgan", "correct": "To'g'ri" },
+    "quiz": { "progress": "{{current}}/{{total}}", "yourScore": "Sizning balingiz", "correctAnswer": "To'g'ri javob: {{answer}}" },
+    "toast": { "started": "Yangi vaziyat boshlandi.", "startFailed": "Boshlab bo'lmadi. Qayta urinib ko'ring.", "needConversation": "Test yaratish uchun kamida bitta suhbat kerak.", "quizCreated": "Test yaratildi.", "quizFailed": "Test yaratib bo'lmadi.", "audioFailed": "Audio ijro etib bo'lmadi.", "sttSuccess": "Ovoz aniqlandi.", "sttFailed": "Ovoz aniqlash xatosi.", "recording": "Yozish...", "micDenied": "Mikrofon ruxsati kerak." }
+  },
+  "writingPage": {
+    "header": { "title": "TOPIK II Yozuv (51–54) tekshiruvi", "subtitle": "AI ball qo'yadi va batafsil fikr bildiradi", "history": "Tarix" },
+    "notice": { "title": "Muhim eslatma" },
+    "steps": { "question": "Topshiriqni yuklang", "answer": "Sizning javobingiz" },
+    "answerMode": { "text": "Matn", "image": "Rasmlar" },
+    "placeholders": { "answerText": "Javobingizni bu yerga qo'ying yoki yozing..." },
+    "tip": { "copyPaste": "Maslahat: Aniqlikni oshirish uchun Word yoki eslatmalardan nusxa oling." },
+    "actions": { "grading": "Tekshirilmoqda...", "grade": "AI bilan tekshirish", "freeGrade": "🎁 Bepul tekshirish (1/kun)", "upgradeToGrade": "Premium ga yangilang" },
+    "pdf": { "generatingTitle": "PDF yaratilmoqda...", "generatingDesc": "Iltimos kuting", "failedTitle": "PDF xatosi", "failedDesc": "Qayta urinib ko'ring" }
+  },
   "interview": {
     "title": "Intervyu simulyatsiyasi", "description": "Koreya kompaniyalari intervyu mashqi",
     "featureName": "Intervyu simulyatsiyasi", "heroTitle": "Intervyu mashqi", "heroDescription": "Koreya yetakchi kompaniyalari bilan intervyu mashqi", "supportVoiceText": "Ovoz va matn qo'llab-quvvatlash",

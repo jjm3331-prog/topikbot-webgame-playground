@@ -718,6 +718,30 @@
     "gradingError": "Không thể chấm điểm. Vui lòng thử lại.",
     "saveError": "Không thể lưu. Vui lòng thử lại."
   },
+  "roleplay": {
+    "badge": "AI Roleplay Speaking",
+    "title": "AI Roleplay Speaking",
+    "subtitle": "Luyện nói tiếng Hàn tự nhiên trong các tình huống thực tế",
+    "labels": { "scenario": "Tình huống:", "suggestions": "Gợi ý trả lời" },
+    "empty": { "title": "Hãy bắt đầu nói!", "desc": "AI sẽ đưa ra tình huống, bạn luyện hội thoại tiếng Hàn tự nhiên." },
+    "actions": { "start": "Bắt đầu Roleplay", "listen": "Nghe", "newScenario": "Tình huống mới", "makeQuiz": "Tạo TOPIK Quiz", "prev": "Trước", "next": "Sau", "showResults": "Xem kết quả", "closeQuiz": "Đóng Quiz" },
+    "placeholders": { "input": "Nhập câu trả lời bằng tiếng Hàn..." },
+    "feedback": { "good": "Tốt lắm!", "needsFix": "Cần sửa" },
+    "tips": { "title": "Hướng dẫn", "step1": "Nhấn 'Bắt đầu Roleplay' để nhận tình huống ngẫu nhiên", "step2": "Trả lời bằng tiếng Hàn (gõ hoặc nói)", "step3": "Xem AI sửa lỗi và giải thích ngữ pháp", "step4": "Tạo TOPIK quiz từ nội dung hội thoại", "tipLabel": "Mẹo:", "tipText": "Tham khảo gợi ý trả lời khi bạn chưa biết nói gì." },
+    "stats": { "title": "Lượt này", "spoken": "Câu đã nói", "correct": "Câu đúng" },
+    "quiz": { "progress": "{{current}}/{{total}}", "yourScore": "Điểm của bạn", "correctAnswer": "Đáp án đúng: {{answer}}" },
+    "toast": { "started": "Đã bắt đầu tình huống mới.", "startFailed": "Không thể bắt đầu. Vui lòng thử lại.", "needConversation": "Cần ít nhất một lượt hội thoại để tạo quiz.", "quizCreated": "Đã tạo quiz.", "quizFailed": "Không thể tạo quiz.", "audioFailed": "Không thể phát âm thanh.", "sttSuccess": "Đã nhận diện giọng nói.", "sttFailed": "Nhận diện giọng nói thất bại.", "recording": "Đang ghi âm...", "micDenied": "Cần quyền truy cập micro." }
+  },
+  "writingPage": {
+    "header": { "title": "Chấm TOPIK II Viết (51–54)", "subtitle": "AI chấm điểm và phản hồi chi tiết", "history": "Lịch sử" },
+    "notice": { "title": "Lưu ý quan trọng" },
+    "steps": { "question": "Tải đề bài lên", "answer": "Bài làm của bạn" },
+    "answerMode": { "text": "Nhập văn bản", "image": "Tải ảnh" },
+    "placeholders": { "answerText": "Dán hoặc nhập bài làm của bạn tại đây..." },
+    "tip": { "copyPaste": "Mẹo: Copy & paste từ Word hoặc ghi chú để đạt độ chính xác cao nhất." },
+    "actions": { "grading": "Đang chấm...", "grade": "Chấm điểm với AI", "freeGrade": "🎁 Chấm miễn phí (1 lần/ngày)", "upgradeToGrade": "Nâng cấp Premium để chấm" },
+    "pdf": { "generatingTitle": "Đang tạo PDF...", "generatingDesc": "Vui lòng chờ", "failedTitle": "Tạo PDF thất bại", "failedDesc": "Vui lòng thử lại" }
+  },
   "interview": {
     "title": "Mô phỏng phỏng vấn",
     "description": "Luyện phỏng vấn công ty Hàn Quốc",

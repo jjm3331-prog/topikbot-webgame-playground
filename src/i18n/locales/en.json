@@ -607,7 +607,7 @@
     "tip": { "copyPaste": "Tip: Copy & paste from Word or notes for best accuracy." },
     "actions": { "grading": "Grading...", "grade": "Grade with AI", "freeGrade": "🎁 Free grading (1/day)", "upgradeToGrade": "Upgrade Premium to grade" },
     "pdf": { "generatingTitle": "Generating PDF...", "generatingDesc": "Please wait a moment", "failedTitle": "PDF failed", "failedDesc": "Please try again" }
-  }
+  },
   "interview": {
     "title": "Interview Simulation",
     "description": "Practice interviews with Korean companies",
