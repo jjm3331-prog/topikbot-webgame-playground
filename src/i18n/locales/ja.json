@@ -751,5 +751,25 @@
     "hintUsed": "ヒント！", "halfScore": "半分の点数", "error": "エラー",
     "types": { "idiom": "慣用句", "proverb": "ことわざ", "slang": "俗語", "internet": "ネット用語" }
   },
-  "footer": { "hanoi": "ハノイ公式", "qnaAgent": "Q&A Agent", "admin": "ADMIN", "copyright": "© 2025 Powered by LUKAS Edutainment" }
+  "footer": { "hanoi": "ハノイ公式", "qnaAgent": "Q&A Agent", "admin": "ADMIN", "copyright": "© 2025 Powered by LUKAS Edutainment" },
+  "stickyCta": {
+    "title": "AIで無料韓国語学習",
+    "subtitle": "50,000+人が利用中",
+    "button": "始める"
+  },
+  "pwa": {
+    "title": "LUKATOゲームをインストール",
+    "description1": "ホーム画面に追加して素早くアクセス！",
+    "description2": "本物のアプリのように使えます！",
+    "fastLaunch": "高速起動",
+    "offline": "オフライン利用",
+    "notifications": "通知を受け取る",
+    "later": "後で",
+    "installNow": "今すぐインストール"
+  },
+  "splash": {
+    "tagline": "ベトナムNo.1韓国語学習",
+    "loading": "読み込み中...",
+    "branding": "🎮 AIと一緒にRPG韓国語学習"
+  }
 }

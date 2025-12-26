@@ -751,5 +751,25 @@
     "hintUsed": "Maslahat!", "halfScore": "Yarim ball", "error": "Xato",
     "types": { "idiom": "Idioma", "proverb": "Maqol", "slang": "Sleng", "internet": "Internet" }
   },
-  "footer": { "hanoi": "Xanoy rasmiy", "qnaAgent": "Q&A Agent", "admin": "ADMIN", "copyright": "© 2025 Powered by LUKAS Edutainment" }
+  "footer": { "hanoi": "Xanoy rasmiy", "qnaAgent": "Q&A Agent", "admin": "ADMIN", "copyright": "© 2025 Powered by LUKAS Edutainment" },
+  "stickyCta": {
+    "title": "AI bilan bepul koreys tilini o'rganing",
+    "subtitle": "50,000+ talaba ishonadi",
+    "button": "Boshlash"
+  },
+  "pwa": {
+    "title": "LUKATO o'yinini o'rnating",
+    "description1": "Tez kirish uchun bosh ekranga qo'shing!",
+    "description2": "Haqiqiy ilova kabi foydalaning!",
+    "fastLaunch": "Tez ishga tushirish",
+    "offline": "Oflayn rejim",
+    "notifications": "Bildirishnomalar",
+    "later": "Keyinroq",
+    "installNow": "Hozir o'rnatish"
+  },
+  "splash": {
+    "tagline": "Vyetnamda #1 koreys tili o'rganish",
+    "loading": "Yuklanmoqda...",
+    "branding": "🎮 AI bilan RPG koreys tili o'rganish"
+  }
 }

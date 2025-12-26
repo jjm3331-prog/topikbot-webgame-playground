@@ -981,5 +981,25 @@
     "qnaAgent": "Q&A Agent",
     "admin": "ADMIN",
     "copyright": "© 2025 Powered by LUKAS Edutainment"
+  },
+  "stickyCta": {
+    "title": "AI로 무료 한국어 학습",
+    "subtitle": "50,000+ 학생이 신뢰합니다",
+    "button": "시작하기"
+  },
+  "pwa": {
+    "title": "LUKATO 게임 설치",
+    "description1": "홈 화면에 추가하여 더 빠르게 접근하세요!",
+    "description2": "진짜 앱처럼 사용할 수 있어요!",
+    "fastLaunch": "빠른 실행",
+    "offline": "오프라인 사용",
+    "notifications": "알림 수신",
+    "later": "나중에",
+    "installNow": "지금 설치"
+  },
+  "splash": {
+    "tagline": "한국어 학습 #1 베트남",
+    "loading": "로딩 중...",
+    "branding": "🎮 AI와 함께하는 RPG 한국어 학습"
   }
 }

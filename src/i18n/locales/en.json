@@ -883,5 +883,25 @@
     "qnaAgent": "Q&A Agent",
     "admin": "ADMIN",
     "copyright": "© 2025 Powered by LUKAS Edutainment"
+  },
+  "stickyCta": {
+    "title": "Learn Korean for free with AI",
+    "subtitle": "Trusted by 50,000+ students",
+    "button": "Start"
+  },
+  "pwa": {
+    "title": "Install LUKATO Game",
+    "description1": "Add to home screen for faster access!",
+    "description2": "Experience it like a real app!",
+    "fastLaunch": "Fast launch",
+    "offline": "Use offline",
+    "notifications": "Get notifications",
+    "later": "Later",
+    "installNow": "Install now"
+  },
+  "splash": {
+    "tagline": "Korean Learning #1 in Vietnam",
+    "loading": "Loading...",
+    "branding": "🎮 RPG Korean Learning with AI"
   }
 }

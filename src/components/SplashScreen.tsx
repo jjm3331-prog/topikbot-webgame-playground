@@ -1,10 +1,13 @@
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 interface SplashScreenProps {
   progress?: number;
 }
 
 const SplashScreen = ({ progress = 0 }: SplashScreenProps) => {
+  const { t } = useTranslation();
+
   return (
     <motion.div
       initial={{ opacity: 1 }}
@@ -90,7 +93,7 @@ const SplashScreen = ({ progress = 0 }: SplashScreenProps) => {
           transition={{ delay: 0.5, duration: 0.5 }}
           className="mt-3 text-white/80 text-base md:text-lg font-medium"
         >
-          Học tiếng Hàn #1 Việt Nam
+          {t("splash.tagline")}
         </motion.p>
       </motion.div>
 
@@ -116,7 +119,7 @@ const SplashScreen = ({ progress = 0 }: SplashScreenProps) => {
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 1.5, repeat: Infinity }}
         >
-          Đang tải... {progress}%
+          {t("splash.loading")} {progress}%
         </motion.p>
       </motion.div>
 
@@ -128,7 +131,7 @@ const SplashScreen = ({ progress = 0 }: SplashScreenProps) => {
         className="absolute bottom-8 text-center"
       >
         <p className="text-white/50 text-sm font-medium">
-          🎮 RPG học tiếng Hàn với AI
+          {t("splash.branding")}
         </p>
       </motion.div>
     </motion.div>
