@@ -469,16 +469,20 @@
     "pricing": { "title1": "Fair price,", "local": "local", "title2": "global quality", "free": "Free", "forever": "Free forever", "start": "Get started", "month": "month", "upgrade": "Upgrade" },
     "finalCta": { "title1": "TOPIK", "title2": "conquest", "desc": "TOPIK professors + LUKATO AI =", "noRival": "Unbeatable combo", "cta": "Start now" }
   },
-  "grammar": {
+"grammar": {
     "title": "Grammar Learning",
     "description": "Master grammar through mini-games",
     "assembly": "Sentence Assembly",
-    "tetris": "Grammar Tetris",
+    "assemblyShort": "Assembly",
+    "tetris": "Tetris",
     "tower": "Tower Defense",
+    "towerShort": "Tower",
     "selectLevel": "Select Level",
-    "beginner": "Beginner (Level 1-2)",
-    "intermediate": "Intermediate (Level 3-4)",
-    "advanced": "Advanced (Level 5-6)",
+    "levels": {
+      "beginner": "Beginner (Level 1-2)",
+      "intermediate": "Intermediate (Level 3-4)",
+      "advanced": "Advanced (Level 5-6)"
+    },
     "arrangeWords": "Arrange words in correct order",
     "dragHere": "Drag words here",
     "grammarPoint": "Grammar Point",
@@ -493,5 +497,11 @@
     "loading": "Loading questions...",
     "gameComplete": "Complete!",
     "playAgain": "Play Again"
+  },
+  "footer": {
+    "hanoi": "Hanoi Official",
+    "qnaAgent": "Q&A Agent",
+    "admin": "ADMIN",
+    "copyright": "© 2025 Powered by LUKAS Edutainment"
   }
 }
