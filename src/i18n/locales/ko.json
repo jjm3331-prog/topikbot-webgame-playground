@@ -308,7 +308,9 @@
     "progressToNextLevel": "다음 레벨까지 진행률",
     "points": "점",
     "topRankers": "상위 랭커",
-    "rankingList": "랭킹 목록"
+    "rankingList": "랭킹 목록",
+    "levelSystem": "TOPIK 레벨 시스템",
+    "earnPointsToLevel": "포인트를 모아 TOPIK 레벨을 올리세요"
   },
   "pricing": {
     "title": "적합한 플랜 선택",

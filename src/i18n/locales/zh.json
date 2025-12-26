@@ -268,7 +268,9 @@
     "progressToNextLevel": "升级进度",
     "points": "分",
     "topRankers": "顶级玩家",
-    "rankingList": "排名列表"
+    "rankingList": "排名列表",
+    "levelSystem": "TOPIK等级系统",
+    "earnPointsToLevel": "获取积分提升你的TOPIK等级"
   },
   "pricing": {
     "title": "选择合适的套餐",

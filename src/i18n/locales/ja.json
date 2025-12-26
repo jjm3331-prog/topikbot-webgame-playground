@@ -268,7 +268,9 @@
     "progressToNextLevel": "次のレベルまでの進捗",
     "points": "ポイント",
     "topRankers": "トップランカー",
-    "rankingList": "ランキングリスト"
+    "rankingList": "ランキングリスト",
+    "levelSystem": "TOPIKレベルシステム",
+    "earnPointsToLevel": "ポイントを獲得してTOPIKレベルを上げよう"
   },
   "pricing": {
     "title": "最適なプランを選択",

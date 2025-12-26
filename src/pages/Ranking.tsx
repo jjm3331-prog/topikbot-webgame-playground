@@ -422,9 +422,9 @@ const Ranking = () => {
           <div className="px-6 py-4 bg-gradient-to-r from-muted/50 to-muted/30 border-b border-border/50">
             <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
               <Star className="w-5 h-5 text-yellow-500" />
-              Hệ thống cấp độ TOPIK
+              {t('ranking.levelSystem')}
             </h3>
-            <p className="text-sm text-muted-foreground mt-0.5">Kiếm điểm để lên cấp TOPIK của bạn</p>
+            <p className="text-sm text-muted-foreground mt-0.5">{t('ranking.earnPointsToLevel')}</p>
           </div>
           <div className="p-6 grid grid-cols-2 sm:grid-cols-3 gap-4">
             {topikLevels.map((level) => (
@@ -438,10 +438,10 @@ const Ranking = () => {
                     <p className={`font-bold text-base ${level.textColor}`}>{level.name}</p>
                     <p className="text-sm text-muted-foreground">
                       {level.min >= 1000000 
-                        ? "1M+ điểm" 
+                        ? `1M+ ${t('ranking.points')}` 
                         : level.min >= 1000 
-                          ? `${(level.min / 1000).toFixed(0)}K+ điểm`
-                          : `${level.min}+ điểm`
+                          ? `${(level.min / 1000).toFixed(0)}K+ ${t('ranking.points')}`
+                          : `${level.min}+ ${t('ranking.points')}`
                       }
                     </p>
                   </div>
