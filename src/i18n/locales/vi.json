@@ -7,7 +7,7 @@
     "settings": "Cài đặt",
     "premium": "Premium",
     "startFree": "Bắt đầu miễn phí",
-    "noCardRequired": "Không cần thẻ tín dụng • Bắt đầu ngay trong 30 giây",
+    "noCardRequired": "Không cần thẻ tín dụng • Bắt đầu trong 30 giây",
     "close": "Đóng",
     "back": "Quay lại",
     "next": "Tiếp theo",
@@ -16,12 +16,14 @@
     "confirm": "Xác nhận",
     "loading": "Đang tải...",
     "error": "Lỗi",
-    "success": "Thành công"
+    "success": "Thành công",
+    "or": "hoặc"
   },
   "brand": {
     "name": "LUKATO AI",
     "tagline": "Your Korean Mentor",
-    "badge": "Game học tiếng Hàn đầu tiên tại Việt Nam"
+    "badge": "Game học tiếng Hàn đầu tiên tại Việt Nam",
+    "platformNo1": "Nền tảng học tiếng Hàn #1 Việt Nam"
   },
   "index": {
     "badge": "Game học tiếng Hàn đầu tiên tại Việt Nam",
@@ -29,7 +31,7 @@
     "title2": "TIẾNG HÀN",
     "title3": "&",
     "title4": "VĂN HÓA",
-    "description": "Nhanh hơn, thông minh hơn. AI siêu cá nhân hóa phân tích chính xác điểm yếu và xây dựng lộ trình chiến thắng dành riêng cho bạn.",
+    "description": "Nhanh hơn, thông minh hơn. AI phân tích chính xác điểm yếu của bạn và xây dựng lộ trình chiến thắng chỉ dành riêng cho bạn.",
     "winningRoadmap": "lộ trình chiến thắng",
     "ctaButton": "Bắt đầu miễn phí"
   },
@@ -37,7 +39,7 @@
     "login": "Đăng nhập",
     "logout": "Đăng xuất",
     "logoutSuccess": "Đã đăng xuất",
-    "logoutMessage": "Hẹn gặp lại bạn!",
+    "logoutMessage": "Hẹn gặp lại lần sau!",
     "menu": "Menu"
   },
   "menu": {
@@ -68,7 +70,10 @@
       "helpCenter": "Trung tâm Hỗ trợ",
       "terms": "Điều khoản",
       "privacy": "Chính sách"
-    }
+    },
+    "premiumFeature": "Tính năng Premium",
+    "premiumDescription": "Bạn vẫn có thể xem trang, nhưng để sử dụng đầy đủ tính năng vui lòng nâng cấp Premium.",
+    "upgrade": "Nâng cấp"
   },
   "toast": {
     "premiumFeature": "Tính năng Premium",
@@ -78,5 +83,94 @@
   "language": {
     "select": "Chọn ngôn ngữ",
     "current": "Ngôn ngữ hiện tại"
+  },
+  "dashboard": {
+    "loading": "Đang tải...",
+    "welcome": "Xin chào",
+    "whatToLearn": "Hôm nay bạn muốn học gì?",
+    "points": "Điểm tích lũy",
+    "dailyCheckIn": "Điểm danh hàng ngày",
+    "days": "ngày",
+    "record": "Kỷ lục",
+    "perDay": "/ngày",
+    "checkInNow": "Điểm danh ngay!",
+    "checkedInToday": "Đã điểm danh hôm nay",
+    "processing": "Đang xử lý...",
+    "checkInSuccess": "Điểm danh thành công! 🎉",
+    "streak": "Streak",
+    "checkInError": "Không thể điểm danh. Vui lòng thử lại.",
+    "streakBonus": "🎁 Điểm danh hôm nay để nhận thưởng 7 ngày liên tiếp!",
+    "pointsToNextLevel": "Còn {points} điểm để lên level tiếp",
+    "battle": {
+      "realtime": "⚔️ 1:1 Real-time",
+      "hot": "HOT",
+      "title": "Đấu trường 1:1",
+      "description": "Nối từ • Đấu nghĩa • Thắng = +1,000đ!",
+      "games": "2 trò chơi",
+      "winPoints": "Thắng lấy điểm!"
+    },
+    "topik": {
+      "allInOne": "🎯 All-in-One",
+      "new": "NEW",
+      "title": "Trung tâm học TOPIK",
+      "description": "Từ vựng • Ngữ pháp • Nghe • Đọc • Viết",
+      "lessons": "6 bài học",
+      "learnWithAI": "Học cùng AI"
+    },
+    "game": {
+      "badge": "🎮 Game",
+      "hot": "HOT",
+      "title": "Trung tâm Game",
+      "description": "7 trò chơi học tiếng Hàn thú vị",
+      "games": "7 games",
+      "learnPlay": "Học mà chơi"
+    },
+    "career": {
+      "allInOne": "⭐ All-in-One",
+      "koreaJob": "한국 취업",
+      "title": "Korea Career Hub",
+      "description": "Headhunting • Báo cáo DN • Phỏng vấn AI - Tất cả trong một!",
+      "successCount": "1,000+ 취업 성공",
+      "satisfaction": "98% 만족도"
+    },
+    "ai": {
+      "badge": "RAG AI",
+      "title": "LUKATO Q&A Agent",
+      "description": "Hỏi trực tiếp các mô hình Premium với Q&A Agent hiệu suất cao nhất!"
+    }
+  },
+  "auth": {
+    "login": "Đăng nhập",
+    "signup": "Đăng ký",
+    "createAccount": "Tạo tài khoản",
+    "resetPassword": "Đặt lại mật khẩu",
+    "welcomeBack": "Chào mừng bạn trở lại! Tiếp tục hành trình học tiếng Hàn.",
+    "startJourney": "Bắt đầu hành trình chinh phục TOPIK của bạn ngay hôm nay.",
+    "enterEmail": "Nhập email đã đăng ký để nhận link đặt lại mật khẩu.",
+    "username": "Tên người dùng",
+    "enterUsername": "Nhập tên của bạn",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "enterPassword": "Nhập mật khẩu (ít nhất 6 ký tự)",
+    "forgotPassword": "Quên mật khẩu?",
+    "sendResetLink": "Gửi link đặt lại",
+    "continueWithGoogle": "Tiếp tục với Google",
+    "noAccount": "Chưa có tài khoản? Đăng ký ngay",
+    "hasAccount": "Đã có tài khoản? Đăng nhập",
+    "goBack": "Quay lại",
+    "checkEmail": "Kiểm tra email của bạn",
+    "resetLinkSent": "Link đặt lại mật khẩu đã được gửi tới {email}.",
+    "backToLogin": "Quay lại đăng nhập",
+    "signupSuccess": "Đăng ký thành công!",
+    "welcomeToLukato": "Chào mừng bạn đến với LUKATO AI",
+    "errorOccurred": "Có lỗi xảy ra",
+    "emailSent": "Đã gửi email",
+    "resetLinkSentDesc": "Link đặt lại mật khẩu đã được gửi tới email của bạn.",
+    "alreadyRegistered": "Email này đã được đăng ký. Vui lòng đăng nhập.",
+    "invalidLogin": "Email hoặc mật khẩu không đúng.",
+    "sslSecurity": "Bảo mật SSL",
+    "students": "50,000+ học viên",
+    "freeForever": "Miễn phí trọn đời",
+    "copyright": "© 2025 LUKATO AI. Nền tảng học tiếng Hàn cho người Việt."
   }
 }

@@ -16,12 +16,14 @@
     "confirm": "Tasdiqlash",
     "loading": "Yuklanmoqda...",
     "error": "Xato",
-    "success": "Muvaffaqiyat"
+    "success": "Muvaffaqiyat",
+    "or": "yoki"
   },
   "brand": {
     "name": "LUKATO AI",
     "tagline": "Your Korean Mentor",
-    "badge": "Vyetnamdagi birinchi koreys tili o'rganish o'yini"
+    "badge": "Vyetnamdagi birinchi koreys tili o'rganish o'yini",
+    "platformNo1": "Vyetnamdagi #1 Koreys tili o'rganish platformasi"
   },
   "index": {
     "badge": "Vyetnamdagi birinchi koreys tili o'rganish o'yini",
@@ -68,7 +70,10 @@
       "helpCenter": "Yordam Markazi",
       "terms": "Shartlar",
       "privacy": "Maxfiylik"
-    }
+    },
+    "premiumFeature": "Premium Xususiyat",
+    "premiumDescription": "Sahifani ko'rishingiz mumkin, lekin to'liq foydalanish uchun Premium-ga yangilang.",
+    "upgrade": "Yangilash"
   },
   "toast": {
     "premiumFeature": "Premium Xususiyat",
@@ -78,5 +83,94 @@
   "language": {
     "select": "Tilni tanlang",
     "current": "Joriy til"
+  },
+  "dashboard": {
+    "loading": "Yuklanmoqda...",
+    "welcome": "Salom",
+    "whatToLearn": "Bugun nima o'rganmoqchisiz?",
+    "points": "Ballar",
+    "dailyCheckIn": "Kunlik tekshirish",
+    "days": "kun",
+    "record": "Rekord",
+    "perDay": "/kun",
+    "checkInNow": "Hozir tekshiring!",
+    "checkedInToday": "Bugun tekshirildi",
+    "processing": "Jarayonda...",
+    "checkInSuccess": "Tekshirish muvaffaqiyatli! 🎉",
+    "streak": "Streak",
+    "checkInError": "Tekshirib bo'lmadi. Qayta urinib ko'ring.",
+    "streakBonus": "🎁 Bugun tekshiring va 7 kunlik bonus oling!",
+    "pointsToNextLevel": "Keyingi darajaga {points} ball kerak",
+    "battle": {
+      "realtime": "⚔️ 1:1 Real-time",
+      "hot": "HOT",
+      "title": "1:1 Jang Maydoni",
+      "description": "So'z Zanjiri • Semantik Jang • G'alaba = +1,000 ball!",
+      "games": "2 ta o'yin",
+      "winPoints": "G'alaba uchun ball!"
+    },
+    "topik": {
+      "allInOne": "🎯 All-in-One",
+      "new": "YANGI",
+      "title": "TOPIK O'quv Markazi",
+      "description": "Lug'at • Grammatika • Tinglash • O'qish • Yozish",
+      "lessons": "6 ta dars",
+      "learnWithAI": "AI bilan o'rganing"
+    },
+    "game": {
+      "badge": "🎮 O'yin",
+      "hot": "HOT",
+      "title": "O'yin Markazi",
+      "description": "7 ta qiziqarli koreys tili o'yini",
+      "games": "7 ta o'yin",
+      "learnPlay": "O'ynab o'rganing"
+    },
+    "career": {
+      "allInOne": "⭐ All-in-One",
+      "koreaJob": "Koreya Ishi",
+      "title": "Korea Career Hub",
+      "description": "Headhunting • Kompaniya Hisoboti • AI Intervyu - Hammasi bir joyda!",
+      "successCount": "1,000+ ish joylashtirildi",
+      "satisfaction": "98% mamnunlik"
+    },
+    "ai": {
+      "badge": "RAG AI",
+      "title": "LUKATO Q&A Agent",
+      "description": "Eng yaxshi Q&A Agent bilan premium modellardan to'g'ridan-to'g'ri so'rang!"
+    }
+  },
+  "auth": {
+    "login": "Kirish",
+    "signup": "Ro'yxatdan o'tish",
+    "createAccount": "Hisob yaratish",
+    "resetPassword": "Parolni tiklash",
+    "welcomeBack": "Xush kelibsiz! Koreys tili o'rganish sayohatingizni davom ettiring.",
+    "startJourney": "Bugun TOPIK sayohatingizni boshlang.",
+    "enterEmail": "Parolni tiklash havolasini olish uchun ro'yxatdan o'tgan emailingizni kiriting.",
+    "username": "Foydalanuvchi nomi",
+    "enterUsername": "Ismingizni kiriting",
+    "email": "Email",
+    "password": "Parol",
+    "enterPassword": "Parolni kiriting (kamida 6 belgi)",
+    "forgotPassword": "Parolni unutdingizmi?",
+    "sendResetLink": "Tiklash havolasini yuborish",
+    "continueWithGoogle": "Google bilan davom etish",
+    "noAccount": "Hisobingiz yo'qmi? Ro'yxatdan o'ting",
+    "hasAccount": "Hisobingiz bormi? Kiring",
+    "goBack": "Orqaga",
+    "checkEmail": "Emailingizni tekshiring",
+    "resetLinkSent": "Parolni tiklash havolasi {email} ga yuborildi.",
+    "backToLogin": "Kirishga qaytish",
+    "signupSuccess": "Ro'yxatdan o'tish muvaffaqiyatli!",
+    "welcomeToLukato": "LUKATO AI ga xush kelibsiz",
+    "errorOccurred": "Xato yuz berdi",
+    "emailSent": "Email yuborildi",
+    "resetLinkSentDesc": "Parolni tiklash havolasi emailingizga yuborildi.",
+    "alreadyRegistered": "Bu email allaqachon ro'yxatdan o'tgan. Iltimos, kiring.",
+    "invalidLogin": "Email yoki parol noto'g'ri.",
+    "sslSecurity": "SSL Xavfsizlik",
+    "students": "50,000+ talaba",
+    "freeForever": "Abadiy bepul",
+    "copyright": "© 2025 LUKATO AI. Vyetnamliklar uchun koreys tili o'rganish platformasi."
   }
 }

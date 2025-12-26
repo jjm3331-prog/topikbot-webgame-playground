@@ -16,28 +16,30 @@
     "confirm": "確認",
     "loading": "読み込み中...",
     "error": "エラー",
-    "success": "成功"
+    "success": "成功",
+    "or": "または"
   },
   "brand": {
     "name": "LUKATO AI",
     "tagline": "Your Korean Mentor",
-    "badge": "ベトナム初の韓国語学習ゲーム"
+    "badge": "ベトナム初の韓国語学習ゲーム",
+    "platformNo1": "ベトナムNo.1韓国語学習プラットフォーム"
   },
   "index": {
     "badge": "ベトナム初の韓国語学習ゲーム",
-    "title1": "韓国語を",
-    "title2": "マスター",
+    "title1": "征服せよ",
+    "title2": "韓国語",
     "title3": "&",
-    "title4": "文化を学ぶ",
-    "description": "より速く、よりスマートに。AIがあなたの弱点を正確に分析し、あなただけの勝利へのロードマップを作成します。",
-    "winningRoadmap": "勝利へのロードマップ",
+    "title4": "文化を",
+    "description": "より速く、よりスマートに。AIがあなたの弱点を正確に分析し、パーソナライズされた勝利のロードマップを作成します。",
+    "winningRoadmap": "勝利のロードマップ",
     "ctaButton": "無料で始める"
   },
   "header": {
     "login": "ログイン",
     "logout": "ログアウト",
     "logoutSuccess": "ログアウトしました",
-    "logoutMessage": "また会いましょう！",
+    "logoutMessage": "またお会いしましょう！",
     "menu": "メニュー"
   },
   "menu": {
@@ -48,7 +50,7 @@
       "topik": "TOPIK学習",
       "game": "ゲーム",
       "ai": "AI",
-      "my": "マイページ"
+      "my": "マイ"
     },
     "items": {
       "headhunting": "ヘッドハンティング",
@@ -56,8 +58,8 @@
       "interviewSimulation": "面接シミュレーション",
       "learningHub": "TOPIK学習センター",
       "community": "コミュニティ",
-      "gameHub": "ゲームセンター",
-      "battle": "⚔️ 1対1バトル",
+      "gameHub": "ゲームハブ",
+      "battle": "⚔️ 1:1バトル",
       "qnaAgent": "Q&Aエージェント",
       "questionVariant": "問題バリエーション",
       "writingCorrection": "作文添削",
@@ -68,15 +70,107 @@
       "helpCenter": "ヘルプセンター",
       "terms": "利用規約",
       "privacy": "プライバシー"
-    }
+    },
+    "premiumFeature": "プレミアム機能",
+    "premiumDescription": "ページは閲覧できますが、全機能はプレミアムでご利用いただけます。",
+    "upgrade": "アップグレード"
   },
   "toast": {
     "premiumFeature": "プレミアム機能",
-    "premiumDescription": "ページは閲覧できますが、全機能を利用するにはプレミアムにアップグレードしてください。",
+    "premiumDescription": "ページは閲覧できますが、全機能はプレミアムでご利用いただけます。",
     "upgrade": "アップグレード"
   },
   "language": {
     "select": "言語を選択",
     "current": "現在の言語"
+  },
+  "dashboard": {
+    "loading": "読み込み中...",
+    "welcome": "こんにちは",
+    "whatToLearn": "今日は何を学びますか？",
+    "points": "ポイント",
+    "dailyCheckIn": "毎日チェックイン",
+    "days": "日",
+    "record": "記録",
+    "perDay": "/日",
+    "checkInNow": "今すぐチェックイン！",
+    "checkedInToday": "今日はチェックイン済み",
+    "processing": "処理中...",
+    "checkInSuccess": "チェックイン成功！🎉",
+    "streak": "連続",
+    "checkInError": "チェックインできませんでした。再試行してください。",
+    "streakBonus": "🎁 今日チェックインして7日連続ボーナスをゲット！",
+    "pointsToNextLevel": "次のレベルまであと{points}ポイント",
+    "battle": {
+      "realtime": "⚔️ 1:1 リアルタイム",
+      "hot": "HOT",
+      "title": "1:1 バトルアリーナ",
+      "description": "しりとり • 意味バトル • 勝利 = +1,000ポイント！",
+      "games": "2つのゲーム",
+      "winPoints": "勝ってポイントゲット！"
+    },
+    "topik": {
+      "allInOne": "🎯 All-in-One",
+      "new": "NEW",
+      "title": "TOPIK学習センター",
+      "description": "語彙 • 文法 • リスニング • 読解 • 作文",
+      "lessons": "6レッスン",
+      "learnWithAI": "AIと一緒に学ぶ"
+    },
+    "game": {
+      "badge": "🎮 ゲーム",
+      "hot": "HOT",
+      "title": "ゲームハブ",
+      "description": "7つの楽しい韓国語学習ゲーム",
+      "games": "7ゲーム",
+      "learnPlay": "遊びながら学ぶ"
+    },
+    "career": {
+      "allInOne": "⭐ All-in-One",
+      "koreaJob": "韓国就職",
+      "title": "Korea Career Hub",
+      "description": "ヘッドハンティング • 企業レポート • AI面接 - オールインワン！",
+      "successCount": "1,000+ 就職成功",
+      "satisfaction": "98% 満足度"
+    },
+    "ai": {
+      "badge": "RAG AI",
+      "title": "LUKATO Q&A Agent",
+      "description": "最高性能のQ&Aエージェントでプレミアムモデルに直接質問！"
+    }
+  },
+  "auth": {
+    "login": "ログイン",
+    "signup": "新規登録",
+    "createAccount": "アカウント作成",
+    "resetPassword": "パスワードリセット",
+    "welcomeBack": "おかえりなさい！韓国語学習の旅を続けましょう。",
+    "startJourney": "今日からTOPIK征服の旅を始めましょう。",
+    "enterEmail": "パスワードリセットリンクを受け取るメールアドレスを入力してください。",
+    "username": "ユーザー名",
+    "enterUsername": "名前を入力してください",
+    "email": "メール",
+    "password": "パスワード",
+    "enterPassword": "パスワードを入力（6文字以上）",
+    "forgotPassword": "パスワードを忘れましたか？",
+    "sendResetLink": "リセットリンクを送信",
+    "continueWithGoogle": "Googleで続ける",
+    "noAccount": "アカウントがありませんか？新規登録",
+    "hasAccount": "すでにアカウントをお持ちですか？ログイン",
+    "goBack": "戻る",
+    "checkEmail": "メールを確認してください",
+    "resetLinkSent": "パスワードリセットリンクを{email}に送信しました。",
+    "backToLogin": "ログインに戻る",
+    "signupSuccess": "登録完了！",
+    "welcomeToLukato": "LUKATO AIへようこそ",
+    "errorOccurred": "エラーが発生しました",
+    "emailSent": "メールを送信しました",
+    "resetLinkSentDesc": "パスワードリセットリンクをメールで送信しました。",
+    "alreadyRegistered": "このメールは既に登録されています。ログインしてください。",
+    "invalidLogin": "メールまたはパスワードが正しくありません。",
+    "sslSecurity": "SSLセキュリティ",
+    "students": "50,000+ 受講生",
+    "freeForever": "永久無料",
+    "copyright": "© 2025 LUKATO AI. ベトナム人向け韓国語学習プラットフォーム。"
   }
 }
