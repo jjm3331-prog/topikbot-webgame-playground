@@ -411,18 +411,28 @@
     "hero": {
       "badge": "Powered by TOPIK Professors 🇰🇷",
       "headline1": "World's first.",
-      "headline2": "Only in Vietnam.",
-      "sub1": "A Korean-learning super app powered by",
+      "headline2": "Globally unique.",
+      "sub1": "Korean learning super app powered by",
       "sub2a": "TOPIK exam authors",
       "sub2b": "LUKATO RAG AI Tech",
       "cta": "Start for Free"
     },
     "universities": {
-      "partner": "🤝 Strategic partners",
-      "titleHighlight": "6 universities",
-      "titleRest": "in Vietnam",
-      "desc": "Trusted by top universities across Vietnam"
-    }
+      "partner": "🤝 Global Partners",
+      "titleHighlight": "Global Universities",
+      "titleRest": "Official Partner",
+      "desc": "AI service officially certified by major universities worldwide"
+    },
+    "stats": { "students": "Learners", "aiAccuracy": "AI Accuracy", "topikApp": "TOPIK App", "aiSupport": "AI Support" },
+    "why": { "title": "Why", "item1Title": "TOPIK Exam Authors", "item1Desc": "Official TOPIK exam creators from Seoul", "item2Title": "LUKATO RAG AI Tech", "item2Desc": "10,000+ TOPIK materials & Korean expert docs", "item3Title": "Next-gen STT/TTS", "item3Desc": "99% native pronunciation for listening & speaking", "item4Title": "AI Headhunting", "item4Desc": "High-precision resume & cover letter evaluation" },
+    "comparison": { "feature": "Feature", "others": "Other Apps", "feature1": "Official TOPIK Exam Authors", "feature2": "LUKATO RAG AI Tech (exclusive AI technology)", "feature3": "10,000+ TOPIK exams & materials", "feature4": "Native AI STT/TTS pronunciation", "feature5": "AI Writing & resume ultra-precise scoring", "feature6": "Headhunting & Korea job consulting", "feature7": "K-Culture integrated (K-POP, K-Drama)" },
+    "challenge": { "headline1": "Got skills?", "headline2": "Try to keep up.", "subtitle": "To all Korean learning apps, websites, and academies.", "line1": "What you do, we do better.", "line2": "What you can't even dream of, we've already done.", "point1Title": "TOPIK exam creation?", "point1Desc": "We have official TOPIK exam authors", "point2Title": "AI Chatbot?", "point2Desc": "LUKATO RAG AI Tech 99.7% accuracy", "point3Title": "Learning games?", "point3Desc": "We integrated K-Culture too", "final": "Feel free to copy. But can you catch up?" },
+    "headhunting": { "badge": "Premium Exclusive Service", "title1": "Direct connection to", "title2": "Korean companies", "desc1": "Professional headhunter team for job support", "free": "100% free", "desc2": "From Korean companies in Vietnam to job opportunities in Seoul!", "tag1": "500+ companies", "tag2": "Resume consulting", "tag3": "Visa support", "cta": "Apply now", "ctaSub": "Completely free" },
+    "features": { "title": "Complete 4 skills learning", "skills": "4 skills", "listen": "Listening", "read": "Reading", "write": "Writing", "speak": "Speaking" },
+    "games": { "korean": "Korean", "survival": "AI Survival", "dating": "Seoul Dating", "wordChain": "Word Chain", "dubbing": "Dubbing", "badgeNew": "New" },
+    "testimonials": { "title": "Real reviews from learners" },
+    "pricing": { "title1": "Fair price,", "local": "local", "title2": "global quality", "free": "Free", "forever": "Free forever", "start": "Get started", "month": "month", "upgrade": "Upgrade" },
+    "finalCta": { "title1": "TOPIK", "title2": "conquest", "desc": "TOPIK professors + LUKATO AI =", "noRival": "Unbeatable combo", "cta": "Start now" }
   },
   "grammar": {
     "title": "Grammar Learning",
