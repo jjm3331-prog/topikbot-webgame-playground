@@ -178,7 +178,7 @@
     "freeForever": "永久無料",
     "copyright": "© 2025 LUKATO AI. ベトナム人向け韓国語学習プラットフォーム。"
   },
-  "gameHub": {
+"gameHub": {
     "title": "🎮 韓国語学習ゲーム",
     "description": "楽しいゲームで学習",
     "games": "7ゲーム",
@@ -186,7 +186,22 @@
     "learnPlay": "遊びながら学ぶ",
     "funLearning": "韓国語学習は楽しい！",
     "dailyPlay": "毎日ゲームをプレイして韓国語スキルを向上させよう！",
-    "hot": "HOT"
+    "hot": "HOT",
+    "cards": {
+      "chatDesc": "ソウルで生き残れ！AIとの会話で韓国語力を高めよう！",
+      "datingTitle": "恋愛シム",
+      "datingDesc": "バーチャル韓国人とデートして感情表現を学ぼう！",
+      "managerTitle": "マネージャー",
+      "managerDesc": "K-POPアイドルマネージャーになってグループを成功に導こう！",
+      "kpopTitle": "K-POPクイズ",
+      "kpopDesc": "K-POPの歌詞クイズで楽しく韓国語を学ぼう！",
+      "kdramaTitle": "Kドラマ",
+      "kdramaDesc": "名シーンの吹き替えで発音を練習しよう！",
+      "wordChainTitle": "しりとり",
+      "wordChainDesc": "AIとしりとりバトル！語彙力を試そう！",
+      "parttimeTitle": "アルバイト",
+      "parttimeDesc": "アルバイトシーンで実践会話を練習しよう！"
+    }
   },
   "learningHub": {
     "title": "📚 TOPIK学習センター",
@@ -196,7 +211,27 @@
     "systematicLearning": "体系的学習",
     "conquestTitle": "今日からTOPIK制覇！",
     "conquestDesc": "TOPIK資格取得に挑戦しよう！",
-    "new": "NEW"
+    "new": "NEW",
+    "cards": {
+      "vocabularyTitle": "語彙",
+      "vocabularySubtitle": "語彙学習",
+      "vocabularyDesc": "フラッシュカード、記憶ゲーム、60秒スプリントで楽しく単語を覚えよう！",
+      "grammarTitle": "文法",
+      "grammarSubtitle": "文法学習",
+      "grammarDesc": "文章組み立て、誤り訂正、文法バトルで韓国語文法をマスター！",
+      "handwritingTitle": "手書き練習",
+      "handwritingSubtitle": "手書き練習",
+      "handwritingDesc": "手でハングル文字と単語を書く練習をしよう！",
+      "listeningTitle": "リスニング練習",
+      "listeningSubtitle": "リスニング練習",
+      "listeningDesc": "本番のTOPIK問題でリスニング力を向上させよう！",
+      "readingATitle": "読解A",
+      "readingASubtitle": "読解A",
+      "readingADesc": "短い会話やお知らせで基本読解力を向上させよう！",
+      "readingBTitle": "読解B",
+      "readingBSubtitle": "読解B",
+      "readingBDesc": "記事、エッセイ、学術テキストで高度な読解練習！"
+    }
   },
   "profile": {
     "title": "マイプロフィール",

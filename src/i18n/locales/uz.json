@@ -178,7 +178,7 @@
     "freeForever": "Abadiy bepul",
     "copyright": "© 2025 LUKATO AI. Vyetnamliklar uchun koreys tili o'rganish platformasi."
   },
-  "gameHub": {
+"gameHub": {
     "title": "🎮 Koreys tili o'rganish o'yinlari",
     "description": "Qiziqarli o'yinlar orqali o'rganing",
     "games": "7 ta o'yin",
@@ -186,7 +186,22 @@
     "learnPlay": "O'ynab o'rgan",
     "funLearning": "Koreys tilini o'rganish qiziqarli!",
     "dailyPlay": "Har kuni o'yin o'ynab koreys tilini yaxshilang!",
-    "hot": "HOT"
+    "hot": "HOT",
+    "cards": {
+      "chatDesc": "Seulda omon qoling! AI bilan suhbat orqali koreys tilini yaxshilang!",
+      "datingTitle": "Uchrashuv simulyatori",
+      "datingDesc": "Virtual koreysliklar bilan uchrashib hissiyot ifodasini o'rganing!",
+      "managerTitle": "Menejer",
+      "managerDesc": "K-POP idol menejeri bo'lib guruhni muvaffaqiyatga olib boring!",
+      "kpopTitle": "K-POP viktorina",
+      "kpopDesc": "K-POP qo'shiq so'zlari viktorinasi orqali koreys tilini o'rganing!",
+      "kdramaTitle": "K-Drama",
+      "kdramaDesc": "Mashhur sahnalarni dublyaj qilib talaffuzni mashq qiling!",
+      "wordChainTitle": "So'z zanjiri",
+      "wordChainDesc": "AI bilan so'z zanjiri o'yini! Lug'at boyligingizni sinang!",
+      "parttimeTitle": "Qo'shimcha ish",
+      "parttimeDesc": "Qo'shimcha ish holatlarida haqiqiy suhbatlarni mashq qiling!"
+    }
   },
   "learningHub": {
     "title": "📚 TOPIK o'quv markazi",
@@ -196,7 +211,27 @@
     "systematicLearning": "Tizimli o'rganish",
     "conquestTitle": "Bugundan TOPIKni zabt eting!",
     "conquestDesc": "TOPIK sertifikatini olish uchun o'zingizni sinab ko'ring!",
-    "new": "NEW"
+    "new": "NEW",
+    "cards": {
+      "vocabularyTitle": "Lug'at",
+      "vocabularySubtitle": "Lug'at o'rganish",
+      "vocabularyDesc": "Fleshkartalar, xotira o'yinlari va 60 soniyalik sprint bilan so'zlarni yodlang!",
+      "grammarTitle": "Grammatika",
+      "grammarSubtitle": "Grammatika o'rganish",
+      "grammarDesc": "Gap tuzish, xatolarni tuzatish va grammatika jangi bilan koreys grammatikasini o'rganing!",
+      "handwritingTitle": "Qo'lda yozish",
+      "handwritingSubtitle": "Yozuv mashqi",
+      "handwritingDesc": "Koreys harflari va so'zlarini qo'lda yozishni mashq qiling!",
+      "listeningTitle": "Tinglash",
+      "listeningSubtitle": "Tinglash mashqi",
+      "listeningDesc": "Haqiqiy TOPIK savollari bilan tinglash qobiliyatini oshiring!",
+      "readingATitle": "O'qish A",
+      "readingASubtitle": "O'qish A",
+      "readingADesc": "Qisqa muloqotlar va e'lonlar bilan asosiy o'qishni yaxshilang!",
+      "readingBTitle": "O'qish B",
+      "readingBSubtitle": "O'qish B",
+      "readingBDesc": "Maqolalar, insholar va ilmiy matnlar bilan ilg'or o'qish!"
+    }
   },
   "profile": {
     "title": "Mening profilim",

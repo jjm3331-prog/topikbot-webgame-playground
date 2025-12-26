@@ -182,7 +182,7 @@
     "freeForever": "Miễn phí trọn đời",
     "copyright": "© 2025 LUKATO AI. Nền tảng học tiếng Hàn cho người Việt."
   },
-  "gameHub": {
+"gameHub": {
     "title": "🎮 Game học tiếng Hàn",
     "description": "Học vui vẻ qua các trò chơi tương tác",
     "games": "7 trò chơi",
@@ -190,7 +190,22 @@
     "learnPlay": "Học mà chơi",
     "funLearning": "Học tiếng Hàn thật vui!",
     "dailyPlay": "Chơi game mỗi ngày để nâng cao kỹ năng tiếng Hàn của bạn!",
-    "hot": "HOT"
+    "hot": "HOT",
+    "cards": {
+      "chatDesc": "Sinh tồn tại Seoul! Cải thiện tiếng Hàn qua trò chuyện với AI!",
+      "datingTitle": "Hẹn hò",
+      "datingDesc": "Hẹn hò với người Hàn ảo và học cách thể hiện cảm xúc!",
+      "managerTitle": "Manager",
+      "managerDesc": "Trở thành quản lý idol K-POP và đưa nhóm đến thành công!",
+      "kpopTitle": "K-POP Quiz",
+      "kpopDesc": "Học tiếng Hàn thú vị qua quiz ca từ K-POP!",
+      "kdramaTitle": "K-Drama",
+      "kdramaDesc": "Luyện phát âm bằng cách lồng tiếng cảnh phim nổi tiếng!",
+      "wordChainTitle": "Nối từ",
+      "wordChainDesc": "Đấu nối từ với AI! Kiểm tra vốn từ vựng của bạn!",
+      "parttimeTitle": "Làm thêm",
+      "parttimeDesc": "Luyện hội thoại thực tế trong các tình huống làm thêm!"
+    }
   },
   "learningHub": {
     "title": "📚 Trung tâm học TOPIK",
@@ -200,7 +215,27 @@
     "systematicLearning": "Học có hệ thống",
     "conquestTitle": "Chinh phục TOPIK ngay hôm nay!",
     "conquestDesc": "Hãy thử thách bản thân để đạt chứng chỉ TOPIK!",
-    "new": "NEW"
+    "new": "NEW",
+    "cards": {
+      "vocabularyTitle": "Từ vựng",
+      "vocabularySubtitle": "Học từ vựng",
+      "vocabularyDesc": "Flashcard, trò chơi trí nhớ, và Sprint 60 giây để ghi nhớ từ vựng thú vị!",
+      "grammarTitle": "Ngữ pháp",
+      "grammarSubtitle": "Học ngữ pháp",
+      "grammarDesc": "Ghép câu, sửa lỗi, và Grammar Battle để làm chủ ngữ pháp tiếng Hàn!",
+      "handwritingTitle": "Luyện viết tay",
+      "handwritingSubtitle": "Viết tay",
+      "handwritingDesc": "Tập viết chữ cái và từ vựng tiếng Hàn bằng tay!",
+      "listeningTitle": "Luyện nghe",
+      "listeningSubtitle": "Nghe hiểu",
+      "listeningDesc": "Nâng cao khả năng nghe với bài thi TOPIK thực tế!",
+      "readingATitle": "Đọc hiểu A",
+      "readingASubtitle": "Đọc A",
+      "readingADesc": "Nâng cao khả năng đọc cơ bản với hội thoại ngắn và thông báo!",
+      "readingBTitle": "Đọc hiểu B",
+      "readingBSubtitle": "Đọc B",
+      "readingBDesc": "Đọc nâng cao với bài báo, bài luận và văn bản học thuật!"
+    }
   },
   "profile": {
     "title": "Hồ sơ của tôi",

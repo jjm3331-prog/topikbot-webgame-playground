@@ -182,7 +182,7 @@
     "freeForever": "Free forever",
     "copyright": "© 2025 LUKATO AI. Korean learning platform for Vietnamese."
   },
-  "gameHub": {
+"gameHub": {
     "title": "🎮 Korean Learning Games",
     "description": "Learn through fun interactive games",
     "games": "7 games",
@@ -190,7 +190,22 @@
     "learnPlay": "Learn while playing",
     "funLearning": "Learning Korean is fun!",
     "dailyPlay": "Play games daily to improve your Korean skills!",
-    "hot": "HOT"
+    "hot": "HOT",
+    "cards": {
+      "chatDesc": "Survive in Seoul! Improve your Korean through AI conversations!",
+      "datingTitle": "Dating Sim",
+      "datingDesc": "Date virtual Koreans and learn emotional expressions!",
+      "managerTitle": "Manager",
+      "managerDesc": "Become a K-POP idol manager and lead your group to success!",
+      "kpopTitle": "K-POP Quiz",
+      "kpopDesc": "Learn Korean through fun K-POP lyrics quizzes!",
+      "kdramaTitle": "K-Drama",
+      "kdramaDesc": "Practice pronunciation by dubbing famous drama scenes!",
+      "wordChainTitle": "Word Chain",
+      "wordChainDesc": "Battle AI in word chain! Test your vocabulary!",
+      "parttimeTitle": "Part-time Job",
+      "parttimeDesc": "Practice real conversations in part-time job situations!"
+    }
   },
   "learningHub": {
     "title": "📚 TOPIK Learning Hub",
@@ -200,7 +215,27 @@
     "systematicLearning": "Systematic learning",
     "conquestTitle": "Conquer TOPIK today!",
     "conquestDesc": "Challenge yourself to get TOPIK certification!",
-    "new": "NEW"
+    "new": "NEW",
+    "cards": {
+      "vocabularyTitle": "Vocabulary",
+      "vocabularySubtitle": "Vocabulary Study",
+      "vocabularyDesc": "Flashcards, memory games, and 60-second sprints to memorize vocabulary!",
+      "grammarTitle": "Grammar",
+      "grammarSubtitle": "Grammar Study",
+      "grammarDesc": "Sentence building, error correction, and Grammar Battle to master Korean grammar!",
+      "handwritingTitle": "Handwriting",
+      "handwritingSubtitle": "Handwriting Practice",
+      "handwritingDesc": "Practice writing Korean letters and words by hand!",
+      "listeningTitle": "Listening",
+      "listeningSubtitle": "Listening Practice",
+      "listeningDesc": "Improve listening skills with real TOPIK exam questions!",
+      "readingATitle": "Reading A",
+      "readingASubtitle": "Reading A",
+      "readingADesc": "Improve basic reading with short dialogues and notices!",
+      "readingBTitle": "Reading B",
+      "readingBSubtitle": "Reading B",
+      "readingBDesc": "Advanced reading with articles, essays, and academic texts!"
+    }
   },
   "profile": {
     "title": "My Profile",
