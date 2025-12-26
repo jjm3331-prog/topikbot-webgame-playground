@@ -549,6 +549,51 @@
     "placeholder": "Enter your question... 💬",
     "hint": "Press Enter to send • Shift+Enter for new line"
   },
+  "writing": {
+    "title": "TOPIK Writing Correction",
+    "description": "Improve your writing with AI",
+    "submit": "Submit",
+    "save": "Save",
+    "history": "History",
+    "overallScore": "Overall Score",
+    "correctionComplete": "Correction Complete!"
+  },
+  "interview": {
+    "title": "Interview Simulation",
+    "description": "Practice interviews with Korean companies",
+    "startInterview": "Start Interview",
+    "endInterview": "End Interview"
+  },
+  "kdrama": {
+    "title": "K-Drama Dubbing",
+    "description": "Practice pronunciation with famous drama scenes",
+    "complete": "Dubbing Complete!"
+  },
+  "dating": {
+    "title": "Dating Simulation",
+    "description": "Learn Korean through virtual dating",
+    "startChat": "Start Chat"
+  },
+  "manager": {
+    "title": "LUKATO Manager",
+    "description": "Manage your K-POP idol group",
+    "startGame": "Start Game"
+  },
+  "headhunting": {
+    "title": "Headhunting Service",
+    "description": "Get help finding jobs in Korea",
+    "submit": "Submit"
+  },
+  "reading": {
+    "title": "Reading Practice",
+    "description": "Solve TOPIK-style reading questions",
+    "complete": "Complete!"
+  },
+  "listening": {
+    "title": "Listening Practice",
+    "description": "Improve listening with AI TTS",
+    "complete": "Complete!"
+  },
   "footer": {
     "hanoi": "Hanoi Official",
     "qnaAgent": "Q&A Agent",
