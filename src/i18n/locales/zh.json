@@ -453,6 +453,30 @@
     "history": "历史记录", "freeUsage": "免费使用", "nextFree": "下次免费",
     "uploadLimit": "最多10张图片", "missingInfo": "请上传题目和答案"
   },
+  "roleplay": {
+    "badge": "AI 角色扮演口语",
+    "title": "角色扮演口语",
+    "subtitle": "真实场景 • 语法反馈 • TOPIK测验",
+    "labels": { "scenario": "场景：", "suggestions": "推荐回复" },
+    "empty": { "title": "开始练口语！", "desc": "AI会给出情景，你用韩语进行真实对话练习。" },
+    "actions": { "start": "开始Roleplay", "listen": "听", "newScenario": "新场景", "makeQuiz": "生成TOPIK测验", "prev": "上一题", "next": "下一题", "showResults": "查看结果", "closeQuiz": "关闭测验" },
+    "placeholders": { "input": "请输入韩语回答..." },
+    "feedback": { "good": "不错！", "needsFix": "需要修改" },
+    "tips": { "title": "使用指南", "step1": "点击“开始Roleplay”获取随机情景", "step2": "用韩语回答（输入或语音）", "step3": "查看AI纠错与语法讲解", "step4": "根据对话生成TOPIK测验", "tipLabel": "提示：", "tipText": "不知道怎么说时可参考推荐回复。" },
+    "stats": { "title": "本次", "spoken": "已说句子", "correct": "正确句子" },
+    "quiz": { "progress": "{{current}}/{{total}}", "yourScore": "你的得分", "correctAnswer": "正确答案：{{answer}}" },
+    "toast": { "started": "已开始新场景。", "startFailed": "启动失败，请重试。", "needConversation": "生成测验至少需要一轮对话。", "quizCreated": "测验已生成。", "quizFailed": "生成测验失败。", "audioFailed": "音频播放失败。", "sttSuccess": "语音已识别。", "sttFailed": "语音识别失败。", "recording": "录音中...", "micDenied": "需要麦克风权限。" }
+  },
+  "writingPage": {
+    "header": { "title": "TOPIK II 写作(51–54) 批改", "subtitle": "AI评分并提供详细反馈", "history": "历史" },
+    "notice": { "title": "重要提示" },
+    "steps": { "question": "上传题目", "answer": "你的答案" },
+    "answerMode": { "text": "文字", "image": "图片" },
+    "placeholders": { "answerText": "在此粘贴或输入你的答案..." },
+    "tip": { "copyPaste": "提示：从Word/笔记复制粘贴，准确度更高。" },
+    "actions": { "grading": "批改中...", "grade": "AI批改", "freeGrade": "🎁 免费批改(1/天)", "upgradeToGrade": "升级Premium进行批改" },
+    "pdf": { "generatingTitle": "正在生成PDF...", "generatingDesc": "请稍候", "failedTitle": "PDF生成失败", "failedDesc": "请重试" }
+  }
   "interview": {
     "title": "面试模拟", "description": "韩国企业面试练习",
     "featureName": "面试模拟", "heroTitle": "面试练习", "heroDescription": "与韩国顶尖企业进行面试练习", "supportVoiceText": "支持语音和文字",

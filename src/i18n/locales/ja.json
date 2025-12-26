@@ -453,6 +453,30 @@
     "history": "履歴", "freeUsage": "無料使用", "nextFree": "次の無料",
     "uploadLimit": "最大10枚", "missingInfo": "問題と答案をアップロードしてください"
   },
+  "roleplay": {
+    "badge": "AIロールプレイ",
+    "title": "ロールプレイスピーキング",
+    "subtitle": "日常シーン • 文法フィードバック • TOPIKクイズ",
+    "labels": { "scenario": "シーン:", "suggestions": "おすすめ返答" },
+    "empty": { "title": "会話を始めましょう！", "desc": "AIが状況を提示し、実戦的な韓国語会話を練習できます。" },
+    "actions": { "start": "ロールプレイ開始", "listen": "聞く", "newScenario": "新しいシーン", "makeQuiz": "TOPIKクイズ作成", "prev": "前へ", "next": "次へ", "showResults": "結果を見る", "closeQuiz": "クイズを閉じる" },
+    "placeholders": { "input": "韓国語で回答を入力..." },
+    "feedback": { "good": "いいね！", "needsFix": "要修正" },
+    "tips": { "title": "使い方", "step1": "「ロールプレイ開始」でランダムシーンを受け取る", "step2": "韓国語で返答（入力/音声）", "step3": "AIの修正と文法説明を確認", "step4": "学んだ内容からTOPIKクイズを作成", "tipLabel": "ヒント:", "tipText": "困ったらおすすめ返答を参考にしてください。" },
+    "stats": { "title": "今回", "spoken": "話した文", "correct": "正しい文" },
+    "quiz": { "progress": "{{current}}/{{total}}", "yourScore": "スコア", "correctAnswer": "正解: {{answer}}" },
+    "toast": { "started": "新しいシーンを開始しました。", "startFailed": "開始に失敗しました。", "needConversation": "クイズ作成には会話が必要です。", "quizCreated": "クイズを作成しました。", "quizFailed": "クイズ作成に失敗しました。", "audioFailed": "音声再生に失敗しました。", "sttSuccess": "音声を認識しました。", "sttFailed": "音声認識に失敗しました。", "recording": "録音中...", "micDenied": "マイク権限が必要です。" }
+  },
+  "writingPage": {
+    "header": { "title": "TOPIK II 作文(51〜54) 添削", "subtitle": "AIが採点し詳細フィードバックを提供", "history": "履歴" },
+    "notice": { "title": "重要なお知らせ" },
+    "steps": { "question": "問題をアップロード", "answer": "あなたの答案" },
+    "answerMode": { "text": "テキスト", "image": "画像" },
+    "placeholders": { "answerText": "ここに答案を貼り付け/入力..." },
+    "tip": { "copyPaste": "ヒント: Word/メモの文章を貼り付けると精度が上がります。" },
+    "actions": { "grading": "採点中...", "grade": "AIで採点", "freeGrade": "🎁 無料採点(1日1回)", "upgradeToGrade": "Premiumにアップグレードして採点" },
+    "pdf": { "generatingTitle": "PDF生成中...", "generatingDesc": "少々お待ちください", "failedTitle": "PDF生成失敗", "failedDesc": "もう一度お試しください" }
+  }
   "interview": {
     "title": "面接シミュレーション", "description": "韓国企業面接練習",
     "featureName": "面接シミュレーション", "heroTitle": "面接練習", "heroDescription": "韓国の大手企業との面接を練習しましょう", "supportVoiceText": "音声・テキスト対応",

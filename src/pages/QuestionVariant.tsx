@@ -12,26 +12,11 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
 interface ParsedResult {
-  originalAnalysis?: {
-    ko: string;
-    vi: string;
-  };
-  variantQuestion?: {
-    ko: string;
-    vi: string;
-  };
-  answer?: {
-    ko: string;
-    vi: string;
-  };
-  explanation?: {
-    ko: string;
-    vi: string;
-  };
-  learningPoints?: {
-    ko: string;
-    vi: string;
-  };
+  originalAnalysis?: Record<string, string>;
+  variantQuestion?: Record<string, string>;
+  answer?: Record<string, string>;
+  explanation?: Record<string, string>;
+  learningPoints?: Record<string, string>;
 }
 
 export default function QuestionVariant() {
@@ -81,7 +66,7 @@ export default function QuestionVariant() {
 
   const parseGeneratedContent = (content: string): ParsedResult => {
     const result: ParsedResult = {};
-    
+
     const sections = {
       originalAnalysis: /##\s*📋\s*원본\s*문제\s*분석\s*[\s\S]*?(?=##|$)/i,
       variantQuestion: /##\s*✨\s*변형\s*문제\s*[\s\S]*?(?=##|$)/i,
@@ -90,14 +75,13 @@ export default function QuestionVariant() {
       learningPoints: /##\s*💡\s*학습\s*포인트\s*[\s\S]*?(?=##|$)/i,
     };
 
+    const language = (t("common.currentLanguage", { defaultValue: "ko" }) as string) || "ko";
+
     for (const [key, regex] of Object.entries(sections)) {
       const match = content.match(regex);
       if (match) {
-        let text = match[0].replace(/^##\s*[📋✨✅📝💡]\s*[^\n]+\n?/, '').trim();
-        result[key as keyof ParsedResult] = {
-          ko: text,
-          vi: ''
-        };
+        const text = match[0].replace(/^##\s*[📋✨✅📝💡]\s*[^\n]+\n?/, "").trim();
+        result[key as keyof ParsedResult] = { [language]: text };
       }
     }
 

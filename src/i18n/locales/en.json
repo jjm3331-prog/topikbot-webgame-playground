@@ -584,6 +584,30 @@
     "overallScore": "Overall Score",
     "correctionComplete": "Correction Complete!"
   },
+  "roleplay": {
+    "badge": "AI Roleplay Speaking",
+    "title": "Roleplay Speaking",
+    "subtitle": "Real-life scenarios • Grammar feedback • TOPIK quiz",
+    "labels": { "scenario": "Scenario:", "suggestions": "Suggested replies" },
+    "empty": { "title": "Start speaking!", "desc": "AI gives you a scenario and you practice natural Korean conversation." },
+    "actions": { "start": "Start Roleplay", "listen": "Listen", "newScenario": "New scenario", "makeQuiz": "Create TOPIK Quiz", "prev": "Prev", "next": "Next", "showResults": "Show results", "closeQuiz": "Close Quiz" },
+    "placeholders": { "input": "Type your answer in Korean..." },
+    "feedback": { "good": "Good!", "needsFix": "Needs fix" },
+    "tips": { "title": "Guide", "step1": "Tap ‘Start Roleplay’ to get a random scenario", "step2": "Reply in Korean (type or speak)", "step3": "Review AI corrections and grammar tips", "step4": "Create a TOPIK quiz from what you learned", "tipLabel": "Tip:", "tipText": "Use suggested replies when you’re not sure what to say." },
+    "stats": { "title": "This session", "spoken": "Sentences spoken", "correct": "Correct sentences" },
+    "quiz": { "progress": "{{current}}/{{total}}", "yourScore": "Your score", "correctAnswer": "Correct answer: {{answer}}" },
+    "toast": { "started": "New scenario started.", "startFailed": "Failed to start. Please try again.", "needConversation": "You need at least one conversation round to create a quiz.", "quizCreated": "Quiz created.", "quizFailed": "Failed to create quiz.", "audioFailed": "Failed to play audio.", "sttSuccess": "Voice recognized.", "sttFailed": "Voice recognition failed.", "recording": "Recording...", "micDenied": "Microphone access is required." }
+  },
+  "writingPage": {
+    "header": { "title": "TOPIK II Writing (51–54)", "subtitle": "AI scores and gives detailed feedback", "history": "History" },
+    "notice": { "title": "Important note" },
+    "steps": { "question": "Upload question", "answer": "Your answer" },
+    "answerMode": { "text": "Text", "image": "Images" },
+    "placeholders": { "answerText": "Paste or type your answer here..." },
+    "tip": { "copyPaste": "Tip: Copy & paste from Word or notes for best accuracy." },
+    "actions": { "grading": "Grading...", "grade": "Grade with AI", "freeGrade": "🎁 Free grading (1/day)", "upgradeToGrade": "Upgrade Premium to grade" },
+    "pdf": { "generatingTitle": "Generating PDF...", "generatingDesc": "Please wait a moment", "failedTitle": "PDF failed", "failedDesc": "Please try again" }
+  }
   "interview": {
     "title": "Interview Simulation",
     "description": "Practice interviews with Korean companies",

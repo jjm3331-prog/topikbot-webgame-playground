@@ -1,10 +1,11 @@
 import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  MessageCircle, 
+import { useTranslation } from "react-i18next";
+import {
+  MessageCircle,
   Play,
-  Volume2, 
-  Mic, 
+  Volume2,
+  Mic,
   MicOff,
   Send,
   Sparkles,
@@ -17,7 +18,7 @@ import {
   Lightbulb,
   CheckCircle2,
   XCircle,
-  HelpCircle
+  HelpCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,6 +67,7 @@ interface QuizData {
 }
 
 export default function RoleplaySpeaking() {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -112,10 +114,10 @@ export default function RoleplaySpeaking() {
       };
 
       setMessages([newMessage]);
-      toast.success("🎭 Bắt đầu tình huống mới!");
+      toast.success(t("roleplay.toast.started"));
     } catch (error: any) {
       console.error("Start roleplay error:", error);
-      toast.error(error.message || "Lỗi khởi tạo. Vui lòng thử lại.");
+      toast.error(error.message || t("roleplay.toast.startFailed"));
     } finally {
       setIsLoading(false);
     }
@@ -199,14 +201,14 @@ export default function RoleplaySpeaking() {
   // Generate quiz from conversation
   const generateQuiz = async () => {
     if (messages.length < 2) {
-      toast.error("Cần ít nhất 1 vòng hội thoại để tạo quiz!");
+      toast.error(t("roleplay.toast.needConversation"));
       return;
     }
 
     setIsGeneratingQuiz(true);
 
     try {
-      const conversationHistory = messages.map(m => ({
+      const conversationHistory = messages.map((m) => ({
         role: m.role,
         content: m.korean,
       }));
@@ -226,10 +228,10 @@ export default function RoleplaySpeaking() {
       setCurrentQuizIndex(0);
       setSelectedAnswers({});
       setShowResults(false);
-      toast.success("📝 Quiz đã được tạo!");
+      toast.success(t("roleplay.toast.quizCreated"));
     } catch (error: any) {
       console.error("Generate quiz error:", error);
-      toast.error(error.message || "Lỗi tạo quiz");
+      toast.error(error.message || t("roleplay.toast.quizFailed"));
     } finally {
       setIsGeneratingQuiz(false);
     }
@@ -268,13 +270,13 @@ export default function RoleplaySpeaking() {
       audioRef.current.onended = () => setIsSpeaking(false);
       audioRef.current.onerror = () => {
         setIsSpeaking(false);
-        toast.error("Lỗi phát âm thanh");
+        toast.error(t("roleplay.toast.audioFailed"));
       };
       await audioRef.current.play();
     } catch (error) {
       console.error("TTS error:", error);
       setIsSpeaking(false);
-      toast.error("Lỗi phát âm");
+      toast.error(t("roleplay.toast.audioFailed"));
     }
   };
 
@@ -308,11 +310,11 @@ export default function RoleplaySpeaking() {
             if (error) throw error;
             if (data.text) {
               setInputText(data.text);
-              toast.success("Đã nhận diện giọng nói!");
+              toast.success(t("roleplay.toast.sttSuccess"));
             }
           } catch (err: any) {
             console.error("STT error:", err);
-            toast.error("Lỗi nhận diện giọng nói");
+            toast.error(t("roleplay.toast.sttFailed"));
           }
         };
         reader.readAsDataURL(audioBlob);
@@ -320,10 +322,10 @@ export default function RoleplaySpeaking() {
 
       mediaRecorder.start();
       setIsRecording(true);
-      toast.info("🎤 Đang ghi âm...");
+      toast.info(t("roleplay.toast.recording"));
     } catch (error) {
       console.error("Recording error:", error);
-      toast.error("Không thể truy cập microphone");
+      toast.error(t("roleplay.toast.micDenied"));
     }
   };
 
@@ -372,13 +374,13 @@ export default function RoleplaySpeaking() {
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
                 <MessageCircle className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-primary">AI Roleplay Speaking</span>
+                <span className="text-sm font-medium text-primary">{t("roleplay.badge")}</span>
               </div>
               <h1 className="text-2xl lg:text-3xl font-bold mb-2">
-                🎭 <span className="text-gradient-primary">Luyện Nói Roleplay</span> Thực Tế
+                🎭 <span className="text-gradient-primary">{t("roleplay.title")}</span>
               </h1>
               <p className="text-muted-foreground max-w-xl mx-auto text-sm">
-                Trò chuyện với AI trong các tình huống đời thường • Nhận phản hồi ngữ pháp • Tạo quiz TOPIK
+                {t("roleplay.subtitle")}
               </p>
             </motion.div>
 
@@ -397,7 +399,7 @@ export default function RoleplaySpeaking() {
                     <div className="px-4 py-3 bg-primary/5 border-b border-border">
                       <div className="flex items-center gap-2 text-sm">
                         <Sparkles className="w-4 h-4 text-primary" />
-                        <span className="text-muted-foreground">Tình huống:</span>
+                        <span className="text-muted-foreground">{t("roleplay.labels.scenario")}</span>
                         <span className="font-medium">{messages[messages.length - 1].scenarioContext}</span>
                       </div>
                     </div>
@@ -413,9 +415,9 @@ export default function RoleplaySpeaking() {
                         <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                           <MessageCircle className="w-10 h-10 text-primary" />
                         </div>
-                        <h3 className="font-semibold text-lg mb-2">Bắt đầu luyện nói!</h3>
+                        <h3 className="font-semibold text-lg mb-2">{t("roleplay.empty.title")}</h3>
                         <p className="text-muted-foreground text-sm mb-6 max-w-sm">
-                          AI sẽ tạo tình huống ngẫu nhiên và bạn sẽ thực hành hội thoại tiếng Hàn thực tế
+                          {t("roleplay.empty.desc")}
                         </p>
                         <Button
                           onClick={startRoleplay}
@@ -427,7 +429,7 @@ export default function RoleplaySpeaking() {
                           ) : (
                             <Play className="w-4 h-4" />
                           )}
-                          Bắt đầu Roleplay
+                          {t("roleplay.actions.start")}
                         </Button>
                       </div>
                     ) : (
@@ -467,7 +469,7 @@ export default function RoleplaySpeaking() {
                                       className="mt-2 h-7 text-xs"
                                     >
                                       <Volume2 className={`w-3 h-3 mr-1 ${isSpeaking ? "animate-pulse" : ""}`} />
-                                      Nghe
+                                      {t("roleplay.actions.listen")}
                                     </Button>
 
                                     {/* Grammar highlight */}
@@ -502,7 +504,7 @@ export default function RoleplaySpeaking() {
                                     {message.suggestedResponses && message.suggestedResponses.length > 0 && (
                                       <div className="mt-3 pt-3 border-t border-border/50">
                                         <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
-                                          <Lightbulb className="w-3 h-3" /> Gợi ý trả lời:
+                                          <Lightbulb className="w-3 h-3" /> {t("roleplay.labels.suggestions")}
                                         </p>
                                         <div className="flex flex-wrap gap-2">
                                           {message.suggestedResponses.map((suggestion, i) => (
@@ -531,9 +533,9 @@ export default function RoleplaySpeaking() {
                                       ) : (
                                         <XCircle className="w-3.5 h-3.5 text-red-300" />
                                       )}
-                                      <span className={message.feedback.is_correct ? "text-green-200" : "text-red-200"}>
-                                        {message.feedback.is_correct ? "Tốt lắm!" : "Cần sửa"}
-                                      </span>
+                                       <span className={message.feedback.is_correct ? "text-green-200" : "text-red-200"}>
+                                         {message.feedback.is_correct ? t("roleplay.feedback.good") : t("roleplay.feedback.needsFix")}
+                                       </span>
                                     </div>
                                     {message.feedback.correction && (
                                       <p className="text-xs mt-1 opacity-90">
@@ -581,7 +583,7 @@ export default function RoleplaySpeaking() {
                           value={inputText}
                           onChange={(e) => setInputText(e.target.value)}
                           onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-                          placeholder="Nhập câu trả lời tiếng Hàn..."
+                          placeholder={t("roleplay.placeholders.input")}
                           className="flex-1"
                           disabled={isLoading}
                         />
@@ -604,7 +606,7 @@ export default function RoleplaySpeaking() {
                           className="gap-1.5"
                         >
                           <RefreshCw className="w-3.5 h-3.5" />
-                          Tình huống mới
+                          {t("roleplay.actions.newScenario")}
                         </Button>
 
                         <Button
@@ -619,7 +621,7 @@ export default function RoleplaySpeaking() {
                           ) : (
                             <Trophy className="w-3.5 h-3.5" />
                           )}
-                          Tạo Quiz TOPIK
+                          {t("roleplay.actions.makeQuiz")}
                         </Button>
                       </div>
                     </div>
@@ -655,9 +657,9 @@ export default function RoleplaySpeaking() {
                       <>
                         {/* Current Question */}
                         <div className="space-y-4">
-                          <div className="text-xs text-muted-foreground">
-                            Câu {currentQuizIndex + 1}/{quizData.questions.length}
-                          </div>
+                            <div className="text-xs text-muted-foreground">
+                              {t("roleplay.quiz.progress", { current: currentQuizIndex + 1, total: quizData.questions.length })}
+                            </div>
 
                           <div className="p-3 bg-muted/50 rounded-lg">
                             <p className="text-sm italic text-muted-foreground mb-2">
@@ -698,7 +700,7 @@ export default function RoleplaySpeaking() {
                                 size="sm"
                                 onClick={() => setCurrentQuizIndex((i) => i - 1)}
                               >
-                                Trước
+                                {t("roleplay.actions.prev")}
                               </Button>
                             )}
                             {currentQuizIndex < quizData.questions.length - 1 ? (
@@ -707,7 +709,7 @@ export default function RoleplaySpeaking() {
                                 onClick={() => setCurrentQuizIndex((i) => i + 1)}
                                 disabled={!selectedAnswers[quizData.questions[currentQuizIndex].id]}
                               >
-                                Tiếp
+                                {t("roleplay.actions.next")}
                               </Button>
                             ) : (
                               <Button
@@ -715,7 +717,7 @@ export default function RoleplaySpeaking() {
                                 onClick={() => setShowResults(true)}
                                 disabled={Object.keys(selectedAnswers).length < quizData.questions.length}
                               >
-                                Xem kết quả
+                                {t("roleplay.actions.showResults")}
                               </Button>
                             )}
                           </div>
@@ -728,7 +730,7 @@ export default function RoleplaySpeaking() {
                           <div className="text-3xl font-bold text-primary mb-1">
                             {calculateScore()}/{quizData.questions.length}
                           </div>
-                          <p className="text-sm text-muted-foreground">Điểm số của bạn</p>
+                          <p className="text-sm text-muted-foreground">{t("roleplay.quiz.yourScore")}</p>
                         </div>
 
                         <div className="space-y-3 max-h-[300px] overflow-y-auto">
@@ -750,9 +752,9 @@ export default function RoleplaySpeaking() {
                                   <div>
                                     <p className="font-medium">{q.question}</p>
                                     {!isCorrect && (
-                                      <p className="text-xs mt-1 text-muted-foreground">
-                                        Đáp án đúng: {q.correct_answer}
-                                      </p>
+                                        <p className="text-xs mt-1 text-muted-foreground">
+                                          {t("roleplay.quiz.correctAnswer", { answer: q.correct_answer })}
+                                        </p>
                                     )}
                                     <p className="text-xs mt-1 text-muted-foreground">{q.explanation}</p>
                                   </div>
@@ -772,7 +774,7 @@ export default function RoleplaySpeaking() {
                             setCurrentQuizIndex(0);
                           }}
                         >
-                          Đóng Quiz
+                          {t("roleplay.actions.closeQuiz")}
                         </Button>
                       </div>
                     )}
@@ -782,30 +784,30 @@ export default function RoleplaySpeaking() {
                   <Card className="premium-card p-4">
                     <h3 className="font-semibold mb-3 flex items-center gap-2">
                       <HelpCircle className="w-4 h-4 text-primary" />
-                      Hướng dẫn
+                      {t("roleplay.tips.title")}
                     </h3>
                     <ul className="text-sm text-muted-foreground space-y-2">
                       <li className="flex items-start gap-2">
                         <span className="text-primary">1.</span>
-                        Nhấn "Bắt đầu Roleplay" để nhận tình huống ngẫu nhiên
+                        {t("roleplay.tips.step1")}
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-primary">2.</span>
-                        Trả lời bằng tiếng Hàn (gõ hoặc nói)
+                        {t("roleplay.tips.step2")}
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-primary">3.</span>
-                        AI sẽ sửa lỗi và hướng dẫn ngữ pháp
+                        {t("roleplay.tips.step3")}
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-primary">4.</span>
-                        Tạo Quiz TOPIK từ nội dung đã học!
+                        {t("roleplay.tips.step4")}
                       </li>
                     </ul>
 
                     <div className="mt-4 p-3 bg-korean-blue/10 rounded-lg">
                       <p className="text-xs text-muted-foreground">
-                        💡 <strong>Mẹo:</strong> Dùng các gợi ý trả lời nếu chưa biết nói gì!
+                        💡 <strong>{t("roleplay.tips.tipLabel")}</strong> {t("roleplay.tips.tipText")}
                       </p>
                     </div>
                   </Card>
@@ -813,19 +815,19 @@ export default function RoleplaySpeaking() {
 
                 {/* Stats Card */}
                 <Card className="premium-card p-4">
-                  <h3 className="font-semibold mb-3">📊 Phiên này</h3>
+                  <h3 className="font-semibold mb-3">📊 {t("roleplay.stats.title")}</h3>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="text-center p-2 bg-muted/50 rounded-lg">
                       <div className="text-xl font-bold text-primary">
                         {messages.filter((m) => m.role === "user").length}
                       </div>
-                      <div className="text-xs text-muted-foreground">Câu đã nói</div>
+                       <div className="text-xs text-muted-foreground">{t("roleplay.stats.spoken")}</div>
                     </div>
                     <div className="text-center p-2 bg-muted/50 rounded-lg">
                       <div className="text-xl font-bold text-green-500">
                         {messages.filter((m) => m.feedback?.is_correct).length}
                       </div>
-                      <div className="text-xs text-muted-foreground">Câu đúng</div>
+                       <div className="text-xs text-muted-foreground">{t("roleplay.stats.correct")}</div>
                     </div>
                   </div>
                 </Card>

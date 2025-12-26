@@ -487,8 +487,8 @@ const WritingCorrection = () => {
     if (!result || !pdfContentRef.current) return;
 
     toast({
-      title: "PDF 생성 중...",
-      description: "잠시만 기다려주세요"
+      title: t("writingPage.pdf.generatingTitle"),
+      description: t("writingPage.pdf.generatingDesc"),
     });
 
     try {
@@ -547,9 +547,9 @@ const WritingCorrection = () => {
     } catch (error) {
       console.error('PDF export error:', error);
       toast({
-        title: "PDF 생성 실패",
-        description: "다시 시도해주세요",
-        variant: "destructive"
+        title: t("writingPage.pdf.failedTitle"),
+        description: t("writingPage.pdf.failedDesc"),
+        variant: "destructive",
       });
     }
   };
@@ -618,10 +618,10 @@ const WritingCorrection = () => {
           <div className="flex items-center justify-between gap-2 mt-6 pt-4">
             <div className="text-center flex-1">
               <h1 className="text-xl sm:text-2xl font-heading font-bold text-foreground">
-                ✍️ Chấm Writing TOPIK II (51~54)
+                ✍️ {t("writingPage.header.title")}
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                AI chấm điểm và phân tích chi tiết bài viết của bạn
+                {t("writingPage.header.subtitle")}
               </p>
             </div>
             <Button
@@ -631,7 +631,7 @@ const WritingCorrection = () => {
               className="shrink-0"
             >
               <History className="w-4 h-4 mr-2" />
-              Lịch sử ({savedCorrections.length})
+              {t("writingPage.header.history")} ({savedCorrections.length})
             </Button>
           </div>
 
@@ -662,7 +662,7 @@ const WritingCorrection = () => {
             <div className="flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium text-foreground">Lưu ý quan trọng</p>
+                <p className="font-medium text-foreground">{t("writingPage.notice.title")}</p>
                 <p className="text-sm text-muted-foreground">
                   Chữ viết tay tiếng Hàn khó nhận dạng có thể ảnh hưởng đến kết quả. 
                   Khuyến nghị sử dụng phương thức <strong>nhập văn bản</strong> để có kết quả chính xác nhất.
@@ -678,7 +678,7 @@ const WritingCorrection = () => {
               <Card className="p-6 bg-card border-border">
                 <h3 className="font-semibold text-lg text-foreground mb-4 flex items-center gap-2">
                   <ImageIcon className="w-5 h-5 text-primary" />
-                  1. Upload đề bài gốc
+                  1. {t("writingPage.steps.question")}
                 </h3>
                 
                 {/* File upload input (no capture - for file selection) */}
@@ -781,31 +781,31 @@ const WritingCorrection = () => {
               <Card className="p-6 bg-card border-border">
                 <h3 className="font-semibold text-lg text-foreground mb-4 flex items-center gap-2">
                   <PenTool className="w-5 h-5 text-primary" />
-                  2. Bài làm của bạn
+                  2. {t("writingPage.steps.answer")}
                 </h3>
 
                 <Tabs value={answerMethod} onValueChange={(v) => setAnswerMethod(v as "image" | "text")}>
                   <TabsList className="w-full mb-4">
                     <TabsTrigger value="text" className="flex-1">
                       <FileText className="w-4 h-4 mr-2" />
-                      Nhập văn bản
+                      {t("writingPage.answerMode.text")}
                     </TabsTrigger>
                     <TabsTrigger value="image" className="flex-1">
                       <ImageIcon className="w-4 h-4 mr-2" />
-                      Upload ảnh
+                      {t("writingPage.answerMode.image")}
                     </TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="text">
-                    <Textarea
-                      value={answerText}
-                      onChange={(e) => setAnswerText(e.target.value)}
-                      placeholder="Dán hoặc nhập bài viết của bạn tại đây..."
-                      className="min-h-[200px] resize-none"
-                    />
-                    <p className="text-xs text-muted-foreground mt-2">
-                      💡 Tip: Copy & Paste văn bản từ file Word hoặc ghi chú
-                    </p>
+                      <Textarea
+                        value={answerText}
+                        onChange={(e) => setAnswerText(e.target.value)}
+                        placeholder={t("writingPage.placeholders.answerText")}
+                        className="min-h-[200px] resize-none"
+                      />
+                      <p className="text-xs text-muted-foreground mt-2">
+                        💡 {t("writingPage.tip.copyPaste")}
+                      </p>
                   </TabsContent>
 
                   <TabsContent value="image">
@@ -922,26 +922,26 @@ const WritingCorrection = () => {
                   disabled={processing || questionImages.length === 0}
                   className="w-full btn-primary text-primary-foreground h-14 text-lg"
                 >
-                  {processing ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Đang chấm điểm...
-                    </>
-                  ) : (
-                    <>
-                      <PenTool className="w-5 h-5 mr-2" />
-                      {isPremium ? 'Chấm điểm AI' : '🎁 Chấm điểm miễn phí (1/ngày)'}
-                    </>
-                  )}
+                      {processing ? (
+                        <>
+                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                          {t("writingPage.actions.grading")}
+                        </>
+                      ) : (
+                        <>
+                          <PenTool className="w-5 h-5 mr-2" />
+                          {isPremium ? t("writingPage.actions.grade") : t("writingPage.actions.freeGrade")}
+                        </>
+                      )}
                 </Button>
               ) : (
-                <Button
-                  onClick={() => navigate("/pricing")}
-                  className="w-full bg-gradient-to-r from-korean-orange to-korean-pink hover:opacity-90 text-white h-14 text-lg"
-                >
-                  <Lock className="w-5 h-5 mr-2" />
-                  Nâng cấp Premium để chấm điểm
-                </Button>
+                  <Button
+                    onClick={() => navigate("/pricing")}
+                    className="w-full bg-gradient-to-r from-korean-orange to-korean-pink hover:opacity-90 text-white h-14 text-lg"
+                  >
+                    <Lock className="w-5 h-5 mr-2" />
+                    {t("writingPage.actions.upgradeToGrade")}
+                  </Button>
               )}
             </div>
 
