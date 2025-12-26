@@ -87,11 +87,11 @@ const Quiz = () => {
         body: { difficulty, userId, sessionId } 
       });
       if (error) throw error;
-      if (data.error) { toast({ title: "오류 / Lỗi", description: data.error, variant: "destructive" }); return; }
+      if (data.error) { toast({ title: t("quiz.error"), description: data.error, variant: "destructive" }); return; }
       setQuestion(data);
       setUsedExpressions(prev => [...prev, data.expression]);
     } catch (error) {
-      toast({ title: "오류가 발생했습니다 / Có lỗi xảy ra", description: "다시 시도해주세요 / Hãy thử lại", variant: "destructive" });
+      toast({ title: t("quiz.errorOccurred"), description: t("quiz.tryAgain"), variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -112,10 +112,10 @@ const Quiz = () => {
       const totalPoints = points + streak * 5;
       setScore(prev => prev + totalPoints);
       setStreak(prev => prev + 1);
-      toast({ title: "정답! 🎉 Đúng rồi!", description: hintUsed ? `+${totalPoints}점 (힌트)` : `+${totalPoints}점` });
+      toast({ title: t("quiz.correctAnswer"), description: hintUsed ? `+${totalPoints}${t("quiz.pointsUnit")} (${t("quiz.hint")})` : `+${totalPoints}${t("quiz.pointsUnit")}` });
     } else {
       setStreak(0);
-      toast({ title: "오답 😢 Sai rồi!", description: "다음에 다시! / Thử lại!", variant: "destructive" });
+      toast({ title: t("quiz.wrongAnswer"), description: t("quiz.tryNext"), variant: "destructive" });
     }
   };
 
@@ -123,15 +123,15 @@ const Quiz = () => {
     if (hintUsed || showResult) return;
     setHintUsed(true);
     setShowHint(true);
-    toast({ title: "힌트! / Gợi ý!", description: "점수 절반 / Điểm giảm nửa" });
+    toast({ title: t("quiz.hintUsed"), description: t("quiz.halfPoints") });
   };
 
   const getTypeLabel = (type: string) => {
     const labels: { [key: string]: { ko: string; vi: string; color: string } } = {
-      idiom: { ko: "관용어", vi: "Thành ngữ", color: "bg-purple-500" },
-      proverb: { ko: "속담", vi: "Tục ngữ", color: "bg-blue-500" },
-      slang: { ko: "유행어", vi: "Tiếng lóng", color: "bg-pink-500" },
-      internet: { ko: "인터넷", vi: "Internet", color: "bg-green-500" },
+      idiom: { ko: t("quiz.types.idiom"), vi: t("quiz.types.idiom"), color: "bg-purple-500" },
+      proverb: { ko: t("quiz.types.proverb"), vi: t("quiz.types.proverb"), color: "bg-blue-500" },
+      slang: { ko: t("quiz.types.slang"), vi: t("quiz.types.slang"), color: "bg-pink-500" },
+      internet: { ko: t("quiz.types.internet"), vi: t("quiz.types.internet"), color: "bg-green-500" },
     };
     return labels[type] || labels.idiom;
   };
@@ -150,7 +150,7 @@ const Quiz = () => {
       
       {/* Stats Bar */}
       <div className="px-3 py-2 flex items-center justify-between border-b border-white/10 shrink-0">
-        <span className="text-white font-medium">관용어 퀴즈 / Quiz thành ngữ</span>
+        <span className="text-white font-medium">{t("quiz.idiomQuiz")}</span>
         <div className="flex items-center gap-2">
           {streak > 0 && (
             <div className="flex items-center gap-0.5 text-orange-400">
@@ -160,7 +160,7 @@ const Quiz = () => {
           )}
           <div className="flex items-center gap-1 text-yellow-400">
             <Sparkles className="w-4 h-4" />
-            <span className="font-bold text-sm">{score}점</span>
+            <span className="font-bold text-sm">{score}{t("quiz.pointsUnit")}</span>
           </div>
           <Button variant="ghost" size="sm" onClick={resetGame} className="text-white/70 hover:text-white h-8 w-8 p-0">
             <RotateCcw className="w-4 h-4" />
@@ -183,8 +183,8 @@ const Quiz = () => {
               }`}
             >
               <div className="flex flex-col leading-tight">
-                <span>{diff === "easy" ? "쉬움" : diff === "medium" ? "보통" : "어려움"}</span>
-                <span className="opacity-70">{diff === "easy" ? "Dễ" : diff === "medium" ? "TB" : "Khó"}</span>
+                <span>{diff === "easy" ? t("quiz.difficulty.easy") : diff === "medium" ? t("quiz.difficulty.medium") : t("quiz.difficulty.hard")}</span>
+                <span className="opacity-70">{diff === "easy" ? t("quiz.difficulty.easyShort") : diff === "medium" ? t("quiz.difficulty.mediumShort") : t("quiz.difficulty.hardShort")}</span>
               </div>
             </Button>
           ))}
@@ -201,7 +201,7 @@ const Quiz = () => {
                 <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }} />
                 <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
               </div>
-              <p className="text-white/60 text-sm">문제 생성중... / Đang tạo...</p>
+              <p className="text-white/60 text-sm">{t("quiz.generating")}</p>
             </div>
           </div>
         ) : question ? (
@@ -221,19 +221,19 @@ const Quiz = () => {
                 </div>
                 
                 <h2 className="text-2xl font-bold text-white text-center mb-2">{question.expression}</h2>
-                <p className="text-white/50 text-xs text-center">이 표현의 의미는? / Ý nghĩa là gì?</p>
+                <p className="text-white/50 text-xs text-center">{t("quiz.whatMeaning")}</p>
 
                 {!showResult && (
                   <div className="mt-3">
                     {!showHint ? (
                       <Button variant="outline" size="sm" onClick={handleUseHint} disabled={hintUsed} className="w-full border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/20 text-xs h-8">
                         <Lightbulb className="w-3 h-3 mr-1" />
-                        힌트 / Gợi ý (점수 ½)
+                        {t("quiz.useHint")}
                       </Button>
                     ) : (
                       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-yellow-500/20 border border-yellow-500/30 p-2 rounded-lg">
-                        <p className="text-white/90 text-xs">{question.hint_ko || "힌트 없음"}</p>
-                        <p className="text-white/60 text-[10px] italic">{question.hint_vi || "Không có gợi ý"}</p>
+                        <p className="text-white/90 text-xs">{question.hint_ko || t("quiz.noHint")}</p>
+                        <p className="text-white/60 text-[10px] italic">{question.hint_vi || t("quiz.noHint")}</p>
                       </motion.div>
                     )}
                   </div>
@@ -276,12 +276,12 @@ const Quiz = () => {
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="glass-card p-3 rounded-xl mb-3">
                     <div className="flex items-center gap-1.5 mb-2">
                       <Lightbulb className="w-4 h-4 text-yellow-400" />
-                      <span className="text-white font-bold text-sm">설명 / Giải thích</span>
+                      <span className="text-white font-bold text-sm">{t("quiz.explanation")}</span>
                     </div>
                     <p className="text-white/90 text-sm mb-1">{question.explanation_ko}</p>
                     <p className="text-white/60 text-xs italic mb-3">{question.explanation_vi}</p>
                     <div className="bg-white/5 p-2 rounded-lg">
-                      <p className="text-white/50 text-[10px] mb-0.5">예문 / Ví dụ:</p>
+                      <p className="text-white/50 text-[10px] mb-0.5">{t("quiz.example")}</p>
                       <p className="text-amber-300 text-sm">{question.example_sentence}</p>
                       <p className="text-white/60 text-xs italic">{question.example_translation}</p>
                     </div>
@@ -291,7 +291,7 @@ const Quiz = () => {
 
               {showResult && (
                 <Button onClick={fetchQuestion} className="w-full bg-amber-600 hover:bg-amber-700 h-11 text-sm">
-                  다음 문제 / Câu tiếp theo
+                  {t("quiz.nextQuestion")}
                 </Button>
               )}
             </motion.div>
@@ -302,9 +302,9 @@ const Quiz = () => {
       {/* Stats Footer */}
       <div className="p-3 border-t border-white/10 bg-gray-900/80 shrink-0">
         <div className="flex items-center justify-between text-white/60 text-xs">
-          <span>문제/Câu: {totalQuestions}</span>
-          <span>정답률/TL: {totalQuestions > 0 ? Math.round((score / (totalQuestions * 20)) * 100) : 0}%</span>
-          <span>연속/LT: {streak}</span>
+          <span>{t("quiz.questions")}: {totalQuestions}</span>
+          <span>{t("quiz.accuracy")}: {totalQuestions > 0 ? Math.round((score / (totalQuestions * 20)) * 100) : 0}%</span>
+          <span>{t("quiz.streak")}: {streak}</span>
         </div>
       </div>
       <AppFooter />

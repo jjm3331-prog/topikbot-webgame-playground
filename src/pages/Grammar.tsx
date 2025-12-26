@@ -124,6 +124,7 @@ function shuffleArray<T>(array: T[]): T[] {
 
 // ==================== 문장 조립 퍼즐 ====================
 function AssemblyGame({ level }: { level: TopikLevel }) {
+  const { t } = useTranslation();
   const [questions, setQuestions] = useState<GrammarQuestion[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedParts, setSelectedParts] = useState<string[]>([]);
@@ -204,10 +205,10 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
       const comboBonus = Math.min(combo, 5) * 5;
       setScore((prev) => prev + 10 + comboBonus);
       setCombo((prev) => prev + 1);
-      toast.success(`Đúng! +${10 + comboBonus} / 정답! +${10 + comboBonus}`);
+      toast.success(`${t("grammar.correct")} +${10 + comboBonus}`);
     } else {
       setCombo(0);
-      toast.error("Sai rồi, thử lại nhé! / 다시 시도해보세요!");
+      toast.error(t("grammar.incorrect"));
     }
   };
 
@@ -216,7 +217,7 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
       setCurrentIndex(prev => prev + 1);
       resetGame(questions[currentIndex + 1]);
     } else {
-      toast.success(`Hoàn thành! Tổng ${score} điểm / 게임 완료! 총 ${score}점`);
+      toast.success(`${t("grammar.gameComplete")} ${score}${t("grammar.pointsUnit")}`);
       setCurrentIndex(0);
       fetchQuestions();
     }
@@ -240,12 +241,12 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
         <div className="flex items-center gap-4">
           <Badge variant="outline" className="text-lg px-4 py-2">
             <Trophy className="w-4 h-4 mr-2" />
-            {score}점
+            {score}{t("grammar.pointsUnit")}
           </Badge>
           {combo > 0 && (
             <Badge className="bg-orange-500 text-lg px-4 py-2">
               <Flame className="w-4 h-4 mr-2" />
-              {combo} 콤보!
+              {combo} {t("grammar.combo")}
             </Badge>
           )}
         </div>
@@ -258,7 +259,7 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
       <Card className="p-4 bg-primary/5 border-primary/20">
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-primary" />
-          <span className="font-medium">Điểm ngữ pháp</span>
+          <span className="font-medium">{t("grammar.grammarPoint")}</span>
           <BilingualText vi={current.grammarPoint.vi} ko={current.grammarPoint.ko} />
         </div>
       </Card>
@@ -267,8 +268,8 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
       <Card className="p-6">
         <BilingualText
           className="mb-4"
-          vi="Hãy sắp xếp các từ theo đúng thứ tự:"
-          ko="다음 어절들을 올바른 순서로 조립하세요:"
+          vi={t("grammar.arrangeInstruction")}
+          ko={t("grammar.arrangeInstructionKo")}
         />
         <BilingualText vi={current.prompt.vi} ko={current.prompt.ko} />
 
@@ -277,8 +278,8 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
           <div className="flex flex-wrap gap-2">
             {selectedParts.length === 0 ? (
               <BilingualText
-                vi="Kéo/nhấn để đặt các từ vào đây theo thứ tự"
-                ko="여기에 어절을 순서대로 배치하세요"
+                vi={t("grammar.dragInstruction")}
+                ko={t("grammar.dragInstructionKo")}
               />
             ) : (
               selectedParts.map((part, index) => (
@@ -332,14 +333,14 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
                   <X className="w-5 h-5 text-red-500" />
                 )}
                 <span className="font-medium">
-                  {isCorrect ? "Đúng! / 정답입니다!" : "Sai rồi / 틀렸습니다"}
+                  {isCorrect ? t("grammar.correctFull") : t("grammar.incorrectFull")}
                 </span>
               </div>
               <p className="text-sm text-muted-foreground">
-                <strong>Đáp án / 정답:</strong> {current.answer}
+                <strong>{t("grammar.answer")}:</strong> {current.answer}
               </p>
               <div className="mt-2 space-y-2">
-                <div className="text-sm font-medium">💡 Giải thích / 해설</div>
+                <div className="text-sm font-medium">💡 {t("grammar.explanation")}</div>
                 <BilingualText vi={current.explanation.vi} ko={current.explanation.ko} />
               </div>
             </motion.div>
@@ -355,11 +356,11 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
               className="flex-1"
             >
               <Check className="w-4 h-4 mr-2" />
-              <BilingualText vi="Kiểm tra" ko="확인하기" />
+              {t("grammar.check")}
             </Button>
           ) : (
             <Button onClick={handleNext} className="flex-1">
-              {currentIndex < questions.length - 1 ? "Tiếp theo / 다음 문제" : "Chơi lại / 다시 시작"}
+              {currentIndex < questions.length - 1 ? t("grammar.next") : t("grammar.restart")}
             </Button>
           )}
           <Button variant="outline" onClick={() => resetGame(current)} disabled={isCorrect !== null}>
