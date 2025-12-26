@@ -970,5 +970,83 @@
       "warning": "⚠ Caution",
       "fail": "✗ Failed"
     }
+  },
+  "aiChat": {
+    "badge": "LUKATO AI Agent",
+    "rag": "RAG",
+    "title": "AI Language Learning Assistant 🤖",
+    "description": "Choose the Agent that matches your language. AI will answer all your questions! ✨",
+    "premiumUnlimited": "Premium - Unlimited questions",
+    "startChat": "Start chat",
+    "comingSoon": "Coming soon",
+    "active": "Active",
+    "whatIsTitle": "What is LUKATO RAG AI? 🧠",
+    "whatIsDesc": "An intelligent AI system using RAG (Retrieval-Augmented Generation) technology to provide accurate answers based on a deep language knowledge database. Each Agent is optimized for specific languages! 🎯",
+    "agent": {
+      "topik": {
+        "subtitle": "TOPIK I & II Expert 🇰🇷",
+        "description": "Get answers about Korean grammar, vocabulary, and TOPIK exam strategies.",
+        "features": ["Korean Grammar", "TOPIK Vocabulary", "Exam Strategy", "Writing Practice"]
+      },
+      "ielts": {
+        "subtitle": "IELTS English 🇬🇧",
+        "description": "Practice all 4 IELTS skills: Listening, Reading, Writing, Speaking.",
+        "features": ["Writing Task 1&2", "Speaking Practice", "Reading Skills", "Listening Tips"]
+      },
+      "jlpt": {
+        "subtitle": "Japanese N1-N5 🇯🇵",
+        "description": "Support for Japanese learning and JLPT preparation at all levels.",
+        "features": ["Japanese Grammar", "Kanji & Vocabulary", "Listening", "Reading"]
+      },
+      "hsk": {
+        "subtitle": "Chinese HSK 1-6 🇨🇳",
+        "description": "Learn Chinese and prepare for HSK exams effectively.",
+        "features": ["Chinese Grammar", "Hanzi", "Listening Practice", "Writing Practice"]
+      }
+    },
+    "welcome": {
+      "topik": {
+        "title": "Hello! 👋",
+        "subtitle": "I'm LUKATO AI Agent - your Korean and TOPIK expert. Ask me anything! 🎓✨"
+      },
+      "ielts": {
+        "title": "Hello! 👋",
+        "subtitle": "I'm LUKATO AI Agent - your IELTS 4-skills expert. Ask me about Speaking, Writing, Reading, Listening! 🇬🇧✨"
+      },
+      "jlpt": {
+        "title": "こんにちは! 👋",
+        "subtitle": "I'm LUKATO AI Agent - your Japanese and JLPT expert. Ask me anything! 🇯🇵✨"
+      },
+      "hsk": {
+        "title": "你好! 👋",
+        "subtitle": "I'm LUKATO AI Agent - your Chinese and HSK expert. Ask me anything! 🇨🇳✨"
+      }
+    },
+    "questions": {
+      "topik": [
+        "What's the difference between '-아/어서' and '-니까'?",
+        "How to get a high score on TOPIK II essay #54?",
+        "How to listen to Korean numbers faster?",
+        "What's the passing score for TOPIK I Level 2?"
+      ],
+      "ielts": [
+        "How to score band 7+ on IELTS Writing Task 2?",
+        "Effective strategies for IELTS Reading?",
+        "How to improve English pronunciation?",
+        "What's the structure of IELTS Speaking Part 2?"
+      ],
+      "jlpt": [
+        "What's the difference between は and が?",
+        "How to study N2 Kanji effectively?",
+        "Strategies for JLPT N3 reading section?",
+        "How long to prepare for JLPT N2?"
+      ],
+      "hsk": [
+        "How to distinguish Chinese tones?",
+        "Strategy for learning HSK 4 Hanzi?",
+        "How to improve Chinese listening?",
+        "What's the passing score for HSK 5?"
+      ]
+    }
   }
 }

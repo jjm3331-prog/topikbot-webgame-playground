@@ -808,5 +808,83 @@
       "warning": "⚠ 注意",
       "fail": "✗ 失敗"
     }
+  },
+  "aiChat": {
+    "badge": "LUKATO AI Agent",
+    "rag": "RAG",
+    "title": "AI言語学習アシスタント 🤖",
+    "description": "学習中の言語に合ったAgentを選択してください。AIがすべての質問にお答えします！ ✨",
+    "premiumUnlimited": "Premium - 質問無制限",
+    "startChat": "チャット開始",
+    "comingSoon": "近日公開",
+    "active": "アクティブ",
+    "whatIsTitle": "LUKATO RAG AIとは？ 🧠",
+    "whatIsDesc": "RAG（Retrieval-Augmented Generation）技術を活用したスマートAIシステムで、言語知識データベースに基づいて正確な回答を提供します。各Agentは特定の言語に最適化されています！ 🎯",
+    "agent": {
+      "topik": {
+        "subtitle": "TOPIK I & II 専門家 🇰🇷",
+        "description": "韓国語文法、語彙、TOPIK試験戦略についてのすべての質問にお答えします。",
+        "features": ["韓国語文法", "TOPIK語彙", "試験戦略", "作文練習"]
+      },
+      "ielts": {
+        "subtitle": "IELTS英語 🇬🇧",
+        "description": "IELTS 4技能の練習：Listening, Reading, Writing, Speaking。",
+        "features": ["Writing Task 1&2", "Speaking練習", "Readingスキル", "Listeningヒント"]
+      },
+      "jlpt": {
+        "subtitle": "日本語 N1-N5 🇯🇵",
+        "description": "日本語学習とJLPT各レベルの試験準備をサポートします。",
+        "features": ["日本語文法", "漢字 & 語彙", "聴解", "読解"]
+      },
+      "hsk": {
+        "subtitle": "中国語 HSK 1-6 🇨🇳",
+        "description": "中国語学習とHSK試験の効率的な準備。",
+        "features": ["中国語文法", "漢字", "リスニング練習", "ライティング練習"]
+      }
+    },
+    "welcome": {
+      "topik": {
+        "title": "アンニョン! 👋",
+        "subtitle": "私はLUKATO AI Agent - 韓国語とTOPIKの専門アドバイザーです。何でも聞いてください！ 🎓✨"
+      },
+      "ielts": {
+        "title": "Hello! 👋",
+        "subtitle": "私はLUKATO AI Agent - IELTS 4技能の専門家です。Speaking, Writing, Reading, Listeningについて何でも聞いてください！ 🇬🇧✨"
+      },
+      "jlpt": {
+        "title": "こんにちは！ 👋",
+        "subtitle": "私はLUKATO AI Agent - 日本語とJLPTの専門アドバイザーです。何でも聞いてください！ 🇯🇵✨"
+      },
+      "hsk": {
+        "title": "你好！ 👋",
+        "subtitle": "私はLUKATO AI Agent - 中国語とHSKの専門アドバイザーです。何でも聞いてください！ 🇨🇳✨"
+      }
+    },
+    "questions": {
+      "topik": [
+        "「-아/어서」と「-니까」の違いは？",
+        "TOPIK II 54番の論述で高得点を取る方法は？",
+        "韓国語の数字を速く聞き取るには？",
+        "TOPIK I 2級の合格点は何点ですか？"
+      ],
+      "ielts": [
+        "IELTS Writing Task 2でバンド7+を取る方法は？",
+        "IELTS Readingの効果的な戦略は？",
+        "英語の発音を改善するには？",
+        "IELTS Speaking Part 2の構成は？"
+      ],
+      "jlpt": [
+        "「は」と「が」の違いは？",
+        "N2漢字を効果的に勉強する方法は？",
+        "JLPT N3の読解戦略は？",
+        "JLPT N2の準備期間はどれくらい必要ですか？"
+      ],
+      "hsk": [
+        "中国語の声調を区別する方法は？",
+        "HSK 4級の漢字学習戦略は？",
+        "中国語のリスニング力を向上させるには？",
+        "HSK 5級の合格点は何点ですか？"
+      ]
+    }
   }
 }
