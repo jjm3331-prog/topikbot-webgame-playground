@@ -579,52 +579,45 @@
   "interview": {
     "title": "Interview Simulation",
     "description": "Practice interviews with Korean companies",
-    "startInterview": "Start Interview",
-    "endInterview": "End Interview"
+    "featureName": "Interview Simulation",
+    "heroTitle": "Interview Practice",
+    "heroDescription": "Practice interviews with leading Korean companies",
+    "supportVoiceText": "Voice & text support",
+    "selectCompanyTitle": "Select Interview Company",
+    "selectPositionTitle": "Select Position",
+    "selectInterviewerTitle": "Select Interview Style",
+    "enterCompanyName": "Enter company name...",
+    "preparingInterview": "Preparing interview...",
+    "startInterviewBtn": "Start Interview",
+    "interviewProgress": "Interview Progress",
+    "questions": "questions",
+    "thinking": "Thinking...",
+    "inputPlaceholder": "Enter your answer...",
+    "stopRecording": "Stop Recording",
+    "answerByVoice": "Answer by Voice",
+    "endInterview": "End",
+    "analyzingResults": "Analyzing results...",
+    "aiEvaluating": "AI is comprehensively evaluating your interview",
+    "interviewComplete": "Interview Complete!",
+    "simulationFor": "Interview simulation for",
+    "grade": "Grade",
+    "pointsUnit": "pts",
+    "overallScore": "Overall Score",
+    "scoresByCategory": "Scores by Category",
+    "overallFeedback": "Overall Feedback",
+    "strengths": "Strengths",
+    "improvements": "Areas for Improvement",
+    "tipsForNext": "Tips for Your Next Interview",
+    "restart": "Try Again",
+    "startAgain": "Start Over",
+    "companies": { "samsung": "Samsung Electronics", "lg": "LG Electronics", "hyundai": "Hyundai Motor", "naver": "Naver", "kakao": "Kakao", "coupang": "Coupang", "skhynix": "SK Hynix", "other": "Other" },
+    "companyTypes": { "conglomerate": "Conglomerate", "tech": "Tech", "ecommerce": "E-commerce", "semiconductor": "Semiconductor", "custom": "Custom" },
+    "positions": { "software": "Software Development", "marketing": "Marketing / PR", "sales": "Sales", "hr": "HR", "design": "Design / UX", "finance": "Finance / Accounting", "production": "Production / Manufacturing", "office": "Office Administration" },
+    "interviewerTypes": { "friendly": "Friendly", "strict": "Strict", "pressure": "High Pressure", "technical": "Technical" },
+    "interviewerDescs": { "friendly": "Relaxed atmosphere, encouraging", "strict": "Logical thinking, specific answers required", "pressure": "Stress test, challenging questions", "technical": "Technical expertise, in-depth questions" },
+    "scoreLabels": { "content": "Content", "communication": "Communication", "korean": "Korean", "attitude": "Attitude", "jobFit": "Job Fit" },
+    "micError": "Microphone access required", "allowMicAccess": "Please allow microphone access.", "voiceNotRecognized": "Voice not recognized", "tryAgain": "Please try again.", "voiceRecognitionError": "Voice recognition error", "selectAll": "Please select all", "selectAllDesc": "Select company, position, and interviewer type.", "errorOccurred": "An error occurred", "cannotStartInterview": "Cannot start interview. Please try again.", "noResponse": "No response."
   },
-  "kdrama": {
-    "title": "K-Drama Dubbing",
-    "description": "Practice pronunciation with famous drama scenes",
-    "complete": "Dubbing Complete!"
-  },
-  "dating": {
-    "title": "Dating Simulation",
-    "description": "Learn Korean through virtual dating",
-    "startChat": "Start Chat"
-  },
-  "manager": {
-    "title": "LUKATO Manager",
-    "description": "Manage your K-POP idol group",
-    "startGame": "Start Game"
-  },
-  "headhunting": {
-    "title": "Headhunting Service",
-    "description": "Get help finding jobs in Korea",
-    "submit": "Submit"
-  },
-  "reading": {
-    "title": "Reading Practice",
-    "description": "Solve TOPIK-style reading questions",
-    "complete": "Complete!"
-  },
-  "listening": {
-    "title": "Listening Practice",
-    "description": "Improve listening with AI TTS",
-    "complete": "Complete!"
-  },
-  "kdrama": {
-    "title": "K-Drama Dubbing",
-    "statsBar": "K-Drama Dubbing",
-    "avgScore": "Avg",
-    "attempts": "attempts",
-    "timer": "Timer",
-    "all": "All",
-    "genres": {
-      "romantic": "Romance",
-      "action": "Action",
-      "fantasy": "Fantasy",
-      "thriller": "Thriller"
-    },
     "difficulty": {
       "easy": "Easy",
       "normal": "Normal",

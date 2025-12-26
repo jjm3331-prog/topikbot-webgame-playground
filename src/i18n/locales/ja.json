@@ -465,15 +465,21 @@
     "uploadLimit": "最大10枚", "missingInfo": "問題と答案をアップロードしてください"
   },
   "interview": {
-    "title": "面接シミュレーション", "subtitle": "韓国企業面接練習",
-    "selectCompany": "企業を選択", "selectPosition": "職種を選択", "selectInterviewer": "面接官タイプを選択",
-    "friendly": "フレンドリー", "strict": "厳格", "pressure": "プレッシャー", "technical": "技術面接",
-    "startInterview": "面接開始", "endInterview": "面接終了", "micAccess": "マイクへのアクセスを許可してください",
-    "recording": "録音中...", "processing": "処理中...", "ttsEnabled": "音声オン", "ttsDisabled": "音声オフ",
-    "evaluation": "面接評価", "overall": "総合評価", "content": "内容", "communication": "コミュニケーション",
-    "korean": "韓国語力", "attitude": "態度", "jobFit": "職種適性",
-    "strengths": "長所", "improvements": "改善点", "tips": "アドバイス", "grade": "グレード",
-    "restart": "やり直す", "backToCareer": "キャリアセンターへ"
+    "title": "面接シミュレーション", "description": "韓国企業面接練習",
+    "featureName": "面接シミュレーション", "heroTitle": "面接練習", "heroDescription": "韓国の大手企業との面接を練習しましょう", "supportVoiceText": "音声・テキスト対応",
+    "selectCompanyTitle": "面接企業を選択", "selectPositionTitle": "応募職種を選択", "selectInterviewerTitle": "面接スタイルを選択", "enterCompanyName": "企業名を入力...",
+    "preparingInterview": "面接準備中...", "startInterviewBtn": "面接開始", "interviewProgress": "面接進捗", "questions": "問",
+    "thinking": "考え中...", "inputPlaceholder": "回答を入力...", "stopRecording": "録音停止", "answerByVoice": "音声で回答", "endInterview": "終了",
+    "analyzingResults": "結果分析中...", "aiEvaluating": "AIが面接を総合評価しています", "interviewComplete": "面接完了！", "simulationFor": "面接シミュレーション",
+    "grade": "ランク", "pointsUnit": "点", "overallScore": "総合点", "scoresByCategory": "項目別スコア", "overallFeedback": "総合フィードバック",
+    "strengths": "強み", "improvements": "改善点", "tipsForNext": "次回面接へのアドバイス", "restart": "もう一度面接", "startAgain": "やり直す",
+    "companies": { "samsung": "サムスン電子", "lg": "LG電子", "hyundai": "現代自動車", "naver": "NAVER", "kakao": "カカオ", "coupang": "クーパン", "skhynix": "SKハイニックス", "other": "その他" },
+    "companyTypes": { "conglomerate": "大企業", "tech": "IT企業", "ecommerce": "Eコマース", "semiconductor": "半導体", "custom": "直接入力" },
+    "positions": { "software": "ソフトウェア開発", "marketing": "マーケティング/PR", "sales": "営業/セールス", "hr": "人事/HR", "design": "デザイン/UX", "finance": "財務/会計", "production": "生産/製造", "office": "一般事務" },
+    "interviewerTypes": { "friendly": "親切", "strict": "厳格", "pressure": "圧迫", "technical": "技術" },
+    "interviewerDescs": { "friendly": "リラックスした雰囲気、励まし", "strict": "論理的思考、具体的な回答要求", "pressure": "ストレステスト、挑戦的な質問", "technical": "専門知識、深い技術質問" },
+    "scoreLabels": { "content": "内容", "communication": "コミュニケーション", "korean": "韓国語", "attitude": "態度", "jobFit": "適性" },
+    "micError": "マイクへのアクセスが必要です", "allowMicAccess": "マイクのアクセスを許可してください。", "voiceNotRecognized": "音声が認識されませんでした", "tryAgain": "もう一度お試しください。", "voiceRecognitionError": "音声認識エラー", "selectAll": "すべて選択してください", "selectAllDesc": "会社、職種、面接官タイプを選択してください。", "errorOccurred": "エラーが発生しました", "cannotStartInterview": "面接を開始できません。もう一度お試しください。", "noResponse": "応答がありません。"
   },
   "kdrama": {
     "title": "Kドラマ吹き替え",
