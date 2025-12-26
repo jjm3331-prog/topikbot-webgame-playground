@@ -29,6 +29,7 @@ const gameMenus = [
     color: "from-red-500 to-pink-600",
     borderColor: "border-red-500/30",
     path: "/chat",
+    isHot: false,
   },
   {
     id: "dating",
@@ -41,6 +42,7 @@ const gameMenus = [
     color: "from-pink-500 to-rose-600",
     borderColor: "border-pink-500/30",
     path: "/dating",
+    isHot: false,
   },
   {
     id: "manager",
@@ -66,6 +68,7 @@ const gameMenus = [
     color: "from-violet-500 to-purple-600",
     borderColor: "border-violet-500/30",
     path: "/kpop",
+    isHot: false,
   },
   {
     id: "kdrama",
@@ -78,6 +81,7 @@ const gameMenus = [
     color: "from-cyan-500 to-blue-600",
     borderColor: "border-cyan-500/30",
     path: "/kdrama",
+    isHot: false,
   },
   {
     id: "wordchain",
@@ -90,6 +94,7 @@ const gameMenus = [
     color: "from-green-500 to-emerald-600",
     borderColor: "border-green-500/30",
     path: "/wordchain",
+    isHot: false,
   },
   {
     id: "parttime",
@@ -102,8 +107,9 @@ const gameMenus = [
     color: "from-slate-500 to-gray-600",
     borderColor: "border-slate-500/30",
     path: "/parttime",
+    isHot: false,
   },
-] as const;
+];
 
 const containerVariants = {
   hidden: { opacity: 0 },

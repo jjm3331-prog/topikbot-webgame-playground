@@ -66,6 +66,7 @@ const topikMenus = [
     bgColor: "bg-purple-500/10",
     borderColor: "border-purple-500/30",
     path: "/handwriting",
+    isNew: false,
   },
   {
     id: "listening",
@@ -80,6 +81,7 @@ const topikMenus = [
     bgColor: "bg-blue-500/10",
     borderColor: "border-blue-500/10",
     path: "/listening",
+    isNew: false,
   },
   {
     id: "reading-a",
@@ -94,6 +96,7 @@ const topikMenus = [
     bgColor: "bg-emerald-500/10",
     borderColor: "border-emerald-500/30",
     path: "/reading-a",
+    isNew: false,
   },
   {
     id: "reading-b",
@@ -108,8 +111,9 @@ const topikMenus = [
     bgColor: "bg-orange-500/10",
     borderColor: "border-orange-500/30",
     path: "/reading-b",
+    isNew: false,
   },
-] as const;
+];
 
 const containerVariants = {
   hidden: { opacity: 0 },
