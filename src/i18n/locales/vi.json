@@ -1,0 +1,82 @@
+{
+  "common": {
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "menu": "Menu",
+    "profile": "Hồ sơ",
+    "settings": "Cài đặt",
+    "premium": "Premium",
+    "startFree": "Bắt đầu miễn phí",
+    "noCardRequired": "Không cần thẻ tín dụng • Bắt đầu ngay trong 30 giây",
+    "close": "Đóng",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "success": "Thành công"
+  },
+  "brand": {
+    "name": "LUKATO AI",
+    "tagline": "Your Korean Mentor",
+    "badge": "Game học tiếng Hàn đầu tiên tại Việt Nam"
+  },
+  "index": {
+    "badge": "Game học tiếng Hàn đầu tiên tại Việt Nam",
+    "title1": "CHINH PHỤC",
+    "title2": "TIẾNG HÀN",
+    "title3": "&",
+    "title4": "VĂN HÓA",
+    "description": "Nhanh hơn, thông minh hơn. AI siêu cá nhân hóa phân tích chính xác điểm yếu và xây dựng lộ trình chiến thắng dành riêng cho bạn.",
+    "winningRoadmap": "lộ trình chiến thắng",
+    "ctaButton": "Bắt đầu miễn phí"
+  },
+  "header": {
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "logoutSuccess": "Đã đăng xuất",
+    "logoutMessage": "Hẹn gặp lại bạn!",
+    "menu": "Menu"
+  },
+  "menu": {
+    "title": "Menu",
+    "logout": "Đăng xuất",
+    "categories": {
+      "jobs": "VIỆC LÀM",
+      "topik": "HỌC TOPIK",
+      "game": "GAME",
+      "ai": "AI",
+      "my": "CỦA TÔI"
+    },
+    "items": {
+      "headhunting": "Headhunting",
+      "companyReport": "Báo cáo Doanh nghiệp",
+      "interviewSimulation": "Phỏng vấn Mô phỏng",
+      "learningHub": "Trung tâm học TOPIK",
+      "community": "Cộng đồng",
+      "gameHub": "Trung tâm Game",
+      "battle": "⚔️ Đấu 1:1",
+      "qnaAgent": "Q&A Agent",
+      "questionVariant": "Biến thể đề thi",
+      "writingCorrection": "Chấm bài viết",
+      "roleplaySpeaking": "Roleplay Speaking",
+      "profile": "Hồ sơ",
+      "ranking": "Bảng xếp hạng",
+      "pricing": "Bảng giá",
+      "helpCenter": "Trung tâm Hỗ trợ",
+      "terms": "Điều khoản",
+      "privacy": "Chính sách"
+    }
+  },
+  "toast": {
+    "premiumFeature": "Tính năng Premium",
+    "premiumDescription": "Bạn vẫn có thể xem trang, nhưng để sử dụng đầy đủ tính năng vui lòng nâng cấp Premium.",
+    "upgrade": "Nâng cấp"
+  },
+  "language": {
+    "select": "Chọn ngôn ngữ",
+    "current": "Ngôn ngữ hiện tại"
+  }
+}

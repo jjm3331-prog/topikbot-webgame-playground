@@ -1,0 +1,82 @@
+{
+  "common": {
+    "login": "Kirish",
+    "logout": "Chiqish",
+    "menu": "Menyu",
+    "profile": "Profil",
+    "settings": "Sozlamalar",
+    "premium": "Premium",
+    "startFree": "Bepul boshlash",
+    "noCardRequired": "Kredit karta kerak emas • 30 soniyada boshlang",
+    "close": "Yopish",
+    "back": "Orqaga",
+    "next": "Keyingi",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "confirm": "Tasdiqlash",
+    "loading": "Yuklanmoqda...",
+    "error": "Xato",
+    "success": "Muvaffaqiyat"
+  },
+  "brand": {
+    "name": "LUKATO AI",
+    "tagline": "Your Korean Mentor",
+    "badge": "Vyetnamdagi birinchi koreys tili o'rganish o'yini"
+  },
+  "index": {
+    "badge": "Vyetnamdagi birinchi koreys tili o'rganish o'yini",
+    "title1": "KOREYS TILINI",
+    "title2": "VA",
+    "title3": "MADANIYATINI",
+    "title4": "O'RGANING",
+    "description": "Tezroq, aqlliroq. AI sizning zaif tomonlaringizni aniq tahlil qilib, sizga maxsus g'alaba yo'l xaritasini tuzadi.",
+    "winningRoadmap": "g'alaba yo'l xaritasi",
+    "ctaButton": "Bepul boshlash"
+  },
+  "header": {
+    "login": "Kirish",
+    "logout": "Chiqish",
+    "logoutSuccess": "Chiqildi",
+    "logoutMessage": "Keyingi safar ko'rishguncha!",
+    "menu": "Menyu"
+  },
+  "menu": {
+    "title": "Menyu",
+    "logout": "Chiqish",
+    "categories": {
+      "jobs": "ISH",
+      "topik": "TOPIK O'RGANISH",
+      "game": "O'YIN",
+      "ai": "AI",
+      "my": "MENING"
+    },
+    "items": {
+      "headhunting": "Headhunting",
+      "companyReport": "Kompaniya Hisoboti",
+      "interviewSimulation": "Intervyu Simulyatsiyasi",
+      "learningHub": "TOPIK O'quv Markazi",
+      "community": "Jamoa",
+      "gameHub": "O'yin Markazi",
+      "battle": "⚔️ 1:1 Jang",
+      "qnaAgent": "Savol-Javob Agent",
+      "questionVariant": "Savol Varianti",
+      "writingCorrection": "Yozuv Tekshiruvi",
+      "roleplaySpeaking": "Roleplay Speaking",
+      "profile": "Profil",
+      "ranking": "Reyting",
+      "pricing": "Narxlar",
+      "helpCenter": "Yordam Markazi",
+      "terms": "Shartlar",
+      "privacy": "Maxfiylik"
+    }
+  },
+  "toast": {
+    "premiumFeature": "Premium Xususiyat",
+    "premiumDescription": "Sahifani ko'rishingiz mumkin, lekin to'liq foydalanish uchun Premium-ga yangilang.",
+    "upgrade": "Yangilash"
+  },
+  "language": {
+    "select": "Tilni tanlang",
+    "current": "Joriy til"
+  }
+}

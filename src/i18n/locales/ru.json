@@ -1,0 +1,82 @@
+{
+  "common": {
+    "login": "Войти",
+    "logout": "Выйти",
+    "menu": "Меню",
+    "profile": "Профиль",
+    "settings": "Настройки",
+    "premium": "Премиум",
+    "startFree": "Начать бесплатно",
+    "noCardRequired": "Карта не требуется • Начните за 30 секунд",
+    "close": "Закрыть",
+    "back": "Назад",
+    "next": "Далее",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "confirm": "Подтвердить",
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успешно"
+  },
+  "brand": {
+    "name": "LUKATO AI",
+    "tagline": "Your Korean Mentor",
+    "badge": "Первая игра для изучения корейского во Вьетнаме"
+  },
+  "index": {
+    "badge": "Первая игра для изучения корейского во Вьетнаме",
+    "title1": "ПОКОРЯЙ",
+    "title2": "КОРЕЙСКИЙ",
+    "title3": "&",
+    "title4": "КУЛЬТУРУ",
+    "description": "Быстрее и умнее. AI точно анализирует ваши слабые стороны и создаёт персональную дорожную карту к победе.",
+    "winningRoadmap": "путь к победе",
+    "ctaButton": "Начать бесплатно"
+  },
+  "header": {
+    "login": "Войти",
+    "logout": "Выйти",
+    "logoutSuccess": "Вы вышли",
+    "logoutMessage": "До скорой встречи!",
+    "menu": "Меню"
+  },
+  "menu": {
+    "title": "Меню",
+    "logout": "Выйти",
+    "categories": {
+      "jobs": "РАБОТА",
+      "topik": "УЧИТЬ TOPIK",
+      "game": "ИГРЫ",
+      "ai": "AI",
+      "my": "МОЁ"
+    },
+    "items": {
+      "headhunting": "Хедхантинг",
+      "companyReport": "Отчёт о компании",
+      "interviewSimulation": "Симуляция интервью",
+      "learningHub": "Учебный центр TOPIK",
+      "community": "Сообщество",
+      "gameHub": "Игровой центр",
+      "battle": "⚔️ Бой 1:1",
+      "qnaAgent": "Q&A Агент",
+      "questionVariant": "Варианты вопросов",
+      "writingCorrection": "Проверка письма",
+      "roleplaySpeaking": "Ролевой Speaking",
+      "profile": "Профиль",
+      "ranking": "Рейтинг",
+      "pricing": "Цены",
+      "helpCenter": "Центр помощи",
+      "terms": "Условия",
+      "privacy": "Конфиденциальность"
+    }
+  },
+  "toast": {
+    "premiumFeature": "Премиум функция",
+    "premiumDescription": "Вы можете просмотреть страницу, но для полного доступа обновитесь до Премиум.",
+    "upgrade": "Обновить"
+  },
+  "language": {
+    "select": "Выберите язык",
+    "current": "Текущий язык"
+  }
+}

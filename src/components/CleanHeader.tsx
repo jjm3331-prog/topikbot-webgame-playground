@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { ChevronDown, LogIn, LogOut, Menu, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { MegaMenuOverlay } from "@/components/MegaMenuOverlay";
 import { NotificationDropdown } from "@/components/NotificationDropdown";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +22,7 @@ interface CleanHeaderProps {
 
 export const CleanHeader = ({ isLoggedIn, username }: CleanHeaderProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userId, setUserId] = useState<string | undefined>();
   const [sessionLoggedIn, setSessionLoggedIn] = useState(false);
@@ -83,8 +86,8 @@ export const CleanHeader = ({ isLoggedIn, username }: CleanHeaderProps) => {
     await safeSignOut();
 
     toast({
-      title: "Đã đăng xuất",
-      description: "Hẹn gặp lại bạn!",
+      title: t('header.logoutSuccess'),
+      description: t('header.logoutMessage'),
     });
     navigate("/");
   };
@@ -108,6 +111,7 @@ export const CleanHeader = ({ isLoggedIn, username }: CleanHeaderProps) => {
 
           {/* Actions */}
           <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0">
+            <LanguageSelector />
             <ThemeToggle />
 
             {effectiveLoggedIn ? (
@@ -131,13 +135,13 @@ export const CleanHeader = ({ isLoggedIn, username }: CleanHeaderProps) => {
                   className="hidden sm:inline-flex h-10 rounded-full text-card-caption"
                 >
                   <LogOut className="w-4 h-4" />
-                  <span className="ml-2">Đăng xuất</span>
+                  <span className="ml-2">{t('header.logout')}</span>
                 </Button>
               </>
             ) : (
               <Button onClick={() => navigate("/auth")} size="sm" className="h-7 sm:h-8 md:h-10 rounded-full text-[11px] sm:text-xs md:text-sm px-2 sm:px-3 md:px-4">
                 <LogIn className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 shrink-0" />
-                <span className="ml-1 sm:ml-1.5 whitespace-nowrap">Đăng nhập</span>
+                <span className="ml-1 sm:ml-1.5 whitespace-nowrap">{t('header.login')}</span>
               </Button>
             )}
 
@@ -150,7 +154,7 @@ export const CleanHeader = ({ isLoggedIn, username }: CleanHeaderProps) => {
               aria-label="Open menu"
             >
               <Menu className="w-4 h-4 shrink-0" />
-              <span className="hidden md:inline text-sm">Menu</span>
+              <span className="hidden md:inline text-sm">{t('header.menu')}</span>
               <motion.span
                 animate={{ rotate: isMenuOpen ? 180 : 0 }}
                 transition={{ duration: 0.18 }}

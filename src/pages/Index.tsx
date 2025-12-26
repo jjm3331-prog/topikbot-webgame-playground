@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +8,7 @@ import { motion } from "framer-motion";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -38,7 +40,7 @@ const Index = () => {
         >
           <Sparkles className="w-5 h-5 text-blue-600" />
           <span className="text-slate-700 font-medium text-sm tracking-wide">
-            Game học tiếng Hàn đầu tiên tại Việt Nam
+            {t('index.badge')}
           </span>
           <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse" />
         </motion.div>
@@ -51,13 +53,13 @@ const Index = () => {
           className="mb-8"
         >
           <h1 className="font-black text-5xl sm:text-6xl md:text-7xl leading-[0.95] tracking-tight">
-            <span className="text-slate-900 block">CHINH PHỤC</span>
+            <span className="text-slate-900 block">{t('index.title1')}</span>
             <span className="bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 bg-clip-text text-transparent block">
-              TIẾNG HÀN
+              {t('index.title2')}
             </span>
-            <span className="text-slate-900 block">&</span>
+            <span className="text-slate-900 block">{t('index.title3')}</span>
             <span className="bg-gradient-to-r from-purple-600 via-pink-500 to-rose-500 bg-clip-text text-transparent block">
-              VĂN HÓA
+              {t('index.title4')}
             </span>
           </h1>
         </motion.div>
@@ -69,9 +71,7 @@ const Index = () => {
           transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
           className="text-slate-600 text-lg sm:text-xl leading-relaxed mb-12 max-w-md mx-auto"
         >
-          Nhanh hơn, thông minh hơn. AI siêu cá nhân hóa phân tích chính xác điểm yếu và xây dựng{" "}
-          <span className="text-blue-600 font-semibold italic">lộ trình chiến thắng</span>{" "}
-          dành riêng cho bạn.
+          {t('index.description')}
         </motion.p>
 
         {/* CTA Button */}
@@ -85,7 +85,7 @@ const Index = () => {
             className="group relative w-full max-w-sm h-16 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 hover:from-blue-700 hover:via-blue-600 hover:to-blue-700 text-white text-xl font-bold rounded-2xl shadow-xl shadow-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/40 transition-all duration-300 hover:scale-[1.02]"
           >
             <span className="flex items-center gap-3">
-              Bắt đầu miễn phí
+              {t('index.ctaButton')}
               <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" />
             </span>
           </Button>
@@ -98,7 +98,7 @@ const Index = () => {
           transition={{ duration: 0.6, delay: 0.8 }}
           className="text-slate-400 text-sm mt-6"
         >
-          Không cần thẻ tín dụng • Bắt đầu ngay trong 30 giây
+          {t('common.noCardRequired')}
         </motion.p>
 
         {/* Logo */}
@@ -112,8 +112,8 @@ const Index = () => {
             <img src="/favicon.png" alt="LUKATO" className="w-full h-full object-cover" />
           </div>
           <div className="flex flex-col items-start">
-            <span className="font-bold text-slate-800 text-lg tracking-wide">LUKATO</span>
-            <span className="text-[10px] text-blue-600/80 tracking-widest uppercase">Your Korean Mentor</span>
+            <span className="font-bold text-slate-800 text-lg tracking-wide">{t('brand.name')}</span>
+            <span className="text-[10px] text-blue-600/80 tracking-widest uppercase">{t('brand.tagline')}</span>
           </div>
         </motion.div>
       </div>

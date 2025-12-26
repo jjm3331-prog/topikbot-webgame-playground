@@ -1,0 +1,82 @@
+{
+  "common": {
+    "login": "登录",
+    "logout": "退出",
+    "menu": "菜单",
+    "profile": "个人资料",
+    "settings": "设置",
+    "premium": "高级版",
+    "startFree": "免费开始",
+    "noCardRequired": "无需信用卡 • 30秒内开始",
+    "close": "关闭",
+    "back": "返回",
+    "next": "下一步",
+    "save": "保存",
+    "cancel": "取消",
+    "confirm": "确认",
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功"
+  },
+  "brand": {
+    "name": "LUKATO AI",
+    "tagline": "Your Korean Mentor",
+    "badge": "越南首款韩语学习游戏"
+  },
+  "index": {
+    "badge": "越南首款韩语学习游戏",
+    "title1": "征服",
+    "title2": "韩语",
+    "title3": "&",
+    "title4": "文化",
+    "description": "更快更智能。AI精准分析您的弱点，为您量身定制胜利路线图。",
+    "winningRoadmap": "胜利路线图",
+    "ctaButton": "免费开始"
+  },
+  "header": {
+    "login": "登录",
+    "logout": "退出",
+    "logoutSuccess": "已退出",
+    "logoutMessage": "下次再见！",
+    "menu": "菜单"
+  },
+  "menu": {
+    "title": "菜单",
+    "logout": "退出",
+    "categories": {
+      "jobs": "就业",
+      "topik": "学习TOPIK",
+      "game": "游戏",
+      "ai": "AI",
+      "my": "我的"
+    },
+    "items": {
+      "headhunting": "猎头服务",
+      "companyReport": "企业报告",
+      "interviewSimulation": "模拟面试",
+      "learningHub": "TOPIK学习中心",
+      "community": "社区",
+      "gameHub": "游戏中心",
+      "battle": "⚔️ 1对1对战",
+      "qnaAgent": "问答代理",
+      "questionVariant": "题目变体",
+      "writingCorrection": "写作批改",
+      "roleplaySpeaking": "角色扮演口语",
+      "profile": "个人资料",
+      "ranking": "排行榜",
+      "pricing": "价格",
+      "helpCenter": "帮助中心",
+      "terms": "条款",
+      "privacy": "隐私"
+    }
+  },
+  "toast": {
+    "premiumFeature": "高级功能",
+    "premiumDescription": "您可以查看此页面，但需升级高级版以获得完整访问权限。",
+    "upgrade": "升级"
+  },
+  "language": {
+    "select": "选择语言",
+    "current": "当前语言"
+  }
+}

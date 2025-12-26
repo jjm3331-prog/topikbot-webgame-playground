@@ -1,0 +1,82 @@
+{
+  "common": {
+    "login": "Login",
+    "logout": "Logout",
+    "menu": "Menu",
+    "profile": "Profile",
+    "settings": "Settings",
+    "premium": "Premium",
+    "startFree": "Start Free",
+    "noCardRequired": "No credit card required • Start in 30 seconds",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "brand": {
+    "name": "LUKATO AI",
+    "tagline": "Your Korean Mentor",
+    "badge": "First Korean learning game in Vietnam"
+  },
+  "index": {
+    "badge": "First Korean learning game in Vietnam",
+    "title1": "CONQUER",
+    "title2": "KOREAN",
+    "title3": "&",
+    "title4": "CULTURE",
+    "description": "Faster and smarter. AI precisely analyzes your weaknesses and builds a personalized winning roadmap just for you.",
+    "winningRoadmap": "winning roadmap",
+    "ctaButton": "Start Free"
+  },
+  "header": {
+    "login": "Login",
+    "logout": "Logout",
+    "logoutSuccess": "Logged out",
+    "logoutMessage": "See you next time!",
+    "menu": "Menu"
+  },
+  "menu": {
+    "title": "Menu",
+    "logout": "Logout",
+    "categories": {
+      "jobs": "JOBS",
+      "topik": "LEARN TOPIK",
+      "game": "GAME",
+      "ai": "AI",
+      "my": "MY"
+    },
+    "items": {
+      "headhunting": "Headhunting",
+      "companyReport": "Company Report",
+      "interviewSimulation": "Interview Simulation",
+      "learningHub": "TOPIK Learning Hub",
+      "community": "Community",
+      "gameHub": "Game Hub",
+      "battle": "⚔️ 1v1 Battle",
+      "qnaAgent": "Q&A Agent",
+      "questionVariant": "Question Variant",
+      "writingCorrection": "Writing Correction",
+      "roleplaySpeaking": "Roleplay Speaking",
+      "profile": "Profile",
+      "ranking": "Ranking",
+      "pricing": "Pricing",
+      "helpCenter": "Help Center",
+      "terms": "Terms",
+      "privacy": "Privacy"
+    }
+  },
+  "toast": {
+    "premiumFeature": "Premium Feature",
+    "premiumDescription": "You can view this page, but please upgrade to Premium for full access.",
+    "upgrade": "Upgrade"
+  },
+  "language": {
+    "select": "Select Language",
+    "current": "Current Language"
+  }
+}
