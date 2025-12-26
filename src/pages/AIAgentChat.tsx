@@ -42,12 +42,53 @@ interface Message {
   images?: string[];
 }
 
-const SUGGESTED_QUESTIONS = [
-  { icon: BookOpen, text: "Phân biệt '-아/어서' và '-니까' trong tiếng Hàn?" },
-  { icon: GraduationCap, text: "Cách viết TOPIK II bài luận 54 đạt điểm cao?" },
-  { icon: HelpCircle, text: "Làm sao nghe số tiếng Hàn nhanh hơn?" },
-  { icon: CheckCircle, text: "Điểm chuẩn đậu TOPIK I cấp 2 là bao nhiêu?" },
-];
+// Agent-specific suggested questions
+const AGENT_QUESTIONS: Record<string, { icon: typeof BookOpen; text: string }[]> = {
+  topik: [
+    { icon: BookOpen, text: "Phân biệt '-아/어서' và '-니까' trong tiếng Hàn?" },
+    { icon: GraduationCap, text: "Cách viết TOPIK II bài luận 54 đạt điểm cao?" },
+    { icon: HelpCircle, text: "Làm sao nghe số tiếng Hàn nhanh hơn?" },
+    { icon: CheckCircle, text: "Điểm chuẩn đậu TOPIK I cấp 2 là bao nhiêu?" },
+  ],
+  ielts: [
+    { icon: BookOpen, text: "Cách viết IELTS Writing Task 2 đạt band 7+?" },
+    { icon: GraduationCap, text: "Chiến lược làm bài IELTS Reading hiệu quả?" },
+    { icon: HelpCircle, text: "Làm sao cải thiện phát âm tiếng Anh?" },
+    { icon: CheckCircle, text: "Cấu trúc bài IELTS Speaking Part 2?" },
+  ],
+  jlpt: [
+    { icon: BookOpen, text: "Phân biệt は và が trong tiếng Nhật?" },
+    { icon: GraduationCap, text: "Cách học Kanji N2 hiệu quả?" },
+    { icon: HelpCircle, text: "Chiến lược làm bài đọc JLPT N3?" },
+    { icon: CheckCircle, text: "Thời gian ôn thi JLPT N2 cần bao lâu?" },
+  ],
+  hsk: [
+    { icon: BookOpen, text: "Cách phân biệt thanh điệu tiếng Trung?" },
+    { icon: GraduationCap, text: "Chiến lược học Hán tự HSK 4?" },
+    { icon: HelpCircle, text: "Làm sao nghe tiếng Trung tốt hơn?" },
+    { icon: CheckCircle, text: "Điểm chuẩn đậu HSK 5 là bao nhiêu?" },
+  ],
+};
+
+// Agent-specific welcome messages
+const AGENT_WELCOME: Record<string, { title: string; subtitle: string }> = {
+  topik: {
+    title: "Xin chào! 👋",
+    subtitle: "Mình là LUKATO AI Agent - chuyên gia tư vấn tiếng Hàn và luyện thi TOPIK. Hãy hỏi mình bất cứ điều gì nhé! 🎓✨"
+  },
+  ielts: {
+    title: "Hello! 👋",
+    subtitle: "Mình là LUKATO AI Agent - chuyên gia luyện thi IELTS 4 kỹ năng. Hãy hỏi mình về Speaking, Writing, Reading, Listening nhé! 🇬🇧✨"
+  },
+  jlpt: {
+    title: "こんにちは! 👋",
+    subtitle: "Mình là LUKATO AI Agent - chuyên gia tư vấn tiếng Nhật và luyện thi JLPT. Hãy hỏi mình bất cứ điều gì nhé! 🇯🇵✨"
+  },
+  hsk: {
+    title: "你好! 👋",
+    subtitle: "Mình là LUKATO AI Agent - chuyên gia tư vấn tiếng Trung và luyện thi HSK. Hãy hỏi mình bất cứ điều gì nhé! 🇨🇳✨"
+  }
+};
 
 const AIAgentChat = () => {
   const { agentId } = useParams<{ agentId: string }>();
@@ -381,16 +422,18 @@ const AIAgentChat = () => {
                 </div>
               </motion.div>
               
-              <h2 className="text-2xl font-bold mb-2">Xin chào! 👋</h2>
+              <h2 className="text-2xl font-bold mb-2">
+                {(AGENT_WELCOME[agentId || 'topik'] || AGENT_WELCOME.topik).title}
+              </h2>
               <p className="text-muted-foreground mb-8 max-w-md">
-                Mình là LUKATO AI Agent - chuyên gia tư vấn tiếng Hàn và luyện thi TOPIK. Hãy hỏi mình bất cứ điều gì nhé! 🎓✨
+                {(AGENT_WELCOME[agentId || 'topik'] || AGENT_WELCOME.topik).subtitle}
               </p>
 
               {/* Suggested Questions */}
               <div className="w-full max-w-2xl">
                 <p className="text-sm text-muted-foreground mb-4">💡 Gợi ý câu hỏi:</p>
                 <div className="grid sm:grid-cols-2 gap-3">
-                  {SUGGESTED_QUESTIONS.map((q, i) => (
+                  {(AGENT_QUESTIONS[agentId || 'topik'] || AGENT_QUESTIONS.topik).map((q, i) => (
                     <motion.button
                       key={i}
                       initial={{ opacity: 0, y: 10 }}
