@@ -465,17 +465,37 @@
     "tips": { "title": "使用指南", "step1": "点击“开始Roleplay”获取随机情景", "step2": "用韩语回答（输入或语音）", "step3": "查看AI纠错与语法讲解", "step4": "根据对话生成TOPIK测验", "tipLabel": "提示：", "tipText": "不知道怎么说时可参考推荐回复。" },
     "stats": { "title": "本次", "spoken": "已说句子", "correct": "正确句子" },
     "quiz": { "progress": "{{current}}/{{total}}", "yourScore": "你的得分", "correctAnswer": "正确答案：{{answer}}" },
-    "toast": { "started": "已开始新场景。", "startFailed": "启动失败，请重试。", "needConversation": "生成测验至少需要一轮对话。", "quizCreated": "测验已生成。", "quizFailed": "生成测验失败。", "audioFailed": "音频播放失败。", "sttSuccess": "语音已识别。", "sttFailed": "语音识别失败。", "recording": "录音中...", "micDenied": "需要麦克风权限。" }
+    "toast": { "started": "已开始新场景。", "startFailed": "启动失败，请重试。", "needConversation": "生成测验至少需要一轮对话。", "quizCreated": "测验已生成。", "quizFailed": "生成测验失败。", "audioFailed": "音频播放失败。", "sttSuccess": "语音已识别。", "sttFailed": "语音识别失败。", "recording": "录音中...", "micDenied": "需要麦克风权限。", "sendFailed": "发送消息失败，请重试。" }
   },
   "writingPage": {
     "header": { "title": "TOPIK II 写作(51–54) 批改", "subtitle": "AI评分并提供详细反馈", "history": "历史" },
-    "notice": { "title": "重要提示" },
+    "notice": { "title": "重要提示", "handwritingWarning": "手写韩语可能难以识别，会影响结果。建议使用文字输入以获得最准确的结果。" },
     "steps": { "question": "上传题目", "answer": "你的答案" },
     "answerMode": { "text": "文字", "image": "图片" },
     "placeholders": { "answerText": "在此粘贴或输入你的答案..." },
     "tip": { "copyPaste": "提示：从Word/笔记复制粘贴，准确度更高。" },
     "actions": { "grading": "批改中...", "grade": "AI批改", "freeGrade": "🎁 免费批改(1/天)", "upgradeToGrade": "升级Premium进行批改" },
-    "pdf": { "generatingTitle": "正在生成PDF...", "generatingDesc": "请稍候", "failedTitle": "PDF生成失败", "failedDesc": "请重试" }
+    "pdf": { "generatingTitle": "正在生成PDF...", "generatingDesc": "请稍候", "failedTitle": "PDF生成失败", "failedDesc": "请重试", "downloadComplete": "PDF下载完成！", "fileDownloaded": "文件已下载" },
+    "featureName": "AI写作批改",
+    "freeUsage": {
+      "availableNow": "现在可用",
+      "hasFreeTry": "今天有1次免费批改机会！",
+      "freeOnceDaily": "每天可免费使用1次。升级Premium可无限使用。",
+      "usedToday": "今天的免费使用已完成",
+      "nextFreeAt": "下次免费使用：{{time}}。升级Premium可无限使用。",
+      "nextFreeSimple": "下次免费使用：{{time}}"
+    },
+    "buttons": {
+      "addImage": "添加图片",
+      "deleteAll": "全部删除",
+      "uploadImage": "上传图片",
+      "takePhoto": "拍照"
+    },
+    "upload": {
+      "maxQuestionImages": "最多{{max}}张题目图片",
+      "maxAnswerImages": "最多{{max}}张答案图片",
+      "multipleSupport": "支持多图同时上传"
+    }
   },
   "interview": {
     "title": "面试模拟", "description": "韩国企业面试练习",

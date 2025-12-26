@@ -596,17 +596,37 @@
     "tips": { "title": "Guide", "step1": "Tap ‘Start Roleplay’ to get a random scenario", "step2": "Reply in Korean (type or speak)", "step3": "Review AI corrections and grammar tips", "step4": "Create a TOPIK quiz from what you learned", "tipLabel": "Tip:", "tipText": "Use suggested replies when you’re not sure what to say." },
     "stats": { "title": "This session", "spoken": "Sentences spoken", "correct": "Correct sentences" },
     "quiz": { "progress": "{{current}}/{{total}}", "yourScore": "Your score", "correctAnswer": "Correct answer: {{answer}}" },
-    "toast": { "started": "New scenario started.", "startFailed": "Failed to start. Please try again.", "needConversation": "You need at least one conversation round to create a quiz.", "quizCreated": "Quiz created.", "quizFailed": "Failed to create quiz.", "audioFailed": "Failed to play audio.", "sttSuccess": "Voice recognized.", "sttFailed": "Voice recognition failed.", "recording": "Recording...", "micDenied": "Microphone access is required." }
+    "toast": { "started": "New scenario started.", "startFailed": "Failed to start. Please try again.", "needConversation": "You need at least one conversation round to create a quiz.", "quizCreated": "Quiz created.", "quizFailed": "Failed to create quiz.", "audioFailed": "Failed to play audio.", "sttSuccess": "Voice recognized.", "sttFailed": "Voice recognition failed.", "recording": "Recording...", "micDenied": "Microphone access is required.", "sendFailed": "Failed to send message. Please try again." }
   },
   "writingPage": {
     "header": { "title": "TOPIK II Writing (51–54)", "subtitle": "AI scores and gives detailed feedback", "history": "History" },
-    "notice": { "title": "Important note" },
+    "notice": { "title": "Important note", "handwritingWarning": "Handwritten Korean may be difficult to recognize and could affect results. We recommend using text input for the most accurate results." },
     "steps": { "question": "Upload question", "answer": "Your answer" },
     "answerMode": { "text": "Text", "image": "Images" },
     "placeholders": { "answerText": "Paste or type your answer here..." },
     "tip": { "copyPaste": "Tip: Copy & paste from Word or notes for best accuracy." },
     "actions": { "grading": "Grading...", "grade": "Grade with AI", "freeGrade": "🎁 Free grading (1/day)", "upgradeToGrade": "Upgrade Premium to grade" },
-    "pdf": { "generatingTitle": "Generating PDF...", "generatingDesc": "Please wait a moment", "failedTitle": "PDF failed", "failedDesc": "Please try again" }
+    "pdf": { "generatingTitle": "Generating PDF...", "generatingDesc": "Please wait a moment", "failedTitle": "PDF failed", "failedDesc": "Please try again", "downloadComplete": "PDF download complete!", "fileDownloaded": "File has been downloaded" },
+    "featureName": "AI Writing Correction",
+    "freeUsage": {
+      "availableNow": "Available now",
+      "hasFreeTry": "You have 1 free grading today!",
+      "freeOnceDaily": "You can use once daily for free. Upgrade to Premium for unlimited access.",
+      "usedToday": "Free usage used today",
+      "nextFreeAt": "Next free usage: {{time}}. Upgrade to Premium for unlimited access.",
+      "nextFreeSimple": "Next free usage: {{time}}"
+    },
+    "buttons": {
+      "addImage": "Add image",
+      "deleteAll": "Delete all",
+      "uploadImage": "Upload image",
+      "takePhoto": "Take photo"
+    },
+    "upload": {
+      "maxQuestionImages": "Max {{max}} question images",
+      "maxAnswerImages": "Max {{max}} answer images",
+      "multipleSupport": "Multiple images upload supported"
+    }
   },
   "interview": {
     "title": "Interview Simulation",

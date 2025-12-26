@@ -730,17 +730,37 @@
     "tips": { "title": "Hướng dẫn", "step1": "Nhấn 'Bắt đầu Roleplay' để nhận tình huống ngẫu nhiên", "step2": "Trả lời bằng tiếng Hàn (gõ hoặc nói)", "step3": "Xem AI sửa lỗi và giải thích ngữ pháp", "step4": "Tạo TOPIK quiz từ nội dung hội thoại", "tipLabel": "Mẹo:", "tipText": "Tham khảo gợi ý trả lời khi bạn chưa biết nói gì." },
     "stats": { "title": "Lượt này", "spoken": "Câu đã nói", "correct": "Câu đúng" },
     "quiz": { "progress": "{{current}}/{{total}}", "yourScore": "Điểm của bạn", "correctAnswer": "Đáp án đúng: {{answer}}" },
-    "toast": { "started": "Đã bắt đầu tình huống mới.", "startFailed": "Không thể bắt đầu. Vui lòng thử lại.", "needConversation": "Cần ít nhất một lượt hội thoại để tạo quiz.", "quizCreated": "Đã tạo quiz.", "quizFailed": "Không thể tạo quiz.", "audioFailed": "Không thể phát âm thanh.", "sttSuccess": "Đã nhận diện giọng nói.", "sttFailed": "Nhận diện giọng nói thất bại.", "recording": "Đang ghi âm...", "micDenied": "Cần quyền truy cập micro." }
+    "toast": { "started": "Đã bắt đầu tình huống mới.", "startFailed": "Không thể bắt đầu. Vui lòng thử lại.", "needConversation": "Cần ít nhất một lượt hội thoại để tạo quiz.", "quizCreated": "Đã tạo quiz.", "quizFailed": "Không thể tạo quiz.", "audioFailed": "Không thể phát âm thanh.", "sttSuccess": "Đã nhận diện giọng nói.", "sttFailed": "Nhận diện giọng nói thất bại.", "recording": "Đang ghi âm...", "micDenied": "Cần quyền truy cập micro.", "sendFailed": "Không thể gửi tin nhắn. Vui lòng thử lại." }
   },
   "writingPage": {
     "header": { "title": "Chấm TOPIK II Viết (51–54)", "subtitle": "AI chấm điểm và phản hồi chi tiết", "history": "Lịch sử" },
-    "notice": { "title": "Lưu ý quan trọng" },
+    "notice": { "title": "Lưu ý quan trọng", "handwritingWarning": "Chữ viết tay tiếng Hàn khó nhận dạng có thể ảnh hưởng đến kết quả. Khuyến nghị sử dụng phương thức nhập văn bản để có kết quả chính xác nhất." },
     "steps": { "question": "Tải đề bài lên", "answer": "Bài làm của bạn" },
     "answerMode": { "text": "Nhập văn bản", "image": "Tải ảnh" },
     "placeholders": { "answerText": "Dán hoặc nhập bài làm của bạn tại đây..." },
     "tip": { "copyPaste": "Mẹo: Copy & paste từ Word hoặc ghi chú để đạt độ chính xác cao nhất." },
     "actions": { "grading": "Đang chấm...", "grade": "Chấm điểm với AI", "freeGrade": "🎁 Chấm miễn phí (1 lần/ngày)", "upgradeToGrade": "Nâng cấp Premium để chấm" },
-    "pdf": { "generatingTitle": "Đang tạo PDF...", "generatingDesc": "Vui lòng chờ", "failedTitle": "Tạo PDF thất bại", "failedDesc": "Vui lòng thử lại" }
+    "pdf": { "generatingTitle": "Đang tạo PDF...", "generatingDesc": "Vui lòng chờ", "failedTitle": "Tạo PDF thất bại", "failedDesc": "Vui lòng thử lại", "downloadComplete": "Tải PDF hoàn tất!", "fileDownloaded": "File đã được tải về" },
+    "featureName": "Chấm bài viết AI",
+    "freeUsage": {
+      "availableNow": "Có thể sử dụng ngay",
+      "hasFreeTry": "Bạn có 1 lượt chấm miễn phí hôm nay!",
+      "freeOnceDaily": "Mỗi ngày bạn được sử dụng 1 lần miễn phí. Nâng cấp Premium để không giới hạn.",
+      "usedToday": "Đã sử dụng lượt miễn phí hôm nay",
+      "nextFreeAt": "Lượt miễn phí tiếp theo: {{time}}. Nâng cấp Premium để không giới hạn.",
+      "nextFreeSimple": "Lượt miễn phí tiếp theo: {{time}}"
+    },
+    "buttons": {
+      "addImage": "Thêm ảnh",
+      "deleteAll": "Xóa tất cả",
+      "uploadImage": "Upload ảnh",
+      "takePhoto": "Chụp ảnh"
+    },
+    "upload": {
+      "maxQuestionImages": "Tối đa {{max}} ảnh đề bài",
+      "maxAnswerImages": "Tối đa {{max}} ảnh bài làm",
+      "multipleSupport": "Hỗ trợ upload nhiều ảnh cùng lúc"
+    }
   },
   "interview": {
     "title": "Mô phỏng phỏng vấn",

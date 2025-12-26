@@ -541,8 +541,8 @@ const WritingCorrection = () => {
       doc.save(`TOPIK_Writing_Report_${Date.now()}.pdf`);
 
       toast({
-        title: "PDF 다운로드 완료!",
-        description: "파일이 다운로드되었습니다"
+        title: t("writingPage.pdf.downloadComplete"),
+        description: t("writingPage.pdf.fileDownloaded")
       });
     } catch (error) {
       console.error('PDF export error:', error);
@@ -557,7 +557,7 @@ const WritingCorrection = () => {
   const formatTimeRemaining = (targetDate: Date) => {
     const now = new Date();
     const diff = targetDate.getTime() - now.getTime();
-    if (diff <= 0) return "Có thể sử dụng ngay";
+    if (diff <= 0) return t("writingPage.freeUsage.availableNow");
     
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -585,7 +585,7 @@ const WritingCorrection = () => {
           className="space-y-8"
         >
           {/* Premium Preview Banner */}
-          {!isPremium && <PremiumPreviewBanner featureName="chấm bài viết AI" />}
+          {!isPremium && <PremiumPreviewBanner featureName={t("writingPage.featureName")} />}
           
           {/* Daily Free Usage Banner for non-premium users */}
           {!isPremium && !checkingFreeUsage && (
@@ -595,17 +595,16 @@ const WritingCorrection = () => {
                 <div className="flex-1">
                   {canUseFreeToday ? (
                     <>
-                      <p className="font-medium text-green-600 dark:text-green-400">🎁 Bạn có 1 lượt chấm miễn phí hôm nay!</p>
+                      <p className="font-medium text-green-600 dark:text-green-400">🎁 {t("writingPage.freeUsage.hasFreeTry")}</p>
                       <p className="text-sm text-muted-foreground">
-                        Mỗi ngày bạn được sử dụng 1 lần miễn phí. Nâng cấp Premium để không giới hạn.
+                        {t("writingPage.freeUsage.freeOnceDaily")}
                       </p>
                     </>
                   ) : (
                     <>
-                      <p className="font-medium text-blue-600 dark:text-blue-400">⏰ Đã sử dụng lượt miễn phí hôm nay</p>
+                      <p className="font-medium text-blue-600 dark:text-blue-400">⏰ {t("writingPage.freeUsage.usedToday")}</p>
                       <p className="text-sm text-muted-foreground">
-                        Lượt miễn phí tiếp theo: {nextFreeTime ? formatTimeRemaining(nextFreeTime) : 'N/A'}. 
-                        Nâng cấp Premium để không giới hạn.
+                        {t("writingPage.freeUsage.nextFreeAt", { time: nextFreeTime ? formatTimeRemaining(nextFreeTime) : 'N/A' })}
                       </p>
                     </>
                   )}
@@ -645,11 +644,11 @@ const WritingCorrection = () => {
                 <div className="flex-1 min-w-0">
                   {canUseFreeToday ? (
                     <p className="text-sm font-medium text-primary">
-                      🎁 Bạn có 1 lượt chấm miễn phí hôm nay!
+                      🎁 {t("writingPage.freeUsage.hasFreeTry")}
                     </p>
                   ) : (
                     <p className="text-sm text-muted-foreground">
-                      ⏰ Lượt miễn phí tiếp theo: {nextFreeTime ? formatTimeRemaining(nextFreeTime) : 'N/A'}
+                      ⏰ {t("writingPage.freeUsage.nextFreeSimple", { time: nextFreeTime ? formatTimeRemaining(nextFreeTime) : 'N/A' })}
                     </p>
                   )}
                 </div>
@@ -664,8 +663,7 @@ const WritingCorrection = () => {
               <div>
                 <p className="font-medium text-foreground">{t("writingPage.notice.title")}</p>
                 <p className="text-sm text-muted-foreground">
-                  Chữ viết tay tiếng Hàn khó nhận dạng có thể ảnh hưởng đến kết quả. 
-                  Khuyến nghị sử dụng phương thức <strong>nhập văn bản</strong> để có kết quả chính xác nhất.
+                  {t("writingPage.notice.handwritingWarning")}
                 </p>
               </div>
             </div>
@@ -733,7 +731,7 @@ const WritingCorrection = () => {
                           onClick={() => questionInputRef.current?.click()}
                         >
                           <Upload className="w-4 h-4 mr-2" />
-                          Thêm ảnh ({questionImagePreviews.length}/{MAX_IMAGES})
+                          {t("writingPage.buttons.addImage")} ({questionImagePreviews.length}/{MAX_IMAGES})
                         </Button>
                         <Button
                           variant="outline"
@@ -743,7 +741,7 @@ const WritingCorrection = () => {
                             setQuestionImagePreviews([]);
                           }}
                         >
-                          Xóa tất cả
+                          {t("writingPage.buttons.deleteAll")}
                         </Button>
                       </div>
                     )}
@@ -752,8 +750,8 @@ const WritingCorrection = () => {
                   <div className="space-y-3">
                     <div className="border-2 border-dashed border-border rounded-lg p-6 text-center bg-muted/20">
                       <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                      <p className="text-sm font-medium text-foreground">📷 Tối đa {MAX_IMAGES} ảnh đề bài</p>
-                      <p className="text-xs text-muted-foreground mt-1">Hỗ trợ upload nhiều ảnh cùng lúc</p>
+                      <p className="text-sm font-medium text-foreground">📷 {t("writingPage.upload.maxQuestionImages", { max: MAX_IMAGES })}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t("writingPage.upload.multipleSupport")}</p>
                     </div>
                     <div className="flex gap-3">
                       <Button
@@ -762,7 +760,7 @@ const WritingCorrection = () => {
                         onClick={() => questionInputRef.current?.click()}
                       >
                         <Upload className="w-4 h-4 mr-2" />
-                        Upload ảnh
+                        {t("writingPage.buttons.uploadImage")}
                       </Button>
                       <Button
                         variant="outline"
@@ -770,7 +768,7 @@ const WritingCorrection = () => {
                         onClick={() => questionCameraRef.current?.click()}
                       >
                         <Camera className="w-4 h-4 mr-2" />
-                        Chụp ảnh
+                        {t("writingPage.buttons.takePhoto")}
                       </Button>
                     </div>
                   </div>
@@ -869,7 +867,7 @@ const WritingCorrection = () => {
                               onClick={() => answerInputRef.current?.click()}
                             >
                               <Upload className="w-4 h-4 mr-2" />
-                              Thêm ảnh ({answerImagePreviews.length}/{MAX_IMAGES})
+                              {t("writingPage.buttons.addImage")} ({answerImagePreviews.length}/{MAX_IMAGES})
                             </Button>
                             <Button
                               variant="outline"
@@ -879,7 +877,7 @@ const WritingCorrection = () => {
                                 setAnswerImagePreviews([]);
                               }}
                             >
-                              Xóa tất cả
+                              {t("writingPage.buttons.deleteAll")}
                             </Button>
                           </div>
                         )}
@@ -888,8 +886,8 @@ const WritingCorrection = () => {
                       <div className="space-y-3">
                         <div className="border-2 border-dashed border-border rounded-lg p-6 text-center bg-muted/20">
                           <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                          <p className="text-sm font-medium text-foreground">📷 Tối đa {MAX_IMAGES} ảnh bài làm</p>
-                          <p className="text-xs text-muted-foreground mt-1">Hỗ trợ upload nhiều ảnh cùng lúc</p>
+                          <p className="text-sm font-medium text-foreground">📷 {t("writingPage.upload.maxAnswerImages", { max: MAX_IMAGES })}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{t("writingPage.upload.multipleSupport")}</p>
                         </div>
                         <div className="flex gap-3">
                           <Button
@@ -898,7 +896,7 @@ const WritingCorrection = () => {
                             onClick={() => answerInputRef.current?.click()}
                           >
                             <Upload className="w-4 h-4 mr-2" />
-                            Upload ảnh
+                            {t("writingPage.buttons.uploadImage")}
                           </Button>
                           <Button
                             variant="outline"
@@ -906,7 +904,7 @@ const WritingCorrection = () => {
                             onClick={() => answerCameraRef.current?.click()}
                           >
                             <Camera className="w-4 h-4 mr-2" />
-                            Chụp ảnh
+                            {t("writingPage.buttons.takePhoto")}
                           </Button>
                         </div>
                       </div>

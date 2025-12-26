@@ -465,17 +465,37 @@
     "tips": { "title": "使い方", "step1": "「ロールプレイ開始」でランダムシーンを受け取る", "step2": "韓国語で返答（入力/音声）", "step3": "AIの修正と文法説明を確認", "step4": "学んだ内容からTOPIKクイズを作成", "tipLabel": "ヒント:", "tipText": "困ったらおすすめ返答を参考にしてください。" },
     "stats": { "title": "今回", "spoken": "話した文", "correct": "正しい文" },
     "quiz": { "progress": "{{current}}/{{total}}", "yourScore": "スコア", "correctAnswer": "正解: {{answer}}" },
-    "toast": { "started": "新しいシーンを開始しました。", "startFailed": "開始に失敗しました。", "needConversation": "クイズ作成には会話が必要です。", "quizCreated": "クイズを作成しました。", "quizFailed": "クイズ作成に失敗しました。", "audioFailed": "音声再生に失敗しました。", "sttSuccess": "音声を認識しました。", "sttFailed": "音声認識に失敗しました。", "recording": "録音中...", "micDenied": "マイク権限が必要です。" }
+    "toast": { "started": "新しいシーンを開始しました。", "startFailed": "開始に失敗しました。", "needConversation": "クイズ作成には会話が必要です。", "quizCreated": "クイズを作成しました。", "quizFailed": "クイズ作成に失敗しました。", "audioFailed": "音声再生に失敗しました。", "sttSuccess": "音声を認識しました。", "sttFailed": "音声認識に失敗しました。", "recording": "録音中...", "micDenied": "マイク権限が必要です。", "sendFailed": "メッセージの送信に失敗しました。もう一度お試しください。" }
   },
   "writingPage": {
     "header": { "title": "TOPIK II 作文(51〜54) 添削", "subtitle": "AIが採点し詳細フィードバックを提供", "history": "履歴" },
-    "notice": { "title": "重要なお知らせ" },
+    "notice": { "title": "重要なお知らせ", "handwritingWarning": "韓国語の手書きは認識が難しく、結果に影響を与える可能性があります。最も正確な結果を得るためにテキスト入力をお勧めします。" },
     "steps": { "question": "問題をアップロード", "answer": "あなたの答案" },
     "answerMode": { "text": "テキスト", "image": "画像" },
     "placeholders": { "answerText": "ここに答案を貼り付け/入力..." },
     "tip": { "copyPaste": "ヒント: Word/メモの文章を貼り付けると精度が上がります。" },
     "actions": { "grading": "採点中...", "grade": "AIで採点", "freeGrade": "🎁 無料採点(1日1回)", "upgradeToGrade": "Premiumにアップグレードして採点" },
-    "pdf": { "generatingTitle": "PDF生成中...", "generatingDesc": "少々お待ちください", "failedTitle": "PDF生成失敗", "failedDesc": "もう一度お試しください" }
+    "pdf": { "generatingTitle": "PDF生成中...", "generatingDesc": "少々お待ちください", "failedTitle": "PDF生成失敗", "failedDesc": "もう一度お試しください", "downloadComplete": "PDFダウンロード完了！", "fileDownloaded": "ファイルがダウンロードされました" },
+    "featureName": "AI作文添削",
+    "freeUsage": {
+      "availableNow": "今すぐ使用可能",
+      "hasFreeTry": "本日1回無料添削が可能です！",
+      "freeOnceDaily": "毎日1回無料で使用できます。無制限利用はPremiumにアップグレードしてください。",
+      "usedToday": "本日の無料利用を完了しました",
+      "nextFreeAt": "次の無料利用: {{time}}。無制限利用はPremiumにアップグレードしてください。",
+      "nextFreeSimple": "次の無料利用: {{time}}"
+    },
+    "buttons": {
+      "addImage": "画像を追加",
+      "deleteAll": "すべて削除",
+      "uploadImage": "画像をアップロード",
+      "takePhoto": "写真を撮る"
+    },
+    "upload": {
+      "maxQuestionImages": "最大{{max}}枚の問題画像",
+      "maxAnswerImages": "最大{{max}}枚の答案画像",
+      "multipleSupport": "複数画像の一括アップロード対応"
+    }
   },
   "interview": {
     "title": "面接シミュレーション", "description": "韓国企業面接練習",
