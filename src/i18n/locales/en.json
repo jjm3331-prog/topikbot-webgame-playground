@@ -1202,5 +1202,61 @@
       "title": "■ Personal Information Complaint Service",
       "content": "The company designates related departments and privacy protection officers."
     }
+  },
+  "footer": { "commonCopyright": "© 2025 LUKATO Vietnam. All rights reserved." },
+  "pointsSystem": {
+    "title": "Points System", "subtitle": "Learn Korean, earn points, level up!",
+    "howToEarn": "How to Earn Points", "levelSystem": "TOPIK Level System", "freeVsPremium": "Free vs Premium Features",
+    "free": "Free", "premium": "Premium", "max": "MAX", "viewPricing": "View Pricing",
+    "earnMethods": {
+      "daily": { "title": "Daily Check-in", "description": "Log in every day to earn bonus points" },
+      "streak": { "title": "7-Day Streak", "description": "Check in 7 days in a row for big bonus" },
+      "quiz": { "title": "Complete Quiz", "description": "Get all 5 answers right for max score" },
+      "game": { "title": "Complete Game", "description": "Play and complete Korean learning games" },
+      "referral": { "title": "Invite Friends", "description": "Invite friends and get bonus when they sign up" },
+      "weeklyGoal": { "title": "Weekly Goal", "description": "Complete weekly learning goals" }
+    },
+    "freeItems": { "aiQuestions": "AI {{count}} questions/day", "topik": "TOPIK I & II Study", "allGames": "All Korean Games", "savedVocab": "Save up to {{count}} vocabulary", "ranking": "View Ranking" },
+    "premiumItems": { "allFree": "All free features included" },
+    "tips": { "title": "Quick Points Tips", "item1": "Check in daily to maintain streak and earn bonus", "item2": "Complete quiz with perfect score for +{{points}} points", "item3": "Invite friends so both get bonus", "item4": "Set and complete weekly learning goals" }
+  },
+  "pricing": {
+    "title": "Choose Your Plan", "subtitle": "Start free, upgrade when needed",
+    "period": { "1month": "1 month", "6months": "6 months", "12months": "12 months" },
+    "perMonth": "month", "save": "Save",
+    "features": {
+      "games": { "name": "TOPIK Games (All)", "desc": "8 Korean learning games" },
+      "topik": { "name": "TOPIK I & II Study", "desc": "Level-based lessons" },
+      "headhunting": { "name": "1:1 Headhunting", "desc": "Personal job consultation" },
+      "writing": { "name": "TOPIK AI Writing", "desc": "AI detailed correction" },
+      "variant": { "name": "AI Question Variant", "desc": "Generate new questions with AI" }
+    },
+    "free": { "badge": "Free", "forever": "Free forever", "feature1": "TOPIK Games (All)", "feature2": "TOPIK I & II Study", "feature3": "Roleplay Speaking", "currentPlan": "Current Plan", "startFree": "Start Free" },
+    "premium": { "badge": "Most Popular", "feature1": "All Free Features", "feature2": "1:1 Headhunting", "feature3": "TOPIK AI Writing", "feature4": "AI Question Variant", "upgrade": "Upgrade Premium" },
+    "comparison": { "title": "Detailed Comparison", "feature": "Feature" },
+    "process": { "title": "Payment Process", "subtitle": "Simple, fast, secure", "step1": { "title": "Choose Plan", "desc": "Select plan that fits your needs" }, "step2": { "title": "Payment", "desc": "ZaloPay, MoMo, Bank Transfer" }, "step3": { "title": "Activate", "desc": "Auto-activate after payment" } },
+    "security": { "title": "100% Secure Payment", "desc": "SSL Encryption • PCI-DSS Security • 7-day Refund" },
+    "faqTitle": "Frequently Asked Questions", "faqSubtitle": "Answers about service plans",
+    "faq": {
+      "cancel": { "question": "Can I cancel anytime?", "answer": "Yes, you can cancel your subscription anytime. After cancellation, you can still use Premium features until the paid period ends." },
+      "payment": { "question": "What payment methods are supported?", "answer": "We support ZaloPay, MoMo, VNPay, and bank transfer. All transactions are SSL encrypted." },
+      "includes": { "question": "What does Premium include?", "answer": "Premium includes: 1:1 Headhunting, TOPIK AI Writing Correction, and AI Question Variant." },
+      "refund": { "question": "Can I get a refund?", "answer": "We offer 100% refund within 7 days if you're not satisfied. Contact support for assistance." },
+      "student": { "question": "Is there a student discount?", "answer": "Yes! Students get 20% off on 6-month or 12-month plans. Contact support for verification." }
+    },
+    "paymentVia": "Secure payment via ZaloPay"
+  },
+  "aiTutor": {
+    "badge": "AI Chat - Smart Q&A", "title": "LUKATO AI Chat", "description": "Vietnam's smartest AI teacher system. 24/7 Q&A for all TOPIK, HSA, TSA, API subjects.",
+    "openChat": "Open LUKATO AI Chat", "supportAt": "Full support at chat-topikbot.kr",
+    "features": { "qa": { "title": "Unlimited Q&A", "desc": "Ask any question about TOPIK knowledge. AI will answer in detail and easy to understand." }, "support": { "title": "24/7 Support", "desc": "AI chatbot is always ready to answer anytime." }, "subjects": { "title": "Diverse Subjects", "desc": "Math, Physics, Chemistry, Biology, English, Geography, History, Literature - all in one platform." }, "ai": { "title": "Advanced AI", "desc": "Using Compound AI technology with Vietnam's first Expert Chatbot." } },
+    "howToUse": { "title": "Detailed Usage Guide", "subtitle": "Follow 4 simple steps to start" },
+    "steps": { "step1": { "title": "Login/Register", "desc": "Access LUKATO AI Chat and login with Google or create new account.", "highlight": "LUKATO members (Basic/Premium) get access immediately after login." }, "step2": { "title": "Select AI Model", "desc": "Click model name at top left to see AI model list. Select model suitable for your subject.", "highlight": "Click 'Find Model' to save favorites." }, "step3": { "title": "Personal Settings", "desc": "Click avatar at top right → Settings to customize language, theme and other options.", "highlight": "Intuitive and easy to use interface!" }, "step4": { "title": "Start Q&A", "desc": "Ask any knowledge question. AI will answer in detail like a personal tutor!", "highlight": "Voice and file upload supported." } },
+    "modelsTitle": "Specialized AI Models", "modelsSubtitle": "LUKATO AI provides specialized AI models for each subject",
+    "models": { "thpt": { "name": "All About TOPIK", "subtitle": "Integrated Model", "desc": "Answer all TOPIK questions from Math, Physics, Chemistry, Biology, English, History, Geography." }, "dgnl": { "name": "ĐGNL & ĐGTD", "subtitle": "AI Expert", "desc": "AI Expert for TSA ĐGNL, Đ.TĐ, APT-O, ĐGTD TSA-HQ." }, "math": { "name": "TOPIK for Math", "subtitle": "Math Specialist", "desc": "High school math formulas and algorithms." }, "english": { "name": "TOPIK for English", "subtitle": "English Specialist", "desc": "English vocabulary and grammar." } },
+    "modelsHint": "After authorization, you can select any model!",
+    "featuresTitle": "Key Features", "noticesTitle": "Important Notices for Members",
+    "notices": { "item1": "AI access granted immediately after successful upgrade.", "item2": "Login with same email registered at LUKATO to sync.", "item3": "AI models will automatically display after authorization.", "item4": "Use LUKATO RAG AI - ask questions and get detailed answers!" },
+    "cta": { "title": "Ready to study with AI?", "desc": "LUKATO AI Chat helps you answer all questions and conquer exams!", "practice": "Practice" }
   }
 }
