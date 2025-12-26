@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import DocumentUploader from "@/components/admin/DocumentUploader";
 import DocumentList from "@/components/admin/DocumentList";
+import TestimonialsManager from "@/components/admin/TestimonialsManager";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -630,7 +631,7 @@ const Admin = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5 mb-8">
+          <TabsList className="grid w-full grid-cols-6 mb-8">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
               <span className="hidden sm:inline">대시보드</span>
@@ -646,6 +647,10 @@ const Admin = () => {
             <TabsTrigger value="documents" className="flex items-center gap-2">
               <FileText className="w-4 h-4" />
               <span className="hidden sm:inline">지식문서</span>
+            </TabsTrigger>
+            <TabsTrigger value="testimonials" className="flex items-center gap-2">
+              <Star className="w-4 h-4" />
+              <span className="hidden sm:inline">후기</span>
             </TabsTrigger>
             <TabsTrigger value="notifications" className="flex items-center gap-2">
               <Bell className="w-4 h-4" />
@@ -1455,6 +1460,21 @@ const Admin = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Testimonials Tab */}
+          <TabsContent value="testimonials">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Star className="w-5 h-5 text-korean-yellow" />
+                  랜딩 페이지 후기 관리
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TestimonialsManager />
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </main>
