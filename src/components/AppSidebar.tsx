@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { 
   BookOpen, 
   Trophy,
@@ -30,7 +31,6 @@ import {
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { safeSignOut } from "@/lib/safeSignOut";
@@ -38,73 +38,18 @@ import { safeSignOut } from "@/lib/safeSignOut";
 
 interface MenuItem {
   icon: React.ElementType;
-  label: string;
+  labelKey: string;
   href: string;
   isPremium?: boolean;
   isHighlight?: boolean;
 }
 
 interface MenuSection {
-  title: string;
+  titleKey: string;
   emoji: string;
   items: MenuItem[];
   defaultOpen?: boolean;
 }
-
-// MegaMenuOverlay와 동일한 구조
-const menuSections: MenuSection[] = [
-  {
-    title: "DU HỌC & VIỆC LÀM",
-    emoji: "✈️",
-    items: [
-      { icon: Building, label: "Tìm việc tại Hàn Quốc", href: "/korea-career", isPremium: true },
-      { icon: Users, label: "Headhunting", href: "/headhunting", isPremium: true },
-    ],
-    defaultOpen: false
-  },
-  {
-    title: "HỌC TOPIK",
-    emoji: "📚",
-    items: [
-      { icon: Sparkles, label: "Trung tâm học TOPIK", href: "/learning-hub", isHighlight: true },
-      { icon: MessageSquare, label: "Cộng đồng", href: "/board-hub", isHighlight: true },
-    ],
-    defaultOpen: true
-  },
-  {
-    title: "GAME",
-    emoji: "🎮",
-    items: [
-      { icon: Gamepad2, label: "Trung tâm Game", href: "/game-hub", isHighlight: true },
-    ],
-    defaultOpen: true
-  },
-  {
-    title: "CÔNG CỤ AI",
-    emoji: "🤖",
-    items: [
-      { icon: MessageSquare, label: "Q&A Agent", href: "/ai-chat", isHighlight: true, isPremium: true },
-      { icon: PenTool, label: "Chấm bài viết", href: "/writing-correction", isPremium: true },
-      { icon: Languages, label: "Roleplay Speaking", href: "/roleplay-speaking", isPremium: true },
-      { icon: Star, label: "Bảng giá", href: "/pricing" },
-    ],
-    defaultOpen: false
-  },
-  {
-    title: "CỦA TÔI",
-    emoji: "👤",
-    items: [
-      { icon: Sparkles, label: "Tiến độ học tập", href: "/dashboard", isPremium: true, isHighlight: true },
-      { icon: User, label: "Hồ sơ", href: "/profile" },
-      { icon: Trophy, label: "Bảng xếp hạng", href: "/ranking" },
-      { icon: Star, label: "Điểm thưởng", href: "/points-system" },
-      { icon: Notebook, label: "Điều khoản", href: "/terms" },
-      { icon: HelpCircle, label: "Chính sách", href: "/privacy" },
-      { icon: Headphones, label: "Trung tâm Hỗ trợ", href: "/help-center" },
-    ],
-    defaultOpen: false
-  },
-];
 
 interface AppSidebarProps {
   username?: string | null;
@@ -118,16 +63,71 @@ interface AppSidebarProps {
 export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, onToggleCollapse }: AppSidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const currentPath = location.pathname;
+
+  const menuSections: MenuSection[] = [
+    {
+      titleKey: "sidebar.sections.studyWork",
+      emoji: "✈️",
+      items: [
+        { icon: Building, labelKey: "sidebar.items.koreaCareer", href: "/korea-career", isPremium: true },
+        { icon: Users, labelKey: "sidebar.items.headhunting", href: "/headhunting", isPremium: true },
+      ],
+      defaultOpen: false
+    },
+    {
+      titleKey: "sidebar.sections.topik",
+      emoji: "📚",
+      items: [
+        { icon: Sparkles, labelKey: "sidebar.items.learningHub", href: "/learning-hub", isHighlight: true },
+        { icon: MessageSquare, labelKey: "sidebar.items.community", href: "/board-hub", isHighlight: true },
+      ],
+      defaultOpen: true
+    },
+    {
+      titleKey: "sidebar.sections.game",
+      emoji: "🎮",
+      items: [
+        { icon: Gamepad2, labelKey: "sidebar.items.gameHub", href: "/game-hub", isHighlight: true },
+      ],
+      defaultOpen: true
+    },
+    {
+      titleKey: "sidebar.sections.ai",
+      emoji: "🤖",
+      items: [
+        { icon: MessageSquare, labelKey: "sidebar.items.qnaAgent", href: "/ai-chat", isHighlight: true, isPremium: true },
+        { icon: PenTool, labelKey: "sidebar.items.writingCorrection", href: "/writing-correction", isPremium: true },
+        { icon: Languages, labelKey: "sidebar.items.roleplay", href: "/roleplay-speaking", isPremium: true },
+        { icon: Star, labelKey: "sidebar.items.pricing", href: "/pricing" },
+      ],
+      defaultOpen: false
+    },
+    {
+      titleKey: "sidebar.sections.my",
+      emoji: "👤",
+      items: [
+        { icon: Sparkles, labelKey: "sidebar.items.progress", href: "/dashboard", isPremium: true, isHighlight: true },
+        { icon: User, labelKey: "sidebar.items.profile", href: "/profile" },
+        { icon: Trophy, labelKey: "sidebar.items.ranking", href: "/ranking" },
+        { icon: Star, labelKey: "sidebar.items.points", href: "/points-system" },
+        { icon: Notebook, labelKey: "sidebar.items.terms", href: "/terms" },
+        { icon: HelpCircle, labelKey: "sidebar.items.privacy", href: "/privacy" },
+        { icon: Headphones, labelKey: "sidebar.items.helpCenter", href: "/help-center" },
+      ],
+      defaultOpen: false
+    },
+  ];
   
   const [openSections, setOpenSections] = useState<Set<string>>(() => {
     const initialOpen = new Set<string>();
     menuSections.forEach(section => {
       if (section.defaultOpen) {
-        initialOpen.add(section.title);
+        initialOpen.add(section.titleKey);
       }
       if (section.items.some(item => currentPath === item.href || currentPath.startsWith(item.href.split("#")[0]))) {
-        initialOpen.add(section.title);
+        initialOpen.add(section.titleKey);
       }
     });
     return initialOpen;
@@ -136,8 +136,8 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
   const handleLogout = async () => {
     await safeSignOut();
     toast({
-      title: "Đăng xuất thành công",
-      description: "Hẹn gặp lại bạn!",
+      title: t("sidebar.logoutSuccess"),
+      description: t("sidebar.seeYouAgain"),
     });
     navigate("/");
   };
@@ -152,13 +152,13 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
     }
   };
 
-  const toggleSection = (title: string) => {
+  const toggleSection = (titleKey: string) => {
     setOpenSections(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(title)) {
-        newSet.delete(title);
+      if (newSet.has(titleKey)) {
+        newSet.delete(titleKey);
       } else {
-        newSet.add(title);
+        newSet.add(titleKey);
       }
       return newSet;
     });
@@ -170,7 +170,6 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
 
   const sidebarContent = (
     <>
-      {/* Header */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-border shrink-0">
         {!isCollapsed && (
           <motion.div 
@@ -188,7 +187,6 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
           </motion.div>
         )}
         
-        {/* Desktop collapse button */}
         <Button
           variant="ghost"
           size="icon"
@@ -198,7 +196,6 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
           {isCollapsed ? <PanelLeft className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
         </Button>
 
-        {/* Mobile close button */}
         <Button
           variant="ghost"
           size="icon"
@@ -209,7 +206,6 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
         </Button>
       </div>
 
-      {/* User Profile */}
       {!isCollapsed && username && (
         <div className="border-b border-border shrink-0">
           <div className="px-4 py-3">
@@ -223,12 +219,11 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
               )}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">{username}</p>
-                <p className="text-xs text-muted-foreground">Thành viên</p>
+                <p className="text-xs text-muted-foreground">{t("sidebar.member")}</p>
               </div>
             </div>
           </div>
 
-          {/* Quick links under profile (mobile hamburger + desktop) */}
           <div className="px-2 pb-3">
             <div className="grid grid-cols-2 gap-2">
               <button
@@ -239,7 +234,7 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
                 )}
               >
                 <User className="w-4 h-4 shrink-0" />
-                <span className="text-sm font-medium truncate">Hồ sơ</span>
+                <span className="text-sm font-medium truncate">{t("sidebar.items.profile")}</span>
               </button>
 
               <button
@@ -250,16 +245,14 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
                 )}
               >
                 <Trophy className="w-4 h-4 shrink-0" />
-                <span className="text-sm font-medium truncate">Ranking</span>
+                <span className="text-sm font-medium truncate">{t("sidebar.items.ranking")}</span>
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-2">
-        {/* Home Link */}
         <div className="px-2 mb-2">
           <button
             onClick={() => handleNavigation("/")}
@@ -271,16 +264,14 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
             )}
           >
             <Home className="w-5 h-5 shrink-0" />
-            {!isCollapsed && <span className="text-sm font-medium">Trang chủ</span>}
+            {!isCollapsed && <span className="text-sm font-medium">{t("sidebar.home")}</span>}
           </button>
         </div>
 
-        {/* Menu Sections */}
         {menuSections.map((section) => (
-          <div key={section.title} className="px-2 mb-1">
-            {/* Section Header */}
+          <div key={section.titleKey} className="px-2 mb-1">
             <button
-              onClick={() => !isCollapsed && toggleSection(section.title)}
+              onClick={() => !isCollapsed && toggleSection(section.titleKey)}
               className={cn(
                 "w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors",
                 isCollapsed ? "justify-center" : "justify-between",
@@ -291,7 +282,7 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
                 <span className="text-base">{section.emoji}</span>
                 {!isCollapsed && (
                   <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    {section.title}
+                    {t(section.titleKey)}
                   </span>
                 )}
               </div>
@@ -299,15 +290,14 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
                 <ChevronDown 
                   className={cn(
                     "w-4 h-4 text-muted-foreground transition-transform",
-                    openSections.has(section.title) ? "rotate-180" : ""
+                    openSections.has(section.titleKey) ? "rotate-180" : ""
                   )} 
                 />
               )}
             </button>
 
-            {/* Section Items */}
             <AnimatePresence>
-              {(!isCollapsed && openSections.has(section.title)) && (
+              {(!isCollapsed && openSections.has(section.titleKey)) && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
@@ -317,7 +307,7 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
                 >
                   {section.items.map((item) => (
                     <button
-                      key={item.label}
+                      key={item.labelKey}
                       onClick={() => handleNavigation(item.href)}
                       className={cn(
                         "w-full flex items-center gap-3 px-3 py-2 ml-4 rounded-lg transition-colors text-left",
@@ -327,7 +317,7 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
                       )}
                     >
                       <item.icon className={cn("w-4 h-4 shrink-0", isActive(item.href) && "text-primary")} />
-                      <span className="text-sm font-medium flex-1 truncate">{item.label}</span>
+                      <span className="text-sm font-medium flex-1 truncate">{t(item.labelKey)}</span>
                       {item.isPremium && (
                         <span className="px-1.5 py-0.5 bg-accent text-accent-foreground text-[10px] font-bold rounded shrink-0">
                           Premium
@@ -342,7 +332,6 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
         ))}
       </nav>
 
-      {/* Footer */}
       <div className="p-2 border-t border-border shrink-0">
         {!isCollapsed ? (
           <Button 
@@ -351,7 +340,7 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
             className="w-full rounded-xl font-semibold text-destructive border-destructive/30 hover:bg-destructive/10"
           >
             <LogOut className="w-4 h-4 mr-2" />
-            Đăng xuất
+            {t("common.logout")}
           </Button>
         ) : (
           <Button
@@ -369,7 +358,6 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
 
   return (
     <>
-      {/* Desktop Sidebar */}
       <motion.aside
         initial={{ x: -280 }}
         animate={{ 
@@ -385,11 +373,9 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
         {sidebarContent}
       </motion.aside>
 
-      {/* Mobile Sidebar with Backdrop */}
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -398,7 +384,6 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
               className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden"
             />
 
-            {/* Slide-out Menu */}
             <motion.aside
               initial={{ x: -280 }}
               animate={{ x: 0 }}
