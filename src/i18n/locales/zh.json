@@ -16,12 +16,14 @@
     "confirm": "确认",
     "loading": "加载中...",
     "error": "错误",
-    "success": "成功"
+    "success": "成功",
+    "or": "或"
   },
   "brand": {
     "name": "LUKATO AI",
     "tagline": "Your Korean Mentor",
-    "badge": "越南首款韩语学习游戏"
+    "badge": "越南首款韩语学习游戏",
+    "platformNo1": "越南第一韩语学习平台"
   },
   "index": {
     "badge": "越南首款韩语学习游戏",
@@ -68,7 +70,10 @@
       "helpCenter": "帮助中心",
       "terms": "条款",
       "privacy": "隐私"
-    }
+    },
+    "premiumFeature": "高级功能",
+    "premiumDescription": "您可以查看此页面，但需升级高级版以获得完整访问权限。",
+    "upgrade": "升级"
   },
   "toast": {
     "premiumFeature": "高级功能",
@@ -78,5 +83,94 @@
   "language": {
     "select": "选择语言",
     "current": "当前语言"
+  },
+  "dashboard": {
+    "loading": "加载中...",
+    "welcome": "您好",
+    "whatToLearn": "今天想学什么？",
+    "points": "积分",
+    "dailyCheckIn": "每日签到",
+    "days": "天",
+    "record": "记录",
+    "perDay": "/天",
+    "checkInNow": "立即签到！",
+    "checkedInToday": "今日已签到",
+    "processing": "处理中...",
+    "checkInSuccess": "签到成功！🎉",
+    "streak": "连续",
+    "checkInError": "签到失败，请重试。",
+    "streakBonus": "🎁 今天签到获得7天连续奖励！",
+    "pointsToNextLevel": "距离下一级还需{points}积分",
+    "battle": {
+      "realtime": "⚔️ 1:1 实时",
+      "hot": "热门",
+      "title": "1:1 对战场",
+      "description": "接龙 • 语义对战 • 获胜 = +1,000分！",
+      "games": "2个游戏",
+      "winPoints": "获胜得积分！"
+    },
+    "topik": {
+      "allInOne": "🎯 All-in-One",
+      "new": "新",
+      "title": "TOPIK学习中心",
+      "description": "词汇 • 语法 • 听力 • 阅读 • 写作",
+      "lessons": "6节课",
+      "learnWithAI": "与AI一起学习"
+    },
+    "game": {
+      "badge": "🎮 游戏",
+      "hot": "热门",
+      "title": "游戏中心",
+      "description": "7款有趣的韩语学习游戏",
+      "games": "7款游戏",
+      "learnPlay": "边玩边学"
+    },
+    "career": {
+      "allInOne": "⭐ All-in-One",
+      "koreaJob": "韩国就业",
+      "title": "Korea Career Hub",
+      "description": "猎头 • 企业报告 • AI面试 - 一站式服务！",
+      "successCount": "1,000+ 就业成功",
+      "satisfaction": "98% 满意度"
+    },
+    "ai": {
+      "badge": "RAG AI",
+      "title": "LUKATO Q&A Agent",
+      "description": "使用最强Q&A Agent直接询问高级模型！"
+    }
+  },
+  "auth": {
+    "login": "登录",
+    "signup": "注册",
+    "createAccount": "创建账户",
+    "resetPassword": "重置密码",
+    "welcomeBack": "欢迎回来！继续您的韩语学习之旅。",
+    "startJourney": "今天开始您的TOPIK征服之旅。",
+    "enterEmail": "输入注册邮箱以接收密码重置链接。",
+    "username": "用户名",
+    "enterUsername": "输入您的名字",
+    "email": "邮箱",
+    "password": "密码",
+    "enterPassword": "输入密码（至少6个字符）",
+    "forgotPassword": "忘记密码？",
+    "sendResetLink": "发送重置链接",
+    "continueWithGoogle": "使用Google继续",
+    "noAccount": "没有账户？立即注册",
+    "hasAccount": "已有账户？登录",
+    "goBack": "返回",
+    "checkEmail": "检查您的邮箱",
+    "resetLinkSent": "密码重置链接已发送至{email}。",
+    "backToLogin": "返回登录",
+    "signupSuccess": "注册成功！",
+    "welcomeToLukato": "欢迎来到LUKATO AI",
+    "errorOccurred": "发生错误",
+    "emailSent": "邮件已发送",
+    "resetLinkSentDesc": "密码重置链接已发送至您的邮箱。",
+    "alreadyRegistered": "此邮箱已注册，请登录。",
+    "invalidLogin": "邮箱或密码错误。",
+    "sslSecurity": "SSL安全",
+    "students": "50,000+ 学员",
+    "freeForever": "永久免费",
+    "copyright": "© 2025 LUKATO AI. 为越南人打造的韩语学习平台。"
   }
 }

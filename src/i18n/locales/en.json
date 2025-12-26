@@ -16,12 +16,14 @@
     "confirm": "Confirm",
     "loading": "Loading...",
     "error": "Error",
-    "success": "Success"
+    "success": "Success",
+    "or": "or"
   },
   "brand": {
     "name": "LUKATO AI",
     "tagline": "Your Korean Mentor",
-    "badge": "First Korean learning game in Vietnam"
+    "badge": "First Korean learning game in Vietnam",
+    "platformNo1": "#1 Korean Learning Platform in Vietnam"
   },
   "index": {
     "badge": "First Korean learning game in Vietnam",
@@ -68,7 +70,10 @@
       "helpCenter": "Help Center",
       "terms": "Terms",
       "privacy": "Privacy"
-    }
+    },
+    "premiumFeature": "Premium Feature",
+    "premiumDescription": "You can view this page, but please upgrade to Premium for full access.",
+    "upgrade": "Upgrade"
   },
   "toast": {
     "premiumFeature": "Premium Feature",
@@ -78,5 +83,94 @@
   "language": {
     "select": "Select Language",
     "current": "Current Language"
+  },
+  "dashboard": {
+    "loading": "Loading...",
+    "welcome": "Hello",
+    "whatToLearn": "What do you want to learn today?",
+    "points": "Points",
+    "dailyCheckIn": "Daily Check-in",
+    "days": "days",
+    "record": "Record",
+    "perDay": "/day",
+    "checkInNow": "Check in now!",
+    "checkedInToday": "Checked in today",
+    "processing": "Processing...",
+    "checkInSuccess": "Check-in successful! 🎉",
+    "streak": "Streak",
+    "checkInError": "Unable to check in. Please try again.",
+    "streakBonus": "🎁 Check in today to get 7-day streak bonus!",
+    "pointsToNextLevel": "{points} points to next level",
+    "battle": {
+      "realtime": "⚔️ 1:1 Real-time",
+      "hot": "HOT",
+      "title": "1:1 Battle Arena",
+      "description": "Word Chain • Semantic Battle • Win = +1,000 pts!",
+      "games": "2 games",
+      "winPoints": "Win for points!"
+    },
+    "topik": {
+      "allInOne": "🎯 All-in-One",
+      "new": "NEW",
+      "title": "TOPIK Learning Hub",
+      "description": "Vocabulary • Grammar • Listening • Reading • Writing",
+      "lessons": "6 lessons",
+      "learnWithAI": "Learn with AI"
+    },
+    "game": {
+      "badge": "🎮 Game",
+      "hot": "HOT",
+      "title": "Game Hub",
+      "description": "7 fun Korean learning games",
+      "games": "7 games",
+      "learnPlay": "Learn while playing"
+    },
+    "career": {
+      "allInOne": "⭐ All-in-One",
+      "koreaJob": "Korea Jobs",
+      "title": "Korea Career Hub",
+      "description": "Headhunting • Company Report • AI Interview - All in one!",
+      "successCount": "1,000+ job placements",
+      "satisfaction": "98% satisfaction"
+    },
+    "ai": {
+      "badge": "RAG AI",
+      "title": "LUKATO Q&A Agent",
+      "description": "Ask premium models directly with our top-performing Q&A Agent!"
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign up",
+    "createAccount": "Create account",
+    "resetPassword": "Reset password",
+    "welcomeBack": "Welcome back! Continue your Korean learning journey.",
+    "startJourney": "Start your TOPIK conquest journey today.",
+    "enterEmail": "Enter your registered email to receive password reset link.",
+    "username": "Username",
+    "enterUsername": "Enter your name",
+    "email": "Email",
+    "password": "Password",
+    "enterPassword": "Enter password (at least 6 characters)",
+    "forgotPassword": "Forgot password?",
+    "sendResetLink": "Send reset link",
+    "continueWithGoogle": "Continue with Google",
+    "noAccount": "Don't have an account? Sign up",
+    "hasAccount": "Already have an account? Login",
+    "goBack": "Go back",
+    "checkEmail": "Check your email",
+    "resetLinkSent": "Password reset link has been sent to {email}.",
+    "backToLogin": "Back to login",
+    "signupSuccess": "Sign up successful!",
+    "welcomeToLukato": "Welcome to LUKATO AI",
+    "errorOccurred": "An error occurred",
+    "emailSent": "Email sent",
+    "resetLinkSentDesc": "Password reset link has been sent to your email.",
+    "alreadyRegistered": "This email is already registered. Please login.",
+    "invalidLogin": "Email or password is incorrect.",
+    "sslSecurity": "SSL Security",
+    "students": "50,000+ students",
+    "freeForever": "Free forever",
+    "copyright": "© 2025 LUKATO AI. Korean learning platform for Vietnamese."
   }
 }
