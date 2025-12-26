@@ -268,7 +268,9 @@
     "progressToNextLevel": "Keyingi darajagacha taraqqiyot",
     "points": "ball",
     "topRankers": "Top reytinglar",
-    "rankingList": "Reyting ro'yxati"
+    "rankingList": "Reyting ro'yxati",
+    "levelSystem": "TOPIK daraja tizimi",
+    "earnPointsToLevel": "TOPIK darajangizni oshirish uchun ball to'plang"
   },
   "pricing": {
     "title": "Mos tarifni tanlang",

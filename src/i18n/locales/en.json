@@ -308,7 +308,9 @@
     "progressToNextLevel": "Progress to next level",
     "points": "points",
     "topRankers": "Top Rankers",
-    "rankingList": "Ranking List"
+    "rankingList": "Ranking List",
+    "levelSystem": "TOPIK Level System",
+    "earnPointsToLevel": "Earn points to level up your TOPIK rank"
   },
   "pricing": {
     "title": "Choose the right plan",

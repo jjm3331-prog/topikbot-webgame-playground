@@ -308,7 +308,9 @@
     "progressToNextLevel": "Tiến độ lên cấp",
     "points": "điểm",
     "topRankers": "Top Rankers",
-    "rankingList": "Danh sách xếp hạng"
+    "rankingList": "Danh sách xếp hạng",
+    "levelSystem": "Hệ thống cấp độ TOPIK",
+    "earnPointsToLevel": "Kiếm điểm để lên cấp TOPIK của bạn"
   },
   "pricing": {
     "title": "Chọn gói phù hợp",

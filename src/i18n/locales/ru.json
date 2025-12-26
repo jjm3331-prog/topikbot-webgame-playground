@@ -268,7 +268,9 @@
     "progressToNextLevel": "Прогресс до следующего уровня",
     "points": "баллов",
     "topRankers": "Топ рейтинга",
-    "rankingList": "Список рейтинга"
+    "rankingList": "Список рейтинга",
+    "levelSystem": "Система уровней TOPIK",
+    "earnPointsToLevel": "Зарабатывайте баллы для повышения уровня TOPIK"
   },
   "pricing": {
     "title": "Выберите подходящий план",
