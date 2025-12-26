@@ -22,6 +22,7 @@ import PWAGuide from "./pages/PWAGuide";
 import Manager from "./pages/Manager";
 import AITutor from "./pages/AITutor";
 import AIChat from "./pages/AIChat";
+import AIAgentChat from "./pages/AIAgentChat";
 import WritingCorrection from "./pages/WritingCorrection";
 import Lesson from "./pages/Lesson";
 import LessonMenu from "./pages/LessonMenu";
@@ -184,6 +185,7 @@ const App = () => {
               <Route path="/manager" element={<Manager />} />
               <Route path="/ai-tutor" element={<AITutor />} />
               <Route path="/ai-chat" element={<AIChat />} />
+              <Route path="/ai-chat/:agentId" element={<AIAgentChat />} />
               <Route path="/lesson/:lessonId" element={<Lesson />} />
               <Route path="/lesson-menu" element={<LessonMenu />} />
               <Route path="/handwriting" element={<HandwritingPractice />} />
