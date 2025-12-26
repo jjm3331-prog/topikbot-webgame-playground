@@ -21,7 +21,8 @@
     "points": "points",
     "playNow": "Play Now",
     "learnNow": "Learn Now",
-    "backToDashboard": "Back to Dashboard"
+    "backToDashboard": "Back to Dashboard",
+    "locale": "en-US"
   },
   "brand": {
     "name": "LUKATO AI",
@@ -608,25 +609,14 @@
     "actions": { "grading": "Grading...", "grade": "Grade with AI", "freeGrade": "🎁 Free grading (1/day)", "upgradeToGrade": "Upgrade Premium to grade" },
     "pdf": { "generatingTitle": "Generating PDF...", "generatingDesc": "Please wait a moment", "failedTitle": "PDF failed", "failedDesc": "Please try again", "downloadComplete": "PDF download complete!", "fileDownloaded": "File has been downloaded" },
     "featureName": "AI Writing Correction",
-    "freeUsage": {
-      "availableNow": "Available now",
-      "hasFreeTry": "You have 1 free grading today!",
-      "freeOnceDaily": "You can use once daily for free. Upgrade to Premium for unlimited access.",
-      "usedToday": "Free usage used today",
-      "nextFreeAt": "Next free usage: {{time}}. Upgrade to Premium for unlimited access.",
-      "nextFreeSimple": "Next free usage: {{time}}"
-    },
-    "buttons": {
-      "addImage": "Add image",
-      "deleteAll": "Delete all",
-      "uploadImage": "Upload image",
-      "takePhoto": "Take photo"
-    },
-    "upload": {
-      "maxQuestionImages": "Max {{max}} question images",
-      "maxAnswerImages": "Max {{max}} answer images",
-      "multipleSupport": "Multiple images upload supported"
-    }
+    "freeUsage": { "availableNow": "Available now", "hasFreeTry": "You have 1 free grading today!", "freeOnceDaily": "You can use once daily for free. Upgrade to Premium for unlimited access.", "usedToday": "Free usage used today", "nextFreeAt": "Next free usage: {{time}}. Upgrade to Premium for unlimited access.", "nextFreeSimple": "Next free usage: {{time}}" },
+    "buttons": { "addImage": "Add image", "deleteAll": "Delete all", "uploadImage": "Upload image", "takePhoto": "Take photo" },
+    "upload": { "maxQuestionImages": "Max {{max}} question images", "maxAnswerImages": "Max {{max}} answer images", "multipleSupport": "Multiple images upload supported" },
+    "scoreDetail": { "score": "Score", "excellent": "Excellent", "average": "Average", "needsImprovement": "Needs improvement", "grammar": { "title": "Grammar Analysis", "errorsFound": "Grammar errors found", "noErrors": "No grammar errors found!" }, "vocabulary": { "title": "Vocabulary Analysis", "suggestions": "Vocabulary improvement suggestions", "appropriate": "Vocabulary usage is appropriate!" }, "structure": { "title": "Structure Analysis", "suggestions": "Structure improvement suggestions", "current": "Current", "improved": "Improved", "wellStructured": "Writing structure is well organized!" }, "content": { "title": "Content Analysis", "analysis": "Content analysis", "doneWell": "Done well", "toImprove": "To improve", "seeDetailedFeedback": "See detailed feedback." } },
+    "swot": { "title": "SWOT Analysis", "strengths": "Strengths", "weaknesses": "Weaknesses", "opportunities": "Opportunities", "threats": "Threats", "point": "Point", "evidence": "Evidence/Analysis", "issue": "Issue", "impact": "Impact", "opportunity": "Opportunity", "action": "Action", "benefit": "Benefit", "threat": "Threat", "riskLevel": "Risk Level", "prevention": "Prevention", "riskHigh": "High", "riskMedium": "Medium", "riskLow": "Low" },
+    "result": { "title": "Grading Result", "uploadPrompt": "Upload question and answer to receive detailed analysis", "saveResult": "Save result", "exportPdf": "Export PDF" },
+    "history": { "title": "Grading History", "score": "Score", "viewAgain": "View again" },
+    "ocr": { "title": "Edit recognized text", "description": "AI recognized text from the image. Please review and edit if there are errors:", "placeholder": "Text recognized from image...", "skipUseImage": "Skip, use original image", "confirmText": "Confirm text" }
   },
   "interview": {
     "title": "Interview Simulation",

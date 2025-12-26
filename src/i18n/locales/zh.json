@@ -17,7 +17,8 @@
     "loading": "加载中...",
     "error": "错误",
     "success": "成功",
-    "or": "或"
+    "or": "或",
+    "locale": "zh-CN"
   },
   "brand": {
     "name": "LUKATO AI",
@@ -477,25 +478,14 @@
     "actions": { "grading": "批改中...", "grade": "AI批改", "freeGrade": "🎁 免费批改(1/天)", "upgradeToGrade": "升级Premium进行批改" },
     "pdf": { "generatingTitle": "正在生成PDF...", "generatingDesc": "请稍候", "failedTitle": "PDF生成失败", "failedDesc": "请重试", "downloadComplete": "PDF下载完成！", "fileDownloaded": "文件已下载" },
     "featureName": "AI写作批改",
-    "freeUsage": {
-      "availableNow": "现在可用",
-      "hasFreeTry": "今天有1次免费批改机会！",
-      "freeOnceDaily": "每天可免费使用1次。升级Premium可无限使用。",
-      "usedToday": "今天的免费使用已完成",
-      "nextFreeAt": "下次免费使用：{{time}}。升级Premium可无限使用。",
-      "nextFreeSimple": "下次免费使用：{{time}}"
-    },
-    "buttons": {
-      "addImage": "添加图片",
-      "deleteAll": "全部删除",
-      "uploadImage": "上传图片",
-      "takePhoto": "拍照"
-    },
-    "upload": {
-      "maxQuestionImages": "最多{{max}}张题目图片",
-      "maxAnswerImages": "最多{{max}}张答案图片",
-      "multipleSupport": "支持多图同时上传"
-    }
+    "freeUsage": { "availableNow": "现在可用", "hasFreeTry": "今天有1次免费批改机会！", "freeOnceDaily": "每天可免费使用1次。升级Premium可无限使用。", "usedToday": "今天的免费使用已完成", "nextFreeAt": "下次免费使用：{{time}}。升级Premium可无限使用。", "nextFreeSimple": "下次免费使用：{{time}}" },
+    "buttons": { "addImage": "添加图片", "deleteAll": "全部删除", "uploadImage": "上传图片", "takePhoto": "拍照" },
+    "upload": { "maxQuestionImages": "最多{{max}}张题目图片", "maxAnswerImages": "最多{{max}}张答案图片", "multipleSupport": "支持多图同时上传" },
+    "scoreDetail": { "score": "分数", "excellent": "优秀", "average": "一般", "needsImprovement": "需要改进", "grammar": { "title": "语法详细分析", "errorsFound": "发现的语法错误", "noErrors": "未发现语法错误！" }, "vocabulary": { "title": "词汇详细分析", "suggestions": "词汇改进建议", "appropriate": "词汇使用恰当！" }, "structure": { "title": "结构详细分析", "suggestions": "结构改进建议", "current": "当前", "improved": "改进", "wellStructured": "文章结构组织良好！" }, "content": { "title": "内容详细分析", "analysis": "内容分析", "doneWell": "做得好的", "toImprove": "待改进的", "seeDetailedFeedback": "请查看详细反馈。" } },
+    "swot": { "title": "SWOT分析", "strengths": "Strengths (优势)", "weaknesses": "Weaknesses (劣势)", "opportunities": "Opportunities (机会)", "threats": "Threats (威胁)", "point": "要点", "evidence": "依据/分析", "issue": "问题", "impact": "影响", "opportunity": "机会", "action": "方法", "benefit": "效果", "threat": "威胁", "riskLevel": "风险等级", "prevention": "预防措施", "riskHigh": "高", "riskMedium": "中", "riskLow": "低" },
+    "result": { "title": "批改结果", "uploadPrompt": "上传题目和答案以获取详细分析", "saveResult": "保存结果", "exportPdf": "导出PDF" },
+    "history": { "title": "批改历史", "score": "分数", "viewAgain": "再看一次" },
+    "ocr": { "title": "编辑识别文本", "description": "AI已从图片中识别文本。如有错误请编辑：", "placeholder": "从图片识别的文本...", "skipUseImage": "跳过，使用原图", "confirmText": "确认文本" }
   },
   "interview": {
     "title": "面试模拟", "description": "韩国企业面试练习",
