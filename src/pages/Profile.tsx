@@ -94,6 +94,8 @@ const Profile = () => {
     fetchProfile();
   }, [navigate]);
 
+  const { t } = useTranslation();
+
   const handleSaveUsername = async () => {
     if (!profile || !newUsername.trim()) return;
     
@@ -105,15 +107,15 @@ const Profile = () => {
 
     if (error) {
       toast({
-        title: "Lỗi",
-        description: "Không thể cập nhật biệt danh. Vui lòng thử lại.",
+        title: t('profile.errorTitle'),
+        description: t('profile.nicknameUpdateFailed'),
         variant: "destructive",
       });
     } else {
       setProfile(prev => prev ? { ...prev, username: newUsername.trim() } : null);
       toast({
-        title: "Thành công",
-        description: "Đã cập nhật biệt danh!",
+        title: t('profile.successTitle'),
+        description: t('profile.nicknameUpdated'),
       });
     }
     setSaving(false);
@@ -122,8 +124,8 @@ const Profile = () => {
   const handleChangePassword = async () => {
     if (!newPassword || !confirmPassword) {
       toast({
-        title: "Lỗi",
-        description: "Vui lòng nhập mật khẩu mới.",
+        title: t('profile.errorTitle'),
+        description: t('profile.enterNewPasswordError'),
         variant: "destructive",
       });
       return;
@@ -131,8 +133,8 @@ const Profile = () => {
 
     if (newPassword !== confirmPassword) {
       toast({
-        title: "Lỗi",
-        description: "Mật khẩu mới không khớp.",
+        title: t('profile.errorTitle'),
+        description: t('profile.passwordMismatch'),
         variant: "destructive",
       });
       return;
@@ -140,8 +142,8 @@ const Profile = () => {
 
     if (newPassword.length < 6) {
       toast({
-        title: "Lỗi",
-        description: "Mật khẩu phải có ít nhất 6 ký tự.",
+        title: t('profile.errorTitle'),
+        description: t('profile.passwordMinLength'),
         variant: "destructive",
       });
       return;
@@ -154,14 +156,14 @@ const Profile = () => {
 
     if (error) {
       toast({
-        title: "Lỗi",
-        description: error.message || "Không thể đổi mật khẩu. Vui lòng thử lại.",
+        title: t('profile.errorTitle'),
+        description: t('profile.passwordChangeFailed'),
         variant: "destructive",
       });
     } else {
       toast({
-        title: "Thành công",
-        description: "Đã đổi mật khẩu thành công!",
+        title: t('profile.successTitle'),
+        description: t('profile.passwordChanged'),
       });
       setNewPassword("");
       setConfirmPassword("");
@@ -177,8 +179,8 @@ const Profile = () => {
     // Validate file type
     if (!file.type.startsWith('image/')) {
       toast({
-        title: "Lỗi",
-        description: "Vui lòng chọn file hình ảnh.",
+        title: t('profile.errorTitle'),
+        description: t('profile.selectImage'),
         variant: "destructive",
       });
       return;
@@ -187,8 +189,8 @@ const Profile = () => {
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast({
-        title: "Lỗi",
-        description: "File quá lớn. Vui lòng chọn file dưới 5MB.",
+        title: t('profile.errorTitle'),
+        description: t('profile.fileTooLarge'),
         variant: "destructive",
       });
       return;
@@ -234,14 +236,14 @@ const Profile = () => {
       setAvatarUrl(avatarUrlWithCache);
       
       toast({
-        title: "Thành công",
-        description: "Đã cập nhật ảnh đại diện!",
+        title: t('profile.successTitle'),
+        description: t('profile.avatarUpdated'),
       });
     } catch (error) {
       console.error("Error uploading avatar:", error);
       toast({
-        title: "Lỗi",
-        description: "Không thể tải ảnh lên. Vui lòng thử lại.",
+        title: t('profile.errorTitle'),
+        description: t('profile.avatarUploadFailed'),
         variant: "destructive",
       });
     } finally {
@@ -262,7 +264,7 @@ const Profile = () => {
       <div className="min-h-[100dvh] bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <img src="/favicon.png" alt="LUKATO" className="w-16 h-16 rounded-full animate-pulse" />
-          <div className="text-muted-foreground text-sm">Đang tải...</div>
+          <div className="text-muted-foreground text-sm">{t('profile.loading')}</div>
         </div>
       </div>
     );
@@ -282,7 +284,7 @@ const Profile = () => {
             className="flex items-center gap-2 text-primary hover:text-primary/80 mb-6"
           >
             <ChevronLeft className="w-5 h-5" />
-            <span>Quay lại</span>
+            <span>{t('profile.backToDashboard')}</span>
           </motion.button>
 
           {/* PWA Install Banner */}
@@ -301,14 +303,14 @@ const Profile = () => {
                   <Smartphone className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-white text-sm sm:text-base">📲 Cài đặt ứng dụng LUKATO</h3>
-                  <p className="text-white/80 text-xs sm:text-sm">Thêm vào màn hình chính để sử dụng như app thực thụ!</p>
+                  <h3 className="font-bold text-white text-sm sm:text-base">{t('profile.installApp')}</h3>
+                  <p className="text-white/80 text-xs sm:text-sm">{t('profile.installDesc')}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <div className="hidden sm:flex items-center gap-1 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
                   <Download className="w-4 h-4 text-white" />
-                  <span className="text-white text-xs font-medium">Miễn phí</span>
+                  <span className="text-white text-xs font-medium">{t('profile.free')}</span>
                 </div>
                 <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
               </div>
@@ -332,13 +334,13 @@ const Profile = () => {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="font-bold text-white text-base sm:text-lg">👑 PREMIUM MEMBER</h3>
-                        <span className="px-2 py-0.5 bg-white/20 rounded-full text-[10px] font-bold text-white uppercase">Active</span>
+                        <h3 className="font-bold text-white text-base sm:text-lg">{t('profile.premiumMember')}</h3>
+                        <span className="px-2 py-0.5 bg-white/20 rounded-full text-[10px] font-bold text-white uppercase">{t('profile.active')}</span>
                       </div>
                       <p className="text-white/90 text-xs sm:text-sm">
                         {subscription?.expiresAt 
-                          ? `Hết hạn: ${new Date(subscription.expiresAt).toLocaleDateString("vi-VN")}`
-                          : "Vĩnh viễn - Cảm ơn bạn đã hỗ trợ!"}
+                          ? `${t('profile.expiresAt')}: ${new Date(subscription.expiresAt).toLocaleDateString()}`
+                          : t('profile.forever')}
                       </p>
                     </div>
                   </div>
@@ -358,13 +360,13 @@ const Profile = () => {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="font-bold text-white text-base sm:text-lg">⭐ PLUS MEMBER</h3>
-                        <span className="px-2 py-0.5 bg-white/20 rounded-full text-[10px] font-bold text-white uppercase">Active</span>
+                        <h3 className="font-bold text-white text-base sm:text-lg">{t('profile.plusMember')}</h3>
+                        <span className="px-2 py-0.5 bg-white/20 rounded-full text-[10px] font-bold text-white uppercase">{t('profile.active')}</span>
                       </div>
                       <p className="text-white/90 text-xs sm:text-sm">
                         {subscription?.expiresAt 
-                          ? `Hết hạn: ${new Date(subscription.expiresAt).toLocaleDateString("vi-VN")}`
-                          : "Đang hoạt động"}
+                          ? `${t('profile.expiresAt')}: ${new Date(subscription.expiresAt).toLocaleDateString()}`
+                          : t('profile.inUse')}
                       </p>
                     </div>
                   </div>
@@ -373,7 +375,7 @@ const Profile = () => {
                     size="sm"
                     className="bg-white/20 hover:bg-white/30 text-white border-0"
                   >
-                    Nâng cấp
+                    {t('profile.upgrade')}
                   </Button>
                 </div>
               </div>
@@ -389,12 +391,12 @@ const Profile = () => {
                       <Crown className="w-6 h-6 text-gray-400" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-white text-base sm:text-lg">🆓 Gói Miễn phí</h3>
-                      <p className="text-white/70 text-xs sm:text-sm">Nâng cấp Premium để mở khóa tất cả tính năng!</p>
+                      <h3 className="font-bold text-white text-base sm:text-lg">{t('profile.freePlan')}</h3>
+                      <p className="text-white/70 text-xs sm:text-sm">{t('profile.upgradeDesc')}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="hidden sm:block text-xs text-yellow-400 font-medium">Nâng cấp ngay</span>
+                    <span className="hidden sm:block text-xs text-yellow-400 font-medium">{t('profile.upgradeNow')}</span>
                     <ArrowRight className="w-5 h-5 text-yellow-400 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
@@ -408,8 +410,8 @@ const Profile = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <h1 className="text-2xl font-bold text-foreground">Hồ sơ của tôi</h1>
-          <p className="text-muted-foreground text-sm">Quản lý thông tin cá nhân</p>
+          <h1 className="text-2xl font-bold text-foreground">{t('profile.title')}</h1>
+          <p className="text-muted-foreground text-sm">{t('profile.manageInfo')}</p>
         </motion.div>
 
           {/* Profile Card */}
@@ -456,12 +458,12 @@ const Profile = () => {
               <div className="flex-1">
                 <h2 className="text-xl font-bold text-foreground">{profile?.username}</h2>
                 <p className="text-sm text-muted-foreground">
-                  {isPremium ? "👑 Premium Member" : isPlus ? "⭐ Plus Member" : "Thành viên"}
+                  {isPremium ? t('profile.premiumMember') : isPlus ? t('profile.plusMember') : t('profile.member')}
                 </p>
               </div>
               <div className="text-right">
                 <p className="text-2xl font-bold text-korean-orange">{profile?.points?.toLocaleString() || 0}</p>
-                <p className="text-xs text-muted-foreground">điểm</p>
+                <p className="text-xs text-muted-foreground">{t('profile.points')}</p>
               </div>
             </div>
           </motion.div>
@@ -476,44 +478,44 @@ const Profile = () => {
           >
             <h3 className="font-semibold text-foreground flex items-center gap-2 mb-4">
               <User className="w-4 h-4" />
-              Menu
+              {t('profile.menu')}
             </h3>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <Button variant="secondary" className="justify-start" onClick={() => navigate("/ranking")}
               >
                 <Trophy className="w-4 h-4 mr-2" />
-                Xếp hạng
+                {t('profile.rankingMenu')}
               </Button>
 
               <Button variant="secondary" className="justify-start" onClick={() => navigate("/points-system")}
               >
                 <Star className="w-4 h-4 mr-2" />
-                Điểm thưởng
+                {t('profile.pointsReward')}
               </Button>
 
               <Button variant="secondary" className="justify-start" onClick={() => navigate("/pricing")}
               >
                 <Crown className="w-4 h-4 mr-2" />
-                Bảng giá
+                {t('profile.pricingMenu')}
               </Button>
 
               <Button variant="secondary" className="justify-start" onClick={() => navigate("/help-center")}
               >
                 <Headphones className="w-4 h-4 mr-2" />
-                Hỗ trợ
+                {t('profile.support')}
               </Button>
 
               <Button variant="secondary" className="justify-start" onClick={() => navigate("/terms")}
               >
                 <Notebook className="w-4 h-4 mr-2" />
-                Điều khoản
+                {t('profile.termsMenu')}
               </Button>
 
               <Button variant="secondary" className="justify-start" onClick={() => navigate("/dashboard")}
               >
                 <ArrowRight className="w-4 h-4 mr-2" />
-                Tổng quan
+                {t('profile.overview')}
               </Button>
             </div>
           </motion.section>
@@ -527,23 +529,23 @@ const Profile = () => {
           >
             <h3 className="font-semibold text-foreground flex items-center gap-2 mb-4">
               <Edit3 className="w-4 h-4" />
-              Chỉnh sửa hồ sơ
+              {t('profile.editProfile')}
             </h3>
 
             <div className="space-y-4">
               <div>
                 <Label htmlFor="username" className="text-sm text-muted-foreground">
-                  Biệt danh
+                  {t('profile.nickname')}
                 </Label>
                 <Input
                   id="username"
                   value={newUsername}
                   onChange={(e) => setNewUsername(e.target.value)}
                   className="mt-1"
-                  placeholder="Nhập biệt danh..."
+                  placeholder={t('profile.enterNickname')}
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Tên này sẽ hiển thị trong ứng dụng
+                  {t('profile.nicknameHint')}
                 </p>
               </div>
 
@@ -553,7 +555,7 @@ const Profile = () => {
                 className="w-full bg-korean-blue hover:bg-korean-blue/90 text-white"
               >
                 <Save className="w-4 h-4 mr-2" />
-                {saving ? "Đang lưu..." : "Lưu thay đổi"}
+                {saving ? t('profile.saving') : t('profile.saveChanges')}
               </Button>
             </div>
           </motion.div>
@@ -567,16 +569,16 @@ const Profile = () => {
           >
             <h3 className="font-semibold text-foreground flex items-center gap-2 mb-4">
               <Mail className="w-4 h-4" />
-              Thông tin tài khoản
+              {t('profile.accountInfo')}
             </h3>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Email:</span>
+                <span className="text-sm text-muted-foreground">{t('profile.email')}:</span>
                 <span className="text-sm font-medium text-foreground">{userData?.email}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Ngày tạo:</span>
+                <span className="text-sm text-muted-foreground">{t('profile.createdDate')}:</span>
                 <span className="text-sm font-medium text-foreground">
                   {profile?.created_at ? formatDate(profile.created_at) : "-"}
                 </span>
@@ -592,7 +594,7 @@ const Profile = () => {
               >
                 <span className="flex items-center gap-2">
                   <Lock className="w-4 h-4" />
-                  Đổi mật khẩu
+                  {t('profile.changePassword')}
                 </span>
                 <ChevronLeft className={`w-4 h-4 transition-transform ${showPasswordSection ? "rotate-90" : "-rotate-90"}`} />
               </Button>
@@ -604,13 +606,13 @@ const Profile = () => {
                   className="mt-4 space-y-3"
                 >
                   <div>
-                    <Label className="text-sm text-muted-foreground">Mật khẩu mới</Label>
+                    <Label className="text-sm text-muted-foreground">{t('profile.newPassword')}</Label>
                     <div className="relative mt-1">
                       <Input
                         type={showNewPassword ? "text" : "password"}
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="Nhập mật khẩu mới..."
+                        placeholder={t('profile.enterNewPassword')}
                       />
                       <button
                         type="button"
@@ -623,12 +625,12 @@ const Profile = () => {
                   </div>
 
                   <div>
-                    <Label className="text-sm text-muted-foreground">Xác nhận mật khẩu mới</Label>
+                    <Label className="text-sm text-muted-foreground">{t('profile.confirmNewPassword')}</Label>
                     <Input
                       type="password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Nhập lại mật khẩu mới..."
+                      placeholder={t('profile.reenterNewPassword')}
                       className="mt-1"
                     />
                   </div>
@@ -638,7 +640,7 @@ const Profile = () => {
                     disabled={changingPassword || !newPassword || !confirmPassword}
                     className="w-full"
                   >
-                    {changingPassword ? "Đang xử lý..." : "Xác nhận đổi mật khẩu"}
+                    {changingPassword ? t('profile.processing') : t('profile.confirmPasswordChange')}
                   </Button>
                 </motion.div>
               )}

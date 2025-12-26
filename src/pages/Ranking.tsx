@@ -47,6 +47,7 @@ const formatPoints = (points: number): string => {
 
 const Ranking = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [rankings, setRankings] = useState<RankingUser[]>([]);
   const [topThree, setTopThree] = useState<RankingUser[]>([]);
   const [currentUser, setCurrentUser] = useState<RankingUser | null>(null);
@@ -139,7 +140,7 @@ const Ranking = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
-          <p className="text-muted-foreground text-lg">Đang tải bảng xếp hạng...</p>
+          <p className="text-muted-foreground text-lg">{t('ranking.loading')}</p>
         </div>
       </div>
     );
@@ -154,8 +155,8 @@ const Ranking = () => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="font-heading font-bold text-xl text-foreground">Bảng Xếp Hạng TOPIK</h1>
-            <p className="text-sm text-muted-foreground">Cạnh tranh và tiến bộ cùng nhau</p>
+            <h1 className="font-heading font-bold text-xl text-foreground">{t('ranking.title')}</h1>
+            <p className="text-sm text-muted-foreground">{t('ranking.description')}</p>
           </div>
         </div>
       </div>
@@ -172,14 +173,14 @@ const Ranking = () => {
               <Trophy className="w-6 h-6 text-white" />
             </div>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
-              BẢNG XẾP HẠNG
+              {t('ranking.title').toUpperCase()}
             </h2>
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/30">
               <Trophy className="w-6 h-6 text-white" />
             </div>
           </div>
           <p className="text-lg text-muted-foreground max-w-md mx-auto">
-            Học tiếng Hàn, kiếm điểm và leo hạng TOPIK cùng cộng đồng!
+            {t('ranking.learnAndClimb')}
           </p>
         </motion.div>
 
@@ -220,7 +221,7 @@ const Ranking = () => {
                   {/* Progress to next level */}
                   <div className="mt-3">
                     <div className="flex items-center justify-between text-sm mb-1.5">
-                      <span className="text-muted-foreground">Tiến độ lên cấp</span>
+                      <span className="text-muted-foreground">{t('ranking.progressToNextLevel')}</span>
                       <span className="font-semibold text-foreground">
                         {formatPoints(currentUser.points)} / {formatPoints(getLevelFromPoints(currentUser.points).nextLevelPoints)}
                       </span>
@@ -237,7 +238,7 @@ const Ranking = () => {
                   <p className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                     {currentUser.points.toLocaleString()}
                   </p>
-                  <p className="text-sm text-muted-foreground">điểm</p>
+                  <p className="text-sm text-muted-foreground">{t('ranking.points')}</p>
                 </div>
               </div>
 
@@ -248,28 +249,28 @@ const Ranking = () => {
                     <Award className="w-5 h-5 text-yellow-500" />
                   </div>
                   <p className="text-xl font-bold text-foreground">#{currentUserRank}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Xếp hạng</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{t('ranking.rank')}</p>
                 </div>
                 <div className="text-center p-3 rounded-xl bg-muted/30">
                   <div className="flex items-center justify-center mb-1">
                     <Zap className="w-5 h-5 text-blue-500" />
                   </div>
                   <p className="text-xl font-bold text-foreground">Lv.{getLevelFromPoints(currentUser.points).level}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Cấp độ</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{t('ranking.level')}</p>
                 </div>
                 <div className="text-center p-3 rounded-xl bg-muted/30">
                   <div className="flex items-center justify-center mb-1">
                     <Flame className="w-5 h-5 text-orange-500" />
                   </div>
                   <p className="text-xl font-bold text-foreground">{currentUser.current_streak}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Streak</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{t('ranking.streak')}</p>
                 </div>
                 <div className="text-center p-3 rounded-xl bg-muted/30">
                   <div className="flex items-center justify-center mb-1">
                     <Target className="w-5 h-5 text-green-500" />
                   </div>
                   <p className="text-xl font-bold text-foreground">{getUserTopikLevel(currentUser.points).level}급</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">TOPIK</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{t('ranking.topik')}</p>
                 </div>
               </div>
             </div>
@@ -305,7 +306,7 @@ const Ranking = () => {
               <p className={`text-xs ${getUserTopikLevel(topThree[1].points).textColor} font-medium`}>{getUserTopikLevel(topThree[1].points).name}</p>
               <div className="mt-2 px-4 py-2 rounded-xl bg-gray-400/10 border border-gray-400/30">
                 <p className="text-base font-bold text-foreground">{formatPoints(topThree[1].points)}</p>
-                <p className="text-xs text-muted-foreground text-center">điểm</p>
+                <p className="text-xs text-muted-foreground text-center">{t('ranking.points')}</p>
               </div>
             </div>
 
@@ -332,7 +333,7 @@ const Ranking = () => {
               <p className={`text-xs ${getUserTopikLevel(topThree[0].points).textColor} font-medium`}>{getUserTopikLevel(topThree[0].points).name}</p>
               <div className="mt-2 px-5 py-3 rounded-xl bg-yellow-400/10 border border-yellow-400/30">
                 <p className="text-xl font-bold text-foreground">{formatPoints(topThree[0].points)}</p>
-                <p className="text-xs text-muted-foreground text-center">điểm</p>
+                <p className="text-xs text-muted-foreground text-center">{t('ranking.points')}</p>
               </div>
             </div>
 
@@ -358,7 +359,7 @@ const Ranking = () => {
               <p className={`text-xs ${getUserTopikLevel(topThree[2].points).textColor} font-medium`}>{getUserTopikLevel(topThree[2].points).name}</p>
               <div className="mt-2 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30">
                 <p className="text-sm font-bold text-foreground">{formatPoints(topThree[2].points)}</p>
-                <p className="text-xs text-muted-foreground text-center">điểm</p>
+                <p className="text-xs text-muted-foreground text-center">{t('ranking.points')}</p>
               </div>
             </div>
           </motion.div>
@@ -369,9 +370,9 @@ const Ranking = () => {
           <div className="px-6 py-4 bg-gradient-to-r from-muted/50 to-muted/30 border-b border-border/50">
             <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
               <Trophy className="w-5 h-5 text-primary" />
-              Bảng xếp hạng tổng điểm
+              {t('ranking.topRankers')}
             </h3>
-            <p className="text-sm text-muted-foreground mt-0.5">Top người học tiếng Hàn xuất sắc nhất</p>
+            <p className="text-sm text-muted-foreground mt-0.5">{t('ranking.rankingList')}</p>
           </div>
           <div className="divide-y divide-border/50">
             {rankings.map((user, index) => {
@@ -408,7 +409,7 @@ const Ranking = () => {
                   
                   <div className="text-right">
                     <p className="font-bold text-lg text-foreground">{user.points.toLocaleString()}</p>
-                    <p className="text-xs text-muted-foreground">điểm</p>
+                    <p className="text-xs text-muted-foreground">{t('ranking.points')}</p>
                   </div>
                 </motion.div>
               );
