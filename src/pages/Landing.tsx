@@ -441,7 +441,7 @@ const Landing = () => {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="inline-block"
             >
-              <h2 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl relative">
+              <h2 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
                 <span className="bg-gradient-to-r from-korean-gold via-korean-yellow to-korean-orange bg-clip-text text-transparent drop-shadow-lg">
                   왜 LUKATO가
                 </span>
@@ -449,14 +449,6 @@ const Landing = () => {
                 <span className="bg-gradient-to-r from-primary via-korean-purple to-korean-pink bg-clip-text text-transparent">
                   {" "}최고인가요?
                 </span>
-                {/* Decorative underline */}
-                <motion.div 
-                  initial={{ scaleX: 0 }}
-                  whileInView={{ scaleX: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 0.5 }}
-                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-32 sm:w-48 h-1 bg-gradient-to-r from-korean-gold via-primary to-korean-purple rounded-full origin-center"
-                />
               </h2>
             </motion.div>
             
