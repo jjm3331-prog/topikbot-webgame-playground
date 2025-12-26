@@ -667,116 +667,65 @@ const Landing = () => {
       </section>
 
 
-      {/* ========== HEADHUNTING PROMO BANNER - PREMIUM DESIGN ========== */}
-      <section className="py-12 sm:py-20 px-4 sm:px-6 relative overflow-hidden">
-        {/* Premium background decorations */}
-        <div className="absolute inset-0 bg-gradient-to-br from-korean-yellow/5 via-background to-korean-blue/5" />
-        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-korean-yellow via-korean-orange to-korean-blue" />
-        <div className="absolute bottom-0 left-0 w-full h-1.5 bg-gradient-to-r from-korean-blue via-korean-purple to-korean-yellow" />
-        
-        <div className="max-w-4xl mx-auto relative z-10">
+      {/* ========== HEADHUNTING PROMO BANNER ========== */}
+      <section className="py-12 sm:py-16 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="relative overflow-hidden rounded-3xl shadow-2xl"
+            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-korean-teal via-korean-blue to-korean-purple p-6 sm:p-8 lg:p-10"
           >
-            {/* Premium Gold/Blue gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-korean-yellow via-korean-orange to-korean-blue" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,255,0.25),transparent_50%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(0,0,0,0.1),transparent_50%)]" />
+            {/* Subtle overlay for depth */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1),transparent_50%)]" />
             
-            {/* Animated sparkles */}
-            <div className="absolute top-4 right-4 sm:top-8 sm:right-8">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="text-2xl sm:text-3xl"
-              >
-                ✨
-              </motion.div>
-            </div>
-            <div className="absolute bottom-4 left-4 sm:bottom-8 sm:left-8">
-              <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="text-xl sm:text-2xl"
-              >
-                🌟
-              </motion.div>
-            </div>
-            
-            <div className="relative z-10 p-6 sm:p-10 lg:p-12 flex flex-col lg:flex-row items-center gap-6 lg:gap-10">
-              {/* Premium Icon */}
+            <div className="relative z-10 flex flex-col lg:flex-row items-center gap-6 lg:gap-8">
+              {/* Icon */}
               <div className="flex-shrink-0">
-                <motion.div
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  className="relative"
-                >
-                  {/* Glow effect */}
-                  <div className="absolute inset-0 w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white/40 blur-xl" />
-                  <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br from-white to-white/80 flex items-center justify-center shadow-2xl border-2 border-white/50">
-                    <div className="text-center">
-                      <Briefcase className="w-10 h-10 sm:w-12 sm:h-12 text-korean-blue mx-auto mb-1" />
-                      <span className="text-[10px] sm:text-xs font-black text-korean-blue tracking-tight">CAREER</span>
-                    </div>
-                  </div>
-                  {/* Crown on top */}
-                  <motion.div
-                    animate={{ y: [0, -3, 0] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="absolute -top-3 left-1/2 -translate-x-1/2"
-                  >
-                    <span className="text-2xl">👑</span>
-                  </motion.div>
-                </motion.div>
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                  <Briefcase className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                </div>
               </div>
               
               {/* Content */}
               <div className="flex-1 text-center lg:text-left">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/30 backdrop-blur-sm text-white text-xs sm:text-sm font-bold mb-4 border border-white/40">
-                  <Crown className="w-4 h-4 text-korean-yellow" />
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-semibold mb-3">
+                  <Crown className="w-3.5 h-3.5" />
                   <span>{t("landing.headhunting.badge")}</span>
                 </div>
-                <h3 className="font-heading font-black text-2xl sm:text-3xl lg:text-4xl text-white mb-3 leading-tight">
-                  {t("landing.headhunting.title1")}
-                  <br />
-                  <span className="text-korean-yellow drop-shadow-lg">{t("landing.headhunting.title2")}</span>
+                <h3 className="font-heading font-bold text-xl sm:text-2xl lg:text-3xl text-white mb-2">
+                  {t("landing.headhunting.title1")} <span className="text-korean-yellow">{t("landing.headhunting.title2")}</span>
                 </h3>
-                <p className="text-white/90 text-sm sm:text-base lg:text-lg mb-5 leading-relaxed">
-                  {t("landing.headhunting.desc1")} <strong className="text-white">{t("landing.headhunting.free")}</strong>.
-                  <br className="hidden sm:block" />
-                  {t("landing.headhunting.desc2")}
+                <p className="text-white/80 text-sm sm:text-base mb-4">
+                  {t("landing.headhunting.desc1")} <strong className="text-white">{t("landing.headhunting.free")}</strong>. {t("landing.headhunting.desc2")}
                 </p>
-                <div className="flex flex-wrap justify-center lg:justify-start gap-2 text-xs sm:text-sm text-white mb-5">
-                  <span className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">
-                    <Check className="w-3.5 h-3.5 text-korean-green" /> 
-                    <span className="font-semibold">{t("landing.headhunting.tag1")}</span>
+                <div className="flex flex-wrap justify-center lg:justify-start gap-2 text-xs text-white/90">
+                  <span className="flex items-center gap-1.5 bg-white/15 px-2.5 py-1 rounded-full">
+                    <Check className="w-3 h-3 text-korean-green" /> 
+                    {t("landing.headhunting.tag1")}
                   </span>
-                  <span className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">
-                    <Check className="w-3.5 h-3.5 text-korean-green" /> 
-                    <span className="font-semibold">{t("landing.headhunting.tag2")}</span>
+                  <span className="flex items-center gap-1.5 bg-white/15 px-2.5 py-1 rounded-full">
+                    <Check className="w-3 h-3 text-korean-green" /> 
+                    {t("landing.headhunting.tag2")}
                   </span>
-                  <span className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">
-                    <Check className="w-3.5 h-3.5 text-korean-green" /> 
-                    <span className="font-semibold">{t("landing.headhunting.tag3")}</span>
+                  <span className="flex items-center gap-1.5 bg-white/15 px-2.5 py-1 rounded-full">
+                    <Check className="w-3 h-3 text-korean-green" /> 
+                    {t("landing.headhunting.tag3")}
                   </span>
                 </div>
               </div>
               
-              {/* Premium CTA */}
-              <div className="flex-shrink-0 w-full lg:w-auto">
+              {/* CTA */}
+              <div className="flex-shrink-0">
                 <Button
                   onClick={() => navigate("/headhunting")}
                   size="lg"
-                  className="w-full lg:w-auto h-12 sm:h-14 px-6 sm:px-8 bg-white hover:bg-white/95 text-korean-blue font-black text-sm sm:text-base rounded-xl group shadow-2xl border-2 border-white/50 hover:scale-105 transition-all duration-300"
+                  className="h-12 px-6 bg-white hover:bg-white/95 text-korean-blue font-bold text-sm rounded-xl group shadow-lg"
                 >
-                  <Rocket className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   {t("landing.headhunting.cta")}
-                  <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
-                <p className="text-white/80 text-[10px] sm:text-xs text-center mt-1.5 font-medium">
+                <p className="text-white/70 text-[10px] text-center mt-1.5">
                   {t("landing.headhunting.ctaSub")}
                 </p>
               </div>
