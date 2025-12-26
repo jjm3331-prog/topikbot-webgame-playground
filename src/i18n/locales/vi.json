@@ -669,7 +669,21 @@
     "saved": "Đã lưu!",
     "savedToHistory": "Đã lưu vào lịch sử chấm bài",
     "maxImages": "Đã đạt số ảnh tối đa",
-    "generatingPdf": "Đang tạo PDF..."
+    "generatingPdf": "Đang tạo PDF...",
+    "limitReached": "Đã đạt giới hạn",
+    "maxImagesLimit": "Tối đa {{count}} ảnh có thể upload",
+    "someImagesSkipped": "Một số ảnh bị bỏ qua",
+    "onlyImagesAdded": "Chỉ {{added}} ảnh được thêm (tối đa {{max}} ảnh)",
+    "missingInfo": "Thiếu thông tin",
+    "uploadQuestionImage": "Vui lòng upload hình ảnh đề bài",
+    "uploadAnswerImage": "Vui lòng upload hình ảnh bài làm",
+    "enterAnswerContent": "Vui lòng nhập nội dung bài làm",
+    "resultFromHistory": "📋 Kết quả từ lịch sử",
+    "cachedResult": "Điểm: {{score}}/100 - Bài viết này đã được chấm trước đó với cùng nội dung.",
+    "gradingComplete": "✅ Chấm điểm hoàn tất!",
+    "scoreResult": "Điểm số: {{score}}/100",
+    "gradingError": "Không thể chấm điểm. Vui lòng thử lại.",
+    "saveError": "Không thể lưu. Vui lòng thử lại."
   },
   "interview": {
     "title": "Mô phỏng phỏng vấn",
@@ -708,7 +722,16 @@
     },
     "micError": "Cần quyền truy cập micro",
     "speechError": "Lỗi nhận dạng giọng nói",
-    "startError": "Lỗi bắt đầu phỏng vấn"
+    "startError": "Lỗi bắt đầu phỏng vấn",
+    "allowMicAccess": "Vui lòng cho phép quyền sử dụng micro.",
+    "voiceNotRecognized": "Không nhận dạng được giọng nói",
+    "tryAgain": "Vui lòng thử lại.",
+    "voiceRecognitionError": "Lỗi nhận dạng giọng nói",
+    "selectAll": "Vui lòng chọn đầy đủ",
+    "selectAllDesc": "Chọn công ty, vị trí và loại người phỏng vấn.",
+    "errorOccurred": "Đã xảy ra lỗi",
+    "cannotStartInterview": "Không thể bắt đầu phỏng vấn. Vui lòng thử lại.",
+    "noResponse": "Không nhận được phản hồi."
   },
   "kdrama": {
     "title": "Lồng tiếng K-Drama",

@@ -28,6 +28,7 @@ const TIMER_DURATION = 30;
 
 const KDrama = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [scenes, setScenes] = useState<DramaScene[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);

@@ -69,6 +69,7 @@ const NPC_PROFILES: DateProfile[] = [
 ];
 
 const Dating = () => {
+  const { t } = useTranslation();
   const [phase, setPhase] = useState<GamePhase>('swipe');
   const [profiles, setProfiles] = useState<DateProfile[]>([...NPC_PROFILES]);
   const [currentMatch, setCurrentMatch] = useState<DateProfile | null>(null);
