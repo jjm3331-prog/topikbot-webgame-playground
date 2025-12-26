@@ -331,6 +331,23 @@
     "loading": "Lug'at yuklanmoqda...",
     "loadError": "Lug'at yuklashda xatolik"
   },
+  "landing": {
+    "hero": {
+      "badge": "TOPIK professorlari tomonidan 🇰🇷",
+      "headline1": "Dunyoda birinchi.",
+      "headline2": "Vyetnamda yagona.",
+      "sub1": "Koreys tili super-ilovasi:",
+      "sub2a": "TOPIK muallif professorlar",
+      "sub2b": "LUKATO RAG AI Tech",
+      "cta": "Bepul boshlash"
+    },
+    "universities": {
+      "partner": "🤝 Strategik hamkorlar",
+      "titleHighlight": "Vyetnamdagi 6 universitet",
+      "titleRest": "rasmiy hamkor",
+      "desc": "Vyetnamning yetakchi universitetlari ishonadi"
+    }
+  },
   "grammar": {
     "title": "Grammatika o'rganish",
     "description": "Mini-o'yinlar orqali grammatikani o'zlashtirang",

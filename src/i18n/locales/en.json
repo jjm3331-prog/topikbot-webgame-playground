@@ -407,6 +407,23 @@
     "loading": "Loading vocabulary...",
     "loadError": "Failed to load vocabulary"
   },
+  "landing": {
+    "hero": {
+      "badge": "Powered by TOPIK Professors 🇰🇷",
+      "headline1": "World's first.",
+      "headline2": "Only in Vietnam.",
+      "sub1": "A Korean-learning super app powered by",
+      "sub2a": "TOPIK exam authors",
+      "sub2b": "LUKATO RAG AI Tech",
+      "cta": "Start for Free"
+    },
+    "universities": {
+      "partner": "🤝 Strategic partners",
+      "titleHighlight": "6 universities",
+      "titleRest": "in Vietnam",
+      "desc": "Trusted by top universities across Vietnam"
+    }
+  },
   "grammar": {
     "title": "Grammar Learning",
     "description": "Master grammar through mini-games",
