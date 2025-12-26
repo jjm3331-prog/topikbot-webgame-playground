@@ -26,11 +26,11 @@
   "brand": {
     "name": "LUKATO AI",
     "tagline": "Your Korean Mentor",
-    "badge": "베트남 최초 한국어 학습 게임",
+    "badge": "글로벌 최초 AI 한국어 학습 게임",
     "platformNo1": "글로벌 1위 한국어 학습 플랫폼"
   },
   "index": {
-    "badge": "베트남 최초 한국어 학습 게임",
+    "badge": "글로벌 최초 AI 한국어 학습 게임",
     "title1": "정복하자",
     "title2": "한국어",
     "title3": "&",
@@ -377,7 +377,7 @@
     "helpItem3": "버그 신고 및 개선 제안",
     "helpItem4": "학습 콘텐츠 문의",
     "copyright": "© 2025 LUKATO AI. AI와 함께하는 스마트 시험 대비.",
-    "platform": "베트남 TOPIK 시험 AI 학습 플랫폼"
+    "platform": "글로벌 TOPIK 시험 AI 학습 플랫폼"
   },
   "battle": {
     "title": "1:1 실시간 배틀",
@@ -999,7 +999,7 @@
     "installNow": "지금 설치"
   },
   "splash": {
-    "tagline": "한국어 학습 #1 베트남",
+    "tagline": "글로벌 1위 한국어 학습 플랫폼",
     "loading": "로딩 중...",
     "branding": "🎮 AI와 함께하는 RPG 한국어 학습"
   }

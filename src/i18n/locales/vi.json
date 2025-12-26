@@ -26,11 +26,11 @@
   "brand": {
     "name": "LUKATO AI",
     "tagline": "Your Korean Mentor",
-    "badge": "Game học tiếng Hàn đầu tiên tại Việt Nam",
+    "badge": "Game AI học tiếng Hàn đầu tiên trên Thế giới",
     "platformNo1": "Nền tảng học tiếng Hàn #1 Thế giới"
   },
   "index": {
-    "badge": "Game học tiếng Hàn đầu tiên tại Việt Nam",
+    "badge": "Game AI học tiếng Hàn đầu tiên trên Thế giới",
     "title1": "CHINH PHỤC",
     "title2": "TIẾNG HÀN",
     "title3": "&",
@@ -377,7 +377,7 @@
     "helpItem3": "Báo lỗi & góp ý cải tiến",
     "helpItem4": "Giải đáp thắc mắc về nội dung học tập",
     "copyright": "© 2025 LUKATO AI. Ôn thi thông minh với AI.",
-    "platform": "Nền tảng học tập AI cho kỳ thi TOPIK Việt Nam"
+    "platform": "Nền tảng AI học TOPIK cho người học toàn cầu"
   },
   "battle": {
     "title": "1:1 Đấu trường Real-time",
@@ -510,7 +510,7 @@
       "title2": "doanh nghiệp Hàn Quốc",
       "desc1": "Đội ngũ headhunter hỗ trợ bạn chinh phục công việc",
       "free": "100% miễn phí",
-      "desc2": "Từ doanh nghiệp tại Việt Nam đến cơ hội làm việc tại Seoul!",
+      "desc2": "Từ doanh nghiệp Hàn địa phương đến cơ hội làm việc tại Seoul!",
       "tag1": "500+ doanh nghiệp",
       "tag2": "Tư vấn CV",
       "tag3": "Hỗ trợ visa",
@@ -1087,7 +1087,7 @@
     "installNow": "Cài đặt ngay"
   },
   "splash": {
-    "tagline": "Học tiếng Hàn #1 Việt Nam",
+    "tagline": "Nền tảng học tiếng Hàn #1 Thế giới",
     "loading": "Đang tải...",
     "branding": "🎮 RPG học tiếng Hàn với AI"
   }
