@@ -70,8 +70,8 @@ const WordChain = () => {
       
       setScoreSaved(true);
       toast({
-        title: `💰 보상 획득! / Nhận thưởng!`,
-        description: `+${finalScore + bonusPoints}점, ₩${moneyEarned.toLocaleString()}`,
+        title: `💰 ${t('wordChain.reward')}`,
+        description: `+${finalScore + bonusPoints}${t('wordChain.score')}, ₩${moneyEarned.toLocaleString()}`,
       });
     }
   };
@@ -103,8 +103,8 @@ const WordChain = () => {
             setGameOver(true);
             setWinner("ai");
             toast({
-              title: "시간 초과! ⏰ Hết giờ!",
-              description: "15초 안에 단어를 입력하지 못했습니다! / Không kịp nhập từ trong 15 giây!",
+              title: `${t('wordChain.timeout')} ⏰`,
+              description: t('wordChain.timeoutDesc'),
               variant: "destructive",
             });
             return 0;
@@ -162,7 +162,7 @@ const WordChain = () => {
       if (error) throw error;
 
       if (data.error) {
-        toast({ title: "오류 / Lỗi", description: data.error, variant: "destructive" });
+        toast({ title: t('wordChain.error'), description: data.error, variant: "destructive" });
         setWords(prev => prev.slice(0, -1));
         setIsLoading(false);
         return;
@@ -172,7 +172,7 @@ const WordChain = () => {
         setWords(prev => prev.map((w, i) => i === prev.length - 1 ? { ...w, isInvalid: true } : w));
         setGameOver(true);
         setWinner("ai");
-        toast({ title: "패배! 💀 Thất bại!", description: data.reason_ko, variant: "destructive" });
+        toast({ title: `${t('wordChain.defeat')} 💀`, description: data.reason_ko, variant: "destructive" });
       } else {
         if (data.user_word_explanation) {
           setWords(prev => prev.map((w, i) => i === prev.length - 1 ? { ...w, explanation: data.user_word_explanation } : w));
@@ -182,7 +182,7 @@ const WordChain = () => {
           setGameOver(true);
           setWinner("user");
           setScore(prev => prev + 100);
-          toast({ title: "승리! 🎉 Chiến thắng!", description: "AI가 단어를 찾지 못했습니다! / AI không tìm được từ!" });
+          toast({ title: `${t('wordChain.victory')} 🎉`, description: t('wordChain.aiLost') });
         } else if (data.ai_word) {
           setWords(prev => [...prev, { 
             word: data.ai_word, 
@@ -196,7 +196,7 @@ const WordChain = () => {
       }
     } catch (error) {
       console.error("Word chain error:", error);
-      toast({ title: "오류가 발생했습니다 / Có lỗi xảy ra", description: "다시 시도해주세요 / Hãy thử lại", variant: "destructive" });
+      toast({ title: t('wordChain.error'), description: t('wordChain.tryAgain'), variant: "destructive" });
       setWords(prev => prev.slice(0, -1));
     } finally {
       setIsLoading(false);
@@ -224,11 +224,11 @@ const WordChain = () => {
       
       {/* Stats Bar */}
       <div className="px-3 py-2 flex items-center justify-between border-b border-white/10 shrink-0">
-        <span className="text-white font-medium">끝말잇기 / Nối từ</span>
+        <span className="text-white font-medium">{t('wordChain.title')}</span>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1 text-yellow-400">
             <Sparkles className="w-4 h-4" />
-            <span className="font-bold text-sm">{score}점</span>
+            <span className="font-bold text-sm">{score}{t('wordChain.score')}</span>
           </div>
           <Button variant="ghost" size="sm" onClick={resetGame} className="text-white/70 hover:text-white h-8 w-8 p-0">
             <RotateCcw className="w-4 h-4" />
@@ -243,18 +243,18 @@ const WordChain = () => {
             <div className="flex items-center gap-2">
               <Clock className={`w-4 h-4 ${timeLeft <= 5 ? "text-red-400 animate-pulse" : "text-white/60"}`} />
               <span className={`text-xl font-bold ${timeLeft <= 5 ? "text-red-400" : timeLeft <= 10 ? "text-yellow-400" : "text-green-400"}`}>
-                {timeLeft}초
+                {timeLeft}{t('wordChain.seconds')}
               </span>
             </div>
 
             <div className="text-center flex-1">
-              <p className="text-white/50 text-[10px]">다음 글자 / Ký tự tiếp</p>
+              <p className="text-white/50 text-[10px]">{t('wordChain.nextChar')}</p>
               {lastChar ? (
                 <motion.span key={lastChar} initial={{ scale: 0.5 }} animate={{ scale: 1 }} className="text-2xl font-bold text-cyan-400">
                   {lastChar}
                 </motion.span>
               ) : (
-                <span className="text-xs text-white/40">아무 단어나!</span>
+                <span className="text-xs text-white/40">{t('wordChain.anyWord')}</span>
               )}
             </div>
 
@@ -292,7 +292,7 @@ const WordChain = () => {
                 </div>
                 {entry.meaning && <p className="text-yellow-300/90 text-xs mt-1">{entry.meaning}</p>}
                 {entry.explanation && <p className="text-white/70 text-xs mt-1">{entry.explanation}</p>}
-                <p className="text-white/40 text-[10px] mt-1">{entry.isUser ? "나 / Tôi" : "AI"}</p>
+                <p className="text-white/40 text-[10px] mt-1">{entry.isUser ? t('wordChain.me') : "AI"}</p>
               </div>
             </motion.div>
           ))}
@@ -319,23 +319,23 @@ const WordChain = () => {
               {winner === "user" ? (
                 <>
                   <Trophy className="w-16 h-16 text-yellow-400 mx-auto mb-3" />
-                  <h2 className="text-2xl font-bold text-yellow-400 mb-1">승리! / Chiến thắng!</h2>
-                  <p className="text-white text-lg mb-4">점수 / Điểm: {score}</p>
+                  <h2 className="text-2xl font-bold text-yellow-400 mb-1">{t('wordChain.victory')}!</h2>
+                  <p className="text-white text-lg mb-4">{score}{t('wordChain.score')}</p>
                 </>
               ) : (
                 <>
                   <Skull className="w-16 h-16 text-red-400 mx-auto mb-3" />
-                  <h2 className="text-2xl font-bold text-red-400 mb-1">패배! / Thất bại!</h2>
-                  <p className="text-white text-lg mb-4">점수 / Điểm: {score}</p>
+                  <h2 className="text-2xl font-bold text-red-400 mb-1">{t('wordChain.defeat')}!</h2>
+                  <p className="text-white text-lg mb-4">{score}{t('wordChain.score')}</p>
                 </>
               )}
               <div className="flex gap-3 justify-center">
                 <Button onClick={resetGame} className="bg-cyan-600 hover:bg-cyan-700">
                   <RotateCcw className="w-4 h-4 mr-1" />
-                  다시 / Lại
+                  {t('wordChain.again')}
                 </Button>
                 <Button variant="outline" onClick={() => navigate("/dashboard")} className="border-white/20 text-white hover:bg-white/10">
-                  대시보드로 / Về Dashboard
+                  {t('wordChain.backToDashboard')}
                 </Button>
               </div>
             </motion.div>
@@ -350,7 +350,7 @@ const WordChain = () => {
             ref={inputRef}
             value={inputWord}
             onChange={(e) => setInputWord(e.target.value)}
-            placeholder={lastChar ? `"${lastChar}"로 시작...` : "첫 단어 입력..."}
+            placeholder={lastChar ? `"${lastChar}"${t('wordChain.startWith')}` : t('wordChain.firstWord')}
             disabled={isLoading || gameOver}
             className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/40 h-10"
           />
@@ -358,7 +358,7 @@ const WordChain = () => {
             <Send className="w-4 h-4" />
           </Button>
         </form>
-        <p className="text-white/40 text-[10px] text-center mt-1.5">한국어 명사만 / Chỉ danh từ tiếng Hàn</p>
+        <p className="text-white/40 text-[10px] text-center mt-1.5">{t('wordChain.koreanNounOnly')}</p>
       </div>
       <AppFooter />
     </div>

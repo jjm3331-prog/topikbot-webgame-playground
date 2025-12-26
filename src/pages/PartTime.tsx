@@ -108,8 +108,8 @@ const PartTime = () => {
     } catch (error) {
       console.error('Error fetching scenario:', error);
       toast({
-        title: "오류 발생",
-        description: "시나리오를 불러오는데 실패했습니다.",
+        title: t('parttime.errorTitle'),
+        description: t('parttime.errorDesc'),
         variant: "destructive"
       });
     } finally {
@@ -142,8 +142,8 @@ const PartTime = () => {
     } catch (error) {
       console.error('Error evaluating response:', error);
       toast({
-        title: "평가 오류",
-        description: "응답 평가에 실패했습니다.",
+        title: t('parttime.evalError'),
+        description: t('parttime.evalErrorDesc'),
         variant: "destructive"
       });
       setGameState('playing');
@@ -221,7 +221,7 @@ const PartTime = () => {
       
       {/* Stats Bar */}
       <div className="flex items-center justify-between p-4 border-b border-white/10">
-        <span className="text-white font-medium">아르바이트 / Làm thêm</span>
+        <span className="text-white font-medium">{t('parttime.statsTitle')}</span>
         {gameState !== 'select_job' && gameState !== 'select_difficulty' && (
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-yellow-400">
@@ -229,7 +229,7 @@ const PartTime = () => {
               <span className="font-bold">₩{totalEarned.toLocaleString()}</span>
             </div>
             <div className="text-white/70">
-              턴 / Lượt {turn}/{MAX_TURNS}
+              {t('parttime.turn')} {turn}/{MAX_TURNS}
             </div>
           </div>
         )}
@@ -247,8 +247,8 @@ const PartTime = () => {
               className="space-y-6"
             >
               <div className="text-center mb-8">
-                <h1 className="text-2xl font-bold text-white mb-2">어디서 일할까요?</h1>
-                <p className="text-white/60">Bạn muốn làm việc ở đâu?</p>
+                <h1 className="text-2xl font-bold text-white mb-2">{t('parttime.selectJob')}</h1>
+                <p className="text-white/60">{t('parttime.selectJob')}</p>
               </div>
 
               <div className="grid grid-cols-1 gap-4">
@@ -264,8 +264,8 @@ const PartTime = () => {
                       <job.icon className="w-8 h-8 text-white" />
                     </div>
                     <div className="text-left">
-                      <h3 className="text-xl font-bold text-white">{job.name_ko}</h3>
-                      <p className="text-white/70">{job.name_vi}</p>
+                      <h3 className="text-xl font-bold text-white">{t(`parttime.jobs.${job.id}`)}</h3>
+                      <p className="text-white/70">{t(`parttime.jobs.${job.id}`)}</p>
                     </div>
                   </motion.button>
                 ))}
@@ -283,8 +283,8 @@ const PartTime = () => {
               className="space-y-6"
             >
               <div className="text-center mb-8">
-                <h1 className="text-2xl font-bold text-white mb-2">난이도 선택</h1>
-                <p className="text-white/60">Chọn độ khó</p>
+                <h1 className="text-2xl font-bold text-white mb-2">{t('parttime.selectDifficulty')}</h1>
+                <p className="text-white/60">{t('parttime.selectDifficulty')}</p>
               </div>
 
               <div className="grid grid-cols-1 gap-4">
@@ -296,8 +296,8 @@ const PartTime = () => {
                     onClick={() => handleSelectDifficulty(diff.id)}
                     className={`glass-card p-6 rounded-xl bg-gradient-to-r ${diff.color} bg-opacity-20 hover:bg-opacity-30 transition-all`}
                   >
-                    <h3 className="text-xl font-bold text-white">{diff.name_ko} / {diff.name_vi}</h3>
-                    <p className="text-white/70 mt-1">{diff.description}</p>
+                    <h3 className="text-xl font-bold text-white">{t(`parttime.difficulty.${diff.id}`)}</h3>
+                    <p className="text-white/70 mt-1">{t(`parttime.difficulty.${diff.id}Desc`)}</p>
                   </motion.button>
                 ))}
               </div>
@@ -307,7 +307,7 @@ const PartTime = () => {
                 onClick={() => setGameState('select_job')}
                 className="w-full border-white/20 text-white hover:bg-white/10"
               >
-                뒤로 / Quay lại
+                {t('parttime.back')}
               </Button>
             </motion.div>
           )}
@@ -325,20 +325,18 @@ const PartTime = () => {
               <div className="glass-card p-4 rounded-xl">
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-neon-cyan font-bold">{scenario.job_name_ko}</span>
-                    <span className="text-white/50 ml-2">/ {scenario.job_name_vi}</span>
+                    <span className="text-neon-cyan font-bold">{t(`parttime.jobs.${selectedJob}`)}</span>
                   </div>
                   <div className="text-white/70">
-                    손님 유형: <span className="text-white">{scenario.customer_type}</span>
+                    {t('parttime.customerType')}: <span className="text-white">{scenario.customer_type}</span>
                   </div>
                 </div>
               </div>
 
               {/* Situation */}
               <div className="glass-card p-4 rounded-xl bg-blue-500/10">
-                <p className="text-white/60 text-sm mb-1">📍 상황 / Tình huống</p>
+                <p className="text-white/60 text-sm mb-1">📍 {t('parttime.situation')}</p>
                 <p className="text-white">{scenario.situation_hint_ko}</p>
-                <p className="text-white/70 text-sm mt-1">{scenario.situation_hint_vi}</p>
               </div>
 
               {/* Customer Line */}
@@ -348,9 +346,8 @@ const PartTime = () => {
                     <MessageCircle className="w-6 h-6 text-pink-400" />
                   </div>
                   <div>
-                    <p className="text-white/60 text-sm mb-2">손님 / Khách hàng:</p>
+                    <p className="text-white/60 text-sm mb-2">{t('parttime.customer')}:</p>
                     <p className="text-xl text-white font-medium">"{scenario.customer_line_ko}"</p>
-                    <p className="text-white/60 mt-2">"{scenario.customer_line_vi}"</p>
                   </div>
                 </div>
               </div>
@@ -362,7 +359,7 @@ const PartTime = () => {
                 className="w-full border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/20"
               >
                 <Lightbulb className="w-4 h-4 mr-2" />
-                {showHint ? '힌트 숨기기' : '힌트 보기'} / {showHint ? 'Ẩn gợi ý' : 'Xem gợi ý'}
+                {showHint ? t('parttime.hideHint') : t('parttime.showHint')}
               </Button>
 
               {/* Hint Display */}
@@ -374,21 +371,20 @@ const PartTime = () => {
                     exit={{ opacity: 0, height: 0 }}
                     className="glass-card p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30"
                   >
-                    <p className="text-yellow-400 text-sm mb-1">💡 힌트 / Gợi ý</p>
+                    <p className="text-yellow-400 text-sm mb-1">💡 {t('parttime.hint')}</p>
                     <p className="text-white">{scenario.expected_response_hint_ko}</p>
-                    <p className="text-white/70 text-sm mt-1">{scenario.expected_response_hint_vi}</p>
                   </motion.div>
                 )}
               </AnimatePresence>
 
               {/* Input Area */}
               <div className="glass-card p-4 rounded-xl">
-                <p className="text-white/60 text-sm mb-2">✍️ 응대하기 / Phản hồi:</p>
+                <p className="text-white/60 text-sm mb-2">✍️ {t('parttime.respond')}:</p>
                 <div className="flex gap-2">
                   <Input
                     value={playerInput}
                     onChange={(e) => setPlayerInput(e.target.value)}
-                    placeholder="손님에게 응대해보세요..."
+                    placeholder={t('parttime.placeholder')}
                     className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/40"
                     disabled={loading}
                     onKeyDown={(e) => e.key === 'Enter' && !loading && handleSubmitResponse()}
@@ -424,7 +420,7 @@ const PartTime = () => {
                 >
                   {evaluation.grade}
                 </motion.div>
-                <p className="text-white text-2xl">{evaluation.score}점</p>
+                <p className="text-white text-2xl">{evaluation.score}{t('parttime.score')}</p>
                 <div className="flex items-center justify-center gap-2 mt-4 text-yellow-400">
                   <Coins className="w-6 h-6" />
                   <span className="text-xl font-bold">+₩{evaluation.earned_money.toLocaleString()}</span>
@@ -433,29 +429,26 @@ const PartTime = () => {
 
               {/* Customer Reaction */}
               <div className="glass-card p-4 rounded-xl bg-purple-500/10">
-                <p className="text-white/60 text-sm mb-1">😊 손님 반응 / Phản ứng khách hàng</p>
+                <p className="text-white/60 text-sm mb-1">😊 {t('parttime.customerReaction')}</p>
                 <p className="text-white">{evaluation.customer_reaction_ko}</p>
-                <p className="text-white/70 text-sm mt-1">{evaluation.customer_reaction_vi}</p>
               </div>
 
               {/* Feedback */}
               <div className="glass-card p-4 rounded-xl">
-                <p className="text-white/60 text-sm mb-2">📝 피드백 / Phản hồi</p>
+                <p className="text-white/60 text-sm mb-2">📝 {t('parttime.feedback')}</p>
                 <p className="text-white">{evaluation.feedback_ko}</p>
-                <p className="text-white/70 text-sm mt-1">{evaluation.feedback_vi}</p>
               </div>
 
               {/* Better Response */}
               <div className="glass-card p-4 rounded-xl bg-green-500/10">
-                <p className="text-white/60 text-sm mb-2">✨ 더 나은 응대 / Phản hồi tốt hơn</p>
+                <p className="text-white/60 text-sm mb-2">✨ {t('parttime.betterResponse')}</p>
                 <p className="text-white">"{evaluation.better_response_ko}"</p>
-                <p className="text-white/70 text-sm mt-1">"{evaluation.better_response_vi}"</p>
               </div>
 
               {/* Language Tips */}
               {evaluation.language_tips && evaluation.language_tips.length > 0 && (
                 <div className="glass-card p-4 rounded-xl bg-red-500/10">
-                  <p className="text-white/60 text-sm mb-2">🔤 언어 교정 / Sửa lỗi ngôn ngữ</p>
+                  <p className="text-white/60 text-sm mb-2">🔤 {t('parttime.languageCorrection')}</p>
                   {evaluation.language_tips.map((tip, idx) => (
                     <div key={idx} className="mb-3 last:mb-0">
                       <div className="flex gap-2 items-center mb-1">
@@ -475,7 +468,7 @@ const PartTime = () => {
                 onClick={handleNextTurn}
                 className="w-full h-14 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-lg font-bold"
               >
-                {turn >= MAX_TURNS ? '결과 보기 / Xem kết quả' : '다음 손님 / Khách tiếp theo'}
+                {turn >= MAX_TURNS ? t('parttime.viewResult') : t('parttime.nextCustomer')}
               </Button>
             </motion.div>
           )}
@@ -497,11 +490,10 @@ const PartTime = () => {
                 >
                   <Trophy className="w-20 h-20 text-yellow-400 mx-auto mb-4" />
                 </motion.div>
-                <h1 className="text-3xl font-bold text-white mb-2">퇴근 완료!</h1>
-                <p className="text-white/60 mb-6">Hoàn thành ca làm việc!</p>
+                <h1 className="text-3xl font-bold text-white mb-2">{t('parttime.workDone')}</h1>
                 
                 <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-xl p-6">
-                  <p className="text-white/70 mb-2">오늘의 수입 / Thu nhập hôm nay</p>
+                  <p className="text-white/70 mb-2">{t('parttime.todayIncome')}</p>
                   <div className="flex items-center justify-center gap-2 text-yellow-400">
                     <Coins className="w-8 h-8" />
                     <span className="text-4xl font-bold">₩{totalEarned.toLocaleString()}</span>
@@ -514,14 +506,14 @@ const PartTime = () => {
                   onClick={handleRestart}
                   className="h-14 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
                 >
-                  다시 하기 / Chơi lại
+                  {t('parttime.restart')}
                 </Button>
                 <Button
                   onClick={() => navigate('/dashboard')}
                   variant="outline"
                   className="h-14 border-white/20 text-white hover:bg-white/10"
                 >
-                  대시보드로 / Về Dashboard
+                  {t('parttime.backToDashboard')}
                 </Button>
               </div>
             </motion.div>
@@ -536,8 +528,7 @@ const PartTime = () => {
             >
               <div className="glass-card p-8 rounded-xl text-center">
                 <Loader2 className="w-12 h-12 text-neon-cyan animate-spin mx-auto mb-4" />
-                <p className="text-white">손님이 오고 있습니다...</p>
-                <p className="text-white/60 text-sm">Khách hàng đang đến...</p>
+                <p className="text-white">{t('parttime.loading')}</p>
               </div>
             </motion.div>
           )}
