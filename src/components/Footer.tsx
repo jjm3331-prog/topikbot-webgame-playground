@@ -15,10 +15,10 @@ const Footer = () => {
             />
             <div>
               <h3 className="text-xl font-display">
-                <NeonText variant="gradient">Game LUKATO</NeonText>
+                <NeonText variant="gradient">LUKATO</NeonText>
               </h3>
               <p className="text-xs text-white/50">
-                당신의 한국어 멘토 / Người hướng dẫn tiếng Hàn của bạn
+                Your Korean Mentor
               </p>
             </div>
           </div>
@@ -26,22 +26,13 @@ const Footer = () => {
           {/* External Links */}
           <div className="flex items-center gap-4">
             <a
-              href="https://hanoi.topikbot.kr"
+              href="https://hq.topikbot.kr"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-card text-xs text-white/70 hover:text-white transition-colors"
             >
               <ExternalLink className="w-3 h-3" />
-              Hanoi Official
-            </a>
-            <a
-              href="/ai-chat"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-card text-xs text-white/70 hover:text-white transition-colors"
-            >
-              <ExternalLink className="w-3 h-3" />
-              Q&A Agent
+              HQ.KOREA
             </a>
             <a
               href="/admin-login"
