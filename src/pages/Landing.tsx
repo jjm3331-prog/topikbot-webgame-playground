@@ -36,15 +36,26 @@ import {
 } from "lucide-react";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 
-// University partner logos
+// University partner logos - Vietnam
 import hanuLogo from "@/assets/universities/hanu.png";
 import dainamLogo from "@/assets/universities/dainam.png";
 import thanglongLogo from "@/assets/universities/thanglong.png";
 import phenikaaLogo from "@/assets/universities/phenikaa.png";
 import netcLogo from "@/assets/universities/netc.png";
 import ptitLogo from "@/assets/universities/ptit.png";
+// University partner logos - Korea & China
+import yonseiLogo from "@/assets/universities/yonsei.png";
+import chsuLogo from "@/assets/universities/chsu.png";
+import doowonLogo from "@/assets/universities/doowon.jpg";
+import knutLogo from "@/assets/universities/knut.png";
+import pekingLogo from "@/assets/universities/peking.png";
 
 const partnerUniversities = [
+  { name: "Yonsei", logo: yonseiLogo },
+  { name: "Peking", logo: pekingLogo },
+  { name: "CHSU", logo: chsuLogo },
+  { name: "Doowon", logo: doowonLogo },
+  { name: "KNUT", logo: knutLogo },
   { name: "HANU", logo: hanuLogo },
   { name: "Đại Nam", logo: dainamLogo },
   { name: "Thăng Long", logo: thanglongLogo },
@@ -53,61 +64,61 @@ const partnerUniversities = [
   { name: "PTIT", logo: ptitLogo },
 ];
 
-// Key differentiators - shortened
-const keyDifferentiators = [
+// Key differentiators - will be translated via t()
+const getKeyDifferentiators = (t: (key: string) => string) => [
   {
     icon: Crown,
-    title: "Giáo sư TOPIK Hàn Quốc",
-    desc: "Đội ngũ ra đề thi TOPIK chính thức từ Seoul",
+    title: t("landing.why.item1Title"),
+    desc: t("landing.why.item1Desc"),
     color: "from-korean-red to-korean-orange",
   },
   {
     icon: Cpu,
-    title: "LUKATO RAG AI Tech",
-    desc: "10,000+ tài liệu TOPIK & văn bản chuyên môn Hàn Quốc",
+    title: t("landing.why.item2Title"),
+    desc: t("landing.why.item2Desc"),
     color: "from-korean-blue to-korean-cyan",
   },
   {
     icon: Headphones,
-    title: "STT/TTS Thế Hệ Mới",
-    desc: "Nghe & Nói với AI phát âm chuẩn bản xứ 99%",
+    title: t("landing.why.item3Title"),
+    desc: t("landing.why.item3Desc"),
     color: "from-korean-purple to-korean-pink",
   },
   {
     icon: Briefcase,
-    title: "AI Headhunting",
-    desc: "Chấm CV, thư xin việc với độ chính xác cao cấp",
+    title: t("landing.why.item4Title"),
+    desc: t("landing.why.item4Desc"),
     color: "from-korean-teal to-korean-green",
   },
 ];
 
-// Core features - shortened
-const coreFeatures = [
-  { icon: Headphones, title: "Nghe", stat: "500+", color: "from-korean-blue to-korean-cyan" },
-  { icon: BookOpen, title: "Đọc", stat: "1,000+", color: "from-korean-teal to-korean-green" },
-  { icon: PenTool, title: "Viết", stat: "AI 24/7", color: "from-korean-purple to-korean-indigo" },
-  { icon: Mic, title: "Nói", stat: "99%", color: "from-korean-pink to-korean-red" },
+// Core features - will be translated via t()
+const getCoreFeatures = (t: (key: string) => string) => [
+  { icon: Headphones, title: t("landing.features.listen"), stat: "500+", color: "from-korean-blue to-korean-cyan" },
+  { icon: BookOpen, title: t("landing.features.read"), stat: "1,000+", color: "from-korean-teal to-korean-green" },
+  { icon: PenTool, title: t("landing.features.write"), stat: "AI 24/7", color: "from-korean-purple to-korean-indigo" },
+  { icon: Mic, title: t("landing.features.speak"), stat: "99%", color: "from-korean-pink to-korean-red" },
 ];
 
-// Game modes - shortened
-const gameModes = [
-  { icon: MessageCircle, name: "Sinh Tồn AI", color: "from-korean-red to-korean-orange", badge: "Hot" },
-  { icon: Heart, name: "Hẹn Hò Seoul", color: "from-korean-pink to-korean-red", badge: "Mới" },
-  { icon: Gamepad2, name: "Nối Từ", color: "from-korean-blue to-korean-purple", badge: null },
+// Game modes - will be translated via t()
+const getGameModes = (t: (key: string) => string) => [
+  { icon: MessageCircle, name: t("landing.games.survival"), color: "from-korean-red to-korean-orange", badge: "Hot" },
+  { icon: Heart, name: t("landing.games.dating"), color: "from-korean-pink to-korean-red", badge: t("landing.games.badgeNew") },
+  { icon: Gamepad2, name: t("landing.games.wordChain"), color: "from-korean-blue to-korean-purple", badge: null },
   { icon: Music, name: "K-POP Quiz", color: "from-korean-purple to-korean-pink", badge: "⭐" },
-  { icon: Film, name: "Lồng Tiếng", color: "from-korean-orange to-korean-yellow", badge: null },
+  { icon: Film, name: t("landing.games.dubbing"), color: "from-korean-orange to-korean-yellow", badge: null },
   { icon: Briefcase, name: "Part-time", color: "from-korean-teal to-korean-green", badge: null },
 ];
 
-// Comparison with competitors
-const comparisonFeatures = [
-  { feature: "Giáo sư ra đề TOPIK chính thức", lukato: true, others: false },
-  { feature: "LUKATO RAG AI Tech (Công nghệ AI độc quyền)", lukato: true, others: false },
-  { feature: "10,000+ đề thi TOPIK & tài liệu", lukato: true, others: false },
-  { feature: "AI STT/TTS phát âm chuẩn bản xứ", lukato: true, others: false },
-  { feature: "AI chấm Writing & CV siêu chính xác", lukato: true, others: false },
-  { feature: "Headhunting & Tư vấn việc làm Hàn Quốc", lukato: true, others: false },
-  { feature: "K-Culture tích hợp (K-POP, K-Drama)", lukato: true, others: false },
+// Comparison with competitors - will be translated via t()
+const getComparisonFeatures = (t: (key: string) => string) => [
+  { feature: t("landing.comparison.feature1"), lukato: true, others: false },
+  { feature: t("landing.comparison.feature2"), lukato: true, others: false },
+  { feature: t("landing.comparison.feature3"), lukato: true, others: false },
+  { feature: t("landing.comparison.feature4"), lukato: true, others: false },
+  { feature: t("landing.comparison.feature5"), lukato: true, others: false },
+  { feature: t("landing.comparison.feature6"), lukato: true, others: false },
+  { feature: t("landing.comparison.feature7"), lukato: true, others: false },
 ];
 
 // Counter animation component
@@ -161,6 +172,12 @@ const Landing = () => {
   const { scrollYProgress } = useScroll();
   const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 0.15], [1, 0.98]);
+
+  // Get translated data
+  const keyDifferentiators = getKeyDifferentiators(t);
+  const coreFeatures = getCoreFeatures(t);
+  const gameModes = getGameModes(t);
+  const comparisonFeatures = getComparisonFeatures(t);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -275,21 +292,21 @@ const Landing = () => {
              </p>
           </motion.div>
           
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-4 max-w-3xl mx-auto">
+          <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-11 gap-2 sm:gap-3 max-w-5xl mx-auto">
             {partnerUniversities.map((uni, i) => (
               <motion.div
                 key={uni.name}
                 initial={{ opacity: 0, scale: 0.8 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
+                transition={{ delay: i * 0.03 }}
                 whileHover={{ scale: 1.1, y: -4 }}
                 className="group flex flex-col items-center"
               >
-                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-white rounded-xl p-2 shadow-md group-hover:shadow-xl transition-all duration-300 flex items-center justify-center border border-border/20 group-hover:border-primary/40">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 bg-white rounded-xl p-1.5 shadow-md group-hover:shadow-xl transition-all duration-300 flex items-center justify-center border border-border/20 group-hover:border-primary/40">
                   <img src={uni.logo} alt={uni.name} className="w-full h-full object-contain" />
                 </div>
-                <span className="mt-1.5 text-[10px] sm:text-xs text-muted-foreground group-hover:text-foreground text-center">
+                <span className="mt-1 text-[9px] sm:text-[10px] text-muted-foreground group-hover:text-foreground text-center truncate max-w-full">
                   {uni.name}
                 </span>
               </motion.div>
@@ -320,7 +337,7 @@ const Landing = () => {
               <div className="font-black text-lg sm:text-2xl md:text-3xl text-gradient-primary mb-0.5 sm:mb-1">
                 <AnimatedCounter target={50000} suffix="+" duration={2.5} />
               </div>
-              <div className="text-muted-foreground text-[10px] sm:text-xs">Học viên</div>
+              <div className="text-muted-foreground text-[10px] sm:text-xs">{t("landing.stats.students")}</div>
             </motion.div>
             
             <motion.div
@@ -341,7 +358,7 @@ const Landing = () => {
               <div className="font-black text-lg sm:text-2xl md:text-3xl text-gradient-secondary mb-0.5 sm:mb-1">
                 <AnimatedCounter target={99.7} suffix="%" duration={2} />
               </div>
-              <div className="text-muted-foreground text-[10px] sm:text-xs">Độ chính xác AI</div>
+              <div className="text-muted-foreground text-[10px] sm:text-xs">{t("landing.stats.aiAccuracy")}</div>
             </motion.div>
             
             <motion.div
@@ -362,7 +379,7 @@ const Landing = () => {
               <div className="font-black text-lg sm:text-2xl md:text-3xl text-korean-yellow mb-0.5 sm:mb-1">
                 #1
               </div>
-              <div className="text-muted-foreground text-[10px] sm:text-xs">TOPIK App VN</div>
+              <div className="text-muted-foreground text-[10px] sm:text-xs">{t("landing.stats.topikApp")}</div>
             </motion.div>
             
             <motion.div
@@ -383,7 +400,7 @@ const Landing = () => {
               <div className="font-black text-lg sm:text-2xl md:text-3xl text-korean-green mb-0.5 sm:mb-1">
                 24/7
               </div>
-              <div className="text-muted-foreground text-[10px] sm:text-xs">AI hỗ trợ</div>
+              <div className="text-muted-foreground text-[10px] sm:text-xs">{t("landing.stats.aiSupport")}</div>
             </motion.div>
           </div>
         </div>
@@ -399,7 +416,7 @@ const Landing = () => {
             className="text-center mb-8 sm:mb-10"
           >
             <h2 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl text-foreground">
-              Tại sao <span className="text-gradient-primary">LUKATO</span>?
+              {t("landing.why.title")} <span className="text-gradient-primary">LUKATO</span>?
             </h2>
           </motion.div>
 
@@ -434,7 +451,7 @@ const Landing = () => {
             viewport={{ once: true }}
             className="text-center font-heading font-bold text-xl sm:text-2xl text-foreground mb-6"
           >
-            LUKATO vs <span className="text-muted-foreground">App khác</span>
+            LUKATO vs <span className="text-muted-foreground">{t("landing.comparison.others")}</span>
           </motion.h2>
 
           <motion.div
@@ -446,11 +463,11 @@ const Landing = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="text-left py-3 px-3 sm:px-4 text-foreground">Tính năng</th>
+                  <th className="text-left py-3 px-3 sm:px-4 text-foreground">{t("landing.comparison.feature")}</th>
                   <th className="py-3 px-2 text-primary text-center">
                     <Crown className="w-4 h-4 mx-auto text-korean-yellow" />
                   </th>
-                  <th className="py-3 px-2 text-muted-foreground text-center text-xs">Khác</th>
+                  <th className="py-3 px-2 text-muted-foreground text-center text-xs">{t("landing.comparison.others")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -581,9 +598,9 @@ const Landing = () => {
             transition={{ delay: 0.1 }}
             className="font-heading font-black text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-foreground mb-4 leading-tight"
           >
-            Đủ giỏi thì
+            {t("landing.challenge.headline1")}
             <br />
-            <span className="text-gradient-primary">theo kịp đi.</span>
+            <span className="text-gradient-primary">{t("landing.challenge.headline2")}</span>
           </motion.h2>
 
           {/* Subtitle */}
@@ -594,11 +611,11 @@ const Landing = () => {
             transition={{ delay: 0.2 }}
             className="text-muted-foreground text-sm sm:text-base md:text-lg mb-8 max-w-xl mx-auto leading-relaxed"
           >
-            Gửi đến tất cả các app, website, trung tâm dạy tiếng Hàn tại Việt Nam.
+            {t("landing.challenge.subtitle")}
             <br className="hidden sm:block" />
-            <span className="text-foreground font-semibold">Những gì các bạn làm được, chúng tôi làm tốt hơn.</span>
+            <span className="text-foreground font-semibold">{t("landing.challenge.line1")}</span>
             <br className="hidden sm:block" />
-            <span className="text-foreground font-semibold">Những gì các bạn không dám nghĩ tới, chúng tôi đã làm rồi.</span>
+            <span className="text-foreground font-semibold">{t("landing.challenge.line2")}</span>
           </motion.p>
 
           {/* Challenge points */}
@@ -611,18 +628,18 @@ const Landing = () => {
           >
             <div className="p-4 rounded-xl bg-card/80 border border-korean-red/20 backdrop-blur-sm">
               <div className="text-2xl mb-2">🎯</div>
-              <p className="text-xs sm:text-sm text-foreground font-medium">Ra đề TOPIK?</p>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">Chúng tôi có giáo sư ra đề TOPIK chính thức</p>
+              <p className="text-xs sm:text-sm text-foreground font-medium">{t("landing.challenge.point1Title")}</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">{t("landing.challenge.point1Desc")}</p>
             </div>
             <div className="p-4 rounded-xl bg-card/80 border border-korean-orange/20 backdrop-blur-sm">
               <div className="text-2xl mb-2">🤖</div>
-              <p className="text-xs sm:text-sm text-foreground font-medium">AI Chatbot?</p>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">LUKATO RAG AI Tech chính xác 99.7%</p>
+              <p className="text-xs sm:text-sm text-foreground font-medium">{t("landing.challenge.point2Title")}</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">{t("landing.challenge.point2Desc")}</p>
             </div>
             <div className="p-4 rounded-xl bg-card/80 border border-korean-yellow/20 backdrop-blur-sm">
               <div className="text-2xl mb-2">🎮</div>
-              <p className="text-xs sm:text-sm text-foreground font-medium">Game học tập?</p>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">Chúng tôi tích hợp cả K-Culture vào đây</p>
+              <p className="text-xs sm:text-sm text-foreground font-medium">{t("landing.challenge.point3Title")}</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">{t("landing.challenge.point3Desc")}</p>
             </div>
           </motion.div>
 
@@ -636,7 +653,7 @@ const Landing = () => {
           >
             <Swords className="w-4 h-4 sm:w-5 sm:h-5 text-korean-orange" />
             <span className="text-sm sm:text-base font-bold text-foreground">
-              Copy thoải mái. Nhưng liệu có theo kịp không?
+              {t("landing.challenge.final")}
             </span>
           </motion.div>
         </motion.div>
@@ -712,30 +729,30 @@ const Landing = () => {
               <div className="flex-1 text-center lg:text-left">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/30 backdrop-blur-sm text-white text-xs sm:text-sm font-bold mb-4 border border-white/40">
                   <Crown className="w-4 h-4 text-korean-yellow" />
-                  <span>DỊCH VỤ ĐỘC QUYỀN PREMIUM</span>
+                  <span>{t("landing.headhunting.badge")}</span>
                 </div>
                 <h3 className="font-heading font-black text-2xl sm:text-3xl lg:text-4xl text-white mb-3 leading-tight">
-                  Kết nối trực tiếp
+                  {t("landing.headhunting.title1")}
                   <br />
-                  <span className="text-korean-yellow drop-shadow-lg">Doanh nghiệp Hàn Quốc</span>
+                  <span className="text-korean-yellow drop-shadow-lg">{t("landing.headhunting.title2")}</span>
                 </h3>
                 <p className="text-white/90 text-sm sm:text-base lg:text-lg mb-5 leading-relaxed">
-                  Đội ngũ headhunter chuyên nghiệp hỗ trợ bạn xin việc <strong className="text-white">MIỄN PHÍ 100%</strong>.
+                  {t("landing.headhunting.desc1")} <strong className="text-white">{t("landing.headhunting.free")}</strong>.
                   <br className="hidden sm:block" />
-                  Từ công ty Hàn Quốc tại Việt Nam đến cơ hội làm việc tại Seoul!
+                  {t("landing.headhunting.desc2")}
                 </p>
                 <div className="flex flex-wrap justify-center lg:justify-start gap-2 text-xs sm:text-sm text-white mb-5">
                   <span className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">
                     <Check className="w-3.5 h-3.5 text-korean-green" /> 
-                    <span className="font-semibold">500+ công ty</span>
+                    <span className="font-semibold">{t("landing.headhunting.tag1")}</span>
                   </span>
                   <span className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">
                     <Check className="w-3.5 h-3.5 text-korean-green" /> 
-                    <span className="font-semibold">Tư vấn CV</span>
+                    <span className="font-semibold">{t("landing.headhunting.tag2")}</span>
                   </span>
                   <span className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">
                     <Check className="w-3.5 h-3.5 text-korean-green" /> 
-                    <span className="font-semibold">Hỗ trợ Visa</span>
+                    <span className="font-semibold">{t("landing.headhunting.tag3")}</span>
                   </span>
                 </div>
               </div>
@@ -748,11 +765,11 @@ const Landing = () => {
                   className="w-full lg:w-auto h-12 sm:h-14 px-6 sm:px-8 bg-white hover:bg-white/95 text-korean-blue font-black text-sm sm:text-base rounded-xl group shadow-2xl border-2 border-white/50 hover:scale-105 transition-all duration-300"
                 >
                   <Rocket className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                  Đăng ký ngay
+                  {t("landing.headhunting.cta")}
                   <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
                 <p className="text-white/80 text-[10px] sm:text-xs text-center mt-1.5 font-medium">
-                  Hoàn toàn miễn phí
+                  {t("landing.headhunting.ctaSub")}
                 </p>
               </div>
             </div>
@@ -774,7 +791,7 @@ const Landing = () => {
               LUKATO AI
             </span>
             <h2 className="font-heading font-bold text-2xl sm:text-3xl text-foreground">
-              Học toàn diện <span className="text-gradient-secondary">4 kỹ năng</span>
+              {t("landing.features.title")} <span className="text-gradient-secondary">{t("landing.features.skills")}</span>
             </h2>
           </motion.div>
 
@@ -814,7 +831,7 @@ const Landing = () => {
               K-Culture
             </span>
             <h2 className="font-heading font-bold text-2xl sm:text-3xl text-foreground">
-              K-POP · K-Drama · <span className="text-gradient-primary">Tiếng Hàn</span>
+              K-POP · K-Drama · <span className="text-gradient-primary">{t("landing.games.korean")}</span>
             </h2>
           </motion.div>
 
@@ -854,7 +871,7 @@ const Landing = () => {
             className="text-center mb-6"
           >
             <h2 className="font-heading font-bold text-xl sm:text-2xl text-foreground">
-              Học viên nói gì về <span className="text-gradient-primary">LUKATO</span>
+              {t("landing.testimonials.title")} <span className="text-gradient-primary">LUKATO</span>
             </h2>
           </motion.div>
           
@@ -915,7 +932,7 @@ const Landing = () => {
             className="text-center mb-6 sm:mb-8"
           >
             <h2 className="font-heading font-bold text-2xl sm:text-3xl text-foreground mb-2">
-              Giá <span className="text-gradient-primary">Việt Nam</span>, chất lượng <span className="text-gradient-secondary">World-class</span>
+              {t("landing.pricing.title1")} <span className="text-gradient-primary">{t("landing.pricing.local")}</span>, {t("landing.pricing.title2")} <span className="text-gradient-secondary">World-class</span>
             </h2>
           </motion.div>
 
@@ -928,12 +945,12 @@ const Landing = () => {
               className="premium-card p-4 sm:p-6 text-center flex flex-col justify-between min-h-[180px] sm:min-h-[200px]"
             >
               <div>
-                <h3 className="font-bold text-base sm:text-lg text-foreground">Miễn phí</h3>
-                <div className="text-2xl sm:text-3xl font-black text-foreground my-2">0₫</div>
-                <p className="text-muted-foreground text-xs sm:text-sm mb-4">Mãi mãi</p>
+                <h3 className="font-bold text-base sm:text-lg text-foreground">{t("landing.pricing.free")}</h3>
+                <div className="text-2xl sm:text-3xl font-black text-foreground my-2">$0</div>
+                <p className="text-muted-foreground text-xs sm:text-sm mb-4">{t("landing.pricing.forever")}</p>
               </div>
               <Button variant="outline" size="sm" className="w-full text-sm rounded-lg" onClick={() => navigate("/auth")}>
-                Bắt đầu
+                {t("landing.pricing.start")}
               </Button>
             </motion.div>
 
@@ -950,11 +967,11 @@ const Landing = () => {
               </div>
               <div className="pt-2">
                 <h3 className="font-bold text-base sm:text-lg text-foreground">Premium</h3>
-                <div className="text-2xl sm:text-3xl font-black text-gradient-primary my-2">299K</div>
-                <p className="text-muted-foreground text-xs sm:text-sm mb-4">/tháng</p>
+                <div className="text-2xl sm:text-3xl font-black text-gradient-primary my-2">$9.99</div>
+                <p className="text-muted-foreground text-xs sm:text-sm mb-4">/{t("landing.pricing.month")}</p>
               </div>
               <Button size="sm" className="w-full text-sm rounded-lg btn-primary text-primary-foreground" onClick={() => navigate("/pricing")}>
-                Nâng cấp
+                {t("landing.pricing.upgrade")}
               </Button>
             </motion.div>
           </div>
@@ -970,10 +987,10 @@ const Landing = () => {
           className="max-w-xl mx-auto text-center"
         >
           <h2 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl text-foreground mb-4">
-            Sẵn sàng <span className="text-gradient-primary">chiến thắng</span> TOPIK?
+            {t("landing.finalCta.title1")} <span className="text-gradient-primary">{t("landing.finalCta.title2")}</span> TOPIK?
           </h2>
           <p className="text-muted-foreground text-sm sm:text-base mb-6">
-            Giáo sư TOPIK + LUKATO RAG AI Tech = <span className="text-foreground font-semibold">Không đối thủ</span>
+            {t("landing.finalCta.desc")} <span className="text-foreground font-semibold">{t("landing.finalCta.noRival")}</span>
           </p>
           <Button
             onClick={() => navigate("/auth")}
@@ -981,7 +998,7 @@ const Landing = () => {
             className="group h-12 sm:h-14 px-8 sm:px-10 btn-primary text-primary-foreground text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl"
           >
             <Rocket className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-            Bắt đầu ngay
+            {t("landing.finalCta.cta")}
             <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
           </Button>
         </motion.div>
