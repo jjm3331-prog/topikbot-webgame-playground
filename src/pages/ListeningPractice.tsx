@@ -108,6 +108,7 @@ type TopikLevel = keyof typeof topikLevels;
 
 const ListeningPractice = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -235,8 +236,8 @@ const ListeningPractice = () => {
         setIsPlaying(false);
         setCurrentPlayingLine(null);
         toast({
-          title: "Lỗi phát âm thanh",
-          description: "Vui lòng thử lại",
+          title: t('listening.audioPlaybackError'),
+          description: t('listening.tryAgain'),
           variant: "destructive",
         });
         reject(error);
@@ -279,7 +280,7 @@ const ListeningPractice = () => {
   const handleSubmit = () => {
     if (selectedAnswer === null) {
       toast({
-        title: "Vui lòng chọn đáp án",
+        title: t('listening.pleaseSelectAnswer'),
         variant: "destructive",
       });
       return;
@@ -347,7 +348,7 @@ const ListeningPractice = () => {
               className="mb-6 hover:bg-primary/10"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Quay lại
+              {t('common.back')}
             </Button>
 
             {/* Hero Section */}

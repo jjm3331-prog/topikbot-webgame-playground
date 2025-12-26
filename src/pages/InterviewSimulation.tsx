@@ -61,6 +61,7 @@ interface Evaluation {
 
 const InterviewSimulation = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { isPremium } = useSubscription();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -219,8 +220,8 @@ const InterviewSimulation = () => {
     } catch (error) {
       console.error("Recording error:", error);
       toast({
-        title: "Lỗi truy cập micro",
-        description: "Vui lòng cho phép quyền sử dụng micro.",
+        title: t('interview.micError'),
+        description: t('interview.allowMicAccess'),
         variant: "destructive"
       });
     }
@@ -257,16 +258,16 @@ const InterviewSimulation = () => {
         await sendMessageWithText(data.text);
       } else {
         toast({
-          title: "Không nhận dạng được giọng nói",
-          description: "Vui lòng thử lại.",
+          title: t('interview.voiceNotRecognized'),
+          description: t('interview.tryAgain'),
           variant: "destructive"
         });
       }
     } catch (error) {
       console.error("Transcription error:", error);
       toast({
-        title: "Lỗi nhận dạng giọng nói",
-        description: "Vui lòng thử lại.",
+        title: t('interview.voiceRecognitionError'),
+        description: t('interview.tryAgain'),
         variant: "destructive"
       });
     } finally {
@@ -278,8 +279,8 @@ const InterviewSimulation = () => {
     const companyName = getCompanyName();
     if (!companyName || !selectedPosition || !selectedInterviewer) {
       toast({
-        title: "Vui lòng chọn đầy đủ",
-        description: "Chọn công ty, vị trí và loại người phỏng vấn.",
+        title: t('interview.selectAll'),
+        description: t('interview.selectAllDesc'),
         variant: "destructive"
       });
       return;
@@ -311,8 +312,8 @@ const InterviewSimulation = () => {
     } catch (error: any) {
       console.error("Interview start error:", error);
       toast({
-        title: "Đã xảy ra lỗi",
-        description: "Không thể bắt đầu phỏng vấn. Vui lòng thử lại.",
+        title: t('interview.errorOccurred'),
+        description: t('interview.cannotStartInterview'),
         variant: "destructive"
       });
       setInterviewStarted(false);
@@ -361,8 +362,8 @@ const InterviewSimulation = () => {
     } catch (error: any) {
       console.error("Interview error:", error);
       toast({
-        title: "Đã xảy ra lỗi",
-        description: "Không nhận được phản hồi.",
+        title: t('interview.errorOccurred'),
+        description: t('interview.noResponse'),
         variant: "destructive"
       });
     } finally {

@@ -86,6 +86,7 @@ interface SavedCorrection {
 
 const WritingCorrection = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { isPremium } = useSubscription();
   const [user, setUser] = useState<any>(null);
@@ -238,8 +239,8 @@ const WritingCorrection = () => {
 
     if (filesToProcess.length === 0) {
       toast({
-        title: "Đã đạt giới hạn",
-        description: `Tối đa ${MAX_IMAGES} ảnh có thể upload`,
+        title: t('writing.limitReached'),
+        description: t('writing.maxImagesLimit', { count: MAX_IMAGES }),
         variant: "destructive"
       });
       return;
@@ -263,8 +264,8 @@ const WritingCorrection = () => {
     // Show toast if some files were skipped
     if (files.length > remainingSlots) {
       toast({
-        title: "Một số ảnh bị bỏ qua",
-        description: `Chỉ ${filesToProcess.length} ảnh được thêm (tối đa ${MAX_IMAGES} ảnh)`,
+        title: t('writing.someImagesSkipped'),
+        description: t('writing.onlyImagesAdded', { added: filesToProcess.length, max: MAX_IMAGES }),
       });
     }
   };
@@ -339,8 +340,8 @@ const WritingCorrection = () => {
   const handleSubmit = async () => {
     if (questionImages.length === 0) {
       toast({
-        title: "Thiếu thông tin",
-        description: "Vui lòng upload hình ảnh đề bài",
+        title: t('writing.missingInfo'),
+        description: t('writing.uploadQuestionImage'),
         variant: "destructive"
       });
       return;
@@ -348,8 +349,8 @@ const WritingCorrection = () => {
 
     if (answerMethod === "image" && answerImages.length === 0) {
       toast({
-        title: "Thiếu thông tin",
-        description: "Vui lòng upload hình ảnh bài làm",
+        title: t('writing.missingInfo'),
+        description: t('writing.uploadAnswerImage'),
         variant: "destructive"
       });
       return;
@@ -357,8 +358,8 @@ const WritingCorrection = () => {
 
     if (answerMethod === "text" && !answerText.trim()) {
       toast({
-        title: "Thiếu thông tin",
-        description: "Vui lòng nhập nội dung bài làm",
+        title: t('writing.missingInfo'),
+        description: t('writing.enterAnswerContent'),
         variant: "destructive"
       });
       return;
@@ -416,20 +417,20 @@ const WritingCorrection = () => {
       // 캐시 히트 여부에 따른 토스트 메시지
       if (response.data.is_cached) {
         toast({
-          title: "📋 Kết quả từ lịch sử",
-          description: `Điểm: ${response.data.overall_score}/100 - Bài viết này đã được chấm trước đó với cùng nội dung.`
+          title: t('writing.resultFromHistory'),
+          description: t('writing.cachedResult', { score: response.data.overall_score })
         });
       } else {
         toast({
-          title: "✅ Chấm điểm hoàn tất!",
-          description: `Điểm số: ${response.data.overall_score}/100`
+          title: t('writing.gradingComplete'),
+          description: t('writing.scoreResult', { score: response.data.overall_score })
         });
       }
     } catch (error: any) {
       console.error("Error:", error);
       toast({
-        title: "Lỗi",
-        description: "Không thể chấm điểm. Vui lòng thử lại.",
+        title: t('common.error'),
+        description: t('writing.gradingError'),
         variant: "destructive"
       });
     } finally {
@@ -455,14 +456,14 @@ const WritingCorrection = () => {
 
       await loadHistory(user.id);
       toast({
-        title: "Đã lưu!",
-        description: "Bài chấm đã được lưu vào lịch sử"
+        title: t('writing.saved'),
+        description: t('writing.savedToHistory')
       });
     } catch (error) {
       console.error("Save error:", error);
       toast({
-        title: "Lỗi",
-        description: "Không thể lưu. Vui lòng thử lại.",
+        title: t('common.error'),
+        description: t('writing.saveError'),
         variant: "destructive"
       });
     } finally {

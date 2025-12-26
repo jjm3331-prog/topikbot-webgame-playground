@@ -115,6 +115,7 @@ type TopikLevel = keyof typeof topikLevels;
 
 const ReadingA = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<TabKey>("grammar");
@@ -147,8 +148,8 @@ const ReadingA = () => {
       console.error('Error fetching questions:', error);
       setQuestions(fallbackQuestions[tabType] || fallbackQuestions.grammar);
       toast({
-        title: "Đang sử dụng câu hỏi mẫu",
-        description: "Không thể tải câu hỏi mới",
+        title: t('reading.usingSampleQuestions'),
+        description: t('reading.cannotLoadNewQuestions'),
       });
     } finally {
       setIsLoading(false);
@@ -197,7 +198,7 @@ const ReadingA = () => {
   const handleSubmit = () => {
     if (selectedAnswer === null) {
       toast({
-        title: "Vui lòng chọn đáp án",
+        title: t('reading.pleaseSelectAnswer'),
         variant: "destructive",
       });
       return;
@@ -249,7 +250,7 @@ const ReadingA = () => {
               className="mb-6 hover:bg-primary/10"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Quay lại
+              {t('common.back')}
             </Button>
 
             {/* Hero Section */}

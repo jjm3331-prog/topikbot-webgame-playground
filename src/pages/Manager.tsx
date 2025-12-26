@@ -141,6 +141,7 @@ const EMOTION_EMOJIS: Record<Emotion, string> = {
 
 export default function Manager() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [phase, setPhase] = useState<GamePhase>('setup');
   const [isLoading, setIsLoading] = useState(false);
   

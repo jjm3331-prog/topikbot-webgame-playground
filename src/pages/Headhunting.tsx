@@ -53,6 +53,7 @@ interface FileUploadState {
 
 const Headhunting = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { isPremium } = useSubscription();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
