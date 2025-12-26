@@ -459,7 +459,7 @@
       "desc": "전세계 주요 대학들이 공식 인증한 AI 서비스"
     },
     "stats": { "students": "학습자", "aiAccuracy": "AI 정확도", "topikApp": "TOPIK App", "aiSupport": "AI 지원" },
-    "why": { "title": "왜", "item1Title": "TOPIK 출제 교수진", "item1Desc": "서울에서 공식 TOPIK 출제진", "item2Title": "LUKATO RAG AI Tech", "item2Desc": "10,000+ TOPIK 자료 & 한국어 전문 문서", "item3Title": "차세대 STT/TTS", "item3Desc": "99% 원어민 발음으로 듣기 & 말하기", "item4Title": "AI 헤드헌팅", "item4Desc": "고정밀 이력서 및 자기소개서 평가" },
+    "why": { "title": "왜 LUKATO가 최고인가요?", "item1Title": "TOPIK 출제 교수진", "item1Desc": "한국 본토의 공식 TOPIK 출제진 공동개발", "item2Title": "LUKATO RAG AI Tech", "item2Desc": "10,000+ TOPIK 자료 &\n한국어 전문 문서", "item3Title": "차세대 STT/TTS", "item3Desc": "99% 원어민 발음으로\n듣기 & 말하기", "item4Title": "AI 헤드헌팅", "item4Desc": "본인의 이력서 및 자기소개서\n평가 & 첨삭 서비스" },
     "comparison": { "feature": "기능", "others": "타앱", "feature1": "공식 TOPIK 출제 교수", "feature2": "LUKATO RAG AI Tech (독점 AI 기술)", "feature3": "10,000+ TOPIK 시험 & 자료", "feature4": "원어민 발음 AI STT/TTS", "feature5": "AI 작문 & 이력서 초정밀 채점", "feature6": "헤드헌팅 & 한국 취업 컨설팅", "feature7": "K-Culture 통합 (K-POP, K-Drama)" },
     "challenge": { "headline1": "실력 되면", "headline2": "따라와 봐.", "subtitle": "모든 한국어 앱, 웹사이트, 학원에게.", "line1": "너희가 하는 건, 우리가 더 잘해.", "line2": "너희가 꿈도 못 꾸는 건, 우린 이미 했어.", "point1Title": "TOPIK 출제?", "point1Desc": "우린 공식 TOPIK 출제 교수가 있어", "point2Title": "AI 챗봇?", "point2Desc": "LUKATO RAG AI Tech 99.7% 정확도", "point3Title": "학습 게임?", "point3Desc": "K-Culture까지 통합했어", "final": "마음껏 베껴. 근데 따라올 수 있을까?" },
     "headhunting": { "badge": "프리미엄 독점 서비스", "title1": "직접 연결", "title2": "한국 기업", "desc1": "전문 헤드헌터 팀이 취업 지원", "free": "100% 무료", "desc2": "현지 한국 기업부터 서울 취업 기회까지!", "tag1": "500+ 기업", "tag2": "이력서 컨설팅", "tag3": "비자 지원", "cta": "지금 신청", "ctaSub": "완전 무료" },

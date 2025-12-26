@@ -426,7 +426,7 @@ const Landing = () => {
             className="text-center mb-8 sm:mb-10"
           >
             <h2 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl text-foreground">
-              {t("landing.why.title")} <span className="text-gradient-primary">LUKATO</span>?
+              {t("landing.why.title")}
             </h2>
           </motion.div>
 
@@ -445,7 +445,7 @@ const Landing = () => {
                   <item.icon className="w-6 h-6 sm:w-7 sm:h-7 text-primary-foreground" />
                 </div>
                 <h3 className="font-bold text-sm sm:text-base text-foreground mb-1">{item.title}</h3>
-                <p className="text-muted-foreground text-xs sm:text-sm leading-snug">{item.desc}</p>
+                <p className="text-muted-foreground text-xs sm:text-sm leading-snug whitespace-pre-line">{item.desc}</p>
               </motion.div>
             ))}
           </div>
