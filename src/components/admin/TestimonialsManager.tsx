@@ -77,6 +77,12 @@ const TestimonialsManager = () => {
 
     setSaving(true);
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("로그인이 필요합니다.");
+      }
+
       const maxOrder = testimonials.reduce((max, t) => Math.max(max, t.display_order), 0);
       
       const { error } = await supabase.from("testimonials").insert({
@@ -86,6 +92,7 @@ const TestimonialsManager = () => {
         rating: newRating,
         display_order: maxOrder + 1,
         is_active: true,
+        created_by: user.id,
       });
 
       if (error) throw error;
