@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -43,58 +44,40 @@ interface Message {
   images?: string[];
 }
 
-// Agent-specific suggested questions
-const AGENT_QUESTIONS: Record<string, { icon: typeof BookOpen; text: string }[]> = {
-  topik: [
-    { icon: BookOpen, text: "Phân biệt '-아/어서' và '-니까' trong tiếng Hàn?" },
-    { icon: GraduationCap, text: "Cách viết TOPIK II bài luận 54 đạt điểm cao?" },
-    { icon: HelpCircle, text: "Làm sao nghe số tiếng Hàn nhanh hơn?" },
-    { icon: CheckCircle, text: "Điểm chuẩn đậu TOPIK I cấp 2 là bao nhiêu?" },
-  ],
-  ielts: [
-    { icon: BookOpen, text: "Cách viết IELTS Writing Task 2 đạt band 7+?" },
-    { icon: GraduationCap, text: "Chiến lược làm bài IELTS Reading hiệu quả?" },
-    { icon: HelpCircle, text: "Làm sao cải thiện phát âm tiếng Anh?" },
-    { icon: CheckCircle, text: "Cấu trúc bài IELTS Speaking Part 2?" },
-  ],
-  jlpt: [
-    { icon: BookOpen, text: "Phân biệt は và が trong tiếng Nhật?" },
-    { icon: GraduationCap, text: "Cách học Kanji N2 hiệu quả?" },
-    { icon: HelpCircle, text: "Chiến lược làm bài đọc JLPT N3?" },
-    { icon: CheckCircle, text: "Thời gian ôn thi JLPT N2 cần bao lâu?" },
-  ],
-  hsk: [
-    { icon: BookOpen, text: "Cách phân biệt thanh điệu tiếng Trung?" },
-    { icon: GraduationCap, text: "Chiến lược học Hán tự HSK 4?" },
-    { icon: HelpCircle, text: "Làm sao nghe tiếng Trung tốt hơn?" },
-    { icon: CheckCircle, text: "Điểm chuẩn đậu HSK 5 là bao nhiêu?" },
-  ],
-};
+// Agent-specific suggested questions (i18n)
+const getAgentQuestions = (t: TFunction) =>
+  ({
+    topik: (t("aiChat.questions.topik", { returnObjects: true }) as string[]) ?? [],
+    ielts: (t("aiChat.questions.ielts", { returnObjects: true }) as string[]) ?? [],
+    jlpt: (t("aiChat.questions.jlpt", { returnObjects: true }) as string[]) ?? [],
+    hsk: (t("aiChat.questions.hsk", { returnObjects: true }) as string[]) ?? [],
+  }) satisfies Record<string, string[]>;
 
-// Agent-specific welcome messages
-const AGENT_WELCOME: Record<string, { title: string; subtitle: string }> = {
-  topik: {
-    title: "Xin chào! 👋",
-    subtitle: "Mình là LUKATO AI Agent - chuyên gia tư vấn tiếng Hàn và luyện thi TOPIK. Hãy hỏi mình bất cứ điều gì nhé! 🎓✨"
-  },
-  ielts: {
-    title: "Hello! 👋",
-    subtitle: "Mình là LUKATO AI Agent - chuyên gia luyện thi IELTS 4 kỹ năng. Hãy hỏi mình về Speaking, Writing, Reading, Listening nhé! 🇬🇧✨"
-  },
-  jlpt: {
-    title: "こんにちは! 👋",
-    subtitle: "Mình là LUKATO AI Agent - chuyên gia tư vấn tiếng Nhật và luyện thi JLPT. Hãy hỏi mình bất cứ điều gì nhé! 🇯🇵✨"
-  },
-  hsk: {
-    title: "你好! 👋",
-    subtitle: "Mình là LUKATO AI Agent - chuyên gia tư vấn tiếng Trung và luyện thi HSK. Hãy hỏi mình bất cứ điều gì nhé! 🇨🇳✨"
-  }
-};
+// Agent-specific welcome messages (i18n)
+const getAgentWelcome = (t: TFunction) =>
+  ({
+    topik: {
+      title: t("aiChat.welcome.topik.title"),
+      subtitle: t("aiChat.welcome.topik.subtitle"),
+    },
+    ielts: {
+      title: t("aiChat.welcome.ielts.title"),
+      subtitle: t("aiChat.welcome.ielts.subtitle"),
+    },
+    jlpt: {
+      title: t("aiChat.welcome.jlpt.title"),
+      subtitle: t("aiChat.welcome.jlpt.subtitle"),
+    },
+    hsk: {
+      title: t("aiChat.welcome.hsk.title"),
+      subtitle: t("aiChat.welcome.hsk.subtitle"),
+    },
+  }) satisfies Record<string, { title: string; subtitle: string }>;
 
 const AIAgentChat = () => {
   const { agentId } = useParams<{ agentId: string }>();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -254,23 +237,25 @@ const AIAgentChat = () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
-      const allMessages = [...messages, userMessage].map(m => ({
+      const allMessages = [...messages, userMessage].map((m) => ({
         role: m.role,
         content: m.content,
-        images: m.images
+        images: m.images,
       }));
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-tutor`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({ messages: allMessages, stream: true, agentId })
-        }
-      );
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-tutor`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          messages: allMessages,
+          stream: true,
+          agentId,
+          language: i18n.resolvedLanguage || i18n.language,
+        }),
+      });
 
       // Handle error responses
       if (!response.ok) {
@@ -423,39 +408,45 @@ const AIAgentChat = () => {
                   <img src={lukasLogo} alt="LUKATO AI" className="w-full h-full object-cover" />
                 </div>
               </motion.div>
-              
-              <h2 className="text-2xl font-bold mb-2">
-                {(AGENT_WELCOME[agentId || 'topik'] || AGENT_WELCOME.topik).title}
-              </h2>
-              <p className="text-muted-foreground mb-8 max-w-md">
-                {(AGENT_WELCOME[agentId || 'topik'] || AGENT_WELCOME.topik).subtitle}
-              </p>
+              const welcomeMap = getAgentWelcome(t);
+              const questionMap = getAgentQuestions(t);
+              const welcome = (welcomeMap[agentId || "topik"] || welcomeMap.topik);
+              const questions = (questionMap[agentId || "topik"] || questionMap.topik);
 
-              {/* Suggested Questions */}
-              <div className="w-full max-w-2xl">
-                <p className="text-sm text-muted-foreground mb-4">💡 {t("aiAgent.suggestedQuestions")}</p>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  {(AGENT_QUESTIONS[agentId || 'topik'] || AGENT_QUESTIONS.topik).map((q, i) => (
-                    <motion.button
-                      key={i}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.1 }}
-                      onClick={() => sendMessage(q.text)}
-                      disabled={isLoading || !isAuthenticated}
-                      className="text-left px-4 py-4 rounded-xl border border-border bg-card hover:bg-muted/50 hover:border-primary/30 transition-all text-sm group disabled:opacity-50"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
-                          <q.icon className="w-4 h-4 text-primary" />
-                        </div>
-                        <span className="leading-relaxed">{q.text}</span>
-                      </div>
-                    </motion.button>
-                  ))}
-                </div>
-              </div>
-            </div>
+              return (
+                <>
+                  <h2 className="text-2xl font-bold mb-2">{welcome.title}</h2>
+                  <p className="text-muted-foreground mb-8 max-w-md">{welcome.subtitle}</p>
+
+                  {/* Suggested Questions */}
+                  <div className="w-full max-w-2xl">
+                    <p className="text-sm text-muted-foreground mb-4">💡 {t("aiAgent.suggestedQuestions")}</p>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      {questions.map((text, i) => {
+                        const Icon = [BookOpen, GraduationCap, HelpCircle, CheckCircle][i % 4];
+                        return (
+                          <motion.button
+                            key={i}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.1 }}
+                            onClick={() => sendMessage(text)}
+                            disabled={isLoading || !isAuthenticated}
+                            className="text-left px-4 py-4 rounded-xl border border-border bg-card hover:bg-muted/50 hover:border-primary/30 transition-all text-sm group disabled:opacity-50"
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                                <Icon className="w-4 h-4 text-primary" />
+                              </div>
+                              <span className="leading-relaxed">{text}</span>
+                            </div>
+                          </motion.button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              );
           ) : (
             /* Messages */
             <ScrollArea ref={scrollAreaRef} className="flex-1 px-4">
