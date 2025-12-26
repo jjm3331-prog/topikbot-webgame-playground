@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { ArrowLeft, Trophy, Crown, Medal, Flame, Star, Zap, Target, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";

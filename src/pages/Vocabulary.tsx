@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
