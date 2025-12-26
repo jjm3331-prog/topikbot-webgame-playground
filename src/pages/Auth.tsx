@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,15 +18,17 @@ const GoogleIcon = () => (
   </svg>
 );
 
-const authSchema = z.object({
-  email: z.string().email("Vui lòng nhập email hợp lệ"),
-  password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
-  username: z.string().min(2, "Tên người dùng phải có ít nhất 2 ký tự").optional(),
+// Validation schema with dynamic messages
+const createAuthSchema = (t: (key: string) => string) => z.object({
+  email: z.string().email(t('auth.invalidEmail') || "Please enter a valid email"),
+  password: z.string().min(6, t('auth.passwordMinLength') || "Password must be at least 6 characters"),
+  username: z.string().min(2, t('auth.usernameMinLength') || "Username must be at least 2 characters").optional(),
 });
 
 type AuthMode = "login" | "signup" | "forgot";
 
 const Auth = () => {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -56,6 +59,8 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
 
+    const authSchema = createAuthSchema(t);
+
     try {
       if (mode === "forgot") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -64,8 +69,8 @@ const Auth = () => {
         if (error) throw error;
         setResetEmailSent(true);
         toast({
-          title: "Đã gửi email",
-          description: "Link đặt lại mật khẩu đã được gửi tới email của bạn.",
+          title: t('auth.emailSent'),
+          description: t('auth.resetLinkSentDesc'),
         });
         return;
       }
@@ -95,8 +100,8 @@ const Auth = () => {
         });
         if (error) throw error;
         toast({
-          title: "Đăng ký thành công!",
-          description: "Chào mừng bạn đến với LUKATO AI",
+          title: t('auth.signupSuccess'),
+          description: t('auth.welcomeToLukato'),
         });
         sessionStorage.removeItem("auth_redirect");
         navigate(redirectTo);
@@ -104,12 +109,12 @@ const Auth = () => {
     } catch (error: any) {
       let message = error.message;
       if (error.message?.includes("already registered")) {
-        message = "Email này đã được đăng ký. Vui lòng đăng nhập.";
+        message = t('auth.alreadyRegistered');
       } else if (error.message?.includes("Invalid login")) {
-        message = "Email hoặc mật khẩu không đúng.";
+        message = t('auth.invalidLogin');
       }
       toast({
-        title: "Có lỗi xảy ra",
+        title: t('auth.errorOccurred'),
         description: message,
         variant: "destructive",
       });
@@ -137,7 +142,7 @@ const Auth = () => {
       if (error) throw error;
     } catch (error: any) {
       toast({
-        title: "Có lỗi xảy ra",
+        title: t('auth.errorOccurred'),
         description: error.message,
         variant: "destructive",
       });
@@ -147,17 +152,17 @@ const Auth = () => {
 
   const getTitle = () => {
     switch (mode) {
-      case "login": return "Đăng nhập";
-      case "signup": return "Tạo tài khoản";
-      case "forgot": return "Đặt lại mật khẩu";
+      case "login": return t('auth.login');
+      case "signup": return t('auth.createAccount');
+      case "forgot": return t('auth.resetPassword');
     }
   };
 
   const getDescription = () => {
     switch (mode) {
-      case "login": return "Chào mừng bạn trở lại! Tiếp tục hành trình học tiếng Hàn.";
-      case "signup": return "Bắt đầu hành trình chinh phục TOPIK của bạn ngay hôm nay.";
-      case "forgot": return "Nhập email đã đăng ký để nhận link đặt lại mật khẩu.";
+      case "login": return t('auth.welcomeBack');
+      case "signup": return t('auth.startJourney');
+      case "forgot": return t('auth.enterEmail');
     }
   };
 
@@ -182,7 +187,7 @@ const Auth = () => {
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group"
         >
           <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-medium">{mode === "forgot" ? "돌아가기" : "Quay lại"}</span>
+          <span className="text-sm font-medium">{t('auth.goBack')}</span>
         </button>
         <div className="flex items-center gap-2">
           <img src="/favicon.png" alt="LUKATO" className="w-8 h-8 rounded-lg" />
@@ -204,7 +209,7 @@ const Auth = () => {
           >
             <div className="badge-premium mb-6 inline-flex">
               <Sparkles className="w-4 h-4" />
-              <span>Nền tảng học tiếng Hàn #1 Việt Nam</span>
+              <span>{t('brand.platformNo1')}</span>
             </div>
             <h1 className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-3">
               {getTitle()}
@@ -226,9 +231,9 @@ const Auth = () => {
                   <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Mail className="w-8 h-8 text-green-600" />
                   </div>
-                  <h3 className="font-semibold text-lg mb-2">Kiểm tra email của bạn</h3>
+                  <h3 className="font-semibold text-lg mb-2">{t('auth.checkEmail')}</h3>
                   <p className="text-muted-foreground text-sm mb-4">
-                    Chúng tôi đã gửi link đặt lại mật khẩu tới {email}.
+                    {t('auth.resetLinkSent', { email })}
                   </p>
                   <Button
                     variant="outline"
@@ -237,17 +242,17 @@ const Auth = () => {
                       setResetEmailSent(false);
                     }}
                   >
-                    Quay lại đăng nhập
+                    {t('auth.backToLogin')}
                   </Button>
                 </div>
               ) : (
               <form onSubmit={handleAuth} className="space-y-4">
                 {mode === "signup" && (
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Tên người dùng</label>
+                    <label className="text-sm font-medium text-foreground">{t('auth.username')}</label>
                     <Input
                       type="text"
-                      placeholder="Nhập tên của bạn"
+                      placeholder={t('auth.enterUsername')}
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       className="h-12 bg-muted/50 border-border focus:border-primary transition-colors"
@@ -257,7 +262,7 @@ const Auth = () => {
                 )}
                 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Email</label>
+                  <label className="text-sm font-medium text-foreground">{t('auth.email')}</label>
                   <Input
                     type="email"
                     placeholder="email@example.com"
@@ -270,11 +275,11 @@ const Auth = () => {
                 
                 {mode !== "forgot" && (
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Mật khẩu</label>
+                    <label className="text-sm font-medium text-foreground">{t('auth.password')}</label>
                     <div className="relative">
                       <Input
                         type={showPassword ? "text" : "password"}
-                        placeholder="Nhập mật khẩu (ít nhất 6 ký tự)"
+                        placeholder={t('auth.enterPassword')}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="h-12 bg-muted/50 border-border focus:border-primary transition-colors pr-12"
@@ -298,7 +303,7 @@ const Auth = () => {
                       onClick={() => setMode("forgot")}
                       className="text-sm text-primary hover:underline"
                     >
-                      Quên mật khẩu?
+                      {t('auth.forgotPassword')}
                     </button>
                   </div>
                 )}
@@ -313,12 +318,12 @@ const Auth = () => {
                   ) : mode === "forgot" ? (
                     <>
                       <Mail className="w-5 h-5 mr-2" />
-                      Gửi link đặt lại
+                      {t('auth.sendResetLink')}
                     </>
                   ) : (
                     <>
                       <Play className="w-5 h-5 mr-2" />
-                      {mode === "login" ? "Đăng nhập" : "Tạo tài khoản"}
+                      {mode === "login" ? t('auth.login') : t('auth.signup')}
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </>
                   )}
@@ -331,7 +336,7 @@ const Auth = () => {
                 {/* Divider */}
                 <div className="flex items-center gap-4 my-6">
                   <div className="flex-1 h-px bg-border"></div>
-                  <span className="text-muted-foreground text-sm">hoặc</span>
+                  <span className="text-muted-foreground text-sm">{t('common.or')}</span>
                   <div className="flex-1 h-px bg-border"></div>
                 </div>
 
@@ -348,7 +353,7 @@ const Auth = () => {
                   ) : (
                     <>
                       <GoogleIcon />
-                      <span>Tiếp tục với Google</span>
+                      <span>{t('auth.continueWithGoogle')}</span>
                     </>
                   )}
                 </Button>
@@ -361,8 +366,8 @@ const Auth = () => {
                     className="text-primary hover:text-primary/80 transition-colors text-sm font-medium"
                   >
                     {mode === "login"
-                      ? "Chưa có tài khoản? Đăng ký ngay"
-                      : "Đã có tài khoản? Đăng nhập"}
+                      ? t('auth.noAccount')
+                      : t('auth.hasAccount')}
                   </button>
                 </div>
               </>
@@ -378,21 +383,21 @@ const Auth = () => {
           >
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-korean-green" />
-              <span className="text-xs font-medium">Bảo mật SSL</span>
+              <span className="text-xs font-medium">{t('auth.sslSecurity')}</span>
             </div>
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4 text-korean-blue" />
-              <span className="text-xs font-medium">50,000+ học viên</span>
+              <span className="text-xs font-medium">{t('auth.students')}</span>
             </div>
             <div className="flex items-center gap-2">
               <Check className="w-4 h-4 text-korean-purple" />
-              <span className="text-xs font-medium">Miễn phí trọn đời</span>
+              <span className="text-xs font-medium">{t('auth.freeForever')}</span>
             </div>
           </motion.div>
 
           {/* Footer */}
           <p className="text-center text-muted-foreground text-xs mt-8">
-            © 2025 LUKATO AI. Nền tảng học tiếng Hàn cho người Việt.
+            {t('auth.copyright')}
           </p>
         </div>
       </main>
