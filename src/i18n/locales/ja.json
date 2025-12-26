@@ -180,28 +180,15 @@
     "copyright": "© 2025 LUKATO AI. 世界中の人々のための韓国語学習Super App。"
   },
 "gameHub": {
-    "title": "🎮 韓国語学習ゲーム",
-    "description": "楽しいゲームで学習",
-    "games": "7ゲーム",
-    "aiInteractive": "AI対話",
-    "learnPlay": "遊びながら学ぶ",
-    "funLearning": "韓国語学習は楽しい！",
-    "dailyPlay": "毎日ゲームをプレイして韓国語スキルを向上させよう！",
-    "hot": "HOT",
+    "title": "🎮 韓国語学習ゲーム", "description": "楽しいゲームで学習", "games": "7ゲーム", "aiInteractive": "AI対話", "learnPlay": "遊びながら学ぶ", "funLearning": "韓国語学習は楽しい！", "dailyPlay": "毎日ゲームをプレイして韓国語スキルを向上させよう！", "hot": "HOT",
     "cards": {
-      "chatDesc": "ソウルで生き残れ！AIとの会話で韓国語力を高めよう！",
-      "datingTitle": "恋愛シム",
-      "datingDesc": "バーチャル韓国人とデートして感情表現を学ぼう！",
-      "managerTitle": "マネージャー",
-      "managerDesc": "K-POPアイドルマネージャーになってグループを成功に導こう！",
-      "kpopTitle": "K-POPクイズ",
-      "kpopDesc": "K-POPの歌詞クイズで楽しく韓国語を学ぼう！",
-      "kdramaTitle": "Kドラマ",
-      "kdramaDesc": "名シーンの吹き替えで発音を練習しよう！",
-      "wordChainTitle": "しりとり",
-      "wordChainDesc": "AIとしりとりバトル！語彙力を試そう！",
-      "parttimeTitle": "アルバイト",
-      "parttimeDesc": "アルバイトシーンで実践会話を練習しよう！"
+      "chatTitle": "AIサバイバル", "chatSubtitle": "ソウル", "chatDesc": "ソウルで生き残れ！AIとの会話で韓国語力を高めよう！",
+      "datingTitle": "恋愛シム", "datingSubtitle": "Korean Dating", "datingDesc": "バーチャル韓国人とデートして感情表現を学ぼう！",
+      "managerTitle": "マネージャー", "managerSubtitle": "K-POP Idol", "managerDesc": "K-POPアイドルマネージャーになってグループを成功に導こう！",
+      "kpopTitle": "K-POPクイズ", "kpopSubtitle": "Music", "kpopDesc": "K-POPの歌詞クイズで楽しく韓国語を学ぼう！",
+      "kdramaTitle": "Kドラマ", "kdramaSubtitle": "吹き替え", "kdramaDesc": "名シーンの吹き替えで発音を練習しよう！",
+      "wordChainTitle": "しりとり", "wordChainSubtitle": "끝말잇기", "wordChainDesc": "AIとしりとりバトル！語彙力を試そう！",
+      "parttimeTitle": "アルバイト", "parttimeSubtitle": "Part-time", "parttimeDesc": "アルバイトシーンで実践会話を練習しよう！"
     }
   },
   "learningHub": {
