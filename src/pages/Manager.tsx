@@ -188,7 +188,7 @@ export default function Manager() {
       
     } catch (error) {
       console.error('Story load error:', error);
-      toast.error('스토리 로드 실패');
+      toast.error(t('manager.storyLoadFailed', '스토리 로드 실패'));
       setPhase('setup');
     }
   };
@@ -199,7 +199,7 @@ export default function Manager() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        toast.error('로그인이 필요합니다');
+        toast.error(t('common.loginRequired', '로그인이 필요합니다'));
         navigate('/auth');
         return;
       }
@@ -207,7 +207,7 @@ export default function Manager() {
       await loadStory(1);
     } catch (error) {
       console.error('Game start error:', error);
-      toast.error('게임 시작 실패');
+      toast.error(t('manager.gameStartFailed', '게임 시작 실패'));
     } finally {
       setIsLoading(false);
     }
@@ -234,7 +234,7 @@ export default function Manager() {
   // 미션 제출
   const submitMission = async () => {
     if (!userInput.trim()) {
-      toast.error('응답을 입력하세요');
+      toast.error(t('manager.enterResponse', '응답을 입력하세요'));
       return;
     }
 
@@ -266,7 +266,7 @@ export default function Manager() {
 
     } catch (error) {
       console.error('Evaluation error:', error);
-      toast.error('채점 실패');
+      toast.error(t('manager.scoringFailed', '채점 실패'));
       setPhase('mission');
     } finally {
       setIsEvaluating(false);
@@ -376,57 +376,46 @@ function SetupPhase({
         {/* 게임 소개 */}
         <div className="bg-gradient-to-br from-pink-500/10 to-purple-600/10 border border-pink-500/20 rounded-xl p-5 space-y-4">
           <div className="text-center">
-            <h1 className="text-xl font-bold text-pink-400 mb-1">🎤 LUKATO 매니저</h1>
-            <p className="text-sm text-purple-300">Quản lý LUKATO - K-POP 매니지먼트 RPG</p>
+            <h1 className="text-xl font-bold text-pink-400 mb-1">🎤 {t('manager.title', 'LUKATO 매니저')}</h1>
+            <p className="text-sm text-purple-300">{t('manager.subtitle', 'Quản lý LUKATO - K-POP 매니지먼트 RPG')}</p>
           </div>
 
           <div className="space-y-3 text-sm">
             <div className="bg-zinc-800/50 rounded-lg p-3">
-              <p className="font-medium text-zinc-200">📖 게임 소개 / Giới thiệu</p>
+              <p className="font-medium text-zinc-200">📖 {t('manager.intro', '게임 소개')}</p>
               <p className="text-zinc-400 mt-1">
-                당신은 데뷔를 앞둔 K-POP 그룹의 매니저. 연습생 탈락 통보, 멘탈 관리, 방송 협상까지... 
-                <span className="text-pink-400">당신의 한국어 실력이 그룹의 운명을 결정합니다.</span>
-              </p>
-              <p className="text-zinc-500 mt-1 text-xs">
-                Bạn là quản lý của nhóm K-POP sắp debut. Từ thông báo loại, quản lý tinh thần, đến đàm phán phát sóng... 
-                <span className="text-pink-400">Tiếng Hàn của bạn quyết định vận mệnh nhóm.</span>
+                {t('manager.introDesc', '당신은 데뷔를 앞둔 K-POP 그룹의 매니저. 연습생 탈락 통보, 멘탈 관리, 방송 협상까지...')}
+                <span className="text-pink-400">{t('manager.introHighlight', '당신의 한국어 실력이 그룹의 운명을 결정합니다.')}</span>
               </p>
             </div>
 
             <div className="bg-zinc-800/50 rounded-lg p-3">
-              <p className="font-medium text-zinc-200">🎬 시즌 1: 데뷔 전쟁</p>
+              <p className="font-medium text-zinc-200">🎬 {t('manager.season1', '시즌 1: 데뷔 전쟁')}</p>
               <p className="text-zinc-400 mt-1">
-                4주간의 데뷔 준비. 매 챕터마다 긴박한 상황에서 NPC와 대화하고, 
-                <span className="text-yellow-400"> 한국어로 미션을 해결</span>하세요.
-              </p>
-              <p className="text-zinc-500 mt-1 text-xs">
-                4 tuần chuẩn bị debut. Mỗi chương, đối thoại với NPC trong tình huống căng thẳng và 
-                <span className="text-yellow-400"> hoàn thành nhiệm vụ bằng tiếng Hàn</span>.
+                {t('manager.season1Desc', '4주간의 데뷔 준비. 매 챕터마다 긴박한 상황에서 NPC와 대화하고,')}
+                <span className="text-yellow-400"> {t('manager.season1Highlight', '한국어로 미션을 해결')}</span>{t('manager.season1Suffix', '하세요.')}
               </p>
             </div>
 
             <div className="bg-zinc-800/50 rounded-lg p-3">
-              <p className="font-medium text-zinc-200">🎮 플레이 방식</p>
+              <p className="font-medium text-zinc-200">🎮 {t('manager.playStyle', '플레이 방식')}</p>
               <div className="text-zinc-400 mt-1 space-y-1">
-                <p>1. 📺 스토리 시청 - 드라마처럼 상황 전개</p>
-                <p>2. 💬 NPC 대화 - 감정과 맥락 이해</p>
-                <p>3. 🎯 미션 수행 - 한국어로 응답</p>
-                <p>4. 📊 채점 & 결과 - AI가 평가</p>
+                <p>1. 📺 {t('manager.step1', '스토리 시청 - 드라마처럼 상황 전개')}</p>
+                <p>2. 💬 {t('manager.step2', 'NPC 대화 - 감정과 맥락 이해')}</p>
+                <p>3. 🎯 {t('manager.step3', '미션 수행 - 한국어로 응답')}</p>
+                <p>4. 📊 {t('manager.step4', '채점 & 결과 - AI가 평가')}</p>
               </div>
             </div>
           </div>
         </div>
 
-
-        {/* 설정 */}
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">그룹 설정</h2>
-          <p className="text-zinc-400 text-sm">Thiết lập nhóm</p>
+          <h2 className="text-2xl font-bold mb-2">{t('manager.groupSetup', '그룹 설정')}</h2>
+          <p className="text-zinc-400 text-sm">{t('manager.groupSetupSub', 'Thiết lập nhóm')}</p>
         </div>
 
-        {/* 그룹명 */}
         <div className="space-y-2">
-          <label className="text-sm text-zinc-400">그룹명 / Tên nhóm</label>
+          <label className="text-sm text-zinc-400">{t('manager.groupName', '그룹명')}</label>
           <input
             type="text"
             value={groupName}
@@ -436,9 +425,8 @@ function SetupPhase({
           />
         </div>
 
-        {/* 성별 */}
         <div className="space-y-2">
-          <label className="text-sm text-zinc-400">성별 / Giới tính</label>
+          <label className="text-sm text-zinc-400">{t('manager.groupGender', '성별')}</label>
           <div className="grid grid-cols-3 gap-2">
             {GENDER_OPTIONS.map(opt => (
               <button
@@ -457,9 +445,8 @@ function SetupPhase({
           </div>
         </div>
 
-        {/* 컨셉 */}
         <div className="space-y-2">
-          <label className="text-sm text-zinc-400">컨셉 / Concept</label>
+          <label className="text-sm text-zinc-400">{t('manager.groupConcept', '컨셉')}</label>
           <div className="grid grid-cols-3 gap-2">
             {CONCEPT_OPTIONS.map(opt => (
               <button
@@ -484,7 +471,7 @@ function SetupPhase({
           disabled={isLoading}
           className="w-full py-6 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-lg font-bold"
         >
-          {isLoading ? '로딩중...' : '게임 시작 / Bắt đầu'}
+          {isLoading ? t('common.loading', '로딩중...') : t('manager.startGame', '게임 시작')}
         </Button>
       </div>
     </motion.div>
@@ -503,13 +490,12 @@ function LoadingPhase({ chapter }: { chapter: number }) {
     >
       <motion.div
         animate={{ rotate: 360 }}
-        transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
-        className="w-16 h-16 border-4 border-pink-500/30 border-t-pink-500 rounded-full mb-6"
-      />
-      <h2 className="text-xl font-bold text-pink-400 mb-2">챕터 {chapter} 로딩중</h2>
-      <p className="text-zinc-400 text-sm">스토리를 생성하고 있습니다...</p>
-      <p className="text-zinc-500 text-xs mt-1">Đang tạo câu chuyện...</p>
-    </motion.div>
+      transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
+      className="w-16 h-16 border-4 border-pink-500/30 border-t-pink-500 rounded-full mb-6"
+    />
+    <h2 className="text-xl font-bold text-pink-400 mb-2">{t('manager.chapter', '챕터')} {chapter} {t('common.loading', '로딩중')}</h2>
+    <p className="text-zinc-400 text-sm">{t('manager.generatingStory', '스토리를 생성하고 있습니다...')}</p>
+  </motion.div>
   );
 }
 
@@ -570,7 +556,7 @@ function ProloguePhase({ storyData, onContinue }: {
         className="p-6"
       >
         <Button onClick={onContinue} className="w-full py-5 bg-gradient-to-r from-pink-600 to-purple-600 text-lg font-bold">
-          시작하기 / Bắt đầu <ChevronRight className="w-5 h-5 ml-2" />
+          {t('manager.continue', '시작하기')} <ChevronRight className="w-5 h-5 ml-2" />
         </Button>
       </motion.div>
     </motion.div>
@@ -667,7 +653,7 @@ function DialoguePhase({ storyData, dialogueIndex, stats, onNext }: {
           transition={{ repeat: Infinity, duration: 1.5 }}
           className="flex items-center justify-end gap-1 mt-3 text-pink-400 text-xs"
         >
-          탭하여 계속 / Chạm để tiếp tục <ChevronRight className="w-3 h-3" />
+          {t('manager.tapToContinue', '탭하여 계속')} <ChevronRight className="w-3 h-3" />
         </motion.div>
       </motion.div>
     </motion.div>
@@ -688,28 +674,28 @@ function MissionPhase({ storyData, stats, userInput, setUserInput, onSubmit }: {
       </div>
       <div className="p-4 text-center border-b border-pink-500/30">
         <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="inline-flex items-center gap-2 px-4 py-1.5 bg-pink-500/20 border border-pink-500/50 rounded-full mb-3">
-          <span className="text-xl">🎯</span><span className="text-pink-400 font-bold">MISSION</span>
+          <span className="text-xl">🎯</span><span className="text-pink-400 font-bold">{t('manager.mission', 'MISSION')}</span>
         </motion.div>
         <h2 className="text-lg font-bold text-white">{storyData.chapter.title_ko}</h2>
       </div>
       <div className="flex-1 p-4 space-y-4">
         <div className="bg-zinc-900/80 border border-zinc-700/50 rounded-xl p-4">
-          <h3 className="text-sm font-medium text-zinc-300 mb-2">📝 상황 / Tình huống</h3>
+          <h3 className="text-sm font-medium text-zinc-300 mb-2">📝 {t('manager.situation', '상황')}</h3>
           <p className="text-white">{mission.intro_ko}</p>
           <p className="text-zinc-400 text-sm mt-2">{mission.intro_vi}</p>
         </div>
         <div className="bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/30 rounded-xl p-4">
-          <h3 className="text-sm font-medium text-pink-300 mb-2">🎤 당신이 할 말 / Bạn cần nói</h3>
+          <h3 className="text-sm font-medium text-pink-300 mb-2">🎤 {t('manager.yourResponse', '당신이 할 말')}</h3>
           <p className="text-pink-100 font-medium">{mission.prompt_ko}</p>
           <p className="text-pink-300/70 text-sm mt-2">{mission.prompt_vi}</p>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
-            <h4 className="text-xs font-medium text-green-400 mb-2">✓ 팁</h4>
-            <ul className="text-xs text-green-300/80 space-y-1">{mission.tips?.map((t, i) => <li key={i}>• {t}</li>)}</ul>
+            <h4 className="text-xs font-medium text-green-400 mb-2">✓ {t('manager.tips', '팁')}</h4>
+            <ul className="text-xs text-green-300/80 space-y-1">{mission.tips?.map((tip, i) => <li key={i}>• {tip}</li>)}</ul>
           </div>
           <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
-            <h4 className="text-xs font-medium text-red-400 mb-2">✗ 금지</h4>
+            <h4 className="text-xs font-medium text-red-400 mb-2">✗ {t('manager.forbidden', '금지')}</h4>
             <ul className="text-xs text-red-300/80 space-y-1">{mission.forbidden?.map((f, i) => <li key={i}>• {f}</li>)}</ul>
           </div>
         </div>
@@ -717,11 +703,11 @@ function MissionPhase({ storyData, stats, userInput, setUserInput, onSubmit }: {
           <textarea 
             value={userInput} 
             onChange={(e) => setUserInput(e.target.value)} 
-            placeholder="한국어로 응답하세요... / Trả lời bằng tiếng Hàn..." 
+            placeholder={t('manager.missionPrompt', '한국어로 응답하세요...')} 
             className="w-full bg-zinc-900/80 border-2 border-pink-500/30 rounded-xl px-4 py-3 resize-none h-28 focus:border-pink-500 focus:outline-none text-white placeholder:text-zinc-500" 
           />
           <Button onClick={onSubmit} disabled={!userInput.trim()} className="w-full py-4 bg-gradient-to-r from-pink-500 to-purple-600 text-lg font-bold disabled:opacity-50">
-            제출하기 / Gửi ✓
+            {t('manager.submit', '제출하기')} ✓
           </Button>
         </div>
       </div>
@@ -742,8 +728,7 @@ function ScoringPhase({ isEvaluating, scoreResult, onContinue }: {
         className="h-full flex flex-col items-center justify-center"
       >
         <Loader2 className="w-12 h-12 text-pink-500 animate-spin mb-4" />
-        <p className="text-lg text-white">채점 중...</p>
-        <p className="text-sm text-zinc-400">Đang chấm điểm...</p>
+        <p className="text-lg text-white">{t('manager.scoring', '채점 중...')}</p>
       </motion.div>
     );
   }
@@ -773,40 +758,37 @@ function ScoringPhase({ isEvaluating, scoreResult, onContinue }: {
         {score}
       </motion.div>
 
-      {/* 결과 텍스트 */}
       <h2 className={`text-2xl font-bold mb-2 ${
         isSuccess ? 'text-green-400' : isWarning ? 'text-yellow-400' : 'text-red-400'
       }`}>
-        {isSuccess ? '✓ 훌륭해요!' : isWarning ? '⚠ 아쉬워요' : '✗ 다시 도전!'}
+        {isSuccess ? t('manager.excellent', '✓ 훌륭해요!') : isWarning ? t('manager.notBad', '⚠ 아쉬워요') : t('manager.tryAgain', '✗ 다시 도전!')}
       </h2>
       <p className="text-zinc-400 text-sm mb-6">
-        {isSuccess ? 'Tuyệt vời!' : isWarning ? 'Hơi tiếc!' : 'Thử lại!'}
+        {isSuccess ? t('manager.excellentSub', 'Tuyệt vời!') : isWarning ? t('manager.notBadSub', 'Hơi tiếc!') : t('manager.tryAgainSub', 'Thử lại!')}
       </p>
 
-      {/* 피드백 */}
       {scoreResult?.feedback_ko && (
         <div className="w-full max-w-md bg-zinc-800/80 rounded-xl p-4 mb-6 space-y-2">
           <p className="text-white">{scoreResult.feedback_ko}</p>
           <p className="text-zinc-400 text-sm">{scoreResult.feedback_vi}</p>
           {scoreResult.better_expression && (
             <p className="text-pink-400 text-sm mt-2">
-              💡 더 좋은 표현: "{scoreResult.better_expression}"
+              💡 {t('manager.betterExpression', '더 좋은 표현')}: "{scoreResult.better_expression}"
             </p>
           )}
         </div>
       )}
 
-      {/* 지표 변화 */}
       {scoreResult?.stat_changes && (
         <div className="flex gap-4 mb-6 text-sm">
           {scoreResult.stat_changes.mental !== 0 && (
             <span className={scoreResult.stat_changes.mental > 0 ? 'text-blue-400' : 'text-blue-600'}>
-              멘탈 {scoreResult.stat_changes.mental > 0 ? '+' : ''}{scoreResult.stat_changes.mental}
+              {t('manager.stats.mental', '멘탈')} {scoreResult.stat_changes.mental > 0 ? '+' : ''}{scoreResult.stat_changes.mental}
             </span>
           )}
           {scoreResult.stat_changes.chemistry !== 0 && (
             <span className={scoreResult.stat_changes.chemistry > 0 ? 'text-green-400' : 'text-green-600'}>
-              케미 {scoreResult.stat_changes.chemistry > 0 ? '+' : ''}{scoreResult.stat_changes.chemistry}
+              {t('manager.stats.chemistry', '케미')} {scoreResult.stat_changes.chemistry > 0 ? '+' : ''}{scoreResult.stat_changes.chemistry}
             </span>
           )}
         </div>
@@ -820,7 +802,7 @@ function ScoringPhase({ isEvaluating, scoreResult, onContinue }: {
           'bg-red-500 hover:bg-red-600'
         }`}
       >
-        다음으로 / Tiếp theo <ChevronRight className="w-5 h-5 ml-2" />
+        {t('manager.next', '다음으로')} <ChevronRight className="w-5 h-5 ml-2" />
       </Button>
     </motion.div>
   );
@@ -842,32 +824,32 @@ function ResultPhase({ stats, onExit }: { stats: GameStats; onExit: () => void }
       >
         🏆
       </motion.div>
-      <h1 className="text-3xl font-bold text-white mb-2">시즌 1 완료!</h1>
-      <p className="text-zinc-400 mb-8">Hoàn thành Mùa 1!</p>
+      <h1 className="text-3xl font-bold text-white mb-2">{t('manager.season1Complete', '시즌 1 완료!')}</h1>
+      <p className="text-zinc-400 mb-8">{t('manager.season1CompleteSub', 'Hoàn thành Mùa 1!')}</p>
 
       <div className="grid grid-cols-2 gap-4 w-full max-w-sm mb-8">
         <div className="bg-zinc-800 rounded-lg p-4 text-center">
           <div className="text-2xl font-bold text-blue-400">{stats.stat_mental}</div>
-          <div className="text-xs text-zinc-500">멘탈</div>
+          <div className="text-xs text-zinc-500">{t('manager.stats.mental', '멘탈')}</div>
         </div>
         <div className="bg-zinc-800 rounded-lg p-4 text-center">
           <div className="text-2xl font-bold text-green-400">{stats.stat_chemistry}</div>
-          <div className="text-xs text-zinc-500">케미</div>
+          <div className="text-xs text-zinc-500">{t('manager.stats.chemistry', '케미')}</div>
         </div>
         <div className="bg-zinc-800 rounded-lg p-4 text-center">
           <div className="text-2xl font-bold text-yellow-400">{stats.stat_media_tone}</div>
-          <div className="text-xs text-zinc-500">미디어</div>
+          <div className="text-xs text-zinc-500">{t('manager.stats.media', '미디어')}</div>
         </div>
         <div className="bg-zinc-800 rounded-lg p-4 text-center">
           <div className="text-2xl font-bold text-red-400">{stats.gauge_rumor}</div>
-          <div className="text-xs text-zinc-500">루머</div>
+          <div className="text-xs text-zinc-500">{t('manager.stats.rumor', '루머')}</div>
         </div>
       </div>
 
       <Button onClick={onExit} className="w-full max-w-sm py-4 bg-pink-500 hover:bg-pink-600">
-        대시보드로 / Về Dashboard
+        {t('manager.backToDashboard', '대시보드로')}
       </Button>
-      <p className="text-xs text-zinc-500 mt-4">시즌 2 준비중... / Mùa 2 đang chuẩn bị...</p>
+      <p className="text-xs text-zinc-500 mt-4">{t('manager.season2Coming', '시즌 2 준비중...')}</p>
     </motion.div>
   );
 }

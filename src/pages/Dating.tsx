@@ -116,7 +116,7 @@ const Dating = () => {
     setAffinity(30);
     setMessages([{
       role: 'npc',
-      content: `안녕~ 나는 ${currentMatch?.name}이야! 프로필 보고 관심 생겼어? 😊\n(Xin chào~ Mình là ${currentMatch?.name}! Bạn thấy profile mình thú vị à? 😊)`
+      content: t('dating.greeting', { name: currentMatch?.name })
     }]);
   };
 
@@ -140,11 +140,11 @@ const Dating = () => {
       if (error) throw error;
       if (data.imageUrl) {
         setCouplePhotos(prev => [...prev, data.imageUrl]);
-        toast({ title: "💕 커플 사진 생성 완료!", description: "앨범에서 확인하세요!" });
+        toast({ title: t('dating.photoGenerated', '💕 커플 사진 생성 완료!'), description: t('dating.checkAlbum', '앨범에서 확인하세요!') });
       }
     } catch (error) {
       console.error('Photo generation error:', error);
-      toast({ title: "사진 생성 실패", description: "다시 시도해주세요", variant: "destructive" });
+      toast({ title: t('dating.photoGenerationFailed', '사진 생성 실패'), description: t('common.tryAgain', '다시 시도해주세요'), variant: "destructive" });
     } finally {
       setIsGeneratingPhoto(false);
     }
@@ -179,7 +179,7 @@ const Dating = () => {
 
       if (data.affinityChange !== 0) {
         toast({
-          title: data.affinityChange > 0 ? `💕 호감도 +${data.affinityChange}` : `💔 호감도 ${data.affinityChange}`,
+          title: data.affinityChange > 0 ? t('dating.affinityUp', { value: data.affinityChange }) : t('dating.affinityDown', { value: data.affinityChange }),
           description: data.reason,
           variant: data.affinityChange < 0 ? "destructive" : undefined
         });
@@ -195,7 +195,7 @@ const Dating = () => {
       }
     } catch (error) {
       console.error('Dating chat error:', error);
-      toast({ title: "오류 발생", description: "다시 시도해주세요", variant: "destructive" });
+      toast({ title: t('common.error', '오류 발생'), description: t('common.tryAgain', '다시 시도해주세요'), variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -224,7 +224,7 @@ const Dating = () => {
 
   const handleMiniGameComplete = (bonus: number) => {
     setAffinity(prev => Math.min(100, prev + bonus));
-    toast({ title: `🎮 미니게임 완료!`, description: `호감도 +${bonus}` });
+    toast({ title: t('dating.miniGameComplete', '🎮 미니게임 완료!'), description: t('dating.affinityBonus', { bonus }) });
   };
 
   return (
@@ -286,8 +286,8 @@ const Dating = () => {
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center text-center">
                 <Sparkles className="w-16 h-16 text-pink-400 mb-4" />
-                <h2 className="text-2xl font-bold text-white mb-2">더 이상 프로필이 없어요!</h2>
-                <Button onClick={() => setProfiles([...NPC_PROFILES])} className="bg-pink-500 hover:bg-pink-600">다시 시작</Button>
+                <h2 className="text-2xl font-bold text-white mb-2">{t('dating.noMoreProfiles', '더 이상 프로필이 없어요!')}</h2>
+                <Button onClick={() => setProfiles([...NPC_PROFILES])} className="bg-pink-500 hover:bg-pink-600">{t('dating.restart', '다시 시작')}</Button>
               </div>
             )}
           </motion.div>
@@ -305,7 +305,7 @@ const Dating = () => {
               </motion.h1>
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1 }}>
                 <Button onClick={startChat} className="bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-lg px-8">
-                  <MessageCircle className="w-5 h-5 mr-2" />대화 시작하기
+                  <MessageCircle className="w-5 h-5 mr-2" />{t('dating.startChat', '대화 시작하기')}
                 </Button>
               </motion.div>
             </div>
@@ -335,11 +335,11 @@ const Dating = () => {
               </div>
               {/* Action Buttons */}
               <div className="flex gap-2 mt-3">
-                <Button size="sm" variant="outline" onClick={() => setShowMbti(true)} className="flex-1 text-xs border-purple-500/50 text-purple-300">🔮 MBTI</Button>
+                <Button size="sm" variant="outline" onClick={() => setShowMbti(true)} className="flex-1 text-xs border-purple-500/50 text-purple-300">🔮 {t('dating.mbti', 'MBTI')}</Button>
                 <Button size="sm" variant="outline" onClick={() => setShowMiniGame(true)} className="flex-1 text-xs border-green-500/50 text-green-300">
-                  <Gamepad2 className="w-3 h-3 mr-1" />게임
+                  <Gamepad2 className="w-3 h-3 mr-1" />{t('dating.miniGame', '게임')}
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => setShowSpin(true)} className="flex-1 text-xs border-yellow-500/50 text-yellow-300">🎰 스핀</Button>
+                <Button size="sm" variant="outline" onClick={() => setShowSpin(true)} className="flex-1 text-xs border-yellow-500/50 text-yellow-300">🎰 {t('dating.spin', '스핀')}</Button>
               </div>
             </div>
 
@@ -356,7 +356,7 @@ const Dating = () => {
 
             <div className="p-4 border-t border-white/10 bg-black/20">
               <div className="flex gap-2">
-                <Input value={inputMessage} onChange={(e) => setInputMessage(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()} placeholder="메시지 입력..." className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/40" disabled={isLoading} />
+                <Input value={inputMessage} onChange={(e) => setInputMessage(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()} placeholder={t('dating.inputPlaceholder', '메시지 입력...')} className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/40" disabled={isLoading} />
                 <Button onClick={sendMessage} disabled={isLoading || !inputMessage.trim()} className="bg-gradient-to-r from-pink-500 to-purple-500"><Send className="w-5 h-5" /></Button>
               </div>
             </div>
@@ -366,7 +366,7 @@ const Dating = () => {
         {/* ALBUM PHASE */}
         {phase === 'album' && (
           <motion.div key="album" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-4 h-[calc(100dvh-70px)] overflow-y-auto">
-            <h2 className="text-xl font-bold text-white mb-4 text-center">💕 커플 앨범 / Album Couple</h2>
+            <h2 className="text-xl font-bold text-white mb-4 text-center">💕 {t('dating.album', '커플 앨범')}</h2>
             {couplePhotos.length > 0 ? (
               <div className="grid grid-cols-2 gap-4">
                 {couplePhotos.map((photo, idx) => (
@@ -378,17 +378,17 @@ const Dating = () => {
             ) : (
               <div className="flex flex-col items-center justify-center h-64 text-center">
                 <Camera className="w-16 h-16 text-white/30 mb-4" />
-                <p className="text-white/50">호감도 100%를 달성하면<br />AI 커플 사진이 생성돼요!</p>
+                <p className="text-white/50">{t('dating.albumEmpty', '호감도 100%를 달성하면')}<br />{t('dating.albumEmptyDesc', 'AI 커플 사진이 생성돼요!')}</p>
               </div>
             )}
-            <Button onClick={() => setPhase('swipe')} className="w-full mt-6 bg-pink-500 hover:bg-pink-600">스와이프로 / Quay lại</Button>
+            <Button onClick={() => setPhase('swipe')} className="w-full mt-6 bg-pink-500 hover:bg-pink-600">{t('dating.backToSwipe', '스와이프로')}</Button>
           </motion.div>
         )}
 
         {/* ENDINGS PHASE */}
         {phase === 'endings' && (
           <motion.div key="endings" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-4 h-[calc(100dvh-70px)] overflow-y-auto">
-            <h2 className="text-xl font-bold text-white mb-4 text-center">🎬 엔딩 컬렉션</h2>
+            <h2 className="text-xl font-bold text-white mb-4 text-center">🎬 {t('dating.endings', '엔딩 컬렉션')}</h2>
             {unlockedEndings.length > 0 ? (
               <div className="space-y-4">
                 {unlockedEndings.map((ending, idx) => (
@@ -396,7 +396,7 @@ const Dating = () => {
                     <img src={ending.npcImage} alt={ending.npcName} className="w-16 h-16 rounded-full object-cover" />
                     <div>
                       <p className="text-white font-bold">{ending.npcName}</p>
-                      <p className="text-pink-300 text-sm">{ending.type === 'romantic' ? '💕 로맨틱' : ending.type === 'friend' ? '🤝 베프' : ending.type === 'tsundere' ? '😤 츤데레' : '🎬 드라마틱'} 엔딩</p>
+                      <p className="text-pink-300 text-sm">{ending.type === 'romantic' ? t('dating.endingRomantic', '💕 로맨틱') : ending.type === 'friend' ? t('dating.endingFriend', '🤝 베프') : ending.type === 'tsundere' ? t('dating.endingTsundere', '😤 츤데레') : t('dating.endingDramatic', '🎬 드라마틱')} {t('dating.ending', '엔딩')}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -404,10 +404,10 @@ const Dating = () => {
             ) : (
               <div className="flex flex-col items-center justify-center h-64 text-center">
                 <Star className="w-16 h-16 text-white/30 mb-4" />
-                <p className="text-white/50">아직 해금된 엔딩이 없어요<br />호감도 100%를 달성하세요!</p>
+                <p className="text-white/50">{t('dating.noEndings', '아직 해금된 엔딩이 없어요')}<br />{t('dating.noEndingsDesc', '호감도 100%를 달성하세요!')}</p>
               </div>
             )}
-            <Button onClick={() => setPhase('swipe')} className="w-full mt-6 bg-purple-500 hover:bg-purple-600">스와이프로 / Quay lại</Button>
+            <Button onClick={() => setPhase('swipe')} className="w-full mt-6 bg-purple-500 hover:bg-purple-600">{t('dating.backToSwipe', '스와이프로')}</Button>
           </motion.div>
         )}
       </AnimatePresence>

@@ -65,10 +65,10 @@ const KDrama = () => {
   const currentScene = scenes[currentIndex];
 
   const voiceOptions = [
-    { id: 'nova', label: '👩 민희', gender: 'female' },
-    { id: 'shimmer', label: '👩 수아', gender: 'female' },
-    { id: 'echo', label: '👨 현준', gender: 'male' },
-    { id: 'fable', label: '👨 지훈', gender: 'male' },
+    { id: 'nova', label: t('kdrama.voices.minhee', '👩 민희'), gender: 'female' },
+    { id: 'shimmer', label: t('kdrama.voices.sua', '👩 수아'), gender: 'female' },
+    { id: 'echo', label: t('kdrama.voices.hyunjun', '👨 현준'), gender: 'male' },
+    { id: 'fable', label: t('kdrama.voices.jihun', '👨 지훈'), gender: 'male' },
   ];
 
   // Save score to profile
@@ -98,7 +98,7 @@ const KDrama = () => {
         .eq('id', session.user.id);
       
       setScoreSaved(true);
-      toast.success(`💰 +${pointsEarned}점, ₩${moneyEarned.toLocaleString()} 획득!`);
+      toast.success(t('kdrama.pointsEarned', { points: pointsEarned, money: moneyEarned.toLocaleString() }));
     }
   };
 
@@ -143,7 +143,7 @@ const KDrama = () => {
       }
     } catch (error) {
       console.error('Load error:', error);
-      toast.error('로딩 실패');
+      toast.error(t('kdrama.loadError', '로딩 실패'));
     } finally {
       setIsLoading(false);
     }
@@ -169,7 +169,7 @@ const KDrama = () => {
 
   const handleTimeUp = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
-    toast.error('⏰ 시간 초과! / Hết giờ!');
+    toast.error(t('kdrama.timeUp', '⏰ 시간 초과!'));
     handleNext();
   }, [currentIndex, scenes.length]);
 
@@ -214,7 +214,7 @@ const KDrama = () => {
     } catch (error) {
       console.error('TTS error:', error);
       setIsPlayingTTS(false);
-      toast.error('TTS 오류');
+      toast.error(t('kdrama.ttsError', 'TTS 오류'));
     }
   };
 
@@ -240,10 +240,10 @@ const KDrama = () => {
       setResult(null);
       if (timerRef.current) clearInterval(timerRef.current);
       
-      toast.success('🎙️ 녹음 시작!');
+      toast.success(t('kdrama.recordingStart', '🎙️ 녹음 시작!'));
     } catch (error) {
       console.error('Mic error:', error);
-      toast.error('마이크 오류');
+      toast.error(t('kdrama.micError', '마이크 오류'));
     }
   };
 
@@ -256,7 +256,7 @@ const KDrama = () => {
 
   const processAudio = async () => {
     if (audioChunksRef.current.length === 0) {
-      toast.error('녹음된 음성이 없습니다');
+      toast.error(t('kdrama.noAudio', '녹음된 음성이 없습니다'));
       return;
     }
 
@@ -302,10 +302,10 @@ const KDrama = () => {
         setVideoKey(prev => prev + 1);
       }
 
-      toast.success(`${data.feedback.emoji} ${data.feedback.grade}등급! (${data.accuracy}%)`);
+      toast.success(t('kdrama.gradeResult', { emoji: data.feedback.emoji, grade: data.feedback.grade, accuracy: data.accuracy }));
     } catch (error) {
       console.error('Process error:', error);
-      toast.error('처리 오류');
+      toast.error(t('kdrama.processError', '처리 오류'));
     } finally {
       setIsProcessing(false);
     }
@@ -347,10 +347,10 @@ const KDrama = () => {
   };
 
   const genres = [
-    { id: 'romantic', label: '로맨스', emoji: '💕' },
-    { id: 'action', label: '액션', emoji: '💥' },
-    { id: 'fantasy', label: '판타지', emoji: '✨' },
-    { id: 'thriller', label: '스릴러', emoji: '😱' },
+    { id: 'romantic', label: t('kdrama.genreRomantic', '로맨스'), emoji: '💕' },
+    { id: 'action', label: t('kdrama.genreAction', '액션'), emoji: '💥' },
+    { id: 'fantasy', label: t('kdrama.genreFantasy', '판타지'), emoji: '✨' },
+    { id: 'thriller', label: t('kdrama.genreThriller', '스릴러'), emoji: '😱' },
   ];
 
   if (isLoading) {
@@ -373,18 +373,18 @@ const KDrama = () => {
         <div className="flex-1 flex items-center justify-center p-4">
           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="bg-black/60 backdrop-blur-xl rounded-3xl p-8 text-center max-w-md w-full border border-purple-500/30">
             <Trophy className="w-20 h-20 text-yellow-400 mx-auto mb-4" />
-            <h2 className="text-3xl font-bold text-white mb-2">더빙 완료! 🎬</h2>
-            <p className="text-gray-400 mb-4">Hoàn thành lồng tiếng!</p>
+            <h2 className="text-3xl font-bold text-white mb-2">{t('kdrama.complete', '더빙 완료!')} 🎬</h2>
+            <p className="text-gray-400 mb-4">{t('kdrama.completeDesc', 'Hoàn thành lồng tiếng!')}</p>
             <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl p-6 mb-6">
-              <p className="text-gray-400 mb-2">{attempts}개 도전 / {attempts} thử thách</p>
-              <p className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">평균 {avgScore}%</p>
+              <p className="text-gray-400 mb-2">{t('kdrama.attempts', { count: attempts })}</p>
+              <p className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">{t('kdrama.avgScore', { score: avgScore })}</p>
             </div>
             <div className="flex gap-3">
               <Button onClick={() => navigate('/dashboard')} variant="outline" className="flex-1 border-gray-600">
-                <ArrowLeft className="w-4 h-4 mr-2" />대시보드로 / Về Dashboard
+                <ArrowLeft className="w-4 h-4 mr-2" />{t('kdrama.backToDashboard', '대시보드로')}
               </Button>
               <Button onClick={() => { setScore(0); setAttempts(0); setScoreSaved(false); setGameComplete(false); setUsedIds([]); loadScenes(selectedGenre, selectedDifficulty); }} className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500">
-                <RotateCcw className="w-4 h-4 mr-2" />다시하기 / Chơi lại
+                <RotateCcw className="w-4 h-4 mr-2" />{t('kdrama.restart', '다시하기')}
               </Button>
             </div>
           </motion.div>
@@ -402,7 +402,7 @@ const KDrama = () => {
       <div className="px-4 py-3 flex items-center justify-between border-b border-purple-500/20 bg-black/40 backdrop-blur-xl">
         <div className="flex items-center gap-2">
           <span className="text-2xl">🎬</span>
-          <span className="text-white font-bold">K-Drama 더빙</span>
+          <span className="text-white font-bold">{t('kdrama.title', 'K-Drama 더빙')}</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-purple-400 font-bold">{attempts > 0 ? Math.round(score / attempts) : 0}%</span>
@@ -424,7 +424,7 @@ const KDrama = () => {
         {/* Timer & Controls */}
         <div className="flex items-center justify-between mb-3">
           <button onClick={() => setTimerMode(!timerMode)} className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${timerMode ? 'bg-cyan-500 text-white' : 'bg-white/10 text-gray-300'}`}>
-            <Zap className="w-3 h-3" /> 타이머 {timerMode ? 'ON' : 'OFF'}
+            <Zap className="w-3 h-3" /> {t('kdrama.timer', '타이머')} {timerMode ? 'ON' : 'OFF'}
           </button>
           {timerMode && !result && !isRecording && !isProcessing && (
             <div className={`flex items-center gap-1 px-3 py-1.5 rounded-full bg-black/50 ${timeLeft <= 10 ? 'text-red-400 animate-pulse' : timeLeft <= 20 ? 'text-yellow-400' : 'text-green-400'}`}>
@@ -440,7 +440,7 @@ const KDrama = () => {
         <div className="flex gap-1.5 mb-3 overflow-x-auto pb-1">
           <button onClick={() => { setSelectedGenre(null); setScore(0); setAttempts(0); setUsedIds([]); loadScenes(null, selectedDifficulty); }}
             className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${selectedGenre === null ? 'bg-purple-500 text-white' : 'bg-white/10 text-gray-300'}`}>
-            전체
+            {t('kdrama.genreAll', '전체')}
           </button>
           {genres.map((g) => (
             <button key={g.id} onClick={() => { setSelectedGenre(g.id); setScore(0); setAttempts(0); setUsedIds([]); loadScenes(g.id, selectedDifficulty); }}
@@ -455,7 +455,7 @@ const KDrama = () => {
           {[null, '쉬움', '보통', '어려움'].map((d) => (
             <button key={d || 'all'} onClick={() => { setSelectedDifficulty(d); setScore(0); setAttempts(0); setUsedIds([]); loadScenes(selectedGenre, d); }}
               className={`flex-1 py-1.5 rounded-lg text-xs font-medium ${selectedDifficulty === d ? (d === '쉬움' ? 'bg-green-500 text-white' : d === '보통' ? 'bg-yellow-500 text-black' : d === '어려움' ? 'bg-red-500 text-white' : 'bg-purple-500 text-white') : 'bg-white/10 text-gray-300'}`}>
-              {d || '전체'}
+              {d === '쉬움' ? t('kdrama.diffEasy', '쉬움') : d === '보통' ? t('kdrama.diffMedium', '보통') : d === '어려움' ? t('kdrama.diffHard', '어려움') : t('kdrama.diffAll', '전체')}
             </button>
           ))}
         </div>
@@ -476,7 +476,7 @@ const KDrama = () => {
               />
               {result && result.accuracy >= 80 && (
                 <motion.div initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} className="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                  🎬 완벽! 다시 감상하세요!
+                  🎬 {t('kdrama.perfect', '완벽! 다시 감상하세요!')}
                 </motion.div>
               )}
               <button onClick={() => window.open(`https://youtube.com/watch?v=${currentScene.youtubeId}&t=${currentScene.timestamp}`, '_blank')} className="absolute bottom-3 right-3 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5">
@@ -530,9 +530,9 @@ const KDrama = () => {
                           <span className="text-2xl font-bold text-white">{result.feedback.grade}</span>
                         </div>
                         <div>
-                          <p className="text-white font-bold text-lg">{result.feedback.emoji} {result.accuracy}% 정확도</p>
-                          <p className="text-gray-400 text-sm">인식: {result.recognizedText || '(인식 실패)'}</p>
-                        </div>
+                        <p className="text-white font-bold text-lg">{result.feedback.emoji} {result.accuracy}% {t('kdrama.accuracy', '정확도')}</p>
+                        <p className="text-gray-400 text-sm">{t('kdrama.recognized', '인식')}: {result.recognizedText || t('kdrama.recognitionFailed', '(인식 실패)')}</p>
+                      </div>
                       </div>
                       <div className="bg-black/30 rounded-lg p-3">
                         <p className="text-white text-sm mb-1">{result.feedback.korean}</p>
@@ -550,7 +550,7 @@ const KDrama = () => {
                     <div className="flex gap-2">
                       <Button onClick={playTTS} variant="outline" className={`flex-1 border-purple-500/50 ${isPlayingTTS ? 'text-purple-400 bg-purple-500/20' : 'text-purple-400'}`}>
                         <Volume2 className={`w-4 h-4 mr-2 ${isPlayingTTS ? 'animate-pulse' : ''}`} />
-                        {isPlayingTTS ? '재생중...' : '원어민 듣기'}
+                        {isPlayingTTS ? t('kdrama.playing', '재생중...') : t('kdrama.playOriginal', '원어민 듣기')}
                       </Button>
                     </div>
                     <Button
@@ -559,21 +559,21 @@ const KDrama = () => {
                       className={`w-full h-14 text-lg font-bold ${isRecording ? 'bg-red-500 hover:bg-red-600' : 'bg-gradient-to-r from-purple-500 to-pink-500'}`}
                     >
                       {isProcessing ? (
-                        <><Loader2 className="w-5 h-5 mr-2 animate-spin" />분석중...</>
+                        <><Loader2 className="w-5 h-5 mr-2 animate-spin" />{t('kdrama.processing', '분석중...')}</>
                       ) : isRecording ? (
-                        <><MicOff className="w-5 h-5 mr-2" />녹음 중지</>
+                        <><MicOff className="w-5 h-5 mr-2" />{t('kdrama.stopRecord', '녹음 중지')}</>
                       ) : (
-                        <><Mic className="w-5 h-5 mr-2" />더빙 시작</>
+                        <><Mic className="w-5 h-5 mr-2" />{t('kdrama.record', '더빙 시작')}</>
                       )}
                     </Button>
                   </>
                 ) : (
                   <div className="flex gap-2">
                     <Button onClick={() => setResult(null)} variant="outline" className="flex-1 border-gray-600">
-                      <RotateCcw className="w-4 h-4 mr-2" />다시 도전
+                      <RotateCcw className="w-4 h-4 mr-2" />{t('kdrama.retry', '다시 도전')}
                     </Button>
                     <Button onClick={handleNext} className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-500">
-                      {currentIndex < scenes.length - 1 ? '다음 장면' : '결과 보기'} <ChevronRight className="w-4 h-4 ml-1" />
+                      {currentIndex < scenes.length - 1 ? t('kdrama.next', '다음 장면') : t('kdrama.viewResult', '결과 보기')} <ChevronRight className="w-4 h-4 ml-1" />
                     </Button>
                   </div>
                 )}
