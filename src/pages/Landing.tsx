@@ -555,176 +555,117 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* ========== CHALLENGE SECTION - 도발적 자신감 ========== */}
-      <section className="py-12 sm:py-20 px-4 sm:px-6 relative overflow-hidden">
-        {/* Aggressive background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-korean-red/5 via-background to-korean-orange/5" />
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-korean-red via-korean-orange to-korean-yellow" />
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-korean-yellow via-korean-orange to-korean-red" />
+      {/* ========== CHALLENGE SECTION - 프리미엄 도발적 자신감 ========== */}
+      <section className="py-16 sm:py-24 px-4 sm:px-6 relative overflow-hidden bg-gradient-to-b from-background via-muted/20 to-background">
+        {/* Premium background effects */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-gradient-radial from-korean-gold/10 via-transparent to-transparent rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-gradient-radial from-primary/10 via-transparent to-transparent rounded-full blur-3xl" />
+        </div>
         
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="relative z-10 max-w-4xl mx-auto text-center"
+          className="relative z-10 max-w-3xl mx-auto"
         >
-          {/* Competitor vs LUKATO Visual */}
+          {/* Premium card container */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="relative flex items-center justify-center gap-3 sm:gap-6 mb-8"
+            className="relative bg-card/60 backdrop-blur-xl rounded-3xl border border-border/50 p-8 sm:p-12 shadow-2xl overflow-hidden"
           >
-            {/* Blurred competitors - left side */}
-            <div className="flex items-center gap-2 sm:gap-3">
-              {[1, 2, 3].map((i) => (
-                <motion.div
-                  key={`left-${i}`}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="relative"
-                >
-                  <div 
-                    className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-muted/60 backdrop-blur-sm border border-border/30 flex items-center justify-center opacity-40 grayscale"
-                    style={{ filter: `blur(${(4 - i) * 0.5}px)` }}
-                  >
-                    <span className="text-lg sm:text-xl opacity-50">
-                      {i === 1 ? '📚' : i === 2 ? '🎧' : '📝'}
-                    </span>
-                  </div>
-                  <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-muted-foreground/30 flex items-center justify-center">
-                    <span className="text-[8px] sm:text-[10px]">?</span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* LUKATO - center, glowing */}
-            <motion.div
-              initial={{ scale: 0, rotate: -180 }}
-              whileInView={{ scale: 1, rotate: 0 }}
-              viewport={{ once: true }}
-              transition={{ type: "spring", stiffness: 200, delay: 0.3 }}
-              className="relative z-10"
-            >
-              {/* Glow effect */}
-              <div className="absolute inset-0 w-16 h-16 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-korean-red to-korean-orange blur-xl opacity-60 animate-pulse" />
-              
-              {/* Main logo container */}
-              <div className="relative w-16 h-16 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-korean-red via-korean-orange to-korean-yellow flex items-center justify-center shadow-2xl border-2 border-white/20">
-                <div className="text-center">
-                  <Crown className="w-6 h-6 sm:w-8 sm:h-8 text-white mx-auto mb-0.5" />
-                  <span className="text-[10px] sm:text-xs font-black text-white tracking-tight">LUKATO</span>
-                </div>
-              </div>
-              
-              {/* Crown on top */}
-              <motion.div
-                animate={{ y: [0, -3, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="absolute -top-2 sm:-top-3 left-1/2 -translate-x-1/2"
+            {/* Decorative gradient border */}
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-korean-gold/20 via-transparent to-primary/20 opacity-50" />
+            <div className="absolute inset-[1px] rounded-3xl bg-card/90" />
+            
+            {/* Content */}
+            <div className="relative z-10 text-center">
+              {/* Subtitle */}
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="text-muted-foreground text-sm sm:text-base mb-6"
               >
-                <span className="text-lg sm:text-xl">👑</span>
+                {t("landing.challenge.subtitle")}
+              </motion.p>
+              
+              {/* Main statement - Line 1 */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="font-heading font-bold text-lg sm:text-xl md:text-2xl text-foreground mb-3"
+              >
+                {t("landing.challenge.line1")}
+              </motion.p>
+              
+              {/* Main statement - Line 2 (Highlighted) */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
+                className="font-heading font-black text-xl sm:text-2xl md:text-3xl mb-8"
+              >
+                <span className="bg-gradient-to-r from-korean-gold via-korean-yellow to-korean-orange bg-clip-text text-transparent">
+                  {t("landing.challenge.line2")}
+                </span>
+              </motion.p>
+              
+              {/* Challenge points - Premium cards */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+                className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8"
+              >
+                <div className="group p-5 rounded-2xl bg-gradient-to-br from-korean-red/5 to-korean-red/10 border border-korean-red/20 hover:border-korean-red/40 transition-all duration-300">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-korean-red to-korean-orange flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform">
+                    <Target className="w-6 h-6 text-white" />
+                  </div>
+                  <p className="text-sm sm:text-base text-foreground font-bold mb-1">{t("landing.challenge.point1Title")}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{t("landing.challenge.point1Desc")}</p>
+                </div>
+                
+                <div className="group p-5 rounded-2xl bg-gradient-to-br from-korean-purple/5 to-korean-purple/10 border border-korean-purple/20 hover:border-korean-purple/40 transition-all duration-300">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-korean-purple to-korean-pink flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform">
+                    <Brain className="w-6 h-6 text-white" />
+                  </div>
+                  <p className="text-sm sm:text-base text-foreground font-bold mb-1">{t("landing.challenge.point2Title")}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{t("landing.challenge.point2Desc")}</p>
+                </div>
+                
+                <div className="group p-5 rounded-2xl bg-gradient-to-br from-korean-teal/5 to-korean-teal/10 border border-korean-teal/20 hover:border-korean-teal/40 transition-all duration-300">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-korean-teal to-korean-cyan flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform">
+                    <Gamepad2 className="w-6 h-6 text-white" />
+                  </div>
+                  <p className="text-sm sm:text-base text-foreground font-bold mb-1">{t("landing.challenge.point3Title")}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{t("landing.challenge.point3Desc")}</p>
+                </div>
               </motion.div>
-            </motion.div>
-
-            {/* Blurred competitors - right side */}
-            <div className="flex items-center gap-2 sm:gap-3">
-              {[3, 2, 1].map((i) => (
-                <motion.div
-                  key={`right-${i}`}
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="relative"
-                >
-                  <div 
-                    className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-muted/60 backdrop-blur-sm border border-border/30 flex items-center justify-center opacity-40 grayscale"
-                    style={{ filter: `blur(${(4 - i) * 0.5}px)` }}
-                  >
-                    <span className="text-lg sm:text-xl opacity-50">
-                      {i === 1 ? '🎓' : i === 2 ? '💬' : '🏫'}
-                    </span>
-                  </div>
-                  <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-muted-foreground/30 flex items-center justify-center">
-                    <span className="text-[8px] sm:text-[10px]">?</span>
-                  </div>
-                </motion.div>
-              ))}
+              
+              {/* Final statement */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5 }}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-korean-gold/20 to-primary/20 border border-korean-gold/30"
+              >
+                <Flame className="w-4 h-4 text-korean-orange" />
+                <span className="text-sm sm:text-base font-bold text-foreground">{t("landing.challenge.final")}</span>
+              </motion.div>
             </div>
-          </motion.div>
-
-          {/* Main challenge headline */}
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="font-heading font-black text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-foreground mb-4 leading-tight"
-          >
-            {t("landing.challenge.headline1")}
-            <br />
-            <span className="text-gradient-primary">{t("landing.challenge.headline2")}</span>
-          </motion.h2>
-
-          {/* Subtitle */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-muted-foreground text-sm sm:text-base md:text-lg mb-8 max-w-xl mx-auto leading-relaxed"
-          >
-            {t("landing.challenge.subtitle")}
-            <br className="hidden sm:block" />
-            <span className="text-foreground font-semibold">{t("landing.challenge.line1")}</span>
-            <br className="hidden sm:block" />
-            <span className="text-foreground font-semibold">{t("landing.challenge.line2")}</span>
-          </motion.p>
-
-          {/* Challenge points */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
-            className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-8"
-          >
-            <div className="p-4 rounded-xl bg-card/80 border border-korean-red/20 backdrop-blur-sm">
-              <div className="text-2xl mb-2">🎯</div>
-              <p className="text-xs sm:text-sm text-foreground font-medium">{t("landing.challenge.point1Title")}</p>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">{t("landing.challenge.point1Desc")}</p>
-            </div>
-            <div className="p-4 rounded-xl bg-card/80 border border-korean-orange/20 backdrop-blur-sm">
-              <div className="text-2xl mb-2">🤖</div>
-              <p className="text-xs sm:text-sm text-foreground font-medium">{t("landing.challenge.point2Title")}</p>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">{t("landing.challenge.point2Desc")}</p>
-            </div>
-            <div className="p-4 rounded-xl bg-card/80 border border-korean-yellow/20 backdrop-blur-sm">
-              <div className="text-2xl mb-2">🎮</div>
-              <p className="text-xs sm:text-sm text-foreground font-medium">{t("landing.challenge.point3Title")}</p>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">{t("landing.challenge.point3Desc")}</p>
-            </div>
-          </motion.div>
-
-          {/* Final challenge statement */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.4 }}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-korean-red/10 via-korean-orange/10 to-korean-yellow/10 border border-korean-orange/30"
-          >
-            <Swords className="w-4 h-4 sm:w-5 sm:h-5 text-korean-orange" />
-            <span className="text-sm sm:text-base font-bold text-foreground">
-              {t("landing.challenge.final")}
-            </span>
           </motion.div>
         </motion.div>
       </section>
+
 
       {/* ========== HEADHUNTING PROMO BANNER - PREMIUM DESIGN ========== */}
       <section className="py-12 sm:py-20 px-4 sm:px-6 relative overflow-hidden">
