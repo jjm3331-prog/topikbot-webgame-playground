@@ -46,6 +46,7 @@ import {
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { autoTranslateText } from "@/lib/autoTranslate";
+import { sanitizeHtml, stripMediaFromHtml, ensureHtmlStructure, cleanTranslationArtifacts } from "@/lib/htmlSanitizer";
 import { AudioPlayer } from "@/components/board/AudioPlayer";
 import { TranslationDropdown } from "@/components/board/TranslationDropdown";
 import { useTranslationCache } from "@/hooks/useTranslationCache";
@@ -441,41 +442,6 @@ export default function BoardPost() {
 
     setIsTranslating(true);
     try {
-      const normalizeNewlines = (s: string) => s.replace(/\\n/g, "\n");
-
-      const cleanTranslationArtifacts = (s: string) => {
-        return s
-          .replace(/\*\*\\$/gm, "")
-          .replace(/\*\*$/gm, "")
-          .replace(/^\*\*/gm, "")
-          .replace(/\\\*/g, "*")
-          .replace(/\s*\*\*\s*$/gm, "")
-          .trim();
-      };
-
-      const ensureHtml = (maybeHtml: string) => {
-        const s = maybeHtml.trim();
-        // If model accidentally returns plain text, keep structure via paragraphs + <br/>
-        if (!/[<>]/.test(s)) {
-          return s
-            .split(/\n\n+/)
-            .filter((p) => p.trim())
-            .map((p) => `<p>${p.replace(/\n/g, "<br/>")}</p>`)
-            .join("");
-        }
-        return s;
-      };
-
-      const stripImages = (html: string) => {
-        try {
-          const doc = new DOMParser().parseFromString(html, "text/html");
-          doc.querySelectorAll("img, picture, figure").forEach((n) => n.remove());
-          return doc.body.innerHTML;
-        } catch {
-          return html;
-        }
-      };
-
       // Translate title (text) and content (HTML) in parallel
       const [titleResultRaw, contentResultRaw] = await Promise.all([
         autoTranslateText({
@@ -492,17 +458,20 @@ export default function BoardPost() {
         }),
       ]);
 
-      const titleResult = cleanTranslationArtifacts(normalizeNewlines(titleResultRaw));
-      const contentResult = ensureHtml(cleanTranslationArtifacts(normalizeNewlines(contentResultRaw)));
-
-      // Avoid duplicated media in translation block (original already renders media)
-      const translatedHtml = stripImages(contentResult);
+      // Clean translation artifacts
+      const titleResult = cleanTranslationArtifacts(titleResultRaw);
+      
+      // Process content: clean artifacts -> ensure structure -> sanitize -> strip media
+      let contentResult = cleanTranslationArtifacts(contentResultRaw);
+      contentResult = ensureHtmlStructure(contentResult);
+      contentResult = sanitizeHtml(contentResult);
+      contentResult = stripMediaFromHtml(contentResult); // Avoid duplicating images
 
       // Save to cache
-      setCached(targetLanguage, titleResult, translatedHtml);
+      setCached(targetLanguage, titleResult, contentResult);
 
       setTranslatedTitle(titleResult);
-      setTranslatedContent(translatedHtml);
+      setTranslatedContent(contentResult);
       setCurrentTranslatedLang(targetLanguage);
       setShowTranslated(true);
       toast({ title: t("board.translation.success") });
@@ -691,37 +660,68 @@ export default function BoardPost() {
               {/* Content - Always show original first, translation below */}
               <div className="mt-6 space-y-6">
                 {/* Original content (always shown) */}
-                <div
+                <article
                   className="prose prose-sm max-w-none text-foreground
                     [&_p]:mb-4 [&_p]:leading-relaxed [&_p]:text-foreground
-                    [&_br]:mb-2 [&_strong]:font-semibold [&_em]:italic
-                    [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5
-                    [&_li]:mb-1 [&_a]:text-primary [&_a]:underline
-                    [&_img]:rounded-lg [&_img]:my-4 [&_img]:max-w-full
-                    [&_iframe]:rounded-lg [&_video]:rounded-lg"
+                    [&_br]:block [&_br]:mb-2
+                    [&_strong]:font-semibold [&_em]:italic
+                    [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-4
+                    [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-4
+                    [&_li]:mb-1 [&_li]:text-foreground
+                    [&_a]:text-primary [&_a]:underline [&_a:hover]:opacity-80
+                    [&_img]:rounded-lg [&_img]:my-4 [&_img]:max-w-full [&_img]:h-auto
+                    [&_iframe]:rounded-lg [&_iframe]:my-4 [&_iframe]:max-w-full
+                    [&_video]:rounded-lg [&_video]:my-4
+                    [&_blockquote]:border-l-4 [&_blockquote]:border-primary/50 [&_blockquote]:pl-4 [&_blockquote]:italic
+                    [&_pre]:bg-muted [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:overflow-x-auto
+                    [&_code]:bg-muted [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded
+                    [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4 [&_h1]:text-foreground
+                    [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mb-3 [&_h2]:text-foreground
+                    [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mb-2 [&_h3]:text-foreground
+                    [&_table]:w-full [&_table]:border-collapse
+                    [&_th]:border [&_th]:border-border [&_th]:p-2 [&_th]:bg-muted [&_th]:text-left
+                    [&_td]:border [&_td]:border-border [&_td]:p-2"
+                  style={{ whiteSpace: 'pre-wrap' }}
                   dangerouslySetInnerHTML={{ __html: post.content }}
                 />
 
-
-                {/* Translation section (optional, never replaces original) */}
+                {/* Translation section (identical styling to original) */}
                 {showTranslated && translatedContent && (
-                  <section className="rounded-lg border border-border bg-muted/20 p-4">
-                    <header className="mb-3 flex items-center justify-between gap-3">
-                      <p className="text-sm font-semibold text-foreground">
-                        {t("board.translation.translatedSectionLabel")}
-                      </p>
+                  <section className="rounded-xl border border-primary/20 bg-primary/5 p-5">
+                    <header className="mb-4 flex items-center justify-between gap-3 pb-3 border-b border-primary/10">
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold">
+                          {languages.find((l) => l.code === currentTranslatedLang)?.flag || "🌐"}
+                        </span>
+                        <p className="text-sm font-semibold text-foreground">
+                          {t("board.translation.translatedSectionLabel")}
+                        </p>
+                      </div>
                       {currentTranslatedLang && (
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-muted-foreground px-2 py-1 rounded-full bg-muted">
                           {languages.find((l) => l.code === currentTranslatedLang)?.nativeName ?? currentTranslatedLang}
                         </span>
                       )}
                     </header>
-                    <div
+                    <article
                       className="prose prose-sm max-w-none text-foreground
                         [&_p]:mb-4 [&_p]:leading-relaxed [&_p]:text-foreground
-                        [&_br]:mb-2 [&_strong]:font-semibold [&_em]:italic
-                        [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5
-                        [&_li]:mb-1 [&_a]:text-primary [&_a]:underline"
+                        [&_br]:block [&_br]:mb-2
+                        [&_strong]:font-semibold [&_em]:italic
+                        [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-4
+                        [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-4
+                        [&_li]:mb-1 [&_li]:text-foreground
+                        [&_a]:text-primary [&_a]:underline [&_a:hover]:opacity-80
+                        [&_blockquote]:border-l-4 [&_blockquote]:border-primary/50 [&_blockquote]:pl-4 [&_blockquote]:italic
+                        [&_pre]:bg-muted [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:overflow-x-auto
+                        [&_code]:bg-muted [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded
+                        [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4 [&_h1]:text-foreground
+                        [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mb-3 [&_h2]:text-foreground
+                        [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mb-2 [&_h3]:text-foreground
+                        [&_table]:w-full [&_table]:border-collapse
+                        [&_th]:border [&_th]:border-border [&_th]:p-2 [&_th]:bg-muted [&_th]:text-left
+                        [&_td]:border [&_td]:border-border [&_td]:p-2"
+                      style={{ whiteSpace: 'pre-wrap' }}
                       dangerouslySetInnerHTML={{ __html: translatedContent }}
                     />
                   </section>
