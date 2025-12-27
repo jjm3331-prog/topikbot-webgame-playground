@@ -50,9 +50,9 @@ export default function BoardWrite() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(!!editId);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [selectedImageSize, setSelectedImageSize] = useState<'small' | 'medium' | 'large'>('medium');
   const [showImageSizeMenu, setShowImageSizeMenu] = useState(false);
   const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
+  const [selectedSize, setSelectedSize] = useState<'small' | 'medium' | 'large' | null>(null);
 
   useEffect(() => {
     checkAuth();
@@ -223,8 +223,20 @@ export default function BoardWrite() {
     }
   };
 
-  const uploadImageWithSize = async (size: 'small' | 'medium' | 'large') => {
-    if (!pendingImageFile || !currentUser) return;
+  const getImageAlignStyle = (align: 'left' | 'center' | 'right') => {
+    switch (align) {
+      case 'left': return 'margin-left:0;margin-right:auto';
+      case 'center': return 'margin-left:auto;margin-right:auto';
+      case 'right': return 'margin-left:auto;margin-right:0';
+    }
+  };
+
+  const handleSizeSelect = (size: 'small' | 'medium' | 'large') => {
+    setSelectedSize(size);
+  };
+
+  const uploadImageWithSizeAndAlign = async (align: 'left' | 'center' | 'right') => {
+    if (!pendingImageFile || !currentUser || !selectedSize) return;
 
     setShowImageSizeMenu(false);
     setUploadingImage(true);
@@ -248,8 +260,9 @@ export default function BoardWrite() {
         .from("board-attachments")
         .getPublicUrl(fileName);
 
-      const sizeStyle = getImageSizeStyle(size);
-      const imageTag = `\n<img src="${urlData.publicUrl}" alt="image" style="${sizeStyle};border-radius:8px;margin:8px 0;" />\n`;
+      const sizeStyle = getImageSizeStyle(selectedSize);
+      const alignStyle = getImageAlignStyle(align);
+      const imageTag = `\n<img src="${urlData.publicUrl}" alt="image" style="${sizeStyle};${alignStyle};display:block;border-radius:8px;margin-top:8px;margin-bottom:8px;" />\n`;
       
       setContent(prev => prev + imageTag);
       
@@ -260,6 +273,7 @@ export default function BoardWrite() {
     } finally {
       setUploadingImage(false);
       setPendingImageFile(null);
+      setSelectedSize(null);
     }
   };
 
@@ -464,47 +478,96 @@ export default function BoardWrite() {
                         </label>
                         
                         {showImageSizeMenu && (
-                          <div className="absolute top-full left-0 mt-1 bg-card border border-border rounded-lg shadow-lg z-50 p-2 min-w-[140px]">
-                            <p className="text-xs text-muted-foreground mb-2 px-2">{t("boardWrite.selectImageSize") || "이미지 크기 선택"}</p>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="w-full justify-start"
-                              onClick={() => uploadImageWithSize('small')}
-                            >
-                              📷 {t("boardWrite.sizeSmall") || "작게"} (300px)
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="w-full justify-start"
-                              onClick={() => uploadImageWithSize('medium')}
-                            >
-                              🖼️ {t("boardWrite.sizeMedium") || "중간"} (500px)
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="w-full justify-start"
-                              onClick={() => uploadImageWithSize('large')}
-                            >
-                              🌅 {t("boardWrite.sizeLarge") || "크게"} (100%)
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="w-full justify-start text-muted-foreground"
-                              onClick={() => {
-                                setShowImageSizeMenu(false);
-                                setPendingImageFile(null);
-                              }}
-                            >
-                              ✕ {t("common.cancel") || "취소"}
-                            </Button>
+                          <div className="absolute top-full left-0 mt-1 bg-card border border-border rounded-lg shadow-lg z-50 p-3 min-w-[180px]">
+                            {!selectedSize ? (
+                              <>
+                                <p className="text-xs text-muted-foreground mb-2 px-1">{t("boardWrite.selectImageSize") || "① 크기 선택"}</p>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="w-full justify-start"
+                                  onClick={() => handleSizeSelect('small')}
+                                >
+                                  📷 {t("boardWrite.sizeSmall") || "작게"} (300px)
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="w-full justify-start"
+                                  onClick={() => handleSizeSelect('medium')}
+                                >
+                                  🖼️ {t("boardWrite.sizeMedium") || "중간"} (500px)
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="w-full justify-start"
+                                  onClick={() => handleSizeSelect('large')}
+                                >
+                                  🌅 {t("boardWrite.sizeLarge") || "크게"} (100%)
+                                </Button>
+                              </>
+                            ) : (
+                              <>
+                                <p className="text-xs text-muted-foreground mb-2 px-1">{t("boardWrite.selectImageAlign") || "② 정렬 선택"}</p>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="w-full justify-start"
+                                  onClick={() => uploadImageWithSizeAndAlign('left')}
+                                >
+                                  ⬅️ {t("boardWrite.alignLeft") || "왼쪽"}
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="w-full justify-start"
+                                  onClick={() => uploadImageWithSizeAndAlign('center')}
+                                >
+                                  ⬛ {t("boardWrite.alignCenter") || "가운데"}
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="w-full justify-start"
+                                  onClick={() => uploadImageWithSizeAndAlign('right')}
+                                >
+                                  ➡️ {t("boardWrite.alignRight") || "오른쪽"}
+                                </Button>
+                                <div className="border-t border-border mt-2 pt-2">
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="w-full justify-start text-muted-foreground"
+                                    onClick={() => setSelectedSize(null)}
+                                  >
+                                    ← {t("common.back") || "뒤로"}
+                                  </Button>
+                                </div>
+                              </>
+                            )}
+                            <div className="border-t border-border mt-2 pt-2">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="w-full justify-start text-muted-foreground"
+                                onClick={() => {
+                                  setShowImageSizeMenu(false);
+                                  setPendingImageFile(null);
+                                  setSelectedSize(null);
+                                }}
+                              >
+                                ✕ {t("common.cancel") || "취소"}
+                              </Button>
+                            </div>
                           </div>
                         )}
                       </div>
