@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { 
   ArrowLeft, 
   Heart,
@@ -47,7 +48,12 @@ import { PostTranslateButton } from "@/components/board/PostTranslateButton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { vi } from "date-fns/locale";
+import { vi, ko, enUS, ja, zhCN, ru, uz } from "date-fns/locale";
+
+const getDateLocale = (lang: string) => {
+  const locales: Record<string, any> = { vi, ko, en: enUS, ja, zh: zhCN, ru, uz };
+  return locales[lang] || enUS;
+};
 
 interface Post {
   id: string;
@@ -92,6 +98,8 @@ const extractYoutubeId = (url: string) => {
 export default function BoardPost() {
   const { boardType, postId } = useParams();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+  const dateLocale = getDateLocale(i18n.language);
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [authors, setAuthors] = useState<Record<string, Author>>({});
@@ -219,8 +227,8 @@ export default function BoardPost() {
     } catch (error) {
       console.error("Error fetching post:", error);
       toast({
-        title: "Lỗi",
-        description: "Không thể tải bài viết",
+        title: t("board.error"),
+        description: t("board.cannotLoadPost"),
         variant: "destructive"
       });
       navigate(`/board/${boardType}`);
@@ -238,7 +246,7 @@ export default function BoardPost() {
 
   const handleLike = async () => {
     if (!currentUser) {
-      toast({ title: "Vui lòng đăng nhập để thích bài viết" });
+      toast({ title: t("board.pleaseLoginToLike") });
       return;
     }
 
@@ -283,13 +291,13 @@ export default function BoardPost() {
       });
     } catch {
       await navigator.clipboard.writeText(window.location.href);
-      toast({ title: "Đã sao chép link bài viết!" });
+      toast({ title: t("board.linkCopied") });
     }
   };
 
   const handleComment = async () => {
     if (!currentUser) {
-      toast({ title: "Vui lòng đăng nhập để bình luận" });
+      toast({ title: t("board.pleaseLoginToComment") });
       return;
     }
     if (!newComment.trim()) return;
@@ -316,30 +324,30 @@ export default function BoardPost() {
       setNewComment("");
       setReplyTo(null);
       fetchPost();
-      toast({ title: "Đã đăng bình luận!" });
+      toast({ title: t("board.commentPosted") });
     } catch (error) {
       console.error("Error posting comment:", error);
-      toast({ title: "Lỗi", description: "Không thể đăng bình luận", variant: "destructive" });
+      toast({ title: t("board.error"), description: t("board.cannotPostComment"), variant: "destructive" });
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!confirm("Bạn có chắc muốn xóa bài viết này?")) return;
+    if (!confirm(t("board.confirmDelete"))) return;
     
     try {
       await supabase.from("board_posts").delete().eq("id", postId);
-      toast({ title: "Đã xóa bài viết" });
+      toast({ title: t("board.postDeleted") });
       navigate(`/board/${boardType}`);
     } catch (error) {
-      toast({ title: "Lỗi", description: "Không thể xóa bài viết", variant: "destructive" });
+      toast({ title: t("board.error"), description: t("board.cannotDeletePost"), variant: "destructive" });
     }
   };
 
   const openReportDialog = (type: 'post' | 'comment', id: string) => {
     if (!currentUser) {
-      toast({ title: "Vui lòng đăng nhập để báo cáo" });
+      toast({ title: t("board.pleaseLoginToReport") });
       return;
     }
     setReportTarget({ type, id });
@@ -367,11 +375,11 @@ export default function BoardPost() {
 
       await supabase.from("board_reports").insert(reportData);
       
-      toast({ title: "Đã gửi báo cáo", description: "Quản trị viên sẽ xem xét báo cáo của bạn." });
+      toast({ title: t("board.reportSent"), description: t("board.reportReviewMessage") });
       setReportDialogOpen(false);
     } catch (error) {
       console.error("Error submitting report:", error);
-      toast({ title: "Lỗi", description: "Không thể gửi báo cáo", variant: "destructive" });
+      toast({ title: t("board.error"), description: t("board.cannotSendReport"), variant: "destructive" });
     } finally {
       setReportSubmitting(false);
     }
@@ -379,7 +387,7 @@ export default function BoardPost() {
 
   const getAuthorDisplay = (authorId: string | null, authorName: string | null, isAnon: boolean) => {
     if (isAnon || boardType === "anonymous") {
-      return { name: "Ẩn danh", avatar: null };
+      return { name: t("board.anonymous"), avatar: null };
     }
     if (authorId && authors[authorId]) {
       return { 
@@ -387,7 +395,7 @@ export default function BoardPost() {
         avatar: authors[authorId].avatar_url 
       };
     }
-    return { name: authorName || "Người dùng", avatar: null };
+    return { name: authorName || t("board.user"), avatar: null };
   };
 
   const renderComments = (parentId: string | null = null, depth = 0) => {
@@ -412,7 +420,7 @@ export default function BoardPost() {
               <div className="flex items-center gap-2">
                 <span className="font-medium text-sm">{author.name}</span>
                 <span className="text-xs text-muted-foreground">
-                  {format(new Date(comment.created_at), "dd/MM/yyyy HH:mm", { locale: vi })}
+                  {format(new Date(comment.created_at), "dd/MM/yyyy HH:mm", { locale: dateLocale })}
                 </span>
               </div>
               <p className="text-sm mt-1">{comment.content}</p>
@@ -424,7 +432,7 @@ export default function BoardPost() {
                   onClick={() => setReplyTo(comment.id)}
                 >
                   <Reply className="w-3 h-3 mr-1" />
-                  Trả lời
+                  {t("board.reply")}
                 </Button>
                 <Button
                   variant="ghost"
@@ -433,7 +441,7 @@ export default function BoardPost() {
                   onClick={() => openReportDialog('comment', comment.id)}
                 >
                   <Flag className="w-3 h-3 mr-1" />
-                  Báo cáo
+                  {t("board.report")}
                 </Button>
               </div>
             </div>
@@ -486,7 +494,7 @@ export default function BoardPost() {
               className="-ml-2"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Quay lại
+              {t("board.back")}
             </Button>
           </motion.div>
 
@@ -520,11 +528,11 @@ export default function BoardPost() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => navigate(`/board/${boardType}/write?edit=${post.id}`)}>
                           <Edit className="w-4 h-4 mr-2" />
-                          Chỉnh sửa
+                          {t("board.edit")}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={handleDelete} className="text-destructive">
                           <Trash2 className="w-4 h-4 mr-2" />
-                          Xóa bài
+                          {t("board.delete")}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -546,7 +554,7 @@ export default function BoardPost() {
                   <div className="flex items-center gap-3 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
-                      {format(new Date(post.created_at), "dd/MM/yyyy HH:mm", { locale: vi })}
+                      {format(new Date(post.created_at), "dd/MM/yyyy HH:mm", { locale: dateLocale })}
                     </span>
                     <span className="flex items-center gap-1">
                       <Eye className="w-3 h-3" />
@@ -584,7 +592,7 @@ export default function BoardPost() {
               {/* Attachments */}
               {post.attachment_urls && post.attachment_urls.length > 0 && (
                 <div className="mt-6">
-                  <p className="text-sm font-medium mb-2">Tệp đính kèm:</p>
+                  <p className="text-sm font-medium mb-2">{t("board.attachments")}:</p>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {post.attachment_urls.map((url, i) => {
                       const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
@@ -609,7 +617,7 @@ export default function BoardPost() {
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 px-3 py-2 bg-muted rounded-lg text-sm hover:bg-muted/80"
                         >
-                          Tệp {i + 1}
+                          {t("board.file")} {i + 1}
                         </a>
                       );
                     })}
@@ -634,7 +642,7 @@ export default function BoardPost() {
                 </Button>
                 <Button variant="outline" size="sm" onClick={handleShare}>
                   <Share2 className="w-4 h-4 mr-2" />
-                  Chia sẻ
+                  {t("board.share")}
                 </Button>
                 <PostTranslateButton 
                   text={`${post.title}\n\n${post.content.replace(/<[^>]*>/g, '')}`}
@@ -651,7 +659,7 @@ export default function BoardPost() {
             className="mt-6"
           >
             <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Bình luận ({comments.length})</h3>
+              <h3 className="text-lg font-semibold mb-4">{t("board.comments")} ({comments.length})</h3>
               
               {/* New comments notification */}
               {newCommentsCount > 0 && (
@@ -661,7 +669,7 @@ export default function BoardPost() {
                   onClick={fetchPost}
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
-                  {newCommentsCount} bình luận mới - Nhấn để tải
+                  {t("board.newCommentsNotification", { count: newCommentsCount })}
                 </Button>
               )}
 
@@ -671,15 +679,15 @@ export default function BoardPost() {
                   {replyTo && (
                     <div className="flex items-center gap-2 mb-2 text-sm text-muted-foreground">
                       <Reply className="w-4 h-4" />
-                      <span>Đang trả lời bình luận</span>
+                      <span>{t("board.replyingToComment")}</span>
                       <Button variant="ghost" size="sm" onClick={() => setReplyTo(null)}>
-                        Hủy
+                        {t("board.cancel")}
                       </Button>
                     </div>
                   )}
                   <div className="flex gap-2">
                     <Textarea
-                      placeholder="Viết bình luận..."
+                      placeholder={t("board.writeComment")}
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
                       rows={2}
@@ -695,7 +703,7 @@ export default function BoardPost() {
               {/* Comments List */}
               <div className="divide-y">
                 {comments.length === 0 ? (
-                  <p className="text-center py-8 text-muted-foreground">Chưa có bình luận nào</p>
+                  <p className="text-center py-8 text-muted-foreground">{t("board.noComments")}</p>
                 ) : (
                   renderComments()
                 )}
@@ -713,10 +721,10 @@ export default function BoardPost() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-destructive" />
-              Báo cáo vi phạm
+              {t("board.reportViolation")}
             </DialogTitle>
             <DialogDescription>
-              Vui lòng cho chúng tôi biết lý do bạn báo cáo {reportTarget?.type === 'post' ? 'bài viết' : 'bình luận'} này.
+              {t("board.reportDescription", { type: reportTarget?.type === 'post' ? t("board.postType") : t("board.commentType") })}
             </DialogDescription>
           </DialogHeader>
           
@@ -724,23 +732,23 @@ export default function BoardPost() {
             <RadioGroup value={reportReason} onValueChange={(v: any) => setReportReason(v)}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="spam" id="spam" />
-                <Label htmlFor="spam">Spam / Quảng cáo</Label>
+                <Label htmlFor="spam">{t("board.reportReasons.spam")}</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="abuse" id="abuse" />
-                <Label htmlFor="abuse">Nội dung xúc phạm / Quấy rối</Label>
+                <Label htmlFor="abuse">{t("board.reportReasons.abuse")}</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="other" id="other" />
-                <Label htmlFor="other">Lý do khác</Label>
+                <Label htmlFor="other">{t("board.reportReasons.other")}</Label>
               </div>
             </RadioGroup>
             
             <div>
-              <Label htmlFor="description">Mô tả chi tiết (tùy chọn)</Label>
+              <Label htmlFor="description">{t("board.detailDescription")}</Label>
               <Textarea
                 id="description"
-                placeholder="Mô tả thêm về vi phạm..."
+                placeholder={t("board.describeViolation")}
                 value={reportDescription}
                 onChange={(e) => setReportDescription(e.target.value)}
                 rows={3}
@@ -751,14 +759,14 @@ export default function BoardPost() {
           
           <DialogFooter>
             <Button variant="outline" onClick={() => setReportDialogOpen(false)}>
-              Hủy
+              {t("board.cancel")}
             </Button>
             <Button 
               variant="destructive" 
               onClick={handleReport}
               disabled={reportSubmitting}
             >
-              {reportSubmitting ? "Đang gửi..." : "Gửi báo cáo"}
+              {reportSubmitting ? t("board.sending") : t("board.sendReport")}
             </Button>
           </DialogFooter>
         </DialogContent>

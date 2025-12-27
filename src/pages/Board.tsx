@@ -46,7 +46,7 @@ import { PostTranslateButton } from "@/components/board/PostTranslateButton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { format, subDays, subWeeks, subMonths } from "date-fns";
-import { vi } from "date-fns/locale";
+import { vi, ko, enUS, ja, zhCN, ru, uz } from "date-fns/locale";
 
 type BoardType = "notice" | "free" | "resource" | "anonymous";
 
@@ -72,31 +72,16 @@ interface Author {
   avatar_url: string | null;
 }
 
-const boardInfo: Record<BoardType, { title: string; subtitle: string; icon: any; color: string }> = {
-  notice: { 
-    title: "Thông báo", 
-    subtitle: "공지사항", 
-    icon: Megaphone,
-    color: "from-red-500 to-rose-600" 
-  },
-  free: { 
-    title: "Tự do trao đổi", 
-    subtitle: "자유게시판", 
-    icon: MessageCircle,
-    color: "from-blue-500 to-cyan-600" 
-  },
-  resource: { 
-    title: "Tài liệu học tập", 
-    subtitle: "학습자료실", 
-    icon: BookOpen,
-    color: "from-emerald-500 to-teal-600" 
-  },
-  anonymous: { 
-    title: "Ẩn danh", 
-    subtitle: "익명게시판", 
-    icon: Ghost,
-    color: "from-purple-500 to-indigo-600" 
-  }
+const boardIcons: Record<BoardType, { icon: any; color: string }> = {
+  notice: { icon: Megaphone, color: "from-red-500 to-rose-600" },
+  free: { icon: MessageCircle, color: "from-blue-500 to-cyan-600" },
+  resource: { icon: BookOpen, color: "from-emerald-500 to-teal-600" },
+  anonymous: { icon: Ghost, color: "from-purple-500 to-indigo-600" }
+};
+
+const getDateLocale = (lang: string) => {
+  const locales: Record<string, any> = { vi, ko, en: enUS, ja, zh: zhCN, ru, uz };
+  return locales[lang] || enUS;
 };
 
 const extractYoutubeId = (url: string) => {
@@ -111,6 +96,7 @@ const getFirstImageFromAttachments = (urls: string[]) => {
 export default function Board() {
   const { boardType } = useParams<{ boardType: string }>();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const [posts, setPosts] = useState<Post[]>([]);
   const [authors, setAuthors] = useState<Record<string, Author>>({});
   const [loading, setLoading] = useState(true);
@@ -122,8 +108,9 @@ export default function Board() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [newPostsCount, setNewPostsCount] = useState(0);
 
-  const info = boardInfo[boardType as BoardType] || boardInfo.free;
-  const Icon = info.icon;
+  const boardData = boardIcons[boardType as BoardType] || boardIcons.free;
+  const Icon = boardData.icon;
+  const dateLocale = getDateLocale(i18n.language);
 
   useEffect(() => {
     checkAuth();
@@ -226,8 +213,8 @@ export default function Board() {
     } catch (error) {
       console.error("Error fetching posts:", error);
       toast({
-        title: "Lỗi",
-        description: "Không thể tải bài viết",
+        title: t("board.error"),
+        description: t("board.cannotLoadPosts"),
         variant: "destructive"
       });
     } finally {
@@ -243,14 +230,14 @@ export default function Board() {
 
   const handleWriteClick = () => {
     if (!currentUser) {
-      toast({ title: "Vui lòng đăng nhập để viết bài" });
+      toast({ title: t("board.pleaseLoginToWrite") });
       navigate("/auth");
       return;
     }
     if (boardType === "notice" && !isAdmin) {
       toast({ 
-        title: "Chỉ quản trị viên",
-        description: "Chỉ quản trị viên mới có thể đăng thông báo.",
+        title: t("board.adminOnly"),
+        description: t("board.adminOnlyNotice"),
         variant: "destructive"
       });
       return;
@@ -260,7 +247,7 @@ export default function Board() {
 
   const getAuthorDisplay = (post: Post) => {
     if (post.is_anonymous || boardType === "anonymous") {
-      return { name: "Ẩn danh", avatar: null };
+      return { name: t("board.anonymous"), avatar: null };
     }
     if (post.author_id && authors[post.author_id]) {
       return { 
@@ -268,7 +255,7 @@ export default function Board() {
         avatar: authors[post.author_id].avatar_url 
       };
     }
-    return { name: post.author_name || "Người dùng", avatar: null };
+    return { name: post.author_name || t("board.user"), avatar: null };
   };
 
   // Apply filters and sorting
@@ -351,17 +338,17 @@ export default function Board() {
               className="mb-4 -ml-2"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Quay lại
+              {t("board.back")}
             </Button>
             
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-4">
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${info.color} flex items-center justify-center shadow-lg`}>
+                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${boardData.color} flex items-center justify-center shadow-lg`}>
                   <Icon className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-headline font-bold text-foreground">{info.title}</h1>
-                  <p className="text-body text-muted-foreground">{info.subtitle}</p>
+                  <h1 className="text-headline font-bold text-foreground">{t(`board.types.${boardType}.title`)}</h1>
+                  <p className="text-body text-muted-foreground">{t(`board.types.${boardType}.subtitle`)}</p>
                 </div>
               </div>
               
@@ -369,19 +356,19 @@ export default function Board() {
               {boardType !== "notice" && currentUser && (
                 <Button 
                   onClick={handleWriteClick}
-                  className={`bg-gradient-to-r ${info.color} hover:opacity-90`}
+                  className={`bg-gradient-to-r ${boardData.color} hover:opacity-90`}
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  Viết bài
+                  {t("board.writePost")}
                 </Button>
               )}
               {boardType === "notice" && isAdmin && (
                 <Button 
                   onClick={handleWriteClick}
-                  className={`bg-gradient-to-r ${info.color} hover:opacity-90`}
+                  className={`bg-gradient-to-r ${boardData.color} hover:opacity-90`}
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  Viết bài
+                  {t("board.writePost")}
                 </Button>
               )}
             </div>
@@ -400,7 +387,7 @@ export default function Board() {
                 onClick={fetchPosts}
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
-                {newPostsCount} bài viết mới - Nhấn để tải
+                {t("board.newPostsNotification", { count: newPostsCount })}
               </Button>
             </motion.div>
           )}
@@ -411,7 +398,7 @@ export default function Board() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder="Tìm kiếm bài viết..."
+                  placeholder={t("board.searchPlaceholder")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
@@ -422,10 +409,10 @@ export default function Board() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tất cả</SelectItem>
-                  <SelectItem value="title">Tiêu đề</SelectItem>
-                  <SelectItem value="content">Nội dung</SelectItem>
-                  <SelectItem value="author">Tác giả</SelectItem>
+                  <SelectItem value="all">{t("board.filters.all")}</SelectItem>
+                  <SelectItem value="title">{t("board.filters.title")}</SelectItem>
+                  <SelectItem value="content">{t("board.filters.content")}</SelectItem>
+                  <SelectItem value="author">{t("board.filters.author")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -437,10 +424,10 @@ export default function Board() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="recent">Mới nhất</SelectItem>
-                  <SelectItem value="likes">Nhiều thích</SelectItem>
-                  <SelectItem value="views">Nhiều xem</SelectItem>
-                  <SelectItem value="comments">Nhiều bình luận</SelectItem>
+                  <SelectItem value="recent">{t("board.sort.recent")}</SelectItem>
+                  <SelectItem value="likes">{t("board.sort.likes")}</SelectItem>
+                  <SelectItem value="views">{t("board.sort.views")}</SelectItem>
+                  <SelectItem value="comments">{t("board.sort.comments")}</SelectItem>
                 </SelectContent>
               </Select>
               
@@ -450,10 +437,10 @@ export default function Board() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tất cả</SelectItem>
-                  <SelectItem value="today">Hôm nay</SelectItem>
-                  <SelectItem value="week">Tuần này</SelectItem>
-                  <SelectItem value="month">Tháng này</SelectItem>
+                  <SelectItem value="all">{t("board.dateFilter.all")}</SelectItem>
+                  <SelectItem value="today">{t("board.dateFilter.today")}</SelectItem>
+                  <SelectItem value="week">{t("board.dateFilter.week")}</SelectItem>
+                  <SelectItem value="month">{t("board.dateFilter.month")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -476,7 +463,7 @@ export default function Board() {
             ) : filteredPosts.length === 0 ? (
               <Card className="p-12 text-center">
                 <Icon className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
-                <p className="text-muted-foreground">Chưa có bài viết nào</p>
+                <p className="text-muted-foreground">{t("board.noPosts")}</p>
                 {canCreatePost() && (
                   <Button 
                     variant="outline" 
@@ -484,7 +471,7 @@ export default function Board() {
                     onClick={handleWriteClick}
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    Viết bài đầu tiên
+                    {t("board.writeFirstPost")}
                   </Button>
                 )}
               </Card>
@@ -532,7 +519,7 @@ export default function Board() {
                               {post.is_pinned && (
                                 <Badge variant="secondary" className="text-xs">
                                   <Pin className="w-3 h-3 mr-1" />
-                                  Ghim
+                                  {t("board.pinned")}
                                 </Badge>
                               )}
                               <h3 className="font-semibold text-foreground line-clamp-1">
@@ -590,7 +577,7 @@ export default function Board() {
                             <span className="font-medium">{author.name}</span>
                             <span className="flex items-center gap-1">
                               <Clock className="w-3 h-3" />
-                              {format(new Date(post.created_at), "dd/MM/yyyy", { locale: vi })}
+                              {format(new Date(post.created_at), "dd/MM/yyyy", { locale: dateLocale })}
                             </span>
                             <span className="flex items-center gap-1">
                               <Eye className="w-3 h-3" />
