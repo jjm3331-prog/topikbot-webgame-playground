@@ -770,13 +770,54 @@
   "roleplay": {
     "badge": "AI 역할극 스피킹",
     "title": "AI 역할극 스피킹",
-    "subtitle": "실전 상황으로 말하기 연습 • 문법 피드백 • TOPIK 퀴즈 생성",
+    "subtitle": "실전 상황으로 말하기 연습 • 레벨별 맞춤 피드백 • TOPIK 퀴즈 생성",
     "labels": { "scenario": "상황:", "suggestions": "추천 답변" },
     "empty": { "title": "말하기를 시작해보세요!", "desc": "AI가 상황을 제시하면, 한국어로 자연스럽게 대화 연습을 할 수 있어요." },
-    "actions": { "start": "Roleplay 시작", "listen": "듣기", "newScenario": "새 상황", "makeQuiz": "TOPIK 퀴즈 만들기", "prev": "이전", "next": "다음", "showResults": "결과 보기", "closeQuiz": "퀴즈 닫기" },
+    "actions": { 
+      "start": "Roleplay 시작", 
+      "startRoleplay": "롤플레이 시작하기",
+      "listen": "듣기", 
+      "newScenario": "새 상황", 
+      "makeQuiz": "TOPIK 퀴즈 만들기", 
+      "prev": "이전", 
+      "next": "다음", 
+      "showResults": "결과 보기", 
+      "closeQuiz": "퀴즈 닫기",
+      "changeSettings": "설정 변경"
+    },
+    "setup": {
+      "levelTitle": "TOPIK 레벨 선택",
+      "difficultyTitle": "난이도 선택",
+      "scenarioTitle": "상황 선택 (15가지)",
+      "customTitle": "또는 원하는 상황 직접 입력",
+      "customPlaceholder": "예: 한국 친구 집에 놀러가서 인사하는 상황",
+      "customHint": "위 15가지 상황 외에 원하는 상황을 자유롭게 입력하세요"
+    },
+    "difficulty": {
+      "easy": "쉬움",
+      "medium": "보통",
+      "hard": "어려움"
+    },
+    "scenarios": {
+      "cafe": "카페 주문",
+      "subway": "지하철/교통",
+      "shopping": "쇼핑",
+      "direction": "길찾기",
+      "phone": "전화 예약",
+      "movie": "영화관",
+      "hotel": "호텔",
+      "restaurant": "식당",
+      "bank": "은행",
+      "dating": "소개팅",
+      "interview": "면접",
+      "airport": "공항",
+      "hospital": "병원",
+      "school": "학교",
+      "meeting": "회의"
+    },
     "placeholders": { "input": "한국어로 답변을 입력하세요..." },
     "feedback": { "good": "좋아요!", "needsFix": "수정 필요" },
-    "tips": { "title": "사용 방법", "step1": "‘Roleplay 시작’을 눌러 랜덤 상황을 받기", "step2": "한국어로 답변하기(키보드 또는 음성)", "step3": "AI의 교정과 문법 설명 확인하기", "step4": "대화 내용으로 TOPIK 퀴즈 만들기", "tipLabel": "팁:", "tipText": "추천 답변을 참고해서 말문이 막힐 때 도움을 받으세요." },
+    "tips": { "title": "사용 방법", "step1": "레벨과 난이도를 선택하세요", "step2": "15가지 상황 중 선택하거나 직접 입력", "step3": "AI의 교정과 문법 설명 확인하기", "step4": "대화 내용으로 TOPIK 퀴즈 만들기", "tipLabel": "팁:", "tipText": "추천 답변을 참고해서 말문이 막힐 때 도움을 받으세요." },
     "stats": { "title": "이번 세션", "spoken": "내가 말한 문장", "correct": "정답 문장" },
     "quiz": {
       "progress": "{{current}}/{{total}}문항",
@@ -794,7 +835,8 @@
       "sttFailed": "음성 인식에 실패했습니다.",
       "recording": "녹음 중...",
       "micDenied": "마이크 접근 권한이 필요합니다.",
-      "sendFailed": "메시지 전송에 실패했습니다. 다시 시도해주세요."
+      "sendFailed": "메시지 전송에 실패했습니다. 다시 시도해주세요.",
+      "selectScenario": "상황을 선택하거나 입력해주세요."
     }
   },
   "writingPage": {
