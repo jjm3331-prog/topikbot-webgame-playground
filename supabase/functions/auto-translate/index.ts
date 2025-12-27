@@ -141,10 +141,32 @@ serve(async (req) => {
     const data = await response.json();
     const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
+    // Extract JSON and clean control characters
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    const parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
-
-    const translation = (parsed?.translation ?? raw).toString().trim();
+    let translation = raw.trim();
+    
+    if (jsonMatch) {
+      try {
+        // Remove control characters that break JSON parsing (except for valid escape sequences)
+        const cleanedJson = jsonMatch[0]
+          .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '') // Remove ASCII control chars
+          .replace(/\\n/g, '\n') // Preserve actual newlines
+          .replace(/\\t/g, '\t'); // Preserve tabs
+        
+        const parsed = JSON.parse(cleanedJson);
+        translation = (parsed?.translation ?? raw).toString().trim();
+      } catch (parseError) {
+        console.warn("JSON parse failed, using raw response:", parseError);
+        // Fallback: try to extract translation value manually
+        const translationMatch = raw.match(/"translation"\s*:\s*"([^"]+)"/);
+        if (translationMatch) {
+          translation = translationMatch[1];
+        } else {
+          // Use raw text as translation (stripping JSON wrapper if present)
+          translation = raw.replace(/^\s*\{\s*"translation"\s*:\s*"?|"?\s*\}\s*$/g, '').trim();
+        }
+      }
+    }
 
     await saveCache(supabase, cacheKey, { translation, sourceLanguage, targetLanguage });
 
