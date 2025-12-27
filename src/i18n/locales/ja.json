@@ -1,4 +1,61 @@
 {
+  "questionVariant": {
+    "title": "問題バリエーションAI",
+    "description": "TOPIK問題の画像をアップロードすると、AIが類似のバリエーション問題を生成します",
+    "howToUse": "使い方",
+    "examples": {
+      "reading": "読解問題",
+      "readingDesc": "文章を分析し、同様の難易度で新しい問題を生成",
+      "grammar": "文法問題",
+      "grammarDesc": "文法パターンを維持しながら新しい例文で変形",
+      "vocabulary": "語彙問題",
+      "vocabularyDesc": "同じタイプの語彙問題を別の単語で生成",
+      "listening": "聴解問題",
+      "listeningDesc": "聴解テキストを分析して類似問題を生成"
+    },
+    "uploadImage": "問題画像をアップロード",
+    "clickToUpload": "クリックして画像を選択",
+    "supportedFormats": "対応形式: JPG, PNG, GIF (最大10MB)",
+    "generate": "バリエーション生成",
+    "generateButton": "AI変形を生成",
+    "features": {
+      "analyze": "元の問題を分析",
+      "generate": "類似バリエーションを生成",
+      "explain": "詳細な解説を提供"
+    },
+    "premiumFeature": "プレミアム機能",
+    "premiumDescription": "この機能はプレミアム会員のみ利用可能です。",
+    "upgradePremium": "プレミアムにアップグレード",
+    "result": "結果",
+    "sections": {
+      "originalAnalysis": "元の問題分析",
+      "variantQuestion": "変形問題",
+      "answer": "正解",
+      "explanation": "解説",
+      "learningPoints": "学習ポイント"
+    },
+    "pdf": {
+      "createdAt": "作成日時",
+      "translation": "翻訳"
+    },
+    "success": {
+      "generated": "変形問題が正常に生成されました！",
+      "pdfOpened": "PDFプレビューが開きました"
+    },
+    "errors": {
+      "imageTooLarge": "画像が大きすぎます。10MB以下のファイルを選択してください。",
+      "selectImage": "先に画像を選択してください。",
+      "premiumRequired": "この機能はプレミアム会員のみ利用可能です。",
+      "apiError": "問題生成中にエラーが発生しました。",
+      "tryAgain": "エラーが発生しました。もう一度お試しください。",
+      "noContent": "ダウンロードするコンテンツがありません。",
+      "popupBlocked": "ポップアップがブロックされました。ポップアップを許可してください。",
+      "pdfError": "PDF生成中にエラーが発生しました。"
+    },
+    "changeImage": "別の画像を選択",
+    "generating": "AIが変形問題を生成中...",
+    "downloadPDF": "PDFダウンロード"
+  },
   "notifications": {
     "title": "通知",
     "markAllRead": "すべて既読にする",

@@ -1,4 +1,61 @@
 {
+  "questionVariant": {
+    "title": "Savol Varianti AI",
+    "description": "TOPIK savol rasmini yuklang, AI o'xshash variant savollarini yaratadi",
+    "howToUse": "Qanday foydalanish",
+    "examples": {
+      "reading": "O'qish savollari",
+      "readingDesc": "Matnni tahlil qilib, o'xshash qiyinlikdagi yangi savollar yaratish",
+      "grammar": "Grammatika savollari",
+      "grammarDesc": "Grammatik naqshlarni saqlagan holda yangi misollar bilan o'zgartirish",
+      "vocabulary": "So'z boyligi savollari",
+      "vocabularyDesc": "Bir xil turdagi savollerni boshqa so'zlar bilan yaratish",
+      "listening": "Tinglash savollari",
+      "listeningDesc": "Tinglash matnini tahlil qilib o'xshash savollar yaratish"
+    },
+    "uploadImage": "Savol rasmini yuklash",
+    "clickToUpload": "Rasm tanlash uchun bosing",
+    "supportedFormats": "Formatlar: JPG, PNG, GIF (maks. 10MB)",
+    "generate": "Variant yaratish",
+    "generateButton": "AI variant yaratish",
+    "features": {
+      "analyze": "Asl savolni tahlil qilish",
+      "generate": "O'xshash variant yaratish",
+      "explain": "Batafsil tushuntirish berish"
+    },
+    "premiumFeature": "Premium xususiyat",
+    "premiumDescription": "Bu xususiyat faqat Premium a'zolar uchun mavjud.",
+    "upgradePremium": "Premium-ga yangilash",
+    "result": "Natija",
+    "sections": {
+      "originalAnalysis": "Asl tahlil",
+      "variantQuestion": "Variant savol",
+      "answer": "Javob",
+      "explanation": "Tushuntirish",
+      "learningPoints": "O'quv nuqtalari"
+    },
+    "pdf": {
+      "createdAt": "Yaratilgan sana",
+      "translation": "Tarjima"
+    },
+    "success": {
+      "generated": "Variant savol muvaffaqiyatli yaratildi!",
+      "pdfOpened": "PDF ko'rish ochildi"
+    },
+    "errors": {
+      "imageTooLarge": "Rasm juda katta. 10MB dan kichik fayl tanlang.",
+      "selectImage": "Avval rasm tanlang.",
+      "premiumRequired": "Bu xususiyat faqat Premium a'zolar uchun mavjud.",
+      "apiError": "Savol yaratishda xatolik.",
+      "tryAgain": "Xatolik yuz berdi. Qayta urinib ko'ring.",
+      "noContent": "Yuklab olish uchun kontent yo'q.",
+      "popupBlocked": "Popup bloklangan. Popupga ruxsat bering.",
+      "pdfError": "PDF yaratishda xatolik."
+    },
+    "changeImage": "Boshqa rasm tanlash",
+    "generating": "AI variant savol yaratmoqda...",
+    "downloadPDF": "PDF yuklab olish"
+  },
   "notifications": {
     "title": "Bildirishnomalar",
     "markAllRead": "Hammasini o'qilgan deb belgilash",
