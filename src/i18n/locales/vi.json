@@ -1694,7 +1694,12 @@
     "uploadingImage": "Đang tải ảnh lên...",
     "imageInserted": "Đã chèn ảnh",
     "uploadError": "Tải ảnh thất bại",
-    "pasteHint": "💡 Ctrl+V để dán ảnh trực tiếp vào nội dung"
+    "pasteHint": "💡 Ctrl+V để dán ảnh trực tiếp vào nội dung",
+    "audioLabel": "Tệp âm thanh (MP3)",
+    "selectAudio": "Chọn âm thanh",
+    "existingAudio": "Tệp âm thanh hiện có",
+    "audioRequired": "Vui lòng tải lên tệp MP3",
+    "mp3Only": "Chỉ cho phép tệp MP3"
   },
   "blockEditor": {
     "text": "Văn bản",

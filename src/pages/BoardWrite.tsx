@@ -144,7 +144,12 @@ export default function BoardWrite() {
     if (existingAudioUrl && !audioFile) return existingAudioUrl;
     if (!audioFile) return null;
 
-    const fileName = `${currentUser}/${Date.now()}_${audioFile.name}`;
+    // Sanitize filename: remove special chars, only keep alphanumeric, dash, underscore, dot
+    const sanitizedName = audioFile.name
+      .replace(/[^a-zA-Z0-9.\-_]/g, '_')
+      .replace(/_+/g, '_');
+    const fileName = `${currentUser}/${Date.now()}_${sanitizedName}`;
+    
     const { error } = await supabase.storage
       .from("podcast-audio")
       .upload(fileName, audioFile, { upsert: false });
@@ -337,16 +342,26 @@ export default function BoardWrite() {
               {/* Audio Upload for Podcast */}
               {boardType === "podcast" && (
                 <div className="space-y-2">
-                  <Label>{t("boardWrite.audioLabel") || "오디오 파일 (MP3)"}</Label>
+                  <Label>{t("boardWrite.audioLabel")}</Label>
                   <div className="flex items-center gap-4">
                     <label className="flex items-center gap-2 px-4 py-2 border border-dashed rounded-lg cursor-pointer hover:bg-muted transition-colors border-orange-500/30 hover:border-orange-500/50">
                       <Music className="w-4 h-4 text-orange-500" />
-                      <span className="text-sm">{t("boardWrite.selectAudio") || "오디오 선택"}</span>
+                      <span className="text-sm">{t("boardWrite.selectAudio")}</span>
                       <input
                         type="file"
-                        onChange={(e) => e.target.files?.[0] && setAudioFile(e.target.files[0])}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            if (!file.name.toLowerCase().endsWith('.mp3')) {
+                              toast({ title: t("boardWrite.mp3Only"), variant: "destructive" });
+                              e.target.value = '';
+                              return;
+                            }
+                            setAudioFile(file);
+                          }
+                        }}
                         className="hidden"
-                        accept="audio/*"
+                        accept=".mp3,audio/mpeg"
                       />
                     </label>
                   </div>
@@ -354,7 +369,7 @@ export default function BoardWrite() {
                     <div className="flex items-center gap-2 mt-2 p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg">
                       <Music className="w-4 h-4 text-orange-500" />
                       <span className="text-sm text-foreground truncate flex-1">
-                        {audioFile ? audioFile.name : (t("boardWrite.existingAudio") || "기존 오디오 파일")}
+                        {audioFile ? audioFile.name : t("boardWrite.existingAudio")}
                       </span>
                       <button onClick={() => { setAudioFile(null); setExistingAudioUrl(null); }}>
                         <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
