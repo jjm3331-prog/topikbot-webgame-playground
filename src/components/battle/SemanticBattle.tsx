@@ -1041,7 +1041,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
         {/* Current word */}
         {lastWord && (
           <div className="text-center py-5 bg-gradient-to-br from-card to-muted/30 rounded-2xl border border-border/50">
-            <p className="text-sm text-muted-foreground mb-2">Từ hiện tại / 현재 단어</p>
+            <p className="text-sm text-muted-foreground mb-2">{t("battle.semanticGame.currentWord")}</p>
             <p className="text-5xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">{lastWord}</p>
           </div>
         )}
@@ -1059,8 +1059,8 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
                   : "bg-red-500/10 text-red-400 border-red-500/30"
               }`}
             >
-              <p className="font-bold text-lg mb-1">Điểm: {lastValidation.score}/100 {lastValidation.score >= PASS_SCORE ? "✅" : "❌"}</p>
-              <p>{lastValidation.reason_vi}</p>
+              <p className="font-bold text-lg mb-1">{t("battle.semanticGame.scoreLabel")}: {lastValidation.score}/100 {lastValidation.score >= PASS_SCORE ? "✅" : "❌"}</p>
+              <p>{i18n.language === "ko" ? lastValidation.reason_ko : lastValidation.reason_vi}</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -1072,7 +1072,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
             value={currentInput}
             onChange={(e) => setCurrentInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSubmitWord()}
-            placeholder={isMyTurn ? "Nhập từ liên quan về ý nghĩa..." : "Đợi lượt của bạn..."}
+            placeholder={isMyTurn ? t("battle.semanticGame.inputPlaceholder") : t("battle.semanticGame.waitTurn")}
             disabled={!isMyTurn || isValidating}
             className="flex-1 h-14 text-xl rounded-xl"
           />
@@ -1093,7 +1093,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
             transition={{ duration: 1.5, repeat: Infinity }}
             className="text-center text-sm text-muted-foreground py-2"
           >
-            Đợi đối thủ... / 상대방 차례입니다
+            {t("battle.semanticGame.waitOpponent")}
           </motion.p>
         )}
       </div>
@@ -1139,10 +1139,10 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
             </motion.div>
 
             <h2 className={`text-4xl font-black mb-3 ${isWinner ? "text-yellow-500" : "text-muted-foreground"}`}>
-              {isWinner ? "🎉 Chiến thắng!" : "😢 Thua cuộc"}
+              {isWinner ? t("battle.semanticGame.victory") : t("battle.semanticGame.defeat")}
             </h2>
             <p className="text-lg text-muted-foreground mb-6">
-              {isWinner ? "Bạn đã thắng +1,000 điểm!" : `${winnerName} đã thắng!`}
+              {isWinner ? t("battle.semanticGame.victoryDesc") : t("battle.semanticGame.defeatDesc", { name: winnerName })}
             </p>
 
             <Card className="p-5 max-w-sm mx-auto mb-8 bg-muted/30 border-border/50">
@@ -1161,7 +1161,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button onClick={onBack} size="lg" className="h-14 px-8 gap-2 text-lg bg-gradient-to-r from-purple-500 to-pink-500">
                 <ArrowLeft className="w-5 h-5" />
-                Quay lại
+                {t("common.back")}
               </Button>
             </motion.div>
           </div>
@@ -1177,7 +1177,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Brain className="w-5 h-5 text-purple-500" />
-            <span className="font-bold">Đấu Nghĩa</span>
+            <span className="font-bold">{t("battle.semantic")}</span>
           </div>
           <div className={`px-3 py-1 rounded-full font-mono font-bold ${turnTimeLeft <= 3 ? "bg-red-500 text-white animate-pulse" : "bg-muted"}`}>
             <Timer className="w-4 h-4 inline mr-1" />
@@ -1240,7 +1240,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
         {/* Current word */}
         {lastWord && (
           <div className="text-center py-4">
-            <p className="text-sm text-muted-foreground mb-1">Từ hiện tại / 현재 단어</p>
+            <p className="text-sm text-muted-foreground mb-1">{t("battle.semanticGame.currentWord")}</p>
             <p className="text-4xl font-bold text-purple-500">{lastWord}</p>
           </div>
         )}
@@ -1252,8 +1252,8 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
             animate={{ opacity: 1, y: 0 }}
             className={`p-3 rounded-lg text-sm ${lastValidation.score >= PASS_SCORE ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}
           >
-            <p className="font-bold">Điểm: {lastValidation.score}/100 {lastValidation.score >= PASS_SCORE ? "✅" : "❌"}</p>
-            <p>{lastValidation.reason_vi}</p>
+            <p className="font-bold">{t("battle.semanticGame.scoreLabel")}: {lastValidation.score}/100 {lastValidation.score >= PASS_SCORE ? "✅" : "❌"}</p>
+            <p>{i18n.language === "ko" ? lastValidation.reason_ko : lastValidation.reason_vi}</p>
           </motion.div>
         )}
 
@@ -1264,7 +1264,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
             value={currentInput}
             onChange={(e) => setCurrentInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSubmitWord()}
-            placeholder={isMyTurn ? "Nhập từ liên quan..." : "Đợi lượt của bạn..."}
+            placeholder={isMyTurn ? t("battle.semanticGame.inputPlaceholder") : t("battle.semanticGame.waitTurn")}
             disabled={!isMyTurn || isValidating}
             className="flex-1"
           />
@@ -1275,7 +1275,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
 
         {!isMyTurn && (
           <p className="text-center text-sm text-muted-foreground animate-pulse">
-            Đợi đối thủ... / 상대방 차례입니다
+            {t("battle.semanticGame.waitOpponent")}
           </p>
         )}
       </div>
@@ -1302,10 +1302,10 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
 
         <div>
           <h2 className="text-3xl font-bold mb-2">
-            {isWinner ? "🎉 Chiến thắng!" : "😢 Thua cuộc"}
+            {isWinner ? t("battle.semanticGame.victory") : t("battle.semanticGame.defeat")}
           </h2>
           <p className="text-muted-foreground">
-            {isWinner ? "Bạn đã thắng +1,000 điểm!" : `${winnerName} đã thắng!`}
+            {isWinner ? t("battle.semanticGame.victoryDesc") : t("battle.semanticGame.defeatDesc", { name: winnerName })}
           </p>
         </div>
 
@@ -1324,7 +1324,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
 
         <Button onClick={onBack} className="gap-2">
           <ArrowLeft className="w-4 h-4" />
-          Quay lại
+          {t("common.back")}
         </Button>
       </div>
     );
