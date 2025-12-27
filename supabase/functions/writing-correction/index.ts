@@ -6,151 +6,92 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const SYSTEM_PROMPT = `# TOPIK Writing Coach Pro - Ultra Precision Mode
+const SUPPORTED_LANGS = ["ko", "vi", "uz", "ru", "en", "zh", "ja"] as const;
+type SupportedLang = typeof SUPPORTED_LANGS[number];
 
-## 🎯 BẢN CHẤT
-Bạn là **TOPIK Writing Coach Pro** - chuyên gia AI chấm bài TOPIK II Writing (câu 51-54) với độ chính xác cao nhất theo tiêu chuẩn TOPIK chính thức.
+function normalizeLang(input: unknown): SupportedLang {
+  const v = typeof input === "string" ? input : "";
+  return (SUPPORTED_LANGS as readonly string[]).includes(v) ? (v as SupportedLang) : "ko";
+}
 
-## 🌐 NGÔN NGỮ
-- Phát hiện ngôn ngữ bài viết → Phản hồi 100% bằng ngôn ngữ đó
-- Tiếng Việt → Phản hồi song ngữ [Tiếng Việt + 한국어]
-- 한국어 → 100% 한국어만
-- English → 100% English only
+function getCacheMessage(lang: SupportedLang) {
+  const map: Record<SupportedLang, string> = {
+    ko: "이 결과는 이전 채점 기록에서 불러왔습니다. 점수와 피드백은 이전 채점과 동일합니다.",
+    vi: "Kết quả này được lấy từ lịch sử chấm điểm trước đó. Điểm số và nhận xét nhất quán với lần chấm trước.",
+    en: "This result was loaded from your previous grading history. The score and feedback match the earlier evaluation.",
+    ja: "この結果は以前の採点履歴から読み込みました。点数とフィードバックは前回と同一です。",
+    zh: "该结果来自你之前的评分记录，分数与反馈与上次一致。",
+    ru: "Этот результат загружен из вашей предыдущей истории проверки. Балл и отзыв совпадают с прошлой оценкой.",
+    uz: "Ushbu natija avvalgi tekshiruv tarixingizdan yuklandi. Ball va fikrlar oldingi baholash bilan bir xil."
+  };
+  return map[lang];
+}
 
-## ⚠️⚠️⚠️ CRITICAL: QUY TẮC ĐẾM SỐ KÝ TỰ (글자 수 세기) ⚠️⚠️⚠️
+function getSystemPrompt(lang: SupportedLang) {
+  const languageRule: Record<SupportedLang, string> = {
+    ko: "모든 설명/피드백/항목의 텍스트는 100% 한국어로 작성한다.",
+    vi: "Tất cả phần giải thích/nhận xét/ghi chú phải viết 100% bằng Tiếng Việt.",
+    en: "All explanations/feedback/notes must be written 100% in English.",
+    ja: "説明/フィードバック/注記はすべて100%日本語で書く。",
+    zh: "所有解释/反馈/说明必须100%使用中文。",
+    ru: "Все объяснения/отзывы/примечания должны быть написаны на 100% по-русски.",
+    uz: "Barcha izohlar/fikr-mulohazalar/qo‘shimcha eslatmalar 100% o‘zbek tilida yozilsin."
+  };
 
-**ĐÂY LÀ QUY TẮC BẮT BUỘC THEO TIÊU CHUẨN TOPIK CHÍNH THỨC:**
+  return `# TOPIK Writing Coach Pro (Strict JSON)
 
-🔴 **QUAN TRỌNG NHẤT**: Trong kỳ thi TOPIK, **KÝ TỰ CÁCH (띄어쓰기/SPACE) ĐƯỢC TÍNH LÀ 1 KÝ TỰ!**
+## 역할
+당신은 TOPIK II 쓰기(51~54) 채점 전문가입니다. 공식 TOPIK 기준으로 매우 엄격하고 일관되게 채점합니다.
 
-### CÁCH ĐẾM ĐÚNG:
-- ✅ Mỗi chữ cái Hangul = 1 ký tự (예: 한 = 1자, 국 = 1자)
-- ✅ Mỗi dấu cách/space = 1 ký tự (예: "안녕 하세요" = 6자, không phải 5자!)
-- ✅ Mỗi dấu chấm câu = 1 ký tự (예: . , ! ? = 1자)
-- ✅ Mỗi số = 1 ký tự (예: 1, 2, 3 = 1자)
-- ✅ Xuống dòng (줄바꿈) = KHÔNG tính
+## 응답 언어 (강제)
+- UI 언어 = ${lang}
+- ${languageRule[lang]}
+- 단, JSON 키 이름은 아래 스키마 그대로 유지한다.
 
-### YÊU CẦU SỐ KÝ TỰ THEO ĐỀ:
-- 문항 53 (Phân tích biểu đồ): 200-300자 (bao gồm cả dấu cách!)
-- 문항 54 (Tiểu luận): 600-700자 (bao gồm cả dấu cách!)
+## 글자 수(문자 수) 규칙 (TOPIK 공식)
+- 띄어쓰기(공백)도 1자로 반드시 포함하여 계산한다.
+- 줄바꿈(개행)은 글자 수에 포함하지 않는다.
 
-🚨 **NẾU BÀI VIẾT THIẾU SỐ KÝ TỰ**: Trừ điểm mạnh ở phần 내용 및 과제 수행!
+## 점수 규칙 (절대)
+- overall_score = grammar_score + vocabulary_score + structure_score + content_score
+- 각 영역 0~25 정수
+- overall_score 0~100 (반드시 합산값)
 
-## ⚠️⚠️⚠️ CRITICAL: 점수 계산 규칙 (MUST FOLLOW - NO EXCEPTIONS!) ⚠️⚠️⚠️
-
-### 🔴 절대 규칙 (ABSOLUTE RULE):
-**overall_score = grammar_score + vocabulary_score + structure_score + content_score**
-
-### 각 영역 점수 범위:
-- grammar_score: 0~25점 (정수만)
-- vocabulary_score: 0~25점 (정수만)
-- structure_score: 0~25점 (정수만)
-- content_score: 0~25점 (정수만)
-- **overall_score: 0~100점 (반드시 위 4개 점수의 합계!)**
-
-### ✅ 올바른 점수 계산 예시:
-| grammar | vocabulary | structure | content | overall |
-|---------|------------|-----------|---------|---------|
-| 20 | 18 | 22 | 15 | **75** ✓ |
-| 22 | 22 | 23 | 13 | **80** ✓ |
-| 15 | 12 | 18 | 10 | **55** ✓ |
-| 25 | 25 | 25 | 25 | **100** ✓ |
-
-### ❌ 잘못된 점수 계산 (절대 금지!):
-| grammar | vocabulary | structure | content | overall | 오류 |
-|---------|------------|-----------|---------|---------|------|
-| 22 | 22 | 23 | 13 | 37 | ❌ 합계가 80인데 37로 잘못 표기! |
-| 20 | 18 | 22 | 15 | 50 | ❌ 합계가 75인데 50으로 잘못 표기! |
-
-## 📋 채점 기준 상세 (각 25점 만점)
-
-### 1. 문법 (grammar_score: 0-25점)
-- 25점: 문법 오류 0개, 완벽한 문장 구조
-- 20-24점: 경미한 오류 1-2개 (조사, 어미 실수)
-- 15-19점: 중간 수준 오류 3-5개
-- 10-14점: 심각한 오류 다수, 의미 전달에 문제
-- 0-9점: 기본 문장 구조 미흡, 읽기 어려움
-
-### 2. 어휘 (vocabulary_score: 0-25점)
-- 25점: TOPIK 6급 수준 학술 어휘, 다양하고 정확한 사용
-- 20-24점: 적절하고 다양한 어휘 선택
-- 15-19점: 평범한 어휘, 일부 반복
-- 10-14점: 제한적 어휘, 부적절한 사용
-- 0-9점: 매우 제한적, 기초 어휘만 사용
-
-### 3. 구조 (structure_score: 0-25점)
-- 25점: 완벽한 서론-본론-결론, 논리적 흐름, 자연스러운 연결
-- 20-24점: 명확한 구조, 약간의 개선 여지
-- 15-19점: 기본 구조 있으나 전환 미흡
-- 10-14점: 구조 불명확, 논리적 흐름 약함
-- 0-9점: 구조 없음, 무질서한 나열
-
-### 4. 내용 (content_score: 0-25점)
-- 25점: 과제 완벽 수행, 글자 수 충족, 설득력 있는 논거
-- 20-24점: 과제 수행 양호, 논거 적절
-- 15-19점: 기본 요구 충족, 깊이 부족
-- 10-14점: 과제 부분 수행, 글자 수 미달
-- 0-9점: 과제 미수행 또는 심각한 글자 수 부족
-
-## 📊 OUTPUT FORMAT (JSON)
-
-⚠️ **CRITICAL**: overall_score는 반드시 grammar_score + vocabulary_score + structure_score + content_score의 합이어야 함!
+## 출력 형식
+- 아래 JSON 스키마를 반드시 준수한다.
+- 설명 텍스트를 JSON 밖에 절대 출력하지 않는다.
 
 {
-  "overall_score": number (= grammar + vocabulary + structure + content, 반드시 합산값!),
-  "grammar_score": number (0-25, 정수),
-  "vocabulary_score": number (0-25, 정수),
-  "structure_score": number (0-25, 정수),
-  "content_score": number (0-25, 정수),
+  "overall_score": number,
+  "grammar_score": number,
+  "vocabulary_score": number,
+  "structure_score": number,
+  "content_score": number,
   "character_count": {
-    "total": number (PHẢI ĐẾM CẢ DẤU CÁCH!),
+    "total": number,
     "required_min": number,
     "required_max": number,
     "is_sufficient": boolean,
-    "note": "Bao gồm cả dấu cách (띄어쓰기) theo tiêu chuẩn TOPIK"
+    "note": string
   },
   "swot_analysis": {
-    "strengths": [{"title": "강점명", "evidence": "인용", "analysis": "분석"}],
-    "weaknesses": [{"title": "약점명", "issue": "문제점", "impact": "영향"}],
-    "opportunities": [{"title": "개선점", "action": "방법", "benefit": "효과"}],
-    "threats": [{"title": "주의사항", "risk_level": "상/중/하", "prevention": "예방법"}]
+    "strengths": [{"title": string, "evidence": string, "analysis": string}],
+    "weaknesses": [{"title": string, "issue": string, "impact": string}],
+    "opportunities": [{"title": string, "action": string, "benefit": string}],
+    "threats": [{"title": string, "risk_level": string, "prevention": string}]
   },
   "corrections": [
-    {
-      "original": "틀린 문장",
-      "corrected": "수정된 문장",
-      "explanation": "설명 (사용자 언어로)",
-      "type": "grammar|vocabulary|spelling|structure"
-    }
+    {"original": string, "corrected": string, "explanation": string, "type": "grammar|vocabulary|spelling|structure"}
   ],
-  "vocabulary_upgrades": [
-    {"basic": "평범한 표현", "advanced": "고급 표현", "difference": "차이점"}
-  ],
-  "structure_improvements": [
-    {"current": "현재 내용", "improved": "개선된 내용", "reason": "이유"}
-  ],
-  "strengths": ["강점1", "강점2"],
-  "improvements": ["개선점1", "개선점2"],
-  "model_answer": "모범 답안 (한국어)",
-  "detailed_feedback": "상세 피드백 (사용자 언어로)",
-  "next_priority": ["최우선 과제", "다음 과제"]
+  "vocabulary_upgrades": [{"basic": string, "advanced": string, "difference": string}],
+  "structure_improvements": [{"current": string, "improved": string, "reason": string}],
+  "strengths": string[],
+  "improvements": string[],
+  "model_answer": string,
+  "detailed_feedback": string,
+  "next_priority": string[]
+}`;
 }
-
-## 🚑 FIRST AID 필수
-1. 🔴 **점수 합산 확인** (최우선!): overall_score = 4개 점수 합계인지 반드시 검증!
-2. 🔴 **글자 수 확인**: 띄어쓰기 포함 정확한 글자 수 계산 및 보고
-3. 🔴 **문법 오류**: 모든 문법 오류 수정 + 이유 설명
-4. 🟡 **어휘 개선**: 평범한 표현 → 고급 표현 업그레이드
-5. 🟢 **구조 강화**: 서론/본론/결론 개선안
-
-## ⚡ 원칙
-- 100% 정확한 TOPIK 기준
-- **overall_score = grammar + vocabulary + structure + content (절대 규칙!)**
-- **글자 수는 반드시 띄어쓰기 포함하여 계산**
-- 모든 오류 빠짐없이 수정
-- 구체적이고 실행 가능한 피드백
-- 모범 답안은 TOPIK 6급 수준
-- JSON만 반환 (설명 텍스트 없이)`;
 
 // 텍스트 정규화 함수 (캐시 비교용)
 function normalizeText(text: string): string {
@@ -191,7 +132,9 @@ serve(async (req) => {
   }
 
   try {
-    const { questionImageUrl, answerImageUrl, answerText, ocrOnly, userId } = await req.json();
+    const { questionImageUrl, answerImageUrl, answerText, ocrOnly, userId, uiLanguage } = await req.json();
+    const lang = normalizeLang(uiLanguage);
+
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -206,10 +149,10 @@ serve(async (req) => {
     // OCR-only mode: extract text from answer image
     if (ocrOnly && answerImageUrl) {
       console.log("OCR-only mode: extracting text from image");
-      
+
       let imageData = answerImageUrl;
       let mimeType = "image/jpeg";
-      
+
       // Handle base64 data URL
       if (answerImageUrl.startsWith("data:")) {
         const matches = answerImageUrl.match(/^data:([^;]+);base64,(.+)$/);
@@ -226,10 +169,9 @@ serve(async (req) => {
           mimeType = imgResponse.headers.get("content-type") || "image/png";
         } catch (e) {
           console.error("Failed to fetch image for OCR:", e);
-          return new Response(
-            JSON.stringify({ extractedText: "" }),
-            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
+          return new Response(JSON.stringify({ extractedText: "" }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
         }
       }
 
@@ -239,52 +181,54 @@ serve(async (req) => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            contents: [{
-              role: "user",
-              parts: [
-                { text: "이 이미지에서 한국어 텍스트를 추출해주세요. 손글씨나 타이핑된 텍스트 모두 포함합니다. 텍스트만 출력하고 다른 설명은 하지 마세요. 텍스트가 없으면 빈 문자열을 반환하세요." },
-                {
-                  inline_data: {
-                    mime_type: mimeType,
-                    data: imageData
-                  }
-                }
-              ]
-            }],
+            contents: [
+              {
+                role: "user",
+                parts: [
+                  {
+                    text: "이 이미지에서 한국어 텍스트를 추출해주세요. 손글씨나 타이핑된 텍스트 모두 포함합니다. 텍스트만 출력하고 다른 설명은 하지 마세요. 텍스트가 없으면 빈 문자열을 반환하세요.",
+                  },
+                  {
+                    inline_data: {
+                      mime_type: mimeType,
+                      data: imageData,
+                    },
+                  },
+                ],
+              },
+            ],
             generationConfig: {
               temperature: 0.1,
-              maxOutputTokens: 4096
-            }
+              maxOutputTokens: 4096,
+            },
           }),
         }
       );
 
       if (!ocrResponse.ok) {
         console.error("OCR API error:", await ocrResponse.text());
-        return new Response(
-          JSON.stringify({ extractedText: "" }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        return new Response(JSON.stringify({ extractedText: "" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
 
       const ocrData = await ocrResponse.json();
       const extractedText = ocrData.candidates?.[0]?.content?.parts?.[0]?.text || "";
-      
+
       console.log("OCR extracted text length:", extractedText.length);
-      
-      return new Response(
-        JSON.stringify({ extractedText: extractedText.trim() }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+
+      return new Response(JSON.stringify({ extractedText: extractedText.trim() }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     // ========== 캐싱 로직 시작 ==========
-    
+
     // 콘텐츠 해시 생성 (문제 URL + 답안 텍스트 조합)
     const normalizedAnswer = normalizeText(answerText || "");
     const contentForHash = `q:${questionImageUrl || ""}|a:${normalizedAnswer}`;
     const contentHash = await generateHash(contentForHash);
-    
+
     console.log("Generated content hash:", contentHash.substring(0, 16) + "...");
 
     // 캐시 확인 (동일 사용자 + 동일 콘텐츠)
@@ -300,28 +244,80 @@ serve(async (req) => {
 
       if (!cacheError && cachedResult && cachedResult.correction_report) {
         console.log("✅ CACHE HIT! Returning cached result for user:", userId);
-        
+
         const cachedReport = cachedResult.correction_report as any;
-        
+
         return new Response(
           JSON.stringify({
             ...cachedReport,
             is_cached: true,
-            cache_message: "Kết quả này được lấy từ lịch sử chấm điểm trước đó. Điểm số và nhận xét nhất quán với lần chấm trước."
+            cache_message: getCacheMessage(lang),
           }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      
+
       console.log("❌ CACHE MISS - Calling AI for fresh grading");
     }
 
     // ========== 캐싱 로직 끝 ==========
 
+    const UI_PROMPTS: Record<SupportedLang, { analyze: string; answerImage: string; answerText: string; finish: string; ack: string }> = {
+      ko: {
+        analyze: "다음 이미지는 TOPIK II 쓰기 문제입니다. 이미지에서 문제를 정확히 읽고 요구사항(글자 수 포함)을 정리하세요.",
+        answerImage: "다음은 수험자의 답안(이미지)입니다.",
+        answerText: "다음은 수험자의 답안(텍스트)입니다:\n\n",
+        finish: "위 규칙을 준수하여 채점하고, 지정된 JSON 형식으로만 결과를 반환하세요.",
+        ack: "네, 이해했습니다. TOPIK II 기준으로 엄격하게 채점하고 JSON으로만 반환하겠습니다.",
+      },
+      vi: {
+        analyze: "Đây là đề TOPIK II Writing. Hãy đọc chính xác yêu cầu (bao gồm số ký tự) từ hình ảnh.",
+        answerImage: "Đây là bài làm của thí sinh (hình ảnh).",
+        answerText: "Đây là bài làm của thí sinh (văn bản):\n\n",
+        finish: "Hãy chấm điểm theo quy tắc và chỉ trả về JSON theo định dạng đã quy định.",
+        ack: "Vâng, tôi hiểu. Tôi sẽ chấm theo tiêu chuẩn TOPIK II và chỉ trả về JSON.",
+      },
+      en: {
+        analyze: "This is a TOPIK II Writing prompt. Accurately read the task requirements (including character limits) from the image.",
+        answerImage: "This is the examinee's answer (image).",
+        answerText: "This is the examinee's answer (text):\n\n",
+        finish: "Grade strictly using the rules and return ONLY the specified JSON.",
+        ack: "Understood. I will grade strictly by TOPIK II standards and return JSON only.",
+      },
+      ja: {
+        analyze: "これはTOPIK IIの作文問題です。画像から課題条件（文字数含む）を正確に読み取ってください。",
+        answerImage: "以下は受験者の解答（画像）です。",
+        answerText: "以下は受験者の解答（テキスト）です。\n\n",
+        finish: "規則に従って採点し、指定されたJSON形式のみで返してください。",
+        ack: "了解しました。TOPIK II基準で厳密に採点し、JSONのみ返します。",
+      },
+      zh: {
+        analyze: "这是一道TOPIK II写作题。请从图片中准确读取题目要求（包含字数要求）。",
+        answerImage: "以下是考生答案（图片）。",
+        answerText: "以下是考生答案（文本）：\n\n",
+        finish: "请严格按规则评分，并且只按指定JSON格式返回结果。",
+        ack: "明白。我将严格按TOPIK II标准评分，并且只返回JSON。",
+      },
+      ru: {
+        analyze: "Это задание TOPIK II Writing. Точно прочитайте требования (включая лимит символов) по изображению.",
+        answerImage: "Ниже — ответ экзаменуемого (изображение).",
+        answerText: "Ниже — ответ экзаменуемого (текст):\n\n",
+        finish: "Оцените строго по правилам и верните ТОЛЬКО указанный JSON.",
+        ack: "Понял. Оценю строго по стандартам TOPIK II и верну только JSON.",
+      },
+      uz: {
+        analyze: "Bu TOPIK II Writing topshirig‘i. Rasmdan talablarni (belgilar soni cheklovi bilan) aniq o‘qing.",
+        answerImage: "Quyida imtihon topshiruvchining javobi (rasm) keltirilgan.",
+        answerText: "Quyida imtihon topshiruvchining javobi (matn):\n\n",
+        finish: "Qoidalarga qat’iy amal qilib baholang va faqat belgilangan JSON ko‘rinishida qaytaring.",
+        ack: "Tushunarli. TOPIK II mezonlari bo‘yicha qat’iy baholab, faqat JSON qaytaraman.",
+      },
+    };
+
+    const ui = UI_PROMPTS[lang];
+
     // Build the content parts for Gemini
-    const contentParts: any[] = [
-      { text: `Đây là đề bài TOPIK II Writing. Hãy phân tích đề bài từ hình ảnh sau:` }
-    ];
+    const contentParts: any[] = [{ text: ui.analyze }];
 
     // Fetch and convert question image to base64 if URL provided
     if (questionImageUrl) {
@@ -330,12 +326,12 @@ serve(async (req) => {
         const arrayBuffer = await imgResponse.arrayBuffer();
         const base64 = arrayBufferToBase64(arrayBuffer);
         const mimeType = imgResponse.headers.get("content-type") || "image/png";
-        
+
         contentParts.push({
           inline_data: {
             mime_type: mimeType,
-            data: base64
-          }
+            data: base64,
+          },
         });
       } catch (e) {
         console.error("Failed to fetch question image:", e);
@@ -343,19 +339,19 @@ serve(async (req) => {
     }
 
     if (answerImageUrl) {
-      contentParts.push({ text: "Đây là bài làm của thí sinh (hình ảnh):" });
-      
+      contentParts.push({ text: ui.answerImage });
+
       try {
         const imgResponse = await fetch(answerImageUrl);
         const arrayBuffer = await imgResponse.arrayBuffer();
         const base64 = arrayBufferToBase64(arrayBuffer);
         const mimeType = imgResponse.headers.get("content-type") || "image/png";
-        
+
         contentParts.push({
           inline_data: {
             mime_type: mimeType,
-            data: base64
-          }
+            data: base64,
+          },
         });
       } catch (e) {
         console.error("Failed to fetch answer image:", e);
@@ -364,15 +360,15 @@ serve(async (req) => {
 
     if (answerText) {
       contentParts.push({
-        text: `Đây là bài làm của thí sinh (văn bản):\n\n${answerText}`
+        text: `${ui.answerText}${answerText}`,
       });
     }
 
-    contentParts.push({
-      text: "Hãy chấm điểm và trả về kết quả theo định dạng JSON đã quy định."
-    });
+    contentParts.push({ text: ui.finish });
 
-    console.log("Calling Gemini 2.5 Flash DIRECT API with thinkingBudget: 24576, maxOutputTokens: 65536");
+    console.log(
+      "Calling Gemini 2.5 Flash DIRECT API with thinkingBudget: 24576, maxOutputTokens: 65536"
+    );
 
     // Direct Gemini API call with thinkingBudget
     const response = await fetch(
@@ -386,16 +382,16 @@ serve(async (req) => {
           contents: [
             {
               role: "user",
-              parts: [{ text: SYSTEM_PROMPT }]
+              parts: [{ text: getSystemPrompt(lang) }],
             },
             {
               role: "model",
-              parts: [{ text: "Vâng, tôi hiểu. Tôi sẽ chấm điểm bài viết TOPIK II theo tiêu chuẩn chính thức và trả về kết quả JSON." }]
+              parts: [{ text: ui.ack }],
             },
             {
               role: "user",
-              parts: contentParts
-            }
+              parts: contentParts,
+            },
           ],
           generationConfig: {
             temperature: 0.15, // 일관성 우선
@@ -403,19 +399,18 @@ serve(async (req) => {
             topK: 40,
             maxOutputTokens: 65536,
             thinkingConfig: {
-              thinkingBudget: 24576 // ✅ 모델 상한(0~24576)
-            }
+              thinkingBudget: 24576, // ✅ 모델 상한(0~24576)
+            },
           },
           safetySettings: [
             { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
             { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
             { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
-          ]
+            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+          ],
         }),
       }
     );
-
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Gemini API error:", response.status, errorText);

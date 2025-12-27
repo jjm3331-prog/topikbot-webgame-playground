@@ -86,7 +86,7 @@ interface SavedCorrection {
 
 const WritingCorrection = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const { isPremium } = useSubscription();
   const [user, setUser] = useState<any>(null);
@@ -294,6 +294,7 @@ const WritingCorrection = () => {
         body: {
           ocrOnly: true,
           answerImageUrl: imageBase64,
+          uiLanguage: i18n.language,
         },
       });
 
@@ -320,6 +321,7 @@ const WritingCorrection = () => {
           body: {
             ocrOnly: true,
             answerImageUrl: imagesBase64[i],
+            uiLanguage: i18n.language,
           },
         });
 
@@ -437,8 +439,9 @@ const WritingCorrection = () => {
           questionImageUrl,
           answerImageUrl,
           answerText: answerMethod === "text" ? answerText : null,
-          userId: user.id // 캐싱을 위한 사용자 ID 전달
-        }
+          userId: user.id, // 캐싱을 위한 사용자 ID 전달
+          uiLanguage: i18n.language,
+        },
       });
 
       if (response.error) throw response.error;
