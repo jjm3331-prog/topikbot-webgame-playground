@@ -728,20 +728,32 @@ export default function BoardPost() {
               {showTranslated && translatedContent ? (
                 <>
                   <div 
-                    className="prose prose-sm max-w-none mt-6 text-foreground [&_p]:mb-4 [&_p]:leading-relaxed"
+                    className="prose prose-sm max-w-none mt-6 text-foreground 
+                      [&_p]:mb-4 [&_p]:leading-relaxed [&_p]:text-foreground
+                      [&_br]:mb-2 [&_strong]:font-semibold [&_em]:italic
+                      [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5
+                      [&_li]:mb-1 [&_a]:text-primary [&_a]:underline"
                     dangerouslySetInnerHTML={{ __html: translatedContent }}
                   />
 
                   {translatedMediaHtml && (
                     <div
-                      className="prose prose-sm max-w-none mt-6 text-foreground"
+                      className="prose prose-sm max-w-none mt-4 text-foreground
+                        [&_img]:rounded-lg [&_img]:my-4 [&_img]:max-w-full
+                        [&_iframe]:rounded-lg [&_video]:rounded-lg"
                       dangerouslySetInnerHTML={{ __html: translatedMediaHtml }}
                     />
                   )}
                 </>
               ) : (
                 <div 
-                  className="prose prose-sm max-w-none mt-6 text-foreground"
+                  className="prose prose-sm max-w-none mt-6 text-foreground
+                    [&_p]:mb-4 [&_p]:leading-relaxed [&_p]:text-foreground
+                    [&_br]:mb-2 [&_strong]:font-semibold [&_em]:italic
+                    [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5
+                    [&_li]:mb-1 [&_a]:text-primary [&_a]:underline
+                    [&_img]:rounded-lg [&_img]:my-4 [&_img]:max-w-full
+                    [&_iframe]:rounded-lg [&_video]:rounded-lg"
                   dangerouslySetInnerHTML={{ __html: post.content }}
                 />
               )}
