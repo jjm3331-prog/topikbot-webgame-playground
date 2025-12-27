@@ -1281,6 +1281,28 @@
     "uploadError": "图片上传失败",
     "pasteHint": "💡 Ctrl+V直接粘贴图片到内容中"
   },
+  "blockEditor": {
+    "text": "文本",
+    "heading": "标题",
+    "quote": "引用",
+    "list": "列表",
+    "divider": "分隔线",
+    "image": "图片",
+    "selectBlockType": "选择块类型",
+    "addFirstBlock": "添加第一个块",
+    "minOneBlock": "至少需要1个块",
+    "onlyImages": "只允许图片",
+    "imageUploaded": "图片已上传",
+    "uploadFailed": "上传失败",
+    "textPlaceholder": "输入文本...",
+    "headingPlaceholder": "输入标题...",
+    "quotePlaceholder": "输入引用...",
+    "listItemPlaceholder": "输入项目...",
+    "addItem": "添加项目",
+    "clickToUpload": "点击上传图片",
+    "youtubePlaceholder": "输入YouTube URL...",
+    "hint": "添加块来撰写帖子。使用块之间的+按钮添加新块。"
+  },
   "boardHub": {
     "back": "返回",
     "title": "社区",

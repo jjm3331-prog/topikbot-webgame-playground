@@ -1274,6 +1274,28 @@
     "update": "Обновить",
     "submit": "Опубликовать"
   },
+  "blockEditor": {
+    "text": "Текст",
+    "heading": "Заголовок",
+    "quote": "Цитата",
+    "list": "Список",
+    "divider": "Разделитель",
+    "image": "Изображение",
+    "selectBlockType": "Выбрать тип блока",
+    "addFirstBlock": "Добавить первый блок",
+    "minOneBlock": "Необходим минимум 1 блок",
+    "onlyImages": "Только изображения",
+    "imageUploaded": "Изображение загружено",
+    "uploadFailed": "Ошибка загрузки",
+    "textPlaceholder": "Введите текст...",
+    "headingPlaceholder": "Введите заголовок...",
+    "quotePlaceholder": "Введите цитату...",
+    "listItemPlaceholder": "Введите пункт...",
+    "addItem": "Добавить пункт",
+    "clickToUpload": "Нажмите для загрузки изображения",
+    "youtubePlaceholder": "Введите URL YouTube...",
+    "hint": "Добавляйте блоки для создания поста. Используйте кнопку + между блоками."
+  },
   "boardHub": {
     "back": "Назад",
     "title": "Сообщество",

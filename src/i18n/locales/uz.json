@@ -1274,6 +1274,28 @@
     "update": "Yangilash",
     "submit": "Joylash"
   },
+  "blockEditor": {
+    "text": "Matn",
+    "heading": "Sarlavha",
+    "quote": "Iqtibos",
+    "list": "Ro'yxat",
+    "divider": "Ajratgich",
+    "image": "Rasm",
+    "selectBlockType": "Blok turini tanlang",
+    "addFirstBlock": "Birinchi blokni qo'shing",
+    "minOneBlock": "Kamida 1 ta blok kerak",
+    "onlyImages": "Faqat rasmlar ruxsat etilgan",
+    "imageUploaded": "Rasm yuklandi",
+    "uploadFailed": "Yuklash muvaffaqiyatsiz",
+    "textPlaceholder": "Matn kiriting...",
+    "headingPlaceholder": "Sarlavha kiriting...",
+    "quotePlaceholder": "Iqtibos kiriting...",
+    "listItemPlaceholder": "Band kiriting...",
+    "addItem": "Band qo'shish",
+    "clickToUpload": "Rasm yuklash uchun bosing",
+    "youtubePlaceholder": "YouTube URL kiriting...",
+    "hint": "Post yozish uchun bloklar qo'shing. Bloklar orasidagi + tugmasidan foydalaning."
+  },
   "boardHub": {
     "back": "Orqaga",
     "title": "Jamiyat",

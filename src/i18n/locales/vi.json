@@ -1690,6 +1690,28 @@
     "uploadError": "Tải ảnh thất bại",
     "pasteHint": "💡 Ctrl+V để dán ảnh trực tiếp vào nội dung"
   },
+  "blockEditor": {
+    "text": "Văn bản",
+    "heading": "Tiêu đề",
+    "quote": "Trích dẫn",
+    "list": "Danh sách",
+    "divider": "Đường kẻ",
+    "image": "Hình ảnh",
+    "selectBlockType": "Chọn loại block",
+    "addFirstBlock": "Thêm block đầu tiên",
+    "minOneBlock": "Cần ít nhất 1 block",
+    "onlyImages": "Chỉ cho phép hình ảnh",
+    "imageUploaded": "Đã tải ảnh lên",
+    "uploadFailed": "Tải lên thất bại",
+    "textPlaceholder": "Nhập văn bản...",
+    "headingPlaceholder": "Nhập tiêu đề...",
+    "quotePlaceholder": "Nhập trích dẫn...",
+    "listItemPlaceholder": "Nhập mục...",
+    "addItem": "Thêm mục",
+    "clickToUpload": "Nhấp để tải ảnh lên",
+    "youtubePlaceholder": "Nhập URL YouTube...",
+    "hint": "Thêm các block để viết bài. Nhấp nút + giữa các block để thêm block mới."
+  },
   "boardHub": {
     "back": "Quay lại",
     "title": "Cộng đồng",
