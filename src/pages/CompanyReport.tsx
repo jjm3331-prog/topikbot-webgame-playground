@@ -108,7 +108,7 @@ const CompanyReport = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <CleanHeader />
 
-      <main className="flex-1 pt-8 pb-12 px-4 max-w-4xl mx-auto w-full">
+      <main className="flex-1 pt-8 pb-12 px-4 sm:px-8 lg:px-12 max-w-6xl mx-auto w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -242,8 +242,25 @@ const CompanyReport = () => {
                   </h2>
                 </div>
 
-                <div className="prose prose-sm dark:prose-invert max-w-none">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{report}</ReactMarkdown>
+                <div className="prose-ai max-w-none">
+                  <ReactMarkdown 
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      table: ({ children }) => (
+                        <div className="overflow-x-auto my-6">
+                          <table>{children}</table>
+                        </div>
+                      ),
+                      li: ({ children }) => (
+                        <li className="pl-1">{children}</li>
+                      ),
+                      strong: ({ children }) => (
+                        <strong className="font-bold text-foreground">{children}</strong>
+                      ),
+                    }}
+                  >
+                    {report}
+                  </ReactMarkdown>
                 </div>
               </Card>
 
