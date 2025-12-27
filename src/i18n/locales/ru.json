@@ -20,6 +20,7 @@
     "sections": { "originalAnalysis": "Анализ оригинала", "variantQuestion": "Вариант", "answer": "Ответ", "explanation": "Объяснение", "learningPoints": "Учебные моменты", "difficultyAnalysis": "Анализ сложности", "similarQuestions": "Похожие вопросы" },
     "difficulty": { "level": "Уровень TOPIK", "grade": "Класс", "score": "Балл сложности", "unknown": "Неизвестно", "easy": "Легко", "medium": "Средне", "hard": "Сложно", "veryHard": "Очень сложно" },
     "pdf": { "createdAt": "Дата создания", "translation": "Перевод" },
+    "userLanguage": "Ваш язык",
     "success": { "generated": "Вариант создан", "pdfOpened": "PDF открыт" },
     "errors": { "selectImage": "Выберите изображение", "premiumRequired": "Требуется премиум", "apiError": "Ошибка API", "tryAgain": "Попробуйте снова", "imageTooLarge": "Размер до 10МБ", "noContent": "Нет контента", "popupBlocked": "Всплывающее окно заблокировано", "pdfError": "Ошибка PDF" }
   },

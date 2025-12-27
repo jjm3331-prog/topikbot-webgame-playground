@@ -20,6 +20,7 @@
     "sections": { "originalAnalysis": "Asl tahlil", "variantQuestion": "Variant", "answer": "Javob", "explanation": "Tushuntirish", "learningPoints": "O'rganish nuqtalari", "difficultyAnalysis": "Qiyinlik tahlili", "similarQuestions": "O'xshash savollar" },
     "difficulty": { "level": "TOPIK darajasi", "grade": "Daraja", "score": "Qiyinlik balli", "unknown": "Noma'lum", "easy": "Oson", "medium": "O'rtacha", "hard": "Qiyin", "veryHard": "Juda qiyin" },
     "pdf": { "createdAt": "Yaratilgan sana", "translation": "Tarjima" },
+    "userLanguage": "Sizning tilingiz",
     "success": { "generated": "Variant yaratildi", "pdfOpened": "PDF ochildi" },
     "errors": { "selectImage": "Rasm tanlang", "premiumRequired": "Premium kerak", "apiError": "API xatosi", "tryAgain": "Qayta urinib ko'ring", "imageTooLarge": "Rasm 10MB dan kichik bo'lishi kerak", "noContent": "Yuklab olish uchun kontent yo'q", "popupBlocked": "Popup bloklangan", "pdfError": "PDF xatosi" }
   },

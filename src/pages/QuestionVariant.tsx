@@ -47,8 +47,9 @@ export default function QuestionVariant() {
   const [generatedContent, setGeneratedContent] = useState<ParsedResult | null>(null);
   const [rawContent, setRawContent] = useState<string | null>(null);
 
-  // 항상 문제/해설 출력은 한국어(ko) 기준으로 표시
-  const currentLang = "ko";
+  // 사용자의 현재 언어 (한국어가 아닌 경우 병기 표시)
+  const userLang = i18n.language;
+  const showBilingual = userLang !== "ko";
 
   const usageExamples = [
     { subject: t("questionVariant.examples.reading"), example: t("questionVariant.examples.readingDesc") },
@@ -334,6 +335,7 @@ export default function QuestionVariant() {
           imageBase64: base64Data,
           imageMimeType: mimeType,
           difficulty: "similar",
+          userLanguage: userLang, // 사용자 언어 전달
         },
       });
 
@@ -623,9 +625,18 @@ export default function QuestionVariant() {
                       </div>
                     </div>
                     {generatedContent.difficulty.reasoning && (
-                      <p className="mt-4 text-sm text-muted-foreground">
-                        {generatedContent.difficulty.reasoning[currentLang] || generatedContent.difficulty.reasoning.ko}
-                      </p>
+                      <div className="mt-4 space-y-2">
+                        <p className="text-sm text-foreground">
+                          <span className="inline-block px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 text-xs font-medium mr-2">🇰🇷 KO</span>
+                          {generatedContent.difficulty.reasoning.ko}
+                        </p>
+                        {showBilingual && generatedContent.difficulty.reasoning[userLang] && (
+                          <p className="text-sm text-muted-foreground">
+                            <span className="inline-block px-2 py-0.5 rounded bg-green-500/20 text-green-400 text-xs font-medium mr-2">🌏 {userLang.toUpperCase()}</span>
+                            {generatedContent.difficulty.reasoning[userLang]}
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
                 )}
@@ -636,9 +647,18 @@ export default function QuestionVariant() {
                       <BookOpen className="w-5 h-5 text-blue-500" />
                       {t("questionVariant.sections.originalAnalysis")}
                     </h4>
-                    <p className="text-foreground whitespace-pre-wrap">
-                      {generatedContent.originalAnalysis[currentLang] || generatedContent.originalAnalysis.ko}
-                    </p>
+                    <div className="space-y-3">
+                      <div>
+                        <span className="inline-block px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 text-xs font-medium mb-2">🇰🇷 한국어</span>
+                        <p className="text-foreground whitespace-pre-wrap">{generatedContent.originalAnalysis.ko}</p>
+                      </div>
+                      {showBilingual && generatedContent.originalAnalysis[userLang] && (
+                        <div className="pt-3 border-t border-blue-500/20">
+                          <span className="inline-block px-2 py-0.5 rounded bg-green-500/20 text-green-400 text-xs font-medium mb-2">🌏 {t("questionVariant.userLanguage")}</span>
+                          <p className="text-muted-foreground whitespace-pre-wrap">{generatedContent.originalAnalysis[userLang]}</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -648,9 +668,18 @@ export default function QuestionVariant() {
                       <Sparkles className="w-5 h-5 text-amber-500" />
                       {t("questionVariant.sections.variantQuestion")}
                     </h4>
-                    <p className="text-foreground whitespace-pre-wrap">
-                      {generatedContent.variantQuestion[currentLang] || generatedContent.variantQuestion.ko}
-                    </p>
+                    <div className="space-y-3">
+                      <div>
+                        <span className="inline-block px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 text-xs font-medium mb-2">🇰🇷 한국어</span>
+                        <p className="text-foreground whitespace-pre-wrap">{generatedContent.variantQuestion.ko}</p>
+                      </div>
+                      {showBilingual && generatedContent.variantQuestion[userLang] && (
+                        <div className="pt-3 border-t border-amber-500/20">
+                          <span className="inline-block px-2 py-0.5 rounded bg-green-500/20 text-green-400 text-xs font-medium mb-2">🌏 {t("questionVariant.userLanguage")}</span>
+                          <p className="text-muted-foreground whitespace-pre-wrap">{generatedContent.variantQuestion[userLang]}</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -660,9 +689,18 @@ export default function QuestionVariant() {
                       <CheckCircle2 className="w-5 h-5 text-green-500" />
                       {t("questionVariant.sections.answer")}
                     </h4>
-                    <p className="text-foreground whitespace-pre-wrap">
-                      {generatedContent.answer[currentLang] || generatedContent.answer.ko}
-                    </p>
+                    <div className="space-y-3">
+                      <div>
+                        <span className="inline-block px-2 py-0.5 rounded bg-green-500/20 text-green-400 text-xs font-medium mb-2">🇰🇷 한국어</span>
+                        <p className="text-foreground whitespace-pre-wrap">{generatedContent.answer.ko}</p>
+                      </div>
+                      {showBilingual && generatedContent.answer[userLang] && (
+                        <div className="pt-3 border-t border-green-500/20">
+                          <span className="inline-block px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 text-xs font-medium mb-2">🌏 {t("questionVariant.userLanguage")}</span>
+                          <p className="text-muted-foreground whitespace-pre-wrap">{generatedContent.answer[userLang]}</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -672,9 +710,18 @@ export default function QuestionVariant() {
                       <Lightbulb className="w-5 h-5 text-purple-500" />
                       {t("questionVariant.sections.explanation")}
                     </h4>
-                    <p className="text-foreground whitespace-pre-wrap">
-                      {generatedContent.explanation[currentLang] || generatedContent.explanation.ko}
-                    </p>
+                    <div className="space-y-3">
+                      <div>
+                        <span className="inline-block px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 text-xs font-medium mb-2">🇰🇷 한국어</span>
+                        <p className="text-foreground whitespace-pre-wrap">{generatedContent.explanation.ko}</p>
+                      </div>
+                      {showBilingual && generatedContent.explanation[userLang] && (
+                        <div className="pt-3 border-t border-purple-500/20">
+                          <span className="inline-block px-2 py-0.5 rounded bg-green-500/20 text-green-400 text-xs font-medium mb-2">🌏 {t("questionVariant.userLanguage")}</span>
+                          <p className="text-muted-foreground whitespace-pre-wrap">{generatedContent.explanation[userLang]}</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -684,9 +731,18 @@ export default function QuestionVariant() {
                       <Target className="w-5 h-5 text-pink-500" />
                       {t("questionVariant.sections.learningPoints")}
                     </h4>
-                    <p className="text-foreground whitespace-pre-wrap">
-                      {generatedContent.learningPoints[currentLang] || generatedContent.learningPoints.ko}
-                    </p>
+                    <div className="space-y-3">
+                      <div>
+                        <span className="inline-block px-2 py-0.5 rounded bg-pink-500/20 text-pink-400 text-xs font-medium mb-2">🇰🇷 한국어</span>
+                        <p className="text-foreground whitespace-pre-wrap">{generatedContent.learningPoints.ko}</p>
+                      </div>
+                      {showBilingual && generatedContent.learningPoints[userLang] && (
+                        <div className="pt-3 border-t border-pink-500/20">
+                          <span className="inline-block px-2 py-0.5 rounded bg-green-500/20 text-green-400 text-xs font-medium mb-2">🌏 {t("questionVariant.userLanguage")}</span>
+                          <p className="text-muted-foreground whitespace-pre-wrap">{generatedContent.learningPoints[userLang]}</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -705,12 +761,28 @@ export default function QuestionVariant() {
                               {index + 1}
                             </div>
                             <div className="flex-1">
-                              <h5 className="font-semibold text-foreground mb-1">
-                                {q.type?.[currentLang] || q.type?.ko || `유형 ${index + 1}`}
-                              </h5>
-                              <p className="text-sm text-muted-foreground mb-2">
-                                {q.description?.[currentLang] || q.description?.ko}
-                              </p>
+                              <div className="mb-2">
+                                <h5 className="font-semibold text-foreground">
+                                  <span className="text-xs text-blue-400 mr-1">🇰🇷</span>
+                                  {q.type?.ko || `유형 ${index + 1}`}
+                                </h5>
+                                {showBilingual && q.type?.[userLang] && (
+                                  <p className="text-sm text-muted-foreground mt-1">
+                                    <span className="text-xs text-green-400 mr-1">🌏</span>
+                                    {q.type[userLang]}
+                                  </p>
+                                )}
+                              </div>
+                              <div className="mb-2">
+                                <p className="text-sm text-foreground">
+                                  {q.description?.ko}
+                                </p>
+                                {showBilingual && q.description?.[userLang] && (
+                                  <p className="text-sm text-muted-foreground mt-1">
+                                    {q.description[userLang]}
+                                  </p>
+                                )}
+                              </div>
                               {q.examReference && (
                                 <div className="flex items-center gap-2 text-xs text-indigo-500">
                                   <ArrowRight className="w-3 h-3" />

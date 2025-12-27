@@ -20,6 +20,7 @@
     "sections": { "originalAnalysis": "原题分析", "variantQuestion": "变体题目", "answer": "答案", "explanation": "解释", "learningPoints": "学习要点", "difficultyAnalysis": "难度分析", "similarQuestions": "类似题目" },
     "difficulty": { "level": "TOPIK级别", "grade": "等级", "score": "难度分数", "unknown": "未知", "easy": "简单", "medium": "中等", "hard": "困难", "veryHard": "非常困难" },
     "pdf": { "createdAt": "创建日期", "translation": "翻译" },
+    "userLanguage": "您的语言",
     "success": { "generated": "变体题目已生成", "pdfOpened": "PDF预览已打开" },
     "errors": { "selectImage": "请先选择图片", "premiumRequired": "需要高级订阅", "apiError": "发生API错误", "tryAgain": "请重试", "imageTooLarge": "图片大小必须小于10MB", "noContent": "没有可下载的内容", "popupBlocked": "弹出窗口被阻止", "pdfError": "PDF生成错误" }
   },

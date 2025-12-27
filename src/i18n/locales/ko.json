@@ -55,6 +55,7 @@
       "createdAt": "생성일",
       "translation": "번역"
     },
+    "userLanguage": "사용자 언어",
     "success": {
       "generated": "변형 문제가 생성되었습니다",
       "pdfOpened": "PDF 미리보기가 열렸습니다"
