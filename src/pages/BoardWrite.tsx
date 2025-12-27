@@ -193,6 +193,55 @@ export default function BoardWrite() {
     }
   };
 
+  const handleInlineImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    if (!currentUser) {
+      toast({ title: t("boardWrite.pleaseLogin") });
+      return;
+    }
+
+    const file = e.target.files[0];
+    if (!file.type.startsWith('image/')) {
+      toast({ title: t("boardWrite.onlyImagesAllowed") || "이미지 파일만 가능합니다", variant: "destructive" });
+      return;
+    }
+
+    setUploadingImage(true);
+    toast({ title: t("boardWrite.uploadingImage") || "이미지 업로드 중..." });
+
+    try {
+      const ext = file.type.split('/')[1] || 'png';
+      const fileName = `${currentUser}/${Date.now()}_inline.${ext}`;
+      
+      const { error } = await supabase.storage
+        .from("board-attachments")
+        .upload(fileName, file);
+
+      if (error) {
+        console.error("Upload error:", error);
+        toast({ title: t("boardWrite.uploadError") || "이미지 업로드 실패", variant: "destructive" });
+        return;
+      }
+
+      const { data: urlData } = supabase.storage
+        .from("board-attachments")
+        .getPublicUrl(fileName);
+
+      const imageTag = `\n<img src="${urlData.publicUrl}" alt="image" style="max-width:100%;border-radius:8px;margin:8px 0;" />\n`;
+      
+      setContent(prev => prev + imageTag);
+      
+      toast({ title: t("boardWrite.imageInserted") || "이미지가 삽입되었습니다" });
+    } catch (err) {
+      console.error("Image upload error:", err);
+      toast({ title: t("boardWrite.uploadError") || "이미지 업로드 실패", variant: "destructive" });
+    } finally {
+      setUploadingImage(false);
+      e.target.value = '';
+    }
+  };
+
   const uploadAttachments = async (): Promise<string[]> => {
     const urls: string[] = [...existingAttachments];
     
@@ -364,7 +413,7 @@ export default function BoardWrite() {
                   </TabsList>
                   
                   <TabsContent value="edit" className="mt-0">
-                    <div className="flex gap-2 mb-2">
+                    <div className="flex gap-2 mb-2 flex-wrap">
                       <Button type="button" variant="outline" size="sm" onClick={() => insertFormatting("bold")}>
                         <Bold className="w-4 h-4" />
                       </Button>
@@ -377,6 +426,20 @@ export default function BoardWrite() {
                       <Button type="button" variant="outline" size="sm" onClick={() => insertFormatting("link")}>
                         <LinkIcon className="w-4 h-4" />
                       </Button>
+                      <label className="inline-flex">
+                        <Button type="button" variant="outline" size="sm" asChild className="cursor-pointer">
+                          <span>
+                            <Image className="w-4 h-4" />
+                          </span>
+                        </Button>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleInlineImageUpload}
+                          className="hidden"
+                          disabled={uploadingImage}
+                        />
+                      </label>
                     </div>
                     <div className="relative">
                       <Textarea
