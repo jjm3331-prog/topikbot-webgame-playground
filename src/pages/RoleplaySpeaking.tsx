@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import {
@@ -19,6 +19,26 @@ import {
   CheckCircle2,
   XCircle,
   HelpCircle,
+  Coffee,
+  MapPin,
+  ShoppingBag,
+  Train,
+  Phone,
+  Film,
+  Hotel,
+  Utensils,
+  Building2,
+  Heart,
+  Briefcase,
+  Plane,
+  Stethoscope,
+  BookOpen,
+  Users,
+  PenLine,
+  Zap,
+  Star,
+  Target,
+  Flame,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +48,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
+import { cn } from "@/lib/utils";
 
 interface ChatMessage {
   id: string;
@@ -66,13 +87,63 @@ interface QuizData {
   questions: QuizQuestion[];
 }
 
+interface Scenario {
+  id: string;
+  icon: React.ElementType;
+  color: string;
+  bgGradient: string;
+}
+
+// 15가지 대표 시나리오
+const PRESET_SCENARIOS: Scenario[] = [
+  { id: "cafe", icon: Coffee, color: "text-amber-500", bgGradient: "from-amber-500/20 to-orange-500/10" },
+  { id: "subway", icon: Train, color: "text-blue-500", bgGradient: "from-blue-500/20 to-cyan-500/10" },
+  { id: "shopping", icon: ShoppingBag, color: "text-pink-500", bgGradient: "from-pink-500/20 to-rose-500/10" },
+  { id: "direction", icon: MapPin, color: "text-green-500", bgGradient: "from-green-500/20 to-emerald-500/10" },
+  { id: "phone", icon: Phone, color: "text-purple-500", bgGradient: "from-purple-500/20 to-violet-500/10" },
+  { id: "movie", icon: Film, color: "text-red-500", bgGradient: "from-red-500/20 to-rose-500/10" },
+  { id: "hotel", icon: Hotel, color: "text-indigo-500", bgGradient: "from-indigo-500/20 to-blue-500/10" },
+  { id: "restaurant", icon: Utensils, color: "text-orange-500", bgGradient: "from-orange-500/20 to-amber-500/10" },
+  { id: "bank", icon: Building2, color: "text-slate-500", bgGradient: "from-slate-500/20 to-gray-500/10" },
+  { id: "dating", icon: Heart, color: "text-rose-500", bgGradient: "from-rose-500/20 to-pink-500/10" },
+  { id: "interview", icon: Briefcase, color: "text-teal-500", bgGradient: "from-teal-500/20 to-cyan-500/10" },
+  { id: "airport", icon: Plane, color: "text-sky-500", bgGradient: "from-sky-500/20 to-blue-500/10" },
+  { id: "hospital", icon: Stethoscope, color: "text-emerald-500", bgGradient: "from-emerald-500/20 to-green-500/10" },
+  { id: "school", icon: BookOpen, color: "text-yellow-500", bgGradient: "from-yellow-500/20 to-amber-500/10" },
+  { id: "meeting", icon: Users, color: "text-cyan-500", bgGradient: "from-cyan-500/20 to-teal-500/10" },
+];
+
+// 레벨 옵션
+const LEVEL_OPTIONS = [
+  { id: "topik1", label: "TOPIK I (1-2급)", badge: "초급", color: "bg-green-500" },
+  { id: "topik2", label: "TOPIK II (3-6급)", badge: "중고급", color: "bg-blue-500" },
+];
+
+// 난이도 옵션
+const DIFFICULTY_OPTIONS = [
+  { id: "easy", icon: Zap, color: "text-green-500", bgColor: "bg-green-500/10 border-green-500/30" },
+  { id: "medium", icon: Target, color: "text-amber-500", bgColor: "bg-amber-500/10 border-amber-500/30" },
+  { id: "hard", icon: Flame, color: "text-red-500", bgColor: "bg-red-500/10 border-red-500/30" },
+];
+
 export default function RoleplaySpeaking() {
   const { t } = useTranslation();
+  
+  // Setup states
+  const [selectedLevel, setSelectedLevel] = useState<string>("topik1");
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>("medium");
+  const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
+  const [customScenario, setCustomScenario] = useState("");
+  const [isSetupComplete, setIsSetupComplete] = useState(false);
+
+  // Chat states
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+
+  // Quiz states
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizData, setQuizData] = useState<QuizData | null>(null);
   const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
@@ -86,16 +157,29 @@ export default function RoleplaySpeaking() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
-  // Start new roleplay scenario
+  // Start roleplay
   const startRoleplay = async () => {
+    const scenario = customScenario.trim() || selectedScenario;
+    if (!scenario) {
+      toast.error(t("roleplay.toast.selectScenario"));
+      return;
+    }
+
     setIsLoading(true);
     setMessages([]);
     setShowQuiz(false);
     setQuizData(null);
+    setIsSetupComplete(true);
 
     try {
       const { data, error } = await supabase.functions.invoke("roleplay-speak", {
-        body: { action: "start_roleplay" },
+        body: { 
+          action: "start_roleplay",
+          level: selectedLevel,
+          difficulty: selectedDifficulty,
+          scenarioId: customScenario.trim() ? "custom" : selectedScenario,
+          customScenario: customScenario.trim() || undefined,
+        },
       });
 
       if (error) throw error;
@@ -118,6 +202,7 @@ export default function RoleplaySpeaking() {
     } catch (error: any) {
       console.error("Start roleplay error:", error);
       toast.error(error.message || t("roleplay.toast.startFailed"));
+      setIsSetupComplete(false);
     } finally {
       setIsLoading(false);
     }
@@ -131,7 +216,6 @@ export default function RoleplaySpeaking() {
     setInputText("");
     setIsLoading(true);
 
-    // Add user message
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: "user",
@@ -151,6 +235,8 @@ export default function RoleplaySpeaking() {
           action: "continue_roleplay",
           messages: [{ role: "user", content: messageText }],
           conversationHistory: [...conversationHistory, { role: "user", content: messageText }],
+          level: selectedLevel,
+          difficulty: selectedDifficulty,
         },
       });
 
@@ -159,14 +245,12 @@ export default function RoleplaySpeaking() {
 
       const result = data.data;
 
-      // Update user message with feedback
       setMessages(prev => prev.map(m => 
         m.id === userMessage.id 
           ? { ...m, feedback: result.feedback }
           : m
       ));
 
-      // Add assistant response
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -180,7 +264,6 @@ export default function RoleplaySpeaking() {
 
       setMessages(prev => [...prev, assistantMessage]);
 
-      // Scroll to bottom
       setTimeout(() => {
         chatContainerRef.current?.scrollTo({
           top: chatContainerRef.current.scrollHeight,
@@ -191,14 +274,13 @@ export default function RoleplaySpeaking() {
     } catch (error: any) {
       console.error("Send message error:", error);
       toast.error(error.message || t("roleplay.toast.sendFailed"));
-      // Remove user message on error
       setMessages(prev => prev.filter(m => m.id !== userMessage.id));
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Generate quiz from conversation
+  // Generate quiz
   const generateQuiz = async () => {
     if (messages.length < 2) {
       toast.error(t("roleplay.toast.needConversation"));
@@ -217,6 +299,7 @@ export default function RoleplaySpeaking() {
         body: {
           action: "generate_quiz",
           conversationHistory,
+          level: selectedLevel,
         },
       });
 
@@ -237,7 +320,7 @@ export default function RoleplaySpeaking() {
     }
   };
 
-  // TTS for Korean
+  // TTS
   const handleSpeak = async (text: string) => {
     if (!text.trim() || isSpeaking) return;
 
@@ -336,12 +419,11 @@ export default function RoleplaySpeaking() {
     }
   };
 
-  // Quiz answer selection
+  // Quiz functions
   const selectAnswer = (questionId: number, answer: string) => {
     setSelectedAnswers(prev => ({ ...prev, [questionId]: answer }));
   };
 
-  // Calculate quiz score
   const calculateScore = () => {
     if (!quizData) return 0;
     let correct = 0;
@@ -352,6 +434,665 @@ export default function RoleplaySpeaking() {
     });
     return correct;
   };
+
+  // Reset to setup
+  const resetToSetup = () => {
+    setIsSetupComplete(false);
+    setMessages([]);
+    setShowQuiz(false);
+    setQuizData(null);
+    setCustomScenario("");
+    setSelectedScenario(null);
+  };
+
+  // Render Setup UI
+  const renderSetupUI = () => (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="max-w-5xl mx-auto"
+    >
+      {/* Level Selection */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="mb-8"
+      >
+        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <GraduationCap className="w-5 h-5 text-primary" />
+          {t("roleplay.setup.levelTitle")}
+        </h3>
+        <div className="grid grid-cols-2 gap-4">
+          {LEVEL_OPTIONS.map((level) => (
+            <button
+              key={level.id}
+              onClick={() => setSelectedLevel(level.id)}
+              className={cn(
+                "relative p-5 rounded-2xl border-2 transition-all duration-300 text-left group overflow-hidden",
+                selectedLevel === level.id
+                  ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
+                  : "border-border hover:border-primary/50 bg-card hover:bg-primary/5"
+              )}
+            >
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-2">
+                  <Badge variant="secondary" className={cn("text-white", level.color)}>
+                    {level.badge}
+                  </Badge>
+                  {selectedLevel === level.id && (
+                    <CheckCircle2 className="w-5 h-5 text-primary" />
+                  )}
+                </div>
+                <p className="font-semibold text-lg">{level.label}</p>
+              </div>
+              {selectedLevel === level.id && (
+                <motion.div
+                  layoutId="levelBg"
+                  className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent -z-0"
+                />
+              )}
+            </button>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Difficulty Selection */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="mb-8"
+      >
+        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <Target className="w-5 h-5 text-primary" />
+          {t("roleplay.setup.difficultyTitle")}
+        </h3>
+        <div className="grid grid-cols-3 gap-4">
+          {DIFFICULTY_OPTIONS.map((diff) => {
+            const Icon = diff.icon;
+            return (
+              <button
+                key={diff.id}
+                onClick={() => setSelectedDifficulty(diff.id)}
+                className={cn(
+                  "relative p-4 rounded-xl border-2 transition-all duration-300 flex flex-col items-center gap-2",
+                  selectedDifficulty === diff.id
+                    ? `border-current ${diff.bgColor} shadow-lg`
+                    : "border-border hover:border-primary/30 bg-card"
+                )}
+              >
+                <Icon className={cn("w-8 h-8", diff.color)} />
+                <span className="font-medium">{t(`roleplay.difficulty.${diff.id}`)}</span>
+                {selectedDifficulty === diff.id && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-2 -right-2"
+                  >
+                    <div className={cn("w-6 h-6 rounded-full flex items-center justify-center", diff.bgColor.replace('/10', ''))}>
+                      <CheckCircle2 className="w-4 h-4 text-white" />
+                    </div>
+                  </motion.div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </motion.div>
+
+      {/* Scenario Selection */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="mb-8"
+      >
+        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-primary" />
+          {t("roleplay.setup.scenarioTitle")}
+        </h3>
+        <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+          {PRESET_SCENARIOS.map((scenario) => {
+            const Icon = scenario.icon;
+            return (
+              <motion.button
+                key={scenario.id}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  setSelectedScenario(scenario.id);
+                  setCustomScenario("");
+                }}
+                className={cn(
+                  "relative p-4 rounded-xl border-2 transition-all duration-300 flex flex-col items-center gap-2 group overflow-hidden",
+                  selectedScenario === scenario.id && !customScenario
+                    ? "border-primary shadow-lg shadow-primary/20"
+                    : "border-border hover:border-primary/40"
+                )}
+              >
+                <div className={cn(
+                  "absolute inset-0 bg-gradient-to-br transition-opacity duration-300",
+                  scenario.bgGradient,
+                  selectedScenario === scenario.id && !customScenario ? "opacity-100" : "opacity-0 group-hover:opacity-50"
+                )} />
+                <div className="relative z-10">
+                  <Icon className={cn("w-8 h-8 mb-1", scenario.color)} />
+                  <span className="text-xs font-medium text-center block">
+                    {t(`roleplay.scenarios.${scenario.id}`)}
+                  </span>
+                </div>
+                {selectedScenario === scenario.id && !customScenario && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-1 -right-1"
+                  >
+                    <CheckCircle2 className="w-5 h-5 text-primary fill-primary/20" />
+                  </motion.div>
+                )}
+              </motion.button>
+            );
+          })}
+        </div>
+      </motion.div>
+
+      {/* Custom Scenario Input */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="mb-8"
+      >
+        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <PenLine className="w-5 h-5 text-primary" />
+          {t("roleplay.setup.customTitle")}
+        </h3>
+        <div className="relative">
+          <Input
+            value={customScenario}
+            onChange={(e) => {
+              setCustomScenario(e.target.value);
+              if (e.target.value.trim()) setSelectedScenario(null);
+            }}
+            placeholder={t("roleplay.setup.customPlaceholder")}
+            className="h-14 text-lg pl-5 pr-14 rounded-xl border-2 focus:border-primary"
+          />
+          {customScenario.trim() && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="absolute right-4 top-1/2 -translate-y-1/2"
+            >
+              <CheckCircle2 className="w-6 h-6 text-primary" />
+            </motion.div>
+          )}
+        </div>
+        <p className="text-sm text-muted-foreground mt-2">
+          {t("roleplay.setup.customHint")}
+        </p>
+      </motion.div>
+
+      {/* Start Button */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="flex justify-center"
+      >
+        <Button
+          size="lg"
+          onClick={startRoleplay}
+          disabled={isLoading || (!selectedScenario && !customScenario.trim())}
+          className="h-14 px-10 text-lg gap-3 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all"
+        >
+          {isLoading ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <Play className="w-5 h-5" />
+          )}
+          {t("roleplay.actions.startRoleplay")}
+        </Button>
+      </motion.div>
+    </motion.div>
+  );
+
+  // Render Chat UI
+  const renderChatUI = () => (
+    <div className="max-w-4xl mx-auto grid lg:grid-cols-3 gap-6">
+      {/* Chat Panel */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="lg:col-span-2"
+      >
+        <Card className="premium-card overflow-hidden h-[600px] flex flex-col">
+          {/* Header with settings */}
+          <div className="px-4 py-3 bg-gradient-to-r from-primary/10 to-secondary/10 border-b border-border flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Badge variant="outline" className="gap-1">
+                <GraduationCap className="w-3 h-3" />
+                {selectedLevel === "topik1" ? "TOPIK I" : "TOPIK II"}
+              </Badge>
+              <Badge variant="outline" className={cn(
+                "gap-1",
+                selectedDifficulty === "easy" ? "text-green-500" :
+                selectedDifficulty === "medium" ? "text-amber-500" : "text-red-500"
+              )}>
+                {selectedDifficulty === "easy" && <Zap className="w-3 h-3" />}
+                {selectedDifficulty === "medium" && <Target className="w-3 h-3" />}
+                {selectedDifficulty === "hard" && <Flame className="w-3 h-3" />}
+                {t(`roleplay.difficulty.${selectedDifficulty}`)}
+              </Badge>
+            </div>
+            <Button variant="ghost" size="sm" onClick={resetToSetup} className="gap-1.5">
+              <RefreshCw className="w-3.5 h-3.5" />
+              {t("roleplay.actions.changeSettings")}
+            </Button>
+          </div>
+
+          {/* Scenario Context */}
+          {messages.length > 0 && messages[0].scenarioContext && (
+            <div className="px-4 py-2 bg-muted/50 border-b border-border">
+              <div className="flex items-center gap-2 text-sm">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <span className="text-muted-foreground">{t("roleplay.labels.scenario")}</span>
+                <span className="font-medium">{messages[0].scenarioContext}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Chat Messages */}
+          <div
+            ref={chatContainerRef}
+            className="flex-1 overflow-y-auto p-4 space-y-4"
+          >
+            <AnimatePresence>
+              {messages.map((message) => (
+                <motion.div
+                  key={message.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                >
+                  <div
+                    className={cn(
+                      "max-w-[85%] rounded-2xl p-4",
+                      message.role === "user"
+                        ? "bg-primary text-primary-foreground rounded-br-md"
+                        : "bg-muted rounded-bl-md"
+                    )}
+                  >
+                    <p className="text-lg font-medium mb-1">{message.korean}</p>
+
+                    {message.role === "assistant" && (
+                      <>
+                        <p className="text-sm opacity-80 mb-1">{message.vietnamese}</p>
+                        {message.pronunciation && (
+                          <p className="text-xs opacity-60 italic">{message.pronunciation}</p>
+                        )}
+
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleSpeak(message.korean)}
+                          disabled={isSpeaking}
+                          className="mt-2 h-7 text-xs"
+                        >
+                          <Volume2 className={`w-3 h-3 mr-1 ${isSpeaking ? "animate-pulse" : ""}`} />
+                          {t("roleplay.actions.listen")}
+                        </Button>
+
+                        {message.grammarHighlight && (
+                          <div className="mt-3 pt-3 border-t border-border/50">
+                            <button
+                              onClick={() => setExpandedGrammar(
+                                expandedGrammar === message.id ? null : message.id
+                              )}
+                              className="flex items-center gap-2 text-xs text-primary"
+                            >
+                              <GraduationCap className="w-3 h-3" />
+                              <span>{message.grammarHighlight.pattern}</span>
+                              <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                                {message.grammarHighlight.level}
+                              </Badge>
+                              {expandedGrammar === message.id ? (
+                                <ChevronUp className="w-3 h-3" />
+                              ) : (
+                                <ChevronDown className="w-3 h-3" />
+                              )}
+                            </button>
+                            {expandedGrammar === message.id && (
+                              <p className="mt-2 text-xs text-muted-foreground">
+                                {message.grammarHighlight.usage}
+                              </p>
+                            )}
+                          </div>
+                        )}
+
+                        {message.suggestedResponses && message.suggestedResponses.length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-border/50">
+                            <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                              <Lightbulb className="w-3 h-3" /> {t("roleplay.labels.suggestions")}
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {message.suggestedResponses.map((suggestion, i) => (
+                                <Button
+                                  key={i}
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => sendMessage(suggestion)}
+                                  className="h-7 text-xs"
+                                >
+                                  {suggestion}
+                                </Button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {message.role === "user" && message.feedback && (
+                      <div className="mt-2 pt-2 border-t border-primary-foreground/20">
+                        <div className="flex items-center gap-1.5 text-xs">
+                          {message.feedback.is_correct ? (
+                            <CheckCircle2 className="w-3.5 h-3.5 text-green-300" />
+                          ) : (
+                            <XCircle className="w-3.5 h-3.5 text-red-300" />
+                          )}
+                          <span className={message.feedback.is_correct ? "text-green-200" : "text-red-200"}>
+                            {message.feedback.is_correct ? t("roleplay.feedback.good") : t("roleplay.feedback.needsFix")}
+                          </span>
+                        </div>
+                        {message.feedback.correction && (
+                          <p className="text-xs mt-1 opacity-90">
+                            ✓ {message.feedback.correction}
+                          </p>
+                        )}
+                        {message.feedback.explanation && (
+                          <p className="text-xs mt-1 opacity-75">
+                            {message.feedback.explanation}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-muted rounded-2xl rounded-bl-md p-4">
+                  <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Input Area */}
+          <div className="p-4 border-t border-border bg-background/50">
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={isRecording ? handleStopRecording : handleStartRecording}
+                className={isRecording ? "text-destructive animate-pulse" : ""}
+              >
+                {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+              </Button>
+
+              <Input
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
+                placeholder={t("roleplay.placeholders.input")}
+                className="flex-1"
+                disabled={isLoading}
+              />
+
+              <Button
+                onClick={() => sendMessage()}
+                disabled={!inputText.trim() || isLoading}
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
+
+            <div className="flex gap-2 mt-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={startRoleplay}
+                disabled={isLoading}
+                className="gap-1.5"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                {t("roleplay.actions.newScenario")}
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={generateQuiz}
+                disabled={isGeneratingQuiz || messages.length < 2}
+                className="gap-1.5"
+              >
+                {isGeneratingQuiz ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Trophy className="w-3.5 h-3.5" />
+                )}
+                {t("roleplay.actions.makeQuiz")}
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </motion.div>
+
+      {/* Side Panel */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="space-y-4"
+      >
+        {/* Quiz Panel */}
+        {showQuiz && quizData ? (
+          <Card className="premium-card p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold flex items-center gap-2">
+                <Trophy className="w-4 h-4 text-primary" />
+                {quizData.quiz_title}
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowQuiz(false)}
+              >
+                ✕
+              </Button>
+            </div>
+
+            {!showResults ? (
+              <div className="space-y-4">
+                <div className="text-xs text-muted-foreground">
+                  {t("roleplay.quiz.progress", { current: currentQuizIndex + 1, total: quizData.questions.length })}
+                </div>
+
+                <div className="p-3 bg-muted/50 rounded-lg">
+                  <p className="text-sm italic text-muted-foreground mb-2">
+                    {quizData.questions[currentQuizIndex].korean_context}
+                  </p>
+                  <p className="font-medium">
+                    {quizData.questions[currentQuizIndex].question}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  {Object.entries(quizData.questions[currentQuizIndex].options).map(
+                    ([key, value]) => (
+                      <button
+                        key={key}
+                        onClick={() =>
+                          selectAnswer(quizData.questions[currentQuizIndex].id, key)
+                        }
+                        className={`w-full text-left p-3 rounded-lg border transition-all ${
+                          selectedAnswers[quizData.questions[currentQuizIndex].id] === key
+                            ? "border-primary bg-primary/10"
+                            : "border-border hover:border-primary/50"
+                        }`}
+                      >
+                        <span className="font-medium mr-2">{key}.</span>
+                        {value}
+                      </button>
+                    )
+                  )}
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  {currentQuizIndex > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentQuizIndex((i) => i - 1)}
+                    >
+                      {t("roleplay.actions.prev")}
+                    </Button>
+                  )}
+                  {currentQuizIndex < quizData.questions.length - 1 ? (
+                    <Button
+                      size="sm"
+                      onClick={() => setCurrentQuizIndex((i) => i + 1)}
+                      disabled={!selectedAnswers[quizData.questions[currentQuizIndex].id]}
+                    >
+                      {t("roleplay.actions.next")}
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      onClick={() => setShowResults(true)}
+                      disabled={Object.keys(selectedAnswers).length < quizData.questions.length}
+                    >
+                      {t("roleplay.actions.showResults")}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="text-center p-4 bg-primary/10 rounded-lg">
+                  <div className="text-3xl font-bold text-primary mb-1">
+                    {calculateScore()}/{quizData.questions.length}
+                  </div>
+                  <p className="text-sm text-muted-foreground">{t("roleplay.quiz.yourScore")}</p>
+                </div>
+
+                <div className="space-y-3 max-h-[300px] overflow-y-auto">
+                  {quizData.questions.map((q) => {
+                    const isCorrect = selectedAnswers[q.id] === q.correct_answer;
+                    return (
+                      <div
+                        key={q.id}
+                        className={`p-3 rounded-lg border ${
+                          isCorrect ? "border-green-500/50 bg-green-500/10" : "border-red-500/50 bg-red-500/10"
+                        }`}
+                      >
+                        <div className="flex items-start gap-2 text-sm">
+                          {isCorrect ? (
+                            <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5" />
+                          ) : (
+                            <XCircle className="w-4 h-4 text-red-500 mt-0.5" />
+                          )}
+                          <div>
+                            <p className="font-medium">{q.question}</p>
+                            {!isCorrect && (
+                              <p className="text-xs mt-1 text-muted-foreground">
+                                {t("roleplay.quiz.correctAnswer", { answer: q.correct_answer })}
+                              </p>
+                            )}
+                            <p className="text-xs mt-1 text-muted-foreground">{q.explanation}</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    setShowQuiz(false);
+                    setShowResults(false);
+                    setSelectedAnswers({});
+                    setCurrentQuizIndex(0);
+                  }}
+                >
+                  {t("roleplay.actions.closeQuiz")}
+                </Button>
+              </div>
+            )}
+          </Card>
+        ) : (
+          <Card className="premium-card p-4">
+            <h3 className="font-semibold mb-3 flex items-center gap-2">
+              <HelpCircle className="w-4 h-4 text-primary" />
+              {t("roleplay.tips.title")}
+            </h3>
+            <ul className="text-sm text-muted-foreground space-y-2">
+              <li className="flex items-start gap-2">
+                <span className="text-primary">1.</span>
+                {t("roleplay.tips.step1")}
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary">2.</span>
+                {t("roleplay.tips.step2")}
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary">3.</span>
+                {t("roleplay.tips.step3")}
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary">4.</span>
+                {t("roleplay.tips.step4")}
+              </li>
+            </ul>
+
+            <div className="mt-4 p-3 bg-primary/10 rounded-lg">
+              <p className="text-xs text-muted-foreground">
+                💡 <strong>{t("roleplay.tips.tipLabel")}</strong> {t("roleplay.tips.tipText")}
+              </p>
+            </div>
+          </Card>
+        )}
+
+        {/* Stats Card */}
+        <Card className="premium-card p-4">
+          <h3 className="font-semibold mb-3 flex items-center gap-2">
+            <Star className="w-4 h-4 text-primary" />
+            {t("roleplay.stats.title")}
+          </h3>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="text-center p-3 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border border-primary/20">
+              <div className="text-2xl font-bold text-primary">
+                {messages.filter((m) => m.role === "user").length}
+              </div>
+              <div className="text-xs text-muted-foreground">{t("roleplay.stats.spoken")}</div>
+            </div>
+            <div className="text-center p-3 bg-gradient-to-br from-green-500/10 to-green-500/5 rounded-xl border border-green-500/20">
+              <div className="text-2xl font-bold text-green-500">
+                {messages.filter((m) => m.feedback?.is_correct).length}
+              </div>
+              <div className="text-xs text-muted-foreground">{t("roleplay.stats.correct")}</div>
+            </div>
+          </div>
+        </Card>
+      </motion.div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -370,469 +1111,22 @@ export default function RoleplaySpeaking() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-6"
+              className="text-center mb-8"
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
                 <MessageCircle className="w-4 h-4 text-primary" />
                 <span className="text-sm font-medium text-primary">{t("roleplay.badge")}</span>
               </div>
-              <h1 className="text-2xl lg:text-3xl font-bold mb-2">
+              <h1 className="text-2xl lg:text-4xl font-bold mb-3">
                 🎭 <span className="text-gradient-primary">{t("roleplay.title")}</span>
               </h1>
-              <p className="text-muted-foreground max-w-xl mx-auto text-sm">
+              <p className="text-muted-foreground max-w-2xl mx-auto">
                 {t("roleplay.subtitle")}
               </p>
             </motion.div>
 
             {/* Main Content */}
-            <div className="max-w-4xl mx-auto grid lg:grid-cols-3 gap-6">
-              {/* Chat Panel - 2 columns */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="lg:col-span-2"
-              >
-                <Card className="premium-card overflow-hidden h-[600px] flex flex-col">
-                  {/* Scenario Context */}
-                  {messages.length > 0 && messages[messages.length - 1].scenarioContext && (
-                    <div className="px-4 py-3 bg-primary/5 border-b border-border">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Sparkles className="w-4 h-4 text-primary" />
-                        <span className="text-muted-foreground">{t("roleplay.labels.scenario")}</span>
-                        <span className="font-medium">{messages[messages.length - 1].scenarioContext}</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Chat Messages */}
-                  <div
-                    ref={chatContainerRef}
-                    className="flex-1 overflow-y-auto p-4 space-y-4"
-                  >
-                    {messages.length === 0 ? (
-                      <div className="h-full flex flex-col items-center justify-center text-center p-6">
-                        <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                          <MessageCircle className="w-10 h-10 text-primary" />
-                        </div>
-                        <h3 className="font-semibold text-lg mb-2">{t("roleplay.empty.title")}</h3>
-                        <p className="text-muted-foreground text-sm mb-6 max-w-sm">
-                          {t("roleplay.empty.desc")}
-                        </p>
-                        <Button
-                          onClick={startRoleplay}
-                          disabled={isLoading}
-                          className="gap-2"
-                        >
-                          {isLoading ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <Play className="w-4 h-4" />
-                          )}
-                          {t("roleplay.actions.start")}
-                        </Button>
-                      </div>
-                    ) : (
-                      <>
-                        <AnimatePresence>
-                          {messages.map((message) => (
-                            <motion.div
-                              key={message.id}
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-                            >
-                              <div
-                                className={`max-w-[85%] rounded-2xl p-4 ${
-                                  message.role === "user"
-                                    ? "bg-primary text-primary-foreground rounded-br-md"
-                                    : "bg-muted rounded-bl-md"
-                                }`}
-                              >
-                                {/* Korean text */}
-                                <p className="text-lg font-medium mb-1">{message.korean}</p>
-
-                                {/* Vietnamese & Pronunciation for assistant */}
-                                {message.role === "assistant" && (
-                                  <>
-                                    <p className="text-sm opacity-80 mb-1">{message.vietnamese}</p>
-                                    {message.pronunciation && (
-                                      <p className="text-xs opacity-60 italic">{message.pronunciation}</p>
-                                    )}
-
-                                    {/* Listen button */}
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => handleSpeak(message.korean)}
-                                      disabled={isSpeaking}
-                                      className="mt-2 h-7 text-xs"
-                                    >
-                                      <Volume2 className={`w-3 h-3 mr-1 ${isSpeaking ? "animate-pulse" : ""}`} />
-                                      {t("roleplay.actions.listen")}
-                                    </Button>
-
-                                    {/* Grammar highlight */}
-                                    {message.grammarHighlight && (
-                                      <div className="mt-3 pt-3 border-t border-border/50">
-                                        <button
-                                          onClick={() => setExpandedGrammar(
-                                            expandedGrammar === message.id ? null : message.id
-                                          )}
-                                          className="flex items-center gap-2 text-xs text-primary"
-                                        >
-                                          <GraduationCap className="w-3 h-3" />
-                                          <span>{message.grammarHighlight.pattern}</span>
-                                          <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                                            {message.grammarHighlight.level}
-                                          </Badge>
-                                          {expandedGrammar === message.id ? (
-                                            <ChevronUp className="w-3 h-3" />
-                                          ) : (
-                                            <ChevronDown className="w-3 h-3" />
-                                          )}
-                                        </button>
-                                        {expandedGrammar === message.id && (
-                                          <p className="mt-2 text-xs text-muted-foreground">
-                                            {message.grammarHighlight.usage}
-                                          </p>
-                                        )}
-                                      </div>
-                                    )}
-
-                                    {/* Suggested responses */}
-                                    {message.suggestedResponses && message.suggestedResponses.length > 0 && (
-                                      <div className="mt-3 pt-3 border-t border-border/50">
-                                        <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
-                                          <Lightbulb className="w-3 h-3" /> {t("roleplay.labels.suggestions")}
-                                        </p>
-                                        <div className="flex flex-wrap gap-2">
-                                          {message.suggestedResponses.map((suggestion, i) => (
-                                            <Button
-                                              key={i}
-                                              variant="outline"
-                                              size="sm"
-                                              onClick={() => sendMessage(suggestion)}
-                                              className="h-7 text-xs"
-                                            >
-                                              {suggestion}
-                                            </Button>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    )}
-                                  </>
-                                )}
-
-                                {/* Feedback for user messages */}
-                                {message.role === "user" && message.feedback && (
-                                  <div className="mt-2 pt-2 border-t border-primary-foreground/20">
-                                    <div className="flex items-center gap-1.5 text-xs">
-                                      {message.feedback.is_correct ? (
-                                        <CheckCircle2 className="w-3.5 h-3.5 text-green-300" />
-                                      ) : (
-                                        <XCircle className="w-3.5 h-3.5 text-red-300" />
-                                      )}
-                                       <span className={message.feedback.is_correct ? "text-green-200" : "text-red-200"}>
-                                         {message.feedback.is_correct ? t("roleplay.feedback.good") : t("roleplay.feedback.needsFix")}
-                                       </span>
-                                    </div>
-                                    {message.feedback.correction && (
-                                      <p className="text-xs mt-1 opacity-90">
-                                        ✓ {message.feedback.correction}
-                                      </p>
-                                    )}
-                                    {message.feedback.explanation && (
-                                      <p className="text-xs mt-1 opacity-75">
-                                        {message.feedback.explanation}
-                                      </p>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            </motion.div>
-                          ))}
-                        </AnimatePresence>
-
-                        {/* Loading indicator */}
-                        {isLoading && (
-                          <div className="flex justify-start">
-                            <div className="bg-muted rounded-2xl rounded-bl-md p-4">
-                              <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                            </div>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-
-                  {/* Input Area */}
-                  {messages.length > 0 && (
-                    <div className="p-4 border-t border-border bg-background/50">
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={isRecording ? handleStopRecording : handleStartRecording}
-                          className={isRecording ? "text-destructive animate-pulse" : ""}
-                        >
-                          {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                        </Button>
-
-                        <Input
-                          value={inputText}
-                          onChange={(e) => setInputText(e.target.value)}
-                          onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-                          placeholder={t("roleplay.placeholders.input")}
-                          className="flex-1"
-                          disabled={isLoading}
-                        />
-
-                        <Button
-                          onClick={() => sendMessage()}
-                          disabled={!inputText.trim() || isLoading}
-                        >
-                          <Send className="w-4 h-4" />
-                        </Button>
-                      </div>
-
-                      {/* Action buttons */}
-                      <div className="flex gap-2 mt-3">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={startRoleplay}
-                          disabled={isLoading}
-                          className="gap-1.5"
-                        >
-                          <RefreshCw className="w-3.5 h-3.5" />
-                          {t("roleplay.actions.newScenario")}
-                        </Button>
-
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={generateQuiz}
-                          disabled={isGeneratingQuiz || messages.length < 2}
-                          className="gap-1.5"
-                        >
-                          {isGeneratingQuiz ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <Trophy className="w-3.5 h-3.5" />
-                          )}
-                          {t("roleplay.actions.makeQuiz")}
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </Card>
-              </motion.div>
-
-              {/* Side Panel - Quiz & Tips */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="space-y-4"
-              >
-                {/* Quiz Panel */}
-                {showQuiz && quizData ? (
-                  <Card className="premium-card p-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-semibold flex items-center gap-2">
-                        <Trophy className="w-4 h-4 text-primary" />
-                        {quizData.quiz_title}
-                      </h3>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowQuiz(false)}
-                      >
-                        ✕
-                      </Button>
-                    </div>
-
-                    {!showResults ? (
-                      <>
-                        {/* Current Question */}
-                        <div className="space-y-4">
-                            <div className="text-xs text-muted-foreground">
-                              {t("roleplay.quiz.progress", { current: currentQuizIndex + 1, total: quizData.questions.length })}
-                            </div>
-
-                          <div className="p-3 bg-muted/50 rounded-lg">
-                            <p className="text-sm italic text-muted-foreground mb-2">
-                              {quizData.questions[currentQuizIndex].korean_context}
-                            </p>
-                            <p className="font-medium">
-                              {quizData.questions[currentQuizIndex].question}
-                            </p>
-                          </div>
-
-                          {/* Options */}
-                          <div className="space-y-2">
-                            {Object.entries(quizData.questions[currentQuizIndex].options).map(
-                              ([key, value]) => (
-                                <button
-                                  key={key}
-                                  onClick={() =>
-                                    selectAnswer(quizData.questions[currentQuizIndex].id, key)
-                                  }
-                                  className={`w-full text-left p-3 rounded-lg border transition-all ${
-                                    selectedAnswers[quizData.questions[currentQuizIndex].id] === key
-                                      ? "border-primary bg-primary/10"
-                                      : "border-border hover:border-primary/50"
-                                  }`}
-                                >
-                                  <span className="font-medium mr-2">{key}.</span>
-                                  {value}
-                                </button>
-                              )
-                            )}
-                          </div>
-
-                          {/* Navigation */}
-                          <div className="flex gap-2 pt-2">
-                            {currentQuizIndex > 0 && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setCurrentQuizIndex((i) => i - 1)}
-                              >
-                                {t("roleplay.actions.prev")}
-                              </Button>
-                            )}
-                            {currentQuizIndex < quizData.questions.length - 1 ? (
-                              <Button
-                                size="sm"
-                                onClick={() => setCurrentQuizIndex((i) => i + 1)}
-                                disabled={!selectedAnswers[quizData.questions[currentQuizIndex].id]}
-                              >
-                                {t("roleplay.actions.next")}
-                              </Button>
-                            ) : (
-                              <Button
-                                size="sm"
-                                onClick={() => setShowResults(true)}
-                                disabled={Object.keys(selectedAnswers).length < quizData.questions.length}
-                              >
-                                {t("roleplay.actions.showResults")}
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      /* Results */
-                      <div className="space-y-4">
-                        <div className="text-center p-4 bg-primary/10 rounded-lg">
-                          <div className="text-3xl font-bold text-primary mb-1">
-                            {calculateScore()}/{quizData.questions.length}
-                          </div>
-                          <p className="text-sm text-muted-foreground">{t("roleplay.quiz.yourScore")}</p>
-                        </div>
-
-                        <div className="space-y-3 max-h-[300px] overflow-y-auto">
-                          {quizData.questions.map((q) => {
-                            const isCorrect = selectedAnswers[q.id] === q.correct_answer;
-                            return (
-                              <div
-                                key={q.id}
-                                className={`p-3 rounded-lg border ${
-                                  isCorrect ? "border-green-500/50 bg-green-500/10" : "border-red-500/50 bg-red-500/10"
-                                }`}
-                              >
-                                <div className="flex items-start gap-2 text-sm">
-                                  {isCorrect ? (
-                                    <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5" />
-                                  ) : (
-                                    <XCircle className="w-4 h-4 text-red-500 mt-0.5" />
-                                  )}
-                                  <div>
-                                    <p className="font-medium">{q.question}</p>
-                                    {!isCorrect && (
-                                        <p className="text-xs mt-1 text-muted-foreground">
-                                          {t("roleplay.quiz.correctAnswer", { answer: q.correct_answer })}
-                                        </p>
-                                    )}
-                                    <p className="text-xs mt-1 text-muted-foreground">{q.explanation}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-
-                        <Button
-                          variant="outline"
-                          className="w-full"
-                          onClick={() => {
-                            setShowQuiz(false);
-                            setShowResults(false);
-                            setSelectedAnswers({});
-                            setCurrentQuizIndex(0);
-                          }}
-                        >
-                          {t("roleplay.actions.closeQuiz")}
-                        </Button>
-                      </div>
-                    )}
-                  </Card>
-                ) : (
-                  /* Tips Card */
-                  <Card className="premium-card p-4">
-                    <h3 className="font-semibold mb-3 flex items-center gap-2">
-                      <HelpCircle className="w-4 h-4 text-primary" />
-                      {t("roleplay.tips.title")}
-                    </h3>
-                    <ul className="text-sm text-muted-foreground space-y-2">
-                      <li className="flex items-start gap-2">
-                        <span className="text-primary">1.</span>
-                        {t("roleplay.tips.step1")}
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-primary">2.</span>
-                        {t("roleplay.tips.step2")}
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-primary">3.</span>
-                        {t("roleplay.tips.step3")}
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-primary">4.</span>
-                        {t("roleplay.tips.step4")}
-                      </li>
-                    </ul>
-
-                    <div className="mt-4 p-3 bg-korean-blue/10 rounded-lg">
-                      <p className="text-xs text-muted-foreground">
-                        💡 <strong>{t("roleplay.tips.tipLabel")}</strong> {t("roleplay.tips.tipText")}
-                      </p>
-                    </div>
-                  </Card>
-                )}
-
-                {/* Stats Card */}
-                <Card className="premium-card p-4">
-                  <h3 className="font-semibold mb-3">📊 {t("roleplay.stats.title")}</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="text-center p-2 bg-muted/50 rounded-lg">
-                      <div className="text-xl font-bold text-primary">
-                        {messages.filter((m) => m.role === "user").length}
-                      </div>
-                       <div className="text-xs text-muted-foreground">{t("roleplay.stats.spoken")}</div>
-                    </div>
-                    <div className="text-center p-2 bg-muted/50 rounded-lg">
-                      <div className="text-xl font-bold text-green-500">
-                        {messages.filter((m) => m.feedback?.is_correct).length}
-                      </div>
-                       <div className="text-xs text-muted-foreground">{t("roleplay.stats.correct")}</div>
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
-            </div>
+            {!isSetupComplete ? renderSetupUI() : renderChatUI()}
           </div>
         </section>
       </main>
