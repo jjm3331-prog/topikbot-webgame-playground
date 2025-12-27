@@ -31,12 +31,15 @@ import { useToast } from "@/hooks/use-toast";
 import { useSubscription } from "@/hooks/useSubscription";
 import zaloPayLogo from "@/assets/zalopay-logo.png";
 
+// 베트남어일 때만 ZaloPay 로고 표시
+const VIETNAM_LANG = "vi";
+
 type BillingPeriod = "1-month" | "6-months" | "12-months";
 
 const Pricing = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const { subscription, isPremium, loading: subscriptionLoading } = useSubscription();
   
@@ -526,18 +529,20 @@ const Pricing = () => {
             </Accordion>
           </motion.div>
 
-          {/* CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="text-center"
-          >
-            <p className="text-body text-muted-foreground mb-5">{t("pricing.paymentVia")}</p>
-            <div className="flex justify-center">
-              <img src={zaloPayLogo} alt="ZaloPay" className="h-8 sm:h-10 md:h-12 w-auto object-contain" />
-            </div>
-          </motion.div>
+          {/* CTA - 베트남어일 때만 ZaloPay 로고 표시 */}
+          {i18n.language?.startsWith(VIETNAM_LANG) && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="text-center"
+            >
+              <p className="text-body text-muted-foreground mb-5">{t("pricing.paymentVia")}</p>
+              <div className="flex justify-center">
+                <img src={zaloPayLogo} alt="ZaloPay" className="h-8 sm:h-10 md:h-12 w-auto object-contain" />
+              </div>
+            </motion.div>
+          )}
         </div>
       </main>
 

@@ -1880,17 +1880,17 @@
     "free": { "badge": "Free", "forever": "Free forever", "feature1": "TOPIK Games (All)", "feature2": "TOPIK I & II Study", "feature3": "Roleplay Speaking", "currentPlan": "Current Plan", "startFree": "Start Free" },
     "premium": { "badge": "Most Popular", "feature1": "All Free Features", "feature2": "1:1 Headhunting", "feature3": "TOPIK AI Writing", "feature4": "AI Question Variant", "upgrade": "Upgrade Premium" },
     "comparison": { "title": "Detailed Comparison", "feature": "Feature" },
-    "process": { "title": "Payment Process", "subtitle": "Simple, fast, secure", "step1": { "title": "Choose Plan", "desc": "Select plan that fits your needs" }, "step2": { "title": "Payment", "desc": "ZaloPay, MoMo, Bank Transfer" }, "step3": { "title": "Activate", "desc": "Auto-activate after payment" } },
+    "process": { "title": "Payment Process", "subtitle": "Simple, fast, secure", "step1": { "title": "Choose Plan", "desc": "Select plan that fits your needs" }, "step2": { "title": "Payment", "desc": "Credit Card, PayPal, Bank Transfer" }, "step3": { "title": "Activate", "desc": "Auto-activate after payment" } },
     "security": { "title": "100% Secure Payment", "desc": "SSL Encryption • PCI-DSS Security • 7-day Refund" },
     "faqTitle": "Frequently Asked Questions", "faqSubtitle": "Answers about service plans",
     "faq": {
       "cancel": { "question": "Can I cancel anytime?", "answer": "Yes, you can cancel your subscription anytime. After cancellation, you can still use Premium features until the paid period ends." },
-      "payment": { "question": "What payment methods are supported?", "answer": "We support ZaloPay, MoMo, VNPay, and bank transfer. All transactions are SSL encrypted." },
+      "payment": { "question": "What payment methods are supported?", "answer": "We support Credit Card, PayPal, and bank transfer. All transactions are SSL encrypted." },
       "includes": { "question": "What does Premium include?", "answer": "Premium includes: 1:1 Headhunting, TOPIK AI Writing Correction, and AI Question Variant." },
       "refund": { "question": "Can I get a refund?", "answer": "We offer 100% refund within 7 days if you're not satisfied. Contact support for assistance." },
       "student": { "question": "Is there a student discount?", "answer": "Yes! Students get 20% off on 6-month or 12-month plans. Contact support for verification." }
     },
-    "paymentVia": "Secure payment via ZaloPay"
+    "paymentVia": "Secure payment via Payverse"
   },
   "aiTutor": {
     "badge": "AI Chat - Smart Q&A", "title": "LUKATO AI Chat", "description": "Vietnam's smartest AI teacher system. 24/7 Q&A for all TOPIK, HSA, TSA, API subjects.",
