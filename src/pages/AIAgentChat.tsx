@@ -381,7 +381,7 @@ const AIAgentChat = () => {
       <main className="flex-1 flex flex-col pt-16">
         {/* Chat Header */}
         <div className="border-b border-border/50 bg-background/80 backdrop-blur sticky top-16 z-10">
-          <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="w-full px-6 md:px-12 lg:px-20 py-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" onClick={() => navigate("/ai-chat")} className="shrink-0">
                 <ArrowLeft className="w-5 h-5" />
@@ -419,8 +419,8 @@ const AIAgentChat = () => {
           </div>
         </div>
 
-        {/* Chat Area */}
-        <div className="flex-1 flex flex-col max-w-5xl mx-auto w-full">
+        {/* Chat Area - WIDE LAYOUT */}
+        <div className="flex-1 flex flex-col w-full">
           {messages.length === 0 ? (
             /* Empty State */
             <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
@@ -462,9 +462,9 @@ const AIAgentChat = () => {
               </div>
             </div>
           ) : (
-            /* Messages */
-            <ScrollArea ref={scrollAreaRef} className="flex-1 px-4">
-              <div className="max-w-4xl mx-auto py-6 space-y-6">
+            /* Messages - WIDE LAYOUT like ChatGPT */
+            <ScrollArea ref={scrollAreaRef} className="flex-1 px-6 md:px-12 lg:px-20">
+              <div className="w-full py-8 space-y-8">
                 <AnimatePresence mode="popLayout">
                   {messages.map((message) => (
                     <motion.div
@@ -472,47 +472,47 @@ const AIAgentChat = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className={`flex gap-4 ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                      className={`flex gap-5 ${message.role === "user" ? "justify-end" : "justify-start"}`}
                     >
                       {message.role === "assistant" && (
-                        <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-primary/20 shrink-0">
+                        <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-primary/20 shrink-0">
                           <img src={lukasLogo} alt="LUKATO AI" className="w-full h-full object-cover" />
                         </div>
                       )}
 
-                      <div className={`max-w-[85%] md:max-w-[75%] ${message.role === "user" ? "order-first" : ""}`}>
+                      <div className={`max-w-[90%] lg:max-w-[85%] ${message.role === "user" ? "order-first" : ""}`}>
                         {/* User images */}
                         {message.images && message.images.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mb-2 justify-end">
+                          <div className="flex flex-wrap gap-2 mb-3 justify-end">
                             {message.images.map((img, idx) => (
                               <img
                                 key={idx}
                                 src={img}
                                 alt="Uploaded"
-                                className="max-w-[200px] max-h-[150px] rounded-lg object-cover"
+                                className="max-w-[250px] max-h-[180px] rounded-xl object-cover"
                               />
                             ))}
                           </div>
                         )}
 
                         <div
-                          className={`rounded-2xl px-5 py-4 ${
+                          className={`rounded-2xl px-6 py-5 ${
                             message.role === "user"
                               ? "bg-primary text-primary-foreground rounded-br-sm"
                               : "bg-muted/60 rounded-bl-sm"
                           }`}
                         >
                           {message.role === "assistant" ? (
-                            <div className="prose prose-sm dark:prose-invert max-w-none">
+                            <div className="prose prose-lg dark:prose-invert max-w-none leading-relaxed">
                               <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
                             </div>
                           ) : (
-                            <p className="whitespace-pre-wrap">{message.content}</p>
+                            <p className="whitespace-pre-wrap text-base md:text-lg leading-relaxed">{message.content}</p>
                           )}
                         </div>
 
                         {message.cached && (
-                          <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
                             <Zap className="w-3 h-3" />
                             {t("aiAgent.cachedResponse")}
                           </div>
@@ -520,8 +520,8 @@ const AIAgentChat = () => {
                       </div>
 
                       {message.role === "user" && (
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-korean-blue to-korean-green flex items-center justify-center shrink-0">
-                          <GraduationCap className="w-5 h-5 text-white" />
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-korean-blue to-korean-green flex items-center justify-center shrink-0">
+                          <GraduationCap className="w-6 h-6 text-white" />
                         </div>
                       )}
                     </motion.div>
@@ -530,13 +530,13 @@ const AIAgentChat = () => {
 
                 {/* Loading indicator */}
                 {isLoading && messages[messages.length - 1]?.role === "user" && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-4">
-                    <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-primary/20">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-5">
+                    <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-primary/20">
                       <img src={lukasLogo} alt="LUKATO AI" className="w-full h-full object-cover" />
                     </div>
-                    <div className="bg-muted/60 rounded-2xl rounded-bl-sm px-5 py-4">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                    <div className="bg-muted/60 rounded-2xl rounded-bl-sm px-6 py-5">
+                      <div className="flex items-center gap-2 text-base text-muted-foreground">
+                        <Loader2 className="w-5 h-5 animate-spin" />
                         <span>{t("aiAgent.thinking")} 🤔</span>
                       </div>
                     </div>
@@ -546,9 +546,9 @@ const AIAgentChat = () => {
             </ScrollArea>
           )}
 
-          {/* Input Area - EXPANDED for better UX */}
-          <div className="border-t border-border/50 bg-background/95 backdrop-blur-sm p-4 md:p-6">
-            <div className="max-w-4xl mx-auto">
+          {/* Input Area - WIDE LAYOUT */}
+          <div className="border-t border-border/50 bg-background/95 backdrop-blur-sm p-6 md:p-8">
+            <div className="w-full px-0 md:px-6 lg:px-14">
               {/* Image previews */}
               {selectedImages.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-4">
