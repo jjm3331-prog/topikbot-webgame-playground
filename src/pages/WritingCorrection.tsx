@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 import { useTranslation } from "react-i18next";
+import { generateWritingCorrectionPDF } from "@/lib/pdfGenerator";
 import { 
   PenTool, 
   Upload, 
@@ -125,7 +124,7 @@ const WritingCorrection = () => {
   const questionCameraRef = useRef<HTMLInputElement>(null);
   const answerInputRef = useRef<HTMLInputElement>(null);
   const answerCameraRef = useRef<HTMLInputElement>(null);
-  const pdfContentRef = useRef<HTMLDivElement>(null);
+  
 
   useEffect(() => {
     checkAuth();
@@ -522,7 +521,7 @@ const WritingCorrection = () => {
   };
 
   const handleExportPDF = async () => {
-    if (!result || !pdfContentRef.current) return;
+    if (!result) return;
 
     toast({
       title: t("writingPage.pdf.generatingTitle"),
@@ -530,53 +529,11 @@ const WritingCorrection = () => {
     });
 
     try {
-      // Make the hidden content visible temporarily
-      const pdfElement = pdfContentRef.current;
-      pdfElement.style.display = 'block';
-      pdfElement.style.position = 'absolute';
-      pdfElement.style.left = '-9999px';
-      pdfElement.style.top = '0';
-      
-      // Wait for rendering
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Capture with html2canvas
-      const canvas = await html2canvas(pdfElement, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff'
+      generateWritingCorrectionPDF({
+        result,
+        language: i18n.language,
+        t
       });
-      
-      // Hide the element again
-      pdfElement.style.display = 'none';
-      
-      // Create PDF from canvas
-      const imgData = canvas.toDataURL('image/png');
-      const doc = new jsPDF('p', 'mm', 'a4');
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      
-      // Calculate dimensions
-      const imgWidth = pageWidth - 20; // 10mm margin on each side
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      let heightLeft = imgHeight;
-      let position = 10; // Top margin
-      
-      // Add first page
-      doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-      heightLeft -= (pageHeight - 20);
-      
-      // Add additional pages if content is longer
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight + 10;
-        doc.addPage();
-        doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-        heightLeft -= (pageHeight - 20);
-      }
-      
-      doc.save(`TOPIK_Writing_Report_${Date.now()}.pdf`);
 
       toast({
         title: t("writingPage.pdf.downloadComplete"),
@@ -1706,125 +1663,6 @@ const WritingCorrection = () => {
           )}
         </motion.div>
       </main>
-      
-      {/* Hidden PDF Content for Export */}
-      {result && (
-        <div
-          ref={pdfContentRef}
-          style={{ display: 'none', width: '800px', fontFamily: 'sans-serif' }}
-          className="bg-white text-black p-8"
-        >
-          {/* Header */}
-          <div className="text-center mb-8 border-b-2 border-gray-200 pb-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              TOPIK Writing Correction Report
-            </h1>
-            <p className="text-gray-600">LUKATO AI - topikbot.kr</p>
-          </div>
-          
-          {/* Score Section */}
-          <div className="border-2 border-gray-300 rounded-lg p-6 mb-8">
-            <h2 className="text-2xl font-bold text-center text-gray-900 mb-4">
-              Overall Score: {result.overall_score}/100
-            </h2>
-            <div className="grid grid-cols-4 gap-4 text-center">
-              <div>
-                <p className="text-gray-600 text-sm">Grammar</p>
-                <p className="text-xl font-bold text-gray-900">{result.grammar_score}/25</p>
-              </div>
-              <div>
-                <p className="text-gray-600 text-sm">Vocabulary</p>
-                <p className="text-xl font-bold text-gray-900">{result.vocabulary_score}/25</p>
-              </div>
-              <div>
-                <p className="text-gray-600 text-sm">Structure</p>
-                <p className="text-xl font-bold text-gray-900">{result.structure_score}/25</p>
-              </div>
-              <div>
-                <p className="text-gray-600 text-sm">Content</p>
-                <p className="text-xl font-bold text-gray-900">{result.content_score}/25</p>
-              </div>
-            </div>
-          </div>
-          
-          {/* Strengths */}
-          <div className="mb-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-200 pb-2">
-              Strengths
-            </h3>
-            <ul className="space-y-2">
-              {result.strengths.map((s, i) => (
-                <li key={i} className="text-gray-700 pl-4 relative">
-                  <span className="absolute left-0">-</span> {cleanMarkdown(s)}
-                </li>
-              ))}
-            </ul>
-          </div>
-          
-          {/* Areas for Improvement */}
-          <div className="mb-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-200 pb-2">
-              Areas for Improvement
-            </h3>
-            <ul className="space-y-2">
-              {result.improvements.map((imp, i) => (
-                <li key={i} className="text-gray-700 pl-4 relative">
-                  <span className="absolute left-0">-</span> {cleanMarkdown(imp)}
-                </li>
-              ))}
-            </ul>
-          </div>
-          
-          {/* Corrections */}
-          {result.corrections.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-200 pb-2">
-                Corrections
-              </h3>
-              <div className="space-y-4">
-                {result.corrections.slice(0, 10).map((c, i) => (
-                  <div key={i} className="bg-gray-50 p-3 rounded">
-                    <p className="text-red-600 mb-1">
-                      <span className="font-medium">Original:</span> {cleanMarkdown(c.original)}
-                    </p>
-                    <p className="text-green-600 mb-1">
-                      <span className="font-medium">Corrected:</span> {cleanMarkdown(c.corrected)}
-                    </p>
-                    <p className="text-gray-500 text-sm">{cleanMarkdown(c.explanation)}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Model Answer */}
-          <div className="mb-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-200 pb-2">
-              Model Answer
-            </h3>
-            <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
-              {cleanMarkdown(result.model_answer)}
-            </p>
-          </div>
-          
-          {/* Detailed Feedback */}
-          {result.detailed_feedback && (
-            <div className="mb-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-200 pb-2">
-                Detailed Feedback
-              </h3>
-              <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
-                {cleanMarkdown(result.detailed_feedback)}
-              </p>
-            </div>
-          )}
-          
-          {/* Footer */}
-          <div className="text-center text-gray-400 text-sm mt-8 pt-4 border-t border-gray-200">
-            Generated by LUKATO AI | topikbot.kr
-          </div>
-        </div>
-      )}
       
       <AppFooter />
     </div>
