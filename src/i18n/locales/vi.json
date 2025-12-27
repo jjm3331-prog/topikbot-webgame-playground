@@ -70,63 +70,6 @@
       "pdfError": "Lỗi tạo PDF"
     }
   },
-  "questionVariant": {
-    "title": "Biến thể đề thi AI",
-    "description": "Tải ảnh đề thi TOPIK lên, AI sẽ tạo câu hỏi biến thể tương tự",
-    "howToUse": "Cách sử dụng",
-    "examples": {
-      "reading": "Đề đọc hiểu",
-      "readingDesc": "Phân tích đoạn văn và tạo câu hỏi mới cùng độ khó",
-      "grammar": "Đề ngữ pháp",
-      "grammarDesc": "Giữ nguyên mẫu ngữ pháp, thay đổi ví dụ",
-      "vocabulary": "Đề từ vựng",
-      "vocabularyDesc": "Tạo câu hỏi từ vựng cùng loại với từ khác",
-      "listening": "Đề nghe",
-      "listeningDesc": "Phân tích văn bản nghe và tạo câu hỏi tương tự"
-    },
-    "uploadImage": "Tải ảnh đề thi",
-    "clickToUpload": "Nhấn để chọn ảnh",
-    "supportedFormats": "Định dạng: JPG, PNG, GIF (tối đa 10MB)",
-    "generate": "Tạo đề biến thể",
-    "generateButton": "Tạo biến thể AI",
-    "features": {
-      "analyze": "Phân tích đề gốc",
-      "generate": "Tạo biến thể tương tự",
-      "explain": "Cung cấp giải thích chi tiết"
-    },
-    "premiumFeature": "Tính năng Premium",
-    "premiumDescription": "Tính năng này chỉ dành cho thành viên Premium.",
-    "upgradePremium": "Nâng cấp Premium",
-    "result": "Kết quả",
-    "sections": {
-      "originalAnalysis": "Phân tích đề gốc",
-      "variantQuestion": "Câu hỏi biến thể",
-      "answer": "Đáp án",
-      "explanation": "Giải thích",
-      "learningPoints": "Điểm học tập"
-    },
-    "pdf": {
-      "createdAt": "Ngày tạo",
-      "translation": "Bản dịch"
-    },
-    "success": {
-      "generated": "Đã tạo câu hỏi biến thể thành công!",
-      "pdfOpened": "Đã mở xem trước PDF"
-    },
-    "errors": {
-      "imageTooLarge": "Ảnh quá lớn. Vui lòng chọn file dưới 10MB.",
-      "selectImage": "Vui lòng chọn ảnh trước.",
-      "premiumRequired": "Tính năng này chỉ dành cho thành viên Premium.",
-      "apiError": "Lỗi khi tạo câu hỏi.",
-      "tryAgain": "Đã xảy ra lỗi. Vui lòng thử lại.",
-      "noContent": "Không có nội dung để tải xuống.",
-      "popupBlocked": "Popup bị chặn. Vui lòng tắt chặn popup.",
-      "pdfError": "Lỗi khi tạo PDF."
-    },
-    "changeImage": "Chọn ảnh khác",
-    "generating": "AI đang tạo câu hỏi biến thể...",
-    "downloadPDF": "Tải PDF"
-  },
   "notifications": {
     "title": "Thông báo",
     "markAllRead": "Đánh dấu đã đọc",
