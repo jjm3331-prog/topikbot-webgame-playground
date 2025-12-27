@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ interface Word {
 const GAME_DURATION = 60;
 
 const BankruptcyRecovery = () => {
+  const { t } = useTranslation();
   const [gameState, setGameState] = useState<GameState>('ready');
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const [words, setWords] = useState<Word[]>([]);
@@ -66,8 +68,8 @@ const BankruptcyRecovery = () => {
     } catch (error) {
       console.error('Error fetching words:', error);
       toast({
-        title: "단어 로딩 오류 / Lỗi tải từ",
-        description: "단어를 불러오는데 실패했습니다. / Không thể tải từ vựng.",
+        title: t("bankruptcyRecovery.wordLoadError"),
+        description: t("bankruptcyRecovery.wordLoadErrorDesc"),
         variant: "destructive"
       });
     } finally {
@@ -103,8 +105,8 @@ const BankruptcyRecovery = () => {
     } catch (error) {
       console.error('Error starting game:', error);
       toast({
-        title: "게임 시작 오류 / Lỗi bắt đầu game",
-        description: "게임을 시작하는데 실패했습니다. / Không thể bắt đầu game.",
+        title: t("bankruptcyRecovery.gameStartError"),
+        description: t("bankruptcyRecovery.gameStartErrorDesc"),
         variant: "destructive"
       });
       setGameState('ready');
@@ -199,8 +201,7 @@ const BankruptcyRecovery = () => {
         .eq('id', session.user.id);
       
       toast({
-        title: `₩${score.toLocaleString()} 획득!`,
-        description: `Đã kiếm được ₩${score.toLocaleString()}!`,
+        title: `₩${score.toLocaleString()} ${t("bankruptcyRecovery.earnMoney")}`,
       });
     }
   };
@@ -223,7 +224,7 @@ const BankruptcyRecovery = () => {
       {/* Stats Bar */}
 
       <div className="flex items-center justify-between p-4 border-b border-white/10">
-        <span className="text-white font-medium">파산 복구 / Phục hồi phá sản</span>
+        <span className="text-white font-medium">{t("bankruptcyRecovery.title")}</span>
         {gameState === 'playing' && (
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-yellow-400">
@@ -256,16 +257,15 @@ const BankruptcyRecovery = () => {
                 >
                   <Zap className="w-20 h-20 text-yellow-400 mx-auto mb-4" />
                 </motion.div>
-                <h1 className="text-3xl font-bold text-white mb-2">파산 복구</h1>
-                <p className="text-white/60">Phục hồi phá sản</p>
-                <p className="text-white/80 mt-4">60초 안에 한국어 단어를 빠르게 타이핑하세요!</p>
-                <p className="text-white/60">Gõ nhanh các từ tiếng Hàn trong 60 giây!</p>
-                <p className="text-neon-cyan text-sm mt-2">🤖 AI가 매번 새로운 단어를 생성합니다!</p>
+                <h1 className="text-3xl font-bold text-white mb-2">{t("bankruptcyRecovery.title")}</h1>
+                <p className="text-white/60">{t("bankruptcyRecovery.subtitle")}</p>
+                <p className="text-white/80 mt-4">{t("bankruptcyRecovery.description")}</p>
+                <p className="text-neon-cyan text-sm mt-2">{t("bankruptcyRecovery.aiNote")}</p>
               </div>
 
               {/* Difficulty Selection */}
               <div className="glass-card p-6 rounded-xl">
-                <h2 className="text-white font-bold mb-4 text-center">난이도 선택 / Chọn độ khó</h2>
+                <h2 className="text-white font-bold mb-4 text-center">{t("bankruptcyRecovery.selectDifficulty")}</h2>
                 <div className="grid grid-cols-3 gap-3">
                   {(['easy', 'medium', 'hard'] as Difficulty[]).map((diff) => (
                     <button
@@ -277,16 +277,8 @@ const BankruptcyRecovery = () => {
                           : 'bg-white/10 text-white/70 hover:bg-white/20'
                       }`}
                     >
-                      <p className="font-bold">
-                        {diff === 'easy' && '쉬움 / Dễ'}
-                        {diff === 'medium' && '보통 / TB'}
-                        {diff === 'hard' && '어려움 / Khó'}
-                      </p>
-                      <p className="text-xs opacity-70">
-                        {diff === 'easy' && '1-3글자 / 1-3 chữ'}
-                        {diff === 'medium' && '3-5글자 / 3-5 chữ'}
-                        {diff === 'hard' && '5글자+ / 5+ chữ'}
-                      </p>
+                      <p className="font-bold">{t(`bankruptcyRecovery.${diff}`)}</p>
+                      <p className="text-xs opacity-70">{t(`bankruptcyRecovery.${diff}Desc`)}</p>
                     </button>
                   ))}
                 </div>
@@ -294,13 +286,13 @@ const BankruptcyRecovery = () => {
 
               {/* How to Play */}
               <div className="glass-card p-4 rounded-xl">
-                <h3 className="text-white font-bold mb-3">🎮 게임 방법 / Cách chơi</h3>
+                <h3 className="text-white font-bold mb-3">{t("bankruptcyRecovery.howToPlay")}</h3>
                 <ul className="space-y-2 text-sm text-white/80">
-                  <li>⌨️ 화면에 나오는 한국어 단어를 타이핑하세요 / Gõ từ tiếng Hàn xuất hiện trên màn hình</li>
-                  <li>⚡ 연속으로 맞추면 콤보 보너스! / Combo bonus khi gõ đúng liên tiếp!</li>
-                  <li>⏭️ 모르면 스킵 버튼으로 다음 단어로 / Bấm skip nếu không biết</li>
-                  <li>💰 60초 후 번 돈이 계정에 추가됩니다 / Tiền kiếm được sẽ được cộng sau 60 giây</li>
-                  <li>🤖 AI가 무한한 다양성의 단어를 생성! / AI tạo từ vựng đa dạng vô hạn!</li>
+                  <li>{t("bankruptcyRecovery.howToPlay1")}</li>
+                  <li>{t("bankruptcyRecovery.howToPlay2")}</li>
+                  <li>{t("bankruptcyRecovery.howToPlay3")}</li>
+                  <li>{t("bankruptcyRecovery.howToPlay4")}</li>
+                  <li>{t("bankruptcyRecovery.howToPlay5")}</li>
                 </ul>
               </div>
 
@@ -309,7 +301,7 @@ const BankruptcyRecovery = () => {
                 className="w-full h-16 text-xl font-bold bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
               >
                 <Zap className="w-6 h-6 mr-2" />
-                게임 시작! / Bắt đầu!
+                {t("bankruptcyRecovery.startGame")}
               </Button>
             </motion.div>
           )}
@@ -324,8 +316,7 @@ const BankruptcyRecovery = () => {
               className="flex flex-col items-center justify-center py-20"
             >
               <Loader2 className="w-16 h-16 text-neon-cyan animate-spin mb-4" />
-              <p className="text-white text-lg">AI가 단어를 생성하고 있습니다...</p>
-              <p className="text-white/60">AI đang tạo từ vựng...</p>
+              <p className="text-white text-lg">{t("bankruptcyRecovery.aiGenerating")}</p>
             </motion.div>
           )}
 
@@ -343,7 +334,7 @@ const BankruptcyRecovery = () => {
                 <div className="flex items-center gap-2">
                   <Flame className={`w-5 h-5 ${streak > 0 ? 'text-orange-400' : 'text-white/30'}`} />
                   <span className={`font-bold ${streak > 0 ? 'text-orange-400' : 'text-white/50'}`}>
-                    {streak}x 콤보
+                    {streak}x {t("bankruptcyRecovery.combo")}
                   </span>
                 </div>
                 <div className="flex items-center gap-4">
@@ -352,7 +343,7 @@ const BankruptcyRecovery = () => {
                   )}
                   <div className="flex items-center gap-2 text-white/70">
                     <Target className="w-5 h-5" />
-                    <span>{wordsCompleted} 단어</span>
+                    <span>{wordsCompleted} {t("bankruptcyRecovery.words")}</span>
                   </div>
                 </div>
               </div>
@@ -378,7 +369,7 @@ const BankruptcyRecovery = () => {
                   showWrong ? 'bg-red-500/30 border-red-400' : ''
                 }`}
               >
-                <p className="text-white/60 text-sm mb-2">다음 단어를 타이핑하세요 / Gõ từ sau:</p>
+                <p className="text-white/60 text-sm mb-2">{t("bankruptcyRecovery.typeNext")}:</p>
                 <motion.p
                   animate={showCorrect ? { scale: [1, 1.2, 1] } : {}}
                   className="text-4xl md:text-5xl font-bold text-white mb-4"
@@ -395,7 +386,7 @@ const BankruptcyRecovery = () => {
                   ref={inputRef}
                   value={userInput}
                   onChange={handleInputChange}
-                  placeholder="여기에 타이핑... / Gõ ở đây..."
+                  placeholder={t("bankruptcyRecovery.typeHere")}
                   className="h-16 text-2xl text-center bg-white/10 border-white/20 text-white placeholder:text-white/40"
                   autoComplete="off"
                   autoCorrect="off"
@@ -408,22 +399,22 @@ const BankruptcyRecovery = () => {
                   className="w-full border-white/20 text-white hover:bg-white/10"
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
-                  스킵 (콤보 리셋) / Bỏ qua
+                  {t("bankruptcyRecovery.skip")}
                 </Button>
               </div>
 
               {/* Current Stats */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="glass-card p-3 rounded-xl text-center">
-                  <p className="text-white/60 text-xs">수입 / Thu nhập</p>
+                  <p className="text-white/60 text-xs">{t("bankruptcyRecovery.income")}</p>
                   <p className="text-yellow-400 font-bold">₩{score}</p>
                 </div>
                 <div className="glass-card p-3 rounded-xl text-center">
-                  <p className="text-white/60 text-xs">최대 콤보 / Max combo</p>
+                  <p className="text-white/60 text-xs">{t("bankruptcyRecovery.maxCombo")}</p>
                   <p className="text-orange-400 font-bold">{maxStreak}x</p>
                 </div>
                 <div className="glass-card p-3 rounded-xl text-center">
-                  <p className="text-white/60 text-xs">완료 / Hoàn thành</p>
+                  <p className="text-white/60 text-xs">{t("bankruptcyRecovery.completed")}</p>
                   <p className="text-green-400 font-bold">{wordsCompleted}</p>
                 </div>
               </div>
@@ -447,11 +438,10 @@ const BankruptcyRecovery = () => {
                 >
                   <Trophy className="w-20 h-20 text-yellow-400 mx-auto mb-4" />
                 </motion.div>
-                <h1 className="text-3xl font-bold text-white mb-2">타임 아웃!</h1>
-                <p className="text-white/60 mb-6">Hết giờ!</p>
+                <h1 className="text-3xl font-bold text-white mb-2">{t("bankruptcyRecovery.timeOut")}</h1>
 
                 <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-xl p-6 mb-6">
-                  <p className="text-white/70 mb-2">총 수입 / Tổng thu nhập</p>
+                  <p className="text-white/70 mb-2">{t("bankruptcyRecovery.totalIncome")}</p>
                   <div className="flex items-center justify-center gap-2 text-yellow-400">
                     <Coins className="w-8 h-8" />
                     <span className="text-4xl font-bold">₩{score.toLocaleString()}</span>

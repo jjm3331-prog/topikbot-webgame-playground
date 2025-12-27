@@ -1,30 +1,24 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Heart, Trophy, Star, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import confetti from "canvas-confetti";
 
 const PWAWelcome = () => {
+  const { t } = useTranslation();
   const [showWelcome, setShowWelcome] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
-    // Check if running in standalone mode (installed PWA)
     const isStandalone = window.matchMedia("(display-mode: standalone)").matches 
       || (window.navigator as any).standalone === true;
-    
-    // Check if we've shown the welcome before
     const hasSeenWelcome = localStorage.getItem("pwa-welcome-seen");
 
     if (isStandalone && !hasSeenWelcome) {
       setShowWelcome(true);
-      // Trigger confetti
       setTimeout(() => {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
       }, 500);
     }
   }, []);
@@ -46,37 +40,29 @@ const PWAWelcome = () => {
     {
       icon: Sparkles,
       emoji: "🎉",
-      titleKo: "설치 완료!",
-      titleVi: "Cài đặt thành công!",
-      descKo: "Game LUKATO가 홈 화면에 추가되었습니다.",
-      descVi: "Game LUKATO đã được thêm vào màn hình chính.",
+      titleKey: "pwaWelcome.installComplete",
+      descKey: "pwaWelcome.appAdded",
       color: "from-neon-pink to-neon-purple"
     },
     {
       icon: Heart,
       emoji: "💕",
-      titleKo: "Seoul Love Signal",
-      titleVi: "Tín hiệu tình yêu Seoul",
-      descKo: "AI 기반 연애 시뮬레이션으로 한국어 실력을 키워보세요!",
-      descVi: "Nâng cao kỹ năng tiếng Hàn với game hẹn hò AI!",
+      titleKey: "pwaWelcome.seoulLoveSignal",
+      descKey: "pwaWelcome.seoulLoveSignalDesc",
       color: "from-pink-500 to-rose-500"
     },
     {
       icon: Trophy,
       emoji: "🏆",
-      titleKo: "랭킹 도전",
-      titleVi: "Thử thách xếp hạng",
-      descKo: "다양한 미니게임으로 포인트를 모아 1위에 도전하세요!",
-      descVi: "Chơi mini-game, tích điểm và chinh phục top 1!",
+      titleKey: "pwaWelcome.rankingChallenge",
+      descKey: "pwaWelcome.rankingChallengeDesc",
       color: "from-yellow-500 to-orange-500"
     },
     {
       icon: Star,
       emoji: "✨",
-      titleKo: "지금 시작하세요!",
-      titleVi: "Bắt đầu ngay!",
-      descKo: "한국어 학습의 새로운 여정을 시작할 준비가 되셨나요?",
-      descVi: "Sẵn sàng bắt đầu hành trình học tiếng Hàn mới?",
+      titleKey: "pwaWelcome.startNow",
+      descKey: "pwaWelcome.startNowDesc",
       color: "from-neon-cyan to-blue-500"
     }
   ];
@@ -118,30 +104,20 @@ const PWAWelcome = () => {
               transition={{ duration: 0.3 }}
               className="text-center max-w-sm w-full"
             >
-              {/* Icon/Emoji */}
               <div className={`w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br ${currentData.color} flex items-center justify-center shadow-lg`}>
                 <span className="text-5xl">{currentData.emoji}</span>
               </div>
 
-              {/* Title */}
               <h1 className="text-2xl font-bold text-white mb-2">
-                {currentData.titleKo}
+                {t(currentData.titleKey)}
               </h1>
-              <p className="text-purple-300 text-sm mb-4">
-                {currentData.titleVi}
-              </p>
 
-              {/* Description */}
               <p className="text-white/80 text-sm mb-2">
-                {currentData.descKo}
-              </p>
-              <p className="text-purple-300/60 text-xs">
-                {currentData.descVi}
+                {t(currentData.descKey)}
               </p>
             </motion.div>
           </AnimatePresence>
 
-          {/* Progress Dots */}
           <div className="flex gap-2 mt-8 mb-6">
             {slides.map((_, index) => (
               <button
@@ -156,7 +132,6 @@ const PWAWelcome = () => {
             ))}
           </div>
 
-          {/* Action Buttons */}
           <div className="flex flex-col gap-3 w-full max-w-xs mt-4">
             <Button
               onClick={handleNext}
@@ -164,10 +139,10 @@ const PWAWelcome = () => {
             >
               {currentSlide < slides.length - 1 ? (
                 <>
-                  다음 / Tiếp <ArrowRight className="w-5 h-5 ml-2" />
+                  {t("pwaWelcome.next")} <ArrowRight className="w-5 h-5 ml-2" />
                 </>
               ) : (
-                "시작하기 / Bắt đầu"
+                t("pwaWelcome.start")
               )}
             </Button>
             
@@ -177,7 +152,7 @@ const PWAWelcome = () => {
                 onClick={handleComplete}
                 className="text-white/50 hover:text-white hover:bg-white/10"
               >
-                건너뛰기 / Bỏ qua
+                {t("pwaWelcome.skipBtn")}
               </Button>
             )}
           </div>
