@@ -1516,6 +1516,28 @@
     "uploadError": "Image upload failed",
     "pasteHint": "💡 Ctrl+V to paste images directly into the content"
   },
+  "blockEditor": {
+    "text": "Text",
+    "heading": "Heading",
+    "quote": "Quote",
+    "list": "List",
+    "divider": "Divider",
+    "image": "Image",
+    "selectBlockType": "Select block type",
+    "addFirstBlock": "Add first block",
+    "minOneBlock": "At least 1 block required",
+    "onlyImages": "Only images allowed",
+    "imageUploaded": "Image uploaded",
+    "uploadFailed": "Upload failed",
+    "textPlaceholder": "Enter text...",
+    "headingPlaceholder": "Enter heading...",
+    "quotePlaceholder": "Enter quote...",
+    "listItemPlaceholder": "Enter item...",
+    "addItem": "Add item",
+    "clickToUpload": "Click to upload image",
+    "youtubePlaceholder": "Enter YouTube URL...",
+    "hint": "Add blocks to compose your post. Use the + button between blocks to add new ones."
+  },
   "boardHub": {
     "back": "Back",
     "title": "Community",

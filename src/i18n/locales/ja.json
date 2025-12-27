@@ -1281,6 +1281,28 @@
     "uploadError": "画像アップロード失敗",
     "pasteHint": "💡 Ctrl+Vで画像を直接貼り付けられます"
   },
+  "blockEditor": {
+    "text": "テキスト",
+    "heading": "見出し",
+    "quote": "引用",
+    "list": "リスト",
+    "divider": "区切り線",
+    "image": "画像",
+    "selectBlockType": "ブロックタイプを選択",
+    "addFirstBlock": "最初のブロックを追加",
+    "minOneBlock": "最低1つのブロックが必要です",
+    "onlyImages": "画像のみ許可されています",
+    "imageUploaded": "画像がアップロードされました",
+    "uploadFailed": "アップロード失敗",
+    "textPlaceholder": "テキストを入力...",
+    "headingPlaceholder": "見出しを入力...",
+    "quotePlaceholder": "引用を入力...",
+    "listItemPlaceholder": "項目を入力...",
+    "addItem": "項目を追加",
+    "clickToUpload": "クリックして画像をアップロード",
+    "youtubePlaceholder": "YouTube URLを入力...",
+    "hint": "ブロックを追加して投稿を作成します。ブロック間の+ボタンで新しいブロックを追加できます。"
+  },
   "boardHub": {
     "back": "戻る",
     "title": "コミュニティ",
