@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import zaloQr from "@/assets/zalo-qr.jpg";
 import kakaoQr from "@/assets/kakao-qr.png";
 import kakaoLogo from "@/assets/kakao-logo.png";
-import telegramQr from "@/assets/telegram-qr.jpg";
+import telegramQr from "@/assets/telegram-qr.png";
 
 // 텔레그램 사용 언어
 const TELEGRAM_LANGS = ["en", "ru", "uz", "zh", "ja"];
