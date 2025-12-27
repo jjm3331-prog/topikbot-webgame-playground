@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import CategoryTabs, { LearningCategory } from "@/components/learning/CategoryTabs";
@@ -82,6 +83,7 @@ const topik1Lessons: LessonData[] = [
 
 const TopikI = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [activeLevel, setActiveLevel] = useState<string>("1");
   const [activeCategory, setActiveCategory] = useState<LearningCategory>("vocabulary");
@@ -155,7 +157,7 @@ const TopikI = () => {
               className="mb-4"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              돌아가기
+              {t('topikPage.goBack')}
             </Button>
 
             <div className="flex items-center gap-4 mb-6">
@@ -163,8 +165,8 @@ const TopikI = () => {
                 <GraduationCap className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-foreground">TOPIK I</h1>
-                <p className="text-muted-foreground">한국어능력시험 초급 (1-2급)</p>
+                <h1 className="text-3xl font-bold text-foreground">{t('topikPage.topik1.title')}</h1>
+                <p className="text-muted-foreground">{t('topikPage.topik1.subtitle')}</p>
               </div>
             </div>
 
@@ -172,10 +174,9 @@ const TopikI = () => {
             <div className="glass-card p-4 flex items-start gap-3 mb-6">
               <AlertCircle className="w-5 h-5 text-korean-blue shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm text-foreground font-medium">TOPIK I 학습 안내</p>
+                <p className="text-sm text-foreground font-medium">{t('topikPage.topik1.infoTitle')}</p>
                 <p className="text-sm text-muted-foreground">
-                  TOPIK I은 1급과 2급으로 구성되며, 일상생활에 필요한 기초 한국어 능력을 평가합니다.
-                  어휘, 문법, 읽기, 듣기 영역을 체계적으로 학습하세요.
+                  {t('topikPage.topik1.infoDesc')}
                 </p>
               </div>
             </div>
@@ -186,11 +187,11 @@ const TopikI = () => {
             <TabsList className="grid w-full max-w-md grid-cols-2">
               <TabsTrigger value="1" className="flex items-center gap-2">
                 <LevelBadge level={1} size="sm" />
-                <span>1급 (초급)</span>
+                <span>{t('topikPage.topik1.level1')}</span>
               </TabsTrigger>
               <TabsTrigger value="2" className="flex items-center gap-2">
                 <LevelBadge level={2} size="sm" />
-                <span>2급 (초급)</span>
+                <span>{t('topikPage.topik1.level2')}</span>
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -244,7 +245,7 @@ const TopikI = () => {
               ) : (
                 <div className="text-center py-12">
                   <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">이 카테고리에 아직 콘텐츠가 없습니다.</p>
+                  <p className="text-muted-foreground">{t('topikPage.noContent')}</p>
                 </div>
               )}
             </motion.div>
