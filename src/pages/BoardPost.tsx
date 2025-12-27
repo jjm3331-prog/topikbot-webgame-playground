@@ -611,7 +611,6 @@ export default function BoardPost() {
 
   const postAuthor = getAuthorDisplay(post.author_id, post.author_name, post.is_anonymous);
   const canModify = currentUser && (post.author_id === currentUser || isAdmin);
-  const isPodcast = boardType === "podcast";
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -692,9 +691,9 @@ export default function BoardPost() {
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
                   <h1 className="text-xl sm:text-2xl font-bold text-foreground">
-                    {isPodcast ? post.title : (showTranslated && translatedTitle ? translatedTitle : post.title)}
+                    {post.title}
                   </h1>
-                  {isPodcast && showTranslated && translatedTitle && (
+                  {showTranslated && translatedTitle && (
                     <p className="mt-2 text-sm text-muted-foreground break-words">
                       {translatedTitle}
                     </p>
@@ -755,70 +754,11 @@ export default function BoardPost() {
                 </div>
               </div>
 
-              {/* Content */}
-              {isPodcast ? (
-                <div className="mt-6 space-y-6">
-                  {/* Original (always) */}
-                  <div
-                    className="prose prose-sm max-w-none text-foreground
-                      [&_p]:mb-4 [&_p]:leading-relaxed [&_p]:text-foreground
-                      [&_br]:mb-2 [&_strong]:font-semibold [&_em]:italic
-                      [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5
-                      [&_li]:mb-1 [&_a]:text-primary [&_a]:underline
-                      [&_img]:rounded-lg [&_img]:my-4 [&_img]:max-w-full
-                      [&_iframe]:rounded-lg [&_video]:rounded-lg"
-                    dangerouslySetInnerHTML={{ __html: post.content }}
-                  />
-
-                  {/* Translation (optional, never replaces original) */}
-                  {showTranslated && translatedContent && (
-                    <div className="pt-6 mt-6 border-t-2 border-primary/30 bg-primary/5 -mx-6 px-6 pb-6 rounded-b-lg">
-                      <p className="text-sm font-semibold text-primary mb-4">
-                        {t("board.translation.translatedSectionLabel")}
-                      </p>
-                      <div
-                        className="prose prose-sm max-w-none text-foreground
-                          [&_p]:mb-4 [&_p]:leading-relaxed [&_p]:text-foreground
-                          [&_br]:mb-2 [&_strong]:font-semibold [&_em]:italic
-                          [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5
-                          [&_li]:mb-1 [&_a]:text-primary [&_a]:underline"
-                        dangerouslySetInnerHTML={{ __html: translatedContent }}
-                      />
-
-                      {translatedMediaHtml && (
-                        <div
-                          className="prose prose-sm max-w-none mt-4 text-foreground
-                            [&_img]:rounded-lg [&_img]:my-4 [&_img]:max-w-full
-                            [&_iframe]:rounded-lg [&_video]:rounded-lg"
-                          dangerouslySetInnerHTML={{ __html: translatedMediaHtml }}
-                        />
-                      )}
-                    </div>
-                  )}
-                </div>
-              ) : showTranslated && translatedContent ? (
-                <>
-                  <div
-                    className="prose prose-sm max-w-none mt-6 text-foreground
-                      [&_p]:mb-4 [&_p]:leading-relaxed [&_p]:text-foreground
-                      [&_br]:mb-2 [&_strong]:font-semibold [&_em]:italic
-                      [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5
-                      [&_li]:mb-1 [&_a]:text-primary [&_a]:underline"
-                    dangerouslySetInnerHTML={{ __html: translatedContent }}
-                  />
-
-                  {translatedMediaHtml && (
-                    <div
-                      className="prose prose-sm max-w-none mt-4 text-foreground
-                        [&_img]:rounded-lg [&_img]:my-4 [&_img]:max-w-full
-                        [&_iframe]:rounded-lg [&_video]:rounded-lg"
-                      dangerouslySetInnerHTML={{ __html: translatedMediaHtml }}
-                    />
-                  )}
-                </>
-              ) : (
+              {/* Content - Always show original first, translation below */}
+              <div className="mt-6 space-y-6">
+                {/* Original content (always shown) */}
                 <div
-                  className="prose prose-sm max-w-none mt-6 text-foreground
+                  className="prose prose-sm max-w-none text-foreground
                     [&_p]:mb-4 [&_p]:leading-relaxed [&_p]:text-foreground
                     [&_br]:mb-2 [&_strong]:font-semibold [&_em]:italic
                     [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5
@@ -827,7 +767,33 @@ export default function BoardPost() {
                     [&_iframe]:rounded-lg [&_video]:rounded-lg"
                   dangerouslySetInnerHTML={{ __html: post.content }}
                 />
-              )}
+
+                {/* Translation section (optional, never replaces original) */}
+                {showTranslated && translatedContent && (
+                  <div className="pt-6 mt-6 border-t-2 border-primary/30 bg-primary/5 -mx-6 px-6 pb-6 rounded-b-lg">
+                    <p className="text-sm font-semibold text-primary mb-4">
+                      {t("board.translation.translatedSectionLabel")}
+                    </p>
+                    <div
+                      className="prose prose-sm max-w-none text-foreground
+                        [&_p]:mb-4 [&_p]:leading-relaxed [&_p]:text-foreground
+                        [&_br]:mb-2 [&_strong]:font-semibold [&_em]:italic
+                        [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5
+                        [&_li]:mb-1 [&_a]:text-primary [&_a]:underline"
+                      dangerouslySetInnerHTML={{ __html: translatedContent }}
+                    />
+
+                    {translatedMediaHtml && (
+                      <div
+                        className="prose prose-sm max-w-none mt-4 text-foreground
+                          [&_img]:rounded-lg [&_img]:my-4 [&_img]:max-w-full
+                          [&_iframe]:rounded-lg [&_video]:rounded-lg"
+                        dangerouslySetInnerHTML={{ __html: translatedMediaHtml }}
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* Audio Player for Podcast */}
               {post.audio_url && (
