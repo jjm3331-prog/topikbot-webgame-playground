@@ -1557,10 +1557,22 @@
       "sameLanguageDesc": "Ngôn ngữ nguồn và ngôn ngữ đã chọn giống nhau."
     },
     "types": {
-      "notice": "📢 Thông báo",
-      "free": "💬 Tự do",
-      "resource": "📚 Tài liệu",
-      "anonymous": "👻 Ẩn danh"
+      "notice": {
+        "title": "📢 Thông báo",
+        "subtitle": "Thông báo chính thức"
+      },
+      "free": {
+        "title": "💬 Tự do",
+        "subtitle": "Thảo luận tự do"
+      },
+      "resource": {
+        "title": "📚 Tài liệu",
+        "subtitle": "Tài liệu học tập"
+      },
+      "anonymous": {
+        "title": "👻 Ẩn danh",
+        "subtitle": "Bài viết ẩn danh"
+      }
     },
     "error": "Lỗi",
     "cannotLoadPosts": "Không thể tải bài viết.",

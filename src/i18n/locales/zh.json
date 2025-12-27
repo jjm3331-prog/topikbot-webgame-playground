@@ -1148,10 +1148,22 @@
       "sameLanguageDesc": "源语言和所选语言相同。"
     },
     "types": {
-      "notice": "📢 公告",
-      "free": "💬 自由讨论",
-      "resource": "📚 资源",
-      "anonymous": "👻 匿名"
+      "notice": {
+        "title": "📢 公告",
+        "subtitle": "官方通知"
+      },
+      "free": {
+        "title": "💬 自由讨论",
+        "subtitle": "自由交流"
+      },
+      "resource": {
+        "title": "📚 资源",
+        "subtitle": "学习资料"
+      },
+      "anonymous": {
+        "title": "👻 匿名",
+        "subtitle": "匿名帖子"
+      }
     },
     "error": "错误",
     "cannotLoadPosts": "无法加载帖子。",
