@@ -209,11 +209,11 @@ const Pricing = () => {
       // USD pricing for all other countries
       switch (billingPeriod) {
         case "1-month":
-          return { price: 9.99, perMonth: 9.99, savings: 0 };
+          return { price: 12, perMonth: 12, savings: 0 };
         case "6-months":
-          return { price: 47.94, perMonth: 7.99, savings: 12.00 };
+          return { price: 60, perMonth: 10, savings: 12 };
         case "12-months":
-          return { price: 83.88, perMonth: 6.99, savings: 36.00 };
+          return { price: 100, perMonth: 8.33, savings: 44 };
       }
     }
   };
