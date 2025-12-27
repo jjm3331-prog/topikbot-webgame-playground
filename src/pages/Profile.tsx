@@ -95,7 +95,7 @@ const Profile = () => {
     fetchProfile();
   }, [navigate]);
 
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const handleSaveUsername = async () => {
     if (!profile || !newUsername.trim()) return;
@@ -253,10 +253,21 @@ const Profile = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("vi-VN", {
-      day: "numeric",
-      month: "numeric",
-      year: "numeric"
+    const lang = (i18n.language || 'ko').split('-')[0];
+    const localeMap: Record<string, string> = {
+      ko: 'ko-KR',
+      vi: 'vi-VN',
+      en: 'en-US',
+      ja: 'ja-JP',
+      zh: 'zh-CN',
+      ru: 'ru-RU',
+      uz: 'uz-UZ',
+    };
+
+    return new Date(dateString).toLocaleDateString(localeMap[lang] || 'en-US', {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
     });
   };
 
@@ -475,7 +486,7 @@ const Profile = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
             className="glass-card rounded-2xl p-6 mb-6"
-            aria-label="My menu"
+            aria-label={t('profile.menu')}
           >
             <h3 className="font-semibold text-foreground flex items-center gap-2 mb-4">
               <User className="w-4 h-4" />
