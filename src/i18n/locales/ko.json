@@ -139,6 +139,7 @@
       "headhunting": "헤드헌팅",
       "companyReport": "기업 리포트",
       "interviewSimulation": "면접 시뮬레이션",
+      "practicalGuide": "실무 가이드",
       "learningHub": "TOPIK 학습 센터",
       "community": "커뮤니티",
       "gameHub": "게임 허브",
@@ -2017,10 +2018,11 @@
       "badge": "Korea Career",
       "title": "Korea Career Hub",
       "subtitle": "올인원 한국 취업 서비스",
-      "subline": "헤드헌팅 • 기업 리포트 • AI 면접",
+      "subline": "헤드헌팅 • 기업 리포트 • AI 면접 • 실무 가이드",
       "premiumPreviewFeatureName": "Korea Career Hub",
-      "status": { "active": "운영 중" },
+      "status": { "active": "운영 중", "coming": "준비 중" },
       "cta": "열기",
+      "comingSoon": "곧 출시",
       "stats": {
         "partnerCompanies": "파트너 기업",
         "successPlacements": "취업 성공",
@@ -2073,6 +2075,17 @@
             "realtimeFeedback": "실시간 피드백",
             "scoring": "채점",
             "customQuestions": "맞춤 질문"
+          }
+        },
+        "practicalGuide": {
+          "title": "실무 가이드",
+          "subtitle": "현장 한국어",
+          "description": "IT 업무 현장에서 사용하는 실무 한국어를 학습하세요.",
+          "features": {
+            "itTerms": "IT 용어",
+            "meetingSim": "미팅 시뮬레이션",
+            "emailTemplates": "메일 템플릿",
+            "businessKorean": "비즈니스 한국어"
           }
         }
       }

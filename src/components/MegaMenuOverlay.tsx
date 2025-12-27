@@ -51,6 +51,7 @@ const baseMenuCategories: MenuCategory[] = [
       { icon: Users, labelKey: "menu.items.headhunting", href: "/headhunting", isPremium: true },
       { icon: Search, labelKey: "menu.items.companyReport", href: "/company-report", isPremium: true },
       { icon: Mic, labelKey: "menu.items.interviewSimulation", href: "/interview-simulation", isPremium: true },
+      { icon: Notebook, labelKey: "menu.items.practicalGuide", href: "/practical-guide", isPremium: true },
     ]
   },
   {

@@ -139,6 +139,7 @@
       "headhunting": "Headhunting",
       "companyReport": "Báo cáo Doanh nghiệp",
       "interviewSimulation": "Phỏng vấn Mô phỏng",
+      "practicalGuide": "Hướng dẫn Thực tế",
       "learningHub": "Trung tâm học TOPIK",
       "community": "Cộng đồng",
       "gameHub": "Trung tâm Game",
@@ -1900,10 +1901,11 @@
       "badge": "Korea Career",
       "title": "Korea Career Hub",
       "subtitle": "Dịch vụ việc làm Hàn Quốc all-in-one",
-      "subline": "Headhunting • Báo cáo DN • Phỏng vấn AI",
+      "subline": "Headhunting • Báo cáo DN • Phỏng vấn AI • Hướng dẫn Thực tế",
       "premiumPreviewFeatureName": "Korea Career Hub",
-      "status": { "active": "Đang hoạt động" },
+      "status": { "active": "Đang hoạt động", "coming": "Sắp ra mắt" },
       "cta": "Mở",
+      "comingSoon": "Sắp ra mắt",
       "stats": {
         "partnerCompanies": "Công ty đối tác",
         "successPlacements": "Việc làm thành công",
@@ -1956,6 +1958,17 @@
             "realtimeFeedback": "Feedback realtime",
             "scoring": "Chấm điểm",
             "customQuestions": "Câu hỏi tùy chỉnh"
+          }
+        },
+        "practicalGuide": {
+          "title": "Hướng dẫn Thực tế",
+          "subtitle": "Tiếng Hàn văn phòng",
+          "description": "Học tiếng Hàn thực tế dùng trong môi trường làm việc IT.",
+          "features": {
+            "itTerms": "Thuật ngữ IT",
+            "meetingSim": "Mô phỏng cuộc họp",
+            "emailTemplates": "Mẫu email",
+            "businessKorean": "Tiếng Hàn công sở"
           }
         }
       }

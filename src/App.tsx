@@ -51,6 +51,7 @@ import CompanyReport from "./pages/CompanyReport";
 import InterviewSimulation from "./pages/InterviewSimulation";
 import QuestionVariant from "./pages/QuestionVariant";
 import RoleplaySpeaking from "./pages/RoleplaySpeaking";
+import PracticalGuide from "./pages/PracticalGuide";
 import BoardHub from "./pages/BoardHub";
 import Board from "./pages/Board";
 import BoardPost from "./pages/BoardPost";
@@ -175,6 +176,7 @@ const App = () => {
               <Route path="/headhunting" element={<ProtectedRoute><Headhunting /></ProtectedRoute>} />
               <Route path="/company-report" element={<ProtectedRoute><CompanyReport /></ProtectedRoute>} />
               <Route path="/interview-simulation" element={<ProtectedRoute><InterviewSimulation /></ProtectedRoute>} />
+              <Route path="/practical-guide" element={<ProtectedRoute><PracticalGuide /></ProtectedRoute>} />
               <Route path="/writing-correction" element={<ProtectedRoute><WritingCorrection /></ProtectedRoute>} />
 
               <Route path="/game" element={<Navigate to="/dashboard" replace />} />
