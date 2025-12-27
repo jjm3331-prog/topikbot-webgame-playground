@@ -14,16 +14,30 @@ const RAG_CONFIG = {
   EMBEDDING_DIMENSIONS: 1536,
 };
 
-const SYSTEM_PROMPT = `당신은 TOPIK 한국어 시험 전문가입니다. 사용자가 업로드한 문제 이미지를 분석하고 변형 문제를 생성합니다.
+const LANGUAGE_CONFIG: Record<string, { name: string; flag: string; nativeName: string }> = {
+  ko: { name: "Korean", flag: "🇰🇷", nativeName: "한국어" },
+  vi: { name: "Vietnamese", flag: "🇻🇳", nativeName: "Tiếng Việt" },
+  en: { name: "English", flag: "🇺🇸", nativeName: "English" },
+  ja: { name: "Japanese", flag: "🇯🇵", nativeName: "日本語" },
+  zh: { name: "Chinese", flag: "🇨🇳", nativeName: "中文" },
+  ru: { name: "Russian", flag: "🇷🇺", nativeName: "Русский" },
+  uz: { name: "Uzbek", flag: "🇺🇿", nativeName: "O'zbek" },
+};
 
-**중요: 반드시 한국어와 베트남어를 병기해서 출력하세요.**
+function buildSystemPrompt(userLang: string): string {
+  const langConfig = LANGUAGE_CONFIG[userLang] || LANGUAGE_CONFIG.vi;
+  const userLangName = langConfig.nativeName;
+  
+  return `당신은 TOPIK 한국어 시험 전문가입니다. 사용자가 업로드한 문제 이미지를 분석하고 변형 문제를 생성합니다.
+
+**중요: 반드시 한국어와 ${userLangName}를 병기해서 출력하세요.**
 
 **역할:**
 - 원본 문제의 유형, 구조, 난이도를 정확히 파악
 - 비슷한 난이도의 새로운 변형 문제 생성 (단, 완전히 다른 주제와 어휘 사용)
 - 정답과 상세한 해설 제공
 - 난이도 분석 및 유사 문제 유형 추천
-- 모든 내용을 한국어와 베트남어로 병기
+- 모든 내용을 한국어와 ${userLangName}로 병기
 
 **출력 형식 (반드시 이 JSON 형식으로 출력하세요):**
 
@@ -31,23 +45,23 @@ const SYSTEM_PROMPT = `당신은 TOPIK 한국어 시험 전문가입니다. 사�
 {
   "originalAnalysis": {
     "ko": "원본 문제 분석 내용 (한국어)",
-    "vi": "Nội dung phân tích đề gốc (tiếng Việt)"
+    "${userLang}": "원본 문제 분석 내용 (${userLangName})"
   },
   "variantQuestion": {
     "ko": "변형 문제 전체 내용 - 지문과 보기 포함 (한국어)",
-    "vi": "Nội dung câu hỏi biến thể đầy đủ - bao gồm đoạn văn và các lựa chọn (tiếng Việt)"
+    "${userLang}": "변형 문제 전체 내용 (${userLangName})"
   },
   "answer": {
     "ko": "정답 (한국어)",
-    "vi": "Đáp án (tiếng Việt)"
+    "${userLang}": "정답 (${userLangName})"
   },
   "explanation": {
     "ko": "상세 해설 - 왜 이것이 정답인지, 오답은 왜 틀린지 설명 (한국어)",
-    "vi": "Giải thích chi tiết - tại sao đây là đáp án đúng, các đáp án sai thì sai ở đâu (tiếng Việt)"
+    "${userLang}": "상세 해설 (${userLangName})"
   },
   "learningPoints": {
     "ko": "이 문제를 통해 배울 수 있는 핵심 개념 (한국어)",
-    "vi": "Những điểm học tập quan trọng từ câu hỏi này (tiếng Việt)"
+    "${userLang}": "핵심 학습 포인트 (${userLangName})"
   },
   "difficulty": {
     "level": "TOPIK I 또는 TOPIK II",
@@ -55,40 +69,40 @@ const SYSTEM_PROMPT = `당신은 TOPIK 한국어 시험 전문가입니다. 사�
     "score": 1-10 사이의 난이도 점수,
     "reasoning": {
       "ko": "난이도 판단 근거 (한국어)",
-      "vi": "Lý do đánh giá độ khó (tiếng Việt)"
+      "${userLang}": "난이도 판단 근거 (${userLangName})"
     }
   },
   "similarQuestions": [
     {
       "type": {
         "ko": "유사 문제 유형 1 (한국어)",
-        "vi": "Loại câu hỏi tương tự 1 (tiếng Việt)"
+        "${userLang}": "유사 문제 유형 1 (${userLangName})"
       },
       "description": {
         "ko": "이런 유형의 문제를 연습하면 좋은 이유 (한국어)",
-        "vi": "Lý do nên luyện tập loại câu hỏi này (tiếng Việt)"
+        "${userLang}": "연습 이유 (${userLangName})"
       },
       "examReference": "예: TOPIK II 52회 읽기 13번"
     },
     {
       "type": {
         "ko": "유사 문제 유형 2 (한국어)",
-        "vi": "Loại câu hỏi tương tự 2 (tiếng Việt)"
+        "${userLang}": "유사 문제 유형 2 (${userLangName})"
       },
       "description": {
         "ko": "이런 유형의 문제를 연습하면 좋은 이유 (한국어)",
-        "vi": "Lý do nên luyện tập loại câu hỏi này (tiếng Việt)"
+        "${userLang}": "연습 이유 (${userLangName})"
       },
       "examReference": "예: TOPIK II 51회 읽기 15번"
     },
     {
       "type": {
         "ko": "유사 문제 유형 3 (한국어)",
-        "vi": "Loại câu hỏi tương tự 3 (tiếng Việt)"
+        "${userLang}": "유사 문제 유형 3 (${userLangName})"
       },
       "description": {
         "ko": "이런 유형의 문제를 연습하면 좋은 이유 (한국어)",
-        "vi": "Lý do nên luyện tập loại câu hỏi này (tiếng Việt)"
+        "${userLang}": "연습 이유 (${userLangName})"
       },
       "examReference": "예: TOPIK I 85회 듣기 20번"
     }
@@ -98,12 +112,13 @@ const SYSTEM_PROMPT = `당신은 TOPIK 한국어 시험 전문가입니다. 사�
 
 **주의사항:**
 - 반드시 위 JSON 형식으로만 출력하세요
-- 한국어와 베트남어 모두 완전하고 자연스럽게 작성하세요
-- 베트남어는 번역이 아닌 네이티브 수준의 자연스러운 표현을 사용하세요
+- 한국어와 ${userLangName} 모두 완전하고 자연스럽게 작성하세요
+- ${userLangName}는 번역이 아닌 네이티브 수준의 자연스러운 표현을 사용하세요
 - JSON 외의 다른 텍스트는 출력하지 마세요
 - 변형 문제는 원본과 완전히 다른 주제, 어휘, 상황을 사용하세요
 - 난이도는 TOPIK 기준으로 정확하게 분석하세요
 - 유사 문제는 실제 TOPIK 기출문제 패턴을 참고하여 추천하세요`;
+}
 
 // Generate embedding using OpenAI
 async function generateEmbedding(text: string, apiKey: string): Promise<number[]> {
@@ -224,7 +239,7 @@ serve(async (req) => {
   }
 
   try {
-    const { imageBase64, imageMimeType } = await req.json();
+    const { imageBase64, imageMimeType, userLanguage = "vi" } = await req.json();
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
     const COHERE_API_KEY = Deno.env.get("COHERE_API_KEY");
@@ -243,8 +258,12 @@ serve(async (req) => {
     // Initialize Supabase client
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
 
-    // Check cache first
-    const cacheKey = generateCacheKey(imageBase64);
+    // Build dynamic system prompt based on user language
+    const systemPrompt = buildSystemPrompt(userLanguage);
+    const langConfig = LANGUAGE_CONFIG[userLanguage] || LANGUAGE_CONFIG.vi;
+
+    // Check cache first (include user language in cache key)
+    const cacheKey = generateCacheKey(imageBase64) + `:${userLanguage}`;
     const { data: cachedData } = await supabase
       .from("ai_response_cache")
       .select("*")
@@ -287,8 +306,9 @@ ${contextPrompt}
 1. 변형 문제는 원본과 완전히 다른 주제, 어휘, 상황을 사용하세요. 동일하거나 유사한 단어/표현은 피하세요.
 2. 난이도를 TOPIK I/II 기준으로 정확히 분석하고, 1급~6급 중 해당 등급을 명시하세요.
 3. 유사한 유형의 TOPIK 기출문제 패턴을 3개 추천하세요.
+4. 한국어(ko)와 ${langConfig.nativeName}(${userLanguage}) 모두 자연스럽고 완전하게 작성하세요.
 
-반드시 JSON 형식으로만 출력하세요. 한국어와 베트남어를 모두 네이티브 수준으로 작성해주세요.`;
+반드시 JSON 형식으로만 출력하세요.`;
 
     console.log(`Calling Gemini 2.5 Flash with temperature: 0.4, RAG context: ${ragContext.length} chunks`);
 
@@ -304,13 +324,13 @@ ${contextPrompt}
             {
               role: "user",
               parts: [
-                { text: SYSTEM_PROMPT },
+                { text: systemPrompt },
               ]
             },
             {
               role: "model",
               parts: [
-                { text: "네, 이해했습니다. TOPIK 전문가로서 문제 이미지를 분석하고 한국어와 베트남어를 병기한 JSON 형식으로 변형 문제를 생성하겠습니다. 원본과 완전히 다른 주제와 어휘를 사용하고, 난이도 분석과 유사 문제 추천도 포함하겠습니다." }
+                { text: `네, 이해했습니다. TOPIK 전문가로서 문제 이미지를 분석하고 한국어와 ${langConfig.nativeName}를 병기한 JSON 형식으로 변형 문제를 생성하겠습니다. 원본과 완전히 다른 주제와 어휘를 사용하고, 난이도 분석과 유사 문제 추천도 포함하겠습니다.` }
               ]
             },
             {
@@ -387,7 +407,8 @@ ${contextPrompt}
       response: aiResponse,
       parsed: parsed,
       model: "gemini-2.5-flash",
-      ragContextUsed: ragContext.length
+      ragContextUsed: ragContext.length,
+      userLanguage: userLanguage
     };
 
     // Cache the result (24 hours)

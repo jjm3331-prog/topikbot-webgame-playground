@@ -55,6 +55,7 @@
       "createdAt": "Ngày tạo",
       "translation": "Bản dịch"
     },
+    "userLanguage": "Ngôn ngữ của bạn",
     "success": {
       "generated": "Đã tạo câu hỏi biến thể",
       "pdfOpened": "Đã mở xem trước PDF"

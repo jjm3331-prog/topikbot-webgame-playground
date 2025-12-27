@@ -55,6 +55,7 @@
       "createdAt": "Created at",
       "translation": "Translation"
     },
+    "userLanguage": "Your Language",
     "success": {
       "generated": "Variant question generated",
       "pdfOpened": "PDF preview opened"

@@ -20,6 +20,7 @@
     "sections": { "originalAnalysis": "原本分析", "variantQuestion": "変形問題", "answer": "正解", "explanation": "解説", "learningPoints": "学習ポイント", "difficultyAnalysis": "難易度分析", "similarQuestions": "類似問題" },
     "difficulty": { "level": "TOPIKレベル", "grade": "級", "score": "難易度スコア", "unknown": "不明", "easy": "簡単", "medium": "普通", "hard": "難しい", "veryHard": "非常に難しい" },
     "pdf": { "createdAt": "作成日", "translation": "翻訳" },
+    "userLanguage": "あなたの言語",
     "success": { "generated": "変形問題が生成されました", "pdfOpened": "PDFプレビューが開きました" },
     "errors": { "selectImage": "画像を選択してください", "premiumRequired": "プレミアム購読が必要です", "apiError": "APIエラーが発生しました", "tryAgain": "もう一度お試しください", "imageTooLarge": "画像サイズは10MB以下にしてください", "noContent": "ダウンロードするコンテンツがありません", "popupBlocked": "ポップアップがブロックされました", "pdfError": "PDF生成エラー" }
   },
