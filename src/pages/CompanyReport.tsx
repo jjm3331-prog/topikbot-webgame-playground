@@ -213,6 +213,7 @@ const CompanyReport = () => {
     };
   }, [i18n.language, reportLanguage, report, searching]);
 
+  const handleDownloadPDF = async () => {
     if (!report || !companyName) return;
     
     setDownloadingPDF(true);
