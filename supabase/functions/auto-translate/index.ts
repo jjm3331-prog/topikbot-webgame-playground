@@ -7,7 +7,9 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-function normalizeText(text: string) {
+function normalizeText(text: string, format: "text" | "html") {
+  // For HTML we must preserve whitespace/newlines as part of structure.
+  if (format === "html") return text.trim();
   return text.trim().replace(/\s+/g, " ");
 }
 
@@ -39,7 +41,11 @@ async function checkCache(supabase: any, cacheKey: string): Promise<string | nul
   return data.response?.translation ?? null;
 }
 
-async function saveCache(supabase: any, cacheKey: string, payload: { translation: string; sourceLanguage: string; targetLanguage: string }) {
+async function saveCache(
+  supabase: any,
+  cacheKey: string,
+  payload: { translation: string; sourceLanguage: string; targetLanguage: string; format: "text" | "html" },
+) {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 365);
 
@@ -48,7 +54,7 @@ async function saveCache(supabase: any, cacheKey: string, payload: { translation
       cache_key: cacheKey,
       function_name: "auto-translate",
       response: payload,
-      request_params: { sourceLanguage: payload.sourceLanguage, targetLanguage: payload.targetLanguage },
+      request_params: { sourceLanguage: payload.sourceLanguage, targetLanguage: payload.targetLanguage, format: payload.format },
       expires_at: expiresAt.toISOString(),
       hit_count: 0,
     },
@@ -60,11 +66,21 @@ const SYSTEM_PROMPT = `You are a professional localization engine for a Korean l
 
 Rules:
 - Output MUST be valid JSON: {"translation":"..."}
-- Translate naturally for UI/marketing/legal content.
-- Keep emojis and proper nouns as-is.
 - Do not add extra fields.
+- Keep emojis and proper nouns as-is.
+
+Text mode rules:
+- Translate naturally for UI/marketing/legal content.
 - Preserve line breaks when helpful.
+
+HTML mode rules (when input contains HTML tags or format=html):
+- IMPORTANT: Preserve the HTML structure EXACTLY.
+- Do NOT add/remove/reorder tags.
+- Translate ONLY the human-readable text nodes between tags.
+- Keep attributes, URLs, and tag names unchanged.
+- Preserve whitespace/newlines inside the HTML as provided.
 `;
+
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -72,7 +88,8 @@ serve(async (req) => {
   }
 
   try {
-    const { text, sourceLanguage, targetLanguage } = await req.json();
+    const { text, sourceLanguage, targetLanguage, format } = await req.json();
+    const effectiveFormat: "text" | "html" = format === "html" ? "html" : "text";
 
     if (!text || typeof text !== "string" || !text.trim()) {
       return new Response(JSON.stringify({ translation: "" }), {
@@ -97,8 +114,8 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const normalized = normalizeText(text);
-    const cacheKey = `auto_translate_v1_${sourceLanguage}_${targetLanguage}_${await sha256Hex(normalized)}`;
+    const normalized = normalizeText(text, effectiveFormat);
+    const cacheKey = `auto_translate_v2_${effectiveFormat}_${sourceLanguage}_${targetLanguage}_${await sha256Hex(normalized)}`;
 
     const cached = await checkCache(supabase, cacheKey);
     if (cached) {
@@ -112,7 +129,7 @@ serve(async (req) => {
       throw new Error("GEMINI_API_KEY is not configured");
     }
 
-    const prompt = `${SYSTEM_PROMPT}\n\nTranslate from ${sourceLanguage} to ${targetLanguage}.\n\nTEXT:\n${text}`;
+    const prompt = `${SYSTEM_PROMPT}\n\nTranslate from ${sourceLanguage} to ${targetLanguage}.\nFormat: ${effectiveFormat}.\n\nTEXT:\n${text}`;
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
@@ -168,7 +185,7 @@ serve(async (req) => {
       }
     }
 
-    await saveCache(supabase, cacheKey, { translation, sourceLanguage, targetLanguage });
+    await saveCache(supabase, cacheKey, { translation, sourceLanguage, targetLanguage, format: effectiveFormat });
 
     return new Response(JSON.stringify({ translation }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
