@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -75,6 +76,7 @@ const PASS_SCORE = 70;
 
 export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBattleProps) {
   const { toast } = useToast();
+  const { t, i18n } = useTranslation();
   const [gamePhase, setGamePhase] = useState<GamePhase>("menu");
   const gamePhaseRef = useRef<GamePhase>("menu");
   const [room, setRoom] = useState<Room | null>(null);
@@ -160,7 +162,10 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
       const { data: profile } = await supabase.from("profiles").select("points").eq("id", session.user.id).maybeSingle();
       const currentPoints = profile?.points || 0;
       await supabase.from("profiles").update({ points: currentPoints + 1000 }).eq("id", session.user.id);
-      toast({ title: "🎉 +1,000 điểm!", description: "Bạn đã nhận được 1,000 điểm thưởng chiến thắng!" });
+      toast({
+        title: t("battle.semanticGame.winToastTitle"),
+        description: t("battle.semanticGame.winToastDesc"),
+      });
     } catch (err) {}
   };
 
@@ -194,9 +199,9 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
             .maybeSingle();
 
           if (findError) throw findError;
-          if (!roomData) { toast({ title: "Không tìm thấy phòng", variant: "destructive" }); setGamePhase("menu"); return; }
-          if (roomData.status === "playing" || roomData.status === "finished") { toast({ title: "Phòng đã bắt đầu hoặc kết thúc", variant: "destructive" }); setGamePhase("menu"); return; }
-          if (roomData.guest_id) { toast({ title: "Phòng đã đầy", variant: "destructive" }); setGamePhase("menu"); return; }
+          if (!roomData) { toast({ title: t("battle.roomNotExists"), variant: "destructive" }); setGamePhase("menu"); return; }
+          if (roomData.status === "playing" || roomData.status === "finished") { toast({ title: t("battle.roomStartedOrFinished"), variant: "destructive" }); setGamePhase("menu"); return; }
+          if (roomData.guest_id) { toast({ title: t("battle.roomFull"), variant: "destructive" }); setGamePhase("menu"); return; }
 
           const { data, error } = await supabase
             .from("chain_reaction_rooms")
@@ -209,9 +214,9 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
           setRoom(data as Room);
           setGamePhase("ready");
           subscribeToRoom(data.id);
-          toast({ title: `Đã tham gia với tên ${autoNickname}!` });
+          toast({ title: t("battle.semanticGame.joinSuccess", { name: autoNickname }) });
         } catch (err) {
-          toast({ title: "Tham gia thất bại", variant: "destructive" });
+          toast({ title: t("battle.semanticGame.joinFailed"), variant: "destructive" });
           setGamePhase("menu");
         }
       };
@@ -220,7 +225,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
   }, [initialRoomCode]);
 
   const createRoom = async () => {
-    if (!playerName.trim()) { toast({ title: "Vui lòng nhập tên", variant: "destructive" }); return; }
+    if (!playerName.trim()) { toast({ title: t("battle.semanticGame.enterName"), variant: "destructive" }); return; }
     setGamePhase("creating");
     const roomCode = generateRoomCode();
 
@@ -242,13 +247,13 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
       setGamePhase("waiting");
       subscribeToRoom(data.id);
     } catch (err) {
-      toast({ title: "Tạo phòng thất bại", variant: "destructive" });
+      toast({ title: t("battle.semanticGame.createFailed"), variant: "destructive" });
       setGamePhase("menu");
     }
   };
 
   const joinRoom = async () => {
-    if (!playerName.trim() || !roomCodeInput.trim()) { toast({ title: "Vui lòng nhập tên và mã phòng", variant: "destructive" }); return; }
+    if (!playerName.trim() || !roomCodeInput.trim()) { toast({ title: t("battle.semanticGame.enterNameAndCode"), variant: "destructive" }); return; }
     setGamePhase("joining");
 
     try {
@@ -261,9 +266,9 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
         .maybeSingle();
 
       if (findError) throw findError;
-      if (!roomData) { toast({ title: "Không tìm thấy phòng", variant: "destructive" }); setGamePhase("menu"); return; }
-      if (roomData.status === "playing" || roomData.status === "finished") { toast({ title: "Phòng đã bắt đầu hoặc kết thúc", variant: "destructive" }); setGamePhase("menu"); return; }
-      if (roomData.guest_id) { toast({ title: "Phòng đã đầy", variant: "destructive" }); setGamePhase("menu"); return; }
+      if (!roomData) { toast({ title: t("battle.roomNotExists"), variant: "destructive" }); setGamePhase("menu"); return; }
+      if (roomData.status === "playing" || roomData.status === "finished") { toast({ title: t("battle.roomStartedOrFinished"), variant: "destructive" }); setGamePhase("menu"); return; }
+      if (roomData.guest_id) { toast({ title: t("battle.roomFull"), variant: "destructive" }); setGamePhase("menu"); return; }
 
       const { data, error } = await supabase
         .from("chain_reaction_rooms")
@@ -277,7 +282,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
       setGamePhase("ready");
       subscribeToRoom(data.id);
     } catch (err) {
-      toast({ title: "Tham gia thất bại", variant: "destructive" });
+      toast({ title: t("battle.semanticGame.joinFailed"), variant: "destructive" });
       setGamePhase("menu");
     }
   };
@@ -442,7 +447,10 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
         finished_at: new Date().toISOString(),
       }).eq("id", room.id);
     } else {
-      toast({ title: `⚠️ Cảnh báo ${newWarnings}/${MAX_WARNINGS + 1}`, description: "Hết thời gian!" });
+      toast({
+        title: t("battle.semanticGame.warningToastTitle", { current: newWarnings, max: MAX_WARNINGS + 1 }),
+        description: t("battle.semanticGame.timeoutDesc"),
+      });
       const nextTurn = isHost ? room.guest_id : room.host_id;
       await supabase.from("chain_reaction_rooms").update({
         [warningField]: newWarnings,
@@ -511,10 +519,14 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
             winner_id: winnerId,
             finished_at: new Date().toISOString(),
           }).eq("id", room.id);
-        } else {
-          toast({ title: `⚠️ Cảnh báo ${newWarnings}/${MAX_WARNINGS + 1}`, description: result.reason_vi });
-          const nextTurn = isHost ? room.guest_id : room.host_id;
-          await supabase.from("chain_reaction_rooms").update({
+          } else {
+            const msg = i18n.language === "vi" ? result.reason_vi : result.reason_ko;
+            toast({
+              title: t("battle.semanticGame.warningToastTitle", { current: newWarnings, max: MAX_WARNINGS + 1 }),
+              description: msg,
+            });
+            const nextTurn = isHost ? room.guest_id : room.host_id;
+            await supabase.from("chain_reaction_rooms").update({
             [warningField]: newWarnings,
             current_turn_player_id: nextTurn,
             turn_start_at: new Date().toISOString(),
@@ -523,7 +535,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
         setCurrentInput("");
       }
     } catch (err) {
-      toast({ title: "Lỗi xác thực", variant: "destructive" });
+      toast({ title: t("battle.semanticGame.validatingError"), variant: "destructive" });
     } finally {
       setIsValidating(false);
     }
@@ -535,15 +547,15 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
     navigator.clipboard.writeText(link);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-    toast({ title: "🔗 Đã sao chép link!" });
+    toast({ title: t("battle.semanticGame.copiedLinkToast") });
   };
 
   const shareRoom = async () => {
     if (!room) return;
     const link = `https://game.topikbot.kr/#/battle?game=semantic&room=${room.room_code}`;
     const shareData = {
-      title: "🧠 Đấu Nghĩa 1:1",
-      text: `Chơi đấu nghĩa với mình nhé! Mã phòng: ${room.room_code}`,
+      title: `🧠 ${t("battle.semantic")}`,
+      text: t("battle.semanticGame.shareText", { code: room.room_code }),
       url: link,
     };
     if (navigator.share && navigator.canShare?.(shareData)) {
@@ -580,13 +592,13 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
           <div>
             <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
               </div>
               <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-                Đấu Nghĩa 1:1
+                {t("battle.semantic")}
               </span>
             </h1>
-            <p className="text-muted-foreground mt-1">의미 연결 대결</p>
+            <p className="text-muted-foreground mt-1">{t("battle.semanticKo")}</p>
           </div>
         </div>
 
@@ -594,70 +606,59 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
         <Card className="p-6 sm:p-8 bg-gradient-to-br from-purple-500/5 to-pink-500/5 border-purple-500/20">
           <h2 className="text-xl sm:text-2xl font-bold mb-6 flex items-center gap-3">
             <span className="text-2xl sm:text-3xl">📋</span>
-            <span>Cách chơi</span>
-            <span className="text-muted-foreground font-normal">/ 게임 방법</span>
+            <span>{t("battle.howToPlay")}</span>
+            <span className="text-muted-foreground font-normal">/ {t("battle.rules")}</span>
           </h2>
 
           {/* Game Overview */}
           <div className="mb-6 p-5 rounded-xl bg-background/80 border border-purple-500/20">
             <p className="text-base sm:text-lg leading-relaxed">
-              Nối từ theo <span className="text-purple-400 font-bold">ý nghĩa liên quan</span>, không phải âm tiết cuối.
+              {t("battle.semanticGame.overview")}
               <br />
-              <span className="text-muted-foreground">
-                Ví dụ: <span className="text-foreground">"바다"</span> → <span className="text-foreground">"파도"</span> (biển → sóng), 
-                <span className="text-foreground"> "학교"</span> → <span className="text-foreground">"선생님"</span> (trường → giáo viên)
-              </span>
+              <span className="text-muted-foreground">{t("battle.semanticGame.overviewExample")}</span>
             </p>
           </div>
 
           {/* Rules Grid */}
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/30">
-              <div className="flex items-center gap-3 mb-2">
-                <Lightbulb className="w-6 h-6 text-green-400" />
-                <span className="font-bold text-lg text-green-400">AI chấm điểm</span>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/30">
+                <div className="flex items-center gap-3 mb-2">
+                  <Lightbulb className="w-6 h-6 text-green-400" />
+                  <span className="font-bold text-lg text-green-400">{t("battle.semanticGame.aiScoringTitle")}</span>
+                </div>
+                <p className="text-muted-foreground">{t("battle.semanticGame.aiScoringDesc")}</p>
               </div>
-              <p className="text-muted-foreground">
-                ≥70 điểm = PASS, dưới 70 = cảnh báo.
-              </p>
-            </div>
 
-            <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/30">
-              <div className="flex items-center gap-3 mb-2">
-                <Timer className="w-6 h-6 text-blue-400" />
-                <span className="font-bold text-lg text-blue-400">12 giây mỗi lượt</span>
+              <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/30">
+                <div className="flex items-center gap-3 mb-2">
+                  <Timer className="w-6 h-6 text-blue-400" />
+                  <span className="font-bold text-lg text-blue-400">{t("battle.secondsPerTurn")}</span>
+                </div>
+                <p className="text-muted-foreground">{t("battle.semanticGame.timerDesc")}</p>
               </div>
-              <p className="text-muted-foreground">
-                Hết giờ = nhận cảnh báo ngay!
-              </p>
-            </div>
 
-            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30">
-              <div className="flex items-center gap-3 mb-2">
-                <AlertTriangle className="w-6 h-6 text-red-400" />
-                <span className="font-bold text-lg text-red-400">2 cảnh báo = Thua</span>
+              <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30">
+                <div className="flex items-center gap-3 mb-2">
+                  <AlertTriangle className="w-6 h-6 text-red-400" />
+                  <span className="font-bold text-lg text-red-400">{t("battle.warnings")}</span>
+                </div>
+                <p className="text-muted-foreground">{t("battle.semanticGame.warningsDesc")}</p>
               </div>
-              <p className="text-muted-foreground">
-                Từ sai, hết giờ, hoặc từ đã dùng.
-              </p>
-            </div>
 
-            <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30">
-              <div className="flex items-center gap-3 mb-2">
-                <Trophy className="w-6 h-6 text-yellow-400" />
-                <span className="font-bold text-lg text-yellow-400">+1,000 điểm</span>
+              <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30">
+                <div className="flex items-center gap-3 mb-2">
+                  <Trophy className="w-6 h-6 text-yellow-400" />
+                  <span className="font-bold text-lg text-yellow-400">{t("battle.semanticGame.rewardTitle")}</span>
+                </div>
+                <p className="text-muted-foreground">{t("battle.semanticGame.rewardDesc")}</p>
               </div>
-              <p className="text-muted-foreground">
-                Chiến thắng để nhận điểm thưởng!
-              </p>
             </div>
-          </div>
 
           {/* Examples */}
           <div className="mt-6 p-4 rounded-xl bg-background/50 border border-muted">
             <p className="font-semibold mb-3 flex items-center gap-2">
               <span className="text-xl">💡</span>
-              Ví dụ từ liên quan
+              {t("battle.semanticGame.relatedExamplesTitle")}
             </p>
             <div className="flex flex-wrap gap-3">
               <span className="px-4 py-2 bg-purple-500/20 rounded-lg text-purple-300 font-medium">커피 → 카페</span>
@@ -670,44 +671,42 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
 
         {/* Action Section */}
         <Card className="p-6 sm:p-8">
-          <div className="space-y-5">
-            <div>
-              <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                Tên của bạn / 닉네임
-              </label>
-              <Input
-                value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
-                placeholder="Nhập tên..."
-                className="text-lg h-12"
-                maxLength={20}
-              />
-            </div>
+            <div className="space-y-5">
+              <div>
+                <label className="text-sm font-medium text-muted-foreground mb-2 block">{t("battle.semanticGame.yourNameLabel")}</label>
+                <Input
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value)}
+                  placeholder={t("battle.semanticGame.yourNamePlaceholder")}
+                  className="text-lg h-12"
+                  maxLength={20}
+                />
+              </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  onClick={createRoom}
-                  className="w-full h-16 text-lg font-bold gap-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white"
-                  disabled={!playerName.trim()}
-                >
-                  <Crown className="w-6 h-6" />
-                  Tạo phòng
-                </Button>
-              </motion.div>
+              <div className="grid grid-cols-2 gap-4">
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    onClick={createRoom}
+                    className="w-full h-16 text-lg font-bold gap-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-primary-foreground"
+                    disabled={!playerName.trim()}
+                  >
+                    <Crown className="w-6 h-6" />
+                    {t("battle.semanticGame.createRoom")}
+                  </Button>
+                </motion.div>
 
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant="outline"
-                  onClick={() => setGamePhase("joining")}
-                  className="w-full h-16 text-lg font-bold gap-3 border-2"
-                  disabled={!playerName.trim()}
-                >
-                  <Users className="w-6 h-6" />
-                  Tham gia
-                </Button>
-              </motion.div>
-            </div>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setGamePhase("joining")}
+                    className="w-full h-16 text-lg font-bold gap-3 border-2"
+                    disabled={!playerName.trim()}
+                  >
+                    <Users className="w-6 h-6" />
+                    {t("battle.semanticGame.join")}
+                  </Button>
+                </motion.div>
+              </div>
           </div>
         </Card>
       </motion.div>
@@ -726,30 +725,24 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
             <Button variant="ghost" size="icon" onClick={() => setGamePhase("menu")}>
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h2 className="text-xl font-bold">Tham gia phòng</h2>
+            <h2 className="text-xl font-bold">{t("battle.semanticGame.joinRoomTitle")}</h2>
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                Mã phòng / 방 코드
-              </label>
-              <Input
-                value={roomCodeInput}
-                onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
-                placeholder="6 ký tự..."
-                className="text-center text-2xl tracking-widest h-14 font-mono"
-                maxLength={6}
-              />
-            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-muted-foreground mb-2 block">{t("battle.semanticGame.roomCodeLabel")}</label>
+                <Input
+                  value={roomCodeInput}
+                  onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
+                  placeholder={t("battle.semanticGame.roomCodePlaceholder")}
+                  className="text-center text-2xl tracking-widest h-14 font-mono"
+                  maxLength={6}
+                />
+              </div>
 
             <div className="flex gap-3">
-              <Button 
-                variant="outline" 
-                onClick={() => setGamePhase("menu")}
-                className="flex-1 h-12"
-              >
-                Hủy
+              <Button variant="outline" onClick={() => setGamePhase("menu")} className="flex-1 h-12">
+                {t("battle.semanticGame.cancel")}
               </Button>
               <Button
                 onClick={joinRoom}
@@ -757,7 +750,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
                 className="flex-1 h-12 bg-gradient-to-r from-purple-500 to-pink-500"
               >
                 <Users className="w-5 h-5 mr-2" />
-                Tham gia
+                {t("battle.semanticGame.join")}
               </Button>
             </div>
           </div>
@@ -774,7 +767,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
           transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
           className="w-16 h-16 rounded-full border-4 border-muted border-t-purple-500 mb-4"
         />
-        <p className="text-muted-foreground text-lg">Đang tạo phòng...</p>
+        <p className="text-muted-foreground text-lg">{t("battle.semanticGame.creatingRoom")}</p>
       </div>
     );
   }
@@ -792,7 +785,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
         {/* Header */}
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={onBack}><ArrowLeft className="w-5 h-5" /></Button>
-          <h2 className="text-xl font-bold">Phòng chờ</h2>
+          <h2 className="text-xl font-bold">{t("battle.semanticGame.waitingRoom")}</h2>
         </div>
 
         {/* Room Code Card - Collapsible for manual entry fallback */}
@@ -808,8 +801,8 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
         />
 
         {/* Players Status */}
-        <Card className="p-5 bg-gradient-to-br from-card to-muted/30 border-border/50">
-          <p className="text-xs text-muted-foreground mb-4 uppercase tracking-wider text-center">Người chơi</p>
+          <Card className="p-5 bg-gradient-to-br from-card to-muted/30 border-border/50">
+            <p className="text-xs text-muted-foreground mb-4 uppercase tracking-wider text-center">{t("battle.semanticGame.players")}</p>
           <div className="grid grid-cols-2 gap-4">
             <motion.div 
               animate={room.host_ready ? { scale: [1, 1.02, 1] } : {}}
@@ -827,7 +820,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
               </div>
               <p className="font-bold text-lg">{room.host_name}</p>
               <p className={`text-sm font-medium ${room.host_ready ? "text-green-500" : "text-muted-foreground"}`}>
-                {room.host_ready ? "✅ Sẵn sàng" : "⏳ Chờ..."}
+                {room.host_ready ? t("battle.semanticGame.ready") : t("battle.semanticGame.waiting")}
               </p>
             </motion.div>
             
@@ -852,10 +845,10 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
                   : <Users className="w-6 h-6 text-muted-foreground/50" />
                 }
               </div>
-              <p className="font-bold text-lg">{room.guest_name || "Đang chờ..."}</p>
+              <p className="font-bold text-lg">{room.guest_name || t("battle.semanticGame.waiting")}</p>
               {room.guest_id && (
                 <p className={`text-sm font-medium ${room.guest_ready ? "text-green-500" : "text-muted-foreground"}`}>
-                  {room.guest_ready ? "✅ Sẵn sàng" : "⏳ Chờ..."}
+                  {room.guest_ready ? t("battle.semanticGame.ready") : t("battle.semanticGame.waiting")}
                 </p>
               )}
             </motion.div>
@@ -878,12 +871,12 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
                 {(isHost ? room.host_ready : room.guest_ready) ? (
                   <>
                     <Check className="w-5 h-5" />
-                    Đã sẵn sàng!
+                    {t("battle.semanticGame.readyDone")}
                   </>
                 ) : (
                   <>
                     <Zap className="w-5 h-5" />
-                    Sẵn sàng
+                    {t("battle.semanticGame.readyToggle")}
                   </>
                 )}
               </Button>
@@ -902,7 +895,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
                   }`}
                 >
                   <Swords className="w-5 h-5" />
-                  {bothReady ? "Bắt đầu!" : "Cả hai cần sẵn sàng"}
+                  {bothReady ? t("battle.semanticGame.start") : t("battle.semanticGame.bothReadyNeeded")}
                 </Button>
               </motion.div>
             )}
@@ -943,7 +936,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
                 animate={{ scale: 1, rotate: 0 }} 
               >
                 <div className="text-6xl sm:text-8xl font-black bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500 bg-clip-text text-transparent">
-                  BẮT ĐẦU! 🧠
+                  {t("battle.semanticGame.countdownStart")} 🧠
                 </div>
               </motion.div>
             )}
@@ -964,8 +957,8 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
               <Brain className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="font-bold">Đấu Nghĩa 1:1</p>
-              <p className="text-xs text-muted-foreground">의미 연결</p>
+              <p className="font-bold">{t("battle.semantic")}</p>
+              <p className="text-xs text-muted-foreground">{t("battle.semanticKo")}</p>
             </div>
           </div>
           
@@ -994,7 +987,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
               </div>
               <span className="font-bold truncate">{room.host_name}</span>
             </div>
-            <p className="text-3xl font-black">{room.host_score} <span className="text-sm font-normal text-muted-foreground">điểm</span></p>
+            <p className="text-3xl font-black">{room.host_score} <span className="text-sm font-normal text-muted-foreground">{t("battle.semanticGame.pointsUnit")}</span></p>
             {room.host_warnings > 0 && (
               <div className="flex gap-1 mt-2">
                 {Array.from({ length: room.host_warnings }).map((_, i) => (
@@ -1011,7 +1004,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
               </div>
               <span className="font-bold truncate">{room.guest_name}</span>
             </div>
-            <p className="text-3xl font-black">{room.guest_score} <span className="text-sm font-normal text-muted-foreground">điểm</span></p>
+            <p className="text-3xl font-black">{room.guest_score} <span className="text-sm font-normal text-muted-foreground">{t("battle.semanticGame.pointsUnit")}</span></p>
             {room.guest_warnings > 0 && (
               <div className="flex gap-1 mt-2">
                 {Array.from({ length: room.guest_warnings }).map((_, i) => (

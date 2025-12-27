@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ChevronDown, ChevronUp, Copy, Check, Share2, Info } from "lucide-react";
@@ -25,6 +26,7 @@ export default function RoomCodeCollapsible({
   bgGlow1,
   bgGlow2,
 }: RoomCodeCollapsibleProps) {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -40,32 +42,31 @@ export default function RoomCodeCollapsible({
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Button onClick={onCopy} variant="outline" className="gap-2 h-12 text-base font-semibold">
               {copied ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
-              {copied ? "Đã copy!" : "Copy link mời"}
+              {copied ? t("battle.invite.copied") : t("battle.invite.copyInvite")}
             </Button>
           </motion.div>
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Button 
-              onClick={onShare} 
-              className={`gap-2 h-12 text-base font-semibold bg-gradient-to-r ${gradientFrom} ${gradientTo} text-white`}
+            <Button
+              onClick={onShare}
+              className={`gap-2 h-12 text-base font-semibold bg-gradient-to-r ${gradientFrom} ${gradientTo} text-primary-foreground`}
             >
               <Share2 className="w-5 h-5" />
-              Chia sẻ
+              {t("battle.invite.share")}
             </Button>
           </motion.div>
         </div>
 
         {/* Helper Text */}
-        <p className="text-center text-sm text-muted-foreground mb-3">
-          Gửi link cho bạn bè để tự động tham gia!
-        </p>
+        <p className="text-center text-sm text-muted-foreground mb-3">{t("battle.invite.helper")}</p>
 
         {/* Collapsible Room Code Section */}
         <button
+          type="button"
           onClick={() => setIsExpanded(!isExpanded)}
           className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors text-sm text-muted-foreground"
         >
           <Info className="w-4 h-4" />
-          <span>Mã phòng (chỉ dùng khi link không hoạt động)</span>
+          <span>{t("battle.invite.roomCodeToggle")}</span>
           {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
 
@@ -79,13 +80,13 @@ export default function RoomCodeCollapsible({
               className="overflow-hidden"
             >
               <div className="pt-4 text-center">
-                <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">Mã phòng</p>
-                <p className={`text-3xl sm:text-4xl font-mono font-black tracking-[0.3em] bg-gradient-to-r ${gradientFrom} ${gradientTo} bg-clip-text text-transparent`}>
+                <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">{t("battle.invite.roomCodeLabel")}</p>
+                <p
+                  className={`text-3xl sm:text-4xl font-mono font-black tracking-[0.3em] bg-gradient-to-r ${gradientFrom} ${gradientTo} bg-clip-text text-transparent`}
+                >
                   {roomCode}
                 </p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Bạn bè có thể nhập mã này nếu link tự động không hoạt động
-                </p>
+                <p className="text-xs text-muted-foreground mt-2">{t("battle.invite.roomCodeHint")}</p>
               </div>
             </motion.div>
           )}
