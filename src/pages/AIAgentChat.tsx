@@ -496,15 +496,35 @@ const AIAgentChat = () => {
                         )}
 
                         <div
-                          className={`rounded-2xl px-6 py-5 ${
+                          className={`rounded-2xl ${
                             message.role === "user"
-                              ? "bg-primary text-primary-foreground rounded-br-sm"
-                              : "bg-muted/60 rounded-bl-sm"
+                              ? "bg-primary text-primary-foreground rounded-br-sm px-6 py-5"
+                              : "bg-muted/40 rounded-bl-sm px-8 py-7 border border-border/30"
                           }`}
                         >
                           {message.role === "assistant" ? (
-                            <div className="prose prose-lg dark:prose-invert max-w-none leading-relaxed">
-                              <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
+                            <div className="prose-ai">
+                              <ReactMarkdown 
+                                remarkPlugins={[remarkGfm]}
+                                components={{
+                                  // Custom table wrapper for horizontal scroll
+                                  table: ({ children }) => (
+                                    <div className="overflow-x-auto -mx-2">
+                                      <table>{children}</table>
+                                    </div>
+                                  ),
+                                  // Enhanced list items
+                                  li: ({ children, ...props }) => (
+                                    <li className="pl-1" {...props}>{children}</li>
+                                  ),
+                                  // Strong text emphasis
+                                  strong: ({ children }) => (
+                                    <strong className="font-bold text-foreground">{children}</strong>
+                                  ),
+                                }}
+                              >
+                                {message.content}
+                              </ReactMarkdown>
                             </div>
                           ) : (
                             <p className="whitespace-pre-wrap text-base md:text-lg leading-relaxed">{message.content}</p>
