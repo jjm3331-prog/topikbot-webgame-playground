@@ -860,16 +860,70 @@
   "roleplay": {
     "badge": "AI Roleplay Speaking",
     "title": "AI Roleplay Speaking",
-    "subtitle": "Luyện nói tiếng Hàn tự nhiên trong các tình huống thực tế",
+    "subtitle": "Luyện nói tiếng Hàn tự nhiên • Phản hồi theo cấp độ • Tạo TOPIK Quiz",
     "labels": { "scenario": "Tình huống:", "suggestions": "Gợi ý trả lời" },
     "empty": { "title": "Hãy bắt đầu nói!", "desc": "AI sẽ đưa ra tình huống, bạn luyện hội thoại tiếng Hàn tự nhiên." },
-    "actions": { "start": "Bắt đầu Roleplay", "listen": "Nghe", "newScenario": "Tình huống mới", "makeQuiz": "Tạo TOPIK Quiz", "prev": "Trước", "next": "Sau", "showResults": "Xem kết quả", "closeQuiz": "Đóng Quiz" },
+    "actions": { 
+      "start": "Bắt đầu Roleplay", 
+      "startRoleplay": "Bắt đầu Roleplay",
+      "listen": "Nghe", 
+      "newScenario": "Tình huống mới", 
+      "makeQuiz": "Tạo TOPIK Quiz", 
+      "prev": "Trước", 
+      "next": "Sau", 
+      "showResults": "Xem kết quả", 
+      "closeQuiz": "Đóng Quiz",
+      "changeSettings": "Đổi cài đặt"
+    },
+    "setup": {
+      "levelTitle": "Chọn cấp độ TOPIK",
+      "difficultyTitle": "Chọn độ khó",
+      "scenarioTitle": "Chọn tình huống (15 loại)",
+      "customTitle": "Hoặc nhập tình huống bạn muốn",
+      "customPlaceholder": "VD: Đến nhà bạn Hàn Quốc chơi và chào hỏi",
+      "customHint": "Nhập tình huống riêng ngoài 15 lựa chọn trên"
+    },
+    "difficulty": {
+      "easy": "Dễ",
+      "medium": "Vừa",
+      "hard": "Khó"
+    },
+    "scenarios": {
+      "cafe": "Gọi cà phê",
+      "subway": "Tàu điện",
+      "shopping": "Mua sắm",
+      "direction": "Hỏi đường",
+      "phone": "Đặt chỗ qua điện thoại",
+      "movie": "Rạp phim",
+      "hotel": "Khách sạn",
+      "restaurant": "Nhà hàng",
+      "bank": "Ngân hàng",
+      "dating": "Hẹn hò",
+      "interview": "Phỏng vấn",
+      "airport": "Sân bay",
+      "hospital": "Bệnh viện",
+      "school": "Trường học",
+      "meeting": "Cuộc họp"
+    },
     "placeholders": { "input": "Nhập câu trả lời bằng tiếng Hàn..." },
     "feedback": { "good": "Tốt lắm!", "needsFix": "Cần sửa" },
-    "tips": { "title": "Hướng dẫn", "step1": "Nhấn 'Bắt đầu Roleplay' để nhận tình huống ngẫu nhiên", "step2": "Trả lời bằng tiếng Hàn (gõ hoặc nói)", "step3": "Xem AI sửa lỗi và giải thích ngữ pháp", "step4": "Tạo TOPIK quiz từ nội dung hội thoại", "tipLabel": "Mẹo:", "tipText": "Tham khảo gợi ý trả lời khi bạn chưa biết nói gì." },
+    "tips": { "title": "Hướng dẫn", "step1": "Chọn cấp độ và độ khó", "step2": "Chọn 1 trong 15 tình huống hoặc tự nhập", "step3": "Xem AI sửa lỗi và giải thích ngữ pháp", "step4": "Tạo TOPIK quiz từ nội dung hội thoại", "tipLabel": "Mẹo:", "tipText": "Tham khảo gợi ý trả lời khi bạn chưa biết nói gì." },
     "stats": { "title": "Lượt này", "spoken": "Câu đã nói", "correct": "Câu đúng" },
     "quiz": { "progress": "{{current}}/{{total}}", "yourScore": "Điểm của bạn", "correctAnswer": "Đáp án đúng: {{answer}}" },
-    "toast": { "started": "Đã bắt đầu tình huống mới.", "startFailed": "Không thể bắt đầu. Vui lòng thử lại.", "needConversation": "Cần ít nhất một lượt hội thoại để tạo quiz.", "quizCreated": "Đã tạo quiz.", "quizFailed": "Không thể tạo quiz.", "audioFailed": "Không thể phát âm thanh.", "sttSuccess": "Đã nhận diện giọng nói.", "sttFailed": "Nhận diện giọng nói thất bại.", "recording": "Đang ghi âm...", "micDenied": "Cần quyền truy cập micro.", "sendFailed": "Không thể gửi tin nhắn. Vui lòng thử lại." }
+    "toast": { 
+      "started": "Đã bắt đầu tình huống mới.", 
+      "startFailed": "Không thể bắt đầu. Vui lòng thử lại.", 
+      "needConversation": "Cần ít nhất một lượt hội thoại để tạo quiz.", 
+      "quizCreated": "Đã tạo quiz.", 
+      "quizFailed": "Không thể tạo quiz.", 
+      "audioFailed": "Không thể phát âm thanh.", 
+      "sttSuccess": "Đã nhận diện giọng nói.", 
+      "sttFailed": "Nhận diện giọng nói thất bại.", 
+      "recording": "Đang ghi âm...", 
+      "micDenied": "Cần quyền truy cập micro.", 
+      "sendFailed": "Không thể gửi tin nhắn. Vui lòng thử lại.",
+      "selectScenario": "Vui lòng chọn hoặc nhập tình huống."
+    }
   },
   "writingPage": {
     "header": { "title": "Chấm TOPIK II Viết (51–54)", "subtitle": "AI chấm điểm và phản hồi chi tiết", "history": "Lịch sử" },

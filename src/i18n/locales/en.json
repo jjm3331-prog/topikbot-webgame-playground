@@ -759,17 +759,71 @@
   },
   "roleplay": {
     "badge": "AI Roleplay Speaking",
-    "title": "Roleplay Speaking",
-    "subtitle": "Real-life scenarios • Grammar feedback • TOPIK quiz",
+    "title": "AI Roleplay Speaking",
+    "subtitle": "Real-life scenarios • Level-based feedback • TOPIK quiz",
     "labels": { "scenario": "Scenario:", "suggestions": "Suggested replies" },
     "empty": { "title": "Start speaking!", "desc": "AI gives you a scenario and you practice natural Korean conversation." },
-    "actions": { "start": "Start Roleplay", "listen": "Listen", "newScenario": "New scenario", "makeQuiz": "Create TOPIK Quiz", "prev": "Prev", "next": "Next", "showResults": "Show results", "closeQuiz": "Close Quiz" },
+    "actions": { 
+      "start": "Start Roleplay", 
+      "startRoleplay": "Start Roleplay",
+      "listen": "Listen", 
+      "newScenario": "New scenario", 
+      "makeQuiz": "Create TOPIK Quiz", 
+      "prev": "Prev", 
+      "next": "Next", 
+      "showResults": "Show results", 
+      "closeQuiz": "Close Quiz",
+      "changeSettings": "Change Settings"
+    },
+    "setup": {
+      "levelTitle": "Select TOPIK Level",
+      "difficultyTitle": "Select Difficulty",
+      "scenarioTitle": "Select Scenario (15 options)",
+      "customTitle": "Or enter your own scenario",
+      "customPlaceholder": "E.g., Visiting a Korean friend's house and greeting them",
+      "customHint": "Enter any scenario outside the 15 options above"
+    },
+    "difficulty": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "scenarios": {
+      "cafe": "Ordering coffee",
+      "subway": "Subway/Transport",
+      "shopping": "Shopping",
+      "direction": "Asking directions",
+      "phone": "Phone reservation",
+      "movie": "Movie theater",
+      "hotel": "Hotel",
+      "restaurant": "Restaurant",
+      "bank": "Bank",
+      "dating": "Dating",
+      "interview": "Job interview",
+      "airport": "Airport",
+      "hospital": "Hospital",
+      "school": "School",
+      "meeting": "Meeting"
+    },
     "placeholders": { "input": "Type your answer in Korean..." },
     "feedback": { "good": "Good!", "needsFix": "Needs fix" },
-    "tips": { "title": "Guide", "step1": "Tap ‘Start Roleplay’ to get a random scenario", "step2": "Reply in Korean (type or speak)", "step3": "Review AI corrections and grammar tips", "step4": "Create a TOPIK quiz from what you learned", "tipLabel": "Tip:", "tipText": "Use suggested replies when you’re not sure what to say." },
+    "tips": { "title": "Guide", "step1": "Select level and difficulty", "step2": "Choose from 15 scenarios or enter your own", "step3": "Review AI corrections and grammar tips", "step4": "Create a TOPIK quiz from what you learned", "tipLabel": "Tip:", "tipText": "Use suggested replies when you're not sure what to say." },
     "stats": { "title": "This session", "spoken": "Sentences spoken", "correct": "Correct sentences" },
     "quiz": { "progress": "{{current}}/{{total}}", "yourScore": "Your score", "correctAnswer": "Correct answer: {{answer}}" },
-    "toast": { "started": "New scenario started.", "startFailed": "Failed to start. Please try again.", "needConversation": "You need at least one conversation round to create a quiz.", "quizCreated": "Quiz created.", "quizFailed": "Failed to create quiz.", "audioFailed": "Failed to play audio.", "sttSuccess": "Voice recognized.", "sttFailed": "Voice recognition failed.", "recording": "Recording...", "micDenied": "Microphone access is required.", "sendFailed": "Failed to send message. Please try again." }
+    "toast": { 
+      "started": "New scenario started.", 
+      "startFailed": "Failed to start. Please try again.", 
+      "needConversation": "You need at least one conversation round to create a quiz.", 
+      "quizCreated": "Quiz created.", 
+      "quizFailed": "Failed to create quiz.", 
+      "audioFailed": "Failed to play audio.", 
+      "sttSuccess": "Voice recognized.", 
+      "sttFailed": "Voice recognition failed.", 
+      "recording": "Recording...", 
+      "micDenied": "Microphone access is required.", 
+      "sendFailed": "Failed to send message. Please try again.",
+      "selectScenario": "Please select or enter a scenario."
+    }
   },
   "writingPage": {
     "header": { "title": "TOPIK II Writing (51–54)", "subtitle": "AI scores and gives detailed feedback", "history": "History" },
