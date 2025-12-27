@@ -1508,8 +1508,9 @@
       "subtitle": "Всё для трудоустройства в Корее",
       "subline": "Хедхантинг • Отчёты о компаниях • AI-интервью",
       "premiumPreviewFeatureName": "Korea Career Hub",
-      "status": { "active": "Доступно" },
+      "status": { "active": "Доступно", "coming": "Скоро" },
       "cta": "Открыть",
+      "comingSoon": "Скоро",
       "stats": {
         "partnerCompanies": "Партнёры",
         "successPlacements": "Успешные трудоустройства",

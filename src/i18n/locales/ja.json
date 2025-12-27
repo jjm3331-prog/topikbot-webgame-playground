@@ -1658,8 +1658,9 @@
       "subtitle": "韓国就職オールインワン",
       "subline": "ヘッドハンティング • 企業レポート • AI面接",
       "premiumPreviewFeatureName": "Korea Career Hub",
-      "status": { "active": "利用可能" },
+      "status": { "active": "利用可能", "coming": "準備中" },
       "cta": "開く",
+      "comingSoon": "近日公開",
       "stats": {
         "partnerCompanies": "提携企業",
         "successPlacements": "就職成功",

@@ -1515,8 +1515,9 @@
       "subtitle": "韩国求职一站式服务",
       "subline": "猎头 • 企业报告 • AI面试",
       "premiumPreviewFeatureName": "Korea Career Hub",
-      "status": { "active": "可用" },
+      "status": { "active": "可用", "coming": "即将上线" },
       "cta": "打开",
+      "comingSoon": "即将上线",
       "stats": {
         "partnerCompanies": "合作企业",
         "successPlacements": "成功入职",

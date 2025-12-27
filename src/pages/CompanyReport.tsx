@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -28,6 +28,31 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { generateCompanyReportPDF } from "@/lib/pdfGenerator";
 
+function countMatches(text: string, re: RegExp) {
+  const m = text.match(re);
+  return m ? m.length : 0;
+}
+
+function isLikelyLanguage(text: string, lang: string): boolean {
+  const sample = text.slice(0, 4000);
+  const letters = countMatches(sample, /[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\u0400-\u04FF\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF\u3040-\u30FF\u4E00-\u9FFF]/g);
+  if (letters === 0) return true;
+
+  const ja = countMatches(sample, /[\u3040-\u30FF\u4E00-\u9FFF]/g);
+  const ko = countMatches(sample, /[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]/g);
+  const zh = countMatches(sample, /[\u4E00-\u9FFF]/g);
+  const ru = countMatches(sample, /[\u0400-\u04FF]/g);
+
+  if (lang === "ja") return ja / letters > 0.12;
+  if (lang === "ko") return ko / letters > 0.12;
+  if (lang === "zh") return zh / letters > 0.12;
+  if (lang === "ru") return ru / letters > 0.12;
+
+  // Latin languages: ensure non-latin scripts are not dominant
+  const nonLatin = ja + ko + zh + ru;
+  return nonLatin / letters < 0.08;
+}
+
 const CompanyReport = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
@@ -37,6 +62,8 @@ const CompanyReport = () => {
   const [companyName, setCompanyName] = useState("");
   const [searching, setSearching] = useState(false);
   const [report, setReport] = useState<string | null>(null);
+  const [reportLanguage, setReportLanguage] = useState<string | null>(null);
+  const [translating, setTranslating] = useState(false);
   const [citations, setCitations] = useState<string[]>([]);
   const [downloadingPDF, setDownloadingPDF] = useState(false);
 
@@ -93,7 +120,28 @@ const CompanyReport = () => {
       cleanReport = cleanReport.replace(/<\/?think>/gi, "");
       cleanReport = cleanReport.replace(/^\s*\n\s*\n/gm, "\n\n").trim();
 
-      setReport(cleanReport);
+      // If the model output is not in the target language, force-clean it via auto-translate.
+      let finalReport = cleanReport;
+      if (finalReport && !isLikelyLanguage(finalReport, i18n.language)) {
+        try {
+          const { data: tData, error: tError } = await supabase.functions.invoke("auto-translate", {
+            body: {
+              sourceLanguage: "auto",
+              targetLanguage: i18n.language,
+              text: finalReport,
+              format: "text",
+            },
+          });
+          if (!tError && typeof tData?.translation === "string" && tData.translation.trim()) {
+            finalReport = tData.translation;
+          }
+        } catch (e) {
+          console.warn("Auto-clean translation failed, using original report.", e);
+        }
+      }
+
+      setReport(finalReport);
+      setReportLanguage(i18n.language);
       setCitations(data.citations || []);
     } catch (error: any) {
       console.error("Search error:", error);
@@ -107,7 +155,64 @@ const CompanyReport = () => {
     }
   };
 
-  const handleDownloadPDF = async () => {
+
+  // When user changes language after a report is already shown, auto-translate it for a seamless UX.
+  useEffect(() => {
+    if (!report || searching) return;
+    if (!reportLanguage) return;
+    if (i18n.language === reportLanguage) return;
+
+    let cancelled = false;
+
+    (async () => {
+      setTranslating(true);
+      try {
+        const { data, error } = await supabase.functions.invoke("auto-translate", {
+          body: {
+            sourceLanguage: reportLanguage,
+            targetLanguage: i18n.language,
+            text: report,
+            format: "text",
+          },
+        });
+
+        if (error) throw error;
+        const translated = data?.translation;
+
+        if (!cancelled && typeof translated === "string" && translated.trim()) {
+          const finalText = isLikelyLanguage(translated, i18n.language)
+            ? translated
+            : (await (async () => {
+                try {
+                  const { data: tData } = await supabase.functions.invoke("auto-translate", {
+                    body: {
+                      sourceLanguage: "auto",
+                      targetLanguage: i18n.language,
+                      text: translated,
+                      format: "text",
+                    },
+                  });
+                  return typeof tData?.translation === "string" && tData.translation.trim() ? tData.translation : translated;
+                } catch {
+                  return translated;
+                }
+              })());
+
+          setReport(finalText);
+          setReportLanguage(i18n.language);
+        }
+      } catch (e) {
+        console.error("Auto-translate on language change failed:", e);
+      } finally {
+        if (!cancelled) setTranslating(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [i18n.language, reportLanguage, report, searching]);
+
     if (!report || !companyName) return;
     
     setDownloadingPDF(true);
@@ -271,6 +376,9 @@ const CompanyReport = () => {
                     <h2 className="text-title text-foreground">
                       {t("careerPages.companyReport.resultTitle", { company: companyName })}
                     </h2>
+                    {translating && (
+                      <span className="text-xs text-muted-foreground">{t("common.loading")}</span>
+                    )}
                   </div>
                   <Button
                     onClick={handleDownloadPDF}
