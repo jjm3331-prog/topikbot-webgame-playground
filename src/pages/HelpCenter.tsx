@@ -24,7 +24,6 @@ import telegramQr from "@/assets/telegram-qr.jpg";
 
 // 텔레그램 사용 언어
 const TELEGRAM_LANGS = ["en", "ru", "uz", "zh", "ja"];
-const TELEGRAM_LINK = "https://t.me/lukato_ai";
 const SUPPORT_EMAIL = "lukas@tam9.me";
 
 // 언어별 텔레그램 고객센터 설정
@@ -33,10 +32,8 @@ const telegramConfigs: Record<string, {
   subtitle: string;
   description: string;
   scanText: string;
-  buttonText: string;
   emailTitle: string;
   emailDesc: string;
-  emailButton: string;
   supportHours: string;
   supportTime: string;
   helpTitle: string;
@@ -48,11 +45,9 @@ const telegramConfigs: Record<string, {
     title: "Help Center",
     subtitle: "LUKATO AI Official Customer Support",
     description: "Get real-time support via Telegram or Email",
-    scanText: "Scan the QR code or click the button below to join",
-    buttonText: "Open Telegram Support",
+    scanText: "Scan the QR code with your phone to join our Telegram support channel",
     emailTitle: "Email Support",
-    emailDesc: "Send us your inquiry via email",
-    emailButton: "Send Email",
+    emailDesc: "For inquiries, please send an email directly to the address below:",
     supportHours: "Live Support",
     supportTime: "Available 24/7 via Telegram",
     helpTitle: "How can we help you?",
@@ -69,11 +64,9 @@ const telegramConfigs: Record<string, {
     title: "Центр помощи",
     subtitle: "Официальная поддержка LUKATO AI",
     description: "Получите поддержку в реальном времени через Telegram или Email",
-    scanText: "Отсканируйте QR-код или нажмите кнопку ниже, чтобы присоединиться",
-    buttonText: "Открыть Telegram поддержку",
+    scanText: "Отсканируйте QR-код телефоном, чтобы присоединиться к нашему каналу поддержки в Telegram",
     emailTitle: "Поддержка по Email",
-    emailDesc: "Отправьте нам ваш запрос по электронной почте",
-    emailButton: "Отправить письмо",
+    emailDesc: "Для запросов, пожалуйста, отправьте письмо напрямую на адрес ниже:",
     supportHours: "Живая поддержка",
     supportTime: "Доступна 24/7 через Telegram",
     helpTitle: "Чем мы можем помочь?",
@@ -90,11 +83,9 @@ const telegramConfigs: Record<string, {
     title: "Yordam markazi",
     subtitle: "LUKATO AI rasmiy mijozlar xizmati",
     description: "Telegram yoki Email orqali real vaqtda yordam oling",
-    scanText: "QR kodni skanerlang yoki quyidagi tugmani bosing",
-    buttonText: "Telegram yordamini ochish",
+    scanText: "Telegram yordam kanalimizga qo'shilish uchun QR kodni telefoningiz bilan skanerlang",
     emailTitle: "Email orqali yordam",
-    emailDesc: "Bizga so'rovingizni elektron pochta orqali yuboring",
-    emailButton: "Email yuborish",
+    emailDesc: "So'rovlar uchun quyidagi manzilga to'g'ridan-to'g'ri elektron pochta yuboring:",
     supportHours: "Jonli yordam",
     supportTime: "Telegram orqali 24/7 mavjud",
     helpTitle: "Sizga qanday yordam bera olamiz?",
@@ -111,11 +102,9 @@ const telegramConfigs: Record<string, {
     title: "帮助中心",
     subtitle: "LUKATO AI 官方客服",
     description: "通过 Telegram 或电子邮件获得实时支持",
-    scanText: "扫描二维码或点击下方按钮加入",
-    buttonText: "打开 Telegram 支持",
+    scanText: "用手机扫描二维码加入我们的 Telegram 支持频道",
     emailTitle: "邮件支持",
-    emailDesc: "通过电子邮件向我们发送您的咨询",
-    emailButton: "发送邮件",
+    emailDesc: "如有咨询，请直接发送邮件至以下地址：",
     supportHours: "在线支持",
     supportTime: "通过 Telegram 24/7 全天候服务",
     helpTitle: "我们能帮您什么？",
@@ -132,11 +121,9 @@ const telegramConfigs: Record<string, {
     title: "ヘルプセンター",
     subtitle: "LUKATO AI 公式カスタマーサポート",
     description: "TelegramまたはEmailでリアルタイムサポートを受けられます",
-    scanText: "QRコードをスキャンするか、下のボタンを押して参加してください",
-    buttonText: "Telegramサポートを開く",
+    scanText: "スマートフォンでQRコードをスキャンして、Telegramサポートチャンネルに参加してください",
     emailTitle: "メールサポート",
-    emailDesc: "メールでお問い合わせを送信してください",
-    emailButton: "メールを送信",
+    emailDesc: "お問い合わせは、以下のアドレスに直接メールをお送りください：",
     supportHours: "ライブサポート",
     supportTime: "Telegramで24時間365日対応",
     helpTitle: "何かお手伝いできますか？",
@@ -243,39 +230,29 @@ const HelpCenter = () => {
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-[#0088cc]/5 to-transparent rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
 
             <div className="relative p-8 flex flex-col items-center">
-              {/* QR Code Container */}
-              <div className="relative mb-6">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#0088cc] to-[#0077b5] rounded-3xl blur-xl opacity-30" />
-                <div className="relative bg-white p-4 rounded-2xl shadow-2xl">
+              {/* QR Code Container - 2x bigger */}
+              <div className="relative mb-8">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0088cc] to-[#0077b5] rounded-3xl blur-2xl opacity-30" />
+                <div className="relative bg-white p-6 rounded-3xl shadow-2xl">
                   <img
                     src={telegramQr}
                     alt="Telegram QR Code"
-                    className="w-56 h-56 sm:w-72 sm:h-72 object-contain"
+                    className="w-80 h-80 sm:w-[28rem] sm:h-[28rem] object-contain"
                     loading="lazy"
                   />
                 </div>
-                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-[#0088cc] rounded-full shadow-lg">
-                  <span className="text-xs font-bold text-white">Telegram</span>
+                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-6 py-2 bg-[#0088cc] rounded-full shadow-lg">
+                  <span className="text-sm font-bold text-white">Telegram</span>
                 </div>
               </div>
 
-              <p className="text-sm text-muted-foreground text-center mb-6">
+              <p className="text-base text-muted-foreground text-center max-w-md">
                 {config.scanText}
               </p>
-
-              {/* CTA Button */}
-              <Button
-                className="w-full max-w-sm bg-[#0088cc] hover:bg-[#0077b5] text-white rounded-2xl py-7 text-lg font-bold shadow-lg shadow-[#0088cc]/20 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-[#0088cc]/30"
-                onClick={() => window.open(TELEGRAM_LINK, "_blank")}
-              >
-                <Send className="w-6 h-6 mr-3" />
-                {config.buttonText}
-                <ExternalLink className="w-5 h-5 ml-3" />
-              </Button>
             </div>
           </motion.section>
 
-          {/* Email Support Card */}
+          {/* Email Support Card - Only display email, no button */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -287,20 +264,12 @@ const HelpCenter = () => {
                 <Mail className="w-7 h-7 text-emerald-500" />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-foreground text-lg mb-1">{config.emailTitle}</h3>
+                <h3 className="font-bold text-foreground text-lg mb-2">{config.emailTitle}</h3>
                 <p className="text-sm text-muted-foreground mb-4">{config.emailDesc}</p>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <code className="flex-1 px-4 py-3 bg-muted/50 rounded-xl text-sm font-mono text-foreground border border-border/50">
+                <div className="px-5 py-4 bg-muted/50 rounded-xl border border-border/50 text-center">
+                  <code className="text-lg font-mono font-semibold text-foreground select-all">
                     {SUPPORT_EMAIL}
                   </code>
-                  <Button
-                    variant="outline"
-                    className="rounded-xl border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10"
-                    onClick={() => window.open(`mailto:${SUPPORT_EMAIL}`, "_blank")}
-                  >
-                    <Mail className="w-4 h-4 mr-2" />
-                    {config.emailButton}
-                  </Button>
                 </div>
               </div>
             </div>
