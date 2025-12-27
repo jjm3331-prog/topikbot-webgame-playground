@@ -546,20 +546,20 @@ const AIAgentChat = () => {
             </ScrollArea>
           )}
 
-          {/* Input Area */}
-          <div className="border-t border-border/50 bg-background/80 backdrop-blur p-4">
+          {/* Input Area - EXPANDED for better UX */}
+          <div className="border-t border-border/50 bg-background/95 backdrop-blur-sm p-4 md:p-6">
             <div className="max-w-4xl mx-auto">
               {/* Image previews */}
               {selectedImages.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-3">
+                <div className="flex flex-wrap gap-2 mb-4">
                   {selectedImages.map((img, idx) => (
                     <div key={idx} className="relative">
-                      <img src={img} alt="Preview" className="w-16 h-16 rounded-lg object-cover" />
+                      <img src={img} alt="Preview" className="w-20 h-20 rounded-xl object-cover border-2 border-primary/20" />
                       <button
                         onClick={() => removeImage(idx)}
-                        className="absolute -top-2 -right-2 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-xs"
+                        className="absolute -top-2 -right-2 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center shadow-lg"
                       >
-                        <X className="w-3 h-3" />
+                        <X className="w-4 h-4" />
                       </button>
                     </div>
                   ))}
@@ -567,20 +567,21 @@ const AIAgentChat = () => {
               )}
 
               {!isAuthenticated ? (
-                <div className="text-center py-6">
-                  <AlertCircle className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                <div className="text-center py-8">
+                  <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                   <p className="text-sm text-muted-foreground mb-4">{t("aiAgent.loginPrompt")} 🔐</p>
-                  <Button onClick={() => navigate("/auth")} className="gap-2">
+                  <Button onClick={() => navigate("/auth")} size="lg" className="gap-2">
                     <Sparkles className="w-4 h-4" />
                     {t("common.login")}
                   </Button>
                 </div>
               ) : remainingQuestions === 0 && !isPremium ? (
-                <div className="text-center py-6">
-                  <Crown className="w-10 h-10 text-korean-yellow mx-auto mb-3" />
+                <div className="text-center py-8">
+                  <Crown className="w-12 h-12 text-korean-yellow mx-auto mb-4" />
                   <p className="text-sm text-muted-foreground mb-4">{t("aiAgent.noQuestionsLeft")} 😢</p>
                   <Button
                     onClick={() => navigate("/pricing")}
+                    size="lg"
                     className="gap-2 bg-korean-yellow hover:bg-korean-yellow/90 text-black"
                   >
                     <Crown className="w-4 h-4" />
@@ -588,7 +589,7 @@ const AIAgentChat = () => {
                   </Button>
                 </div>
               ) : (
-                <div className="flex items-end gap-2">
+                <div className="flex items-end gap-3">
                   {/* Image upload button */}
                   <input
                     ref={fileInputRef}
@@ -602,10 +603,10 @@ const AIAgentChat = () => {
                     variant="outline"
                     size="icon"
                     onClick={() => fileInputRef.current?.click()}
-                    className="shrink-0 h-11 w-11 rounded-xl"
+                    className="shrink-0 h-14 w-14 rounded-2xl border-2 hover:border-primary/50 transition-colors"
                     title={t("aiAgent.uploadImage")}
                   >
-                    <ImagePlus className="w-5 h-5" />
+                    <ImagePlus className="w-6 h-6" />
                   </Button>
 
                   {/* Voice input button */}
@@ -613,13 +614,13 @@ const AIAgentChat = () => {
                     variant="outline"
                     size="icon"
                     onClick={toggleRecording}
-                    className={`shrink-0 h-11 w-11 rounded-xl ${isRecording ? "bg-red-500/20 border-red-500" : ""}`}
+                    className={`shrink-0 h-14 w-14 rounded-2xl border-2 transition-colors ${isRecording ? "bg-red-500/20 border-red-500" : "hover:border-primary/50"}`}
                     title={t("aiAgent.voiceInput")}
                   >
-                    {isRecording ? <MicOff className="w-5 h-5 text-red-500" /> : <Mic className="w-5 h-5" />}
+                    {isRecording ? <MicOff className="w-6 h-6 text-red-500" /> : <Mic className="w-6 h-6" />}
                   </Button>
 
-                  {/* Text input */}
+                  {/* Text input - ENLARGED */}
                   <div className="flex-1 relative">
                     <Textarea
                       ref={textareaRef}
@@ -628,23 +629,25 @@ const AIAgentChat = () => {
                       onKeyDown={handleKeyDown}
                       placeholder={t("aiAgent.placeholder")}
                       disabled={isLoading}
-                      className="min-h-[44px] max-h-40 resize-none pr-14 rounded-xl text-base"
-                      rows={1}
+                      className="min-h-[56px] max-h-48 resize-none pr-16 rounded-2xl text-base md:text-lg py-4 px-5 border-2 focus:border-primary/50 transition-colors leading-relaxed"
+                      rows={2}
                     />
                     <Button
                       size="icon"
                       onClick={() => sendMessage()}
                       disabled={(!input.trim() && selectedImages.length === 0) || isLoading}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-lg"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 h-11 w-11 rounded-xl shadow-lg"
                     >
-                      {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                      {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                     </Button>
                   </div>
                 </div>
               )}
 
               {isAuthenticated && (
-                <p className="text-xs text-center text-muted-foreground mt-3">{t("aiAgent.hint")} 📝</p>
+                <p className="text-xs text-center text-muted-foreground mt-4">
+                  {t("aiAgent.hint")} 📝
+                </p>
               )}
             </div>
           </div>
