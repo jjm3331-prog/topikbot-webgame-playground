@@ -1,8 +1,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+const RAG_CONFIG = {
+  SIMILARITY_THRESHOLD: 0.5,
+  MATCH_COUNT: 10,
+  RERANK_TOP_K: 2,
+  EMBEDDING_MODEL: "text-embedding-3-small",
+  EMBEDDING_DIMENSIONS: 1536,
 };
 
 const SYSTEM_PROMPT = `당신은 TOPIK 한국어 시험 전문가입니다. 사용자가 업로드한 문제 이미지를 분석하고 변형 문제를 생성합니다.
@@ -11,7 +20,7 @@ const SYSTEM_PROMPT = `당신은 TOPIK 한국어 시험 전문가입니다. 사�
 
 **역할:**
 - 원본 문제의 유형, 구조, 난이도를 정확히 파악
-- 비슷한 난이도의 새로운 변형 문제 생성
+- 비슷한 난이도의 새로운 변형 문제 생성 (단, 완전히 다른 주제와 어휘 사용)
 - 정답과 상세한 해설 제공
 - 모든 내용을 한국어와 베트남어로 병기
 
@@ -46,7 +55,121 @@ const SYSTEM_PROMPT = `당신은 TOPIK 한국어 시험 전문가입니다. 사�
 - 반드시 위 JSON 형식으로만 출력하세요
 - 한국어와 베트남어 모두 완전하고 자연스럽게 작성하세요
 - 베트남어는 번역이 아닌 네이티브 수준의 자연스러운 표현을 사용하세요
-- JSON 외의 다른 텍스트는 출력하지 마세요`;
+- JSON 외의 다른 텍스트는 출력하지 마세요
+- 변형 문제는 원본과 완전히 다른 주제, 어휘, 상황을 사용하세요`;
+
+// Generate embedding using OpenAI
+async function generateEmbedding(text: string, apiKey: string): Promise<number[]> {
+  try {
+    const response = await fetch("https://api.openai.com/v1/embeddings", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: RAG_CONFIG.EMBEDDING_MODEL,
+        input: text.slice(0, 8000),
+        dimensions: RAG_CONFIG.EMBEDDING_DIMENSIONS,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("Embedding API error:", response.status);
+      return [];
+    }
+
+    const data = await response.json();
+    return data.data?.[0]?.embedding || [];
+  } catch (error) {
+    console.error("Embedding generation failed:", error);
+    return [];
+  }
+}
+
+// Rerank results using Cohere
+async function rerankResults(
+  query: string,
+  documents: any[],
+  apiKey: string,
+  topN: number
+): Promise<any[]> {
+  if (!apiKey || documents.length === 0) {
+    return documents.slice(0, topN);
+  }
+
+  try {
+    const response = await fetch("https://api.cohere.ai/v1/rerank", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "rerank-v3.5",
+        query,
+        documents: documents.map(d => d.content),
+        top_n: topN,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("Cohere rerank error:", response.status);
+      return documents.slice(0, topN);
+    }
+
+    const data = await response.json();
+    return data.results?.map((r: any) => documents[r.index]) || documents.slice(0, topN);
+  } catch (error) {
+    console.error("Rerank failed:", error);
+    return documents.slice(0, topN);
+  }
+}
+
+// Search RAG for context
+async function searchRAG(
+  query: string,
+  supabase: any,
+  openAIKey: string,
+  cohereKey: string | undefined
+): Promise<string[]> {
+  try {
+    const embedding = await generateEmbedding(query, openAIKey);
+    if (embedding.length === 0) {
+      console.log("RAG: No embedding generated, skipping");
+      return [];
+    }
+
+    const { data, error } = await supabase.rpc("search_knowledge", {
+      query_embedding: JSON.stringify(embedding),
+      match_threshold: RAG_CONFIG.SIMILARITY_THRESHOLD,
+      match_count: RAG_CONFIG.MATCH_COUNT,
+    });
+
+    if (error || !data || data.length === 0) {
+      console.log("RAG: No results from search_knowledge");
+      return [];
+    }
+
+    console.log(`RAG: Found ${data.length} initial results`);
+
+    // Rerank with Cohere
+    const reranked = await rerankResults(query, data, cohereKey || "", RAG_CONFIG.RERANK_TOP_K);
+    console.log(`RAG: Reranked to ${reranked.length} results`);
+
+    return reranked.map((r: any) => r.content);
+  } catch (error) {
+    console.error("RAG search failed:", error);
+    return [];
+  }
+}
+
+// Generate cache key
+function generateCacheKey(imageBase64: string): string {
+  // Use first 100 chars + length as simple hash
+  const prefix = imageBase64.slice(0, 100);
+  return `question-variant:${prefix}:${imageBase64.length}`;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -56,6 +179,10 @@ serve(async (req) => {
   try {
     const { imageBase64, imageMimeType } = await req.json();
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    const COHERE_API_KEY = Deno.env.get("COHERE_API_KEY");
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
     if (!GEMINI_API_KEY) {
       console.error("GEMINI_API_KEY is not configured");
@@ -66,11 +193,54 @@ serve(async (req) => {
       throw new Error("이미지가 제공되지 않았습니다.");
     }
 
+    // Initialize Supabase client
+    const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
+
+    // Check cache first
+    const cacheKey = generateCacheKey(imageBase64);
+    const { data: cachedData } = await supabase
+      .from("ai_response_cache")
+      .select("*")
+      .eq("cache_key", cacheKey)
+      .eq("function_name", "question-variant")
+      .gt("expires_at", new Date().toISOString())
+      .single();
+
+    if (cachedData) {
+      console.log("Cache hit for question-variant");
+      await supabase.rpc("increment_cache_hit", { p_id: cachedData.id });
+      return new Response(
+        JSON.stringify(cachedData.response),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // RAG search for additional context
+    let ragContext: string[] = [];
+    if (OPENAI_API_KEY) {
+      console.log("Attempting RAG search...");
+      ragContext = await searchRAG(
+        "TOPIK 읽기 문제 유형 문법 어휘 표현",
+        supabase,
+        OPENAI_API_KEY,
+        COHERE_API_KEY
+      );
+      console.log(`RAG context retrieved: ${ragContext.length} chunks`);
+    }
+
+    // Build context-enhanced prompt
+    let contextPrompt = "";
+    if (ragContext.length > 0) {
+      contextPrompt = `\n\n**참고 자료 (변형 문제 생성시 참고):**\n${ragContext.join("\n\n")}\n\n`;
+    }
+
     const userPrompt = `이 문제 이미지를 분석하고, 비슷한 난이도의 변형 문제를 생성해주세요.
+${contextPrompt}
+**중요:** 변형 문제는 원본과 완전히 다른 주제, 어휘, 상황을 사용하세요. 동일하거나 유사한 단어/표현은 피하세요.
 
 반드시 JSON 형식으로만 출력하세요. 한국어와 베트남어를 모두 네이티브 수준으로 작성해주세요.`;
 
-    console.log(`Calling Gemini 2.5 Flash DIRECT API with thinkingBudget: 24576`);
+    console.log(`Calling Gemini 2.5 Flash with temperature: 0.4, RAG context: ${ragContext.length} chunks`);
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
@@ -90,7 +260,7 @@ serve(async (req) => {
             {
               role: "model",
               parts: [
-                { text: "네, 이해했습니다. TOPIK 전문가로서 문제 이미지를 분석하고 한국어와 베트남어를 병기한 JSON 형식으로 변형 문제를 생성하겠습니다." }
+                { text: "네, 이해했습니다. TOPIK 전문가로서 문제 이미지를 분석하고 한국어와 베트남어를 병기한 JSON 형식으로 변형 문제를 생성하겠습니다. 원본과 완전히 다른 주제와 어휘를 사용하겠습니다." }
               ]
             },
             {
@@ -107,7 +277,7 @@ serve(async (req) => {
             }
           ],
           generationConfig: {
-            temperature: 0.7,
+            temperature: 0.4,
             maxOutputTokens: 65536,
             thinkingConfig: {
               thinkingBudget: 24576
@@ -145,13 +315,11 @@ serve(async (req) => {
     // Try to parse JSON from response
     let parsed = null;
     try {
-      // Extract JSON from response (handle markdown code blocks)
       let jsonStr = aiResponse;
       const jsonMatch = aiResponse.match(/```json\s*([\s\S]*?)\s*```/);
       if (jsonMatch) {
         jsonStr = jsonMatch[1];
       } else {
-        // Try to find raw JSON
         const startIdx = aiResponse.indexOf('{');
         const endIdx = aiResponse.lastIndexOf('}');
         if (startIdx !== -1 && endIdx !== -1) {
@@ -165,12 +333,29 @@ serve(async (req) => {
       console.log("Could not parse JSON, returning raw response");
     }
 
+    const result = { 
+      response: aiResponse,
+      parsed: parsed,
+      model: "gemini-2.5-flash",
+      ragContextUsed: ragContext.length
+    };
+
+    // Cache the result (24 hours)
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24);
+
+    await supabase.from("ai_response_cache").insert({
+      cache_key: cacheKey,
+      function_name: "question-variant",
+      response: result,
+      expires_at: expiresAt.toISOString(),
+      request_params: { imageMimeType, imageLength: imageBase64.length }
+    });
+
+    console.log("Result cached successfully");
+
     return new Response(
-      JSON.stringify({ 
-        response: aiResponse,
-        parsed: parsed,
-        model: "gemini-2.5-flash-thinking"
-      }),
+      JSON.stringify(result),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: unknown) {
