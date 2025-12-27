@@ -1151,7 +1151,8 @@
       "error": "翻译错误",
       "errorDesc": "翻译失败，请重试。",
       "sameLanguage": "相同语言",
-      "sameLanguageDesc": "源语言和所选语言相同。"
+      "sameLanguageDesc": "源语言和所选语言相同。",
+      "translatedSectionLabel": "🌐 翻译"
     },
     "types": {
       "notice": {

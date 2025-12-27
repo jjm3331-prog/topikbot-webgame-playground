@@ -1560,7 +1560,8 @@
       "error": "Lỗi dịch",
       "errorDesc": "Dịch thất bại. Vui lòng thử lại.",
       "sameLanguage": "Cùng ngôn ngữ",
-      "sameLanguageDesc": "Ngôn ngữ nguồn và ngôn ngữ đã chọn giống nhau."
+      "sameLanguageDesc": "Ngôn ngữ nguồn và ngôn ngữ đã chọn giống nhau.",
+      "translatedSectionLabel": "🌐 Bản dịch"
     },
     "types": {
       "notice": {
