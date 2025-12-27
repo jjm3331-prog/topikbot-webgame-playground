@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -98,6 +98,51 @@ interface Author {
 const extractYoutubeId = (url: string) => {
   const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
   return match ? match[1] : null;
+};
+
+const extractMediaHtmlFromPostContent = (html: string) => {
+  if (typeof window === "undefined") return "";
+  if (!html || typeof html !== "string") return "";
+
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+
+    const media: string[] = [];
+
+    // Images
+    doc.querySelectorAll("img").forEach((img) => {
+      const src = img.getAttribute("src");
+      if (!src) return;
+      const alt = img.getAttribute("alt") || "";
+      media.push(`<img src="${src}" alt="${alt}" loading="lazy" />`);
+    });
+
+    // Iframes (e.g., YouTube embeds in editor)
+    doc.querySelectorAll("iframe").forEach((iframe) => {
+      const src = iframe.getAttribute("src");
+      if (!src) return;
+      media.push(`<div class="aspect-video rounded-lg overflow-hidden"><iframe src="${src}" class="w-full h-full" allowfullscreen></iframe></div>`);
+    });
+
+    // Videos
+    doc.querySelectorAll("video").forEach((video) => {
+      const src = video.getAttribute("src");
+      if (src) {
+        media.push(`<video src="${src}" controls class="w-full rounded-lg"></video>`);
+        return;
+      }
+      const source = video.querySelector("source")?.getAttribute("src");
+      if (source) {
+        media.push(`<video controls class="w-full rounded-lg"><source src="${source}" /></video>`);
+      }
+    });
+
+    return media.join("\n");
+  } catch (e) {
+    console.error("extractMediaHtmlFromPostContent failed", e);
+    return "";
+  }
 };
 
 export default function BoardPost() {
@@ -512,6 +557,10 @@ export default function BoardPost() {
 
   const postAuthor = getAuthorDisplay(post.author_id, post.author_name, post.is_anonymous);
   const canModify = currentUser && (post.author_id === currentUser || isAdmin);
+  const translatedMediaHtml = useMemo(
+    () => extractMediaHtmlFromPostContent(post.content),
+    [post.content]
+  );
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -650,9 +699,18 @@ export default function BoardPost() {
 
               {/* Content */}
               {showTranslated && translatedContent ? (
-                <div className="prose prose-sm max-w-none mt-6 text-foreground whitespace-pre-wrap">
-                  {translatedContent}
-                </div>
+                <>
+                  <div className="prose prose-sm max-w-none mt-6 text-foreground whitespace-pre-wrap">
+                    {translatedContent}
+                  </div>
+
+                  {translatedMediaHtml && (
+                    <div
+                      className="prose prose-sm max-w-none mt-6 text-foreground"
+                      dangerouslySetInnerHTML={{ __html: translatedMediaHtml }}
+                    />
+                  )}
+                </>
               ) : (
                 <div 
                   className="prose prose-sm max-w-none mt-6 text-foreground"
