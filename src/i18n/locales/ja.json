@@ -733,7 +733,8 @@
     "interviewerTypes": { "friendly": "親切", "strict": "厳格", "pressure": "圧迫", "technical": "技術" },
     "interviewerDescs": { "friendly": "リラックスした雰囲気、励まし", "strict": "論理的思考、具体的な回答要求", "pressure": "ストレステスト、挑戦的な質問", "technical": "専門知識、深い技術質問" },
     "scoreLabels": { "content": "内容", "communication": "コミュニケーション", "korean": "韓国語", "attitude": "態度", "jobFit": "適性" },
-    "micError": "マイクへのアクセスが必要です", "allowMicAccess": "マイクのアクセスを許可してください。", "voiceNotRecognized": "音声が認識されませんでした", "tryAgain": "もう一度お試しください。", "voiceRecognitionError": "音声認識エラー", "selectAll": "すべて選択してください", "selectAllDesc": "会社、職種、面接官タイプを選択してください。", "errorOccurred": "エラーが発生しました", "cannotStartInterview": "面接を開始できません。もう一度お試しください。", "noResponse": "応答がありません。"
+    "micError": "マイクへのアクセスが必要です", "allowMicAccess": "マイクのアクセスを許可してください。", "voiceNotRecognized": "音声が認識されませんでした", "tryAgain": "もう一度お試しください。", "voiceRecognitionError": "音声認識エラー", "selectAll": "すべて選択してください", "selectAllDesc": "会社、職種、面接官タイプを選択してください。", "errorOccurred": "エラーが発生しました", "cannotStartInterview": "面接を開始できません。もう一度お試しください。", "noResponse": "応答がありません。",
+    "ttsEnabled": "音声出力が有効", "ttsDisabled": "音声出力が無効", "clickToListen": "クリックして面接官の回答を聞く"
   },
   "kdrama": {
     "title": "Kドラマ吹き替え",

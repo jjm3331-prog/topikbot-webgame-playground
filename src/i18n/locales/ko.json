@@ -1035,7 +1035,10 @@
     "selectAllDesc": "회사, 직무, 면접관 유형을 선택해주세요.",
     "errorOccurred": "오류가 발생했습니다",
     "cannotStartInterview": "면접을 시작할 수 없습니다. 다시 시도해주세요.",
-    "noResponse": "응답이 없습니다."
+    "noResponse": "응답이 없습니다.",
+    "ttsEnabled": "음성 출력 활성화됨",
+    "ttsDisabled": "음성 출력 비활성화됨",
+    "clickToListen": "클릭하여 면접관 답변 듣기"
   },
   "kdrama": {
     "title": "K-Drama 더빙",

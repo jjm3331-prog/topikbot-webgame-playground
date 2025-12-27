@@ -733,7 +733,8 @@
     "interviewerTypes": { "friendly": "Do'stona", "strict": "Qat'iy", "pressure": "Bosim ostida", "technical": "Texnik" },
     "interviewerDescs": { "friendly": "Qulay muhit, qo'llab-quvvatlash", "strict": "Mantiqiy fikrlash, aniq javoblar", "pressure": "Stress-test, qiyin savollar", "technical": "Mutaxassislik, chuqur savollar" },
     "scoreLabels": { "content": "Mazmun", "communication": "Muloqot", "korean": "Koreyscha", "attitude": "Munosabat", "jobFit": "Lavozimga mosligi" },
-    "micError": "Mikrofon ruxsati kerak", "allowMicAccess": "Mikrofon ruxsatini bering.", "voiceNotRecognized": "Ovoz aniqlanmadi", "tryAgain": "Qayta urinib ko'ring.", "voiceRecognitionError": "Ovoz aniqlash xatosi", "selectAll": "Hammasini tanlang", "selectAllDesc": "Kompaniya, lavozim va intervyuer turini tanlang.", "errorOccurred": "Xato yuz berdi", "cannotStartInterview": "Intervyuni boshlab bo'lmadi. Qayta urinib ko'ring.", "noResponse": "Javob yo'q."
+    "micError": "Mikrofon ruxsati kerak", "allowMicAccess": "Mikrofon ruxsatini bering.", "voiceNotRecognized": "Ovoz aniqlanmadi", "tryAgain": "Qayta urinib ko'ring.", "voiceRecognitionError": "Ovoz aniqlash xatosi", "selectAll": "Hammasini tanlang", "selectAllDesc": "Kompaniya, lavozim va intervyuer turini tanlang.", "errorOccurred": "Xato yuz berdi", "cannotStartInterview": "Intervyuni boshlab bo'lmadi. Qayta urinib ko'ring.", "noResponse": "Javob yo'q.",
+    "ttsEnabled": "Ovozli chiqish yoqilgan", "ttsDisabled": "Ovozli chiqish o'chirilgan", "clickToListen": "Intervyuer javobini tinglash uchun bosing"
   },
   "kdrama": {
     "title": "K-Drama Dublyaj",
