@@ -19,7 +19,10 @@ import {
   Youtube,
   Flag,
   AlertTriangle,
-  RefreshCw
+  RefreshCw,
+  Languages,
+  Loader2,
+  RotateCcw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -44,7 +47,8 @@ import {
 } from "@/components/ui/dialog";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
-import { PostTranslateButton } from "@/components/board/PostTranslateButton";
+import { autoTranslateText } from "@/lib/autoTranslate";
+
 import { CommentItem } from "@/components/board/CommentItem";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -112,6 +116,12 @@ export default function BoardPost() {
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [newCommentsCount, setNewCommentsCount] = useState(0);
+  
+  // Translation state
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [translatedTitle, setTranslatedTitle] = useState<string | null>(null);
+  const [translatedContent, setTranslatedContent] = useState<string | null>(null);
+  const [showTranslated, setShowTranslated] = useState(false);
   
   // Report dialog state
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
@@ -386,6 +396,66 @@ export default function BoardPost() {
     }
   };
 
+  const handleTranslate = async () => {
+    if (!post) return;
+    
+    // If already translated, toggle view
+    if (translatedTitle && translatedContent) {
+      setShowTranslated(!showTranslated);
+      return;
+    }
+
+    setIsTranslating(true);
+    try {
+      // Detect source language
+      const hasKorean = /[가-힣]/.test(post.title + post.content);
+      const sourceLanguage = hasKorean ? "ko" : "vi";
+      const targetLanguage = i18n.language;
+      
+      // Skip if same language
+      if (targetLanguage === sourceLanguage) {
+        toast({ 
+          title: t("board.translation.sameLanguage"),
+          description: t("board.translation.sameLanguageDesc")
+        });
+        setIsTranslating(false);
+        return;
+      }
+
+      // Translate title and content in parallel
+      const [titleResult, contentResult] = await Promise.all([
+        autoTranslateText({
+          text: post.title,
+          sourceLanguage,
+          targetLanguage,
+        }),
+        autoTranslateText({
+          text: post.content.replace(/<[^>]*>/g, ''), // Strip HTML for translation
+          sourceLanguage,
+          targetLanguage,
+        }),
+      ]);
+
+      setTranslatedTitle(titleResult);
+      setTranslatedContent(contentResult);
+      setShowTranslated(true);
+      toast({ title: t("board.translation.success") });
+    } catch (error) {
+      console.error("Translation error:", error);
+      toast({
+        title: t("board.translation.error"),
+        description: t("board.translation.errorDesc"),
+        variant: "destructive",
+      });
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
+  const handleShowOriginal = () => {
+    setShowTranslated(false);
+  };
+
   const getAuthorDisplay = (authorId: string | null, authorName: string | null, isAnon: boolean) => {
     if (isAnon || boardType === "anonymous") {
       return { name: t("board.anonymous"), avatar: null };
@@ -472,10 +542,56 @@ export default function BoardPost() {
             animate={{ opacity: 1, y: 0 }}
           >
             <Card className="p-6">
+              {/* Translation Button - TOP */}
+              <div className="flex items-center justify-end gap-2 mb-4 pb-4 border-b">
+                {showTranslated && translatedTitle ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleShowOriginal}
+                    className="text-xs"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
+                    {t("board.translation.showOriginal")}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleTranslate}
+                    disabled={isTranslating}
+                    className="text-xs"
+                  >
+                    {isTranslating ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                        {t("board.translation.translating")}
+                      </>
+                    ) : (
+                      <>
+                        <Languages className="w-3.5 h-3.5 mr-1.5" />
+                        {t("board.translation.translate")}
+                      </>
+                    )}
+                  </Button>
+                )}
+                {translatedTitle && !showTranslated && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowTranslated(true)}
+                    className="text-xs text-primary"
+                  >
+                    <Languages className="w-3.5 h-3.5 mr-1.5" />
+                    {t("board.translation.showTranslation")}
+                  </Button>
+                )}
+              </div>
+
               {/* Title & Actions */}
               <div className="flex items-start justify-between gap-4">
                 <h1 className="text-xl sm:text-2xl font-bold text-foreground">
-                  {post.title}
+                  {showTranslated && translatedTitle ? translatedTitle : post.title}
                 </h1>
                 <div className="flex items-center gap-2">
                   <Button
@@ -533,10 +649,16 @@ export default function BoardPost() {
               </div>
 
               {/* Content */}
-              <div 
-                className="prose prose-sm max-w-none mt-6 text-foreground"
-                dangerouslySetInnerHTML={{ __html: post.content }}
-              />
+              {showTranslated && translatedContent ? (
+                <div className="prose prose-sm max-w-none mt-6 text-foreground whitespace-pre-wrap">
+                  {translatedContent}
+                </div>
+              ) : (
+                <div 
+                  className="prose prose-sm max-w-none mt-6 text-foreground"
+                  dangerouslySetInnerHTML={{ __html: post.content }}
+                />
+              )}
 
               {/* YouTube Embeds */}
               {post.youtube_urls && post.youtube_urls.length > 0 && (
@@ -612,9 +734,6 @@ export default function BoardPost() {
                   <Share2 className="w-4 h-4 mr-2" />
                   {t("board.share")}
                 </Button>
-                <PostTranslateButton 
-                  text={`${post.title}\n\n${post.content.replace(/<[^>]*>/g, '')}`}
-                />
               </div>
             </Card>
           </motion.div>
