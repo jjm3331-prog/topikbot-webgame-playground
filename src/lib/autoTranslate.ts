@@ -4,8 +4,9 @@ export async function autoTranslateText(params: {
   text: string;
   sourceLanguage: string;
   targetLanguage: string;
+  format?: "text" | "html";
 }): Promise<string> {
-  const { text, sourceLanguage, targetLanguage } = params;
+  const { text, sourceLanguage, targetLanguage, format = "text" } = params;
 
   if (!text.trim()) return "";
   if (sourceLanguage === targetLanguage) return text;
@@ -15,6 +16,7 @@ export async function autoTranslateText(params: {
       text,
       sourceLanguage,
       targetLanguage,
+      format,
     },
   });
 

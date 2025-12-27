@@ -441,71 +441,68 @@ export default function BoardPost() {
 
     setIsTranslating(true);
     try {
-      // Extract text content while preserving structure markers
-      const extractTextWithStructure = (html: string) => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
+      const normalizeNewlines = (s: string) => s.replace(/\\n/g, "\n");
 
-        // Replace <br> and block elements with newlines for translation
-        doc.querySelectorAll("br").forEach((el) => el.replaceWith("\n"));
-        doc
-          .querySelectorAll("p, div, h1, h2, h3, h4, h5, h6, li")
-          .forEach((el) => {
-            if (el.textContent) {
-              el.insertAdjacentText("afterend", "\n\n");
-            }
-          });
-
-        return doc.body.textContent || "";
-      };
-
-      const normalizeNewlines = (s: string) => {
-        // Some model outputs return literal "\\n" sequences instead of real newlines.
-        return s.replace(/\\n/g, "\n");
-      };
-
-      // Clean up broken markdown artifacts from translation
       const cleanTranslationArtifacts = (s: string) => {
         return s
-          .replace(/\*\*\\$/gm, "") // trailing **\
-          .replace(/\*\*$/gm, "")   // trailing **
-          .replace(/^\*\*/gm, "")   // leading **
-          .replace(/\\\*/g, "*")    // escaped asterisks
-          .replace(/\s*\*\*\s*$/gm, "") // whitespace around trailing **
+          .replace(/\*\*\\$/gm, "")
+          .replace(/\*\*$/gm, "")
+          .replace(/^\*\*/gm, "")
+          .replace(/\\\*/g, "*")
+          .replace(/\s*\*\*\s*$/gm, "")
           .trim();
       };
 
-      const textContent = extractTextWithStructure(post.content);
+      const ensureHtml = (maybeHtml: string) => {
+        const s = maybeHtml.trim();
+        // If model accidentally returns plain text, keep structure via paragraphs + <br/>
+        if (!/[<>]/.test(s)) {
+          return s
+            .split(/\n\n+/)
+            .filter((p) => p.trim())
+            .map((p) => `<p>${p.replace(/\n/g, "<br/>")}</p>`)
+            .join("");
+        }
+        return s;
+      };
 
-      // Translate title and content in parallel
+      const stripImages = (html: string) => {
+        try {
+          const doc = new DOMParser().parseFromString(html, "text/html");
+          doc.querySelectorAll("img, picture, figure").forEach((n) => n.remove());
+          return doc.body.innerHTML;
+        } catch {
+          return html;
+        }
+      };
+
+      // Translate title (text) and content (HTML) in parallel
       const [titleResultRaw, contentResultRaw] = await Promise.all([
         autoTranslateText({
           text: post.title,
           sourceLanguage,
           targetLanguage,
+          format: "text",
         }),
         autoTranslateText({
-          text: textContent,
+          text: post.content,
           sourceLanguage,
           targetLanguage,
+          format: "html",
         }),
       ]);
 
       const titleResult = cleanTranslationArtifacts(normalizeNewlines(titleResultRaw));
-      const contentResult = cleanTranslationArtifacts(normalizeNewlines(contentResultRaw));
+      const contentResult = ensureHtml(cleanTranslationArtifacts(normalizeNewlines(contentResultRaw)));
 
-      // Convert newlines back to HTML structure
-      const formattedContent = contentResult
-        .split(/\n\n+/)
-        .filter((p) => p.trim())
-        .map((p) => `<p>${p.replace(/\n/g, "<br/>")}</p>`)
-        .join("");
+      // Avoid duplicated media in translation block (original already renders media)
+      const translatedHtml = stripImages(contentResult);
 
       // Save to cache
-      setCached(targetLanguage, titleResult, formattedContent);
-      
+      setCached(targetLanguage, titleResult, translatedHtml);
+
       setTranslatedTitle(titleResult);
-      setTranslatedContent(formattedContent);
+      setTranslatedContent(translatedHtml);
       setCurrentTranslatedLang(targetLanguage);
       setShowTranslated(true);
       toast({ title: t("board.translation.success") });
