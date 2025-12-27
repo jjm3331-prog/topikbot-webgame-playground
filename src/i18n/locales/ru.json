@@ -951,7 +951,7 @@
     "dialogue": "Диалог", "single": "Монолог", "speaker": "Говорящий",
     "question": "Вопрос {{current}}/{{total}}", "score": "Баллы",
     "submit": "Отправить", "next": "Далее", "restart": "Заново", "newQuestions": "Новые вопросы",
-    "correct": "Правильно", "wrong": "Неверно", "explanation": "Объяснение",
+    "correct": "Правильно!", "incorrect": "Неверно", "correctAnswer": "Ответ", "wrong": "Неверно", "explanation": "Объяснение",
     "complete": "Завершено", "accuracy": "Точность", "goBack": "Назад",
     "loading": "Загрузка...", "ttsError": "Ошибка воспроизведения"
   },

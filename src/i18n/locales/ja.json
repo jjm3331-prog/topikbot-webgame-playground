@@ -457,7 +457,7 @@
     },
     "semanticGame": {
       "overview": "前の単語と意味的に関連する単語を言います（最後の音節ではありません）。",
-      "overviewExample": "例：「바다」→「파도」（海→波）、「학교」→「선생님」（学校→先生）",
+      "overviewExample": "例：「海」→「波」、「学校」→「先生」",
       "aiScoringTitle": "AI採点",
       "aiScoringDesc": "≥70点 = パス、70未満 = 警告。",
       "timerDesc": "時間切れ = 即座に警告！",
@@ -1069,7 +1069,7 @@
     "dialogue": "会話", "single": "モノローグ", "speaker": "話者",
     "question": "{{current}}/{{total}}問目", "score": "スコア",
     "submit": "送信", "next": "次へ", "restart": "やり直す", "newQuestions": "新しい問題",
-    "correct": "正解", "wrong": "不正解", "explanation": "解説",
+    "correct": "正解!", "incorrect": "不正解", "correctAnswer": "正解", "wrong": "不正解", "explanation": "解説",
     "complete": "完了", "accuracy": "正答率", "goBack": "戻る",
     "loading": "読み込み中...", "ttsError": "音声再生エラー"
   },
@@ -1304,7 +1304,7 @@
     },
     "questions": {
       "topik": [
-        "「-아/어서」と「-니까」の違いは？",
+        "「-아서/어서」と「-니까」の使い分けは？",
         "TOPIK II 54番の論述で高得点を取る方法は？",
         "韓国語の数字を速く聞き取るには？",
         "TOPIK I 2級の合格点は何点ですか？"
