@@ -1575,6 +1575,10 @@
         "title": "📚 Tài liệu",
         "subtitle": "Tài liệu học tập"
       },
+      "podcast": {
+        "title": "🎙️ Podcast",
+        "subtitle": "Nội dung âm thanh"
+      },
       "anonymous": {
         "title": "👻 Ẩn danh",
         "subtitle": "Bài viết ẩn danh"
@@ -1589,6 +1593,7 @@
     "pleaseLoginToReport": "Vui lòng đăng nhập để báo cáo.",
     "adminOnly": "Chỉ Admin",
     "adminOnlyNotice": "Chỉ admin mới có thể đăng thông báo.",
+    "adminOnlyPodcast": "Chỉ admin mới có thể đăng podcast.",
     "anonymous": "Ẩn danh",
     "user": "Người dùng",
     "back": "Quay lại",
@@ -1652,6 +1657,7 @@
   "boardWrite": {
     "pleaseLogin": "Vui lòng đăng nhập",
     "adminOnlyNotice": "Chỉ admin mới có thể đăng thông báo",
+    "adminOnlyPodcast": "Chỉ admin mới có thể đăng podcast",
     "error": "Lỗi",
     "loadError": "Không thể tải bài viết",
     "saveError": "Không thể lưu bài viết",

@@ -74,8 +74,8 @@ export default function BoardWrite() {
       .maybeSingle();
     setIsAdmin(!!roleData);
 
-    if (boardType === "notice" && !roleData) {
-      toast({ title: t("boardWrite.adminOnlyNotice") });
+    if ((boardType === "notice" || boardType === "podcast") && !roleData) {
+      toast({ title: boardType === "podcast" ? t("boardWrite.adminOnlyPodcast") : t("boardWrite.adminOnlyNotice") });
       navigate(`/board/${boardType}`);
     }
   };

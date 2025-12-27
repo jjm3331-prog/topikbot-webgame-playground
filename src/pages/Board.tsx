@@ -48,7 +48,7 @@ import { toast } from "@/hooks/use-toast";
 import { format, subDays, subWeeks, subMonths } from "date-fns";
 import { vi, ko, enUS, ja, zhCN, ru, uz } from "date-fns/locale";
 
-type BoardType = "notice" | "free" | "resource" | "anonymous";
+type BoardType = "notice" | "free" | "resource" | "anonymous" | "podcast";
 
 interface Post {
   id: string;
@@ -76,7 +76,8 @@ const boardIcons: Record<BoardType, { icon: any; color: string }> = {
   notice: { icon: Megaphone, color: "from-red-500 to-rose-600" },
   free: { icon: MessageCircle, color: "from-blue-500 to-cyan-600" },
   resource: { icon: BookOpen, color: "from-emerald-500 to-teal-600" },
-  anonymous: { icon: Ghost, color: "from-purple-500 to-indigo-600" }
+  anonymous: { icon: Ghost, color: "from-purple-500 to-indigo-600" },
+  podcast: { icon: Megaphone, color: "from-orange-500 to-amber-600" }
 };
 
 const getDateLocale = (lang: string) => {
@@ -224,7 +225,7 @@ export default function Board() {
 
   const canCreatePost = () => {
     if (!currentUser) return false;
-    if (boardType === "notice") return isAdmin;
+    if (boardType === "notice" || boardType === "podcast") return isAdmin;
     return true;
   };
 
@@ -234,10 +235,10 @@ export default function Board() {
       navigate("/auth");
       return;
     }
-    if (boardType === "notice" && !isAdmin) {
+    if ((boardType === "notice" || boardType === "podcast") && !isAdmin) {
       toast({ 
         title: t("board.adminOnly"),
-        description: t("board.adminOnlyNotice"),
+        description: boardType === "podcast" ? t("board.adminOnlyPodcast") : t("board.adminOnlyNotice"),
         variant: "destructive"
       });
       return;
@@ -352,8 +353,8 @@ export default function Board() {
                 </div>
               </div>
               
-              {/* Only show write button if user can create post (admin check for notice) */}
-              {boardType !== "notice" && currentUser && (
+              {/* Only show write button if user can create post (admin check for notice/podcast) */}
+              {boardType !== "notice" && boardType !== "podcast" && currentUser && (
                 <Button 
                   onClick={handleWriteClick}
                   className={`bg-gradient-to-r ${boardData.color} hover:opacity-90`}
@@ -362,7 +363,7 @@ export default function Board() {
                   {t("board.writePost")}
                 </Button>
               )}
-              {boardType === "notice" && isAdmin && (
+              {(boardType === "notice" || boardType === "podcast") && isAdmin && (
                 <Button 
                   onClick={handleWriteClick}
                   className={`bg-gradient-to-r ${boardData.color} hover:opacity-90`}
