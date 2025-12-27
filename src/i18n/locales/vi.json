@@ -1743,6 +1743,12 @@
     },
     "freeItems": { "aiQuestions": "Hỏi AI {{count}} lần/ngày", "topik": "Học TOPIK I & II", "allGames": "Tất cả Game học tiếng Hàn", "ranking": "Xem bảng xếp hạng" },
     "premiumItems": { "allFree": "Tất cả tính năng miễn phí" },
+    "premiumFeatures": {
+      "unlimited_ai": "Hỏi AI không giới hạn",
+      "writing_correction": "Chấm bài viết",
+      "progress_analysis": "Phân tích tiến độ học tập AI",
+      "mistake_analysis": "Phân tích sổ tay lỗi sai AI"
+    },
     "tips": { "title": "Mẹo kiếm điểm nhanh", "item1": "Điểm danh mỗi ngày để duy trì streak và nhận điểm thưởng", "item2": "Hoàn thành quiz với điểm tuyệt đối để nhận +{{points}} điểm", "item3": "Mời bạn bè tham gia để cả hai cùng nhận thưởng", "item4": "Đặt và hoàn thành mục tiêu học tập hàng tuần" }
   },
   "pricing": {

@@ -241,7 +241,9 @@ const PointsSystem = () => {
                   {PREMIUM_FEATURES.map((feature) => (
                     <li key={feature.id} className="flex items-start gap-2 text-card-body">
                       <CheckCircle2 className="w-5 h-5 text-korean-green shrink-0 mt-0.5" />
-                      <span className="text-muted-foreground">{feature.nameKo}</span>
+                      <span className="text-muted-foreground">
+                        {t(`pointsSystem.premiumFeatures.${feature.id}`, { defaultValue: feature.nameKo })}
+                      </span>
                     </li>
                   ))}
                 </ul>

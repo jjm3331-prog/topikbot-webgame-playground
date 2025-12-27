@@ -1807,6 +1807,12 @@
       "ranking": "랭킹 보기"
     },
     "premiumItems": { "allFree": "모든 무료 기능 포함" },
+    "premiumFeatures": {
+      "unlimited_ai": "AI 질문 무제한",
+      "writing_correction": "작문 첨삭",
+      "progress_analysis": "학습진도 AI",
+      "mistake_analysis": "오답노트 AI 분석"
+    },
     "tips": {
       "title": "빠른 포인트 적립 팁",
       "item1": "매일 출석체크로 streak 유지하고 보너스 받기",
