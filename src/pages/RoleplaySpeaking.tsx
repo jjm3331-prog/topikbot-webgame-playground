@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import confetti from "canvas-confetti";
 import {
   MessageCircle,
   Play,
@@ -156,6 +157,26 @@ export default function RoleplaySpeaking() {
   const audioChunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
+
+  // Confetti effect for scenario selection
+  const triggerConfetti = useCallback((e: React.MouseEvent) => {
+    const rect = (e.target as HTMLElement).getBoundingClientRect();
+    const x = (rect.left + rect.width / 2) / window.innerWidth;
+    const y = (rect.top + rect.height / 2) / window.innerHeight;
+    
+    confetti({
+      particleCount: 50,
+      spread: 60,
+      origin: { x, y },
+      colors: ['#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#3B82F6'],
+      ticks: 100,
+      gravity: 1.2,
+      decay: 0.94,
+      startVelocity: 20,
+      shapes: ['circle', 'square'],
+    });
+  }, []);
+
 
   // Start roleplay
   const startRoleplay = async () => {
@@ -464,36 +485,89 @@ export default function RoleplaySpeaking() {
           {t("roleplay.setup.levelTitle")}
         </h3>
         <div className="grid grid-cols-2 gap-4">
-          {LEVEL_OPTIONS.map((level) => (
-            <button
-              key={level.id}
-              onClick={() => setSelectedLevel(level.id)}
-              className={cn(
-                "relative p-5 rounded-2xl border-2 transition-all duration-300 text-left group overflow-hidden",
-                selectedLevel === level.id
-                  ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
-                  : "border-border hover:border-primary/50 bg-card hover:bg-primary/5"
-              )}
-            >
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-2">
-                  <Badge variant="secondary" className={cn("text-white", level.color)}>
-                    {level.badge}
-                  </Badge>
-                  {selectedLevel === level.id && (
-                    <CheckCircle2 className="w-5 h-5 text-primary" />
-                  )}
+          {LEVEL_OPTIONS.map((level, index) => {
+            const isSelected = selectedLevel === level.id;
+            return (
+              <motion.button
+                key={level.id}
+                initial={{ opacity: 0, x: index === 0 ? -20 : 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ 
+                  scale: 1.03, 
+                  y: -4,
+                  transition: { type: "spring", stiffness: 400, damping: 15 }
+                }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setSelectedLevel(level.id)}
+                className={cn(
+                  "relative p-6 rounded-2xl border-2 transition-all duration-500 text-left group overflow-hidden",
+                  isSelected
+                    ? "border-primary shadow-2xl shadow-primary/25 bg-primary/5"
+                    : "border-border/50 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/15 bg-card"
+                )}
+              >
+                {/* Animated gradient background */}
+                <div className={cn(
+                  "absolute inset-0 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent transition-opacity duration-500",
+                  isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-60"
+                )} />
+                
+                {/* Shimmer effect */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
                 </div>
-                <p className="font-semibold text-lg">{level.label}</p>
-              </div>
-              {selectedLevel === level.id && (
-                <motion.div
-                  layoutId="levelBg"
-                  className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent -z-0"
-                />
-              )}
-            </button>
-          ))}
+                
+                {/* Glow ring */}
+                <div className={cn(
+                  "absolute inset-0 rounded-2xl transition-all duration-500",
+                  isSelected 
+                    ? "ring-4 ring-primary/20 ring-offset-2 ring-offset-background" 
+                    : "ring-0 group-hover:ring-2 group-hover:ring-primary/10"
+                )} />
+                
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-3">
+                    <motion.div whileHover={{ scale: 1.1 }} transition={{ type: "spring", stiffness: 400 }}>
+                      <Badge variant="secondary" className={cn(
+                        "text-white px-3 py-1 text-sm font-bold shadow-lg",
+                        level.color,
+                        isSelected && "shadow-lg"
+                      )}>
+                        {level.badge}
+                      </Badge>
+                    </motion.div>
+                    {isSelected && (
+                      <motion.div
+                        initial={{ scale: 0, rotate: -180 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ type: "spring", stiffness: 400 }}
+                      >
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-primary rounded-full animate-ping opacity-30" />
+                          <CheckCircle2 className="w-6 h-6 text-primary" />
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+                  <p className={cn(
+                    "font-bold text-lg transition-colors duration-300",
+                    isSelected ? "text-primary" : "text-foreground group-hover:text-primary/80"
+                  )}>
+                    {level.label}
+                  </p>
+                </div>
+                
+                {/* Bottom accent line */}
+                <div className={cn(
+                  "absolute bottom-0 left-1/2 -translate-x-1/2 h-1 rounded-full transition-all duration-500",
+                  isSelected 
+                    ? "w-20 bg-primary" 
+                    : "w-0 group-hover:w-12 bg-primary/50"
+                )} />
+              </motion.button>
+            );
+          })}
         </div>
       </motion.div>
 
@@ -509,33 +583,103 @@ export default function RoleplaySpeaking() {
           {t("roleplay.setup.difficultyTitle")}
         </h3>
         <div className="grid grid-cols-3 gap-4">
-          {DIFFICULTY_OPTIONS.map((diff) => {
+          {DIFFICULTY_OPTIONS.map((diff, index) => {
             const Icon = diff.icon;
+            const isSelected = selectedDifficulty === diff.id;
+            const colorClass = diff.id === "easy" ? "green" : diff.id === "medium" ? "amber" : "red";
+            
             return (
-              <button
+              <motion.button
                 key={diff.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ 
+                  scale: 1.08, 
+                  y: -6,
+                  transition: { type: "spring", stiffness: 400, damping: 15 }
+                }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedDifficulty(diff.id)}
                 className={cn(
-                  "relative p-4 rounded-xl border-2 transition-all duration-300 flex flex-col items-center gap-2",
-                  selectedDifficulty === diff.id
-                    ? `border-current ${diff.bgColor} shadow-lg`
-                    : "border-border hover:border-primary/30 bg-card"
+                  "relative p-5 rounded-2xl border-2 transition-all duration-500 flex flex-col items-center gap-3 group overflow-hidden",
+                  isSelected
+                    ? `border-${colorClass}-500/60 shadow-2xl shadow-${colorClass}-500/25 ${diff.bgColor}`
+                    : "border-border/50 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/15 bg-card"
                 )}
               >
-                <Icon className={cn("w-8 h-8", diff.color)} />
-                <span className="font-medium">{t(`roleplay.difficulty.${diff.id}`)}</span>
-                {selectedDifficulty === diff.id && (
+                {/* Background gradient */}
+                <div className={cn(
+                  "absolute inset-0 transition-opacity duration-500",
+                  `bg-gradient-to-br from-${colorClass}-500/20 to-${colorClass}-500/5`,
+                  isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-60"
+                )} />
+                
+                {/* Shimmer effect */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+                </div>
+                
+                {/* Glow ring */}
+                <div className={cn(
+                  "absolute inset-0 rounded-2xl transition-all duration-500",
+                  isSelected 
+                    ? `ring-4 ring-${colorClass}-500/20 ring-offset-2 ring-offset-background` 
+                    : "ring-0 group-hover:ring-2 group-hover:ring-primary/10"
+                )} />
+                
+                {/* Icon container with effects */}
+                <motion.div 
+                  className="relative z-10"
+                  whileHover={{ rotate: [0, -10, 10, -5, 5, 0] }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <div className={cn(
+                    "w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300",
+                    isSelected 
+                      ? `bg-${colorClass}-500/20 shadow-lg shadow-${colorClass}-500/30` 
+                      : "bg-muted/50 group-hover:bg-primary/10 group-hover:shadow-md"
+                  )}>
+                    <Icon className={cn(
+                      "w-8 h-8 transition-all duration-300",
+                      diff.color,
+                      "group-hover:scale-110"
+                    )} />
+                  </div>
+                </motion.div>
+                
+                {/* Label */}
+                <span className={cn(
+                  "relative z-10 font-semibold transition-all duration-300",
+                  isSelected ? diff.color : "text-foreground/80 group-hover:text-foreground"
+                )}>
+                  {t(`roleplay.difficulty.${diff.id}`)}
+                </span>
+                
+                {/* Selected indicator with pulse */}
+                {isSelected && (
                   <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
                     className="absolute -top-2 -right-2"
                   >
-                    <div className={cn("w-6 h-6 rounded-full flex items-center justify-center", diff.bgColor.replace('/10', ''))}>
-                      <CheckCircle2 className="w-4 h-4 text-white" />
+                    <div className="relative">
+                      <div className={cn("absolute inset-0 rounded-full animate-ping opacity-30", `bg-${colorClass}-500`)} />
+                      <div className={cn("relative rounded-full p-1 shadow-lg", `bg-${colorClass}-500 shadow-${colorClass}-500/50`)}>
+                        <CheckCircle2 className="w-4 h-4 text-white" />
+                      </div>
                     </div>
                   </motion.div>
                 )}
-              </button>
+                
+                {/* Bottom accent line */}
+                <div className={cn(
+                  "absolute bottom-0 left-1/2 -translate-x-1/2 h-1 rounded-full transition-all duration-500",
+                  isSelected 
+                    ? `w-12 bg-${colorClass}-500` 
+                    : `w-0 group-hover:w-8 bg-${colorClass}-500/50`
+                )} />
+              </motion.button>
             );
           })}
         </div>
@@ -568,7 +712,10 @@ export default function RoleplaySpeaking() {
                   transition: { type: "spring", stiffness: 400, damping: 15 }
                 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => {
+                onClick={(e) => {
+                  if (selectedScenario !== scenario.id) {
+                    triggerConfetti(e);
+                  }
                   setSelectedScenario(scenario.id);
                   setCustomScenario("");
                 }}
