@@ -131,7 +131,7 @@ export default function BlockEditor({ blocks, setBlocks, userId }: BlockEditorPr
             value={block.content}
             onChange={(e) => updateBlock(block.id, { content: e.target.value })}
             placeholder={t("blockEditor.textPlaceholder") || "텍스트를 입력하세요..."}
-            className="min-h-[100px] resize-none border-none focus-visible:ring-0 bg-transparent text-base"
+            className="min-h-[150px] resize-y border-none focus-visible:ring-0 bg-transparent text-base leading-relaxed"
           />
         );
 
@@ -372,10 +372,10 @@ export default function BlockEditor({ blocks, setBlocks, userId }: BlockEditorPr
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="bg-card border border-border rounded-xl p-4 hover:border-primary/30 transition-colors"
+              className="bg-card border border-border rounded-xl p-5 hover:border-primary/30 transition-colors"
             >
               {/* Block toolbar */}
-              <div className="absolute -left-12 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-1">
+              <div className="absolute -left-10 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-1">
                 <Button
                   type="button"
                   variant="ghost"
