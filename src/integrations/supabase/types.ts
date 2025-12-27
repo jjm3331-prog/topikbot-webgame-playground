@@ -170,6 +170,7 @@ export type Database = {
       board_posts: {
         Row: {
           attachment_urls: string[] | null
+          audio_url: string | null
           author_id: string | null
           author_name: string | null
           board_type: Database["public"]["Enums"]["board_type"]
@@ -187,6 +188,7 @@ export type Database = {
         }
         Insert: {
           attachment_urls?: string[] | null
+          audio_url?: string | null
           author_id?: string | null
           author_name?: string | null
           board_type: Database["public"]["Enums"]["board_type"]
@@ -204,6 +206,7 @@ export type Database = {
         }
         Update: {
           attachment_urls?: string[] | null
+          audio_url?: string | null
           author_id?: string | null
           author_name?: string | null
           board_type?: Database["public"]["Enums"]["board_type"]
@@ -1135,7 +1138,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
-      board_type: "notice" | "free" | "resource" | "anonymous"
+      board_type: "notice" | "free" | "resource" | "anonymous" | "podcast"
       group_concept: "fresh" | "crush" | "hiphop" | "retro" | "dark" | "band"
       group_gender: "male" | "female" | "mixed"
       subscription_plan: "free" | "plus" | "premium"
@@ -1267,7 +1270,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
-      board_type: ["notice", "free", "resource", "anonymous"],
+      board_type: ["notice", "free", "resource", "anonymous", "podcast"],
       group_concept: ["fresh", "crush", "hiphop", "retro", "dark", "band"],
       group_gender: ["male", "female", "mixed"],
       subscription_plan: ["free", "plus", "premium"],

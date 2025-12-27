@@ -1717,7 +1717,7 @@
     "title": "Cộng đồng",
     "subtitle": "Diễn đàn giao lưu & chia sẻ",
     "stats": {
-      "categories": "4 chuyên mục",
+      "categories": "5 chuyên mục",
       "realtime": "Realtime",
       "upload": "Upload tệp & video"
     },
@@ -1741,6 +1741,11 @@
         "title": "Tài liệu học tập",
         "subtitle": "학습자료실",
         "description": "Chia sẻ tài liệu, video và nguồn học tập TOPIK hữu ích!"
+      },
+      "podcast": {
+        "title": "Podcast",
+        "subtitle": "AI 팟캐스트",
+        "description": "Nghe và chia sẻ nội dung audio để học tiếng Hàn!"
       },
       "anonymous": {
         "title": "Ẩn danh",

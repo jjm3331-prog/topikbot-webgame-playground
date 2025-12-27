@@ -48,6 +48,7 @@ import {
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { autoTranslateText } from "@/lib/autoTranslate";
+import { AudioPlayer } from "@/components/board/AudioPlayer";
 
 import { CommentItem } from "@/components/board/CommentItem";
 import { supabase } from "@/integrations/supabase/client";
@@ -75,6 +76,7 @@ interface Post {
   created_at: string;
   youtube_urls: string[];
   attachment_urls: string[];
+  audio_url?: string | null;
 }
 
 interface Comment {
@@ -756,6 +758,13 @@ export default function BoardPost() {
                     [&_iframe]:rounded-lg [&_video]:rounded-lg"
                   dangerouslySetInnerHTML={{ __html: post.content }}
                 />
+              )}
+
+              {/* Audio Player for Podcast */}
+              {post.audio_url && (
+                <div className="mt-6">
+                  <AudioPlayer src={post.audio_url} title={post.title} />
+                </div>
               )}
 
               {/* YouTube Embeds */}
