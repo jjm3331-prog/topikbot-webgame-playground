@@ -88,13 +88,17 @@ const PremiumRequired = () => {
 };
 
 export const PremiumRoute = ({ children }: PremiumRouteProps) => {
-  const { isPremium, loading, user } = useSubscription();
+  const { isPremium, isPlus, loading } = useSubscription();
 
   if (loading) {
     return <LoadingState />;
   }
 
-  // Auth and premium checks disabled for testing - allow all access
+  // Free 사용자는 Premium 기능 접근 차단
+  if (!isPremium && !isPlus) {
+    return <PremiumRequired />;
+  }
+
   return <>{children}</>;
 };
 

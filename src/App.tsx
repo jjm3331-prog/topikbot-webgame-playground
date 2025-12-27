@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { PremiumRoute } from "./components/PremiumRoute";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -172,10 +173,10 @@ const App = () => {
               {/* Protected routes - login required */}
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/korea-career" element={<ProtectedRoute><KoreaCareer /></ProtectedRoute>} />
-              <Route path="/headhunting" element={<ProtectedRoute><Headhunting /></ProtectedRoute>} />
-              <Route path="/company-report" element={<ProtectedRoute><CompanyReport /></ProtectedRoute>} />
-              <Route path="/interview-simulation" element={<ProtectedRoute><InterviewSimulation /></ProtectedRoute>} />
-              <Route path="/writing-correction" element={<ProtectedRoute><WritingCorrection /></ProtectedRoute>} />
+              <Route path="/headhunting" element={<ProtectedRoute><PremiumRoute><Headhunting /></PremiumRoute></ProtectedRoute>} />
+              <Route path="/company-report" element={<ProtectedRoute><PremiumRoute><CompanyReport /></PremiumRoute></ProtectedRoute>} />
+              <Route path="/interview-simulation" element={<ProtectedRoute><PremiumRoute><InterviewSimulation /></PremiumRoute></ProtectedRoute>} />
+              <Route path="/writing-correction" element={<ProtectedRoute><PremiumRoute><WritingCorrection /></PremiumRoute></ProtectedRoute>} />
 
               <Route path="/game" element={<Navigate to="/dashboard" replace />} />
               <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
@@ -202,8 +203,8 @@ const App = () => {
               <Route path="/learning-hub" element={<ProtectedRoute><LearningHub /></ProtectedRoute>} />
               <Route path="/game-hub" element={<ProtectedRoute><GameHub /></ProtectedRoute>} />
               <Route path="/battle" element={<ProtectedRoute><Battle /></ProtectedRoute>} />
-              <Route path="/question-variant" element={<ProtectedRoute><QuestionVariant /></ProtectedRoute>} />
-              <Route path="/roleplay-speaking" element={<ProtectedRoute><RoleplaySpeaking /></ProtectedRoute>} />
+              <Route path="/question-variant" element={<ProtectedRoute><PremiumRoute><QuestionVariant /></PremiumRoute></ProtectedRoute>} />
+              <Route path="/roleplay-speaking" element={<ProtectedRoute><PremiumRoute><RoleplaySpeaking /></PremiumRoute></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
               <Route path="/points-system" element={<ProtectedRoute><PointsSystem /></ProtectedRoute>} />
