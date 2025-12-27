@@ -209,8 +209,8 @@ export default function BoardWrite() {
     <div className="min-h-screen bg-background flex flex-col">
       <CleanHeader />
       
-      <main className="flex-1 pt-6 pb-12 px-4 sm:px-6">
-        <div className="max-w-3xl mx-auto w-full">
+      <main className="flex-1 pt-6 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto w-full">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -269,7 +269,7 @@ export default function BoardWrite() {
                   </TabsList>
                   
                   <TabsContent value="edit" className="mt-0">
-                    <div className="pl-14">
+                    <div className="pl-10 sm:pl-12">
                       <BlockEditor 
                         blocks={blocks} 
                         setBlocks={setBlocks} 
