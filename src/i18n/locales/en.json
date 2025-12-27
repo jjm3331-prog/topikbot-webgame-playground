@@ -1501,7 +1501,14 @@
     "pinDescription": "Post will appear at the top of the list",
     "cancel": "Cancel",
     "update": "Update",
-    "submit": "Submit"
+    "submit": "Submit",
+    "editTab": "Edit",
+    "previewTab": "Preview",
+    "previewEmpty": "Nothing to preview",
+    "uploadingImage": "Uploading image...",
+    "imageInserted": "Image inserted",
+    "uploadError": "Image upload failed",
+    "pasteHint": "💡 Ctrl+V to paste images directly into the content"
   },
   "boardHub": {
     "back": "Back",
