@@ -30,29 +30,29 @@ interface Question {
   explanationVi: string;
 }
 
-// Tab categories - 정적 데이터는 fallback용
-const tabCategories = {
+// Tab categories - will be populated with i18n
+const getTabCategories = (t: (key: string) => string) => ({
   grammar: {
-    label: "빈칸 문법",
-    sublabel: "Ngữ pháp điền chỗ trống",
+    label: t('reading.tabs.grammar'),
+    sublabel: t('reading.tabs.grammarSub'),
     emoji: "📝",
   },
   vocabulary: {
-    label: "유의어/의미",
-    sublabel: "Từ đồng nghĩa / Nghĩa",
+    label: t('reading.tabs.vocabulary'),
+    sublabel: t('reading.tabs.vocabularySub'),
     emoji: "📚",
   },
   topic: {
-    label: "주제파악",
-    sublabel: "Xác định chủ đề",
+    label: t('reading.tabs.topic'),
+    sublabel: t('reading.tabs.topicSub'),
     emoji: "🎯",
   },
   advertisement: {
-    label: "광고/안내문",
-    sublabel: "Quảng cáo / Thông báo",
+    label: t('reading.tabs.advertisement'),
+    sublabel: t('reading.tabs.advertisementSub'),
     emoji: "📰",
   },
-};
+});
 
 // Fallback questions
 const fallbackQuestions: Record<string, Question[]> = {
@@ -102,16 +102,8 @@ const fallbackQuestions: Record<string, Question[]> = {
   ],
 };
 
-type TabKey = keyof typeof tabCategories;
-
-// TOPIK 급수 레벨
-const topikLevels = {
-  "1-2": { label: "TOPIK I (1-2급)", sublabel: "Sơ cấp", color: "from-green-500 to-emerald-500" },
-  "3-4": { label: "TOPIK II (3-4급)", sublabel: "Trung cấp", color: "from-blue-500 to-cyan-500" },
-  "5-6": { label: "TOPIK II (5-6급)", sublabel: "Cao cấp", color: "from-purple-500 to-pink-500" },
-};
-
-type TopikLevel = keyof typeof topikLevels;
+type TabKey = "grammar" | "vocabulary" | "topic" | "advertisement";
+type TopikLevel = "1-2" | "3-4" | "5-6";
 
 const ReadingA = () => {
   const navigate = useNavigate();
@@ -127,6 +119,14 @@ const ReadingA = () => {
   const [isQuizComplete, setIsQuizComplete] = useState(false);
   const [questions, setQuestions] = useState<Question[]>(fallbackQuestions.grammar);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Get localized data
+  const tabCategories = getTabCategories(t);
+  const topikLevels = {
+    "1-2": { label: t('reading.levels.1-2'), sublabel: t('reading.levels.beginner'), color: "from-green-500 to-emerald-500" },
+    "3-4": { label: t('reading.levels.3-4'), sublabel: t('reading.levels.intermediate'), color: "from-blue-500 to-cyan-500" },
+    "5-6": { label: t('reading.levels.5-6'), sublabel: t('reading.levels.advanced'), color: "from-purple-500 to-pink-500" },
+  };
 
   // RAG에서 문제 가져오기
   const fetchQuestions = useCallback(async (tabType: string, level: TopikLevel) => {
@@ -154,7 +154,7 @@ const ReadingA = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t, toast]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -274,7 +274,7 @@ const ReadingA = () => {
                     className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-medium mb-2"
                   >
                     <Sparkles className="w-3 h-3" />
-                    Phong cách TOPIK
+                    {t('reading.topikStyle')}
                   </motion.div>
                   <motion.h1 
                     initial={{ opacity: 0, x: -20 }}
@@ -282,7 +282,7 @@ const ReadingA = () => {
                     transition={{ delay: 0.4 }}
                     className="text-3xl sm:text-4xl font-bold text-white mb-1"
                   >
-                    읽기A
+                    {t('reading.basic')}
                   </motion.h1>
                   <motion.p 
                     initial={{ opacity: 0, x: -20 }}
@@ -290,7 +290,7 @@ const ReadingA = () => {
                     transition={{ delay: 0.5 }}
                     className="text-white/80"
                   >
-                    Đọc hiểu cơ bản
+                    {t('reading.description')}
                   </motion.p>
                 </div>
               </div>
@@ -343,9 +343,9 @@ const ReadingA = () => {
                 exit={{ opacity: 0 }}
                 className="rounded-3xl bg-gradient-to-b from-card to-card/50 border border-border/50 shadow-2xl p-12 text-center"
               >
-                <Loader2 className="w-16 h-16 animate-spin text-primary mx-auto mb-6" />
-                <h3 className="text-xl font-bold text-foreground mb-2">Đang tạo câu hỏi...</h3>
-                <p className="text-muted-foreground">AI đang tạo câu hỏi TOPIK phù hợp</p>
+              <Loader2 className="w-16 h-16 animate-spin text-primary mx-auto mb-6" />
+                <h3 className="text-xl font-bold text-foreground mb-2">{t('reading.loading')}</h3>
+                <p className="text-muted-foreground">{t('reading.loadingDesc')}</p>
               </motion.div>
             ) : !currentQuestion ? (
               <motion.div
@@ -354,10 +354,10 @@ const ReadingA = () => {
                 animate={{ opacity: 1 }}
                 className="rounded-3xl bg-card border border-border p-12 text-center"
               >
-                <p className="text-muted-foreground mb-4">Không có câu hỏi</p>
+                <p className="text-muted-foreground mb-4">{t('reading.noQuestions')}</p>
                 <Button onClick={() => fetchQuestions(activeTab, topikLevel)}>
                   <RefreshCw className="w-4 h-4 mr-2" />
-                  Tải lại
+                  {t('reading.reload')}
                 </Button>
               </motion.div>
             ) : isQuizComplete ? (
@@ -379,15 +379,15 @@ const ReadingA = () => {
                 </motion.div>
 
                 <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-                  {currentCategory.label} Hoàn thành!
+                  {currentCategory.label} {t('reading.complete')}
                 </h2>
                 <p className="text-muted-foreground mb-8 text-lg">
-                  Tổng {questions.length} câu, đúng <span className="text-primary font-bold">{score} câu</span>
+                  {t('reading.totalCorrect', { total: questions.length, correct: score })}
                 </p>
 
                 <div className="w-full max-w-sm mx-auto mb-8">
                   <div className="flex justify-between text-sm text-muted-foreground mb-3">
-                    <span>Tỷ lệ đúng</span>
+                    <span>{t('reading.accuracy')}</span>
                     <span className="font-bold text-foreground text-lg">
                       {Math.round((score / questions.length) * 100)}%
                     </span>
@@ -410,14 +410,14 @@ const ReadingA = () => {
                     className="gap-2"
                   >
                     <RotateCcw className="w-5 h-5" />
-                    Làm lại
+                    {t('reading.tryAgain')}
                   </Button>
                   <Button
                     onClick={() => navigate("/dashboard")}
                     size="lg"
                     className="gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:opacity-90 text-white"
                   >
-                    Quay lại
+                    {t('reading.goBack')}
                     <ChevronRight className="w-5 h-5" />
                   </Button>
                 </div>
@@ -434,10 +434,10 @@ const ReadingA = () => {
                 <div className="mb-6 p-4 rounded-2xl bg-card border border-border">
                   <div className="flex justify-between items-center mb-3">
                     <span className="text-sm font-medium text-foreground">
-                      {currentCategory.emoji} {currentCategory.label} - Câu {currentQuestionIndex + 1} / {questions.length}
+                      {currentCategory.emoji} {currentCategory.label} - {t('reading.questionNumber', { current: currentQuestionIndex + 1, total: questions.length })}
                     </span>
                     <span className="text-sm font-bold text-primary">
-                      Điểm: {score}
+                      {t('reading.score')}: {score}
                     </span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-2.5">
@@ -518,7 +518,7 @@ const ReadingA = () => {
                       ))}
                     </div>
 
-                    {/* Explanation - 한국어/베트남어 병기 */}
+                    {/* Explanation */}
                     <AnimatePresence>
                       {showResult && (
                         <motion.div
@@ -529,14 +529,14 @@ const ReadingA = () => {
                         >
                           <div className="bg-blue-500/10 p-4 border-b border-blue-500/20">
                             <p className="text-sm font-bold text-blue-600 dark:text-blue-400">
-                              💡 해설 / Giải thích
+                              💡 {t('reading.explanation')}
                             </p>
                           </div>
                           <div className="p-5 space-y-4 bg-blue-500/5">
                             {/* Korean Explanation */}
                             <div>
                               <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mb-2 flex items-center gap-1">
-                                🇰🇷 한국어
+                                🇰🇷 {t('reading.explanationKo')}
                               </p>
                               <p className="text-foreground text-sm leading-relaxed whitespace-pre-wrap">
                                 {currentQuestion.explanationKo}
@@ -548,7 +548,7 @@ const ReadingA = () => {
                             {/* Vietnamese Explanation */}
                             <div>
                               <p className="text-xs font-semibold text-orange-600 dark:text-orange-400 mb-2 flex items-center gap-1">
-                                🇻🇳 Tiếng Việt
+                                🇻🇳 {t('reading.explanationVi')}
                               </p>
                               <p className="text-foreground text-sm leading-relaxed whitespace-pre-wrap">
                                 {currentQuestion.explanationVi}
@@ -567,14 +567,14 @@ const ReadingA = () => {
                           disabled={selectedAnswer === null}
                           className="flex-1 h-14 text-lg bg-gradient-to-r from-emerald-500 to-teal-500 hover:opacity-90 text-white"
                         >
-                          Kiểm tra đáp án
+                          {t('reading.checkAnswer')}
                         </Button>
                       ) : (
                         <Button
                           onClick={handleNext}
                           className="flex-1 h-14 text-lg bg-gradient-to-r from-emerald-500 to-teal-500 hover:opacity-90 text-white"
                         >
-                          {currentQuestionIndex < questions.length - 1 ? "Câu tiếp theo" : "Xem kết quả"}
+                          {currentQuestionIndex < questions.length - 1 ? t('reading.nextQuestion') : t('reading.viewResult')}
                           <ChevronRight className="w-5 h-5 ml-2" />
                         </Button>
                       )}
