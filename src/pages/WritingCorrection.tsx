@@ -257,10 +257,9 @@ const WritingCorrection = () => {
           setAnswerImages(prev => [...prev, file]);
           setAnswerImagePreviews(prev => [...prev, preview]);
           
-          // 🔥 자동 OCR 실행: 답안 이미지 업로드 시 첫 번째 이미지에서 텍스트 추출
+          // 🔥 자동 OCR 실행: 답안 이미지 업로드 시 단일 이미지면 즉시 텍스트 추출/편집
           if (index === 0 && filesToProcess.length === 1) {
-            // 단일 이미지 업로드 시 OCR 자동 실행
-            performOCR(preview, "answer");
+            performOCRAll([preview]);
           }
         }
       };
@@ -288,24 +287,55 @@ const WritingCorrection = () => {
 
   const performOCR = async (imageBase64: string, type: "question" | "answer") => {
     if (type !== "answer") return; // Only OCR for answer images
-    
+
     setOcrProcessing(true);
     try {
-      // Use Gemini to extract text from image
       const response = await supabase.functions.invoke("writing-correction", {
         body: {
           ocrOnly: true,
-          answerImageUrl: imageBase64
-        }
+          answerImageUrl: imageBase64,
+        },
       });
 
-      if (response.data?.extractedText) {
-        setOcrRecognizedText(response.data.extractedText);
-        setShowOcrEditModal(true);
-      }
+      const extracted = response.data?.extractedText as string | undefined;
+      return extracted?.trim() || "";
     } catch (error) {
       console.error("OCR error:", error);
-      // If OCR fails, just continue without it
+      return "";
+    } finally {
+      setOcrProcessing(false);
+    }
+  };
+
+  const performOCRAll = async (imagesBase64: string[]) => {
+    if (!imagesBase64.length) return;
+
+    setOcrProcessing(true);
+    try {
+      const parts: string[] = [];
+
+      // 순차 실행(안정성/일관성): 이미지가 많아도 한 번에 처리
+      for (let i = 0; i < imagesBase64.length; i++) {
+        const text = await supabase.functions.invoke("writing-correction", {
+          body: {
+            ocrOnly: true,
+            answerImageUrl: imagesBase64[i],
+          },
+        });
+
+        const extracted = (text.data?.extractedText as string | undefined)?.trim() || "";
+        if (extracted) {
+          parts.push(`--- Page ${i + 1}/${imagesBase64.length} ---\n${extracted}`);
+        } else {
+          parts.push(`--- Page ${i + 1}/${imagesBase64.length} ---\n`);
+        }
+      }
+
+      const combined = parts.join("\n\n");
+      setOcrRecognizedText(combined);
+      setShowOcrEditModal(true);
+    } catch (error) {
+      console.error("OCR all error:", error);
     } finally {
       setOcrProcessing(false);
     }
@@ -853,14 +883,14 @@ const WritingCorrection = () => {
                               <span className="absolute bottom-1 left-1 bg-background/80 text-xs px-1.5 py-0.5 rounded">
                                 {index + 1}/{answerImagePreviews.length}
                               </span>
-                              {ocrProcessing && index === answerImagePreviews.length - 1 && (
-                                <div className="absolute inset-0 bg-background/80 flex items-center justify-center rounded-lg">
-                                  <div className="text-center">
-                                    <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
-                                    <p className="text-xs">OCR...</p>
-                                  </div>
-                                </div>
-                              )}
+                               {ocrProcessing && (
+                                 <div className="absolute inset-0 bg-background/80 flex items-center justify-center rounded-lg">
+                                   <div className="text-center">
+                                     <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
+                                     <p className="text-xs">OCR...</p>
+                                   </div>
+                                 </div>
+                               )}
                             </div>
                           ))}
                         </div>
@@ -887,14 +917,13 @@ const WritingCorrection = () => {
                                 {t("writingPage.buttons.deleteAll")}
                               </Button>
                             </div>
-                            {/* 🔥 OCR 텍스트 추출 버튼 */}
                             <Button
                               variant="secondary"
                               size="sm"
                               className="w-full"
                               onClick={() => {
                                 if (answerImagePreviews.length > 0) {
-                                  performOCR(answerImagePreviews[0], "answer");
+                                  performOCRAll(answerImagePreviews);
                                 }
                               }}
                               disabled={ocrProcessing || answerImagePreviews.length === 0}
