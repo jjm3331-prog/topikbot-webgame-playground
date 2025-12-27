@@ -1,4 +1,19 @@
 {
+  "splash": {
+    "tagline": "AI asosidagi koreys tilini o'rganish o'yini",
+    "loading": "Yuklanmoqda...",
+    "branding": "LUKATO AI Korean Learning"
+  },
+  "pwa": {
+    "title": "Ilovani o'rnatish",
+    "description1": "LUKATOni bosh ekranga qo'shing!",
+    "description2": "Oddiy ilova kabi tez kirish imkoniyati.",
+    "fastLaunch": "Tez ishga tushirish",
+    "offline": "Oflayn",
+    "notifications": "Bildirishnomalar",
+    "later": "Keyinroq",
+    "installNow": "O'rnatish"
+  },
   "bankruptcyRecovery": {
     "title": "Bankrotlikdan qayta tiklash",
     "subtitle": "파산 복구",
@@ -1883,5 +1898,36 @@
     "updated": "Ariza yangilandi!",
     "privacyNote": "Sizning ma'lumotlaringiz faqat headhunting uchun ishlatiladi va xavfsiz saqlanadi.",
     "featureName": "Headhunting xizmati"
+  },
+  "practicalGuidePage": {
+    "badge": "📖 Amaliy qo'llanma",
+    "tagline": "IT ish muhitida darhol foydalanish mumkin bo'lgan amaliy koreys tili",
+    "comingSoon": "Tayyorlanmoqda",
+    "comingSoonDesc": "IT COMTOR uchun amaliy koreys tili kontentini tayyorlayapmiz.",
+    "targetTitle": "🎯 Maqsadli auditoriya",
+    "targets": {
+      "comtor": "Tarjimon",
+      "gameqa": "Game QA",
+      "brse": "Bridge SE",
+      "pmpl": "Loyiha boshqaruvi"
+    },
+    "features": {
+      "itTerms": {
+        "title": "IT terminologiyasi",
+        "desc": "Soha bo'yicha IT koreys terminlari: SI / Game / AI / Web / ERP"
+      },
+      "meeting": {
+        "title": "Yig'ilish simulyatsiyasi",
+        "desc": "Kickoff, Demo, haftalik/oylik/retro yig'ilishlarni mashq qilish"
+      },
+      "email": {
+        "title": "Email/Messenger shablonlari",
+        "desc": "Kechikish, muammo hisoboti, tasdiqlash va hokazo uchun shablonlar"
+      },
+      "business": {
+        "title": "Biznes koreys tili",
+        "desc": "IT COMTOR uchun zarur biznes koreys ifodalari"
+      }
+    }
   }
 }

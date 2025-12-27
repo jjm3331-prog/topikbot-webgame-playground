@@ -1,4 +1,19 @@
 {
+  "splash": {
+    "tagline": "AI 기반 한국어 학습 게임",
+    "loading": "로딩 중...",
+    "branding": "LUKATO AI Korean Learning"
+  },
+  "pwa": {
+    "title": "앱 설치하기",
+    "description1": "홈 화면에 LUKATO를 추가하세요!",
+    "description2": "앱처럼 빠르게 접속할 수 있습니다.",
+    "fastLaunch": "빠른 실행",
+    "offline": "오프라인",
+    "notifications": "알림",
+    "later": "나중에",
+    "installNow": "설치"
+  },
   "bankruptcyRecovery": {
     "title": "파산 복구",
     "subtitle": "Phục hồi phá sản",
@@ -2289,6 +2304,37 @@
         "enterCompanyDesc": "검색할 기업명을 입력해 주세요.",
         "searchErrorTitle": "검색 실패",
         "searchErrorDesc": "리포트를 생성할 수 없습니다. 다시 시도해 주세요."
+      }
+    }
+  },
+  "practicalGuidePage": {
+    "badge": "📖 실무 가이드",
+    "tagline": "IT 업무 현장에서 바로 활용할 수 있는 실무 한국어",
+    "comingSoon": "준비 중",
+    "comingSoonDesc": "IT COMTOR를 위한 실무 한국어 콘텐츠를 준비하고 있습니다.",
+    "targetTitle": "🎯 대상",
+    "targets": {
+      "comtor": "통번역사",
+      "gameqa": "게임 QA",
+      "brse": "브릿지 SE",
+      "pmpl": "프로젝트 관리"
+    },
+    "features": {
+      "itTerms": {
+        "title": "IT 용어 학습",
+        "desc": "SI / Game / AI / Web / ERP 직무별 IT 한국어 용어"
+      },
+      "meeting": {
+        "title": "미팅 시뮬레이션",
+        "desc": "Kickoff, Demo, 주간/월간/회고 미팅 연습"
+      },
+      "email": {
+        "title": "메일/메신저 표현",
+        "desc": "일정 지연, 이슈 보고, 확인 요청 등 상황별 표현"
+      },
+      "business": {
+        "title": "비즈니스 한국어",
+        "desc": "IT COMTOR에게 필요한 비즈니스 한국어 표현"
       }
     }
   }

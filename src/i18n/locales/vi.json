@@ -1,4 +1,19 @@
 {
+  "splash": {
+    "tagline": "Game học tiếng Hàn với AI",
+    "loading": "Đang tải...",
+    "branding": "LUKATO AI Korean Learning"
+  },
+  "pwa": {
+    "title": "Cài đặt ứng dụng",
+    "description1": "Thêm LUKATO vào màn hình chính!",
+    "description2": "Truy cập nhanh như ứng dụng gốc.",
+    "fastLaunch": "Khởi động nhanh",
+    "offline": "Ngoại tuyến",
+    "notifications": "Thông báo",
+    "later": "Để sau",
+    "installNow": "Cài đặt"
+  },
   "bankruptcyRecovery": {
     "title": "Phục hồi phá sản",
     "subtitle": "파산 복구",
@@ -2170,6 +2185,37 @@
         "enterCompanyDesc": "Vui lòng nhập tên doanh nghiệp để tìm kiếm.",
         "searchErrorTitle": "Tìm kiếm thất bại",
         "searchErrorDesc": "Không thể tạo báo cáo. Vui lòng thử lại."
+      }
+    }
+  },
+  "practicalGuidePage": {
+    "badge": "📖 Hướng dẫn Thực tế",
+    "tagline": "Tiếng Hàn thực tế có thể sử dụng ngay trong môi trường làm việc IT",
+    "comingSoon": "Đang phát triển",
+    "comingSoonDesc": "Đang chuẩn bị nội dung tiếng Hàn thực tế cho IT COMTOR.",
+    "targetTitle": "🎯 Đối tượng",
+    "targets": {
+      "comtor": "Phiên dịch",
+      "gameqa": "Game QA",
+      "brse": "Bridge SE",
+      "pmpl": "Quản lý dự án"
+    },
+    "features": {
+      "itTerms": {
+        "title": "Thuật ngữ IT",
+        "desc": "Thuật ngữ IT tiếng Hàn theo lĩnh vực: SI / Game / AI / Web / ERP"
+      },
+      "meeting": {
+        "title": "Mô phỏng cuộc họp",
+        "desc": "Luyện tập Kickoff, Demo, họp tuần/tháng/retro"
+      },
+      "email": {
+        "title": "Mẫu Email/Tin nhắn",
+        "desc": "Mẫu câu theo tình huống: delay, báo cáo issue, xác nhận..."
+      },
+      "business": {
+        "title": "Tiếng Hàn công sở",
+        "desc": "Tiếng Hàn doanh nghiệp cần thiết cho IT COMTOR"
       }
     }
   }

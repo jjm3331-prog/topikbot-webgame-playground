@@ -450,11 +450,11 @@ const BankruptcyRecovery = () => {
 
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="glass-card p-4 rounded-xl">
-                    <p className="text-white/60">완료 단어 / Từ hoàn thành</p>
-                    <p className="text-2xl font-bold text-green-400">{wordsCompleted}개</p>
+                    <p className="text-white/60">{t("bankruptcyRecovery.totalWords")}</p>
+                    <p className="text-2xl font-bold text-green-400">{wordsCompleted}</p>
                   </div>
                   <div className="glass-card p-4 rounded-xl">
-                    <p className="text-white/60">최대 콤보 / Max combo</p>
+                    <p className="text-white/60">{t("bankruptcyRecovery.maxCombo")}</p>
                     <p className="text-2xl font-bold text-orange-400">{maxStreak}x</p>
                   </div>
                 </div>
@@ -466,14 +466,14 @@ const BankruptcyRecovery = () => {
                   className="h-14 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
                 >
                   <RefreshCw className="w-5 h-5 mr-2" />
-                  다시하기 / Chơi lại
+                  {t("bankruptcyRecovery.playAgain")}
                 </Button>
                 <Button
                   onClick={handleFinish}
                   className="h-14 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
                 >
                   <Coins className="w-5 h-5 mr-2" />
-                  저장 / Lưu
+                  {t("common.save")}
                 </Button>
               </div>
             </motion.div>
