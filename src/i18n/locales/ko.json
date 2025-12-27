@@ -1825,5 +1825,98 @@
         "description": "익명으로 편하게 의견과 질문을 공유하세요!"
       }
     }
+  },
+  "careerPages": {
+    "hub": {
+      "badge": "Korea Career",
+      "title": "Korea Career Hub",
+      "subtitle": "올인원 한국 취업 서비스",
+      "subline": "헤드헌팅 • 기업 리포트 • AI 면접",
+      "premiumPreviewFeatureName": "Korea Career Hub",
+      "status": { "active": "운영 중" },
+      "cta": "열기",
+      "stats": {
+        "partnerCompanies": "파트너 기업",
+        "successPlacements": "취업 성공",
+        "satisfaction": "만족도",
+        "aiSupport": "AI 지원"
+      },
+      "premiumCta": {
+        "title": "Premium 업그레이드",
+        "description": "Korea Career 모든 기능 이용 가능"
+      },
+      "infoCards": {
+        "headhunters": {
+          "title": "전문 헤드헌터",
+          "description": "경험 많은 채용 전문가의 1:1 가이드"
+        },
+        "ai": {
+          "title": "AI 인사이트",
+          "description": "빠른 리서치, 면접 연습, 피드백"
+        }
+      },
+      "services": {
+        "headhunting": {
+          "title": "헤드헌팅",
+          "subtitle": "1:1 커리어 지원",
+          "description": "전문가 지원으로 한국 취업 매칭을 받으세요.",
+          "features": {
+            "consulting": "커리어 상담",
+            "cvReview": "이력서 검토",
+            "interviewCoaching": "면접 코칭",
+            "salaryNegotiation": "연봉 협상"
+          }
+        },
+        "companyReport": {
+          "title": "기업 리포트",
+          "subtitle": "심층 분석",
+          "description": "한국 기업에 대한 상세 리포트를 생성하세요.",
+          "features": {
+            "salary": "연봉",
+            "culture": "조직문화",
+            "interviewReviews": "면접 후기",
+            "news": "최신 뉴스"
+          }
+        },
+        "interviewSim": {
+          "title": "면접 시뮬레이션",
+          "subtitle": "음성 연습",
+          "description": "AI와 면접 연습하고 피드백을 받으세요.",
+          "features": {
+            "voice": "음성",
+            "realtimeFeedback": "실시간 피드백",
+            "scoring": "채점",
+            "customQuestions": "맞춤 질문"
+          }
+        }
+      }
+    },
+    "companyReport": {
+      "premiumPreviewFeatureName": "기업 리포트",
+      "badge": "기업 심층 리포트",
+      "title": "기업 리포트",
+      "description": "기업을 검색하고 상세 리포트를 받으세요.",
+      "inputPlaceholder": "기업명을 입력하세요…",
+      "searchButtonLabel": "검색",
+      "quickSearch": "빠른 검색",
+      "includes": "받을 수 있는 정보",
+      "loadingTitle": "리포트 생성 중…",
+      "loadingDesc": "잠시만 기다려 주세요.",
+      "resultTitle": "리포트: {{company}}",
+      "citations": "출처 ({{count}}개)",
+      "sections": {
+        "overview": "개요",
+        "salary": "연봉",
+        "culture": "조직문화",
+        "interviewReviews": "면접 후기",
+        "latestNews": "최신 뉴스"
+      },
+      "toast": {
+        "enterCompanyTitle": "기업명을 입력하세요",
+        "enterCompanyDesc": "검색할 기업명을 입력해 주세요.",
+        "searchErrorTitle": "검색 실패",
+        "searchErrorDesc": "리포트를 생성할 수 없습니다. 다시 시도해 주세요."
+      }
+    }
   }
 }
