@@ -163,5 +163,114 @@ export function logI18nValidation(): void {
     } else {
       console.log('✅ writingPage.cache: Present in all locales');
     }
+    
+    // Check writing cache toast keys
+    const writingCacheKeys = [
+      'writing.resultFromHistory',
+      'writing.cachedResult', 
+      'writing.gradingComplete',
+      'writing.scoreResult',
+      'writing.gradingError',
+      'writing.saveError',
+    ];
+    
+    const missingWritingKeys: { lang: string; key: string }[] = [];
+    
+    for (const [langCode, locale] of Object.entries(locales)) {
+      for (const keyPath of writingCacheKeys) {
+        const parts = keyPath.split('.');
+        let current: unknown = locale;
+        
+        for (const part of parts) {
+          if (current && typeof current === 'object' && part in (current as object)) {
+            current = (current as Record<string, unknown>)[part];
+          } else {
+            current = undefined;
+            break;
+          }
+        }
+        
+        if (current === undefined) {
+          missingWritingKeys.push({ lang: langCode, key: keyPath });
+        }
+      }
+    }
+    
+    if (missingWritingKeys.length > 0) {
+      console.warn('❌ Missing writing cache keys:', missingWritingKeys);
+    } else {
+      console.log('✅ Writing cache/toast keys: Present in all locales');
+    }
+  }
+}
+
+/**
+ * Smoke test function to verify language-specific output
+ * Returns the translated strings for cache messages in a given language
+ */
+export function getWritingCacheTranslations(langCode: string): Record<string, string | undefined> {
+  const locale = locales[langCode];
+  if (!locale) return {};
+  
+  const keys = [
+    'writing.resultFromHistory',
+    'writing.cachedResult',
+    'writing.gradingComplete', 
+    'writing.scoreResult',
+    'writing.gradingError',
+    'writing.saveError',
+    'writingPage.cache.title',
+    'writingPage.cache.message',
+    'writingPage.cache.savedTime',
+    'writingPage.cache.viewFresh',
+  ];
+  
+  const result: Record<string, string | undefined> = {};
+  
+  for (const keyPath of keys) {
+    const parts = keyPath.split('.');
+    let current: unknown = locale;
+    
+    for (const part of parts) {
+      if (current && typeof current === 'object' && part in (current as object)) {
+        current = (current as Record<string, unknown>)[part];
+      } else {
+        current = undefined;
+        break;
+      }
+    }
+    
+    result[keyPath] = typeof current === 'string' ? current : undefined;
+  }
+  
+  return result;
+}
+
+/**
+ * Run smoke test for all languages and log results
+ */
+export function runWritingCacheSmokeTest(): void {
+  if (import.meta.env.DEV) {
+    console.group('🧪 Writing Cache Translation Smoke Test');
+    
+    const langs = ['ko', 'vi', 'en', 'ja', 'zh', 'ru', 'uz'];
+    
+    for (const lang of langs) {
+      const translations = getWritingCacheTranslations(lang);
+      const missing = Object.entries(translations)
+        .filter(([, v]) => v === undefined)
+        .map(([k]) => k);
+      
+      if (missing.length > 0) {
+        console.warn(`❌ ${lang}: Missing ${missing.length} keys:`, missing);
+      } else {
+        console.log(`✅ ${lang}: All cache keys present`);
+        // Show sample translation to verify language
+        const sample = translations['writing.resultFromHistory'];
+        console.log(`   Sample: "${sample}"`);
+      }
+    }
+    
+    console.groupEnd();
   }
 }
