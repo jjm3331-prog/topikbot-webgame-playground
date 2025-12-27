@@ -246,9 +246,9 @@ const WritingCorrection = () => {
       return;
     }
 
-    filesToProcess.forEach((file) => {
+    filesToProcess.forEach((file, index) => {
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = async (event) => {
         const preview = event.target?.result as string;
         if (type === "question") {
           setQuestionImages(prev => [...prev, file]);
@@ -256,6 +256,12 @@ const WritingCorrection = () => {
         } else {
           setAnswerImages(prev => [...prev, file]);
           setAnswerImagePreviews(prev => [...prev, preview]);
+          
+          // 🔥 자동 OCR 실행: 답안 이미지 업로드 시 첫 번째 이미지에서 텍스트 추출
+          if (index === 0 && filesToProcess.length === 1) {
+            // 단일 이미지 업로드 시 OCR 자동 실행
+            performOCR(preview, "answer");
+          }
         }
       };
       reader.readAsDataURL(file);
@@ -859,25 +865,51 @@ const WritingCorrection = () => {
                           ))}
                         </div>
                         {answerImagePreviews.length < MAX_IMAGES && (
-                          <div className="flex gap-2">
+                          <div className="flex flex-col gap-2">
+                            <div className="flex gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="flex-1"
+                                onClick={() => answerInputRef.current?.click()}
+                              >
+                                <Upload className="w-4 h-4 mr-2" />
+                                {t("writingPage.buttons.addImage")} ({answerImagePreviews.length}/{MAX_IMAGES})
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setAnswerImages([]);
+                                  setAnswerImagePreviews([]);
+                                }}
+                              >
+                                {t("writingPage.buttons.deleteAll")}
+                              </Button>
+                            </div>
+                            {/* 🔥 OCR 텍스트 추출 버튼 */}
                             <Button
-                              variant="outline"
+                              variant="secondary"
                               size="sm"
-                              className="flex-1"
-                              onClick={() => answerInputRef.current?.click()}
-                            >
-                              <Upload className="w-4 h-4 mr-2" />
-                              {t("writingPage.buttons.addImage")} ({answerImagePreviews.length}/{MAX_IMAGES})
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
+                              className="w-full"
                               onClick={() => {
-                                setAnswerImages([]);
-                                setAnswerImagePreviews([]);
+                                if (answerImagePreviews.length > 0) {
+                                  performOCR(answerImagePreviews[0], "answer");
+                                }
                               }}
+                              disabled={ocrProcessing || answerImagePreviews.length === 0}
                             >
-                              {t("writingPage.buttons.deleteAll")}
+                              {ocrProcessing ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                  OCR 처리 중...
+                                </>
+                              ) : (
+                                <>
+                                  <Edit3 className="w-4 h-4 mr-2" />
+                                  📝 텍스트 추출 및 편집 (OCR)
+                                </>
+                              )}
                             </Button>
                           </div>
                         )}
