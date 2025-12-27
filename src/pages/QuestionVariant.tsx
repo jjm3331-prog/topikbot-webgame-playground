@@ -130,6 +130,20 @@ export default function QuestionVariant() {
       return;
     }
 
+    // 사용자 언어에 따른 레이블 설정
+    const langLabels: Record<string, { flag: string; name: string }> = {
+      ko: { flag: "🇰🇷", name: "한국어" },
+      vi: { flag: "🇻🇳", name: "Tiếng Việt" },
+      en: { flag: "🇺🇸", name: "English" },
+      ja: { flag: "🇯🇵", name: "日本語" },
+      zh: { flag: "🇨🇳", name: "中文" },
+      ru: { flag: "🇷🇺", name: "Русский" },
+      uz: { flag: "🇺🇿", name: "O'zbek" },
+    };
+    
+    const userLangLabel = langLabels[userLang] || langLabels.vi;
+    const showUserLangColumn = userLang !== "ko";
+
     try {
       const printContent = `
         <!DOCTYPE html>
@@ -155,14 +169,16 @@ export default function QuestionVariant() {
             .section-4 .section-title { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
             .section-5 .section-title { background: linear-gradient(135deg, #ec4899, #be185d); }
             .section-6 .section-title { background: linear-gradient(135deg, #06b6d4, #0891b2); }
-            .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+            .content-grid { display: grid; grid-template-columns: ${showUserLangColumn ? '1fr 1fr' : '1fr'}; gap: 20px; }
             .lang-block { padding: 15px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; }
             .lang-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid; }
             .lang-ko .lang-label { color: #3b82f6; border-color: #3b82f6; }
-            .lang-vi .lang-label { color: #10b981; border-color: #10b981; }
+            .lang-user .lang-label { color: #10b981; border-color: #10b981; }
             .lang-content { font-size: 13px; line-height: 1.8; white-space: pre-wrap; }
             .similar-questions { margin-top: 20px; }
             .similar-item { padding: 12px; margin-bottom: 10px; background: #f1f5f9; border-radius: 8px; border-left: 4px solid #06b6d4; }
+            .similar-ko { font-weight: 600; color: #1a1a1a; }
+            .similar-user { color: #64748b; margin-top: 4px; font-size: 12px; }
             .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #999; }
             @media print { body { padding: 20px; } .section { break-inside: avoid; } }
           </style>
@@ -188,10 +204,12 @@ export default function QuestionVariant() {
                     <div class="lang-label">🇰🇷 한국어</div>
                     <div class="lang-content">${generatedContent.originalAnalysis.ko || '-'}</div>
                   </div>
-                  <div class="lang-block lang-vi">
-                    <div class="lang-label">🇻🇳 ${t("questionVariant.pdf.translation")}</div>
-                    <div class="lang-content">${generatedContent.originalAnalysis.vi || '-'}</div>
-                  </div>
+                  ${showUserLangColumn ? `
+                    <div class="lang-block lang-user">
+                      <div class="lang-label">${userLangLabel.flag} ${userLangLabel.name}</div>
+                      <div class="lang-content">${generatedContent.originalAnalysis[userLang] || '-'}</div>
+                    </div>
+                  ` : ''}
                 </div>
               </div>
             ` : ''}
@@ -204,10 +222,12 @@ export default function QuestionVariant() {
                     <div class="lang-label">🇰🇷 한국어</div>
                     <div class="lang-content">${generatedContent.variantQuestion.ko || '-'}</div>
                   </div>
-                  <div class="lang-block lang-vi">
-                    <div class="lang-label">🇻🇳 ${t("questionVariant.pdf.translation")}</div>
-                    <div class="lang-content">${generatedContent.variantQuestion.vi || '-'}</div>
-                  </div>
+                  ${showUserLangColumn ? `
+                    <div class="lang-block lang-user">
+                      <div class="lang-label">${userLangLabel.flag} ${userLangLabel.name}</div>
+                      <div class="lang-content">${generatedContent.variantQuestion[userLang] || '-'}</div>
+                    </div>
+                  ` : ''}
                 </div>
               </div>
             ` : ''}
@@ -220,10 +240,12 @@ export default function QuestionVariant() {
                     <div class="lang-label">🇰🇷 한국어</div>
                     <div class="lang-content">${generatedContent.answer.ko || '-'}</div>
                   </div>
-                  <div class="lang-block lang-vi">
-                    <div class="lang-label">🇻🇳 ${t("questionVariant.pdf.translation")}</div>
-                    <div class="lang-content">${generatedContent.answer.vi || '-'}</div>
-                  </div>
+                  ${showUserLangColumn ? `
+                    <div class="lang-block lang-user">
+                      <div class="lang-label">${userLangLabel.flag} ${userLangLabel.name}</div>
+                      <div class="lang-content">${generatedContent.answer[userLang] || '-'}</div>
+                    </div>
+                  ` : ''}
                 </div>
               </div>
             ` : ''}
@@ -236,10 +258,12 @@ export default function QuestionVariant() {
                     <div class="lang-label">🇰🇷 한국어</div>
                     <div class="lang-content">${generatedContent.explanation.ko || '-'}</div>
                   </div>
-                  <div class="lang-block lang-vi">
-                    <div class="lang-label">🇻🇳 ${t("questionVariant.pdf.translation")}</div>
-                    <div class="lang-content">${generatedContent.explanation.vi || '-'}</div>
-                  </div>
+                  ${showUserLangColumn ? `
+                    <div class="lang-block lang-user">
+                      <div class="lang-label">${userLangLabel.flag} ${userLangLabel.name}</div>
+                      <div class="lang-content">${generatedContent.explanation[userLang] || '-'}</div>
+                    </div>
+                  ` : ''}
                 </div>
               </div>
             ` : ''}
@@ -252,10 +276,12 @@ export default function QuestionVariant() {
                     <div class="lang-label">🇰🇷 한국어</div>
                     <div class="lang-content">${generatedContent.learningPoints.ko || '-'}</div>
                   </div>
-                  <div class="lang-block lang-vi">
-                    <div class="lang-label">🇻🇳 ${t("questionVariant.pdf.translation")}</div>
-                    <div class="lang-content">${generatedContent.learningPoints.vi || '-'}</div>
-                  </div>
+                  ${showUserLangColumn ? `
+                    <div class="lang-block lang-user">
+                      <div class="lang-label">${userLangLabel.flag} ${userLangLabel.name}</div>
+                      <div class="lang-content">${generatedContent.learningPoints[userLang] || '-'}</div>
+                    </div>
+                  ` : ''}
                 </div>
               </div>
             ` : ''}
@@ -266,9 +292,11 @@ export default function QuestionVariant() {
                 <div class="similar-questions">
                   ${generatedContent.similarQuestions.map((q, i) => `
                     <div class="similar-item">
-                      <strong>${i + 1}. ${q.type?.ko || q.type?.vi || ''}</strong>
-                      <p style="margin-top: 8px; color: #64748b;">${q.description?.ko || q.description?.vi || ''}</p>
-                      ${q.examReference ? `<p style="margin-top: 4px; color: #0891b2; font-size: 12px;">📖 ${q.examReference}</p>` : ''}
+                      <div class="similar-ko"><strong>${i + 1}. 🇰🇷 ${q.type?.ko || ''}</strong></div>
+                      ${showUserLangColumn && q.type?.[userLang] ? `<div class="similar-user">${userLangLabel.flag} ${q.type[userLang]}</div>` : ''}
+                      <p style="margin-top: 8px; color: #1a1a1a;">🇰🇷 ${q.description?.ko || ''}</p>
+                      ${showUserLangColumn && q.description?.[userLang] ? `<p style="margin-top: 4px; color: #64748b; font-size: 12px;">${userLangLabel.flag} ${q.description[userLang]}</p>` : ''}
+                      ${q.examReference ? `<p style="margin-top: 8px; color: #0891b2; font-size: 12px;">📖 ${q.examReference}</p>` : ''}
                     </div>
                   `).join('')}
                 </div>
