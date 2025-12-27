@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import i18n from "i18next";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import StickyCTA from "@/components/StickyCTA";
@@ -180,6 +181,15 @@ const Landing = () => {
   const coreFeatures = getCoreFeatures(t);
   const gameModes = getGameModes(t);
   const comparisonFeatures = getComparisonFeatures(t);
+
+  // Dynamic pricing based on language
+  const displayPrice = useMemo(() => {
+    const lang = i18n.language;
+    if (lang === "vi") {
+      return "299.000₫";
+    }
+    return "$12";
+  }, [i18n.language]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -868,7 +878,7 @@ const Landing = () => {
               </div>
               <div className="pt-2">
                 <h3 className="font-bold text-base sm:text-lg text-foreground">Premium</h3>
-                <div className="text-2xl sm:text-3xl font-black text-gradient-primary my-2">$9.99</div>
+                <div className="text-2xl sm:text-3xl font-black text-gradient-primary my-2">{displayPrice}</div>
                 <p className="text-muted-foreground text-xs sm:text-sm mb-4">/{t("landing.pricing.month")}</p>
               </div>
               <Button size="sm" className="w-full text-sm rounded-lg btn-primary text-primary-foreground" onClick={() => navigate("/pricing")}>
