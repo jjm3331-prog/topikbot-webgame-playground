@@ -659,3 +659,390 @@ export async function generateWritingCorrectionPDF(options: WritingPDFOptions): 
   generator.generate(options.result);
   doc.save(filename);
 }
+
+// ========================
+// Company Report PDF Generator
+// ========================
+
+export interface CompanyReportPDFOptions {
+  companyName: string;
+  report: string;
+  citations: string[];
+  language: string;
+  filename?: string;
+}
+
+const companyReportLabels: Record<string, Record<string, string>> = {
+  ko: {
+    title: "기업 분석 리포트",
+    subtitle: "LUKATO AI 심층 분석",
+    companyName: "분석 기업",
+    generatedAt: "생성일시",
+    page: "페이지",
+    citations: "참고 자료",
+  },
+  vi: {
+    title: "Báo cáo phân tích doanh nghiệp",
+    subtitle: "Phân tích chuyên sâu bởi LUKATO AI",
+    companyName: "Công ty",
+    generatedAt: "Ngày tạo",
+    page: "Trang",
+    citations: "Nguồn tham khảo",
+  },
+  en: {
+    title: "Company Analysis Report",
+    subtitle: "In-depth Analysis by LUKATO AI",
+    companyName: "Company",
+    generatedAt: "Generated",
+    page: "Page",
+    citations: "References",
+  },
+  ja: {
+    title: "企業分析レポート",
+    subtitle: "LUKATO AI 詳細分析",
+    companyName: "企業名",
+    generatedAt: "作成日",
+    page: "ページ",
+    citations: "参考資料",
+  },
+  zh: {
+    title: "企业分析报告",
+    subtitle: "LUKATO AI 深度分析",
+    companyName: "公司名称",
+    generatedAt: "生成日期",
+    page: "页码",
+    citations: "参考资料",
+  },
+  ru: {
+    title: "Отчёт по анализу компании",
+    subtitle: "Глубокий анализ от LUKATO AI",
+    companyName: "Компания",
+    generatedAt: "Дата создания",
+    page: "Страница",
+    citations: "Источники",
+  },
+  uz: {
+    title: "Kompaniya tahlili hisoboti",
+    subtitle: "LUKATO AI chuqur tahlili",
+    companyName: "Kompaniya",
+    generatedAt: "Yaratilgan",
+    page: "Sahifa",
+    citations: "Manbalar",
+  },
+};
+
+function getCompanyReportLabel(lang: string, key: string): string {
+  const baseLang = (lang || "en").split("-")[0];
+  return companyReportLabels[baseLang]?.[key] ?? companyReportLabels.en[key] ?? key;
+}
+
+class CompanyReportPDFGenerator {
+  private doc: jsPDF;
+  private pageWidth: number;
+  private pageHeight: number;
+  private margin: number;
+  private contentWidth: number;
+  private y: number;
+  private pageNum: number;
+  private lang: string;
+  private lineHeight: number;
+
+  constructor(doc: jsPDF, lang: string) {
+    this.doc = doc;
+    this.pageWidth = this.doc.internal.pageSize.getWidth();
+    this.pageHeight = this.doc.internal.pageSize.getHeight();
+    this.margin = 18;
+    this.contentWidth = this.pageWidth - this.margin * 2;
+    this.y = this.margin;
+    this.pageNum = 1;
+    this.lang = lang;
+    this.lineHeight = 6.5;
+  }
+
+  private setColor(color: { r: number; g: number; b: number }) {
+    this.doc.setTextColor(color.r, color.g, color.b);
+  }
+
+  private setFillColor(color: { r: number; g: number; b: number }) {
+    this.doc.setFillColor(color.r, color.g, color.b);
+  }
+
+  private checkPage(needed: number) {
+    if (this.y + needed > this.pageHeight - this.margin - 15) {
+      this.addPage();
+    }
+  }
+
+  private addPage() {
+    this.doc.addPage();
+    this.pageNum++;
+    this.y = this.margin;
+    this.drawBackground();
+    this.drawPageNumber();
+  }
+
+  private drawBackground() {
+    this.setFillColor(COLORS.bg);
+    this.doc.rect(0, 0, this.pageWidth, this.pageHeight, "F");
+  }
+
+  private drawPageNumber() {
+    this.doc.setFontSize(10);
+    this.setColor(COLORS.muted);
+    const text = `${getCompanyReportLabel(this.lang, "page")} ${this.pageNum}`;
+    this.doc.text(text, this.pageWidth - this.margin, this.pageHeight - 10, { align: "right" });
+  }
+
+  private roundedRect(x: number, y: number, w: number, h: number, r: number, style: "F" | "S" | "FD" = "F") {
+    this.doc.roundedRect(x, y, w, h, r, r, style);
+  }
+
+  private drawHeader(companyName: string, dateStr: string) {
+    const headerHeight = 38;
+
+    // Header background with gradient effect
+    this.setFillColor({ r: 235, g: 241, b: 255 });
+    this.roundedRect(this.margin, this.y, this.contentWidth, headerHeight, 5, "F");
+
+    // Title
+    this.doc.setFontSize(22);
+    this.setColor(COLORS.text);
+    this.doc.text(getCompanyReportLabel(this.lang, "title"), this.margin + 12, this.y + 15);
+
+    // Subtitle
+    this.doc.setFontSize(11);
+    this.setColor(COLORS.muted);
+    this.doc.text(getCompanyReportLabel(this.lang, "subtitle"), this.margin + 12, this.y + 24);
+
+    // Company name badge
+    this.doc.setFontSize(12);
+    this.setColor(COLORS.primary);
+    this.doc.text(`${getCompanyReportLabel(this.lang, "companyName")}: ${companyName}`, this.margin + 12, this.y + 33);
+
+    // Date
+    this.doc.setFontSize(10);
+    this.setColor(COLORS.muted);
+    this.doc.text(dateStr, this.pageWidth - this.margin - 12, this.y + 15, { align: "right" });
+
+    this.y += headerHeight + 12;
+  }
+
+  private parseMarkdownToBlocks(markdown: string): Array<{ type: string; content: string; level?: number }> {
+    const blocks: Array<{ type: string; content: string; level?: number }> = [];
+    const lines = markdown.split("\n");
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+
+      // Headers
+      const h1Match = line.match(/^#\s+(.+)$/);
+      const h2Match = line.match(/^##\s+(.+)$/);
+      const h3Match = line.match(/^###\s+(.+)$/);
+
+      if (h1Match) {
+        blocks.push({ type: "h1", content: cleanText(h1Match[1]) });
+      } else if (h2Match) {
+        blocks.push({ type: "h2", content: cleanText(h2Match[1]) });
+      } else if (h3Match) {
+        blocks.push({ type: "h3", content: cleanText(h3Match[1]) });
+      } else if (line.startsWith("- ") || line.startsWith("* ")) {
+        blocks.push({ type: "bullet", content: cleanText(line.substring(2)) });
+      } else if (/^\d+\.\s/.test(line)) {
+        blocks.push({ type: "numbered", content: cleanText(line.replace(/^\d+\.\s/, "")) });
+      } else if (line.startsWith(">")) {
+        blocks.push({ type: "quote", content: cleanText(line.substring(1).trim()) });
+      } else if (line.startsWith("|")) {
+        // Table row - skip for now, parse separately
+        continue;
+      } else {
+        blocks.push({ type: "paragraph", content: cleanText(line) });
+      }
+    }
+
+    return blocks;
+  }
+
+  private drawContent(markdown: string) {
+    const blocks = this.parseMarkdownToBlocks(markdown);
+
+    for (const block of blocks) {
+      switch (block.type) {
+        case "h1":
+          this.checkPage(20);
+          this.y += 8;
+          this.doc.setFontSize(18);
+          this.setColor(COLORS.primary);
+          const h1Lines = this.doc.splitTextToSize(block.content, this.contentWidth);
+          h1Lines.forEach((line: string) => {
+            this.doc.text(line, this.margin, this.y);
+            this.y += 8;
+          });
+          this.y += 4;
+          break;
+
+        case "h2":
+          this.checkPage(18);
+          this.y += 6;
+          this.doc.setFontSize(15);
+          this.setColor(COLORS.accent);
+          const h2Lines = this.doc.splitTextToSize(block.content, this.contentWidth);
+          h2Lines.forEach((line: string) => {
+            this.doc.text(line, this.margin, this.y);
+            this.y += 7;
+          });
+          this.y += 3;
+          break;
+
+        case "h3":
+          this.checkPage(15);
+          this.y += 4;
+          this.doc.setFontSize(13);
+          this.setColor(COLORS.text);
+          const h3Lines = this.doc.splitTextToSize(block.content, this.contentWidth);
+          h3Lines.forEach((line: string) => {
+            this.doc.text(line, this.margin, this.y);
+            this.y += 6;
+          });
+          this.y += 2;
+          break;
+
+        case "bullet":
+          this.checkPage(12);
+          this.doc.setFontSize(11);
+          this.setColor(COLORS.text);
+
+          // Bullet point
+          this.setFillColor(COLORS.primary);
+          this.doc.circle(this.margin + 3, this.y - 1.5, 1.2, "F");
+
+          const bulletLines = this.doc.splitTextToSize(block.content, this.contentWidth - 12);
+          bulletLines.forEach((line: string, idx: number) => {
+            this.doc.text(line, this.margin + 8, this.y);
+            this.y += this.lineHeight;
+            if (idx < bulletLines.length - 1) {
+              this.checkPage(this.lineHeight);
+            }
+          });
+          this.y += 2;
+          break;
+
+        case "numbered":
+          this.checkPage(12);
+          this.doc.setFontSize(11);
+          this.setColor(COLORS.text);
+          const numLines = this.doc.splitTextToSize(block.content, this.contentWidth - 12);
+          numLines.forEach((line: string, idx: number) => {
+            this.doc.text(line, this.margin + 8, this.y);
+            this.y += this.lineHeight;
+            if (idx < numLines.length - 1) {
+              this.checkPage(this.lineHeight);
+            }
+          });
+          this.y += 2;
+          break;
+
+        case "quote":
+          this.checkPage(15);
+          this.setFillColor({ r: 240, g: 245, b: 255 });
+          const quoteLines = this.doc.splitTextToSize(block.content, this.contentWidth - 20);
+          const quoteHeight = quoteLines.length * this.lineHeight + 8;
+          this.roundedRect(this.margin, this.y - 4, this.contentWidth, quoteHeight, 3, "F");
+          
+          // Left accent bar
+          this.setFillColor(COLORS.primary);
+          this.doc.rect(this.margin, this.y - 4, 3, quoteHeight, "F");
+          
+          this.doc.setFontSize(11);
+          this.setColor(COLORS.muted);
+          quoteLines.forEach((line: string) => {
+            this.doc.text(line, this.margin + 10, this.y + 2);
+            this.y += this.lineHeight;
+          });
+          this.y += 6;
+          break;
+
+        case "paragraph":
+        default:
+          this.checkPage(12);
+          this.doc.setFontSize(11);
+          this.setColor(COLORS.text);
+          const pLines = this.doc.splitTextToSize(block.content, this.contentWidth);
+          pLines.forEach((line: string, idx: number) => {
+            this.doc.text(line, this.margin, this.y);
+            this.y += this.lineHeight;
+            if (idx < pLines.length - 1) {
+              this.checkPage(this.lineHeight);
+            }
+          });
+          this.y += 4;
+          break;
+      }
+    }
+  }
+
+  private drawCitations(citations: string[]) {
+    if (!citations || citations.length === 0) return;
+
+    this.checkPage(30);
+    this.y += 10;
+
+    // Section header
+    this.doc.setFontSize(14);
+    this.setColor(COLORS.text);
+    this.doc.text(getCompanyReportLabel(this.lang, "citations"), this.margin, this.y);
+    this.y += 10;
+
+    // Citations list
+    this.doc.setFontSize(9);
+    citations.forEach((url, idx) => {
+      this.checkPage(8);
+      this.setColor(COLORS.primary);
+      const citationText = `[${idx + 1}] ${url}`;
+      const lines = this.doc.splitTextToSize(citationText, this.contentWidth);
+      lines.forEach((line: string) => {
+        this.doc.text(line, this.margin, this.y);
+        this.y += 5;
+      });
+      this.y += 2;
+    });
+  }
+
+  private drawFooter() {
+    this.doc.setFontSize(9);
+    this.setColor(COLORS.muted);
+    this.doc.text("LUKATO AI • topikbot.kr", this.pageWidth / 2, this.pageHeight - 10, { align: "center" });
+  }
+
+  public generate(companyName: string, report: string, citations: string[]): jsPDF {
+    this.drawBackground();
+    this.drawPageNumber();
+
+    const now = new Date();
+    const dateStr = `${getCompanyReportLabel(this.lang, "generatedAt")}: ${now.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    })}`;
+
+    this.drawHeader(companyName, dateStr);
+    this.drawContent(report);
+    this.drawCitations(citations);
+    this.drawFooter();
+
+    return this.doc;
+  }
+}
+
+export async function generateCompanyReportPDF(options: CompanyReportPDFOptions): Promise<void> {
+  const lang = (options.language || "en").split("-")[0];
+  const safeCompanyName = options.companyName.replace(/[^a-zA-Z0-9가-힣\s]/g, "").substring(0, 30);
+  const filename = options.filename || `${safeCompanyName}_Report_${Date.now()}.pdf`;
+
+  const doc = new jsPDF("p", "mm", "a4");
+  await embedUnicodeFont(doc);
+
+  const generator = new CompanyReportPDFGenerator(doc, lang);
+  generator.generate(options.companyName, options.report, options.citations);
+  doc.save(filename);
+}
