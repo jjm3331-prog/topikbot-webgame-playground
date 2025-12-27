@@ -1,4 +1,10 @@
 {
+  "notifications": {
+    "title": "Bildirishnomalar",
+    "markAllRead": "Hammasini o'qilgan deb belgilash",
+    "empty": "Bildirishnomalar yo'q",
+    "showingCount": "So'nggi {{count}} ta bildirishnoma ko'rsatilmoqda"
+  },
   "common": {
     "login": "Kirish",
     "logout": "Chiqish",

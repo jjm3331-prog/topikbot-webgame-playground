@@ -1,4 +1,10 @@
 {
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "empty": "No notifications",
+    "showingCount": "Showing {{count}} recent notifications"
+  },
   "common": {
     "login": "Login",
     "logout": "Logout",

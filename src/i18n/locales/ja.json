@@ -1,4 +1,10 @@
 {
+  "notifications": {
+    "title": "通知",
+    "markAllRead": "すべて既読にする",
+    "empty": "通知はありません",
+    "showingCount": "最近の{{count}}件の通知を表示"
+  },
   "common": {
     "login": "ログイン",
     "logout": "ログアウト",

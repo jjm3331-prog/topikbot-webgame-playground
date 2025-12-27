@@ -1,4 +1,10 @@
 {
+  "notifications": {
+    "title": "Thông báo",
+    "markAllRead": "Đánh dấu đã đọc",
+    "empty": "Chưa có thông báo nào",
+    "showingCount": "Hiển thị {{count}} thông báo gần nhất"
+  },
   "common": {
     "login": "Đăng nhập",
     "logout": "Đăng xuất",
