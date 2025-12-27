@@ -131,6 +131,32 @@ export default function BoardWrite() {
     setAttachments(attachments.filter((_, i) => i !== index));
   };
 
+  const handlePaste = async (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    const imageItems = Array.from(items).filter(item => item.type.startsWith('image/'));
+    if (imageItems.length === 0) return;
+
+    e.preventDefault();
+
+    for (const item of imageItems) {
+      const file = item.getAsFile();
+      if (!file) continue;
+
+      if (attachments.length + 1 > 5) {
+        toast({ title: t("boardWrite.maxAttachments") });
+        return;
+      }
+
+      // Generate a unique filename
+      const ext = file.type.split('/')[1] || 'png';
+      const newFile = new File([file], `pasted_image_${Date.now()}.${ext}`, { type: file.type });
+      setAttachments(prev => [...prev, newFile]);
+      toast({ title: t("boardWrite.imagePasted") || "이미지가 추가되었습니다" });
+    }
+  };
+
   const uploadAttachments = async (): Promise<string[]> => {
     const urls: string[] = [...existingAttachments];
     
@@ -309,9 +335,13 @@ export default function BoardWrite() {
                   placeholder={t("boardWrite.contentPlaceholder")}
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
+                  onPaste={handlePaste}
                   rows={12}
                   className="font-mono text-sm"
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {t("boardWrite.pasteHint") || "💡 Ctrl+V로 이미지를 직접 붙여넣을 수 있습니다"}
+                </p>
               </div>
 
               {/* YouTube URLs */}
