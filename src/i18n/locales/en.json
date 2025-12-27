@@ -1415,6 +1415,7 @@
     "pleaseLoginToReport": "Please login to report.",
     "adminOnly": "Admin Only",
     "adminOnlyNotice": "Only admins can post notices.",
+    "adminOnlyPodcast": "Only admins can upload podcasts.",
     "anonymous": "Anonymous",
     "user": "User",
     "back": "Back",
@@ -1478,6 +1479,7 @@
   "boardWrite": {
     "pleaseLogin": "Please login",
     "adminOnlyNotice": "Only admins can post notices",
+    "adminOnlyPodcast": "Only admins can upload podcasts",
     "error": "Error",
     "loadError": "Failed to load post",
     "saveError": "Failed to save post",
