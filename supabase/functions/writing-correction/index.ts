@@ -395,12 +395,27 @@ serve(async (req) => {
     const result = JSON.parse(jsonMatch[0]);
 
     // Validate and provide defaults
+    const grammarScore = Math.min(25, Math.max(0, result.grammar_score || 0));
+    const vocabularyScore = Math.min(25, Math.max(0, result.vocabulary_score || 0));
+    const structureScore = Math.min(25, Math.max(0, result.structure_score || 0));
+    const contentScore = Math.min(25, Math.max(0, result.content_score || 0));
+    
+    // ⚠️ CRITICAL: overall_score MUST be the sum of the four individual scores
+    // AI sometimes returns inconsistent values, so we calculate it ourselves
+    const calculatedOverallScore = grammarScore + vocabularyScore + structureScore + contentScore;
+    
+    console.log(`Score validation: grammar=${grammarScore}, vocabulary=${vocabularyScore}, structure=${structureScore}, content=${contentScore}, calculated_total=${calculatedOverallScore}, ai_reported=${result.overall_score}`);
+    
+    if (result.overall_score && Math.abs(result.overall_score - calculatedOverallScore) > 1) {
+      console.warn(`⚠️ SCORE MISMATCH: AI reported ${result.overall_score} but sum is ${calculatedOverallScore}. Using calculated value.`);
+    }
+    
     const validatedResult = {
-      overall_score: result.overall_score || 0,
-      grammar_score: result.grammar_score || 0,
-      vocabulary_score: result.vocabulary_score || 0,
-      structure_score: result.structure_score || 0,
-      content_score: result.content_score || 0,
+      overall_score: calculatedOverallScore, // Always use calculated sum, never trust AI's overall_score
+      grammar_score: grammarScore,
+      vocabulary_score: vocabularyScore,
+      structure_score: structureScore,
+      content_score: contentScore,
       corrections: result.corrections || [],
       strengths: result.strengths || [],
       improvements: result.improvements || [],
