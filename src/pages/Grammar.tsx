@@ -41,6 +41,23 @@ function BilingualText({
   );
 }
 
+function LocalizedText({
+  vi,
+  ko,
+  className,
+}: {
+  vi: string;
+  ko: string;
+  className?: string;
+}) {
+  const { i18n } = useTranslation();
+  const lang = (i18n.language || "ko").split("-")[0];
+
+  if (lang === "vi") return <div className={className}>{vi || ko}</div>;
+  // default: show Korean only (prevents Vietnamese leaking into Korean/other UIs)
+  return <div className={className}>{ko || vi}</div>;
+}
+
 // Custom Level Selector for Grammar
 function GrammarLevelSelector({ value, onChange }: { value: TopikLevel; onChange: (v: TopikLevel) => void }) {
   const { t } = useTranslation();
