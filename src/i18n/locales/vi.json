@@ -1664,5 +1664,42 @@
     "cancel": "Hủy",
     "update": "Cập nhật",
     "submit": "Đăng bài"
+  },
+  "boardHub": {
+    "back": "Quay lại",
+    "title": "Cộng đồng",
+    "subtitle": "Diễn đàn giao lưu & chia sẻ",
+    "stats": {
+      "categories": "4 chuyên mục",
+      "realtime": "Realtime",
+      "upload": "Upload tệp & video"
+    },
+    "badges": {
+      "new": "NEW",
+      "official": "Official"
+    },
+    "viewNow": "Xem ngay",
+    "boards": {
+      "notice": {
+        "title": "Thông báo",
+        "subtitle": "공지사항",
+        "description": "Thông báo quan trọng từ quản trị viên về cập nhật, sự kiện và tin tức!"
+      },
+      "free": {
+        "title": "Tự do trao đổi",
+        "subtitle": "자유게시판",
+        "description": "Chia sẻ kinh nghiệm, hỏi đáp và giao lưu với cộng đồng học viên!"
+      },
+      "resource": {
+        "title": "Tài liệu học tập",
+        "subtitle": "학습자료실",
+        "description": "Chia sẻ tài liệu, video và nguồn học tập TOPIK hữu ích!"
+      },
+      "anonymous": {
+        "title": "Ẩn danh",
+        "subtitle": "익명게시판",
+        "description": "Chia sẻ ý kiến và câu hỏi một cách ẩn danh, thoải mái!"
+      }
+    }
   }
 }

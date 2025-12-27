@@ -1255,5 +1255,42 @@
     "cancel": "Bekor qilish",
     "update": "Yangilash",
     "submit": "Joylash"
+  },
+  "boardHub": {
+    "back": "Orqaga",
+    "title": "Jamiyat",
+    "subtitle": "Muhokama va almashish forumi",
+    "stats": {
+      "categories": "4 ta kategoriya",
+      "realtime": "Realtime",
+      "upload": "Fayl va video yuklash"
+    },
+    "badges": {
+      "new": "NEW",
+      "official": "Official"
+    },
+    "viewNow": "Hozir ko'rish",
+    "boards": {
+      "notice": {
+        "title": "E'lonlar",
+        "subtitle": "공지사항",
+        "description": "Adminlardan muhim e'lonlar! Yangilanishlar, tadbirlar va yangiliklarni tekshiring!"
+      },
+      "free": {
+        "title": "Erkin",
+        "subtitle": "자유게시판",
+        "description": "Tajribalarni baham ko'ring, savol bering va o'quvchilar jamoasi bilan muloqot qiling!"
+      },
+      "resource": {
+        "title": "Resurslar",
+        "subtitle": "학습자료실",
+        "description": "Foydali TOPIK materiallarini, videolarni va o'quv resurslarini baham ko'ring!"
+      },
+      "anonymous": {
+        "title": "Anonim",
+        "subtitle": "익명게시판",
+        "description": "Fikr va savollarni anonim va erkin baham ko'ring!"
+      }
+    }
   }
 }
