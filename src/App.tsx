@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -158,60 +159,60 @@ const App = () => {
           <BrowserRouter>
             <HashDeepLinkBridge />
             <Routes>
+              {/* Public routes - no login required */}
               <Route path="/" element={<Landing />} />
               <Route path="/auth" element={<Auth />} />
-
-              {/* Pages are viewable for everyone (Premium is handled in-page / on actions) */}
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/korea-career" element={<KoreaCareer />} />
-              <Route path="/headhunting" element={<Headhunting />} />
-              <Route path="/company-report" element={<CompanyReport />} />
-              <Route path="/interview-simulation" element={<InterviewSimulation />} />
-              <Route path="/writing-correction" element={<WritingCorrection />} />
-
-              {/* Free Routes */}
-              <Route path="/game" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/chat" element={<Chat />} />
-              <Route path="/wordchain" element={<WordChain />} />
-
-              <Route path="/quiz" element={<Quiz />} />
-              <Route path="/parttime" element={<PartTime />} />
-              <Route path="/bankruptcy" element={<BankruptcyRecovery />} />
-              <Route path="/dating" element={<Dating />} />
-              <Route path="/kdrama" element={<KDrama />} />
-              <Route path="/kpop" element={<KPop />} />
-              <Route path="/tutorial" element={<Tutorial />} />
-              <Route path="/pwa-guide" element={<PWAGuide />} />
-              <Route path="/manager" element={<Manager />} />
-              <Route path="/ai-tutor" element={<AITutor />} />
-              <Route path="/ai-chat" element={<AIChat />} />
-              <Route path="/ai-chat/:agentId" element={<AIAgentChat />} />
-              <Route path="/lesson/:lessonId" element={<Lesson />} />
-              <Route path="/lesson-menu" element={<LessonMenu />} />
-              <Route path="/handwriting" element={<HandwritingPractice />} />
-              <Route path="/listening" element={<ListeningPractice />} />
-              <Route path="/reading-a" element={<ReadingA />} />
-              <Route path="/reading-b" element={<ReadingB />} />
-              <Route path="/vocabulary" element={<Vocabulary />} />
-              <Route path="/grammar" element={<Grammar />} />
-              <Route path="/learning-hub" element={<LearningHub />} />
-              <Route path="/game-hub" element={<GameHub />} />
-              <Route path="/battle" element={<Battle />} />
-              <Route path="/question-variant" element={<QuestionVariant />} />
-              <Route path="/roleplay-speaking" element={<RoleplaySpeaking />} />
               <Route path="/pricing" element={<Pricing />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/ranking" element={<Ranking />} />
-              <Route path="/points-system" element={<PointsSystem />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/help-center" element={<HelpCenter />} />
-              <Route path="/board-hub" element={<BoardHub />} />
-              <Route path="/board/:boardType" element={<Board />} />
-              <Route path="/board/:boardType/:postId" element={<BoardPost />} />
-              <Route path="/board/:boardType/write" element={<BoardWrite />} />
+              <Route path="/pwa-guide" element={<PWAGuide />} />
+              <Route path="/admin-login" element={<AdminLogin />} />
+              
+              {/* Protected routes - login required */}
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/korea-career" element={<ProtectedRoute><KoreaCareer /></ProtectedRoute>} />
+              <Route path="/headhunting" element={<ProtectedRoute><Headhunting /></ProtectedRoute>} />
+              <Route path="/company-report" element={<ProtectedRoute><CompanyReport /></ProtectedRoute>} />
+              <Route path="/interview-simulation" element={<ProtectedRoute><InterviewSimulation /></ProtectedRoute>} />
+              <Route path="/writing-correction" element={<ProtectedRoute><WritingCorrection /></ProtectedRoute>} />
+
+              <Route path="/game" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+              <Route path="/wordchain" element={<ProtectedRoute><WordChain /></ProtectedRoute>} />
+              <Route path="/quiz" element={<ProtectedRoute><Quiz /></ProtectedRoute>} />
+              <Route path="/parttime" element={<ProtectedRoute><PartTime /></ProtectedRoute>} />
+              <Route path="/bankruptcy" element={<ProtectedRoute><BankruptcyRecovery /></ProtectedRoute>} />
+              <Route path="/dating" element={<ProtectedRoute><Dating /></ProtectedRoute>} />
+              <Route path="/kdrama" element={<ProtectedRoute><KDrama /></ProtectedRoute>} />
+              <Route path="/kpop" element={<ProtectedRoute><KPop /></ProtectedRoute>} />
+              <Route path="/tutorial" element={<ProtectedRoute><Tutorial /></ProtectedRoute>} />
+              <Route path="/manager" element={<ProtectedRoute><Manager /></ProtectedRoute>} />
+              <Route path="/ai-tutor" element={<ProtectedRoute><AITutor /></ProtectedRoute>} />
+              <Route path="/ai-chat" element={<ProtectedRoute><AIChat /></ProtectedRoute>} />
+              <Route path="/ai-chat/:agentId" element={<ProtectedRoute><AIAgentChat /></ProtectedRoute>} />
+              <Route path="/lesson/:lessonId" element={<ProtectedRoute><Lesson /></ProtectedRoute>} />
+              <Route path="/lesson-menu" element={<ProtectedRoute><LessonMenu /></ProtectedRoute>} />
+              <Route path="/handwriting" element={<ProtectedRoute><HandwritingPractice /></ProtectedRoute>} />
+              <Route path="/listening" element={<ProtectedRoute><ListeningPractice /></ProtectedRoute>} />
+              <Route path="/reading-a" element={<ProtectedRoute><ReadingA /></ProtectedRoute>} />
+              <Route path="/reading-b" element={<ProtectedRoute><ReadingB /></ProtectedRoute>} />
+              <Route path="/vocabulary" element={<ProtectedRoute><Vocabulary /></ProtectedRoute>} />
+              <Route path="/grammar" element={<ProtectedRoute><Grammar /></ProtectedRoute>} />
+              <Route path="/learning-hub" element={<ProtectedRoute><LearningHub /></ProtectedRoute>} />
+              <Route path="/game-hub" element={<ProtectedRoute><GameHub /></ProtectedRoute>} />
+              <Route path="/battle" element={<ProtectedRoute><Battle /></ProtectedRoute>} />
+              <Route path="/question-variant" element={<ProtectedRoute><QuestionVariant /></ProtectedRoute>} />
+              <Route path="/roleplay-speaking" element={<ProtectedRoute><RoleplaySpeaking /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
+              <Route path="/points-system" element={<ProtectedRoute><PointsSystem /></ProtectedRoute>} />
+              <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+              <Route path="/board-hub" element={<ProtectedRoute><BoardHub /></ProtectedRoute>} />
+              <Route path="/board/:boardType" element={<ProtectedRoute><Board /></ProtectedRoute>} />
+              <Route path="/board/:boardType/:postId" element={<ProtectedRoute><BoardPost /></ProtectedRoute>} />
+              <Route path="/board/:boardType/write" element={<ProtectedRoute><BoardWrite /></ProtectedRoute>} />
+              
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

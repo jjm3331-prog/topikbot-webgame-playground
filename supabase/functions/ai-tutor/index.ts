@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const FREE_DAILY_LIMIT = 30;
+const FREE_DAILY_LIMIT = 10;
 
 type Lang = "ko" | "vi" | "en" | "ja" | "zh" | "ru" | "uz";
 
