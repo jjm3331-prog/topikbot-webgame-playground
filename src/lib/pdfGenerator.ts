@@ -27,14 +27,15 @@ export interface WritingPDFOptions {
 }
 
 const COLORS = {
-  bg: { r: 11, g: 18, b: 32 },
-  card: { r: 17, g: 26, b: 46 },
+  // Printer-friendly light theme
+  bg: { r: 255, g: 255, b: 255 },
+  card: { r: 245, g: 247, b: 252 },
   primary: { r: 45, g: 76, b: 255 },
   accent: { r: 124, g: 58, b: 237 },
-  text: { r: 230, g: 237, b: 247 },
-  muted: { r: 160, g: 170, b: 190 },
-  success: { r: 34, g: 197, b: 94 },
-  error: { r: 239, g: 68, b: 68 },
+  text: { r: 17, g: 24, b: 39 },
+  muted: { r: 75, g: 85, b: 99 },
+  success: { r: 22, g: 163, b: 74 },
+  error: { r: 220, g: 38, b: 38 },
   white: { r: 255, g: 255, b: 255 },
 };
 
@@ -290,7 +291,7 @@ class PDFGenerator {
   }
 
   private drawPageNumber() {
-    this.doc.setFontSize(8);
+    this.doc.setFontSize(10);
     this.setColor(COLORS.muted);
     const text = `${getLabel(this.lang, "page")} ${this.pageNum}`;
     this.doc.text(text, this.pageWidth - this.margin, this.pageHeight - 8, { align: "right" });
@@ -301,57 +302,56 @@ class PDFGenerator {
   }
 
   private drawHeader(title: string, subtitle: string, dateStr: string) {
-    const headerHeight = 28;
-    
-    // Gradient header simulation
-    this.setFillColor(COLORS.primary);
+    const headerHeight = 30;
+
+    // Header background
+    this.setFillColor({ r: 235, g: 241, b: 255 });
     this.roundedRect(this.margin, this.y, this.contentWidth, headerHeight, 4, "F");
-    
-    // Accent overlay (skip GState for compatibility)
-    this.setFillColor({ r: 100, g: 60, b: 220 });
-    this.roundedRect(this.margin + this.contentWidth * 0.6, this.y, this.contentWidth * 0.4, headerHeight, 4, "F");
 
     // Title
-    this.doc.setFontSize(16);
-    this.setColor(COLORS.white);
-    this.doc.text(title, this.margin + 8, this.y + 11);
+    this.doc.setFontSize(20);
+    this.setColor(COLORS.text);
+    this.doc.text(title, this.margin + 8, this.y + 12);
 
     // Subtitle
-    this.doc.setFontSize(9);
-    this.doc.text(subtitle, this.margin + 8, this.y + 19);
+    this.doc.setFontSize(12);
+    this.setColor(COLORS.muted);
+    this.doc.text(subtitle, this.margin + 8, this.y + 21);
 
     // Date
-    this.doc.setFontSize(8);
-    this.doc.text(dateStr, this.pageWidth - this.margin - 8, this.y + 11, { align: "right" });
+    this.doc.setFontSize(10);
+    this.setColor(COLORS.muted);
+    this.doc.text(dateStr, this.pageWidth - this.margin - 8, this.y + 12, { align: "right" });
 
-    this.y += headerHeight + 8;
+    this.y += headerHeight + 10;
   }
 
   private drawOverallScore(score: number) {
-    const cardHeight = 38;
-    const cardWidth = 55;
-    
+    const cardHeight = 42;
+    const cardWidth = 62;
+
     // Card background
     this.setFillColor(COLORS.card);
-    this.roundedRect(this.margin, this.y, cardWidth, cardHeight, 4, "F");
+    this.setDrawColor({ r: 220, g: 225, b: 235 });
+    this.roundedRect(this.margin, this.y, cardWidth, cardHeight, 4, "FD");
 
     // Label
-    this.doc.setFontSize(9);
+    this.doc.setFontSize(11);
     this.setColor(COLORS.muted);
-    this.doc.text(getLabel(this.lang, "overall"), this.margin + 8, this.y + 12);
+    this.doc.text(getLabel(this.lang, "overall"), this.margin + 10, this.y + 14);
 
     // Score
-    this.doc.setFontSize(28);
+    this.doc.setFontSize(34);
     const scoreColor = getScoreColor(score, 100);
     this.setColor(scoreColor);
-    this.doc.text(String(score), this.margin + 8, this.y + 30);
+    this.doc.text(String(score), this.margin + 10, this.y + 34);
 
     // /100
-    this.doc.setFontSize(12);
+    this.doc.setFontSize(14);
     this.setColor(COLORS.muted);
-    this.doc.text("/100", this.margin + 32, this.y + 30);
+    this.doc.text("/100", this.margin + 40, this.y + 34);
 
-    return { endX: this.margin + cardWidth + 6 };
+    return { endX: this.margin + cardWidth + 8 };
   }
 
   private drawGradeBadge(score: number, startX: number) {
@@ -431,49 +431,49 @@ class PDFGenerator {
   private drawSection(title: string, items: string[], bulletColor: { r: number; g: number; b: number }) {
     if (!items || items.length === 0) return;
 
-    this.checkPage(20 + items.length * 8);
+    this.checkPage(26 + items.length * 10);
 
-    // Section card
-    const itemHeight = 7;
-    const padding = 8;
-    const titleHeight = 12;
+    const itemHeight = 8;
+    const padding = 10;
+    const titleHeight = 14;
     const cardHeight = titleHeight + padding + items.length * itemHeight + padding;
 
     this.setFillColor(COLORS.card);
-    this.roundedRect(this.margin, this.y, this.contentWidth, cardHeight, 4, "F");
+    this.setDrawColor({ r: 220, g: 225, b: 235 });
+    this.roundedRect(this.margin, this.y, this.contentWidth, cardHeight, 4, "FD");
 
     // Title
-    this.doc.setFontSize(10);
+    this.doc.setFontSize(12);
     this.setColor(COLORS.text);
-    this.doc.text(title, this.margin + padding, this.y + 10);
+    this.doc.text(title, this.margin + padding, this.y + 12);
 
     // Items
     let itemY = this.y + titleHeight + padding;
-    this.doc.setFontSize(8);
+    this.doc.setFontSize(10.5);
 
-    items.forEach((item, idx) => {
+    items.forEach((item) => {
       const cleanItem = cleanText(item);
       if (!cleanItem) return;
 
       // Bullet
       this.setFillColor(bulletColor);
-      this.doc.circle(this.margin + padding + 2, itemY - 1.5, 1.2, "F");
+      this.doc.circle(this.margin + padding + 2, itemY - 1.8, 1.3, "F");
 
       // Text
       this.setColor(COLORS.text);
-      const lines = this.doc.splitTextToSize(cleanItem, this.contentWidth - padding * 2 - 8);
+      const lines = this.doc.splitTextToSize(cleanItem, this.contentWidth - padding * 2 - 10);
       lines.forEach((line: string, lineIdx: number) => {
         if (lineIdx === 0) {
-          this.doc.text(line, this.margin + padding + 6, itemY);
+          this.doc.text(line, this.margin + padding + 7, itemY);
         } else {
           itemY += itemHeight;
-          this.doc.text(line, this.margin + padding + 6, itemY);
+          this.doc.text(line, this.margin + padding + 7, itemY);
         }
       });
       itemY += itemHeight;
     });
 
-    this.y += cardHeight + 6;
+    this.y += cardHeight + 8;
   }
 
   private drawCorrections(corrections: WritingCorrectionResult["corrections"]) {
@@ -545,41 +545,42 @@ class PDFGenerator {
     const cleanedText = cleanText(text);
     if (!cleanedText) return;
 
-    this.checkPage(30);
+    this.checkPage(40);
 
     // Title
-    this.doc.setFontSize(10);
+    this.doc.setFontSize(12);
     this.setColor(COLORS.text);
-    this.doc.text(title, this.margin, this.y + 4);
-    this.y += 10;
+    this.doc.text(title, this.margin, this.y + 5);
+    this.y += 12;
 
     // Content card
-    const lines = this.doc.splitTextToSize(cleanedText, this.contentWidth - 16);
-    const lineHeight = 5;
-    const cardHeight = Math.min(lines.length * lineHeight + 16, 80);
+    const lines = this.doc.splitTextToSize(cleanedText, this.contentWidth - 20);
+    const lineHeight = 6;
+    const cardHeight = Math.min(lines.length * lineHeight + 20, 110);
 
     this.setFillColor(COLORS.card);
-    this.roundedRect(this.margin, this.y, this.contentWidth, cardHeight, 3, "F");
+    this.setDrawColor({ r: 220, g: 225, b: 235 });
+    this.roundedRect(this.margin, this.y, this.contentWidth, cardHeight, 4, "FD");
 
-    this.doc.setFontSize(8);
+    this.doc.setFontSize(11);
     this.setColor(COLORS.text);
 
-    let textY = this.y + 8;
-    const maxLines = Math.floor((cardHeight - 16) / lineHeight);
+    let textY = this.y + 10;
+    const maxLines = Math.floor((cardHeight - 20) / lineHeight);
     const displayLines = lines.slice(0, maxLines);
 
     displayLines.forEach((line: string) => {
-      this.doc.text(line, this.margin + 8, textY);
+      this.doc.text(line, this.margin + 10, textY);
       textY += lineHeight;
     });
 
     if (lines.length > maxLines) {
-      this.doc.setFontSize(7);
+      this.doc.setFontSize(10);
       this.setColor(COLORS.muted);
-      this.doc.text("...", this.margin + 8, textY);
+      this.doc.text("…", this.margin + 10, textY);
     }
 
-    this.y += cardHeight + 6;
+    this.y += cardHeight + 10;
   }
 
   private drawFooter() {

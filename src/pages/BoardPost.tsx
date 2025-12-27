@@ -47,6 +47,7 @@ import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { autoTranslateText } from "@/lib/autoTranslate";
 import { sanitizeHtml, stripMediaFromHtml, ensureHtmlStructure, cleanTranslationArtifacts } from "@/lib/htmlSanitizer";
+import { translateHtmlPreservingStructure } from "@/lib/structuredHtmlTranslate";
 import { AudioPlayer } from "@/components/board/AudioPlayer";
 import { TranslationDropdown } from "@/components/board/TranslationDropdown";
 import { useTranslationCache } from "@/hooks/useTranslationCache";
@@ -442,30 +443,33 @@ export default function BoardPost() {
 
     setIsTranslating(true);
     try {
-      // Translate title (text) and content (HTML) in parallel
-      const [titleResultRaw, contentResultRaw] = await Promise.all([
+      // Translate title (text) + content (preserve EXACT HTML structure)
+      const [titleResultRaw, contentPreservedRaw] = await Promise.all([
         autoTranslateText({
           text: post.title,
           sourceLanguage,
           targetLanguage,
           format: "text",
         }),
-        autoTranslateText({
-          text: post.content,
+        translateHtmlPreservingStructure({
+          html: post.content,
           sourceLanguage,
           targetLanguage,
-          format: "html",
         }),
       ]);
 
       // Clean translation artifacts
       const titleResult = cleanTranslationArtifacts(titleResultRaw);
-      
-      // Process content: clean artifacts -> ensure structure -> sanitize -> strip media
-      let contentResult = cleanTranslationArtifacts(contentResultRaw);
+
+      // Content pipeline:
+      // 1) we already preserved original tag structure via text-node replacement
+      // 2) ensure there's valid HTML structure
+      // 3) sanitize for safety
+      // 4) strip media to prevent duplicate images/videos inside the translation block
+      let contentResult = cleanTranslationArtifacts(contentPreservedRaw);
       contentResult = ensureHtmlStructure(contentResult);
       contentResult = sanitizeHtml(contentResult);
-      contentResult = stripMediaFromHtml(contentResult); // Avoid duplicating images
+      contentResult = stripMediaFromHtml(contentResult);
 
       // Save to cache
       setCached(targetLanguage, titleResult, contentResult);
