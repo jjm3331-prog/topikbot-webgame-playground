@@ -641,11 +641,9 @@ const Dashboard = () => {
         </div>
 
         {/* AI Floating Button */}
-        <a
-          href="https://chat-topikbot.kr"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="fixed bottom-24 right-4 z-50"
+        <div
+          onClick={() => navigate('/ai-chat')}
+          className="fixed bottom-24 right-4 z-50 cursor-pointer"
         >
           <motion.div
             animate={{ 
@@ -668,7 +666,7 @@ const Dashboard = () => {
           <span className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full text-[8px] font-bold bg-white text-amber-600 shadow-sm">
             AI
           </span>
-        </a>
+        </div>
       </main>
       <AppFooter />
     </div>
