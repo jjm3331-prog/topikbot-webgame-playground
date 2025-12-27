@@ -1714,6 +1714,17 @@
             "scoring": "採点",
             "customQuestions": "カスタム質問"
           }
+        },
+        "practicalGuide": {
+          "title": "実務ガイド",
+          "subtitle": "職場韓国語",
+          "description": "IT業務環境で使われる実践的な韓国語を学びます。",
+          "features": {
+            "itTerms": "IT用語",
+            "meetingSim": "会議シミュレーション",
+            "emailTemplates": "メールテンプレート",
+            "businessKorean": "ビジネス韓国語"
+          }
         }
       }
     },

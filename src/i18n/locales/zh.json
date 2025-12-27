@@ -1571,6 +1571,17 @@
             "scoring": "评分",
             "customQuestions": "定制问题"
           }
+        },
+        "practicalGuide": {
+          "title": "实务指南",
+          "subtitle": "职场韩语",
+          "description": "学习IT工作环境中使用的实用韩语。",
+          "features": {
+            "itTerms": "IT术语",
+            "meetingSim": "会议模拟",
+            "emailTemplates": "邮件模板",
+            "businessKorean": "商务韩语"
+          }
         }
       }
     },
