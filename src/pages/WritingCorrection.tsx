@@ -529,15 +529,15 @@ const WritingCorrection = () => {
     });
 
     try {
-      generateWritingCorrectionPDF({
+      await generateWritingCorrectionPDF({
         result,
         language: i18n.language,
-        t
+        t,
       });
 
       toast({
         title: t("writingPage.pdf.downloadComplete"),
-        description: t("writingPage.pdf.fileDownloaded")
+        description: t("writingPage.pdf.fileDownloaded"),
       });
     } catch (error) {
       console.error('PDF export error:', error);
