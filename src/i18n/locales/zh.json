@@ -1266,7 +1266,14 @@
     "pinDescription": "帖子将显示在列表顶部",
     "cancel": "取消",
     "update": "更新",
-    "submit": "发布"
+    "submit": "发布",
+    "editTab": "编辑",
+    "previewTab": "预览",
+    "previewEmpty": "没有内容可预览",
+    "uploadingImage": "图片上传中...",
+    "imageInserted": "图片已插入",
+    "uploadError": "图片上传失败",
+    "pasteHint": "💡 Ctrl+V直接粘贴图片到内容中"
   },
   "boardHub": {
     "back": "返回",

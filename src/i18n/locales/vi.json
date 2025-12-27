@@ -1675,7 +1675,14 @@
     "pinDescription": "Bài viết sẽ hiển thị ở đầu danh sách",
     "cancel": "Hủy",
     "update": "Cập nhật",
-    "submit": "Đăng bài"
+    "submit": "Đăng bài",
+    "editTab": "Soạn",
+    "previewTab": "Xem trước",
+    "previewEmpty": "Không có nội dung để xem trước",
+    "uploadingImage": "Đang tải ảnh lên...",
+    "imageInserted": "Đã chèn ảnh",
+    "uploadError": "Tải ảnh thất bại",
+    "pasteHint": "💡 Ctrl+V để dán ảnh trực tiếp vào nội dung"
   },
   "boardHub": {
     "back": "Quay lại",

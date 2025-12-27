@@ -13,7 +13,9 @@ import {
   Bold,
   Italic,
   List,
-  Link as LinkIcon
+  Link as LinkIcon,
+  Eye,
+  Edit3
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -21,6 +23,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { supabase } from "@/integrations/supabase/client";
@@ -345,44 +348,66 @@ export default function BoardWrite() {
                 />
               </div>
 
-              {/* Content */}
+              {/* Content with Preview */}
               <div className="space-y-2">
                 <Label htmlFor="content">{t("boardWrite.contentLabel")} *</Label>
-                <div className="flex gap-2 mb-2">
-                  <Button type="button" variant="outline" size="sm" onClick={() => insertFormatting("bold")}>
-                    <Bold className="w-4 h-4" />
-                  </Button>
-                  <Button type="button" variant="outline" size="sm" onClick={() => insertFormatting("italic")}>
-                    <Italic className="w-4 h-4" />
-                  </Button>
-                  <Button type="button" variant="outline" size="sm" onClick={() => insertFormatting("list")}>
-                    <List className="w-4 h-4" />
-                  </Button>
-                  <Button type="button" variant="outline" size="sm" onClick={() => insertFormatting("link")}>
-                    <LinkIcon className="w-4 h-4" />
-                  </Button>
-                </div>
-                <div className="relative">
-                  <Textarea
-                    id="content"
-                    name="content"
-                    placeholder={t("boardWrite.contentPlaceholder")}
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    onPaste={handlePaste}
-                    rows={12}
-                    className="font-mono text-sm"
-                    disabled={uploadingImage}
-                  />
-                  {uploadingImage && (
-                    <div className="absolute inset-0 bg-background/50 flex items-center justify-center rounded-md">
-                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                <Tabs defaultValue="edit" className="w-full">
+                  <TabsList className="mb-2">
+                    <TabsTrigger value="edit" className="gap-2">
+                      <Edit3 className="w-4 h-4" />
+                      {t("boardWrite.editTab") || "작성"}
+                    </TabsTrigger>
+                    <TabsTrigger value="preview" className="gap-2">
+                      <Eye className="w-4 h-4" />
+                      {t("boardWrite.previewTab") || "미리보기"}
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="edit" className="mt-0">
+                    <div className="flex gap-2 mb-2">
+                      <Button type="button" variant="outline" size="sm" onClick={() => insertFormatting("bold")}>
+                        <Bold className="w-4 h-4" />
+                      </Button>
+                      <Button type="button" variant="outline" size="sm" onClick={() => insertFormatting("italic")}>
+                        <Italic className="w-4 h-4" />
+                      </Button>
+                      <Button type="button" variant="outline" size="sm" onClick={() => insertFormatting("list")}>
+                        <List className="w-4 h-4" />
+                      </Button>
+                      <Button type="button" variant="outline" size="sm" onClick={() => insertFormatting("link")}>
+                        <LinkIcon className="w-4 h-4" />
+                      </Button>
                     </div>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {t("boardWrite.pasteHint") || "💡 Ctrl+V로 이미지를 붙여넣으면 본문에 바로 삽입됩니다"}
-                </p>
+                    <div className="relative">
+                      <Textarea
+                        id="content"
+                        name="content"
+                        placeholder={t("boardWrite.contentPlaceholder")}
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        onPaste={handlePaste}
+                        rows={12}
+                        className="font-mono text-sm"
+                        disabled={uploadingImage}
+                      />
+                      {uploadingImage && (
+                        <div className="absolute inset-0 bg-background/50 flex items-center justify-center rounded-md">
+                          <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {t("boardWrite.pasteHint") || "💡 Ctrl+V로 이미지를 붙여넣으면 본문에 바로 삽입됩니다"}
+                    </p>
+                  </TabsContent>
+                  
+                  <TabsContent value="preview" className="mt-0">
+                    <div 
+                      className="prose prose-sm max-w-none min-h-[300px] p-4 border rounded-md bg-muted/30"
+                      dangerouslySetInnerHTML={{ __html: content || `<p class="text-muted-foreground">${t("boardWrite.previewEmpty") || "미리보기할 내용이 없습니다"}</p>` }}
+                    />
+                  </TabsContent>
+                </Tabs>
               </div>
 
               {/* YouTube URLs */}
