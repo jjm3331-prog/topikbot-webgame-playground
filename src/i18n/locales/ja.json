@@ -2007,5 +2007,36 @@
         "desc": "IT COMTORに必要なビジネス韓国語表現"
       }
     }
+  },
+  "sidebar": {
+    "home": "ホーム",
+    "member": "メンバー",
+    "logoutSuccess": "ログアウトしました",
+    "seeYouAgain": "またお会いしましょう！",
+    "sections": {
+      "studyWork": "就職",
+      "topik": "TOPIK",
+      "game": "ゲーム",
+      "ai": "AI",
+      "my": "マイ"
+    },
+    "items": {
+      "koreaCareer": "Korea Career",
+      "headhunting": "ヘッドハンティング",
+      "learningHub": "TOPIK学習センター",
+      "community": "コミュニティ",
+      "gameHub": "ゲームハブ",
+      "qnaAgent": "Q&Aエージェント",
+      "writingCorrection": "作文添削",
+      "roleplay": "ロールプレイスピーキング",
+      "pricing": "価格",
+      "progress": "ダッシュボード",
+      "profile": "プロフィール",
+      "ranking": "ランキング",
+      "points": "ポイント",
+      "terms": "利用規約",
+      "privacy": "プライバシー",
+      "helpCenter": "ヘルプセンター"
+    }
   }
 }

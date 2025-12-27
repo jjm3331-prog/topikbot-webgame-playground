@@ -320,7 +320,7 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
                       <span className="text-sm font-medium flex-1 truncate">{t(item.labelKey)}</span>
                       {item.isPremium && (
                         <span className="px-1.5 py-0.5 bg-accent text-accent-foreground text-[10px] font-bold rounded shrink-0">
-                          Premium
+                          {t("common.premium")}
                         </span>
                       )}
                     </button>

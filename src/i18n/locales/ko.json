@@ -2393,5 +2393,36 @@
         "desc": "IT COMTOR에게 필요한 비즈니스 한국어 표현"
       }
     }
+  },
+  "sidebar": {
+    "home": "홈",
+    "member": "회원",
+    "logoutSuccess": "로그아웃됨",
+    "seeYouAgain": "다음에 또 만나요!",
+    "sections": {
+      "studyWork": "취업",
+      "topik": "TOPIK",
+      "game": "게임",
+      "ai": "AI",
+      "my": "마이"
+    },
+    "items": {
+      "koreaCareer": "Korea Career",
+      "headhunting": "헤드헌팅",
+      "learningHub": "TOPIK 학습 센터",
+      "community": "커뮤니티",
+      "gameHub": "게임 허브",
+      "qnaAgent": "Q&A 에이전트",
+      "writingCorrection": "작문 첨삭",
+      "roleplay": "역할극 스피킹",
+      "pricing": "가격",
+      "progress": "대시보드",
+      "profile": "프로필",
+      "ranking": "랭킹",
+      "points": "포인트",
+      "terms": "이용약관",
+      "privacy": "개인정보처리방침",
+      "helpCenter": "고객센터"
+    }
   }
 }

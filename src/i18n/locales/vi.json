@@ -2274,5 +2274,36 @@
         "desc": "Tiếng Hàn doanh nghiệp cần thiết cho IT COMTOR"
       }
     }
+  },
+  "sidebar": {
+    "home": "Trang chủ",
+    "member": "Thành viên",
+    "logoutSuccess": "Đã đăng xuất",
+    "seeYouAgain": "Hẹn gặp lại lần sau!",
+    "sections": {
+      "studyWork": "Việc làm",
+      "topik": "TOPIK",
+      "game": "Game",
+      "ai": "AI",
+      "my": "Của tôi"
+    },
+    "items": {
+      "koreaCareer": "Korea Career",
+      "headhunting": "Headhunting",
+      "learningHub": "Trung tâm học TOPIK",
+      "community": "Cộng đồng",
+      "gameHub": "Trung tâm Game",
+      "qnaAgent": "Q&A Agent",
+      "writingCorrection": "Chấm bài viết",
+      "roleplay": "Roleplay Speaking",
+      "pricing": "Bảng giá",
+      "progress": "Dashboard",
+      "profile": "Hồ sơ",
+      "ranking": "Bảng xếp hạng",
+      "points": "Hệ thống điểm",
+      "terms": "Điều khoản",
+      "privacy": "Chính sách",
+      "helpCenter": "Trung tâm Hỗ trợ"
+    }
   }
 }
