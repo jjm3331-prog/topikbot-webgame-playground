@@ -632,16 +632,70 @@
   "roleplay": {
     "badge": "AIロールプレイ",
     "title": "ロールプレイスピーキング",
-    "subtitle": "日常シーン • 文法フィードバック • TOPIKクイズ",
+    "subtitle": "日常シーン • レベル別フィードバック • TOPIKクイズ",
     "labels": { "scenario": "シーン:", "suggestions": "おすすめ返答" },
     "empty": { "title": "会話を始めましょう！", "desc": "AIが状況を提示し、実戦的な韓国語会話を練習できます。" },
-    "actions": { "start": "ロールプレイ開始", "listen": "聞く", "newScenario": "新しいシーン", "makeQuiz": "TOPIKクイズ作成", "prev": "前へ", "next": "次へ", "showResults": "結果を見る", "closeQuiz": "クイズを閉じる" },
+    "actions": { 
+      "start": "ロールプレイ開始", 
+      "startRoleplay": "ロールプレイ開始",
+      "listen": "聞く", 
+      "newScenario": "新しいシーン", 
+      "makeQuiz": "TOPIKクイズ作成", 
+      "prev": "前へ", 
+      "next": "次へ", 
+      "showResults": "結果を見る", 
+      "closeQuiz": "クイズを閉じる",
+      "changeSettings": "設定変更"
+    },
+    "setup": {
+      "levelTitle": "TOPIKレベルを選択",
+      "difficultyTitle": "難易度を選択",
+      "scenarioTitle": "シーンを選択（15種類）",
+      "customTitle": "または自分でシーンを入力",
+      "customPlaceholder": "例：韓国人の友達の家を訪問して挨拶する",
+      "customHint": "上記15個以外のシーンを自由に入力してください"
+    },
+    "difficulty": {
+      "easy": "簡単",
+      "medium": "普通",
+      "hard": "難しい"
+    },
+    "scenarios": {
+      "cafe": "カフェ注文",
+      "subway": "地下鉄/交通",
+      "shopping": "ショッピング",
+      "direction": "道案内",
+      "phone": "電話予約",
+      "movie": "映画館",
+      "hotel": "ホテル",
+      "restaurant": "レストラン",
+      "bank": "銀行",
+      "dating": "デート",
+      "interview": "面接",
+      "airport": "空港",
+      "hospital": "病院",
+      "school": "学校",
+      "meeting": "会議"
+    },
     "placeholders": { "input": "韓国語で回答を入力..." },
     "feedback": { "good": "いいね！", "needsFix": "要修正" },
-    "tips": { "title": "使い方", "step1": "「ロールプレイ開始」でランダムシーンを受け取る", "step2": "韓国語で返答（入力/音声）", "step3": "AIの修正と文法説明を確認", "step4": "学んだ内容からTOPIKクイズを作成", "tipLabel": "ヒント:", "tipText": "困ったらおすすめ返答を参考にしてください。" },
+    "tips": { "title": "使い方", "step1": "レベルと難易度を選択", "step2": "15個のシーンから選ぶか自分で入力", "step3": "AIの修正と文法説明を確認", "step4": "学んだ内容からTOPIKクイズを作成", "tipLabel": "ヒント:", "tipText": "困ったらおすすめ返答を参考にしてください。" },
     "stats": { "title": "今回", "spoken": "話した文", "correct": "正しい文" },
     "quiz": { "progress": "{{current}}/{{total}}", "yourScore": "スコア", "correctAnswer": "正解: {{answer}}" },
-    "toast": { "started": "新しいシーンを開始しました。", "startFailed": "開始に失敗しました。", "needConversation": "クイズ作成には会話が必要です。", "quizCreated": "クイズを作成しました。", "quizFailed": "クイズ作成に失敗しました。", "audioFailed": "音声再生に失敗しました。", "sttSuccess": "音声を認識しました。", "sttFailed": "音声認識に失敗しました。", "recording": "録音中...", "micDenied": "マイク権限が必要です。", "sendFailed": "メッセージの送信に失敗しました。もう一度お試しください。" }
+    "toast": { 
+      "started": "新しいシーンを開始しました。", 
+      "startFailed": "開始に失敗しました。", 
+      "needConversation": "クイズ作成には会話が必要です。", 
+      "quizCreated": "クイズを作成しました。", 
+      "quizFailed": "クイズ作成に失敗しました。", 
+      "audioFailed": "音声再生に失敗しました。", 
+      "sttSuccess": "音声を認識しました。", 
+      "sttFailed": "音声認識に失敗しました。", 
+      "recording": "録音中...", 
+      "micDenied": "マイク権限が必要です。", 
+      "sendFailed": "メッセージの送信に失敗しました。もう一度お試しください。",
+      "selectScenario": "シーンを選択または入力してください。"
+    }
   },
   "writingPage": {
     "header": { "title": "TOPIK II 作文(51〜54) 添削", "subtitle": "AIが採点し詳細フィードバックを提供", "history": "履歴" },

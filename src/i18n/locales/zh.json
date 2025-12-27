@@ -632,16 +632,70 @@
   "roleplay": {
     "badge": "AI 角色扮演口语",
     "title": "角色扮演口语",
-    "subtitle": "真实场景 • 语法反馈 • TOPIK测验",
+    "subtitle": "真实场景 • 分级反馈 • TOPIK测验",
     "labels": { "scenario": "场景：", "suggestions": "推荐回复" },
     "empty": { "title": "开始练口语！", "desc": "AI会给出情景，你用韩语进行真实对话练习。" },
-    "actions": { "start": "开始Roleplay", "listen": "听", "newScenario": "新场景", "makeQuiz": "生成TOPIK测验", "prev": "上一题", "next": "下一题", "showResults": "查看结果", "closeQuiz": "关闭测验" },
+    "actions": { 
+      "start": "开始Roleplay", 
+      "startRoleplay": "开始Roleplay",
+      "listen": "听", 
+      "newScenario": "新场景", 
+      "makeQuiz": "生成TOPIK测验", 
+      "prev": "上一题", 
+      "next": "下一题", 
+      "showResults": "查看结果", 
+      "closeQuiz": "关闭测验",
+      "changeSettings": "更改设置"
+    },
+    "setup": {
+      "levelTitle": "选择TOPIK级别",
+      "difficultyTitle": "选择难度",
+      "scenarioTitle": "选择场景（15种）",
+      "customTitle": "或自定义场景",
+      "customPlaceholder": "例如：拜访韩国朋友的家并问候",
+      "customHint": "可输入上述15种以外的任何场景"
+    },
+    "difficulty": {
+      "easy": "简单",
+      "medium": "中等",
+      "hard": "困难"
+    },
+    "scenarios": {
+      "cafe": "点咖啡",
+      "subway": "地铁/交通",
+      "shopping": "购物",
+      "direction": "问路",
+      "phone": "电话预约",
+      "movie": "电影院",
+      "hotel": "酒店",
+      "restaurant": "餐厅",
+      "bank": "银行",
+      "dating": "约会",
+      "interview": "面试",
+      "airport": "机场",
+      "hospital": "医院",
+      "school": "学校",
+      "meeting": "会议"
+    },
     "placeholders": { "input": "请输入韩语回答..." },
     "feedback": { "good": "不错！", "needsFix": "需要修改" },
-    "tips": { "title": "使用指南", "step1": "点击“开始Roleplay”获取随机情景", "step2": "用韩语回答（输入或语音）", "step3": "查看AI纠错与语法讲解", "step4": "根据对话生成TOPIK测验", "tipLabel": "提示：", "tipText": "不知道怎么说时可参考推荐回复。" },
+    "tips": { "title": "使用指南", "step1": "选择级别和难度", "step2": "从15个场景中选择或自定义", "step3": "查看AI纠错与语法讲解", "step4": "根据对话生成TOPIK测验", "tipLabel": "提示：", "tipText": "不知道怎么说时可参考推荐回复。" },
     "stats": { "title": "本次", "spoken": "已说句子", "correct": "正确句子" },
     "quiz": { "progress": "{{current}}/{{total}}", "yourScore": "你的得分", "correctAnswer": "正确答案：{{answer}}" },
-    "toast": { "started": "已开始新场景。", "startFailed": "启动失败，请重试。", "needConversation": "生成测验至少需要一轮对话。", "quizCreated": "测验已生成。", "quizFailed": "生成测验失败。", "audioFailed": "音频播放失败。", "sttSuccess": "语音已识别。", "sttFailed": "语音识别失败。", "recording": "录音中...", "micDenied": "需要麦克风权限。", "sendFailed": "发送消息失败，请重试。" }
+    "toast": { 
+      "started": "已开始新场景。", 
+      "startFailed": "启动失败，请重试。", 
+      "needConversation": "生成测验至少需要一轮对话。", 
+      "quizCreated": "测验已生成。", 
+      "quizFailed": "生成测验失败。", 
+      "audioFailed": "音频播放失败。", 
+      "sttSuccess": "语音已识别。", 
+      "sttFailed": "语音识别失败。", 
+      "recording": "录音中...", 
+      "micDenied": "需要麦克风权限。", 
+      "sendFailed": "发送消息失败，请重试。",
+      "selectScenario": "请选择或输入场景。"
+    }
   },
   "writingPage": {
     "header": { "title": "TOPIK II 写作(51–54) 批改", "subtitle": "AI评分并提供详细反馈", "history": "历史" },

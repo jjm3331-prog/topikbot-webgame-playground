@@ -632,16 +632,70 @@
   "roleplay": {
     "badge": "AI Roleplay Speaking",
     "title": "AI Roleplay Speaking",
-    "subtitle": "Haqiqiy vaziyatlarda tabiiy koreys tilida gapirish mashqi",
+    "subtitle": "Haqiqiy vaziyatlar • Darajali fikr-mulohaza • TOPIK test",
     "labels": { "scenario": "Vaziyat:", "suggestions": "Tavsiya etilgan javoblar" },
     "empty": { "title": "Gapirishni boshlang!", "desc": "AI vaziyat taklif qiladi, siz tabiiy koreys tilida suhbat qilasiz." },
-    "actions": { "start": "Roleplay boshlash", "listen": "Tinglash", "newScenario": "Yangi vaziyat", "makeQuiz": "TOPIK test yaratish", "prev": "Oldingi", "next": "Keyingi", "showResults": "Natijalar", "closeQuiz": "Testni yopish" },
+    "actions": { 
+      "start": "Roleplay boshlash", 
+      "startRoleplay": "Roleplay boshlash",
+      "listen": "Tinglash", 
+      "newScenario": "Yangi vaziyat", 
+      "makeQuiz": "TOPIK test yaratish", 
+      "prev": "Oldingi", 
+      "next": "Keyingi", 
+      "showResults": "Natijalar", 
+      "closeQuiz": "Testni yopish",
+      "changeSettings": "Sozlamalarni o'zgartirish"
+    },
+    "setup": {
+      "levelTitle": "TOPIK darajasini tanlang",
+      "difficultyTitle": "Qiyinlik darajasini tanlang",
+      "scenarioTitle": "Vaziyatni tanlang (15 ta)",
+      "customTitle": "Yoki o'z vaziyatingizni kiriting",
+      "customPlaceholder": "Masalan: Koreya do'stining uyiga tashrif buyurib salomlashish",
+      "customHint": "Yuqoridagi 15 tadan tashqari istalgan vaziyatni kiriting"
+    },
+    "difficulty": {
+      "easy": "Oson",
+      "medium": "O'rtacha",
+      "hard": "Qiyin"
+    },
+    "scenarios": {
+      "cafe": "Kofe buyurtma",
+      "subway": "Metro/Transport",
+      "shopping": "Xarid qilish",
+      "direction": "Yo'l so'rash",
+      "phone": "Telefon orqali bron",
+      "movie": "Kinoteatr",
+      "hotel": "Mehmonxona",
+      "restaurant": "Restoran",
+      "bank": "Bank",
+      "dating": "Uchrashish",
+      "interview": "Intervyu",
+      "airport": "Aeroport",
+      "hospital": "Shifoxona",
+      "school": "Maktab",
+      "meeting": "Yig'ilish"
+    },
     "placeholders": { "input": "Koreys tilida javob kiriting..." },
     "feedback": { "good": "Ajoyib!", "needsFix": "Tuzatish kerak" },
-    "tips": { "title": "Ko'rsatmalar", "step1": "Tasodifiy vaziyat olish uchun 'Roleplay boshlash'ni bosing", "step2": "Koreys tilida javob bering (matn yoki ovoz)", "step3": "AI tuzatishlari va grammatika izohlarini ko'ring", "step4": "Suhbatdan TOPIK test yarating", "tipLabel": "Maslahat:", "tipText": "Nima deyishni bilmasangiz tavsiyalardan foydalaning." },
+    "tips": { "title": "Ko'rsatmalar", "step1": "Daraja va qiyinlikni tanlang", "step2": "15 ta vaziyatdan tanlang yoki o'zingizniki kiriting", "step3": "AI tuzatishlari va grammatika izohlarini ko'ring", "step4": "Suhbatdan TOPIK test yarating", "tipLabel": "Maslahat:", "tipText": "Nima deyishni bilmasangiz tavsiyalardan foydalaning." },
     "stats": { "title": "Bu raund", "spoken": "Aytilgan", "correct": "To'g'ri" },
     "quiz": { "progress": "{{current}}/{{total}}", "yourScore": "Sizning balingiz", "correctAnswer": "To'g'ri javob: {{answer}}" },
-    "toast": { "started": "Yangi vaziyat boshlandi.", "startFailed": "Boshlab bo'lmadi. Qayta urinib ko'ring.", "needConversation": "Test yaratish uchun kamida bitta suhbat kerak.", "quizCreated": "Test yaratildi.", "quizFailed": "Test yaratib bo'lmadi.", "audioFailed": "Audio ijro etib bo'lmadi.", "sttSuccess": "Ovoz aniqlandi.", "sttFailed": "Ovoz aniqlash xatosi.", "recording": "Yozish...", "micDenied": "Mikrofon ruxsati kerak.", "sendFailed": "Xabar yuborib bo'lmadi. Qayta urinib ko'ring." }
+    "toast": { 
+      "started": "Yangi vaziyat boshlandi.", 
+      "startFailed": "Boshlab bo'lmadi. Qayta urinib ko'ring.", 
+      "needConversation": "Test yaratish uchun kamida bitta suhbat kerak.", 
+      "quizCreated": "Test yaratildi.", 
+      "quizFailed": "Test yaratib bo'lmadi.", 
+      "audioFailed": "Audio ijro etib bo'lmadi.", 
+      "sttSuccess": "Ovoz aniqlandi.", 
+      "sttFailed": "Ovoz aniqlash xatosi.", 
+      "recording": "Yozish...", 
+      "micDenied": "Mikrofon ruxsati kerak.", 
+      "sendFailed": "Xabar yuborib bo'lmadi. Qayta urinib ko'ring.",
+      "selectScenario": "Vaziyatni tanlang yoki kiriting."
+    }
   },
   "writingPage": {
     "header": { "title": "TOPIK II Yozuv (51–54) tekshiruvi", "subtitle": "AI ball qo'yadi va batafsil fikr bildiradi", "history": "Tarix" },
