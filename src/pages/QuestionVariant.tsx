@@ -47,7 +47,8 @@ export default function QuestionVariant() {
   const [generatedContent, setGeneratedContent] = useState<ParsedResult | null>(null);
   const [rawContent, setRawContent] = useState<string | null>(null);
 
-  const currentLang = i18n.language?.startsWith("vi") ? "vi" : "ko";
+  // 항상 문제/해설 출력은 한국어(ko) 기준으로 표시
+  const currentLang = "ko";
 
   const usageExamples = [
     { subject: t("questionVariant.examples.reading"), example: t("questionVariant.examples.readingDesc") },

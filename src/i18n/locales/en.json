@@ -70,63 +70,6 @@
       "pdfError": "PDF generation error"
     }
   },
-  "questionVariant": {
-    "title": "Question Variant AI",
-    "description": "Upload a TOPIK question image and AI will generate similar variant questions",
-    "howToUse": "How to Use",
-    "examples": {
-      "reading": "Reading Questions",
-      "readingDesc": "Analyze passages and generate new questions at similar difficulty",
-      "grammar": "Grammar Questions",
-      "grammarDesc": "Keep grammar patterns while creating new examples",
-      "vocabulary": "Vocabulary Questions",
-      "vocabularyDesc": "Generate same type vocabulary questions with different words",
-      "listening": "Listening Questions",
-      "listeningDesc": "Analyze listening text and generate similar questions"
-    },
-    "uploadImage": "Upload Question Image",
-    "clickToUpload": "Click to select image",
-    "supportedFormats": "Formats: JPG, PNG, GIF (max 10MB)",
-    "generate": "Generate Variant",
-    "generateButton": "Generate AI Variant",
-    "features": {
-      "analyze": "Analyze original question",
-      "generate": "Generate similar variant",
-      "explain": "Provide detailed explanation"
-    },
-    "premiumFeature": "Premium Feature",
-    "premiumDescription": "This feature is only available for Premium members.",
-    "upgradePremium": "Upgrade to Premium",
-    "result": "Result",
-    "sections": {
-      "originalAnalysis": "Original Analysis",
-      "variantQuestion": "Variant Question",
-      "answer": "Answer",
-      "explanation": "Explanation",
-      "learningPoints": "Learning Points"
-    },
-    "pdf": {
-      "createdAt": "Created at",
-      "translation": "Translation"
-    },
-    "success": {
-      "generated": "Variant question generated successfully!",
-      "pdfOpened": "PDF preview opened"
-    },
-    "errors": {
-      "imageTooLarge": "Image too large. Please select a file under 10MB.",
-      "selectImage": "Please select an image first.",
-      "premiumRequired": "This feature is only available for Premium members.",
-      "apiError": "Error generating question.",
-      "tryAgain": "An error occurred. Please try again.",
-      "noContent": "No content to download.",
-      "popupBlocked": "Popup blocked. Please allow popups.",
-      "pdfError": "Error generating PDF."
-    },
-    "changeImage": "Choose Different Image",
-    "generating": "AI is generating variant question...",
-    "downloadPDF": "Download PDF"
-  },
   "notifications": {
     "title": "Notifications",
     "markAllRead": "Mark all as read",
