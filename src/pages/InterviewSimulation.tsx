@@ -305,7 +305,7 @@ const InterviewSimulation = () => {
       
       if (data.success) {
         setMessages([{ role: "assistant", content: data.message }]);
-        await speakText(data.message);
+        // TTS는 자동 재생하지 않음 - 사용자가 스피커 버튼 클릭 시에만 재생
       } else {
         throw new Error(data.error || "Failed to start interview");
       }
@@ -353,9 +353,8 @@ const InterviewSimulation = () => {
         if (data.ended) {
           setInterviewEnded(true);
           await requestEvaluation([...messages, { role: "user", content: userMessage }, { role: "assistant", content: data.message }]);
-        } else {
-          await speakText(data.message);
         }
+        // TTS는 자동 재생하지 않음 - 사용자가 스피커 버튼 클릭 시에만 재생
       } else {
         throw new Error(data.error || "Failed to get response");
       }
@@ -646,19 +645,54 @@ const InterviewSimulation = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
+                    {/* Interactive Speaker Button - 수동 클릭으로 최신 AI 응답 재생 */}
+                    <motion.div
+                      animate={!isSpeaking && messages.length > 0 && messages[messages.length - 1]?.role === "assistant" ? {
+                        scale: [1, 1.1, 1],
+                        boxShadow: [
+                          "0 0 0 0 rgba(249, 115, 22, 0)",
+                          "0 0 0 8px rgba(249, 115, 22, 0.3)",
+                          "0 0 0 0 rgba(249, 115, 22, 0)"
+                        ]
+                      } : {}}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      className="rounded-full"
+                    >
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          const lastAssistantMsg = [...messages].reverse().find(m => m.role === "assistant");
+                          if (lastAssistantMsg) {
+                            speakText(lastAssistantMsg.content);
+                          }
+                        }}
+                        disabled={isSpeaking || messages.length === 0}
+                        className={`gap-1.5 rounded-full transition-all duration-300 ${
+                          isSpeaking 
+                            ? "bg-orange-500/20 text-orange-500" 
+                            : messages.length > 0 && messages[messages.length - 1]?.role === "assistant"
+                              ? "bg-orange-500/10 text-orange-500 hover:bg-orange-500/20 hover:scale-110"
+                              : "text-muted-foreground"
+                        }`}
+                      >
+                        {isSpeaking ? (
+                          <Volume2 className="w-5 h-5 animate-pulse" />
+                        ) : (
+                          <Volume2 className="w-5 h-5" />
+                        )}
+                      </Button>
+                    </motion.div>
+                    {/* TTS 토글 버튼 */}
                     <Button
                       variant="ghost"
-                      size="sm"
+                      size="icon"
                       onClick={() => setTtsEnabled(!ttsEnabled)}
-                      className="gap-1.5"
+                      className={`h-8 w-8 ${ttsEnabled ? 'text-foreground' : 'text-muted-foreground'}`}
+                      title={ttsEnabled ? t('interview.ttsEnabled') : t('interview.ttsDisabled')}
                     >
                       {ttsEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
                     </Button>
-                    {isSpeaking && (
-                      <div className="flex items-center gap-2 text-orange-500">
-                        <Volume2 className="w-4 h-4 animate-pulse" />
-                      </div>
-                    )}
                   </div>
                 </div>
                 <div className="mt-4">

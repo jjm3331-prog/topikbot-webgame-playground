@@ -886,7 +886,8 @@
     "interviewerTypes": { "friendly": "Friendly", "strict": "Strict", "pressure": "High Pressure", "technical": "Technical" },
     "interviewerDescs": { "friendly": "Relaxed atmosphere, encouraging", "strict": "Logical thinking, specific answers required", "pressure": "Stress test, challenging questions", "technical": "Technical expertise, in-depth questions" },
     "scoreLabels": { "content": "Content", "communication": "Communication", "korean": "Korean", "attitude": "Attitude", "jobFit": "Job Fit" },
-    "micError": "Microphone access required", "allowMicAccess": "Please allow microphone access.", "voiceNotRecognized": "Voice not recognized", "tryAgain": "Please try again.", "voiceRecognitionError": "Voice recognition error", "selectAll": "Please select all", "selectAllDesc": "Select company, position, and interviewer type.", "errorOccurred": "An error occurred", "cannotStartInterview": "Cannot start interview. Please try again.", "noResponse": "No response."
+    "micError": "Microphone access required", "allowMicAccess": "Please allow microphone access.", "voiceNotRecognized": "Voice not recognized", "tryAgain": "Please try again.", "voiceRecognitionError": "Voice recognition error", "selectAll": "Please select all", "selectAllDesc": "Select company, position, and interviewer type.", "errorOccurred": "An error occurred", "cannotStartInterview": "Cannot start interview. Please try again.", "noResponse": "No response.",
+    "ttsEnabled": "Voice output enabled", "ttsDisabled": "Voice output disabled", "clickToListen": "Click to hear interviewer response"
   },
   "kdrama": {
     "title": "K-Drama Dubbing",
