@@ -951,7 +951,7 @@
     "dialogue": "Dialog", "single": "Yakka", "speaker": "Gapiruvchi",
     "question": "Savol {{current}}/{{total}}", "score": "Ball",
     "submit": "Yuborish", "next": "Keyingi", "restart": "Qaytadan", "newQuestions": "Yangi savollar",
-    "correct": "To'g'ri", "wrong": "Noto'g'ri", "explanation": "Tushuntirish",
+    "correct": "To'g'ri!", "incorrect": "Noto'g'ri", "correctAnswer": "Javob", "wrong": "Noto'g'ri", "explanation": "Tushuntirish",
     "complete": "Tugadi", "accuracy": "Aniqlik", "goBack": "Orqaga",
     "loading": "Yuklanmoqda...", "ttsError": "Ovoz xatosi"
   },

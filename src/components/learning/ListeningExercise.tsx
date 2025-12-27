@@ -16,6 +16,7 @@ import {
   Pause
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface ListeningQuestion {
   id: number;
@@ -30,6 +31,7 @@ interface ListeningExerciseProps {
 }
 
 const ListeningExercise = ({ questions, onComplete }: ListeningExerciseProps) => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userAnswer, setUserAnswer] = useState("");
@@ -340,13 +342,13 @@ const ListeningExercise = ({ questions, onComplete }: ListeningExerciseProps) =>
                 "font-medium",
                 isCorrect ? "text-korean-green" : "text-korean-red"
               )}>
-                {isCorrect ? "정답입니다!" : "오답입니다"}
+                {isCorrect ? t("listening.correct") : t("listening.incorrect")}
               </span>
             </div>
             
             {!isCorrect && (
               <div className="text-sm">
-                <p className="text-muted-foreground">정답:</p>
+                <p className="text-muted-foreground">{t("listening.correctAnswer")}:</p>
                 <p className="font-medium text-foreground">{currentQuestion.korean}</p>
               </div>
             )}

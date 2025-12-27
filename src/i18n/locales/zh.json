@@ -926,7 +926,7 @@
     "dialogue": "对话", "single": "独白", "speaker": "说话者",
     "question": "第{{current}}/{{total}}题", "score": "得分",
     "submit": "提交", "next": "下一题", "restart": "重新开始", "newQuestions": "新题目",
-    "correct": "正确", "wrong": "错误", "explanation": "解析",
+    "correct": "正确!", "incorrect": "错误", "correctAnswer": "答案", "wrong": "错误", "explanation": "解析",
     "complete": "完成", "accuracy": "正确率", "goBack": "返回",
     "loading": "加载中...", "ttsError": "音频播放失败"
   },
