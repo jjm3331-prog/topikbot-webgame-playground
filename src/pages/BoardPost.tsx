@@ -175,6 +175,12 @@ export default function BoardPost() {
   const [reportDescription, setReportDescription] = useState("");
   const [reportSubmitting, setReportSubmitting] = useState(false);
 
+  // useMemo must be called at top level before any conditional returns
+  const translatedMediaHtml = useMemo(
+    () => post ? extractMediaHtmlFromPostContent(post.content) : "",
+    [post?.content]
+  );
+
   useEffect(() => {
     checkAuth();
     fetchPost();
@@ -557,10 +563,6 @@ export default function BoardPost() {
 
   const postAuthor = getAuthorDisplay(post.author_id, post.author_name, post.is_anonymous);
   const canModify = currentUser && (post.author_id === currentUser || isAdmin);
-  const translatedMediaHtml = useMemo(
-    () => extractMediaHtmlFromPostContent(post.content),
-    [post.content]
-  );
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
