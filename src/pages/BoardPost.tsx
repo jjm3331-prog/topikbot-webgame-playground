@@ -45,6 +45,7 @@ import {
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { PostTranslateButton } from "@/components/board/PostTranslateButton";
+import { CommentItem } from "@/components/board/CommentItem";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -405,49 +406,16 @@ export default function BoardPost() {
       const author = getAuthorDisplay(comment.author_id, comment.author_name, comment.is_anonymous);
       
       return (
-        <div key={comment.id} className={depth > 0 ? "ml-8 border-l-2 border-muted pl-4" : ""}>
-          <div className="flex gap-3 py-4">
-            <div className="shrink-0">
-              {author.avatar ? (
-                <img src={author.avatar} alt={author.name} className="w-8 h-8 rounded-full object-cover" />
-              ) : (
-                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                  {comment.is_anonymous ? <Ghost className="w-4 h-4" /> : <User className="w-4 h-4" />}
-                </div>
-              )}
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-sm">{author.name}</span>
-                <span className="text-xs text-muted-foreground">
-                  {format(new Date(comment.created_at), "dd/MM/yyyy HH:mm", { locale: dateLocale })}
-                </span>
-              </div>
-              <p className="text-sm mt-1">{comment.content}</p>
-              <div className="flex items-center gap-2 mt-1">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-7 text-xs"
-                  onClick={() => setReplyTo(comment.id)}
-                >
-                  <Reply className="w-3 h-3 mr-1" />
-                  {t("board.reply")}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 text-xs text-muted-foreground hover:text-destructive"
-                  onClick={() => openReportDialog('comment', comment.id)}
-                >
-                  <Flag className="w-3 h-3 mr-1" />
-                  {t("board.report")}
-                </Button>
-              </div>
-            </div>
-          </div>
-          {renderComments(comment.id, depth + 1)}
-        </div>
+        <CommentItem
+          key={comment.id}
+          comment={comment}
+          author={author}
+          depth={depth}
+          dateLocale={dateLocale}
+          onReply={() => setReplyTo(comment.id)}
+          onReport={() => openReportDialog('comment', comment.id)}
+          renderChildren={() => renderComments(comment.id, depth + 1)}
+        />
       );
     });
   };
