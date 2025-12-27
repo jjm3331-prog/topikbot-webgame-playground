@@ -635,10 +635,10 @@ const Headhunting = () => {
             transition={{ delay: 0.1 }}
             className="text-headline text-foreground mb-4"
           >
-            {editingApplication ? (
-              <>Chỉnh sửa <span className="text-gradient-primary">đơn đăng ký</span></>
+          {editingApplication ? (
+              <>{t('headhunting.heroTitleEdit')}</>
             ) : (
-              <>Dịch vụ <span className="text-gradient-primary">Headhunting</span> doanh nghiệp Hàn Quốc</>
+              <>{t('headhunting.heroTitle')}</>
             )}
           </motion.h1>
           
@@ -648,9 +648,9 @@ const Headhunting = () => {
             transition={{ delay: 0.2 }}
             className="text-body text-muted-foreground max-w-2xl mx-auto mb-8"
           >
-            Đội ngũ Headhunter chuyên nghiệp của LUKATO hỗ trợ bạn xin việc tại doanh nghiệp Hàn Quốc.
+            {t('headhunting.heroDescription')}
             <br />
-            <span className="text-foreground font-semibold">Từ công ty Hàn Quốc tại Việt Nam đến cơ hội làm việc tại Hàn Quốc!</span>
+            <span className="text-foreground font-semibold">{t('headhunting.heroSubtitle')}</span>
           </motion.p>
 
           {/* Benefits */}
@@ -675,28 +675,28 @@ const Headhunting = () => {
       <section className="py-12 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Thông tin cơ bản */}
+            {/* Basic Info */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users className="w-5 h-5 text-primary" />
-                  Thông tin cơ bản
+                  {t('headhunting.sections.basicInfo')}
                 </CardTitle>
-                <CardDescription>Vui lòng điền thông tin chính xác</CardDescription>
+                <CardDescription>{t('headhunting.sections.basicInfoDesc')}</CardDescription>
               </CardHeader>
               <CardContent className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="full_name">Họ và tên *</Label>
+                  <Label htmlFor="full_name">{t('headhunting.form.fullName')} *</Label>
                   <Input
                     id="full_name"
                     value={formData.full_name}
                     onChange={(e) => handleChange("full_name", e.target.value)}
-                    placeholder="Nguyen Van A"
+                    placeholder={t('headhunting.form.fullNamePlaceholder')}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email *</Label>
+                  <Label htmlFor="email">{t('headhunting.form.email')} *</Label>
                   <Input
                     id="email"
                     type="email"
@@ -706,22 +706,22 @@ const Headhunting = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Số điện thoại</Label>
+                  <Label htmlFor="phone">{t('headhunting.form.phone')}</Label>
                   <Input
                     id="phone"
                     value={formData.phone}
                     onChange={(e) => handleChange("phone", e.target.value)}
-                    placeholder="+84 xxx xxx xxx"
+                    placeholder={t('headhunting.form.phonePlaceholder')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="birth_year">Năm sinh</Label>
+                  <Label htmlFor="birth_year">{t('headhunting.form.birthYear')}</Label>
                   <Input
                     id="birth_year"
                     type="number"
                     value={formData.birth_year}
                     onChange={(e) => handleChange("birth_year", e.target.value)}
-                    placeholder="1995"
+                    placeholder={t('headhunting.form.birthYearPlaceholder')}
                     min="1970"
                     max="2010"
                   />
@@ -729,188 +729,188 @@ const Headhunting = () => {
               </CardContent>
             </Card>
 
-            {/* Học vấn */}
+            {/* Education */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Star className="w-5 h-5 text-korean-yellow" />
-                  Học vấn & Trình độ tiếng Hàn
+                  {t('headhunting.sections.education')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>Trình độ học vấn</Label>
+                  <Label>{t('headhunting.form.educationLevel')}</Label>
                   <Select value={formData.education_level} onValueChange={(v) => handleChange("education_level", v)}>
-                    <SelectTrigger><SelectValue placeholder="Chọn" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder={t('headhunting.form.educationLevelPlaceholder')} /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="high_school">Tốt nghiệp THPT</SelectItem>
-                      <SelectItem value="college">Tốt nghiệp Cao đẳng</SelectItem>
-                      <SelectItem value="bachelor">Tốt nghiệp Đại học</SelectItem>
-                      <SelectItem value="master">Thạc sĩ</SelectItem>
-                      <SelectItem value="phd">Tiến sĩ</SelectItem>
+                      <SelectItem value="high_school">{t('headhunting.form.educationOptions.highSchool')}</SelectItem>
+                      <SelectItem value="college">{t('headhunting.form.educationOptions.college')}</SelectItem>
+                      <SelectItem value="bachelor">{t('headhunting.form.educationOptions.bachelor')}</SelectItem>
+                      <SelectItem value="master">{t('headhunting.form.educationOptions.master')}</SelectItem>
+                      <SelectItem value="phd">{t('headhunting.form.educationOptions.phd')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="university_name">Tên trường</Label>
+                  <Label htmlFor="university_name">{t('headhunting.form.university')}</Label>
                   <Input
                     id="university_name"
                     value={formData.university_name}
                     onChange={(e) => handleChange("university_name", e.target.value)}
-                    placeholder="Đại học..."
+                    placeholder={t('headhunting.form.universityPlaceholder')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="major">Chuyên ngành</Label>
+                  <Label htmlFor="major">{t('headhunting.form.major')}</Label>
                   <Input
                     id="major"
                     value={formData.major}
                     onChange={(e) => handleChange("major", e.target.value)}
-                    placeholder="Ngôn ngữ Hàn, CNTT, Kinh doanh..."
+                    placeholder={t('headhunting.form.majorPlaceholder')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Trình độ TOPIK</Label>
+                  <Label>{t('headhunting.form.topikLevel')}</Label>
                   <Select value={formData.topik_level} onValueChange={(v) => handleChange("topik_level", v)}>
-                    <SelectTrigger><SelectValue placeholder="Chọn" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder={t('headhunting.form.educationLevelPlaceholder')} /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="0">Chưa có / Đang chuẩn bị</SelectItem>
-                      <SelectItem value="1">TOPIK 1</SelectItem>
-                      <SelectItem value="2">TOPIK 2</SelectItem>
-                      <SelectItem value="3">TOPIK 3</SelectItem>
-                      <SelectItem value="4">TOPIK 4</SelectItem>
-                      <SelectItem value="5">TOPIK 5</SelectItem>
-                      <SelectItem value="6">TOPIK 6</SelectItem>
+                      <SelectItem value="0">{t('headhunting.form.topikOptions.none')}</SelectItem>
+                      <SelectItem value="1">{t('headhunting.form.topikOptions.level1')}</SelectItem>
+                      <SelectItem value="2">{t('headhunting.form.topikOptions.level2')}</SelectItem>
+                      <SelectItem value="3">{t('headhunting.form.topikOptions.level3')}</SelectItem>
+                      <SelectItem value="4">{t('headhunting.form.topikOptions.level4')}</SelectItem>
+                      <SelectItem value="5">{t('headhunting.form.topikOptions.level5')}</SelectItem>
+                      <SelectItem value="6">{t('headhunting.form.topikOptions.level6')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Kinh nghiệm làm việc */}
+            {/* Work Experience */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Briefcase className="w-5 h-5 text-korean-blue" />
-                  Kinh nghiệm làm việc
+                  {t('headhunting.sections.workExperience')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid gap-4">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label>Số năm kinh nghiệm</Label>
+                    <Label>{t('headhunting.form.experienceYears')}</Label>
                     <Select value={formData.work_experience_years} onValueChange={(v) => handleChange("work_experience_years", v)}>
-                      <SelectTrigger><SelectValue placeholder="Chọn" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder={t('headhunting.form.educationLevelPlaceholder')} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="0">Sinh viên mới ra trường</SelectItem>
-                        <SelectItem value="1">Dưới 1 năm</SelectItem>
-                        <SelectItem value="2">1-2 năm</SelectItem>
-                        <SelectItem value="3">3-5 năm</SelectItem>
-                        <SelectItem value="5">5-10 năm</SelectItem>
-                        <SelectItem value="10">Trên 10 năm</SelectItem>
+                        <SelectItem value="0">{t('headhunting.form.experienceOptions.fresh')}</SelectItem>
+                        <SelectItem value="1">{t('headhunting.form.experienceOptions.less1')}</SelectItem>
+                        <SelectItem value="2">{t('headhunting.form.experienceOptions.1to2')}</SelectItem>
+                        <SelectItem value="3">{t('headhunting.form.experienceOptions.3to5')}</SelectItem>
+                        <SelectItem value="5">{t('headhunting.form.experienceOptions.5to10')}</SelectItem>
+                        <SelectItem value="10">{t('headhunting.form.experienceOptions.over10')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="current_company">Công ty hiện tại/gần nhất</Label>
+                    <Label htmlFor="current_company">{t('headhunting.form.currentCompany')}</Label>
                     <Input
                       id="current_company"
                       value={formData.current_company}
                       onChange={(e) => handleChange("current_company", e.target.value)}
-                      placeholder="Samsung Vietnam..."
+                      placeholder={t('headhunting.form.currentCompanyPlaceholder')}
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="work_experience_details">Chi tiết kinh nghiệm (tùy chọn)</Label>
+                  <Label htmlFor="work_experience_details">{t('headhunting.form.experienceDetails')}</Label>
                   <Textarea
                     id="work_experience_details"
                     value={formData.work_experience_details}
                     onChange={(e) => handleChange("work_experience_details", e.target.value)}
-                    placeholder="Công việc chính, thành tích, dự án đã tham gia..."
+                    placeholder={t('headhunting.form.experienceDetailsPlaceholder')}
                     rows={3}
                   />
                 </div>
               </CardContent>
             </Card>
 
-            {/* Yêu cầu công việc */}
+            {/* Job Preferences */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Rocket className="w-5 h-5 text-korean-orange" />
-                  Yêu cầu công việc mong muốn
+                  {t('headhunting.sections.jobPreferences')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>Hình thức làm việc</Label>
+                  <Label>{t('headhunting.form.desiredJobType')}</Label>
                   <Select value={formData.desired_job_type} onValueChange={(v) => handleChange("desired_job_type", v)}>
-                    <SelectTrigger><SelectValue placeholder="Chọn" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder={t('headhunting.form.educationLevelPlaceholder')} /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="fulltime">Toàn thời gian</SelectItem>
-                      <SelectItem value="contract">Hợp đồng</SelectItem>
-                      <SelectItem value="intern">Thực tập sinh</SelectItem>
-                      <SelectItem value="any">Không giới hạn</SelectItem>
+                      <SelectItem value="fulltime">{t('headhunting.form.jobTypeOptions.fulltime')}</SelectItem>
+                      <SelectItem value="contract">{t('headhunting.form.jobTypeOptions.contract')}</SelectItem>
+                      <SelectItem value="intern">{t('headhunting.form.jobTypeOptions.intern')}</SelectItem>
+                      <SelectItem value="any">{t('headhunting.form.jobTypeOptions.any')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Ngành nghề mong muốn</Label>
+                  <Label>{t('headhunting.form.desiredIndustry')}</Label>
                   <Select value={formData.desired_industry} onValueChange={(v) => handleChange("desired_industry", v)}>
-                    <SelectTrigger><SelectValue placeholder="Chọn" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder={t('headhunting.form.educationLevelPlaceholder')} /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="it">IT / Phần mềm</SelectItem>
-                      <SelectItem value="manufacturing">Sản xuất</SelectItem>
-                      <SelectItem value="trading">Thương mại / Xuất nhập khẩu</SelectItem>
-                      <SelectItem value="service">Dịch vụ</SelectItem>
-                      <SelectItem value="education">Giáo dục</SelectItem>
-                      <SelectItem value="finance">Tài chính</SelectItem>
-                      <SelectItem value="any">Không giới hạn</SelectItem>
+                      <SelectItem value="it">{t('headhunting.form.industryOptions.it')}</SelectItem>
+                      <SelectItem value="manufacturing">{t('headhunting.form.industryOptions.manufacturing')}</SelectItem>
+                      <SelectItem value="trading">{t('headhunting.form.industryOptions.trading')}</SelectItem>
+                      <SelectItem value="service">{t('headhunting.form.industryOptions.service')}</SelectItem>
+                      <SelectItem value="education">{t('headhunting.form.industryOptions.education')}</SelectItem>
+                      <SelectItem value="finance">{t('headhunting.form.industryOptions.finance')}</SelectItem>
+                      <SelectItem value="any">{t('headhunting.form.industryOptions.any')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Địa điểm làm việc</Label>
+                  <Label>{t('headhunting.form.desiredLocation')}</Label>
                   <Select value={formData.desired_location} onValueChange={(v) => handleChange("desired_location", v)}>
-                    <SelectTrigger><SelectValue placeholder="Chọn" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder={t('headhunting.form.educationLevelPlaceholder')} /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="vietnam_korean">Công ty Hàn Quốc tại Việt Nam</SelectItem>
-                      <SelectItem value="korea">Hàn Quốc</SelectItem>
-                      <SelectItem value="both">Cả hai đều được</SelectItem>
+                      <SelectItem value="vietnam_korean">{t('headhunting.form.locationOptions.vietnamKorean')}</SelectItem>
+                      <SelectItem value="korea">{t('headhunting.form.locationOptions.korea')}</SelectItem>
+                      <SelectItem value="both">{t('headhunting.form.locationOptions.both')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Mức lương mong muốn</Label>
+                  <Label>{t('headhunting.form.desiredSalary')}</Label>
                   <Select value={formData.desired_salary_range} onValueChange={(v) => handleChange("desired_salary_range", v)}>
-                    <SelectTrigger><SelectValue placeholder="Chọn" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder={t('headhunting.form.educationLevelPlaceholder')} /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="negotiable">Thỏa thuận</SelectItem>
-                      <SelectItem value="10-15m">10-15 triệu VND</SelectItem>
-                      <SelectItem value="15-25m">15-25 triệu VND</SelectItem>
-                      <SelectItem value="25-40m">25-40 triệu VND</SelectItem>
-                      <SelectItem value="40m+">Trên 40 triệu VND</SelectItem>
-                      <SelectItem value="korea_standard">Mức lương tại Hàn Quốc</SelectItem>
+                      <SelectItem value="negotiable">{t('headhunting.form.salaryOptions.negotiable')}</SelectItem>
+                      <SelectItem value="10-15m">{t('headhunting.form.salaryOptions.10to15m')}</SelectItem>
+                      <SelectItem value="15-25m">{t('headhunting.form.salaryOptions.15to25m')}</SelectItem>
+                      <SelectItem value="25-40m">{t('headhunting.form.salaryOptions.25to40m')}</SelectItem>
+                      <SelectItem value="40m+">{t('headhunting.form.salaryOptions.over40m')}</SelectItem>
+                      <SelectItem value="korea_standard">{t('headhunting.form.salaryOptions.koreaStandard')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Tải file lên */}
+            {/* Documents */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Upload className="w-5 h-5 text-korean-purple" />
-                  Tải file đính kèm
+                  {t('headhunting.sections.documents')}
                 </CardTitle>
-                <CardDescription>Tải CV, thư xin việc, portfolio dưới dạng PDF hoặc Word (tối đa 10MB)</CardDescription>
+                <CardDescription>{t('headhunting.sections.documentsDesc')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Resume Upload */}
                 <div className="space-y-2">
-                  <Label>CV (Resume)</Label>
+                  <Label>{t('headhunting.form.resume')}</Label>
                   <input
                     ref={resumeInputRef}
                     type="file"
@@ -922,7 +922,7 @@ const Headhunting = () => {
                     <div className="flex items-center justify-between p-3 rounded-lg bg-korean-green/10 border border-korean-green/30">
                       <div className="flex items-center gap-2">
                         <FileText className="w-5 h-5 text-korean-green" />
-                        <span className="text-sm text-foreground">{resumeUpload.file?.name || 'CV đã tải lên'}</span>
+                        <span className="text-sm text-foreground">{resumeUpload.file?.name || t('headhunting.form.resumeUploaded')}</span>
                       </div>
                       <Button
                         type="button"
@@ -946,14 +946,14 @@ const Headhunting = () => {
                       ) : (
                         <Upload className="w-5 h-5 mr-2" />
                       )}
-                      {resumeUpload.uploading ? 'Đang tải lên...' : 'Tải CV lên (PDF/Word)'}
+                      {resumeUpload.uploading ? t('headhunting.form.uploading') : t('headhunting.form.uploadResume')}
                     </Button>
                   )}
                 </div>
 
                 {/* Cover Letter Upload */}
                 <div className="space-y-2">
-                  <Label>Thư xin việc (Cover Letter)</Label>
+                  <Label>{t('headhunting.form.coverLetter')}</Label>
                   <input
                     ref={coverLetterInputRef}
                     type="file"
@@ -965,7 +965,7 @@ const Headhunting = () => {
                     <div className="flex items-center justify-between p-3 rounded-lg bg-korean-green/10 border border-korean-green/30">
                       <div className="flex items-center gap-2">
                         <FileText className="w-5 h-5 text-korean-green" />
-                        <span className="text-sm text-foreground">{coverLetterUpload.file?.name || 'Thư xin việc đã tải lên'}</span>
+                        <span className="text-sm text-foreground">{coverLetterUpload.file?.name || t('headhunting.form.coverLetterUploaded')}</span>
                       </div>
                       <Button
                         type="button"
@@ -989,14 +989,14 @@ const Headhunting = () => {
                       ) : (
                         <Upload className="w-5 h-5 mr-2" />
                       )}
-                      {coverLetterUpload.uploading ? 'Đang tải lên...' : 'Tải thư xin việc lên (PDF/Word)'}
+                      {coverLetterUpload.uploading ? t('headhunting.form.uploading') : t('headhunting.form.uploadCoverLetter')}
                     </Button>
                   )}
                 </div>
 
                 {/* Portfolio Upload */}
                 <div className="space-y-2">
-                  <Label>Portfolio (tùy chọn)</Label>
+                  <Label>{t('headhunting.form.portfolio')}</Label>
                   <input
                     ref={portfolioInputRef}
                     type="file"
@@ -1008,7 +1008,7 @@ const Headhunting = () => {
                     <div className="flex items-center justify-between p-3 rounded-lg bg-korean-green/10 border border-korean-green/30">
                       <div className="flex items-center gap-2">
                         <FileText className="w-5 h-5 text-korean-green" />
-                        <span className="text-sm text-foreground">{portfolioUpload.file?.name || 'Portfolio đã tải lên'}</span>
+                        <span className="text-sm text-foreground">{portfolioUpload.file?.name || t('headhunting.form.portfolioUploaded')}</span>
                       </div>
                       <Button
                         type="button"
@@ -1032,50 +1032,50 @@ const Headhunting = () => {
                       ) : (
                         <Upload className="w-5 h-5 mr-2" />
                       )}
-                      {portfolioUpload.uploading ? 'Đang tải lên...' : 'Tải portfolio lên (PDF/Word)'}
+                      {portfolioUpload.uploading ? t('headhunting.form.uploading') : t('headhunting.form.uploadPortfolio')}
                     </Button>
                   )}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Giới thiệu bản thân */}
+            {/* Introduction */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Globe className="w-5 h-5 text-korean-teal" />
-                  Giới thiệu bản thân
+                  {t('headhunting.sections.introduction')}
                 </CardTitle>
-                <CardDescription>Hãy viết để headhunter hiểu bạn hơn</CardDescription>
+                <CardDescription>{t('headhunting.sections.introductionDesc')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="introduction">Giới thiệu bản thân</Label>
+                  <Label htmlFor="introduction">{t('headhunting.form.introduction')}</Label>
                   <Textarea
                     id="introduction"
                     value={formData.introduction}
                     onChange={(e) => handleChange("introduction", e.target.value)}
-                    placeholder="Viết vài dòng giới thiệu về bản thân..."
+                    placeholder={t('headhunting.form.introductionPlaceholder')}
                     rows={3}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="strengths">Điểm mạnh & Kỹ năng</Label>
+                  <Label htmlFor="strengths">{t('headhunting.form.strengths')}</Label>
                   <Textarea
                     id="strengths"
                     value={formData.strengths}
                     onChange={(e) => handleChange("strengths", e.target.value)}
-                    placeholder="Điểm mạnh, kỹ năng, chứng chỉ của bạn..."
+                    placeholder={t('headhunting.form.strengthsPlaceholder')}
                     rows={2}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="career_goals">Mục tiêu nghề nghiệp</Label>
+                  <Label htmlFor="career_goals">{t('headhunting.form.careerGoals')}</Label>
                   <Textarea
                     id="career_goals"
                     value={formData.career_goals}
                     onChange={(e) => handleChange("career_goals", e.target.value)}
-                    placeholder="Mục tiêu và tầm nhìn nghề nghiệp trong tương lai..."
+                    placeholder={t('headhunting.form.careerGoalsPlaceholder')}
                     rows={2}
                   />
                 </div>
@@ -1094,11 +1094,11 @@ const Headhunting = () => {
                   {loading ? (
                     <>
                       <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Đang gửi...
+                      {t('headhunting.submitting')}
                     </>
                   ) : (
                     <>
-                      Đăng ký dịch vụ Headhunting
+                      {t('headhunting.submit')}
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </>
                   )}
@@ -1111,11 +1111,11 @@ const Headhunting = () => {
                   className="w-full sm:w-auto h-14 px-10 bg-gradient-to-r from-korean-orange to-korean-pink text-white text-lg font-bold rounded-2xl"
                 >
                   <Lock className="w-5 h-5 mr-2" />
-                  Nâng cấp Premium để đăng ký
+                  {t('headhunting.upgradeToPremium')}
                 </Button>
               )}
               <p className="text-xs text-muted-foreground text-center">
-                Thông tin của bạn chỉ được sử dụng cho mục đích headhunting và được bảo mật an toàn.
+                {t('headhunting.privacyNote')}
               </p>
             </div>
           </form>
