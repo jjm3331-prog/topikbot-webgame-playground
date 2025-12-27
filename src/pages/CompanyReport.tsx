@@ -82,7 +82,7 @@ const CompanyReport = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke("company-deep-report", {
-        body: { companyName: searchQuery },
+        body: { companyName: searchQuery, targetLanguage: i18n.language },
       });
 
       if (error) throw error;
