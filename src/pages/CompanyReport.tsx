@@ -1,17 +1,18 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { 
-  Search, 
-  Loader2, 
-  Building2, 
+import { useTranslation } from "react-i18next";
+import {
+  Search,
+  Loader2,
+  Building2,
   DollarSign,
   Users,
   MessageSquare,
   Newspaper,
   ArrowLeft,
   Sparkles,
-  ExternalLink
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -27,74 +28,81 @@ import remarkGfm from "remark-gfm";
 
 const CompanyReport = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { isPremium } = useSubscription();
-  
+
   const [companyName, setCompanyName] = useState("");
   const [searching, setSearching] = useState(false);
   const [report, setReport] = useState<string | null>(null);
   const [citations, setCitations] = useState<string[]>([]);
 
-  const quickSearches = [
-    "Samsung Electronics",
-    "LG Electronics", 
-    "Hyundai Motor",
-    "Naver",
-    "Kakao",
-    "SK Hynix",
-    "Coupang",
-    "Baemin (Woowa Brothers)"
-  ];
+  const quickSearches = useMemo(
+    () => [
+      "Samsung Electronics",
+      "LG Electronics",
+      "Hyundai Motor",
+      "Naver",
+      "Kakao",
+      "SK Hynix",
+      "Coupang",
+      "Baemin (Woowa Brothers)",
+    ],
+    []
+  );
+
+  const reportSections = useMemo(
+    () => [
+      { icon: Building2, labelKey: "careerPages.companyReport.sections.overview", color: "text-blue-500" },
+      { icon: DollarSign, labelKey: "careerPages.companyReport.sections.salary", color: "text-green-500" },
+      { icon: Users, labelKey: "careerPages.companyReport.sections.culture", color: "text-purple-500" },
+      { icon: MessageSquare, labelKey: "careerPages.companyReport.sections.interviewReviews", color: "text-orange-500" },
+      { icon: Newspaper, labelKey: "careerPages.companyReport.sections.latestNews", color: "text-pink-500" },
+    ],
+    []
+  );
 
   const handleSearch = async (query?: string) => {
     const searchQuery = query || companyName;
     if (!searchQuery.trim()) {
       toast({
-        title: "Vui lòng nhập tên công ty",
-        description: "Hãy nhập tên công ty Hàn Quốc bạn muốn tìm kiếm.",
-        variant: "destructive"
+        title: t("careerPages.companyReport.toast.enterCompanyTitle"),
+        description: t("careerPages.companyReport.toast.enterCompanyDesc"),
+        variant: "destructive",
       });
       return;
     }
-    
+
     setSearching(true);
     setReport(null);
     setCitations([]);
-    
+
     try {
       const { data, error } = await supabase.functions.invoke("company-deep-report", {
-        body: { companyName: searchQuery }
+        body: { companyName: searchQuery },
       });
-      
+
       if (error) throw error;
-      
+
       // Filter out any <think> tags that might have slipped through
-      let cleanReport = data.report || '';
-      cleanReport = cleanReport.replace(/<think>[\s\S]*?<\/think>/gi, '');
-      cleanReport = cleanReport.replace(/<\/?think>/gi, '');
-      cleanReport = cleanReport.replace(/^\s*\n\s*\n/gm, '\n\n').trim();
-      
+      let cleanReport = data.report || "";
+      cleanReport = cleanReport.replace(/<think>[\s\S]*?<\/think>/gi, "");
+      cleanReport = cleanReport.replace(/<\/?think>/gi, "");
+      cleanReport = cleanReport.replace(/^\s*\n\s*\n/gm, "\n\n").trim();
+
       setReport(cleanReport);
       setCitations(data.citations || []);
     } catch (error: any) {
       console.error("Search error:", error);
       toast({
-        title: "Lỗi tìm kiếm",
-        description: "Không thể lấy thông tin công ty. Vui lòng thử lại.",
-        variant: "destructive"
+        title: t("careerPages.companyReport.toast.searchErrorTitle"),
+        description: t("careerPages.companyReport.toast.searchErrorDesc"),
+        variant: "destructive",
       });
     } finally {
       setSearching(false);
     }
   };
-
-  const reportSections = [
-    { icon: Building2, label: "Tổng quan công ty", color: "text-blue-500" },
-    { icon: DollarSign, label: "Thông tin lương", color: "text-green-500" },
-    { icon: Users, label: "Văn hóa công ty", color: "text-purple-500" },
-    { icon: MessageSquare, label: "Review phỏng vấn", color: "text-orange-500" },
-    { icon: Newspaper, label: "Tin tức mới nhất", color: "text-pink-500" }
-  ];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -114,27 +122,27 @@ const CompanyReport = () => {
             className="gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            Korea Career Hub
+            {t("careerPages.hub.title")}
           </Button>
 
           {/* Premium Banner */}
-          {!isPremium && <PremiumPreviewBanner featureName="Báo cáo chuyên sâu công ty" />}
+          {!isPremium && (
+            <PremiumPreviewBanner featureName={t("careerPages.companyReport.premiumPreviewFeatureName")} />
+          )}
 
           {/* Header */}
           <div className="text-center space-y-3">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30">
               <Search className="w-4 h-4 text-purple-500" />
-              <span className="text-sm font-medium">Dựa trên AI Web Search</span>
+              <span className="text-sm font-medium">{t("careerPages.companyReport.badge")}</span>
             </div>
-            
+
             <h1 className="text-headline">
               <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-                Báo Cáo Chuyên Sâu Công Ty
+                {t("careerPages.companyReport.title")}
               </span>
             </h1>
-            <p className="text-body text-muted-foreground">
-              Phân tích thông tin ẩn của các công ty Hàn Quốc với LUKATO RAG AI
-            </p>
+            <p className="text-body text-muted-foreground">{t("careerPages.companyReport.description")}</p>
           </div>
 
           {/* Search Section */}
@@ -144,7 +152,7 @@ const CompanyReport = () => {
                 <Input
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
-                  placeholder="Nhập tên công ty Hàn Quốc (VD: Samsung, Hyundai...)"
+                  placeholder={t("careerPages.companyReport.inputPlaceholder")}
                   className="flex-1"
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 />
@@ -152,6 +160,7 @@ const CompanyReport = () => {
                   onClick={() => handleSearch()}
                   disabled={searching || !companyName.trim()}
                   className="bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90"
+                  aria-label={t("careerPages.companyReport.searchButtonLabel")}
                 >
                   {searching ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -163,7 +172,9 @@ const CompanyReport = () => {
 
               {/* Quick Search */}
               <div>
-                <p className="text-card-body text-muted-foreground mb-2">Tìm kiếm nhanh:</p>
+                <p className="text-card-body text-muted-foreground mb-2">
+                  {t("careerPages.companyReport.quickSearch")}
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {quickSearches.map((company) => (
                     <Button
@@ -185,12 +196,14 @@ const CompanyReport = () => {
 
               {/* What you'll get */}
               <div className="pt-4 border-t">
-                <p className="text-card-title text-foreground mb-3">Nội dung báo cáo bao gồm:</p>
+                <p className="text-card-title text-foreground mb-3">
+                  {t("careerPages.companyReport.includes")}
+                </p>
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                   {reportSections.map((section) => (
-                    <div key={section.label} className="flex items-center gap-2">
+                    <div key={section.labelKey} className="flex items-center gap-2">
                       <section.icon className={`w-4 h-4 ${section.color}`} />
-                      <span className="text-card-caption text-muted-foreground">{section.label}</span>
+                      <span className="text-card-caption text-muted-foreground">{t(section.labelKey)}</span>
                     </div>
                   ))}
                 </div>
@@ -207,8 +220,8 @@ const CompanyReport = () => {
                   <Loader2 className="w-8 h-8 text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-spin" />
                 </div>
                 <div className="text-center">
-                  <p className="text-card-title-lg text-foreground">AI đang tìm kiếm trên web...</p>
-                  <p className="text-card-body text-muted-foreground">Đang phân tích lương, văn hóa, review phỏng vấn...</p>
+                  <p className="text-card-title-lg text-foreground">{t("careerPages.companyReport.loadingTitle")}</p>
+                  <p className="text-card-body text-muted-foreground">{t("careerPages.companyReport.loadingDesc")}</p>
                 </div>
               </div>
             </Card>
@@ -224,13 +237,13 @@ const CompanyReport = () => {
               <Card className="p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <Sparkles className="w-5 h-5 text-purple-500" />
-                  <h2 className="text-title text-foreground">Báo cáo chuyên sâu: {companyName}</h2>
+                  <h2 className="text-title text-foreground">
+                    {t("careerPages.companyReport.resultTitle", { company: companyName })}
+                  </h2>
                 </div>
-                
+
                 <div className="prose prose-sm dark:prose-invert max-w-none">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {report}
-                  </ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{report}</ReactMarkdown>
                 </div>
               </Card>
 
@@ -239,7 +252,7 @@ const CompanyReport = () => {
                 <Card className="p-4">
                   <h3 className="font-medium text-sm mb-3 flex items-center gap-2">
                     <ExternalLink className="w-4 h-4" />
-                    Tài liệu tham khảo ({citations.length})
+                    {t("careerPages.companyReport.citations", { count: citations.length })}
                   </h3>
                   <div className="space-y-2">
                     {citations.map((url, idx) => (
@@ -267,3 +280,4 @@ const CompanyReport = () => {
 };
 
 export default CompanyReport;
+
