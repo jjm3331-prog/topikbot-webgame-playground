@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Ghost, User, Reply, Flag, Languages } from "lucide-react";
+import { Ghost, User, Reply, Flag, Languages, Loader2, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { usePostTranslation } from "@/components/board/PostTranslateButton";
+import { autoTranslateText } from "@/lib/autoTranslate";
+import { toast } from "@/hooks/use-toast";
 import { format, Locale } from "date-fns";
 
 interface Comment {
@@ -40,16 +42,57 @@ export function CommentItem({
   onReport,
   renderChildren,
 }: CommentItemProps) {
-  const { t } = useTranslation();
-  const {
-    displayText,
-    isTranslated,
-    isTranslating,
-    translate,
-    showOriginal,
-    showTranslation,
-    hasTranslation,
-  } = usePostTranslation(comment.content);
+  const { t, i18n } = useTranslation();
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [translatedContent, setTranslatedContent] = useState<string | null>(null);
+  const [showTranslated, setShowTranslated] = useState(false);
+
+  const handleTranslate = async () => {
+    // If already translated, toggle view
+    if (translatedContent) {
+      setShowTranslated(!showTranslated);
+      return;
+    }
+
+    setIsTranslating(true);
+    try {
+      // Detect source language
+      const hasKorean = /[가-힣]/.test(comment.content);
+      const sourceLanguage = hasKorean ? "ko" : "vi";
+      const targetLanguage = i18n.language;
+
+      // Skip if same language
+      if (targetLanguage === sourceLanguage) {
+        toast({
+          title: t("board.translation.sameLanguage"),
+          description: t("board.translation.sameLanguageDesc"),
+        });
+        setIsTranslating(false);
+        return;
+      }
+
+      const result = await autoTranslateText({
+        text: comment.content,
+        sourceLanguage,
+        targetLanguage,
+      });
+
+      setTranslatedContent(result);
+      setShowTranslated(true);
+      toast({ title: t("board.translation.success") });
+    } catch (error) {
+      console.error("Translation error:", error);
+      toast({
+        title: t("board.translation.error"),
+        description: t("board.translation.errorDesc"),
+        variant: "destructive",
+      });
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
+  const displayText = showTranslated && translatedContent ? translatedContent : comment.content;
 
   return (
     <div className={depth > 0 ? "ml-8 border-l-2 border-muted pl-4" : ""}>
@@ -71,43 +114,40 @@ export function CommentItem({
             </span>
           </div>
           <p className="text-sm mt-1 whitespace-pre-wrap">{displayText}</p>
-          <div className="flex items-center gap-1 mt-1 flex-wrap">
+          <div className="flex items-center gap-1 mt-2 flex-wrap">
             {/* Translation controls */}
-            {!hasTranslation ? (
+            {showTranslated && translatedContent ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs text-muted-foreground"
+                onClick={() => setShowTranslated(false)}
+              >
+                <RotateCcw className="w-3 h-3 mr-1" />
+                {t("board.translation.showOriginal")}
+              </Button>
+            ) : (
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-7 text-xs text-primary"
-                onClick={translate}
+                onClick={handleTranslate}
                 disabled={isTranslating}
               >
-                <Languages className="w-3 h-3 mr-1" />
-                {isTranslating ? t("board.translation.translating") : t("board.translation.translate")}
-              </Button>
-            ) : (
-              <>
-                {isTranslated ? (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 text-xs text-primary"
-                    onClick={showOriginal}
-                  >
-                    <Languages className="w-3 h-3 mr-1" />
-                    {t("board.translation.showOriginal")}
-                  </Button>
+                {isTranslating ? (
+                  <>
+                    <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                    {t("board.translation.translating")}
+                  </>
                 ) : (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 text-xs text-primary"
-                    onClick={showTranslation}
-                  >
+                  <>
                     <Languages className="w-3 h-3 mr-1" />
-                    {t("board.translation.showTranslation")}
-                  </Button>
+                    {translatedContent 
+                      ? t("board.translation.showTranslation") 
+                      : t("board.translation.translate")}
+                  </>
                 )}
-              </>
+              </Button>
             )}
             <Button 
               variant="ghost" 
