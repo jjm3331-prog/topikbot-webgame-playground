@@ -1681,10 +1681,22 @@
       "sameLanguageDesc": "원문과 선택한 언어가 같습니다."
     },
     "types": {
-      "notice": "📢 공지사항",
-      "free": "💬 자유게시판",
-      "resource": "📚 자료실",
-      "anonymous": "👻 익명게시판"
+      "notice": {
+        "title": "📢 공지사항",
+        "subtitle": "중요 공지 및 안내"
+      },
+      "free": {
+        "title": "💬 자유게시판",
+        "subtitle": "자유로운 토론"
+      },
+      "resource": {
+        "title": "📚 자료실",
+        "subtitle": "학습 자료 공유"
+      },
+      "anonymous": {
+        "title": "👻 익명게시판",
+        "subtitle": "익명으로 소통"
+      }
     },
     "error": "오류",
     "cannotLoadPosts": "게시글을 불러올 수 없습니다.",

@@ -1383,10 +1383,22 @@
       "sameLanguageDesc": "The source and selected languages are the same."
     },
     "types": {
-      "notice": "📢 Notices",
-      "free": "💬 Free Board",
-      "resource": "📚 Resources",
-      "anonymous": "👻 Anonymous"
+      "notice": {
+        "title": "📢 Notices",
+        "subtitle": "Official announcements"
+      },
+      "free": {
+        "title": "💬 Free Board",
+        "subtitle": "Free discussion"
+      },
+      "resource": {
+        "title": "📚 Resources",
+        "subtitle": "Learning materials"
+      },
+      "anonymous": {
+        "title": "👻 Anonymous",
+        "subtitle": "Anonymous posts"
+      }
     },
     "error": "Error",
     "cannotLoadPosts": "Failed to load posts.",

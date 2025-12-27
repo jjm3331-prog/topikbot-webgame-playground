@@ -1148,10 +1148,22 @@
       "sameLanguageDesc": "Manba va tanlangan tillar bir xil."
     },
     "types": {
-      "notice": "📢 E'lonlar",
-      "free": "💬 Erkin",
-      "resource": "📚 Resurslar",
-      "anonymous": "👻 Anonim"
+      "notice": {
+        "title": "📢 E'lonlar",
+        "subtitle": "Rasmiy bildirishnomalar"
+      },
+      "free": {
+        "title": "💬 Erkin",
+        "subtitle": "Erkin muhokama"
+      },
+      "resource": {
+        "title": "📚 Resurslar",
+        "subtitle": "O'quv materiallari"
+      },
+      "anonymous": {
+        "title": "👻 Anonim",
+        "subtitle": "Anonim postlar"
+      }
     },
     "error": "Xato",
     "cannotLoadPosts": "Postlarni yuklab bo'lmadi.",
