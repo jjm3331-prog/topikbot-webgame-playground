@@ -1508,8 +1508,9 @@
       "subtitle": "Koreyada ish topish uchun all-in-one",
       "subline": "Headhunting • Kompaniya hisobotlari • AI intervyu",
       "premiumPreviewFeatureName": "Korea Career Hub",
-      "status": { "active": "Faol" },
+      "status": { "active": "Faol", "coming": "Tez kunda" },
       "cta": "Ochish",
+      "comingSoon": "Tez kunda",
       "stats": {
         "partnerCompanies": "Hamkor kompaniyalar",
         "successPlacements": "Muvaffaqiyatli ishga joylashish",

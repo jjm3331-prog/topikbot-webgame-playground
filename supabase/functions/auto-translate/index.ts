@@ -64,6 +64,7 @@ async function saveCache(
 }
 
 const LANG_NAMES: Record<string, string> = {
+  auto: "Auto-detect",
   ko: "Korean",
   vi: "Vietnamese",
   en: "English",
@@ -74,7 +75,7 @@ const LANG_NAMES: Record<string, string> = {
 };
 
 function systemPromptForSingle(format: "text" | "html", sourceLang: string, targetLang: string): string {
-  const srcName = LANG_NAMES[sourceLang] || sourceLang;
+  const srcName = sourceLang === "auto" ? "the source language (auto-detect)" : (LANG_NAMES[sourceLang] || sourceLang);
   const tgtName = LANG_NAMES[targetLang] || targetLang;
 
   if (format === "html") {
@@ -98,7 +99,7 @@ RULES:
 }
 
 function systemPromptForSegments(sourceLang: string, targetLang: string, count: number): string {
-  const srcName = LANG_NAMES[sourceLang] || sourceLang;
+  const srcName = sourceLang === "auto" ? "the source language (auto-detect)" : (LANG_NAMES[sourceLang] || sourceLang);
   const tgtName = LANG_NAMES[targetLang] || targetLang;
 
   return `You are a professional translation engine.
