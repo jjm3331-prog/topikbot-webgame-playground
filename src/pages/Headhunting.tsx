@@ -37,11 +37,11 @@ import {
 import { PremiumPreviewBanner } from "@/components/PremiumPreviewBanner";
 import { useSubscription } from "@/hooks/useSubscription";
 
-const benefits = [
-  { icon: Crown, title: "Đội ngũ Headhunter chuyên nghiệp", desc: "Kết nối trực tiếp với doanh nghiệp Hàn Quốc" },
-  { icon: Building2, title: "500+ công ty đối tác", desc: "Từ Samsung, LG, Hyundai đến các startup" },
-  { icon: Globe, title: "Hỗ trợ làm việc tại Hàn", desc: "Tư vấn visa, chỗ ở, cuộc sống" },
-  { icon: Shield, title: "MIỄN PHÍ 100%", desc: "Hoàn toàn miễn phí cho thành viên Premium" },
+const getBenefits = (t: any) => [
+  { icon: Crown, title: t('headhunting.benefits.headhunter'), desc: t('headhunting.benefits.headhunterDesc') },
+  { icon: Building2, title: t('headhunting.benefits.companies'), desc: t('headhunting.benefits.companiesDesc') },
+  { icon: Globe, title: t('headhunting.benefits.support'), desc: t('headhunting.benefits.supportDesc') },
+  { icon: Shield, title: t('headhunting.benefits.free'), desc: t('headhunting.benefits.freeDesc') },
 ];
 
 interface FileUploadState {
@@ -125,15 +125,15 @@ const Headhunting = () => {
   const getStatusInfo = (status: string) => {
     switch (status) {
       case 'pending':
-        return { label: 'Đang chờ xét duyệt', color: 'bg-yellow-500/20 text-yellow-600 border-yellow-500/50', icon: '⏳' };
+        return { label: t('headhunting.status.pending'), color: 'bg-yellow-500/20 text-yellow-600 border-yellow-500/50', icon: '⏳' };
       case 'reviewing':
-        return { label: 'Đang xem xét', color: 'bg-blue-500/20 text-blue-600 border-blue-500/50', icon: '🔍' };
+        return { label: t('headhunting.status.reviewing'), color: 'bg-blue-500/20 text-blue-600 border-blue-500/50', icon: '🔍' };
       case 'matched':
-        return { label: 'Đã kết nối công ty', color: 'bg-green-500/20 text-green-600 border-green-500/50', icon: '🤝' };
+        return { label: t('headhunting.status.matched'), color: 'bg-green-500/20 text-green-600 border-green-500/50', icon: '🤝' };
       case 'rejected':
-        return { label: 'Không phù hợp', color: 'bg-red-500/20 text-red-600 border-red-500/50', icon: '❌' };
+        return { label: t('headhunting.status.rejected'), color: 'bg-red-500/20 text-red-600 border-red-500/50', icon: '❌' };
       case 'hired':
-        return { label: 'Đã được tuyển dụng', color: 'bg-purple-500/20 text-purple-600 border-purple-500/50', icon: '🎉' };
+        return { label: t('headhunting.status.hired'), color: 'bg-purple-500/20 text-purple-600 border-purple-500/50', icon: '🎉' };
       default:
         return { label: status, color: 'bg-muted text-muted-foreground border-border', icon: '📋' };
     }
@@ -386,10 +386,10 @@ const Headhunting = () => {
                 <Briefcase className="w-8 h-8 text-white" />
               </div>
               <h1 className="text-title text-foreground mb-2">
-                Lịch sử đăng ký Headhunting
+                {t('headhunting.applicationHistory')}
               </h1>
               <p className="text-body text-muted-foreground">
-                Bạn đã gửi {applications.length} đơn đăng ký
+                {t('headhunting.historySubtitle', { count: applications.length })}
               </p>
             </motion.div>
 
@@ -455,7 +455,7 @@ const Headhunting = () => {
                         
                         {app.admin_notes && (
                           <div className="mt-4 p-3 bg-muted/50 rounded-lg border border-border/50">
-                            <p className="text-xs text-muted-foreground font-medium mb-1">💬 Phản hồi từ Headhunter:</p>
+                            <p className="text-xs text-muted-foreground font-medium mb-1">💬 {t('headhunting.headhunterFeedback')}:</p>
                             <p className="text-sm text-foreground">{app.admin_notes}</p>
                           </div>
                         )}
@@ -478,7 +478,7 @@ const Headhunting = () => {
                                 className="gap-2"
                               >
                                 <Pencil className="w-4 h-4" />
-                                Chỉnh sửa
+                                {t('headhunting.edit')}
                               </Button>
                             )}
                             <Button
@@ -493,12 +493,12 @@ const Headhunting = () => {
                               ) : (
                                 <Trash2 className="w-4 h-4" />
                               )}
-                              Xóa đơn
+                              {t('headhunting.delete')}
                             </Button>
                           </div>
                           {!canEdit && (
                             <p className="text-xs text-muted-foreground mt-2">
-                              ⚠️ Không thể chỉnh sửa đơn đã được xử lý. Bạn có thể tạo đơn đăng ký mới.
+                              ⚠️ {t('headhunting.cannotEditProcessed')}
                             </p>
                           )}
                         </motion.div>
@@ -521,13 +521,13 @@ const Headhunting = () => {
                 className="btn-primary text-primary-foreground gap-2"
               >
                 <Rocket className="w-4 h-4" />
-                Tạo đơn đăng ký mới
+                {t('headhunting.newApplication')}
               </Button>
               <Button 
                 variant="outline"
                 onClick={() => navigate("/dashboard")}
               >
-                Quay về Dashboard
+                {t('headhunting.backToDashboard')}
               </Button>
             </motion.div>
 
@@ -538,7 +538,7 @@ const Headhunting = () => {
               transition={{ delay: 0.4 }}
               className="text-center text-xs text-muted-foreground mt-6"
             >
-              💡 Bạn có thể gửi nhiều đơn đăng ký với các vị trí hoặc ngành nghề khác nhau
+              💡 {t('headhunting.infoTip')}
             </motion.p>
           </div>
         </main>
@@ -563,11 +563,11 @@ const Headhunting = () => {
               <CheckCircle2 className="w-10 h-10 text-white" />
             </motion.div>
             <h1 className="text-headline text-foreground mb-4">
-              🎉 Đăng ký thành công!
+              {t('headhunting.successTitle')}
             </h1>
             <p className="text-body text-muted-foreground mb-8">
-              Đội ngũ Headhunter sẽ liên hệ với bạn sớm.<br />
-              Bạn sẽ nhận được phản hồi trong 3-5 ngày làm việc.
+              {t('headhunting.successMessage')}<br />
+              {t('headhunting.successSubMessage')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button 
@@ -578,13 +578,13 @@ const Headhunting = () => {
                 }}
                 variant="outline"
               >
-                Xem lịch sử đăng ký
+                {t('headhunting.viewHistory')}
               </Button>
               <Button 
                 onClick={() => navigate("/dashboard")} 
                 className="btn-primary text-primary-foreground"
               >
-                Quay về Dashboard
+                {t('headhunting.backToDashboard')}
               </Button>
             </div>
           </div>
@@ -604,7 +604,7 @@ const Headhunting = () => {
         {/* Premium Preview Banner */}
         {!isPremium && (
           <div className="max-w-4xl mx-auto mb-6">
-            <PremiumPreviewBanner featureName="dịch vụ Headhunting" />
+            <PremiumPreviewBanner featureName={t('headhunting.featureName')} />
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-br from-korean-purple/10 via-background to-korean-blue/10" />
@@ -619,12 +619,12 @@ const Headhunting = () => {
             {editingApplication ? (
               <>
                 <Pencil className="w-4 h-4" />
-                Chỉnh sửa đơn đăng ký
+                {t('headhunting.editApplication')}
               </>
             ) : (
               <>
                 <Crown className="w-4 h-4 text-korean-yellow" />
-                Dịch vụ dành cho Premium
+                {t('headhunting.premiumService')}
               </>
             )}
           </motion.div>
@@ -660,7 +660,7 @@ const Headhunting = () => {
             transition={{ delay: 0.3 }}
             className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-8"
           >
-            {benefits.map((benefit, i) => (
+            {getBenefits(t).map((benefit, i) => (
               <div key={benefit.title} className="p-4 rounded-xl bg-card/80 border border-border/50">
                 <benefit.icon className="w-6 h-6 mx-auto mb-2 text-primary" />
                 <h3 className="text-card-title text-foreground">{benefit.title}</h3>
