@@ -1,9 +1,10 @@
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { Sparkles, Upload, Wand2, Loader2, Crown, ImageIcon, RefreshCw, BookOpen, Lightbulb, CheckCircle2, XCircle, Target, Download } from "lucide-react";
+import { Sparkles, Upload, Wand2, Loader2, Crown, ImageIcon, RefreshCw, BookOpen, Lightbulb, CheckCircle2, Target, Download, BarChart3, TrendingUp, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -11,16 +12,31 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
+interface DifficultyInfo {
+  level?: string;
+  grade?: string;
+  score?: number;
+  reasoning?: Record<string, string>;
+}
+
+interface SimilarQuestion {
+  type?: Record<string, string>;
+  description?: Record<string, string>;
+  examReference?: string;
+}
+
 interface ParsedResult {
   originalAnalysis?: Record<string, string>;
   variantQuestion?: Record<string, string>;
   answer?: Record<string, string>;
   explanation?: Record<string, string>;
   learningPoints?: Record<string, string>;
+  difficulty?: DifficultyInfo;
+  similarQuestions?: SimilarQuestion[];
 }
 
 export default function QuestionVariant() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { isPremium, loading: subscriptionLoading } = useSubscription();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -30,6 +46,8 @@ export default function QuestionVariant() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedContent, setGeneratedContent] = useState<ParsedResult | null>(null);
   const [rawContent, setRawContent] = useState<string | null>(null);
+
+  const currentLang = i18n.language?.startsWith("vi") ? "vi" : "ko";
 
   const usageExamples = [
     { subject: t("questionVariant.examples.reading"), example: t("questionVariant.examples.readingDesc") },
@@ -81,11 +99,27 @@ export default function QuestionVariant() {
       const match = content.match(regex);
       if (match) {
         const text = match[0].replace(/^##\s*[📋✨✅📝💡]\s*[^\n]+\n?/, "").trim();
-        result[key as keyof ParsedResult] = { [language]: text };
+        result[key as keyof ParsedResult] = { [language]: text } as any;
       }
     }
 
     return result;
+  };
+
+  const getDifficultyColor = (score?: number) => {
+    if (!score) return "bg-gray-500";
+    if (score <= 3) return "bg-green-500";
+    if (score <= 5) return "bg-yellow-500";
+    if (score <= 7) return "bg-orange-500";
+    return "bg-red-500";
+  };
+
+  const getDifficultyLabel = (score?: number) => {
+    if (!score) return t("questionVariant.difficulty.unknown");
+    if (score <= 3) return t("questionVariant.difficulty.easy");
+    if (score <= 5) return t("questionVariant.difficulty.medium");
+    if (score <= 7) return t("questionVariant.difficulty.hard");
+    return t("questionVariant.difficulty.veryHard");
   };
 
   const handleDownloadPDF = () => {
@@ -110,6 +144,7 @@ export default function QuestionVariant() {
             .header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 3px solid #f59e0b; }
             .header h1 { font-size: 24px; color: #f59e0b; margin-bottom: 8px; }
             .header .date { font-size: 12px; color: #666; }
+            .difficulty-badge { display: inline-block; padding: 8px 16px; border-radius: 8px; background: #f59e0b; color: white; font-weight: bold; margin: 10px 0; }
             .section { margin-bottom: 25px; break-inside: avoid; }
             .section-title { font-size: 14px; font-weight: 700; color: white; padding: 10px 15px; margin-bottom: 15px; border-radius: 6px; }
             .section-1 .section-title { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
@@ -117,12 +152,15 @@ export default function QuestionVariant() {
             .section-3 .section-title { background: linear-gradient(135deg, #10b981, #059669); }
             .section-4 .section-title { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
             .section-5 .section-title { background: linear-gradient(135deg, #ec4899, #be185d); }
+            .section-6 .section-title { background: linear-gradient(135deg, #06b6d4, #0891b2); }
             .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
             .lang-block { padding: 15px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; }
             .lang-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid; }
             .lang-ko .lang-label { color: #3b82f6; border-color: #3b82f6; }
             .lang-vi .lang-label { color: #10b981; border-color: #10b981; }
             .lang-content { font-size: 13px; line-height: 1.8; white-space: pre-wrap; }
+            .similar-questions { margin-top: 20px; }
+            .similar-item { padding: 12px; margin-bottom: 10px; background: #f1f5f9; border-radius: 8px; border-left: 4px solid #06b6d4; }
             .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #999; }
             @media print { body { padding: 20px; } .section { break-inside: avoid; } }
           </style>
@@ -131,6 +169,12 @@ export default function QuestionVariant() {
           <div class="header">
             <h1>✨ TOPIK ${t("questionVariant.title")}</h1>
             <div class="date">${t("questionVariant.pdf.createdAt")}: ${new Date().toLocaleString()}</div>
+            ${generatedContent?.difficulty ? `
+              <div class="difficulty-badge">
+                ${generatedContent.difficulty.level} ${generatedContent.difficulty.grade} | 
+                ${t("questionVariant.difficulty.score")}: ${generatedContent.difficulty.score}/10
+              </div>
+            ` : ''}
           </div>
           
           ${generatedContent ? `
@@ -210,6 +254,21 @@ export default function QuestionVariant() {
                     <div class="lang-label">🇻🇳 ${t("questionVariant.pdf.translation")}</div>
                     <div class="lang-content">${generatedContent.learningPoints.vi || '-'}</div>
                   </div>
+                </div>
+              </div>
+            ` : ''}
+
+            ${generatedContent.similarQuestions && generatedContent.similarQuestions.length > 0 ? `
+              <div class="section section-6">
+                <div class="section-title">📚 ${t("questionVariant.sections.similarQuestions")}</div>
+                <div class="similar-questions">
+                  ${generatedContent.similarQuestions.map((q, i) => `
+                    <div class="similar-item">
+                      <strong>${i + 1}. ${q.type?.ko || q.type?.vi || ''}</strong>
+                      <p style="margin-top: 8px; color: #64748b;">${q.description?.ko || q.description?.vi || ''}</p>
+                      ${q.examReference ? `<p style="margin-top: 4px; color: #0891b2; font-size: 12px;">📖 ${q.examReference}</p>` : ''}
+                    </div>
+                  `).join('')}
                 </div>
               </div>
             ` : ''}
@@ -489,6 +548,14 @@ export default function QuestionVariant() {
                     <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
                     <span>{t("questionVariant.features.explain")}</span>
                   </div>
+                  <div className="flex items-start gap-2">
+                    <BarChart3 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" />
+                    <span>{t("questionVariant.features.difficulty")}</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <TrendingUp className="w-5 h-5 text-purple-500 shrink-0 mt-0.5" />
+                    <span>{t("questionVariant.features.similar")}</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -502,11 +569,24 @@ export default function QuestionVariant() {
             className="max-w-4xl mx-auto mt-8"
           >
             <Card className="overflow-hidden">
-              <div className="bg-gradient-to-r from-amber-500 to-orange-600 p-4 flex items-center justify-between">
-                <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                  <Target className="w-6 h-6" />
-                  {t("questionVariant.result")}
-                </h3>
+              <div className="bg-gradient-to-r from-amber-500 to-orange-600 p-4 flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-4">
+                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    <Target className="w-6 h-6" />
+                    {t("questionVariant.result")}
+                  </h3>
+                  
+                  {generatedContent?.difficulty && (
+                    <div className="flex items-center gap-2">
+                      <Badge className="bg-white/20 text-white border-white/30 px-3 py-1">
+                        {generatedContent.difficulty.level} {generatedContent.difficulty.grade}
+                      </Badge>
+                      <Badge className={`${getDifficultyColor(generatedContent.difficulty.score)} text-white border-0 px-3 py-1`}>
+                        {getDifficultyLabel(generatedContent.difficulty.score)} ({generatedContent.difficulty.score}/10)
+                      </Badge>
+                    </div>
+                  )}
+                </div>
                 <Button
                   onClick={handleDownloadPDF}
                   variant="outline"
@@ -518,13 +598,46 @@ export default function QuestionVariant() {
               </div>
 
               <CardContent className="p-6 space-y-6">
+                {/* Difficulty Analysis Section */}
+                {generatedContent?.difficulty && (
+                  <div className="p-4 rounded-xl bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30">
+                    <h4 className="font-bold text-foreground mb-3 flex items-center gap-2">
+                      <BarChart3 className="w-5 h-5 text-cyan-500" />
+                      {t("questionVariant.sections.difficultyAnalysis")}
+                    </h4>
+                    <div className="grid gap-4 md:grid-cols-3">
+                      <div className="text-center p-3 rounded-lg bg-background/50">
+                        <div className="text-sm text-muted-foreground mb-1">{t("questionVariant.difficulty.level")}</div>
+                        <div className="text-lg font-bold text-foreground">{generatedContent.difficulty.level}</div>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-background/50">
+                        <div className="text-sm text-muted-foreground mb-1">{t("questionVariant.difficulty.grade")}</div>
+                        <div className="text-lg font-bold text-foreground">{generatedContent.difficulty.grade}</div>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-background/50">
+                        <div className="text-sm text-muted-foreground mb-1">{t("questionVariant.difficulty.score")}</div>
+                        <div className={`text-lg font-bold ${getDifficultyColor(generatedContent.difficulty.score).replace('bg-', 'text-')}`}>
+                          {generatedContent.difficulty.score}/10
+                        </div>
+                      </div>
+                    </div>
+                    {generatedContent.difficulty.reasoning && (
+                      <p className="mt-4 text-sm text-muted-foreground">
+                        {generatedContent.difficulty.reasoning[currentLang] || generatedContent.difficulty.reasoning.ko}
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 {generatedContent?.originalAnalysis && (
                   <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/30">
                     <h4 className="font-bold text-foreground mb-3 flex items-center gap-2">
                       <BookOpen className="w-5 h-5 text-blue-500" />
                       {t("questionVariant.sections.originalAnalysis")}
                     </h4>
-                    <p className="text-foreground whitespace-pre-wrap">{generatedContent.originalAnalysis.ko}</p>
+                    <p className="text-foreground whitespace-pre-wrap">
+                      {generatedContent.originalAnalysis[currentLang] || generatedContent.originalAnalysis.ko}
+                    </p>
                   </div>
                 )}
 
@@ -534,7 +647,9 @@ export default function QuestionVariant() {
                       <Sparkles className="w-5 h-5 text-amber-500" />
                       {t("questionVariant.sections.variantQuestion")}
                     </h4>
-                    <p className="text-foreground whitespace-pre-wrap">{generatedContent.variantQuestion.ko}</p>
+                    <p className="text-foreground whitespace-pre-wrap">
+                      {generatedContent.variantQuestion[currentLang] || generatedContent.variantQuestion.ko}
+                    </p>
                   </div>
                 )}
 
@@ -544,7 +659,9 @@ export default function QuestionVariant() {
                       <CheckCircle2 className="w-5 h-5 text-green-500" />
                       {t("questionVariant.sections.answer")}
                     </h4>
-                    <p className="text-foreground whitespace-pre-wrap">{generatedContent.answer.ko}</p>
+                    <p className="text-foreground whitespace-pre-wrap">
+                      {generatedContent.answer[currentLang] || generatedContent.answer.ko}
+                    </p>
                   </div>
                 )}
 
@@ -554,7 +671,9 @@ export default function QuestionVariant() {
                       <Lightbulb className="w-5 h-5 text-purple-500" />
                       {t("questionVariant.sections.explanation")}
                     </h4>
-                    <p className="text-foreground whitespace-pre-wrap">{generatedContent.explanation.ko}</p>
+                    <p className="text-foreground whitespace-pre-wrap">
+                      {generatedContent.explanation[currentLang] || generatedContent.explanation.ko}
+                    </p>
                   </div>
                 )}
 
@@ -564,7 +683,44 @@ export default function QuestionVariant() {
                       <Target className="w-5 h-5 text-pink-500" />
                       {t("questionVariant.sections.learningPoints")}
                     </h4>
-                    <p className="text-foreground whitespace-pre-wrap">{generatedContent.learningPoints.ko}</p>
+                    <p className="text-foreground whitespace-pre-wrap">
+                      {generatedContent.learningPoints[currentLang] || generatedContent.learningPoints.ko}
+                    </p>
+                  </div>
+                )}
+
+                {/* Similar Questions Section */}
+                {generatedContent?.similarQuestions && generatedContent.similarQuestions.length > 0 && (
+                  <div className="p-4 rounded-xl bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/30">
+                    <h4 className="font-bold text-foreground mb-4 flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-indigo-500" />
+                      {t("questionVariant.sections.similarQuestions")}
+                    </h4>
+                    <div className="space-y-3">
+                      {generatedContent.similarQuestions.map((q, index) => (
+                        <div key={index} className="p-4 rounded-lg bg-background/50 border border-border/50 hover:border-indigo-500/50 transition-colors">
+                          <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-500 font-bold shrink-0">
+                              {index + 1}
+                            </div>
+                            <div className="flex-1">
+                              <h5 className="font-semibold text-foreground mb-1">
+                                {q.type?.[currentLang] || q.type?.ko || `유형 ${index + 1}`}
+                              </h5>
+                              <p className="text-sm text-muted-foreground mb-2">
+                                {q.description?.[currentLang] || q.description?.ko}
+                              </p>
+                              {q.examReference && (
+                                <div className="flex items-center gap-2 text-xs text-indigo-500">
+                                  <ArrowRight className="w-3 h-3" />
+                                  {q.examReference}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
 

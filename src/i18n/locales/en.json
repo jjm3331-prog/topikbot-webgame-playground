@@ -1,5 +1,76 @@
 {
   "questionVariant": {
+    "title": "AI Question Variant",
+    "description": "Upload a TOPIK question image and AI will generate similar variant questions",
+    "howToUse": "How to Use",
+    "uploadImage": "Upload Question Image",
+    "generate": "Generate Variant",
+    "generateButton": "Generate AI Variant",
+    "generating": "Generating...",
+    "changeImage": "Change Image",
+    "clickToUpload": "Click to upload image",
+    "supportedFormats": "JPG, PNG, WEBP (max 10MB)",
+    "result": "Result",
+    "downloadPDF": "Download PDF",
+    "premiumFeature": "Premium Feature",
+    "premiumDescription": "This feature is only available for Premium members.",
+    "upgradePremium": "Upgrade to Premium",
+    "examples": {
+      "reading": "Reading Questions",
+      "readingDesc": "Analyze passages and create new questions at the same difficulty",
+      "grammar": "Grammar Questions",
+      "grammarDesc": "Keep grammar patterns while changing examples",
+      "vocabulary": "Vocabulary Questions",
+      "vocabularyDesc": "Create same type vocabulary questions with different words",
+      "listening": "Listening Questions",
+      "listeningDesc": "Analyze listening scripts and create similar situations"
+    },
+    "features": {
+      "analyze": "Analyze original question",
+      "generate": "Generate similar variants",
+      "explain": "Provide detailed explanations",
+      "difficulty": "Difficulty analysis and grading",
+      "similar": "Similar question recommendations"
+    },
+    "sections": {
+      "originalAnalysis": "Original Analysis",
+      "variantQuestion": "Variant Question",
+      "answer": "Answer",
+      "explanation": "Explanation",
+      "learningPoints": "Learning Points",
+      "difficultyAnalysis": "Difficulty Analysis",
+      "similarQuestions": "Similar Questions"
+    },
+    "difficulty": {
+      "level": "TOPIK Level",
+      "grade": "Grade",
+      "score": "Difficulty Score",
+      "unknown": "Unknown",
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard",
+      "veryHard": "Very Hard"
+    },
+    "pdf": {
+      "createdAt": "Created at",
+      "translation": "Translation"
+    },
+    "success": {
+      "generated": "Variant question generated",
+      "pdfOpened": "PDF preview opened"
+    },
+    "errors": {
+      "selectImage": "Please select an image first",
+      "premiumRequired": "Premium subscription required",
+      "apiError": "API error occurred",
+      "tryAgain": "Please try again",
+      "imageTooLarge": "Image size must be under 10MB",
+      "noContent": "No content to download",
+      "popupBlocked": "Popup was blocked",
+      "pdfError": "PDF generation error"
+    }
+  },
+  "questionVariant": {
     "title": "Question Variant AI",
     "description": "Upload a TOPIK question image and AI will generate similar variant questions",
     "howToUse": "How to Use",

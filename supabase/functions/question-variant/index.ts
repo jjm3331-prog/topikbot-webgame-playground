@@ -22,6 +22,7 @@ const SYSTEM_PROMPT = `당신은 TOPIK 한국어 시험 전문가입니다. 사�
 - 원본 문제의 유형, 구조, 난이도를 정확히 파악
 - 비슷한 난이도의 새로운 변형 문제 생성 (단, 완전히 다른 주제와 어휘 사용)
 - 정답과 상세한 해설 제공
+- 난이도 분석 및 유사 문제 유형 추천
 - 모든 내용을 한국어와 베트남어로 병기
 
 **출력 형식 (반드시 이 JSON 형식으로 출력하세요):**
@@ -47,7 +48,51 @@ const SYSTEM_PROMPT = `당신은 TOPIK 한국어 시험 전문가입니다. 사�
   "learningPoints": {
     "ko": "이 문제를 통해 배울 수 있는 핵심 개념 (한국어)",
     "vi": "Những điểm học tập quan trọng từ câu hỏi này (tiếng Việt)"
-  }
+  },
+  "difficulty": {
+    "level": "TOPIK I 또는 TOPIK II",
+    "grade": "1급~6급 중 하나",
+    "score": 1-10 사이의 난이도 점수,
+    "reasoning": {
+      "ko": "난이도 판단 근거 (한국어)",
+      "vi": "Lý do đánh giá độ khó (tiếng Việt)"
+    }
+  },
+  "similarQuestions": [
+    {
+      "type": {
+        "ko": "유사 문제 유형 1 (한국어)",
+        "vi": "Loại câu hỏi tương tự 1 (tiếng Việt)"
+      },
+      "description": {
+        "ko": "이런 유형의 문제를 연습하면 좋은 이유 (한국어)",
+        "vi": "Lý do nên luyện tập loại câu hỏi này (tiếng Việt)"
+      },
+      "examReference": "예: TOPIK II 52회 읽기 13번"
+    },
+    {
+      "type": {
+        "ko": "유사 문제 유형 2 (한국어)",
+        "vi": "Loại câu hỏi tương tự 2 (tiếng Việt)"
+      },
+      "description": {
+        "ko": "이런 유형의 문제를 연습하면 좋은 이유 (한국어)",
+        "vi": "Lý do nên luyện tập loại câu hỏi này (tiếng Việt)"
+      },
+      "examReference": "예: TOPIK II 51회 읽기 15번"
+    },
+    {
+      "type": {
+        "ko": "유사 문제 유형 3 (한국어)",
+        "vi": "Loại câu hỏi tương tự 3 (tiếng Việt)"
+      },
+      "description": {
+        "ko": "이런 유형의 문제를 연습하면 좋은 이유 (한국어)",
+        "vi": "Lý do nên luyện tập loại câu hỏi này (tiếng Việt)"
+      },
+      "examReference": "예: TOPIK I 85회 듣기 20번"
+    }
+  ]
 }
 \`\`\`
 
@@ -56,7 +101,9 @@ const SYSTEM_PROMPT = `당신은 TOPIK 한국어 시험 전문가입니다. 사�
 - 한국어와 베트남어 모두 완전하고 자연스럽게 작성하세요
 - 베트남어는 번역이 아닌 네이티브 수준의 자연스러운 표현을 사용하세요
 - JSON 외의 다른 텍스트는 출력하지 마세요
-- 변형 문제는 원본과 완전히 다른 주제, 어휘, 상황을 사용하세요`;
+- 변형 문제는 원본과 완전히 다른 주제, 어휘, 상황을 사용하세요
+- 난이도는 TOPIK 기준으로 정확하게 분석하세요
+- 유사 문제는 실제 TOPIK 기출문제 패턴을 참고하여 추천하세요`;
 
 // Generate embedding using OpenAI
 async function generateEmbedding(text: string, apiKey: string): Promise<number[]> {
@@ -220,7 +267,7 @@ serve(async (req) => {
     if (OPENAI_API_KEY) {
       console.log("Attempting RAG search...");
       ragContext = await searchRAG(
-        "TOPIK 읽기 문제 유형 문법 어휘 표현",
+        "TOPIK 읽기 문제 유형 문법 어휘 표현 난이도",
         supabase,
         OPENAI_API_KEY,
         COHERE_API_KEY
@@ -236,7 +283,10 @@ serve(async (req) => {
 
     const userPrompt = `이 문제 이미지를 분석하고, 비슷한 난이도의 변형 문제를 생성해주세요.
 ${contextPrompt}
-**중요:** 변형 문제는 원본과 완전히 다른 주제, 어휘, 상황을 사용하세요. 동일하거나 유사한 단어/표현은 피하세요.
+**중요:** 
+1. 변형 문제는 원본과 완전히 다른 주제, 어휘, 상황을 사용하세요. 동일하거나 유사한 단어/표현은 피하세요.
+2. 난이도를 TOPIK I/II 기준으로 정확히 분석하고, 1급~6급 중 해당 등급을 명시하세요.
+3. 유사한 유형의 TOPIK 기출문제 패턴을 3개 추천하세요.
 
 반드시 JSON 형식으로만 출력하세요. 한국어와 베트남어를 모두 네이티브 수준으로 작성해주세요.`;
 
@@ -260,7 +310,7 @@ ${contextPrompt}
             {
               role: "model",
               parts: [
-                { text: "네, 이해했습니다. TOPIK 전문가로서 문제 이미지를 분석하고 한국어와 베트남어를 병기한 JSON 형식으로 변형 문제를 생성하겠습니다. 원본과 완전히 다른 주제와 어휘를 사용하겠습니다." }
+                { text: "네, 이해했습니다. TOPIK 전문가로서 문제 이미지를 분석하고 한국어와 베트남어를 병기한 JSON 형식으로 변형 문제를 생성하겠습니다. 원본과 완전히 다른 주제와 어휘를 사용하고, 난이도 분석과 유사 문제 추천도 포함하겠습니다." }
               ]
             },
             {
