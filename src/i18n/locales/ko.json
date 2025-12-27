@@ -1685,7 +1685,9 @@
       "errorDesc": "번역에 실패했습니다. 다시 시도해주세요.",
       "sameLanguage": "같은 언어",
       "sameLanguageDesc": "원문과 선택한 언어가 같습니다.",
-      "translatedSectionLabel": "🌐 번역"
+      "translatedSectionLabel": "🌐 번역",
+      "selectLanguage": "번역",
+      "cached": "캐시됨"
     },
     "types": {
       "notice": {

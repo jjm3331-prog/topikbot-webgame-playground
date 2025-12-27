@@ -20,9 +20,7 @@ import {
   Flag,
   AlertTriangle,
   RefreshCw,
-  Languages,
-  Loader2,
-  RotateCcw
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -49,6 +47,9 @@ import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { autoTranslateText } from "@/lib/autoTranslate";
 import { AudioPlayer } from "@/components/board/AudioPlayer";
+import { TranslationDropdown } from "@/components/board/TranslationDropdown";
+import { useTranslationCache } from "@/hooks/useTranslationCache";
+import { languages, type LanguageCode } from "@/i18n/config";
 
 import { CommentItem } from "@/components/board/CommentItem";
 import { supabase } from "@/integrations/supabase/client";
@@ -169,6 +170,13 @@ export default function BoardPost() {
   const [translatedTitle, setTranslatedTitle] = useState<string | null>(null);
   const [translatedContent, setTranslatedContent] = useState<string | null>(null);
   const [showTranslated, setShowTranslated] = useState(false);
+  const [currentTranslatedLang, setCurrentTranslatedLang] = useState<string | null>(null);
+  
+  // Translation cache
+  const { getCached, setCached, hasCached } = useTranslationCache(postId || "");
+  const cachedLanguages = languages
+    .map((l) => l.code)
+    .filter((code) => hasCached(code)) as LanguageCode[];
   
   // Report dialog state
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
@@ -449,32 +457,39 @@ export default function BoardPost() {
     }
   };
 
-  const handleTranslate = async () => {
+  // Detect source language from post content
+  const getSourceLanguage = (): string => {
+    if (!post) return "ko";
+    const hasKorean = /[가-힣]/.test(post.title + post.content);
+    return hasKorean ? "ko" : "vi";
+  };
+
+  const handleTranslate = async (targetLanguage: LanguageCode) => {
     if (!post) return;
     
-    // If already translated, toggle view
-    if (translatedTitle && translatedContent) {
-      setShowTranslated(!showTranslated);
+    const sourceLanguage = getSourceLanguage();
+    
+    // Skip if same language
+    if (targetLanguage === sourceLanguage) {
+      toast({ 
+        title: t("board.translation.sameLanguage"),
+        description: t("board.translation.sameLanguageDesc")
+      });
+      return;
+    }
+
+    // Check cache first
+    const cached = getCached(targetLanguage);
+    if (cached) {
+      setTranslatedTitle(cached.title);
+      setTranslatedContent(cached.content);
+      setCurrentTranslatedLang(targetLanguage);
+      setShowTranslated(true);
       return;
     }
 
     setIsTranslating(true);
     try {
-      // Detect source language
-      const hasKorean = /[가-힣]/.test(post.title + post.content);
-      const sourceLanguage = hasKorean ? "ko" : "vi";
-      const targetLanguage = i18n.language;
-      
-      // Skip if same language
-      if (targetLanguage === sourceLanguage) {
-        toast({ 
-          title: t("board.translation.sameLanguage"),
-          description: t("board.translation.sameLanguageDesc")
-        });
-        setIsTranslating(false);
-        return;
-      }
-
       // Extract text content while preserving structure markers
       const extractTextWithStructure = (html: string) => {
         const parser = new DOMParser();
@@ -535,8 +550,12 @@ export default function BoardPost() {
         .map((p) => `<p>${p.replace(/\n/g, "<br/>")}</p>`)
         .join("");
 
+      // Save to cache
+      setCached(targetLanguage, titleResult, formattedContent);
+      
       setTranslatedTitle(titleResult);
       setTranslatedContent(formattedContent);
+      setCurrentTranslatedLang(targetLanguage);
       setShowTranslated(true);
       toast({ title: t("board.translation.success") });
     } catch (error) {
@@ -641,50 +660,17 @@ export default function BoardPost() {
             animate={{ opacity: 1, y: 0 }}
           >
             <Card className="p-6">
-              {/* Translation Button - TOP */}
+              {/* Translation Dropdown - TOP */}
               <div className="flex items-center justify-end gap-2 mb-4 pb-4 border-b">
-                {showTranslated && translatedTitle ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleShowOriginal}
-                    className="text-xs"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
-                    {t("board.translation.showOriginal")}
-                  </Button>
-                ) : (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleTranslate}
-                    disabled={isTranslating}
-                    className="text-xs"
-                  >
-                    {isTranslating ? (
-                      <>
-                        <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
-                        {t("board.translation.translating")}
-                      </>
-                    ) : (
-                      <>
-                        <Languages className="w-3.5 h-3.5 mr-1.5" />
-                        {t("board.translation.translate")}
-                      </>
-                    )}
-                  </Button>
-                )}
-                {translatedTitle && !showTranslated && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowTranslated(true)}
-                    className="text-xs text-primary"
-                  >
-                    <Languages className="w-3.5 h-3.5 mr-1.5" />
-                    {t("board.translation.showTranslation")}
-                  </Button>
-                )}
+                <TranslationDropdown
+                  isTranslating={isTranslating}
+                  currentTranslatedLang={currentTranslatedLang}
+                  cachedLanguages={cachedLanguages}
+                  sourceLanguage={getSourceLanguage()}
+                  onTranslate={handleTranslate}
+                  onShowOriginal={handleShowOriginal}
+                  showingTranslated={showTranslated}
+                />
               </div>
 
               {/* Title & Actions */}

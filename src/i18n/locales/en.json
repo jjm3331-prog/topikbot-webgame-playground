@@ -1387,7 +1387,9 @@
       "errorDesc": "Translation failed. Please try again.",
       "sameLanguage": "Same Language",
       "sameLanguageDesc": "The source and selected languages are the same.",
-      "translatedSectionLabel": "🌐 Translation"
+      "translatedSectionLabel": "🌐 Translation",
+      "selectLanguage": "Translate",
+      "cached": "Cached"
     },
     "types": {
       "notice": {
