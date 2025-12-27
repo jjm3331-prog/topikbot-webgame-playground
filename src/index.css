@@ -470,9 +470,269 @@
   }
 
   /* Divider */
-  .divider-gradient {
+.divider-gradient {
     @apply h-px w-full;
     background: linear-gradient(90deg, transparent, hsl(var(--border)), transparent);
+  }
+
+  /* ========== AI CHAT PROSE - PRODUCTION LEVEL READABILITY ========== */
+  .prose-ai {
+    @apply text-foreground;
+    font-family: var(--font-body);
+    font-size: 1.0625rem; /* 17px - optimal for reading */
+    line-height: 1.85;
+    letter-spacing: 0.01em;
+  }
+
+  .prose-ai > * + * {
+    margin-top: 1.25em;
+  }
+
+  /* Headings */
+  .prose-ai h1,
+  .prose-ai h2,
+  .prose-ai h3,
+  .prose-ai h4,
+  .prose-ai h5,
+  .prose-ai h6 {
+    font-family: var(--font-heading);
+    @apply font-bold text-foreground;
+    line-height: 1.4;
+    margin-top: 2em;
+    margin-bottom: 0.75em;
+    letter-spacing: -0.02em;
+  }
+
+  .prose-ai h1 { font-size: 1.75em; }
+  .prose-ai h2 { font-size: 1.5em; }
+  .prose-ai h3 { font-size: 1.25em; }
+  .prose-ai h4 { font-size: 1.125em; }
+  .prose-ai h5, .prose-ai h6 { font-size: 1em; }
+
+  /* Paragraphs */
+  .prose-ai p {
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+    line-height: 1.9;
+  }
+
+  /* Strong & Bold */
+  .prose-ai strong,
+  .prose-ai b {
+    @apply font-semibold text-foreground;
+  }
+
+  /* Lists */
+  .prose-ai ul,
+  .prose-ai ol {
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+    padding-left: 1.75em;
+  }
+
+  .prose-ai li {
+    margin-top: 0.65em;
+    margin-bottom: 0.65em;
+    line-height: 1.85;
+    padding-left: 0.5em;
+  }
+
+  .prose-ai li::marker {
+    color: hsl(var(--primary));
+  }
+
+  .prose-ai ul > li {
+    list-style-type: disc;
+  }
+
+  .prose-ai ol > li {
+    list-style-type: decimal;
+  }
+
+  .prose-ai li > ul,
+  .prose-ai li > ol {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+
+  /* Links */
+  .prose-ai a {
+    @apply text-primary underline underline-offset-2 decoration-primary/40 hover:decoration-primary transition-colors;
+  }
+
+  /* Blockquotes */
+  .prose-ai blockquote {
+    @apply border-l-4 border-primary/30 bg-muted/30 rounded-r-lg;
+    padding: 1em 1.25em;
+    margin: 1.5em 0;
+    font-style: italic;
+  }
+
+  .prose-ai blockquote p {
+    margin: 0;
+  }
+
+  /* Code inline */
+  .prose-ai code:not(pre code) {
+    @apply bg-muted text-primary px-1.5 py-0.5 rounded-md;
+    font-size: 0.9em;
+    font-family: 'Fira Code', 'SF Mono', 'Consolas', monospace;
+  }
+
+  /* Code blocks */
+  .prose-ai pre {
+    @apply bg-muted/80 rounded-xl overflow-x-auto;
+    padding: 1.25em 1.5em;
+    margin: 1.75em 0;
+    font-size: 0.875em;
+    line-height: 1.7;
+    border: 1px solid hsl(var(--border));
+  }
+
+  .prose-ai pre code {
+    font-family: 'Fira Code', 'SF Mono', 'Consolas', monospace;
+    background: transparent;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  /* Tables - Production Level */
+  .prose-ai table {
+    @apply w-full text-left border-collapse;
+    margin: 2em 0;
+    font-size: 0.95em;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: 1px solid hsl(var(--border));
+  }
+
+  .prose-ai thead {
+    @apply bg-muted/70;
+  }
+
+  .prose-ai thead tr {
+    border-bottom: 2px solid hsl(var(--border));
+  }
+
+  .prose-ai th {
+    @apply font-semibold text-foreground;
+    padding: 0.875em 1em;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .prose-ai tbody tr {
+    border-bottom: 1px solid hsl(var(--border) / 0.5);
+    transition: background-color 0.15s ease;
+  }
+
+  .prose-ai tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .prose-ai tbody tr:hover {
+    @apply bg-muted/40;
+  }
+
+  .prose-ai td {
+    padding: 0.875em 1em;
+    vertical-align: top;
+    line-height: 1.7;
+  }
+
+  /* Horizontal Rule */
+  .prose-ai hr {
+    @apply border-border/50;
+    margin: 2.5em 0;
+  }
+
+  /* Images */
+  .prose-ai img {
+    @apply rounded-xl max-w-full h-auto;
+    margin: 1.75em 0;
+  }
+
+  /* Definition lists */
+  .prose-ai dl {
+    margin: 1.5em 0;
+  }
+
+  .prose-ai dt {
+    @apply font-semibold text-foreground;
+    margin-top: 1em;
+  }
+
+  .prose-ai dd {
+    margin-left: 1.5em;
+    margin-top: 0.25em;
+    line-height: 1.85;
+  }
+
+  /* First paragraph - no top margin */
+  .prose-ai > :first-child {
+    margin-top: 0;
+  }
+
+  /* Last element - no bottom margin */
+  .prose-ai > :last-child {
+    margin-bottom: 0;
+  }
+
+  /* Korean/Vietnamese text optimization */
+  .prose-ai :lang(ko),
+  .prose-ai :lang(vi),
+  .prose-ai :lang(ja),
+  .prose-ai :lang(zh) {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+
+  /* Emoji spacing */
+  .prose-ai em,
+  .prose-ai i {
+    @apply text-muted-foreground;
+    font-style: italic;
+  }
+
+  /* Warning/Note boxes (if using special syntax) */
+  .prose-ai .note,
+  .prose-ai .warning,
+  .prose-ai .tip {
+    @apply rounded-xl p-4 my-6;
+    border-left: 4px solid;
+  }
+
+  .prose-ai .note {
+    @apply bg-korean-blue/10 border-korean-blue;
+  }
+
+  .prose-ai .warning {
+    @apply bg-korean-orange/10 border-korean-orange;
+  }
+
+  .prose-ai .tip {
+    @apply bg-korean-green/10 border-korean-green;
+  }
+
+  /* Dark mode specific adjustments */
+  .dark .prose-ai code:not(pre code) {
+    @apply bg-muted/80;
+  }
+
+  .dark .prose-ai pre {
+    @apply bg-background/50 border-border/50;
+  }
+
+  .dark .prose-ai blockquote {
+    @apply bg-muted/20;
+  }
+
+  .dark .prose-ai thead {
+    @apply bg-muted/40;
+  }
+
+  .dark .prose-ai tbody tr:hover {
+    @apply bg-muted/20;
   }
 }
 
