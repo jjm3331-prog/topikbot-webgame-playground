@@ -1152,7 +1152,9 @@
       "errorDesc": "翻訳に失敗しました。もう一度お試しください。",
       "sameLanguage": "同じ言語",
       "sameLanguageDesc": "原文と選択した言語が同じです。",
-      "translatedSectionLabel": "🌐 翻訳"
+      "translatedSectionLabel": "🌐 翻訳",
+      "selectLanguage": "翻訳",
+      "cached": "キャッシュ済み"
     },
     "types": {
       "notice": {

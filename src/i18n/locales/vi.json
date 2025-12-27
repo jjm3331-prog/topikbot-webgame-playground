@@ -1561,7 +1561,9 @@
       "errorDesc": "Dịch thất bại. Vui lòng thử lại.",
       "sameLanguage": "Cùng ngôn ngữ",
       "sameLanguageDesc": "Ngôn ngữ nguồn và ngôn ngữ đã chọn giống nhau.",
-      "translatedSectionLabel": "🌐 Bản dịch"
+      "translatedSectionLabel": "🌐 Bản dịch",
+      "selectLanguage": "Dịch",
+      "cached": "Đã lưu"
     },
     "types": {
       "notice": {

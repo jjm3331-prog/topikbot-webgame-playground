@@ -1152,7 +1152,9 @@
       "errorDesc": "Tarjima amalga oshmadi. Qaytadan urinib ko'ring.",
       "sameLanguage": "Bir xil til",
       "sameLanguageDesc": "Manba va tanlangan tillar bir xil.",
-      "translatedSectionLabel": "🌐 Tarjima"
+      "translatedSectionLabel": "🌐 Tarjima",
+      "selectLanguage": "Tarjima",
+      "cached": "Saqlangan"
     },
     "types": {
       "notice": {
