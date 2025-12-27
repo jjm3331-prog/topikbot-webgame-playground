@@ -478,23 +478,30 @@ export default function BoardPost() {
       // Extract text content while preserving structure markers
       const extractTextWithStructure = (html: string) => {
         const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        
+        const doc = parser.parseFromString(html, "text/html");
+
         // Replace <br> and block elements with newlines for translation
-        doc.querySelectorAll('br').forEach(el => el.replaceWith('\n'));
-        doc.querySelectorAll('p, div, h1, h2, h3, h4, h5, h6, li').forEach(el => {
-          if (el.textContent) {
-            el.insertAdjacentText('afterend', '\n\n');
-          }
-        });
-        
-        return doc.body.textContent || '';
+        doc.querySelectorAll("br").forEach((el) => el.replaceWith("\n"));
+        doc
+          .querySelectorAll("p, div, h1, h2, h3, h4, h5, h6, li")
+          .forEach((el) => {
+            if (el.textContent) {
+              el.insertAdjacentText("afterend", "\n\n");
+            }
+          });
+
+        return doc.body.textContent || "";
+      };
+
+      const normalizeNewlines = (s: string) => {
+        // Some model outputs return literal "\\n" sequences instead of real newlines.
+        return s.replace(/\\n/g, "\n");
       };
 
       const textContent = extractTextWithStructure(post.content);
 
       // Translate title and content in parallel
-      const [titleResult, contentResult] = await Promise.all([
+      const [titleResult, contentResultRaw] = await Promise.all([
         autoTranslateText({
           text: post.title,
           sourceLanguage,
@@ -507,12 +514,14 @@ export default function BoardPost() {
         }),
       ]);
 
+      const contentResult = normalizeNewlines(contentResultRaw);
+
       // Convert newlines back to HTML structure
       const formattedContent = contentResult
         .split(/\n\n+/)
-        .filter(p => p.trim())
-        .map(p => `<p>${p.replace(/\n/g, '<br/>')}</p>`)
-        .join('');
+        .filter((p) => p.trim())
+        .map((p) => `<p>${p.replace(/\n/g, "<br/>")}</p>`)
+        .join("");
 
       setTranslatedTitle(titleResult);
       setTranslatedContent(formattedContent);
@@ -590,6 +599,7 @@ export default function BoardPost() {
 
   const postAuthor = getAuthorDisplay(post.author_id, post.author_name, post.is_anonymous);
   const canModify = currentUser && (post.author_id === currentUser || isAdmin);
+  const isPodcast = boardType === "podcast";
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -668,9 +678,16 @@ export default function BoardPost() {
 
               {/* Title & Actions */}
               <div className="flex items-start justify-between gap-4">
-                <h1 className="text-xl sm:text-2xl font-bold text-foreground">
-                  {showTranslated && translatedTitle ? translatedTitle : post.title}
-                </h1>
+                <div className="min-w-0">
+                  <h1 className="text-xl sm:text-2xl font-bold text-foreground">
+                    {isPodcast ? post.title : (showTranslated && translatedTitle ? translatedTitle : post.title)}
+                  </h1>
+                  {isPodcast && showTranslated && translatedTitle && (
+                    <p className="mt-2 text-sm text-muted-foreground break-words">
+                      {translatedTitle}
+                    </p>
+                  )}
+                </div>
                 <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
@@ -727,10 +744,47 @@ export default function BoardPost() {
               </div>
 
               {/* Content */}
-              {showTranslated && translatedContent ? (
+              {isPodcast ? (
+                <div className="mt-6 space-y-6">
+                  {/* Original (always) */}
+                  <div
+                    className="prose prose-sm max-w-none text-foreground
+                      [&_p]:mb-4 [&_p]:leading-relaxed [&_p]:text-foreground
+                      [&_br]:mb-2 [&_strong]:font-semibold [&_em]:italic
+                      [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5
+                      [&_li]:mb-1 [&_a]:text-primary [&_a]:underline
+                      [&_img]:rounded-lg [&_img]:my-4 [&_img]:max-w-full
+                      [&_iframe]:rounded-lg [&_video]:rounded-lg"
+                    dangerouslySetInnerHTML={{ __html: post.content }}
+                  />
+
+                  {/* Translation (optional, never replaces original) */}
+                  {showTranslated && translatedContent && (
+                    <div className="pt-6 border-t border-border/60">
+                      <div
+                        className="prose prose-sm max-w-none text-foreground
+                          [&_p]:mb-4 [&_p]:leading-relaxed [&_p]:text-foreground
+                          [&_br]:mb-2 [&_strong]:font-semibold [&_em]:italic
+                          [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5
+                          [&_li]:mb-1 [&_a]:text-primary [&_a]:underline"
+                        dangerouslySetInnerHTML={{ __html: translatedContent }}
+                      />
+
+                      {translatedMediaHtml && (
+                        <div
+                          className="prose prose-sm max-w-none mt-4 text-foreground
+                            [&_img]:rounded-lg [&_img]:my-4 [&_img]:max-w-full
+                            [&_iframe]:rounded-lg [&_video]:rounded-lg"
+                          dangerouslySetInnerHTML={{ __html: translatedMediaHtml }}
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : showTranslated && translatedContent ? (
                 <>
-                  <div 
-                    className="prose prose-sm max-w-none mt-6 text-foreground 
+                  <div
+                    className="prose prose-sm max-w-none mt-6 text-foreground
                       [&_p]:mb-4 [&_p]:leading-relaxed [&_p]:text-foreground
                       [&_br]:mb-2 [&_strong]:font-semibold [&_em]:italic
                       [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5
@@ -748,7 +802,7 @@ export default function BoardPost() {
                   )}
                 </>
               ) : (
-                <div 
+                <div
                   className="prose prose-sm max-w-none mt-6 text-foreground
                     [&_p]:mb-4 [&_p]:leading-relaxed [&_p]:text-foreground
                     [&_br]:mb-2 [&_strong]:font-semibold [&_em]:italic
