@@ -248,11 +248,10 @@ const Lesson = () => {
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate("/auth");
-        return;
+      // Auth check disabled for testing - allow access without login
+      if (user) {
+        setUser(user);
       }
-      setUser(user);
       setStartTime(new Date());
       
       // First try to get RAG-generated questions

@@ -133,15 +133,14 @@ const WritingCorrection = () => {
 
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/auth");
-      return;
+    // Auth check disabled for testing - allow access without login
+    if (session) {
+      setUser(session.user);
+      await Promise.all([
+        loadHistory(session.user.id),
+        checkDailyFreeUsage(session.user.id)
+      ]);
     }
-    setUser(session.user);
-    await Promise.all([
-      loadHistory(session.user.id),
-      checkDailyFreeUsage(session.user.id)
-    ]);
     setLoading(false);
   };
 

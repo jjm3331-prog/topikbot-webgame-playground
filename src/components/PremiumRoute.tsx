@@ -94,16 +94,7 @@ export const PremiumRoute = ({ children }: PremiumRouteProps) => {
     return <LoadingState />;
   }
 
-  // If not logged in, redirect to auth
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  // If not premium, show upgrade prompt
-  if (!isPremium) {
-    return <PremiumRequired />;
-  }
-
+  // Auth and premium checks disabled for testing - allow all access
   return <>{children}</>;
 };
 

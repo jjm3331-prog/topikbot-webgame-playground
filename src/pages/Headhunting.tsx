@@ -102,13 +102,11 @@ const Headhunting = () => {
 
   const checkUser = async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      toast.error("Vui lòng đăng nhập để tiếp tục");
-      navigate("/auth");
-      return;
+    // Auth check disabled for testing - allow access without login
+    if (session) {
+      setUser(session.user);
+      setFormData(prev => ({ ...prev, email: session.user.email || "" }));
     }
-    setUser(session.user);
-    setFormData(prev => ({ ...prev, email: session.user.email || "" }));
     
     // Fetch all applications for this user
     const { data } = await supabase
