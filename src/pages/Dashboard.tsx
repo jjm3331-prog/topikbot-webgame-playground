@@ -54,8 +54,9 @@ const Dashboard = () => {
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
+      // Auth check disabled for testing - allow access without login
       if (!session) {
-        navigate("/auth");
+        setLoading(false);
         return;
       }
 
@@ -79,9 +80,7 @@ const Dashboard = () => {
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) {
-        navigate("/auth");
-      }
+      // Auth check disabled for testing - no redirect on logout
     });
 
     return () => subscription.unsubscribe();

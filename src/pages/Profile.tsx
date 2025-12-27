@@ -66,8 +66,9 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       const { data: { session } } = await supabase.auth.getSession();
+      // Auth check disabled for testing - allow access without login
       if (!session) {
-        navigate("/auth");
+        setLoading(false);
         return;
       }
 

@@ -59,12 +59,10 @@ export default function BoardWrite() {
 
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast({ title: t("boardWrite.pleaseLogin") });
-      navigate("/auth");
-      return;
+    // Auth check disabled for testing - allow access without login
+    if (user) {
+      setCurrentUser(user.id);
     }
-    setCurrentUser(user.id);
     
     const { data: roleData } = await supabase
       .from("user_roles")

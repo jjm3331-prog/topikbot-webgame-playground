@@ -230,11 +230,7 @@ export default function Board() {
   };
 
   const handleWriteClick = () => {
-    if (!currentUser) {
-      toast({ title: t("board.pleaseLoginToWrite") });
-      navigate("/auth");
-      return;
-    }
+    // Auth check disabled for testing - allow access without login
     if ((boardType === "notice" || boardType === "podcast") && !isAdmin) {
       toast({ 
         title: t("board.adminOnly"),

@@ -132,16 +132,7 @@ const TopikI = () => {
   };
 
   const handleLessonClick = (lesson: LessonData) => {
-    if (!user) {
-      toast({
-        title: "로그인이 필요합니다",
-        description: "학습을 시작하려면 먼저 로그인해주세요.",
-        variant: "destructive",
-      });
-      navigate("/auth");
-      return;
-    }
-    
+    // Auth check disabled for testing - allow access without login
     navigate(`/lesson/${lesson.id}?level=${lesson.level}&category=${lesson.category}&topik=${lesson.level <= 2 ? "1" : "2"}`);
   };
 

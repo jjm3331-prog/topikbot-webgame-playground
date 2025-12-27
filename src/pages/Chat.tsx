@@ -73,25 +73,23 @@ const Chat = () => {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        navigate("/auth");
-        return;
+      // Auth check disabled for testing - allow access without login
+      if (session) {
+        supabase
+          .from("profiles")
+          .select("hp, money")
+          .eq("id", session.user.id)
+          .single()
+          .then(({ data }) => {
+            if (data) {
+              setGameState((prev) => ({
+                ...prev,
+                hp: data.hp,
+                money: data.money,
+              }));
+            }
+          });
       }
-
-      supabase
-        .from("profiles")
-        .select("hp, money")
-        .eq("id", session.user.id)
-        .single()
-        .then(({ data }) => {
-          if (data) {
-            setGameState((prev) => ({
-              ...prev,
-              hp: data.hp,
-              money: data.money,
-            }));
-          }
-        });
     });
   }, [navigate]);
 
