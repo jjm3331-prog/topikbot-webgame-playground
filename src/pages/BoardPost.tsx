@@ -473,6 +473,24 @@ export default function BoardPost() {
         return;
       }
 
+      // Extract text content while preserving structure markers
+      const extractTextWithStructure = (html: string) => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        // Replace <br> and block elements with newlines for translation
+        doc.querySelectorAll('br').forEach(el => el.replaceWith('\n'));
+        doc.querySelectorAll('p, div, h1, h2, h3, h4, h5, h6, li').forEach(el => {
+          if (el.textContent) {
+            el.insertAdjacentText('afterend', '\n\n');
+          }
+        });
+        
+        return doc.body.textContent || '';
+      };
+
+      const textContent = extractTextWithStructure(post.content);
+
       // Translate title and content in parallel
       const [titleResult, contentResult] = await Promise.all([
         autoTranslateText({
@@ -481,14 +499,21 @@ export default function BoardPost() {
           targetLanguage,
         }),
         autoTranslateText({
-          text: post.content.replace(/<[^>]*>/g, ''), // Strip HTML for translation
+          text: textContent,
           sourceLanguage,
           targetLanguage,
         }),
       ]);
 
+      // Convert newlines back to HTML structure
+      const formattedContent = contentResult
+        .split(/\n\n+/)
+        .filter(p => p.trim())
+        .map(p => `<p>${p.replace(/\n/g, '<br/>')}</p>`)
+        .join('');
+
       setTranslatedTitle(titleResult);
-      setTranslatedContent(contentResult);
+      setTranslatedContent(formattedContent);
       setShowTranslated(true);
       toast({ title: t("board.translation.success") });
     } catch (error) {
@@ -702,9 +727,10 @@ export default function BoardPost() {
               {/* Content */}
               {showTranslated && translatedContent ? (
                 <>
-                  <div className="prose prose-sm max-w-none mt-6 text-foreground whitespace-pre-wrap">
-                    {translatedContent}
-                  </div>
+                  <div 
+                    className="prose prose-sm max-w-none mt-6 text-foreground [&_p]:mb-4 [&_p]:leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: translatedContent }}
+                  />
 
                   {translatedMediaHtml && (
                     <div
