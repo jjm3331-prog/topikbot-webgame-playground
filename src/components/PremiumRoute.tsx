@@ -1,13 +1,13 @@
 import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { useSubscription } from "@/hooks/useSubscription";
 import { motion } from "framer-motion";
-import { Crown, Loader2, Lock, Zap, PenTool, Mic, Sparkles, Star, Check } from "lucide-react";
+import { Crown, Loader2, Zap, PenTool, Mic, Sparkles, Star, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface PremiumRouteProps {
   children: ReactNode;
+  featureName?: string;
 }
 
 const LoadingState = () => (
@@ -17,7 +17,6 @@ const LoadingState = () => (
 );
 
 const PremiumRequired = () => {
-  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const benefits = [
