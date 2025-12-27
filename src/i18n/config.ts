@@ -44,13 +44,14 @@ i18n
       escapeValue: false,
     },
     detection: {
-      // Auto language switching order:
-      // 1) URL ?lng=xx (useful for testing/marketing)
-      // 2) persisted user choice
+      // Language detection priority (user choice takes precedence over marketing links):
+      // 1) persisted user choice (localStorage) - highest priority
+      // 2) URL ?lng=xx (for marketing/testing, but doesn't override user preference)
       // 3) browser language
-      order: ['querystring', 'localStorage', 'navigator', 'htmlTag'],
+      order: ['localStorage', 'querystring', 'navigator', 'htmlTag'],
       caches: ['localStorage'],
       lookupLocalStorage: 'i18nextLng',
+      lookupQuerystring: 'lng',
     },
   });
 

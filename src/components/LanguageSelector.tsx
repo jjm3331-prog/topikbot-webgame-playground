@@ -1,10 +1,19 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Check, Globe, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { languages, type LanguageCode } from '@/i18n/config';
 import { toast } from '@/hooks/use-toast';
+
+// Normalize language code (e.g., "ko-KR" → "ko", "en-US" → "en")
+const normalizeLanguageCode = (code: string): LanguageCode => {
+  const baseCode = code.split('-')[0].toLowerCase();
+  const validCodes = languages.map(l => l.code);
+  return validCodes.includes(baseCode as LanguageCode) 
+    ? (baseCode as LanguageCode) 
+    : 'ko'; // fallback to Korean
+};
 
 export const LanguageSelector = () => {
   const { i18n, t } = useTranslation();
@@ -13,10 +22,20 @@ export const LanguageSelector = () => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
+  // Normalize current language (handle ko-KR, en-US, etc.)
+  const normalizedLang = useMemo(() => normalizeLanguageCode(i18n.language), [i18n.language]);
+  
+  // Auto-normalize language if it doesn't match (e.g., ko-KR → ko)
+  useEffect(() => {
+    if (i18n.language !== normalizedLang) {
+      i18n.changeLanguage(normalizedLang);
+    }
+  }, [i18n, normalizedLang]);
+
+  const currentLanguage = languages.find(lang => lang.code === normalizedLang) || languages[0];
 
   const handleLanguageChange = async (code: LanguageCode) => {
-    if (code === i18n.language) {
+    if (code === normalizedLang) {
       setIsOpen(false);
       return;
     }
@@ -215,7 +234,7 @@ export const LanguageSelector = () => {
               {/* Language List */}
               <div className="relative p-2.5 max-h-[340px] overflow-y-auto custom-scrollbar">
                 {languages.map((lang, index) => {
-                  const isActive = lang.code === i18n.language;
+                  const isActive = lang.code === normalizedLang;
                   const isHovered = hoveredLang === lang.code;
                   
                   return (

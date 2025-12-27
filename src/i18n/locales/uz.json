@@ -551,7 +551,8 @@
     "swot": { "title": "SWOT tahlili", "strengths": "Strengths (Kuchli tomonlar)", "weaknesses": "Weaknesses (Zaif tomonlar)", "opportunities": "Opportunities (Imkoniyatlar)", "threats": "Threats (Xavflar)", "point": "Nuqta", "evidence": "Dalil/Tahlil", "issue": "Muammo", "impact": "Ta'sir", "opportunity": "Imkoniyat", "action": "Usul", "benefit": "Foyda", "threat": "Xavf", "riskLevel": "Xavf darajasi", "prevention": "Oldini olish", "riskHigh": "Yuqori", "riskMedium": "O'rtacha", "riskLow": "Past" },
     "result": { "title": "Tekshirish natijasi", "uploadPrompt": "Batafsil tahlil olish uchun topshiriq va javobni yuklang", "saveResult": "Natijani saqlash", "exportPdf": "PDF eksport" },
     "history": { "title": "Tekshirish tarixi", "score": "Ball", "viewAgain": "Qayta ko'rish" },
-    "ocr": { "title": "Aniqlangan matnni tahrirlash", "description": "AI rasmdan matnni aniqladi. Xatolik bo'lsa tahrirlang:", "placeholder": "Rasmdan aniqlangan matn...", "skipUseImage": "O'tkazib yuborish, asl rasmni ishlatish", "confirmText": "Matnni tasdiqlash" }
+    "ocr": { "title": "Aniqlangan matnni tahrirlash", "description": "AI rasmdan matnni aniqladi. Xatolik bo'lsa tahrirlang:", "placeholder": "Rasmdan aniqlangan matn...", "skipUseImage": "O'tkazib yuborish, asl rasmni ishlatish", "confirmText": "Matnni tasdiqlash" },
+    "cache": { "title": "Keshda saqlangan natija", "message": "Bu avval shu kontent bilan tekshirilgan natija.", "savedTime": "Saqlangan vaqt", "viewFresh": "Qayta tekshirish" }
   },
   "interview": {
     "title": "Intervyu simulyatsiyasi", "description": "Koreya kompaniyalari intervyu mashqi",
