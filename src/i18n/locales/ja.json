@@ -106,6 +106,10 @@
     "error": "エラー",
     "success": "成功",
     "or": "または",
+    "points": "ポイント",
+    "playNow": "今すぐプレイ",
+    "learnNow": "今すぐ学習",
+    "backToDashboard": "ダッシュボードに戻る",
     "locale": "ja-JP"
   },
   "brand": {

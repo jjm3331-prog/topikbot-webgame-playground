@@ -106,6 +106,10 @@
     "error": "Ошибка",
     "success": "Успешно",
     "or": "или",
+    "points": "баллы",
+    "playNow": "Играть",
+    "learnNow": "Учиться",
+    "backToDashboard": "Назад на панель",
     "locale": "ru-RU"
   },
   "brand": {

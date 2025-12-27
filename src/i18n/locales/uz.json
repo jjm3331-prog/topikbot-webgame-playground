@@ -106,6 +106,10 @@
     "error": "Xato",
     "success": "Muvaffaqiyat",
     "or": "yoki",
+    "points": "ball",
+    "playNow": "Hozir o'ynash",
+    "learnNow": "Hozir o'rganish",
+    "backToDashboard": "Dashboardga qaytish",
     "locale": "uz-UZ"
   },
   "brand": {

@@ -106,6 +106,10 @@
     "error": "错误",
     "success": "成功",
     "or": "或",
+    "points": "分",
+    "playNow": "立即玩",
+    "learnNow": "立即学习",
+    "backToDashboard": "返回仪表盘",
     "locale": "zh-CN"
   },
   "brand": {
