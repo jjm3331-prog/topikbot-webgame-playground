@@ -477,7 +477,16 @@
       "copiedLinkToast": "🔗 Đã sao chép link!",
       "shareText": "Chơi đấu nghĩa với mình nhé! Mã phòng: {{code}}",
       "warningToastTitle": "⚠️ Cảnh báo {{current}}/{{max}}",
-      "timeoutDesc": "Hết thời gian!"
+      "timeoutDesc": "Hết thời gian!",
+      "currentWord": "Từ hiện tại",
+      "scoreLabel": "Điểm",
+      "inputPlaceholder": "Nhập từ liên quan về ý nghĩa...",
+      "waitTurn": "Đợi lượt của bạn...",
+      "waitOpponent": "Đợi đối thủ...",
+      "victory": "🎉 Chiến thắng!",
+      "defeat": "😢 Thua cuộc",
+      "victoryDesc": "Bạn đã thắng +1,000 điểm!",
+      "defeatDesc": "{{name}} đã thắng!"
     }
   },
   "vocabulary": {

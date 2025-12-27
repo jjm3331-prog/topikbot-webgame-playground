@@ -477,7 +477,16 @@
       "copiedLinkToast": "🔗 Invite link copied!",
       "shareText": "Play Semantic Battle with me! Room code: {{code}}",
       "warningToastTitle": "⚠️ Warning {{current}}/{{max}}",
-      "timeoutDesc": "Time's up!"
+      "timeoutDesc": "Time's up!",
+      "currentWord": "Current word",
+      "scoreLabel": "Score",
+      "inputPlaceholder": "Enter a semantically related word...",
+      "waitTurn": "Wait for your turn...",
+      "waitOpponent": "Waiting for opponent...",
+      "victory": "🎉 Victory!",
+      "defeat": "😢 Defeat",
+      "victoryDesc": "You won +1,000 points!",
+      "defeatDesc": "{{name}} won!"
     }
   },
   "vocabulary": {

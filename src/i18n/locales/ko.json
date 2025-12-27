@@ -477,7 +477,16 @@
       "copiedLinkToast": "🔗 초대 링크를 복사했어요!",
       "shareText": "나와 의미 배틀 하자! 방 코드: {{code}}",
       "warningToastTitle": "⚠️ 경고 {{current}}/{{max}}",
-      "timeoutDesc": "시간 초과!"
+      "timeoutDesc": "시간 초과!",
+      "currentWord": "현재 단어",
+      "scoreLabel": "점수",
+      "inputPlaceholder": "의미가 연관된 단어를 입력하세요...",
+      "waitTurn": "상대방 차례입니다...",
+      "waitOpponent": "상대방 차례입니다...",
+      "victory": "🎉 승리!",
+      "defeat": "😢 패배",
+      "victoryDesc": "승리 보너스 +1,000점 획득!",
+      "defeatDesc": "{{name}}님이 승리했습니다!"
     }
   },
   "vocabulary": {
