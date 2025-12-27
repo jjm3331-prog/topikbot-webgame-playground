@@ -498,10 +498,21 @@ export default function BoardPost() {
         return s.replace(/\\n/g, "\n");
       };
 
+      // Clean up broken markdown artifacts from translation
+      const cleanTranslationArtifacts = (s: string) => {
+        return s
+          .replace(/\*\*\\$/gm, "") // trailing **\
+          .replace(/\*\*$/gm, "")   // trailing **
+          .replace(/^\*\*/gm, "")   // leading **
+          .replace(/\\\*/g, "*")    // escaped asterisks
+          .replace(/\s*\*\*\s*$/gm, "") // whitespace around trailing **
+          .trim();
+      };
+
       const textContent = extractTextWithStructure(post.content);
 
       // Translate title and content in parallel
-      const [titleResult, contentResultRaw] = await Promise.all([
+      const [titleResultRaw, contentResultRaw] = await Promise.all([
         autoTranslateText({
           text: post.title,
           sourceLanguage,
@@ -514,7 +525,8 @@ export default function BoardPost() {
         }),
       ]);
 
-      const contentResult = normalizeNewlines(contentResultRaw);
+      const titleResult = cleanTranslationArtifacts(normalizeNewlines(titleResultRaw));
+      const contentResult = cleanTranslationArtifacts(normalizeNewlines(contentResultRaw));
 
       // Convert newlines back to HTML structure
       const formattedContent = contentResult
@@ -760,7 +772,10 @@ export default function BoardPost() {
 
                   {/* Translation (optional, never replaces original) */}
                   {showTranslated && translatedContent && (
-                    <div className="pt-6 border-t border-border/60">
+                    <div className="pt-6 mt-6 border-t-2 border-primary/30 bg-primary/5 -mx-6 px-6 pb-6 rounded-b-lg">
+                      <p className="text-sm font-semibold text-primary mb-4">
+                        {t("board.translation.translatedSectionLabel")}
+                      </p>
                       <div
                         className="prose prose-sm max-w-none text-foreground
                           [&_p]:mb-4 [&_p]:leading-relaxed [&_p]:text-foreground
