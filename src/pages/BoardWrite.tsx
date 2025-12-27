@@ -46,6 +46,7 @@ export default function BoardWrite() {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(!!editId);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -131,7 +132,7 @@ export default function BoardWrite() {
     setAttachments(attachments.filter((_, i) => i !== index));
   };
 
-  const handlePaste = async (e: React.ClipboardEvent) => {
+  const handlePaste = async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     const items = e.clipboardData?.items;
     if (!items) return;
 
@@ -140,20 +141,52 @@ export default function BoardWrite() {
 
     e.preventDefault();
 
+    if (!currentUser) {
+      toast({ title: t("boardWrite.pleaseLogin") });
+      return;
+    }
+
+    const textarea = e.currentTarget;
+    const cursorPos = textarea.selectionStart;
+
     for (const item of imageItems) {
       const file = item.getAsFile();
       if (!file) continue;
 
-      if (attachments.length + 1 > 5) {
-        toast({ title: t("boardWrite.maxAttachments") });
-        return;
-      }
+      setUploadingImage(true);
+      toast({ title: t("boardWrite.uploadingImage") || "이미지 업로드 중..." });
 
-      // Generate a unique filename
-      const ext = file.type.split('/')[1] || 'png';
-      const newFile = new File([file], `pasted_image_${Date.now()}.${ext}`, { type: file.type });
-      setAttachments(prev => [...prev, newFile]);
-      toast({ title: t("boardWrite.imagePasted") || "이미지가 추가되었습니다" });
+      try {
+        const ext = file.type.split('/')[1] || 'png';
+        const fileName = `${currentUser}/${Date.now()}_inline.${ext}`;
+        
+        const { error } = await supabase.storage
+          .from("board-attachments")
+          .upload(fileName, file);
+
+        if (error) {
+          console.error("Upload error:", error);
+          toast({ title: t("boardWrite.uploadError") || "이미지 업로드 실패", variant: "destructive" });
+          continue;
+        }
+
+        const { data: urlData } = supabase.storage
+          .from("board-attachments")
+          .getPublicUrl(fileName);
+
+        const imageTag = `\n<img src="${urlData.publicUrl}" alt="image" style="max-width:100%;border-radius:8px;margin:8px 0;" />\n`;
+        
+        setContent(prev => 
+          prev.substring(0, cursorPos) + imageTag + prev.substring(cursorPos)
+        );
+        
+        toast({ title: t("boardWrite.imageInserted") || "이미지가 삽입되었습니다" });
+      } catch (err) {
+        console.error("Image upload error:", err);
+        toast({ title: t("boardWrite.uploadError") || "이미지 업로드 실패", variant: "destructive" });
+      } finally {
+        setUploadingImage(false);
+      }
     }
   };
 
@@ -329,18 +362,26 @@ export default function BoardWrite() {
                     <LinkIcon className="w-4 h-4" />
                   </Button>
                 </div>
-                <Textarea
-                  id="content"
-                  name="content"
-                  placeholder={t("boardWrite.contentPlaceholder")}
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  onPaste={handlePaste}
-                  rows={12}
-                  className="font-mono text-sm"
-                />
+                <div className="relative">
+                  <Textarea
+                    id="content"
+                    name="content"
+                    placeholder={t("boardWrite.contentPlaceholder")}
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    onPaste={handlePaste}
+                    rows={12}
+                    className="font-mono text-sm"
+                    disabled={uploadingImage}
+                  />
+                  {uploadingImage && (
+                    <div className="absolute inset-0 bg-background/50 flex items-center justify-center rounded-md">
+                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                    </div>
+                  )}
+                </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {t("boardWrite.pasteHint") || "💡 Ctrl+V로 이미지를 직접 붙여넣을 수 있습니다"}
+                  {t("boardWrite.pasteHint") || "💡 Ctrl+V로 이미지를 붙여넣으면 본문에 바로 삽입됩니다"}
                 </p>
               </div>
 
