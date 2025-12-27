@@ -620,7 +620,7 @@ const AIAgentChat = () => {
                     {isRecording ? <MicOff className="w-6 h-6 text-red-500" /> : <Mic className="w-6 h-6" />}
                   </Button>
 
-                  {/* Text input - ENLARGED */}
+                  {/* Text input - ENLARGED 3X MORE */}
                   <div className="flex-1 relative">
                     <Textarea
                       ref={textareaRef}
@@ -629,16 +629,16 @@ const AIAgentChat = () => {
                       onKeyDown={handleKeyDown}
                       placeholder={t("aiAgent.placeholder")}
                       disabled={isLoading}
-                      className="min-h-[56px] max-h-48 resize-none pr-16 rounded-2xl text-base md:text-lg py-4 px-5 border-2 focus:border-primary/50 transition-colors leading-relaxed"
-                      rows={2}
+                      className="min-h-[160px] max-h-[400px] resize-none pr-20 rounded-3xl text-lg md:text-xl py-6 px-6 border-2 focus:border-primary/50 transition-colors leading-relaxed"
+                      rows={5}
                     />
                     <Button
                       size="icon"
                       onClick={() => sendMessage()}
                       disabled={(!input.trim() && selectedImages.length === 0) || isLoading}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 h-11 w-11 rounded-xl shadow-lg"
+                      className="absolute right-4 bottom-4 h-14 w-14 rounded-2xl shadow-lg"
                     >
-                      {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                      {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Send className="w-6 h-6" />}
                     </Button>
                   </div>
                 </div>
