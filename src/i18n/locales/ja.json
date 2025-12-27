@@ -1456,6 +1456,7 @@
         "interviewReviews": "面接インサイト",
         "latestNews": "最新ニュース"
       },
+      "downloadPDF": "PDFダウンロード",
       "toast": {
         "enterCompanyTitle": "企業名を入力してください",
         "enterCompanyDesc": "検索する企業名を入力してください。",

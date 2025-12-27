@@ -1983,6 +1983,7 @@
         "interviewReviews": "면접 후기",
         "latestNews": "최신 뉴스"
       },
+      "downloadPDF": "PDF 다운로드",
       "toast": {
         "enterCompanyTitle": "기업명을 입력하세요",
         "enterCompanyDesc": "검색할 기업명을 입력해 주세요.",

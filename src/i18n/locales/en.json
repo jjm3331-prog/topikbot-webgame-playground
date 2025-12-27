@@ -1710,6 +1710,7 @@
         "interviewReviews": "Interview insights",
         "latestNews": "Latest news"
       },
+      "downloadPDF": "Download PDF",
       "toast": {
         "enterCompanyTitle": "Enter a company name",
         "enterCompanyDesc": "Please type a company name to search.",
