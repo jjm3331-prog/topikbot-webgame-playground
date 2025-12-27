@@ -245,7 +245,7 @@ export const MegaMenuOverlay = ({
   const { t } = useTranslation();
   const currentPath = location.pathname;
   const isMobile = useIsMobile();
-  const { isPremium, isPlus } = useSubscription();
+  const { isPremium } = useSubscription();
   const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   // Premium routes that require subscription
@@ -260,7 +260,7 @@ export const MegaMenuOverlay = ({
 
   const handleNavigation = (href: string, isPremiumItem?: boolean) => {
     // Free 사용자가 Premium 기능 클릭 시 모달 표시 & 이동 차단
-    if (isPremiumItem && premiumRoutes.includes(href) && !isPremium && !isPlus) {
+    if (isPremiumItem && premiumRoutes.includes(href) && !isPremium) {
       setShowPremiumModal(true);
       return; // 이동 차단
     }
