@@ -1564,6 +1564,17 @@
             "scoring": "Baholash",
             "customQuestions": "Maxsus savollar"
           }
+        },
+        "practicalGuide": {
+          "title": "Amaliy qo'llanma",
+          "subtitle": "Ish joyi koreys tili",
+          "description": "IT ish muhitida ishlatiladigan amaliy koreys tilini o'rganing.",
+          "features": {
+            "itTerms": "IT atamalar",
+            "meetingSim": "Yig'ilish simulyatsiyasi",
+            "emailTemplates": "Email shablonlari",
+            "businessKorean": "Biznes koreys tili"
+          }
         }
       }
     },

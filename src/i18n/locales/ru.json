@@ -1564,6 +1564,17 @@
             "scoring": "Оценка",
             "customQuestions": "Свои вопросы"
           }
+        },
+        "practicalGuide": {
+          "title": "Практический гид",
+          "subtitle": "Рабочий корейский",
+          "description": "Изучайте практический корейский для IT-среды.",
+          "features": {
+            "itTerms": "IT термины",
+            "meetingSim": "Симуляция совещаний",
+            "emailTemplates": "Шаблоны писем",
+            "businessKorean": "Деловой корейский"
+          }
         }
       }
     },
