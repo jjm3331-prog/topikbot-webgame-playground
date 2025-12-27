@@ -1292,5 +1292,98 @@
         "description": "匿名自由地分享意见和问题！"
       }
     }
+  },
+  "careerPages": {
+    "hub": {
+      "badge": "Korea Career",
+      "title": "Korea Career Hub",
+      "subtitle": "韩国求职一站式服务",
+      "subline": "猎头 • 企业报告 • AI面试",
+      "premiumPreviewFeatureName": "Korea Career Hub",
+      "status": { "active": "可用" },
+      "cta": "打开",
+      "stats": {
+        "partnerCompanies": "合作企业",
+        "successPlacements": "成功入职",
+        "satisfaction": "满意度",
+        "aiSupport": "AI支持"
+      },
+      "premiumCta": {
+        "title": "解锁Premium",
+        "description": "使用Korea Career全部功能"
+      },
+      "infoCards": {
+        "headhunters": {
+          "title": "专业猎头",
+          "description": "资深招聘顾问1对1指导"
+        },
+        "ai": {
+          "title": "AI洞察",
+          "description": "快速调研、面试练习与反馈"
+        }
+      },
+      "services": {
+        "headhunting": {
+          "title": "猎头服务",
+          "subtitle": "1对1求职支持",
+          "description": "在专家协助下准备韩国求职。",
+          "features": {
+            "consulting": "职业咨询",
+            "cvReview": "简历优化",
+            "interviewCoaching": "面试辅导",
+            "salaryNegotiation": "薪资谈判"
+          }
+        },
+        "companyReport": {
+          "title": "企业报告",
+          "subtitle": "深度调研",
+          "description": "生成韩国企业的深度信息报告。",
+          "features": {
+            "salary": "薪资",
+            "culture": "文化",
+            "interviewReviews": "面试洞察",
+            "news": "最新新闻"
+          }
+        },
+        "interviewSim": {
+          "title": "面试模拟",
+          "subtitle": "语音练习",
+          "description": "与AI练习面试并获得反馈。",
+          "features": {
+            "voice": "语音",
+            "realtimeFeedback": "实时反馈",
+            "scoring": "评分",
+            "customQuestions": "定制问题"
+          }
+        }
+      }
+    },
+    "companyReport": {
+      "premiumPreviewFeatureName": "企业报告",
+      "badge": "企业深度报告",
+      "title": "企业报告",
+      "description": "搜索企业并获取详细报告。",
+      "inputPlaceholder": "输入企业名称…",
+      "searchButtonLabel": "搜索",
+      "quickSearch": "快速搜索",
+      "includes": "你将获得",
+      "loadingTitle": "正在生成报告…",
+      "loadingDesc": "请稍候。",
+      "resultTitle": "报告：{{company}}",
+      "citations": "来源（{{count}}）",
+      "sections": {
+        "overview": "概览",
+        "salary": "薪资",
+        "culture": "文化",
+        "interviewReviews": "面试洞察",
+        "latestNews": "最新新闻"
+      },
+      "toast": {
+        "enterCompanyTitle": "请输入企业名称",
+        "enterCompanyDesc": "请输入要搜索的企业名称。",
+        "searchErrorTitle": "搜索失败",
+        "searchErrorDesc": "无法生成报告，请重试。"
+      }
+    }
   }
 }

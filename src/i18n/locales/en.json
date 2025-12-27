@@ -1524,7 +1524,101 @@
       "anonymous": {
         "title": "Anonymous",
         "subtitle": "익명게시판",
-        "description": "Share opinions and questions anonymously, freely!"
+         "description": "Share opinions and questions anonymously, freely!"
+        }
+      }
+    },
+    "careerPages": {
+      "hub": {
+        "badge": "Korea Career",
+        "title": "Korea Career Hub",
+        "subtitle": "All-in-one Korea job services",
+        "subline": "Headhunting • Company reports • AI interview",
+        "premiumPreviewFeatureName": "Korea Career Hub",
+        "status": { "active": "Active" },
+        "cta": "Open",
+        "stats": {
+          "partnerCompanies": "Partner companies",
+          "successPlacements": "Successful placements",
+          "satisfaction": "Satisfaction",
+          "aiSupport": "AI support"
+        },
+        "premiumCta": {
+          "title": "Unlock Premium",
+          "description": "Get full access to Korea Career features"
+        },
+        "infoCards": {
+          "headhunters": {
+            "title": "Professional headhunters",
+            "description": "1:1 guidance from experienced recruiters"
+          },
+          "ai": {
+            "title": "AI-powered insights",
+            "description": "Fast research, interview practice, and feedback"
+          }
+        },
+        "services": {
+          "headhunting": {
+            "title": "Headhunting",
+            "subtitle": "1:1 career support",
+            "description": "Get matched with jobs in Korea with expert support.",
+            "features": {
+              "consulting": "Career consulting",
+              "cvReview": "CV review",
+              "interviewCoaching": "Interview coaching",
+              "salaryNegotiation": "Salary negotiation"
+            }
+          },
+          "companyReport": {
+            "title": "Company Report",
+            "subtitle": "Deep research",
+            "description": "Generate an in-depth report about a company in Korea.",
+            "features": {
+              "salary": "Salary",
+              "culture": "Culture",
+              "interviewReviews": "Interview insights",
+              "news": "Latest news"
+            }
+          },
+          "interviewSim": {
+            "title": "Interview Simulation",
+            "subtitle": "Voice practice",
+            "description": "Practice interviews with AI and get feedback.",
+            "features": {
+              "voice": "Voice",
+              "realtimeFeedback": "Real-time feedback",
+              "scoring": "Scoring",
+              "customQuestions": "Custom questions"
+            }
+          }
+        }
+      },
+      "companyReport": {
+        "premiumPreviewFeatureName": "Company Report",
+        "badge": "Company deep report",
+        "title": "Company Report",
+        "description": "Search a company and get a detailed report.",
+        "inputPlaceholder": "Enter a company name…",
+        "searchButtonLabel": "Search",
+        "quickSearch": "Quick search",
+        "includes": "What you'll get",
+        "loadingTitle": "Generating report…",
+        "loadingDesc": "Please wait a moment.",
+        "resultTitle": "Report: {{company}}",
+        "citations": "Sources ({{count}})",
+        "sections": {
+          "overview": "Overview",
+          "salary": "Salary",
+          "culture": "Culture",
+          "interviewReviews": "Interview insights",
+          "latestNews": "Latest news"
+        },
+        "toast": {
+          "enterCompanyTitle": "Enter a company name",
+          "enterCompanyDesc": "Please type a company name to search.",
+          "searchErrorTitle": "Search failed",
+          "searchErrorDesc": "Could not generate the report. Try again."
+        }
       }
     }
   }

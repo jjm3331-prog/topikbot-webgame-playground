@@ -1292,5 +1292,98 @@
         "description": "匿名で気軽に意見や質問を共有しましょう！"
       }
     }
+  },
+  "careerPages": {
+    "hub": {
+      "badge": "Korea Career",
+      "title": "Korea Career Hub",
+      "subtitle": "韓国就職オールインワン",
+      "subline": "ヘッドハンティング • 企業レポート • AI面接",
+      "premiumPreviewFeatureName": "Korea Career Hub",
+      "status": { "active": "利用可能" },
+      "cta": "開く",
+      "stats": {
+        "partnerCompanies": "提携企業",
+        "successPlacements": "就職成功",
+        "satisfaction": "満足度",
+        "aiSupport": "AIサポート"
+      },
+      "premiumCta": {
+        "title": "Premiumで解放",
+        "description": "Korea Careerの全機能を利用できます"
+      },
+      "infoCards": {
+        "headhunters": {
+          "title": "プロのヘッドハンター",
+          "description": "経験豊富な採用担当者から1:1サポート"
+        },
+        "ai": {
+          "title": "AIインサイト",
+          "description": "高速リサーチ、面接練習、フィードバック"
+        }
+      },
+      "services": {
+        "headhunting": {
+          "title": "ヘッドハンティング",
+          "subtitle": "1:1就職支援",
+          "description": "専門家と一緒に韓国就職を目指しましょう。",
+          "features": {
+            "consulting": "キャリア相談",
+            "cvReview": "CVレビュー",
+            "interviewCoaching": "面接コーチング",
+            "salaryNegotiation": "年俸交渉"
+          }
+        },
+        "companyReport": {
+          "title": "企業レポート",
+          "subtitle": "深掘り調査",
+          "description": "韓国企業の詳細レポートを生成します。",
+          "features": {
+            "salary": "年俸",
+            "culture": "企業文化",
+            "interviewReviews": "面接インサイト",
+            "news": "最新ニュース"
+          }
+        },
+        "interviewSim": {
+          "title": "面接シミュレーション",
+          "subtitle": "音声練習",
+          "description": "AIで面接練習し、フィードバックを受けます。",
+          "features": {
+            "voice": "音声",
+            "realtimeFeedback": "リアルタイムFB",
+            "scoring": "採点",
+            "customQuestions": "カスタム質問"
+          }
+        }
+      }
+    },
+    "companyReport": {
+      "premiumPreviewFeatureName": "企業レポート",
+      "badge": "企業深掘りレポート",
+      "title": "企業レポート",
+      "description": "企業名を検索して詳細レポートを取得します。",
+      "inputPlaceholder": "企業名を入力…",
+      "searchButtonLabel": "検索",
+      "quickSearch": "クイック検索",
+      "includes": "内容",
+      "loadingTitle": "レポート生成中…",
+      "loadingDesc": "少々お待ちください。",
+      "resultTitle": "レポート：{{company}}",
+      "citations": "出典（{{count}}）",
+      "sections": {
+        "overview": "概要",
+        "salary": "年俸",
+        "culture": "文化",
+        "interviewReviews": "面接インサイト",
+        "latestNews": "最新ニュース"
+      },
+      "toast": {
+        "enterCompanyTitle": "企業名を入力してください",
+        "enterCompanyDesc": "検索する企業名を入力してください。",
+        "searchErrorTitle": "検索に失敗しました",
+        "searchErrorDesc": "レポートを生成できませんでした。再試行してください。"
+      }
+    }
   }
 }
