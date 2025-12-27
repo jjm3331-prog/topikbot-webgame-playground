@@ -2039,5 +2039,36 @@
         "desc": "IT COMTOR uchun zarur biznes koreys ifodalari"
       }
     }
+  },
+  "sidebar": {
+    "home": "Bosh sahifa",
+    "member": "A'zo",
+    "logoutSuccess": "Tizimdan chiqildi",
+    "seeYouAgain": "Yana ko'rishguncha!",
+    "sections": {
+      "studyWork": "Ish",
+      "topik": "TOPIK",
+      "game": "O'yin",
+      "ai": "AI",
+      "my": "Mening"
+    },
+    "items": {
+      "koreaCareer": "Korea Career",
+      "headhunting": "Headhunting",
+      "learningHub": "TOPIK o'quv markazi",
+      "community": "Hamjamiyat",
+      "gameHub": "O'yinlar markazi",
+      "qnaAgent": "Q&A agent",
+      "writingCorrection": "Yozuv tekshiruvi",
+      "roleplay": "Roleplay speaking",
+      "pricing": "Narxlar",
+      "progress": "Dashboard",
+      "profile": "Profil",
+      "ranking": "Reyting",
+      "points": "Ballar",
+      "terms": "Shartlar",
+      "privacy": "Maxfiylik",
+      "helpCenter": "Yordam markazi"
+    }
   }
 }

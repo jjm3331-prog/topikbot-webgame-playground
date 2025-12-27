@@ -260,27 +260,24 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-primary" />
           <span className="font-medium">{t("grammar.grammarPoint")}</span>
-          <BilingualText vi={current.grammarPoint.vi} ko={current.grammarPoint.ko} />
+          <LocalizedText
+            className="font-medium"
+            vi={current.grammarPoint.vi}
+            ko={current.grammarPoint.ko}
+          />
         </div>
       </Card>
 
       {/* Question */}
       <Card className="p-6">
-        <BilingualText
-          className="mb-4"
-          vi={t("grammar.arrangeInstruction")}
-          ko={t("grammar.arrangeInstructionKo")}
-        />
-        <BilingualText vi={current.prompt.vi} ko={current.prompt.ko} />
+        <p className="mb-4 text-sm text-muted-foreground">{t("grammar.arrangeInstruction")}</p>
+        <LocalizedText className="font-medium" vi={current.prompt.vi} ko={current.prompt.ko} />
 
         {/* Selected Parts (Answer Area) */}
         <div className="min-h-16 p-4 bg-muted/30 rounded-lg border-2 border-dashed border-muted-foreground/30 mb-4">
           <div className="flex flex-wrap gap-2">
             {selectedParts.length === 0 ? (
-              <BilingualText
-                vi={t("grammar.dragInstruction")}
-                ko={t("grammar.dragInstructionKo")}
-              />
+              <p className="text-sm text-muted-foreground">{t("grammar.dragInstruction")}</p>
             ) : (
               selectedParts.map((part, index) => (
                 <motion.button
@@ -323,7 +320,7 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               className={`p-4 rounded-lg mb-4 ${
-                isCorrect ? 'bg-green-500/10 border border-green-500/30' : 'bg-red-500/10 border border-red-500/30'
+                isCorrect ? "bg-green-500/10 border border-green-500/30" : "bg-red-500/10 border border-red-500/30"
               }`}
             >
               <div className="flex items-center gap-2 mb-2">
@@ -341,7 +338,11 @@ function AssemblyGame({ level }: { level: TopikLevel }) {
               </p>
               <div className="mt-2 space-y-2">
                 <div className="text-sm font-medium">💡 {t("grammar.explanation")}</div>
-                <BilingualText vi={current.explanation.vi} ko={current.explanation.ko} />
+                <LocalizedText
+                  className="text-sm text-muted-foreground"
+                  vi={current.explanation.vi}
+                  ko={current.explanation.ko}
+                />
               </div>
             </motion.div>
           )}

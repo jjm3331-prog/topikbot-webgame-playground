@@ -2021,5 +2021,36 @@
         "desc": "IT COMTOR所需的商务韩语表达"
       }
     }
+  },
+  "sidebar": {
+    "home": "首页",
+    "member": "会员",
+    "logoutSuccess": "已退出登录",
+    "seeYouAgain": "下次再见！",
+    "sections": {
+      "studyWork": "就业",
+      "topik": "TOPIK",
+      "game": "游戏",
+      "ai": "AI",
+      "my": "我的"
+    },
+    "items": {
+      "koreaCareer": "Korea Career",
+      "headhunting": "猎头服务",
+      "learningHub": "TOPIK学习中心",
+      "community": "社区",
+      "gameHub": "游戏中心",
+      "qnaAgent": "Q&A智能助理",
+      "writingCorrection": "作文批改",
+      "roleplay": "角色扮演口语",
+      "pricing": "价格",
+      "progress": "仪表盘",
+      "profile": "个人资料",
+      "ranking": "排行榜",
+      "points": "积分",
+      "terms": "条款",
+      "privacy": "隐私政策",
+      "helpCenter": "帮助中心"
+    }
   }
 }

@@ -2039,5 +2039,36 @@
         "desc": "Деловые выражения на корейском для IT COMTOR"
       }
     }
+  },
+  "sidebar": {
+    "home": "Главная",
+    "member": "Участник",
+    "logoutSuccess": "Вы вышли",
+    "seeYouAgain": "До встречи!",
+    "sections": {
+      "studyWork": "Работа",
+      "topik": "TOPIK",
+      "game": "Игры",
+      "ai": "AI",
+      "my": "Моё"
+    },
+    "items": {
+      "koreaCareer": "Korea Career",
+      "headhunting": "Хедхантинг",
+      "learningHub": "Центр TOPIK",
+      "community": "Сообщество",
+      "gameHub": "Игровой хаб",
+      "qnaAgent": "Q&A агент",
+      "writingCorrection": "Проверка письма",
+      "roleplay": "Ролевая речь",
+      "pricing": "Цены",
+      "progress": "Дашборд",
+      "profile": "Профиль",
+      "ranking": "Рейтинг",
+      "points": "Баллы",
+      "terms": "Условия",
+      "privacy": "Конфиденциальность",
+      "helpCenter": "Центр помощи"
+    }
   }
 }
