@@ -2255,5 +2255,36 @@
         "desc": "Business Korean expressions needed for IT COMTORs"
       }
     }
+  },
+  "sidebar": {
+    "home": "Home",
+    "member": "Member",
+    "logoutSuccess": "Logged out",
+    "seeYouAgain": "See you next time!",
+    "sections": {
+      "studyWork": "Jobs",
+      "topik": "TOPIK",
+      "game": "Game",
+      "ai": "AI",
+      "my": "My"
+    },
+    "items": {
+      "koreaCareer": "Korea Career",
+      "headhunting": "Headhunting",
+      "learningHub": "TOPIK Learning Hub",
+      "community": "Community",
+      "gameHub": "Game Hub",
+      "qnaAgent": "Q&A Agent",
+      "writingCorrection": "Writing Correction",
+      "roleplay": "Roleplay Speaking",
+      "pricing": "Pricing",
+      "progress": "Dashboard",
+      "profile": "Profile",
+      "ranking": "Ranking",
+      "points": "Points",
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "helpCenter": "Help Center"
+    }
   }
 }
