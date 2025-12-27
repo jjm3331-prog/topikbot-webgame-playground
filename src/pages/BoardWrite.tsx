@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, 
@@ -28,6 +29,7 @@ import { toast } from "@/hooks/use-toast";
 type BoardType = "notice" | "free" | "resource" | "anonymous";
 
 export default function BoardWrite() {
+  const { t } = useTranslation();
   const { boardType } = useParams<{ boardType: string }>();
   const [searchParams] = useSearchParams();
   const editId = searchParams.get("edit");
@@ -55,7 +57,7 @@ export default function BoardWrite() {
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      toast({ title: "Vui lòng đăng nhập" });
+      toast({ title: t("boardWrite.pleaseLogin") });
       navigate("/auth");
       return;
     }
@@ -71,7 +73,7 @@ export default function BoardWrite() {
 
     // Check permissions for notice board
     if (boardType === "notice" && !roleData) {
-      toast({ title: "Chỉ quản trị viên mới có thể đăng thông báo" });
+      toast({ title: t("boardWrite.adminOnlyNotice") });
       navigate(`/board/${boardType}`);
     }
   };
@@ -93,7 +95,7 @@ export default function BoardWrite() {
       setIsPinned(data.is_pinned);
     } catch (error) {
       console.error("Error fetching post:", error);
-      toast({ title: "Lỗi", description: "Không thể tải bài viết", variant: "destructive" });
+      toast({ title: t("boardWrite.error"), description: t("boardWrite.loadError"), variant: "destructive" });
       navigate(`/board/${boardType}`);
     } finally {
       setLoading(false);
@@ -103,7 +105,7 @@ export default function BoardWrite() {
   const handleAddYoutubeUrl = () => {
     if (!newYoutubeUrl.trim()) return;
     if (!newYoutubeUrl.includes("youtube.com") && !newYoutubeUrl.includes("youtu.be")) {
-      toast({ title: "URL YouTube không hợp lệ" });
+      toast({ title: t("boardWrite.invalidYoutubeUrl") });
       return;
     }
     setYoutubeUrls([...youtubeUrls, newYoutubeUrl.trim()]);
@@ -118,7 +120,7 @@ export default function BoardWrite() {
     if (e.target.files) {
       const files = Array.from(e.target.files);
       if (files.length + attachments.length > 5) {
-        toast({ title: "Tối đa 5 tệp đính kèm" });
+        toast({ title: t("boardWrite.maxAttachments") });
         return;
       }
       setAttachments([...attachments, ...files]);
@@ -155,15 +157,15 @@ export default function BoardWrite() {
 
   const handleSubmit = async () => {
     if (!title.trim()) {
-      toast({ title: "Vui lòng nhập tiêu đề" });
+      toast({ title: t("boardWrite.enterTitle") });
       return;
     }
     if (!content.trim()) {
-      toast({ title: "Vui lòng nhập nội dung" });
+      toast({ title: t("boardWrite.enterContent") });
       return;
     }
     if (!currentUser) {
-      toast({ title: "Vui lòng đăng nhập" });
+      toast({ title: t("boardWrite.pleaseLogin") });
       return;
     }
 
@@ -188,18 +190,18 @@ export default function BoardWrite() {
           .from("board_posts")
           .update(postData)
           .eq("id", editId);
-        toast({ title: "Đã cập nhật bài viết!" });
+        toast({ title: t("boardWrite.updateSuccess") });
       } else {
         await supabase
           .from("board_posts")
           .insert(postData);
-        toast({ title: "Đã đăng bài viết!" });
+        toast({ title: t("boardWrite.postSuccess") });
       }
 
       navigate(`/board/${boardType}`);
     } catch (error) {
       console.error("Error saving post:", error);
-      toast({ title: "Lỗi", description: "Không thể lưu bài viết", variant: "destructive" });
+      toast({ title: t("boardWrite.error"), description: t("boardWrite.saveError"), variant: "destructive" });
     } finally {
       setSubmitting(false);
     }
@@ -216,16 +218,16 @@ export default function BoardWrite() {
     let newText = "";
     switch (format) {
       case "bold":
-        newText = `<strong>${selected || "văn bản"}</strong>`;
+        newText = `<strong>${selected || t("boardWrite.formatText")}</strong>`;
         break;
       case "italic":
-        newText = `<em>${selected || "văn bản"}</em>`;
+        newText = `<em>${selected || t("boardWrite.formatText")}</em>`;
         break;
       case "list":
-        newText = `\n<ul>\n  <li>${selected || "Mục 1"}</li>\n  <li>Mục 2</li>\n</ul>`;
+        newText = `\n<ul>\n  <li>${selected || t("boardWrite.listItem1")}</li>\n  <li>${t("boardWrite.listItem2")}</li>\n</ul>`;
         break;
       case "link":
-        newText = `<a href="URL">${selected || "liên kết"}</a>`;
+        newText = `<a href="URL">${selected || t("boardWrite.linkText")}</a>`;
         break;
     }
     
@@ -259,11 +261,11 @@ export default function BoardWrite() {
               className="-ml-2"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Quay lại
+              {t("boardWrite.back")}
             </Button>
             
             <h1 className="text-headline font-bold text-foreground mt-4">
-              {editId ? "Chỉnh sửa bài viết" : "Viết bài mới"}
+              {editId ? t("boardWrite.editPost") : t("boardWrite.newPost")}
             </h1>
           </motion.div>
 
@@ -274,10 +276,10 @@ export default function BoardWrite() {
             <Card className="p-6 space-y-6">
               {/* Title */}
               <div className="space-y-2">
-                <Label htmlFor="title">Tiêu đề *</Label>
+                <Label htmlFor="title">{t("boardWrite.titleLabel")} *</Label>
                 <Input
                   id="title"
-                  placeholder="Nhập tiêu đề bài viết..."
+                  placeholder={t("boardWrite.titlePlaceholder")}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   maxLength={200}
@@ -286,7 +288,7 @@ export default function BoardWrite() {
 
               {/* Content */}
               <div className="space-y-2">
-                <Label htmlFor="content">Nội dung *</Label>
+                <Label htmlFor="content">{t("boardWrite.contentLabel")} *</Label>
                 <div className="flex gap-2 mb-2">
                   <Button type="button" variant="outline" size="sm" onClick={() => insertFormatting("bold")}>
                     <Bold className="w-4 h-4" />
@@ -304,7 +306,7 @@ export default function BoardWrite() {
                 <Textarea
                   id="content"
                   name="content"
-                  placeholder="Nhập nội dung bài viết... (Hỗ trợ HTML cơ bản)"
+                  placeholder={t("boardWrite.contentPlaceholder")}
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   rows={12}
@@ -314,10 +316,10 @@ export default function BoardWrite() {
 
               {/* YouTube URLs */}
               <div className="space-y-2">
-                <Label>Video YouTube</Label>
+                <Label>{t("boardWrite.youtubeLabel")}</Label>
                 <div className="flex gap-2">
                   <Input
-                    placeholder="Dán link YouTube..."
+                    placeholder={t("boardWrite.youtubePlaceholder")}
                     value={newYoutubeUrl}
                     onChange={(e) => setNewYoutubeUrl(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddYoutubeUrl())}
@@ -343,11 +345,11 @@ export default function BoardWrite() {
 
               {/* Attachments */}
               <div className="space-y-2">
-                <Label>Tệp đính kèm (tối đa 5)</Label>
+                <Label>{t("boardWrite.attachmentsLabel")}</Label>
                 <div className="flex items-center gap-4">
                   <label className="flex items-center gap-2 px-4 py-2 border border-dashed rounded-lg cursor-pointer hover:bg-muted transition-colors">
                     <FileUp className="w-4 h-4" />
-                    <span className="text-sm">Chọn tệp</span>
+                    <span className="text-sm">{t("boardWrite.selectFile")}</span>
                     <input
                       type="file"
                       multiple
@@ -362,7 +364,7 @@ export default function BoardWrite() {
                     {existingAttachments.map((url, i) => (
                       <div key={`existing-${i}`} className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg text-sm">
                         <Image className="w-4 h-4" />
-                        <span>Tệp {i + 1}</span>
+                        <span>{t("boardWrite.file")} {i + 1}</span>
                       </div>
                     ))}
                     {attachments.map((file, i) => (
@@ -382,8 +384,8 @@ export default function BoardWrite() {
               {isAdmin && (
                 <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
                   <div>
-                    <p className="font-medium">Ghim bài viết</p>
-                    <p className="text-sm text-muted-foreground">Bài viết sẽ hiển thị ở đầu danh sách</p>
+                    <p className="font-medium">{t("boardWrite.pinPost")}</p>
+                    <p className="text-sm text-muted-foreground">{t("boardWrite.pinDescription")}</p>
                   </div>
                   <Switch checked={isPinned} onCheckedChange={setIsPinned} />
                 </div>
@@ -392,7 +394,7 @@ export default function BoardWrite() {
               {/* Submit */}
               <div className="flex justify-end gap-3 pt-4">
                 <Button variant="outline" onClick={() => navigate(`/board/${boardType}`)}>
-                  Hủy
+                  {t("boardWrite.cancel")}
                 </Button>
                 <Button onClick={handleSubmit} disabled={submitting}>
                   {submitting ? (
@@ -400,7 +402,7 @@ export default function BoardWrite() {
                   ) : (
                     <Send className="w-4 h-4 mr-2" />
                   )}
-                  {editId ? "Cập nhật" : "Đăng bài"}
+                  {editId ? t("boardWrite.update") : t("boardWrite.submit")}
                 </Button>
               </div>
             </Card>
