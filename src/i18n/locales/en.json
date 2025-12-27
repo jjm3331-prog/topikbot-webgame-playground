@@ -682,7 +682,8 @@
     "swot": { "title": "SWOT Analysis", "strengths": "Strengths", "weaknesses": "Weaknesses", "opportunities": "Opportunities", "threats": "Threats", "point": "Point", "evidence": "Evidence/Analysis", "issue": "Issue", "impact": "Impact", "opportunity": "Opportunity", "action": "Action", "benefit": "Benefit", "threat": "Threat", "riskLevel": "Risk Level", "prevention": "Prevention", "riskHigh": "High", "riskMedium": "Medium", "riskLow": "Low" },
     "result": { "title": "Grading Result", "uploadPrompt": "Upload question and answer to receive detailed analysis", "saveResult": "Save result", "exportPdf": "Export PDF" },
     "history": { "title": "Grading History", "score": "Score", "viewAgain": "View again" },
-    "ocr": { "title": "Edit recognized text", "description": "AI recognized text from the image. Please review and edit if there are errors:", "placeholder": "Text recognized from image...", "skipUseImage": "Skip, use original image", "confirmText": "Confirm text" }
+    "ocr": { "title": "Edit recognized text", "description": "AI recognized text from the image. Please review and edit if there are errors:", "placeholder": "Text recognized from image...", "skipUseImage": "Skip, use original image", "confirmText": "Confirm text" },
+    "cache": { "title": "Cached Result", "message": "This is a result from a previous grading with the same content.", "savedTime": "Saved time", "viewFresh": "Grade again" }
   },
   "interview": {
     "title": "Interview Simulation",

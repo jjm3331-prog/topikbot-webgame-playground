@@ -551,7 +551,8 @@
     "swot": { "title": "SWOT分析", "strengths": "Strengths (优势)", "weaknesses": "Weaknesses (劣势)", "opportunities": "Opportunities (机会)", "threats": "Threats (威胁)", "point": "要点", "evidence": "依据/分析", "issue": "问题", "impact": "影响", "opportunity": "机会", "action": "方法", "benefit": "效果", "threat": "威胁", "riskLevel": "风险等级", "prevention": "预防措施", "riskHigh": "高", "riskMedium": "中", "riskLow": "低" },
     "result": { "title": "批改结果", "uploadPrompt": "上传题目和答案以获取详细分析", "saveResult": "保存结果", "exportPdf": "导出PDF" },
     "history": { "title": "批改历史", "score": "分数", "viewAgain": "再看一次" },
-    "ocr": { "title": "编辑识别文本", "description": "AI已从图片中识别文本。如有错误请编辑：", "placeholder": "从图片识别的文本...", "skipUseImage": "跳过，使用原图", "confirmText": "确认文本" }
+    "ocr": { "title": "编辑识别文本", "description": "AI已从图片中识别文本。如有错误请编辑：", "placeholder": "从图片识别的文本...", "skipUseImage": "跳过，使用原图", "confirmText": "确认文本" },
+    "cache": { "title": "缓存结果", "message": "这是之前相同内容批改的结果。", "savedTime": "保存时间", "viewFresh": "重新批改" }
   },
   "interview": {
     "title": "面试模拟", "description": "韩国企业面试练习",

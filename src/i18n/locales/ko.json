@@ -821,6 +821,12 @@
       "placeholder": "이미지에서 인식된 텍스트...",
       "skipUseImage": "건너뛰고 원본 이미지 사용",
       "confirmText": "텍스트 확인"
+    },
+    "cache": {
+      "title": "캐시된 결과",
+      "message": "이전에 채점된 동일한 내용의 결과입니다.",
+      "savedTime": "저장 시간",
+      "viewFresh": "새로 채점하기"
     }
   },
   "interview": {

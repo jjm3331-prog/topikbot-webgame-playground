@@ -551,7 +551,8 @@
     "swot": { "title": "SWOT分析", "strengths": "Strengths (強み)", "weaknesses": "Weaknesses (弱み)", "opportunities": "Opportunities (機会)", "threats": "Threats (脅威)", "point": "ポイント", "evidence": "根拠/分析", "issue": "問題点", "impact": "影響", "opportunity": "機会", "action": "方法", "benefit": "効果", "threat": "脅威", "riskLevel": "リスクレベル", "prevention": "予防法", "riskHigh": "高", "riskMedium": "中", "riskLow": "低" },
     "result": { "title": "採点結果", "uploadPrompt": "問題と答案をアップロードして詳細分析を受けましょう", "saveResult": "結果を保存", "exportPdf": "PDFエクスポート" },
     "history": { "title": "採点履歴", "score": "点数", "viewAgain": "再確認" },
-    "ocr": { "title": "認識テキストの編集", "description": "AIが画像からテキストを認識しました。エラーがあれば編集してください：", "placeholder": "画像から認識されたテキスト...", "skipUseImage": "スキップして元の画像を使用", "confirmText": "テキストを確認" }
+    "ocr": { "title": "認識テキストの編集", "description": "AIが画像からテキストを認識しました。エラーがあれば編集してください：", "placeholder": "画像から認識されたテキスト...", "skipUseImage": "スキップして元の画像を使用", "confirmText": "テキストを確認" },
+    "cache": { "title": "キャッシュされた結果", "message": "これは以前に同じ内容で採点された結果です。", "savedTime": "保存時間", "viewFresh": "再採点する" }
   },
   "interview": {
     "title": "面接シミュレーション", "description": "韓国企業面接練習",

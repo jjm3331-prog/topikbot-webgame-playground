@@ -816,7 +816,8 @@
     "swot": { "title": "Phân tích SWOT", "strengths": "Strengths (Điểm mạnh)", "weaknesses": "Weaknesses (Điểm yếu)", "opportunities": "Opportunities (Cơ hội)", "threats": "Threats (Rủi ro)", "point": "Điểm", "evidence": "Bằng chứng/Phân tích", "issue": "Vấn đề", "impact": "Ảnh hưởng", "opportunity": "Cơ hội", "action": "Phương pháp", "benefit": "Lợi ích", "threat": "Rủi ro", "riskLevel": "Mức rủi ro", "prevention": "Phòng ngừa", "riskHigh": "Cao", "riskMedium": "Trung bình", "riskLow": "Thấp" },
     "result": { "title": "Kết quả chấm điểm", "uploadPrompt": "Upload đề bài và bài làm để nhận phân tích chi tiết", "saveResult": "Lưu kết quả", "exportPdf": "Xuất PDF" },
     "history": { "title": "Lịch sử chấm điểm", "score": "Điểm", "viewAgain": "Xem lại" },
-    "ocr": { "title": "Chỉnh sửa văn bản nhận dạng", "description": "AI đã nhận dạng văn bản từ hình ảnh. Vui lòng kiểm tra và chỉnh sửa nếu có lỗi:", "placeholder": "Văn bản nhận dạng từ hình ảnh...", "skipUseImage": "Bỏ qua, dùng ảnh gốc", "confirmText": "Xác nhận văn bản" }
+    "ocr": { "title": "Chỉnh sửa văn bản nhận dạng", "description": "AI đã nhận dạng văn bản từ hình ảnh. Vui lòng kiểm tra và chỉnh sửa nếu có lỗi:", "placeholder": "Văn bản nhận dạng từ hình ảnh...", "skipUseImage": "Bỏ qua, dùng ảnh gốc", "confirmText": "Xác nhận văn bản" },
+    "cache": { "title": "Kết quả đã lưu trong bộ nhớ cache", "message": "Đây là kết quả từ bài chấm trước đó với nội dung tương tự.", "savedTime": "Thời gian lưu", "viewFresh": "Chấm mới" }
   },
   "interview": {
     "title": "Mô phỏng phỏng vấn",
