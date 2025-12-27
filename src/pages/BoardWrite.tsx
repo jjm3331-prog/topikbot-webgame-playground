@@ -50,6 +50,9 @@ export default function BoardWrite() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(!!editId);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [selectedImageSize, setSelectedImageSize] = useState<'small' | 'medium' | 'large'>('medium');
+  const [showImageSizeMenu, setShowImageSizeMenu] = useState(false);
+  const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     checkAuth();
@@ -193,7 +196,7 @@ export default function BoardWrite() {
     }
   };
 
-  const handleInlineImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     
     if (!currentUser) {
@@ -207,16 +210,33 @@ export default function BoardWrite() {
       return;
     }
 
+    setPendingImageFile(file);
+    setShowImageSizeMenu(true);
+    e.target.value = '';
+  };
+
+  const getImageSizeStyle = (size: 'small' | 'medium' | 'large') => {
+    switch (size) {
+      case 'small': return 'max-width:300px';
+      case 'medium': return 'max-width:500px';
+      case 'large': return 'max-width:100%';
+    }
+  };
+
+  const uploadImageWithSize = async (size: 'small' | 'medium' | 'large') => {
+    if (!pendingImageFile || !currentUser) return;
+
+    setShowImageSizeMenu(false);
     setUploadingImage(true);
     toast({ title: t("boardWrite.uploadingImage") || "이미지 업로드 중..." });
 
     try {
-      const ext = file.type.split('/')[1] || 'png';
+      const ext = pendingImageFile.type.split('/')[1] || 'png';
       const fileName = `${currentUser}/${Date.now()}_inline.${ext}`;
       
       const { error } = await supabase.storage
         .from("board-attachments")
-        .upload(fileName, file);
+        .upload(fileName, pendingImageFile);
 
       if (error) {
         console.error("Upload error:", error);
@@ -228,7 +248,8 @@ export default function BoardWrite() {
         .from("board-attachments")
         .getPublicUrl(fileName);
 
-      const imageTag = `\n<img src="${urlData.publicUrl}" alt="image" style="max-width:100%;border-radius:8px;margin:8px 0;" />\n`;
+      const sizeStyle = getImageSizeStyle(size);
+      const imageTag = `\n<img src="${urlData.publicUrl}" alt="image" style="${sizeStyle};border-radius:8px;margin:8px 0;" />\n`;
       
       setContent(prev => prev + imageTag);
       
@@ -238,7 +259,7 @@ export default function BoardWrite() {
       toast({ title: t("boardWrite.uploadError") || "이미지 업로드 실패", variant: "destructive" });
     } finally {
       setUploadingImage(false);
-      e.target.value = '';
+      setPendingImageFile(null);
     }
   };
 
@@ -426,20 +447,67 @@ export default function BoardWrite() {
                       <Button type="button" variant="outline" size="sm" onClick={() => insertFormatting("link")}>
                         <LinkIcon className="w-4 h-4" />
                       </Button>
-                      <label className="inline-flex">
-                        <Button type="button" variant="outline" size="sm" asChild className="cursor-pointer">
-                          <span>
-                            <Image className="w-4 h-4" />
-                          </span>
-                        </Button>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleInlineImageUpload}
-                          className="hidden"
-                          disabled={uploadingImage}
-                        />
-                      </label>
+                      <div className="relative">
+                        <label className="inline-flex">
+                          <Button type="button" variant="outline" size="sm" asChild className="cursor-pointer">
+                            <span>
+                              <Image className="w-4 h-4" />
+                            </span>
+                          </Button>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageFileSelect}
+                            className="hidden"
+                            disabled={uploadingImage}
+                          />
+                        </label>
+                        
+                        {showImageSizeMenu && (
+                          <div className="absolute top-full left-0 mt-1 bg-card border border-border rounded-lg shadow-lg z-50 p-2 min-w-[140px]">
+                            <p className="text-xs text-muted-foreground mb-2 px-2">{t("boardWrite.selectImageSize") || "이미지 크기 선택"}</p>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="w-full justify-start"
+                              onClick={() => uploadImageWithSize('small')}
+                            >
+                              📷 {t("boardWrite.sizeSmall") || "작게"} (300px)
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="w-full justify-start"
+                              onClick={() => uploadImageWithSize('medium')}
+                            >
+                              🖼️ {t("boardWrite.sizeMedium") || "중간"} (500px)
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="w-full justify-start"
+                              onClick={() => uploadImageWithSize('large')}
+                            >
+                              🌅 {t("boardWrite.sizeLarge") || "크게"} (100%)
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="w-full justify-start text-muted-foreground"
+                              onClick={() => {
+                                setShowImageSizeMenu(false);
+                                setPendingImageFile(null);
+                              }}
+                            >
+                              ✕ {t("common.cancel") || "취소"}
+                            </Button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <div className="relative">
                       <Textarea
