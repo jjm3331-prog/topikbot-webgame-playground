@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/dialog";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
+import { PostTranslateButton } from "@/components/board/PostTranslateButton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -635,6 +636,9 @@ export default function BoardPost() {
                   <Share2 className="w-4 h-4 mr-2" />
                   Chia sẻ
                 </Button>
+                <PostTranslateButton 
+                  text={`${post.title}\n\n${post.content.replace(/<[^>]*>/g, '')}`}
+                />
               </div>
             </Card>
           </motion.div>

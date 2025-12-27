@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { 
   ArrowLeft, 
   Plus, 
@@ -41,6 +42,7 @@ import {
 } from "@/components/ui/popover";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
+import { PostTranslateButton } from "@/components/board/PostTranslateButton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { format, subDays, subWeeks, subMonths } from "date-fns";
@@ -602,6 +604,10 @@ export default function Board() {
                               <MessageCircle className="w-3 h-3" />
                               {post.comment_count}
                             </span>
+                            <PostTranslateButton 
+                              text={`${post.title} ${post.content.replace(/<[^>]*>/g, '').slice(0, 200)}`}
+                              className="text-muted-foreground hover:text-primary"
+                            />
                           </div>
                         </div>
                       </div>
