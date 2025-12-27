@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import {
@@ -15,6 +15,7 @@ import {
   PenTool,
   Users,
   HelpCircle,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,16 +27,23 @@ import {
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useSubscription } from "@/hooks/useSubscription";
 import zaloPayLogo from "@/assets/zalopay-logo.png";
 
 type BillingPeriod = "1-month" | "6-months" | "12-months";
 
 const Pricing = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { t } = useTranslation();
+  const { toast } = useToast();
+  const { subscription, isPremium, loading: subscriptionLoading } = useSubscription();
+  
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>("1-month");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState<string | undefined>();
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   const comparisonFeatures = useMemo(
     () => [
@@ -104,6 +112,19 @@ const Pricing = () => {
     [t]
   );
 
+  // Check for payment completion
+  useEffect(() => {
+    const paymentStatus = searchParams.get("payment");
+    if (paymentStatus === "complete") {
+      toast({
+        title: t("pricing.paymentSuccess.title", "결제 완료!"),
+        description: t("pricing.paymentSuccess.desc", "Premium 구독이 활성화되었습니다."),
+      });
+      // Remove the query param
+      navigate("/pricing", { replace: true });
+    }
+  }, [searchParams, toast, navigate, t]);
+
   useEffect(() => {
     const checkAuth = async () => {
       const {
@@ -123,6 +144,41 @@ const Pricing = () => {
     };
     checkAuth();
   }, []);
+
+  const handlePayment = async () => {
+    if (!isLoggedIn) {
+      navigate("/auth");
+      return;
+    }
+
+    setIsProcessingPayment(true);
+    try {
+      const months = billingPeriod === "1-month" ? 1 : billingPeriod === "6-months" ? 6 : 12;
+      
+      const { data, error } = await supabase.functions.invoke("create-payment", {
+        body: { tier: "premium", months },
+      });
+
+      if (error) throw error;
+
+      if (data.success && data.paymentUrl) {
+        // Redirect to payment page
+        window.location.href = data.paymentUrl;
+      } else {
+        throw new Error(data.error || "결제 생성 실패");
+      }
+    } catch (error: unknown) {
+      console.error("Payment error:", error);
+      const errorMessage = error instanceof Error ? error.message : "결제 처리 중 오류가 발생했습니다.";
+      toast({
+        title: t("pricing.paymentError.title", "결제 오류"),
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN").format(price);
@@ -295,11 +351,26 @@ const Pricing = () => {
               </ul>
 
               <Button
-                onClick={() => navigate("/auth")}
-                className="w-full bg-korean-green hover:bg-korean-green/90 text-white text-button-lg py-3"
+                onClick={isPremium ? undefined : handlePayment}
+                disabled={isPremium || isProcessingPayment || subscriptionLoading}
+                className="w-full bg-korean-green hover:bg-korean-green/90 text-white text-button-lg py-3 disabled:opacity-70"
               >
-                {t("pricing.premium.upgrade")}
+                {isProcessingPayment ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {t("pricing.processing", "처리 중...")}
+                  </>
+                ) : isPremium ? (
+                  t("pricing.premium.currentPlan", "현재 구독 중")
+                ) : (
+                  t("pricing.premium.upgrade")
+                )}
               </Button>
+              {isPremium && subscription?.expiresAt && (
+                <p className="text-center text-card-caption text-muted-foreground mt-2">
+                  {t("pricing.expiresAt", "만료일")}: {new Date(subscription.expiresAt).toLocaleDateString()}
+                </p>
+              )}
             </div>
           </motion.div>
 
