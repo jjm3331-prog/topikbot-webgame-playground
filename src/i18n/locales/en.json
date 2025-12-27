@@ -1516,7 +1516,12 @@
     "uploadingImage": "Uploading image...",
     "imageInserted": "Image inserted",
     "uploadError": "Image upload failed",
-    "pasteHint": "💡 Ctrl+V to paste images directly into the content"
+    "pasteHint": "💡 Ctrl+V to paste images directly into the content",
+    "audioLabel": "Audio File (MP3)",
+    "selectAudio": "Select Audio",
+    "existingAudio": "Existing audio file",
+    "audioRequired": "Please upload an MP3 file",
+    "mp3Only": "Only MP3 files allowed"
   },
   "blockEditor": {
     "text": "Text",
