@@ -89,7 +89,6 @@ const KoreaCareer = () => {
   ];
 
   const handleServiceClick = (service: (typeof services)[0]) => {
-    if (service.status === "coming") return;
     navigate(service.path);
   };
 
@@ -159,16 +158,12 @@ const KoreaCareer = () => {
                 >
                   <Card
                     onClick={() => handleServiceClick(service)}
-                    className={`relative overflow-hidden p-6 h-full transition-all duration-500 ${
-                      service.status === "coming"
-                        ? "opacity-70 cursor-not-allowed"
-                        : `cursor-pointer hover:shadow-2xl ${service.shadowColor}`
-                    } bg-gradient-to-br ${service.bgGradient} border-2 ${
+                    className={`relative overflow-hidden p-6 h-full transition-all duration-500 cursor-pointer hover:shadow-2xl ${service.shadowColor} bg-gradient-to-br ${service.bgGradient} border-2 ${
                       hoveredCard === service.id ? "border-primary/50" : "border-transparent"
                     }`}
                   >
                     {/* Animated background glow */}
-                    {hoveredCard === service.id && service.status === "active" && (
+                    {hoveredCard === service.id && (
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -177,23 +172,12 @@ const KoreaCareer = () => {
                     )}
 
                     {/* Status Badge */}
-                    {service.status === "coming" && (
-                      <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-yellow-500/20 border border-yellow-500/50 flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-yellow-500" />
-                        <span className="text-xs font-medium text-yellow-600 dark:text-yellow-400">
-                          {t("careerPages.hub.status.comingSoon")}
-                        </span>
-                      </div>
-                    )}
-
-                    {service.status === "active" && (
-                      <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-green-500/20 border border-green-500/50 flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3 text-green-500" />
-                        <span className="text-xs font-medium text-green-600 dark:text-green-400">
-                          {t("careerPages.hub.status.active")}
-                        </span>
-                      </div>
-                    )}
+                    <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-green-500/20 border border-green-500/50 flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3 text-green-500" />
+                      <span className="text-xs font-medium text-green-600 dark:text-green-400">
+                        {t("careerPages.hub.status.active")}
+                      </span>
+                    </div>
 
                     {/* Icon with emoji */}
                     <div className="relative mb-4">

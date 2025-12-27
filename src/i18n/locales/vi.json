@@ -1543,5 +1543,18 @@
     "featuresTitle": "Tính năng nổi bật", "noticesTitle": "Lưu ý quan trọng cho hội viên",
     "notices": { "item1": "Quyền truy cập AI được cấp ngay lập tức sau khi nâng cấp thành công.", "item2": "Đăng nhập bằng cùng email đã đăng ký tại LUKATO để đồng bộ.", "item3": "Các mô hình AI sẽ tự động hiển thị sau khi được cấp quyền.", "item4": "Sử dụng LUKATO RAG AI - đặt câu hỏi và nhận trả lời chi tiết!" },
     "cta": { "title": "Sẵn sàng học tập cùng AI?", "desc": "LUKATO AI Chat giúp bạn giải đáp mọi thắc mắc và chinh phục kỳ thi!", "practice": "Làm bài tập" }
+  },
+  "board": {
+    "translation": {
+      "translate": "Dịch",
+      "translating": "Đang dịch...",
+      "showOriginal": "Xem bản gốc",
+      "showTranslation": "Xem bản dịch",
+      "success": "Dịch thành công",
+      "error": "Lỗi dịch",
+      "errorDesc": "Dịch thất bại. Vui lòng thử lại.",
+      "sameLanguage": "Cùng ngôn ngữ",
+      "sameLanguageDesc": "Ngôn ngữ nguồn và ngôn ngữ đã chọn giống nhau."
+    }
   }
 }

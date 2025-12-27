@@ -1369,5 +1369,18 @@
     "featuresTitle": "Key Features", "noticesTitle": "Important Notices for Members",
     "notices": { "item1": "AI access granted immediately after successful upgrade.", "item2": "Login with same email registered at LUKATO to sync.", "item3": "AI models will automatically display after authorization.", "item4": "Use LUKATO RAG AI - ask questions and get detailed answers!" },
     "cta": { "title": "Ready to study with AI?", "desc": "LUKATO AI Chat helps you answer all questions and conquer exams!", "practice": "Practice" }
+  },
+  "board": {
+    "translation": {
+      "translate": "Translate",
+      "translating": "Translating...",
+      "showOriginal": "Show Original",
+      "showTranslation": "Show Translation",
+      "success": "Translation complete",
+      "error": "Translation Error",
+      "errorDesc": "Translation failed. Please try again.",
+      "sameLanguage": "Same Language",
+      "sameLanguageDesc": "The source and selected languages are the same."
+    }
   }
 }
