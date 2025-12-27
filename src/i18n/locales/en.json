@@ -1664,6 +1664,12 @@
     },
     "freeItems": { "aiQuestions": "AI {{count}} questions/day", "topik": "TOPIK I & II Study", "allGames": "All Korean Games", "ranking": "View Ranking" },
     "premiumItems": { "allFree": "All free features included" },
+    "premiumFeatures": {
+      "unlimited_ai": "Unlimited AI questions",
+      "writing_correction": "Writing correction",
+      "progress_analysis": "AI progress analysis",
+      "mistake_analysis": "AI mistake notebook analysis"
+    },
     "tips": { "title": "Quick Points Tips", "item1": "Check in daily to maintain streak and earn bonus", "item2": "Complete quiz with perfect score for +{{points}} points", "item3": "Invite friends so both get bonus", "item4": "Set and complete weekly learning goals" }
   },
   "pricing": {
