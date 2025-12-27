@@ -3,6 +3,77 @@
     "title": "Biến thể đề thi AI",
     "description": "Tải ảnh đề thi TOPIK lên, AI sẽ tạo câu hỏi biến thể tương tự",
     "howToUse": "Cách sử dụng",
+    "uploadImage": "Tải ảnh đề thi",
+    "generate": "Tạo đề biến thể",
+    "generateButton": "Tạo biến thể AI",
+    "generating": "Đang tạo...",
+    "changeImage": "Chọn ảnh khác",
+    "clickToUpload": "Nhấp để tải ảnh lên",
+    "supportedFormats": "JPG, PNG, WEBP (tối đa 10MB)",
+    "result": "Kết quả",
+    "downloadPDF": "Tải PDF",
+    "premiumFeature": "Tính năng Premium",
+    "premiumDescription": "Tính năng này chỉ dành cho thành viên Premium.",
+    "upgradePremium": "Nâng cấp Premium",
+    "examples": {
+      "reading": "Đề đọc hiểu",
+      "readingDesc": "Phân tích đoạn văn và tạo câu hỏi mới cùng độ khó",
+      "grammar": "Đề ngữ pháp",
+      "grammarDesc": "Giữ nguyên mẫu ngữ pháp, thay đổi ví dụ",
+      "vocabulary": "Đề từ vựng",
+      "vocabularyDesc": "Tạo câu hỏi từ vựng cùng loại với từ khác",
+      "listening": "Đề nghe",
+      "listeningDesc": "Phân tích văn bản nghe và tạo câu hỏi tương tự"
+    },
+    "features": {
+      "analyze": "Phân tích đề gốc",
+      "generate": "Tạo biến thể tương tự",
+      "explain": "Cung cấp giải thích chi tiết",
+      "difficulty": "Phân tích độ khó và cấp độ",
+      "similar": "Đề xuất câu hỏi tương tự"
+    },
+    "sections": {
+      "originalAnalysis": "Phân tích đề gốc",
+      "variantQuestion": "Câu hỏi biến thể",
+      "answer": "Đáp án",
+      "explanation": "Giải thích",
+      "learningPoints": "Điểm học tập",
+      "difficultyAnalysis": "Phân tích độ khó",
+      "similarQuestions": "Câu hỏi tương tự"
+    },
+    "difficulty": {
+      "level": "Cấp độ TOPIK",
+      "grade": "Cấp",
+      "score": "Điểm độ khó",
+      "unknown": "Không xác định",
+      "easy": "Dễ",
+      "medium": "Trung bình",
+      "hard": "Khó",
+      "veryHard": "Rất khó"
+    },
+    "pdf": {
+      "createdAt": "Ngày tạo",
+      "translation": "Bản dịch"
+    },
+    "success": {
+      "generated": "Đã tạo câu hỏi biến thể",
+      "pdfOpened": "Đã mở xem trước PDF"
+    },
+    "errors": {
+      "selectImage": "Vui lòng chọn ảnh trước",
+      "premiumRequired": "Cần đăng ký Premium",
+      "apiError": "Lỗi API đã xảy ra",
+      "tryAgain": "Vui lòng thử lại",
+      "imageTooLarge": "Kích thước ảnh phải nhỏ hơn 10MB",
+      "noContent": "Không có nội dung để tải xuống",
+      "popupBlocked": "Popup bị chặn",
+      "pdfError": "Lỗi tạo PDF"
+    }
+  },
+  "questionVariant": {
+    "title": "Biến thể đề thi AI",
+    "description": "Tải ảnh đề thi TOPIK lên, AI sẽ tạo câu hỏi biến thể tương tự",
+    "howToUse": "Cách sử dụng",
     "examples": {
       "reading": "Đề đọc hiểu",
       "readingDesc": "Phân tích đoạn văn và tạo câu hỏi mới cùng độ khó",

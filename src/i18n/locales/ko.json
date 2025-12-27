@@ -1,6 +1,77 @@
 {
   "questionVariant": {
     "title": "문제 변형 AI",
+    "description": "TOPIK 문제 이미지를 업로드하면 AI가 유사한 변형 문제를 생성합니다",
+    "howToUse": "사용 방법",
+    "uploadImage": "문제 이미지 업로드",
+    "generate": "변형 문제 생성",
+    "generateButton": "AI 변형 생성",
+    "generating": "생성 중...",
+    "changeImage": "다른 이미지",
+    "clickToUpload": "클릭하여 이미지 업로드",
+    "supportedFormats": "JPG, PNG, WEBP (최대 10MB)",
+    "result": "결과",
+    "downloadPDF": "PDF 다운로드",
+    "premiumFeature": "프리미엄 전용 기능",
+    "premiumDescription": "이 기능은 프리미엄 회원만 사용할 수 있습니다.",
+    "upgradePremium": "프리미엄 업그레이드",
+    "examples": {
+      "reading": "읽기 문제",
+      "readingDesc": "지문을 분석하고 새로운 주제로 변형 문제 생성",
+      "grammar": "문법 문제",
+      "grammarDesc": "문법 패턴을 유지하면서 다른 예문으로 변형",
+      "vocabulary": "어휘 문제",
+      "vocabularyDesc": "같은 유형의 어휘 문제를 다른 단어로 생성",
+      "listening": "듣기 문제",
+      "listeningDesc": "듣기 지문을 분석하고 유사한 상황 생성"
+    },
+    "features": {
+      "analyze": "원본 문제 분석",
+      "generate": "유사 변형 문제 생성",
+      "explain": "상세 해설 제공",
+      "difficulty": "난이도 분석 및 등급 표시",
+      "similar": "유사 기출문제 추천"
+    },
+    "sections": {
+      "originalAnalysis": "원본 문제 분석",
+      "variantQuestion": "변형 문제",
+      "answer": "정답",
+      "explanation": "해설",
+      "learningPoints": "학습 포인트",
+      "difficultyAnalysis": "난이도 분석",
+      "similarQuestions": "유사 문제 추천"
+    },
+    "difficulty": {
+      "level": "TOPIK 레벨",
+      "grade": "등급",
+      "score": "난이도 점수",
+      "unknown": "알 수 없음",
+      "easy": "쉬움",
+      "medium": "보통",
+      "hard": "어려움",
+      "veryHard": "매우 어려움"
+    },
+    "pdf": {
+      "createdAt": "생성일",
+      "translation": "번역"
+    },
+    "success": {
+      "generated": "변형 문제가 생성되었습니다",
+      "pdfOpened": "PDF 미리보기가 열렸습니다"
+    },
+    "errors": {
+      "selectImage": "이미지를 먼저 선택해주세요",
+      "premiumRequired": "프리미엄 구독이 필요합니다",
+      "apiError": "API 오류가 발생했습니다",
+      "tryAgain": "다시 시도해주세요",
+      "imageTooLarge": "이미지 크기는 10MB 이하여야 합니다",
+      "noContent": "다운로드할 내용이 없습니다",
+      "popupBlocked": "팝업이 차단되었습니다",
+      "pdfError": "PDF 생성 오류"
+    }
+  },
+  "questionVariant": {
+    "title": "문제 변형 AI",
     "description": "TOPIK 기출문제 이미지를 업로드하면 AI가 유사 변형 문제를 생성합니다",
     "howToUse": "사용 방법",
     "examples": {
