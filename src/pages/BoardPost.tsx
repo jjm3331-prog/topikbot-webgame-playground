@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -103,50 +103,6 @@ const extractYoutubeId = (url: string) => {
   return match ? match[1] : null;
 };
 
-const extractMediaHtmlFromPostContent = (html: string) => {
-  if (typeof window === "undefined") return "";
-  if (!html || typeof html !== "string") return "";
-
-  try {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-
-    const media: string[] = [];
-
-    // Images
-    doc.querySelectorAll("img").forEach((img) => {
-      const src = img.getAttribute("src");
-      if (!src) return;
-      const alt = img.getAttribute("alt") || "";
-      media.push(`<img src="${src}" alt="${alt}" loading="lazy" />`);
-    });
-
-    // Iframes (e.g., YouTube embeds in editor)
-    doc.querySelectorAll("iframe").forEach((iframe) => {
-      const src = iframe.getAttribute("src");
-      if (!src) return;
-      media.push(`<div class="aspect-video rounded-lg overflow-hidden"><iframe src="${src}" class="w-full h-full" allowfullscreen></iframe></div>`);
-    });
-
-    // Videos
-    doc.querySelectorAll("video").forEach((video) => {
-      const src = video.getAttribute("src");
-      if (src) {
-        media.push(`<video src="${src}" controls class="w-full rounded-lg"></video>`);
-        return;
-      }
-      const source = video.querySelector("source")?.getAttribute("src");
-      if (source) {
-        media.push(`<video controls class="w-full rounded-lg"><source src="${source}" /></video>`);
-      }
-    });
-
-    return media.join("\n");
-  } catch (e) {
-    console.error("extractMediaHtmlFromPostContent failed", e);
-    return "";
-  }
-};
 
 export default function BoardPost() {
   const { boardType, postId } = useParams();
@@ -185,11 +141,6 @@ export default function BoardPost() {
   const [reportDescription, setReportDescription] = useState("");
   const [reportSubmitting, setReportSubmitting] = useState(false);
 
-  // useMemo must be called at top level before any conditional returns
-  const translatedMediaHtml = useMemo(
-    () => post ? extractMediaHtmlFromPostContent(post.content) : "",
-    [post?.content]
-  );
 
   useEffect(() => {
     checkAuth();
@@ -754,12 +705,20 @@ export default function BoardPost() {
                   dangerouslySetInnerHTML={{ __html: post.content }}
                 />
 
+
                 {/* Translation section (optional, never replaces original) */}
                 {showTranslated && translatedContent && (
-                  <div className="pt-6 mt-6 border-t-2 border-primary/30 bg-primary/5 -mx-6 px-6 pb-6 rounded-b-lg">
-                    <p className="text-sm font-semibold text-primary mb-4">
-                      {t("board.translation.translatedSectionLabel")}
-                    </p>
+                  <section className="rounded-lg border border-border bg-muted/20 p-4">
+                    <header className="mb-3 flex items-center justify-between gap-3">
+                      <p className="text-sm font-semibold text-foreground">
+                        {t("board.translation.translatedSectionLabel")}
+                      </p>
+                      {currentTranslatedLang && (
+                        <span className="text-xs text-muted-foreground">
+                          {languages.find((l) => l.code === currentTranslatedLang)?.nativeName ?? currentTranslatedLang}
+                        </span>
+                      )}
+                    </header>
                     <div
                       className="prose prose-sm max-w-none text-foreground
                         [&_p]:mb-4 [&_p]:leading-relaxed [&_p]:text-foreground
@@ -768,16 +727,7 @@ export default function BoardPost() {
                         [&_li]:mb-1 [&_a]:text-primary [&_a]:underline"
                       dangerouslySetInnerHTML={{ __html: translatedContent }}
                     />
-
-                    {translatedMediaHtml && (
-                      <div
-                        className="prose prose-sm max-w-none mt-4 text-foreground
-                          [&_img]:rounded-lg [&_img]:my-4 [&_img]:max-w-full
-                          [&_iframe]:rounded-lg [&_video]:rounded-lg"
-                        dangerouslySetInnerHTML={{ __html: translatedMediaHtml }}
-                      />
-                    )}
-                  </div>
+                  </section>
                 )}
               </div>
 
@@ -844,13 +794,12 @@ export default function BoardPost() {
               )}
 
               {/* Actions */}
-              <div className="flex items-center gap-4 mt-6 pt-4 border-t">
-                <Button 
-                  variant={liked ? "default" : "outline"} 
-                  size="sm"
-                  onClick={handleLike}
-                  className={liked ? "bg-pink-500 hover:bg-pink-600" : ""}
-                >
+               <div className="flex items-center gap-4 mt-6 pt-4 border-t">
+                 <Button
+                   variant={liked ? "default" : "outline"}
+                   size="sm"
+                   onClick={handleLike}
+                 >
                   <Heart className={`w-4 h-4 mr-2 ${liked ? "fill-current" : ""}`} />
                   {post.like_count}
                 </Button>
