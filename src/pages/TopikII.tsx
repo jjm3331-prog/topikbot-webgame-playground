@@ -278,7 +278,7 @@ const TopikII = () => {
               ) : (
                 <div className="text-center py-12">
                   <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">이 카테고리에 아직 콘텐츠가 없습니다.</p>
+                  <p className="text-muted-foreground">{t('topikPage.noContent')}</p>
                 </div>
               )}
             </motion.div>
