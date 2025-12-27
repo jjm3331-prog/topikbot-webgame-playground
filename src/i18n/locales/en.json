@@ -1,4 +1,19 @@
 {
+  "splash": {
+    "tagline": "AI-Powered Korean Learning Game",
+    "loading": "Loading...",
+    "branding": "LUKATO AI Korean Learning"
+  },
+  "pwa": {
+    "title": "Install App",
+    "description1": "Add LUKATO to your home screen!",
+    "description2": "Access it quickly like a native app.",
+    "fastLaunch": "Fast Launch",
+    "offline": "Offline",
+    "notifications": "Notifications",
+    "later": "Later",
+    "installNow": "Install"
+  },
   "bankruptcyRecovery": {
     "title": "Bankruptcy Recovery",
     "subtitle": "Phục hồi phá sản",
@@ -2115,6 +2130,37 @@
         "enterCompanyDesc": "Please type a company name to search.",
         "searchErrorTitle": "Search failed",
         "searchErrorDesc": "Could not generate the report. Try again."
+      }
+    }
+  },
+  "practicalGuidePage": {
+    "badge": "📖 Practical Guide",
+    "tagline": "Practical Korean you can use right away in IT work environments",
+    "comingSoon": "Coming Soon",
+    "comingSoonDesc": "We're preparing practical Korean content for IT COMTORs.",
+    "targetTitle": "🎯 Target Audience",
+    "targets": {
+      "comtor": "Interpreter",
+      "gameqa": "Game QA",
+      "brse": "Bridge SE",
+      "pmpl": "Project Management"
+    },
+    "features": {
+      "itTerms": {
+        "title": "IT Terminology",
+        "desc": "IT Korean terms by field: SI / Game / AI / Web / ERP"
+      },
+      "meeting": {
+        "title": "Meeting Simulation",
+        "desc": "Practice Kickoff, Demo, weekly/monthly/retro meetings"
+      },
+      "email": {
+        "title": "Email/Messenger Templates",
+        "desc": "Templates for delays, issue reports, confirmations, etc."
+      },
+      "business": {
+        "title": "Business Korean",
+        "desc": "Business Korean expressions needed for IT COMTORs"
       }
     }
   }

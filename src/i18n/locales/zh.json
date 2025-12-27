@@ -1,4 +1,19 @@
 {
+  "splash": {
+    "tagline": "AI驱动的韩语学习游戏",
+    "loading": "加载中...",
+    "branding": "LUKATO AI Korean Learning"
+  },
+  "pwa": {
+    "title": "安装应用",
+    "description1": "将LUKATO添加到主屏幕！",
+    "description2": "像原生应用一样快速访问。",
+    "fastLaunch": "快速启动",
+    "offline": "离线",
+    "notifications": "通知",
+    "later": "稍后",
+    "installNow": "安装"
+  },
   "bankruptcyRecovery": {
     "title": "破产恢复",
     "subtitle": "파산 복구",
@@ -1865,5 +1880,36 @@
     "updated": "申请已更新！",
     "privacyNote": "您的信息仅用于猎头目的，并得到安全保护。",
     "featureName": "猎头服务"
+  },
+  "practicalGuidePage": {
+    "badge": "📖 实务指南",
+    "tagline": "可在IT工作环境中直接使用的实务韩语",
+    "comingSoon": "准备中",
+    "comingSoonDesc": "正在为IT COMTOR准备实务韩语内容。",
+    "targetTitle": "🎯 对象",
+    "targets": {
+      "comtor": "翻译",
+      "gameqa": "游戏QA",
+      "brse": "Bridge SE",
+      "pmpl": "项目管理"
+    },
+    "features": {
+      "itTerms": {
+        "title": "IT术语学习",
+        "desc": "按领域分类的IT韩语术语：SI / Game / AI / Web / ERP"
+      },
+      "meeting": {
+        "title": "会议模拟",
+        "desc": "练习Kickoff、Demo、周会/月会/回顾会议"
+      },
+      "email": {
+        "title": "邮件/消息模板",
+        "desc": "延迟、问题报告、确认请求等场景表达"
+      },
+      "business": {
+        "title": "商务韩语",
+        "desc": "IT COMTOR所需的商务韩语表达"
+      }
+    }
   }
 }
