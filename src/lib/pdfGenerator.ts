@@ -1,4 +1,5 @@
 import jsPDF from "jspdf";
+import notoSansUrl from "@/assets/fonts/NotoSansKR-VF.ttf?url";
 
 export interface WritingCorrectionResult {
   overall_score: number;
@@ -213,6 +214,29 @@ function getGrade(score: number): { grade: string; color: { r: number; g: number
   return { grade: "D", color: COLORS.error };
 }
 
+const PDF_FONT_FAMILY = "NotoSans";
+const PDF_FONT_FILE = "NotoSansKR-VF.ttf";
+
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  let binary = "";
+  const bytes = new Uint8Array(buffer);
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
+}
+
+async function embedUnicodeFont(doc: jsPDF) {
+  const res = await fetch(notoSansUrl);
+  if (!res.ok) throw new Error(`Failed to load PDF font (${res.status})`);
+  const buf = await res.arrayBuffer();
+  const base64 = arrayBufferToBase64(buf);
+  doc.addFileToVFS(PDF_FONT_FILE, base64);
+  doc.addFont(PDF_FONT_FILE, PDF_FONT_FAMILY, "normal");
+  doc.setFont(PDF_FONT_FAMILY, "normal");
+}
+
 class PDFGenerator {
   private doc: jsPDF;
   private pageWidth: number;
@@ -223,8 +247,8 @@ class PDFGenerator {
   private pageNum: number;
   private lang: string;
 
-  constructor(lang: string) {
-    this.doc = new jsPDF("p", "mm", "a4");
+  constructor(doc: jsPDF, lang: string) {
+    this.doc = doc;
     this.pageWidth = this.doc.internal.pageSize.getWidth();
     this.pageHeight = this.doc.internal.pageSize.getHeight();
     this.margin = 15;
@@ -626,7 +650,11 @@ export async function generateWritingCorrectionPDF(options: WritingPDFOptions): 
   const lang = (options.language || "en").split("-")[0];
   const filename = options.filename || `TOPIK_Writing_Report_${Date.now()}.pdf`;
 
-  const generator = new PDFGenerator(lang);
-  const doc = generator.generate(options.result);
+  // IMPORTANT: jsPDF default fonts are NOT unicode-safe; embed a unicode font first.
+  const doc = new jsPDF("p", "mm", "a4");
+  await embedUnicodeFont(doc);
+
+  const generator = new PDFGenerator(doc, lang);
+  generator.generate(options.result);
   doc.save(filename);
 }
