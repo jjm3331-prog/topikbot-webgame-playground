@@ -1,4 +1,10 @@
 {
+  "notifications": {
+    "title": "알림",
+    "markAllRead": "모두 읽음 표시",
+    "empty": "알림이 없습니다",
+    "showingCount": "최근 {{count}}개 알림 표시"
+  },
   "common": {
     "login": "로그인",
     "logout": "로그아웃",

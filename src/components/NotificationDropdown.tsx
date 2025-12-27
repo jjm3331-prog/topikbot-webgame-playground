@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { Bell, Check, X, Megaphone, Gift, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
-import { vi } from "date-fns/locale";
+import { ko, enUS, vi, ja, zhCN, ru } from "date-fns/locale";
 
 interface Notification {
   id: string;
@@ -20,10 +21,22 @@ interface NotificationDropdownProps {
 }
 
 export const NotificationDropdown = ({ userId }: NotificationDropdownProps) => {
+  const { t, i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [readIds, setReadIds] = useState<string[]>([]);
+
+  const getDateLocale = () => {
+    switch (i18n.language) {
+      case 'ko': return ko;
+      case 'vi': return vi;
+      case 'ja': return ja;
+      case 'zh': return zhCN;
+      case 'ru': return ru;
+      default: return enUS;
+    }
+  };
 
   useEffect(() => {
     if (userId) {
@@ -104,7 +117,7 @@ export const NotificationDropdown = ({ userId }: NotificationDropdownProps) => {
 
   const formatTime = (dateString: string) => {
     try {
-      return formatDistanceToNow(new Date(dateString), { addSuffix: true, locale: vi });
+      return formatDistanceToNow(new Date(dateString), { addSuffix: true, locale: getDateLocale() });
     } catch {
       return "";
     }
@@ -156,7 +169,7 @@ export const NotificationDropdown = ({ userId }: NotificationDropdownProps) => {
               <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/50">
                 <h3 className="font-semibold text-foreground flex items-center gap-2">
                   <Bell className="w-4 h-4" />
-                  Thông báo
+                  {t("notifications.title")}
                 </h3>
                 {unreadCount > 0 && (
                   <Button
@@ -166,7 +179,7 @@ export const NotificationDropdown = ({ userId }: NotificationDropdownProps) => {
                     className="text-xs text-primary hover:text-primary/80"
                   >
                     <Check className="w-3 h-3 mr-1" />
-                    Đánh dấu đã đọc
+                    {t("notifications.markAllRead")}
                   </Button>
                 )}
               </div>
@@ -176,7 +189,7 @@ export const NotificationDropdown = ({ userId }: NotificationDropdownProps) => {
                 {notifications.length === 0 ? (
                   <div className="py-12 text-center">
                     <Bell className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
-                    <p className="text-muted-foreground text-sm">Chưa có thông báo nào</p>
+                    <p className="text-muted-foreground text-sm">{t("notifications.empty")}</p>
                   </div>
                 ) : (
                   <ul className="divide-y divide-border">
@@ -226,7 +239,7 @@ export const NotificationDropdown = ({ userId }: NotificationDropdownProps) => {
               {notifications.length > 0 && (
                 <div className="px-4 py-2.5 border-t border-border bg-muted/30">
                   <p className="text-xs text-center text-muted-foreground">
-                    Hiển thị {notifications.length} thông báo gần nhất
+                    {t("notifications.showingCount", { count: notifications.length })}
                   </p>
                 </div>
               )}

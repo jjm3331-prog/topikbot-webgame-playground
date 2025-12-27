@@ -1,4 +1,10 @@
 {
+  "notifications": {
+    "title": "Уведомления",
+    "markAllRead": "Отметить все как прочитанные",
+    "empty": "Нет уведомлений",
+    "showingCount": "Показано {{count}} последних уведомлений"
+  },
   "common": {
     "login": "Войти",
     "logout": "Выйти",
