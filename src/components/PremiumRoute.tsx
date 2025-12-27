@@ -178,14 +178,14 @@ const PremiumRequired = () => {
 };
 
 export const PremiumRoute = ({ children }: PremiumRouteProps) => {
-  const { isPremium, isPlus, loading } = useSubscription();
+  const { isPremium, loading } = useSubscription();
 
   if (loading) {
     return <LoadingState />;
   }
 
   // Free 사용자는 Premium 기능 접근 차단
-  if (!isPremium && !isPlus) {
+  if (!isPremium) {
     return <PremiumRequired />;
   }
 
