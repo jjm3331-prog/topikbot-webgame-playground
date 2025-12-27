@@ -143,21 +143,21 @@ export default function BoardWrite() {
   const uploadAudio = async (): Promise<string | null> => {
     if (existingAudioUrl && !audioFile) return existingAudioUrl;
     if (!audioFile) return null;
-    
+
     const fileName = `${currentUser}/${Date.now()}_${audioFile.name}`;
     const { error } = await supabase.storage
       .from("podcast-audio")
-      .upload(fileName, audioFile);
-    
+      .upload(fileName, audioFile, { upsert: false });
+
     if (error) {
       console.error("Audio upload error:", error);
-      return null;
+      throw error;
     }
-    
+
     const { data: urlData } = supabase.storage
       .from("podcast-audio")
       .getPublicUrl(fileName);
-    
+
     return urlData.publicUrl;
   };
 
@@ -166,20 +166,29 @@ export default function BoardWrite() {
       toast({ title: t("boardWrite.enterTitle") });
       return;
     }
-    
+
     const hasContent = blocks.some(b => 
       b.type === 'divider' || 
       (b.content && b.content.trim()) || 
       (b.meta?.items && b.meta.items.some(item => item.trim()))
     );
-    
+
     if (!hasContent) {
       toast({ title: t("boardWrite.enterContent") });
       return;
     }
-    
+
     if (!currentUser) {
       toast({ title: t("boardWrite.pleaseLogin") });
+      return;
+    }
+
+    // Podcast posts require an audio file
+    if (boardType === "podcast" && !audioFile && !existingAudioUrl) {
+      toast({
+        title: t("boardWrite.audioRequired") || "MP3 파일을 업로드해주세요.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -201,27 +210,33 @@ export default function BoardWrite() {
         is_pinned: isAdmin ? isPinned : false
       };
 
-      if (audioUrl) {
+      if (boardType === "podcast") {
         postData.audio_url = audioUrl;
       }
 
       if (editId) {
-        await supabase
+        const { error } = await supabase
           .from("board_posts")
           .update(postData)
           .eq("id", editId);
+        if (error) throw error;
         toast({ title: t("boardWrite.updateSuccess") });
       } else {
-        await supabase
+        const { error } = await supabase
           .from("board_posts")
           .insert(postData);
+        if (error) throw error;
         toast({ title: t("boardWrite.postSuccess") });
       }
 
       navigate(`/board/${boardType}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving post:", error);
-      toast({ title: t("boardWrite.error"), description: t("boardWrite.saveError"), variant: "destructive" });
+      toast({ 
+        title: t("boardWrite.error"), 
+        description: error?.message || t("boardWrite.saveError"), 
+        variant: "destructive" 
+      });
     } finally {
       setSubmitting(false);
     }
