@@ -532,7 +532,6 @@ const WritingCorrection = () => {
       await generateWritingCorrectionPDF({
         result,
         language: i18n.language,
-        t,
       });
 
       toast({
