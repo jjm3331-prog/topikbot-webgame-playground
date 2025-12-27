@@ -1456,6 +1456,7 @@
         "interviewReviews": "面试洞察",
         "latestNews": "最新新闻"
       },
+      "downloadPDF": "下载PDF",
       "toast": {
         "enterCompanyTitle": "请输入企业名称",
         "enterCompanyDesc": "请输入要搜索的企业名称。",

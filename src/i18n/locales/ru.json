@@ -1449,6 +1449,7 @@
         "interviewReviews": "Инсайты интервью",
         "latestNews": "Последние новости"
       },
+      "downloadPDF": "Скачать PDF",
       "toast": {
         "enterCompanyTitle": "Введите название компании",
         "enterCompanyDesc": "Пожалуйста, введите компанию для поиска.",
