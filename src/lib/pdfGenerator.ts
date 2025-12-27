@@ -1,7 +1,6 @@
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 
-export type WritingCorrectionResult = {
+export interface WritingCorrectionResult {
   overall_score: number;
   grammar_score: number;
   vocabulary_score: number;
@@ -18,12 +17,24 @@ export type WritingCorrectionResult = {
   model_answer?: string;
   detailed_feedback?: string;
   next_priority?: string[];
-};
+}
 
-export type WritingPDFOptions = {
+export interface WritingPDFOptions {
   result: WritingCorrectionResult;
   language: string;
   filename?: string;
+}
+
+const COLORS = {
+  bg: { r: 11, g: 18, b: 32 },
+  card: { r: 17, g: 26, b: 46 },
+  primary: { r: 45, g: 76, b: 255 },
+  accent: { r: 124, g: 58, b: 237 },
+  text: { r: 230, g: 237, b: 247 },
+  muted: { r: 160, g: 170, b: 190 },
+  success: { r: 34, g: 197, b: 94 },
+  error: { r: 239, g: 68, b: 68 },
+  white: { r: 255, g: 255, b: 255 },
 };
 
 const labels: Record<string, Record<string, string>> = {
@@ -45,6 +56,7 @@ const labels: Record<string, Record<string, string>> = {
     structure: "구조",
     content: "내용",
     generatedAt: "생성일시",
+    page: "페이지",
   },
   vi: {
     title: "Báo cáo chấm bài TOPIK",
@@ -64,18 +76,19 @@ const labels: Record<string, Record<string, string>> = {
     structure: "Cấu trúc",
     content: "Nội dung",
     generatedAt: "Ngày tạo",
+    page: "Trang",
   },
   en: {
     title: "TOPIK Writing Correction Report",
     subtitle: "Professional Assessment by LUKATO AI",
-    overall: "Overall score",
-    breakdown: "Score breakdown",
+    overall: "Overall Score",
+    breakdown: "Score Breakdown",
     strengths: "Strengths",
-    improvements: "Areas for improvement",
-    corrections: "Key corrections",
-    modelAnswer: "Model answer",
-    detailedFeedback: "Detailed feedback",
-    nextPriority: "Next steps",
+    improvements: "Areas for Improvement",
+    corrections: "Key Corrections",
+    modelAnswer: "Model Answer",
+    detailedFeedback: "Detailed Feedback",
+    nextPriority: "Next Steps",
     original: "Original",
     corrected: "Corrected",
     grammar: "Grammar",
@@ -83,6 +96,7 @@ const labels: Record<string, Record<string, string>> = {
     structure: "Structure",
     content: "Content",
     generatedAt: "Generated",
+    page: "Page",
   },
   ja: {
     title: "TOPIK作文添削レポート",
@@ -102,6 +116,7 @@ const labels: Record<string, Record<string, string>> = {
     structure: "構成",
     content: "内容",
     generatedAt: "作成日",
+    page: "ページ",
   },
   zh: {
     title: "TOPIK写作批改报告",
@@ -121,6 +136,7 @@ const labels: Record<string, Record<string, string>> = {
     structure: "结构",
     content: "内容",
     generatedAt: "生成日期",
+    page: "页",
   },
   ru: {
     title: "Отчёт по исправлению TOPIK",
@@ -140,6 +156,7 @@ const labels: Record<string, Record<string, string>> = {
     structure: "Структура",
     content: "Содержание",
     generatedAt: "Дата создания",
+    page: "Страница",
   },
   uz: {
     title: "TOPIK Yozuv Tuzatish Hisoboti",
@@ -159,26 +176,18 @@ const labels: Record<string, Record<string, string>> = {
     structure: "Tuzilma",
     content: "Mazmun",
     generatedAt: "Yaratilgan",
+    page: "Sahifa",
   },
 };
 
-function L(lang: string, key: string) {
-  const base = (lang || "en").split("-")[0];
-  return labels[base]?.[key] ?? labels.en[key] ?? key;
+function getLabel(lang: string, key: string): string {
+  const baseLang = (lang || "en").split("-")[0];
+  return labels[baseLang]?.[key] ?? labels.en[key] ?? key;
 }
 
-function esc(s: string) {
-  return (s || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-function clean(text?: string) {
-  const t = (text || "").trim();
-  return t
+function cleanText(text?: string): string {
+  if (!text) return "";
+  return text
     .replace(/\*\*/g, "")
     .replace(/\*/g, "")
     .replace(/##/g, "")
@@ -187,236 +196,437 @@ function clean(text?: string) {
     .trim();
 }
 
-function css() {
-  return `
-    *{box-sizing:border-box;}
-    body{margin:0;padding:0;}
-    .page{width:794px; padding:32px; background:#0b1220; color:#e6edf7;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
-      "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans", "PingFang SC", "Microsoft YaHei", sans-serif;}
-    .header{display:flex; align-items:flex-end; justify-content:space-between; padding:20px 22px; border-radius:16px;
-      background: linear-gradient(135deg,#2d4cff,#7c3aed);}
-    .brandTitle{font-size:22px; font-weight:800; letter-spacing:-0.02em;}
-    .brandSub{font-size:12px; opacity:.9; margin-top:4px;}
-    .meta{font-size:11px; opacity:.9;}
-
-    .hero{display:flex; gap:16px; margin-top:16px;}
-    .card{border-radius:16px; background:#111a2e; padding:18px; border:1px solid rgba(255,255,255,.08);} 
-    .overallLabel{font-size:12px; opacity:.9;}
-    .overallValue{margin-top:10px; display:flex; align-items:baseline; gap:8px;}
-    .overallValue .big{font-size:44px; font-weight:900; letter-spacing:-0.04em;}
-    .overallValue .muted{opacity:.8;}
-
-    .sectionTitle{font-size:12px; opacity:.9; margin-bottom:12px;}
-    .scores{display:grid; grid-template-columns: repeat(2, 1fr); gap:10px;}
-    .scoreItem{padding:12px; border-radius:14px; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06);} 
-    .scoreLabel{font-size:11px; opacity:.9;}
-    .scoreValue{margin-top:6px; font-size:16px; font-weight:800;}
-    .bar{height:6px; border-radius:999px; background: rgba(255,255,255,.10); overflow:hidden; margin-top:8px;}
-    .barFill{height:100%; border-radius:999px; background: linear-gradient(90deg,#22c55e,#60a5fa);} 
-
-    .grid{display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top:16px;}
-    .panel{border-radius:16px; background:#0f172a; padding:18px; border:1px solid rgba(255,255,255,.08);} 
-    .panelTitle{font-size:13px; font-weight:800; margin-bottom:10px;}
-    .list{margin:0; padding-left:18px; font-size:12px; line-height:1.55; color: rgba(230,237,247,.92);} 
-    .list li{margin:6px 0;}
-    .mt{margin-top:16px;}
-
-    .corrList{display:flex; flex-direction:column; gap:10px;}
-    .corrCard{display:flex; gap:10px; padding:12px; border-radius:14px; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06);} 
-    .corrIndex{width:22px; height:22px; border-radius:999px; display:flex; align-items:center; justify-content:center; background:#ef4444; color:#fff; font-size:11px; font-weight:800; flex:0 0 auto;}
-    .corrRow{display:flex; gap:8px; align-items:flex-start;}
-    .tag{display:inline-flex; align-items:center; padding:2px 8px; border-radius:999px; font-size:10px; font-weight:700; line-height:1.2; white-space:nowrap;}
-    .tagBad{background: rgba(239,68,68,.14); color:#fecaca; border:1px solid rgba(239,68,68,.30);} 
-    .tagGood{background: rgba(34,197,94,.14); color:#bbf7d0; border:1px solid rgba(34,197,94,.30);} 
-    .corrText{font-size:12px; line-height:1.5; color: rgba(230,237,247,.92);} 
-    .corrText.good{color:#bbf7d0;}
-    .corrExplain{margin-top:6px; font-size:11px; color: rgba(230,237,247,.78);} 
-
-    .mono{white-space:pre-wrap; font-size:12px; line-height:1.65; padding:12px; border-radius:12px; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06);} 
-    .body{white-space:pre-wrap; font-size:12px; line-height:1.65; color: rgba(230,237,247,.92);} 
-
-    .footer{margin-top:18px; text-align:center; font-size:10px; color: rgba(230,237,247,.55);} 
-  `;
+function getScoreColor(score: number, max: number): { r: number; g: number; b: number } {
+  const pct = score / max;
+  if (pct >= 0.8) return COLORS.success;
+  if (pct >= 0.6) return { r: 96, g: 165, b: 250 };
+  if (pct >= 0.4) return { r: 251, g: 191, b: 36 };
+  return COLORS.error;
 }
 
-function scoreItem(label: string, score: number) {
-  const width = Math.min(100, Math.max(0, (score / 25) * 100));
-  return `
-    <div class="scoreItem">
-      <div class="scoreLabel">${esc(label)}</div>
-      <div class="scoreValue">${score}/25</div>
-      <div class="bar"><div class="barFill" style="width:${width}%"></div></div>
-    </div>
-  `;
+function getGrade(score: number): { grade: string; color: { r: number; g: number; b: number } } {
+  if (score >= 90) return { grade: "A+", color: COLORS.success };
+  if (score >= 80) return { grade: "A", color: COLORS.success };
+  if (score >= 70) return { grade: "B+", color: { r: 96, g: 165, b: 250 } };
+  if (score >= 60) return { grade: "B", color: { r: 96, g: 165, b: 250 } };
+  if (score >= 50) return { grade: "C", color: { r: 251, g: 191, b: 36 } };
+  return { grade: "D", color: COLORS.error };
 }
 
-function html(result: WritingCorrectionResult, lang: string) {
-  const now = new Date();
-  const dateStr = now.toLocaleString(undefined, {
-    year: "numeric",
-    month: "long",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+class PDFGenerator {
+  private doc: jsPDF;
+  private pageWidth: number;
+  private pageHeight: number;
+  private margin: number;
+  private contentWidth: number;
+  private y: number;
+  private pageNum: number;
+  private lang: string;
 
-  const strengths = (result.strengths || []).slice(0, 8);
-  const improvements = (result.improvements || []).slice(0, 8);
-  const next = (result.next_priority || []).slice(0, 6);
-  const corrections = (result.corrections || []).slice(0, 12);
+  constructor(lang: string) {
+    this.doc = new jsPDF("p", "mm", "a4");
+    this.pageWidth = this.doc.internal.pageSize.getWidth();
+    this.pageHeight = this.doc.internal.pageSize.getHeight();
+    this.margin = 15;
+    this.contentWidth = this.pageWidth - this.margin * 2;
+    this.y = this.margin;
+    this.pageNum = 1;
+    this.lang = lang;
+  }
 
-  const bullet = (s: string) => `<li>${esc(clean(s))}</li>`;
+  private setColor(color: { r: number; g: number; b: number }) {
+    this.doc.setTextColor(color.r, color.g, color.b);
+  }
 
-  const corrCard = (c: (typeof corrections)[number], idx: number) => `
-    <div class="corrCard">
-      <div class="corrIndex">${idx + 1}</div>
-      <div class="corrBody">
-        <div class="corrRow"><span class="tag tagBad">${esc(L(lang, "original"))}</span><span class="corrText">${esc(clean(c.original))}</span></div>
-        <div class="corrRow"><span class="tag tagGood">${esc(L(lang, "corrected"))}</span><span class="corrText good">${esc(clean(c.corrected))}</span></div>
-        ${c.explanation ? `<div class="corrExplain">${esc(clean(c.explanation))}</div>` : ""}
-      </div>
-    </div>
-  `;
+  private setFillColor(color: { r: number; g: number; b: number }) {
+    this.doc.setFillColor(color.r, color.g, color.b);
+  }
 
-  return `
-    <div class="page">
-      <div class="header">
-        <div class="brand">
-          <div class="brandTitle">${esc(L(lang, "title"))}</div>
-          <div class="brandSub">${esc(L(lang, "subtitle"))}</div>
-        </div>
-        <div class="meta">${esc(L(lang, "generatedAt"))}: ${esc(dateStr)}</div>
-      </div>
+  private setDrawColor(color: { r: number; g: number; b: number }) {
+    this.doc.setDrawColor(color.r, color.g, color.b);
+  }
 
-      <div class="hero">
-        <div class="card" style="flex:0 0 220px;">
-          <div class="overallLabel">${esc(L(lang, "overall"))}</div>
-          <div class="overallValue"><span class="big">${result.overall_score}</span><span class="muted">/100</span></div>
-        </div>
-        <div class="card" style="flex:1;">
-          <div class="sectionTitle">${esc(L(lang, "breakdown"))}</div>
-          <div class="scores">
-            ${scoreItem(L(lang, "grammar"), result.grammar_score)}
-            ${scoreItem(L(lang, "vocabulary"), result.vocabulary_score)}
-            ${scoreItem(L(lang, "structure"), result.structure_score)}
-            ${scoreItem(L(lang, "content"), result.content_score)}
-          </div>
-        </div>
-      </div>
-
-      <div class="grid">
-        <div class="panel">
-          <div class="panelTitle">${esc(L(lang, "strengths"))}</div>
-          <ul class="list">${strengths.map(bullet).join("")}</ul>
-        </div>
-        <div class="panel">
-          <div class="panelTitle">${esc(L(lang, "improvements"))}</div>
-          <ul class="list">${improvements.map(bullet).join("")}</ul>
-        </div>
-      </div>
-
-      ${next.length ? `
-        <div class="panel mt">
-          <div class="panelTitle">${esc(L(lang, "nextPriority"))}</div>
-          <ol class="list">${next.map((s) => `<li>${esc(clean(s))}</li>`).join("")}</ol>
-        </div>
-      ` : ""}
-
-      ${corrections.length ? `
-        <div class="panel mt">
-          <div class="panelTitle">${esc(L(lang, "corrections"))}</div>
-          <div class="corrList">${corrections.map(corrCard).join("")}</div>
-        </div>
-      ` : ""}
-
-      ${result.model_answer ? `
-        <div class="panel mt">
-          <div class="panelTitle">${esc(L(lang, "modelAnswer"))}</div>
-          <div class="mono">${esc(clean(result.model_answer))}</div>
-        </div>
-      ` : ""}
-
-      ${result.detailed_feedback ? `
-        <div class="panel mt">
-          <div class="panelTitle">${esc(L(lang, "detailedFeedback"))}</div>
-          <div class="body">${esc(clean(result.detailed_feedback))}</div>
-        </div>
-      ` : ""}
-
-      <div class="footer">LUKATO AI • topikbot.kr</div>
-    </div>
-  `;
-}
-
-async function toCanvas(el: HTMLElement) {
-  // wait for fonts
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const f = (document as any).fonts;
-  if (f?.ready) {
-    try {
-      await f.ready;
-    } catch {
-      // ignore
+  private checkPage(needed: number) {
+    if (this.y + needed > this.pageHeight - this.margin - 10) {
+      this.addPage();
     }
   }
 
-  return html2canvas(el, {
-    scale: 2.5,
-    useCORS: true,
-    logging: false,
-    backgroundColor: "#0b1220",
-  });
+  private addPage() {
+    this.doc.addPage();
+    this.pageNum++;
+    this.y = this.margin;
+    this.drawBackground();
+    this.drawPageNumber();
+  }
+
+  private drawBackground() {
+    this.setFillColor(COLORS.bg);
+    this.doc.rect(0, 0, this.pageWidth, this.pageHeight, "F");
+  }
+
+  private drawPageNumber() {
+    this.doc.setFontSize(8);
+    this.setColor(COLORS.muted);
+    const text = `${getLabel(this.lang, "page")} ${this.pageNum}`;
+    this.doc.text(text, this.pageWidth - this.margin, this.pageHeight - 8, { align: "right" });
+  }
+
+  private roundedRect(x: number, y: number, w: number, h: number, r: number, style: "F" | "S" | "FD" = "F") {
+    this.doc.roundedRect(x, y, w, h, r, r, style);
+  }
+
+  private drawHeader(title: string, subtitle: string, dateStr: string) {
+    const headerHeight = 28;
+    
+    // Gradient header simulation
+    this.setFillColor(COLORS.primary);
+    this.roundedRect(this.margin, this.y, this.contentWidth, headerHeight, 4, "F");
+    
+    // Accent overlay (skip GState for compatibility)
+    this.setFillColor({ r: 100, g: 60, b: 220 });
+    this.roundedRect(this.margin + this.contentWidth * 0.6, this.y, this.contentWidth * 0.4, headerHeight, 4, "F");
+
+    // Title
+    this.doc.setFontSize(16);
+    this.setColor(COLORS.white);
+    this.doc.text(title, this.margin + 8, this.y + 11);
+
+    // Subtitle
+    this.doc.setFontSize(9);
+    this.doc.text(subtitle, this.margin + 8, this.y + 19);
+
+    // Date
+    this.doc.setFontSize(8);
+    this.doc.text(dateStr, this.pageWidth - this.margin - 8, this.y + 11, { align: "right" });
+
+    this.y += headerHeight + 8;
+  }
+
+  private drawOverallScore(score: number) {
+    const cardHeight = 38;
+    const cardWidth = 55;
+    
+    // Card background
+    this.setFillColor(COLORS.card);
+    this.roundedRect(this.margin, this.y, cardWidth, cardHeight, 4, "F");
+
+    // Label
+    this.doc.setFontSize(9);
+    this.setColor(COLORS.muted);
+    this.doc.text(getLabel(this.lang, "overall"), this.margin + 8, this.y + 12);
+
+    // Score
+    this.doc.setFontSize(28);
+    const scoreColor = getScoreColor(score, 100);
+    this.setColor(scoreColor);
+    this.doc.text(String(score), this.margin + 8, this.y + 30);
+
+    // /100
+    this.doc.setFontSize(12);
+    this.setColor(COLORS.muted);
+    this.doc.text("/100", this.margin + 32, this.y + 30);
+
+    return { endX: this.margin + cardWidth + 6 };
+  }
+
+  private drawGradeBadge(score: number, startX: number) {
+    const { grade, color } = getGrade(score);
+    const badgeSize = 20;
+    const badgeX = startX;
+    const badgeY = this.y + 9;
+
+    this.setFillColor(color);
+    this.doc.circle(badgeX + badgeSize / 2, badgeY + badgeSize / 2, badgeSize / 2, "F");
+
+    this.doc.setFontSize(12);
+    this.setColor(COLORS.white);
+    this.doc.text(grade, badgeX + badgeSize / 2, badgeY + badgeSize / 2 + 4, { align: "center" });
+
+    return { endX: badgeX + badgeSize + 8 };
+  }
+
+  private drawScoreBreakdown(result: WritingCorrectionResult, startX: number) {
+    const scores = [
+      { key: "grammar", value: result.grammar_score },
+      { key: "vocabulary", value: result.vocabulary_score },
+      { key: "structure", value: result.structure_score },
+      { key: "content", value: result.content_score },
+    ];
+
+    const cardWidth = this.pageWidth - this.margin - startX;
+    const cardHeight = 38;
+
+    // Card
+    this.setFillColor(COLORS.card);
+    this.roundedRect(startX, this.y, cardWidth, cardHeight, 4, "F");
+
+    // Title
+    this.doc.setFontSize(9);
+    this.setColor(COLORS.muted);
+    this.doc.text(getLabel(this.lang, "breakdown"), startX + 6, this.y + 10);
+
+    // Score bars
+    const barStartY = this.y + 16;
+    const barHeight = 4;
+    const barGap = 7;
+    const labelWidth = 28;
+    const barWidth = (cardWidth - 20 - labelWidth) / 2;
+
+    scores.forEach((s, i) => {
+      const row = Math.floor(i / 2);
+      const col = i % 2;
+      const x = startX + 6 + col * (labelWidth + barWidth + 10);
+      const rowY = barStartY + row * barGap;
+
+      // Label
+      this.doc.setFontSize(7);
+      this.setColor(COLORS.text);
+      this.doc.text(getLabel(this.lang, s.key), x, rowY + 3);
+
+      // Bar background
+      const barX = x + labelWidth;
+      this.setFillColor({ r: 50, g: 60, b: 80 });
+      this.roundedRect(barX, rowY, barWidth - 18, barHeight, 1.5, "F");
+
+      // Bar fill
+      const fillWidth = ((s.value / 25) * (barWidth - 18));
+      const barColor = getScoreColor(s.value, 25);
+      this.setFillColor(barColor);
+      this.roundedRect(barX, rowY, fillWidth, barHeight, 1.5, "F");
+
+      // Score text
+      this.doc.setFontSize(7);
+      this.setColor(barColor);
+      this.doc.text(`${s.value}/25`, barX + barWidth - 14, rowY + 3);
+    });
+
+    this.y += cardHeight + 8;
+  }
+
+  private drawSection(title: string, items: string[], bulletColor: { r: number; g: number; b: number }) {
+    if (!items || items.length === 0) return;
+
+    this.checkPage(20 + items.length * 8);
+
+    // Section card
+    const itemHeight = 7;
+    const padding = 8;
+    const titleHeight = 12;
+    const cardHeight = titleHeight + padding + items.length * itemHeight + padding;
+
+    this.setFillColor(COLORS.card);
+    this.roundedRect(this.margin, this.y, this.contentWidth, cardHeight, 4, "F");
+
+    // Title
+    this.doc.setFontSize(10);
+    this.setColor(COLORS.text);
+    this.doc.text(title, this.margin + padding, this.y + 10);
+
+    // Items
+    let itemY = this.y + titleHeight + padding;
+    this.doc.setFontSize(8);
+
+    items.forEach((item, idx) => {
+      const cleanItem = cleanText(item);
+      if (!cleanItem) return;
+
+      // Bullet
+      this.setFillColor(bulletColor);
+      this.doc.circle(this.margin + padding + 2, itemY - 1.5, 1.2, "F");
+
+      // Text
+      this.setColor(COLORS.text);
+      const lines = this.doc.splitTextToSize(cleanItem, this.contentWidth - padding * 2 - 8);
+      lines.forEach((line: string, lineIdx: number) => {
+        if (lineIdx === 0) {
+          this.doc.text(line, this.margin + padding + 6, itemY);
+        } else {
+          itemY += itemHeight;
+          this.doc.text(line, this.margin + padding + 6, itemY);
+        }
+      });
+      itemY += itemHeight;
+    });
+
+    this.y += cardHeight + 6;
+  }
+
+  private drawCorrections(corrections: WritingCorrectionResult["corrections"]) {
+    if (!corrections || corrections.length === 0) return;
+
+    this.checkPage(25);
+
+    // Section title
+    this.doc.setFontSize(10);
+    this.setColor(COLORS.text);
+    this.doc.text(getLabel(this.lang, "corrections"), this.margin, this.y + 4);
+    this.y += 10;
+
+    corrections.forEach((c, idx) => {
+      const original = cleanText(c.original);
+      const corrected = cleanText(c.corrected);
+      const explanation = cleanText(c.explanation);
+
+      if (!original && !corrected) return;
+
+      this.checkPage(28);
+
+      const cardHeight = explanation ? 32 : 24;
+
+      // Card
+      this.setFillColor(COLORS.card);
+      this.roundedRect(this.margin, this.y, this.contentWidth, cardHeight, 3, "F");
+
+      // Index badge
+      this.setFillColor(COLORS.error);
+      this.doc.circle(this.margin + 8, this.y + 10, 5, "F");
+      this.doc.setFontSize(8);
+      this.setColor(COLORS.white);
+      this.doc.text(String(idx + 1), this.margin + 8, this.y + 12, { align: "center" });
+
+      // Original
+      const textX = this.margin + 18;
+      this.doc.setFontSize(7);
+      this.setColor(COLORS.error);
+      this.doc.text(getLabel(this.lang, "original") + ":", textX, this.y + 8);
+      this.setColor(COLORS.text);
+      const origLines = this.doc.splitTextToSize(original, this.contentWidth - 50);
+      this.doc.text(origLines[0] || "", textX + 16, this.y + 8);
+
+      // Corrected
+      this.setColor(COLORS.success);
+      this.doc.text(getLabel(this.lang, "corrected") + ":", textX, this.y + 16);
+      this.setColor(COLORS.success);
+      const corrLines = this.doc.splitTextToSize(corrected, this.contentWidth - 50);
+      this.doc.text(corrLines[0] || "", textX + 16, this.y + 16);
+
+      // Explanation
+      if (explanation) {
+        this.doc.setFontSize(6.5);
+        this.setColor(COLORS.muted);
+        const explLines = this.doc.splitTextToSize(explanation, this.contentWidth - 26);
+        this.doc.text(explLines[0] || "", textX, this.y + 24);
+      }
+
+      this.y += cardHeight + 4;
+    });
+
+    this.y += 4;
+  }
+
+  private drawTextBlock(title: string, text?: string) {
+    if (!text) return;
+
+    const cleanedText = cleanText(text);
+    if (!cleanedText) return;
+
+    this.checkPage(30);
+
+    // Title
+    this.doc.setFontSize(10);
+    this.setColor(COLORS.text);
+    this.doc.text(title, this.margin, this.y + 4);
+    this.y += 10;
+
+    // Content card
+    const lines = this.doc.splitTextToSize(cleanedText, this.contentWidth - 16);
+    const lineHeight = 5;
+    const cardHeight = Math.min(lines.length * lineHeight + 16, 80);
+
+    this.setFillColor(COLORS.card);
+    this.roundedRect(this.margin, this.y, this.contentWidth, cardHeight, 3, "F");
+
+    this.doc.setFontSize(8);
+    this.setColor(COLORS.text);
+
+    let textY = this.y + 8;
+    const maxLines = Math.floor((cardHeight - 16) / lineHeight);
+    const displayLines = lines.slice(0, maxLines);
+
+    displayLines.forEach((line: string) => {
+      this.doc.text(line, this.margin + 8, textY);
+      textY += lineHeight;
+    });
+
+    if (lines.length > maxLines) {
+      this.doc.setFontSize(7);
+      this.setColor(COLORS.muted);
+      this.doc.text("...", this.margin + 8, textY);
+    }
+
+    this.y += cardHeight + 6;
+  }
+
+  private drawFooter() {
+    this.doc.setFontSize(8);
+    this.setColor(COLORS.muted);
+    this.doc.text("LUKATO AI • topikbot.kr", this.pageWidth / 2, this.pageHeight - 8, { align: "center" });
+  }
+
+  public generate(result: WritingCorrectionResult): jsPDF {
+    // Page 1: Header + Scores
+    this.drawBackground();
+    this.drawPageNumber();
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+
+    this.drawHeader(
+      getLabel(this.lang, "title"),
+      getLabel(this.lang, "subtitle"),
+      `${getLabel(this.lang, "generatedAt")}: ${dateStr}`
+    );
+
+    const { endX: scoreEndX } = this.drawOverallScore(result.overall_score);
+    const { endX: badgeEndX } = this.drawGradeBadge(result.overall_score, scoreEndX);
+    this.drawScoreBreakdown(result, badgeEndX);
+
+    // Strengths & Improvements
+    this.drawSection(
+      getLabel(this.lang, "strengths"),
+      (result.strengths || []).slice(0, 6),
+      COLORS.success
+    );
+
+    this.drawSection(
+      getLabel(this.lang, "improvements"),
+      (result.improvements || []).slice(0, 6),
+      COLORS.error
+    );
+
+    // Next Priority
+    this.drawSection(
+      getLabel(this.lang, "nextPriority"),
+      (result.next_priority || []).slice(0, 5),
+      COLORS.accent
+    );
+
+    // Corrections
+    this.drawCorrections((result.corrections || []).slice(0, 8));
+
+    // Model Answer
+    this.drawTextBlock(getLabel(this.lang, "modelAnswer"), result.model_answer);
+
+    // Detailed Feedback
+    this.drawTextBlock(getLabel(this.lang, "detailedFeedback"), result.detailed_feedback);
+
+    // Footer on last page
+    this.drawFooter();
+
+    return this.doc;
+  }
 }
 
 export async function generateWritingCorrectionPDF(options: WritingPDFOptions): Promise<void> {
   const lang = (options.language || "en").split("-")[0];
   const filename = options.filename || `TOPIK_Writing_Report_${Date.now()}.pdf`;
 
-  const root = document.createElement("div");
-  root.style.position = "fixed";
-  root.style.left = "-10000px";
-  root.style.top = "0";
-  root.style.width = "794px";
-  root.style.zIndex = "-1";
-
-  const style = document.createElement("style");
-  style.textContent = css();
-
-  const container = document.createElement("div");
-  container.innerHTML = html(options.result, lang);
-
-  root.appendChild(style);
-  root.appendChild(container);
-  document.body.appendChild(root);
-
-  try {
-    const canvas = await toCanvas(root);
-    const imgData = canvas.toDataURL("image/png");
-
-    const doc = new jsPDF("p", "mm", "a4");
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-
-    const margin = 10;
-    const usableWidth = pageWidth - margin * 2;
-    const imgHeight = (canvas.height * usableWidth) / canvas.width;
-
-    let heightLeft = imgHeight;
-    let position = margin;
-
-    doc.addImage(imgData, "PNG", margin, position, usableWidth, imgHeight, undefined, "FAST");
-    heightLeft -= pageHeight - margin * 2;
-
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight + margin;
-      doc.addPage();
-      doc.addImage(imgData, "PNG", margin, position, usableWidth, imgHeight, undefined, "FAST");
-      heightLeft -= pageHeight - margin * 2;
-    }
-
-    doc.save(filename);
-  } finally {
-    document.body.removeChild(root);
-  }
+  const generator = new PDFGenerator(lang);
+  const doc = generator.generate(options.result);
+  doc.save(filename);
 }
