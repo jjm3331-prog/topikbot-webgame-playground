@@ -1292,5 +1292,98 @@
         "description": "Fikr va savollarni anonim va erkin baham ko'ring!"
       }
     }
+  },
+  "careerPages": {
+    "hub": {
+      "badge": "Korea Career",
+      "title": "Korea Career Hub",
+      "subtitle": "Koreyada ish topish uchun all-in-one",
+      "subline": "Headhunting • Kompaniya hisobotlari • AI intervyu",
+      "premiumPreviewFeatureName": "Korea Career Hub",
+      "status": { "active": "Faol" },
+      "cta": "Ochish",
+      "stats": {
+        "partnerCompanies": "Hamkor kompaniyalar",
+        "successPlacements": "Muvaffaqiyatli ishga joylashish",
+        "satisfaction": "Qoniqish",
+        "aiSupport": "AI yordam"
+      },
+      "premiumCta": {
+        "title": "Premiumni ochish",
+        "description": "Korea Career funksiyalariga to'liq kirish"
+      },
+      "infoCards": {
+        "headhunters": {
+          "title": "Professional headhunterlar",
+          "description": "Tajribali rekruterlar bilan 1:1 yo'l-yo'riq"
+        },
+        "ai": {
+          "title": "AI insight",
+          "description": "Tezkor tadqiqot, intervyu mashqi va fikr-mulohaza"
+        }
+      },
+      "services": {
+        "headhunting": {
+          "title": "Headhunting",
+          "subtitle": "1:1 qo'llab-quvvatlash",
+          "description": "Mutaxassislar bilan Koreyada ishga tayyorlaning.",
+          "features": {
+            "consulting": "Karyera konsultatsiyasi",
+            "cvReview": "CV ko'rib chiqish",
+            "interviewCoaching": "Intervyu coaching",
+            "salaryNegotiation": "Maosh bo'yicha kelishuv"
+          }
+        },
+        "companyReport": {
+          "title": "Kompaniya hisoboti",
+          "subtitle": "Chuqur tahlil",
+          "description": "Koreya kompaniyasi haqida batafsil hisobot yarating.",
+          "features": {
+            "salary": "Maosh",
+            "culture": "Madaniyat",
+            "interviewReviews": "Intervyu insight",
+            "news": "Yangiliklar"
+          }
+        },
+        "interviewSim": {
+          "title": "Intervyu simulyatsiyasi",
+          "subtitle": "Ovoz mashqi",
+          "description": "AI bilan intervyu mashq qiling va feedback oling.",
+          "features": {
+            "voice": "Ovoz",
+            "realtimeFeedback": "Realtime feedback",
+            "scoring": "Baholash",
+            "customQuestions": "Maxsus savollar"
+          }
+        }
+      }
+    },
+    "companyReport": {
+      "premiumPreviewFeatureName": "Kompaniya hisoboti",
+      "badge": "Kompaniya chuqur hisoboti",
+      "title": "Kompaniya hisoboti",
+      "description": "Kompaniyani qidiring va batafsil hisobot oling.",
+      "inputPlaceholder": "Kompaniya nomini kiriting…",
+      "searchButtonLabel": "Qidirish",
+      "quickSearch": "Tez qidiruv",
+      "includes": "Siz olasiz",
+      "loadingTitle": "Hisobot yaratilmoqda…",
+      "loadingDesc": "Biroz kuting.",
+      "resultTitle": "Hisobot: {{company}}",
+      "citations": "Manbalar ({{count}})",
+      "sections": {
+        "overview": "Umumiy",
+        "salary": "Maosh",
+        "culture": "Madaniyat",
+        "interviewReviews": "Intervyu insight",
+        "latestNews": "So'nggi yangiliklar"
+      },
+      "toast": {
+        "enterCompanyTitle": "Kompaniya nomini kiriting",
+        "enterCompanyDesc": "Qidirish uchun kompaniya nomini kiriting.",
+        "searchErrorTitle": "Qidiruv muvaffaqiyatsiz",
+        "searchErrorDesc": "Hisobot yaratib bo'lmadi. Qayta urinib ko'ring."
+      }
+    }
   }
 }

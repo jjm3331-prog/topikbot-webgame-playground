@@ -1701,5 +1701,98 @@
         "description": "Chia sẻ ý kiến và câu hỏi một cách ẩn danh, thoải mái!"
       }
     }
+  },
+  "careerPages": {
+    "hub": {
+      "badge": "Korea Career",
+      "title": "Korea Career Hub",
+      "subtitle": "Dịch vụ việc làm Hàn Quốc all-in-one",
+      "subline": "Headhunting • Báo cáo DN • Phỏng vấn AI",
+      "premiumPreviewFeatureName": "Korea Career Hub",
+      "status": { "active": "Đang hoạt động" },
+      "cta": "Mở",
+      "stats": {
+        "partnerCompanies": "Công ty đối tác",
+        "successPlacements": "Việc làm thành công",
+        "satisfaction": "Hài lòng",
+        "aiSupport": "Hỗ trợ AI"
+      },
+      "premiumCta": {
+        "title": "Mở khóa Premium",
+        "description": "Truy cập đầy đủ tính năng Korea Career"
+      },
+      "infoCards": {
+        "headhunters": {
+          "title": "Headhunter chuyên nghiệp",
+          "description": "Tư vấn 1:1 từ đội ngũ tuyển dụng giàu kinh nghiệm"
+        },
+        "ai": {
+          "title": "Insight với AI",
+          "description": "Nghiên cứu nhanh, luyện phỏng vấn và nhận feedback"
+        }
+      },
+      "services": {
+        "headhunting": {
+          "title": "Headhunting",
+          "subtitle": "Hỗ trợ 1:1",
+          "description": "Được hỗ trợ tìm việc tại Hàn Quốc cùng chuyên gia.",
+          "features": {
+            "consulting": "Tư vấn nghề nghiệp",
+            "cvReview": "Review CV",
+            "interviewCoaching": "Coaching phỏng vấn",
+            "salaryNegotiation": "Đàm phán lương"
+          }
+        },
+        "companyReport": {
+          "title": "Báo cáo Doanh nghiệp",
+          "subtitle": "Nghiên cứu sâu",
+          "description": "Tạo báo cáo chi tiết về doanh nghiệp tại Hàn Quốc.",
+          "features": {
+            "salary": "Lương",
+            "culture": "Văn hóa",
+            "interviewReviews": "Insight phỏng vấn",
+            "news": "Tin mới"
+          }
+        },
+        "interviewSim": {
+          "title": "Phỏng vấn Mô phỏng",
+          "subtitle": "Luyện giọng nói",
+          "description": "Luyện phỏng vấn với AI và nhận phản hồi.",
+          "features": {
+            "voice": "Giọng nói",
+            "realtimeFeedback": "Feedback realtime",
+            "scoring": "Chấm điểm",
+            "customQuestions": "Câu hỏi tùy chỉnh"
+          }
+        }
+      }
+    },
+    "companyReport": {
+      "premiumPreviewFeatureName": "Báo cáo Doanh nghiệp",
+      "badge": "Báo cáo doanh nghiệp chuyên sâu",
+      "title": "Báo cáo Doanh nghiệp",
+      "description": "Tìm doanh nghiệp và nhận báo cáo chi tiết.",
+      "inputPlaceholder": "Nhập tên doanh nghiệp…",
+      "searchButtonLabel": "Tìm kiếm",
+      "quickSearch": "Tìm nhanh",
+      "includes": "Bạn sẽ nhận được",
+      "loadingTitle": "Đang tạo báo cáo…",
+      "loadingDesc": "Vui lòng đợi trong giây lát.",
+      "resultTitle": "Báo cáo: {{company}}",
+      "citations": "Nguồn ({{count}})",
+      "sections": {
+        "overview": "Tổng quan",
+        "salary": "Lương",
+        "culture": "Văn hóa",
+        "interviewReviews": "Insight phỏng vấn",
+        "latestNews": "Tin mới"
+      },
+      "toast": {
+        "enterCompanyTitle": "Nhập tên doanh nghiệp",
+        "enterCompanyDesc": "Vui lòng nhập tên doanh nghiệp để tìm kiếm.",
+        "searchErrorTitle": "Tìm kiếm thất bại",
+        "searchErrorDesc": "Không thể tạo báo cáo. Vui lòng thử lại."
+      }
+    }
   }
 }

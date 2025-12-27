@@ -1292,5 +1292,98 @@
         "description": "Анонимно делитесь мнениями и вопросами, свободно!"
       }
     }
+  },
+  "careerPages": {
+    "hub": {
+      "badge": "Korea Career",
+      "title": "Korea Career Hub",
+      "subtitle": "Всё для трудоустройства в Корее",
+      "subline": "Хедхантинг • Отчёты о компаниях • AI-интервью",
+      "premiumPreviewFeatureName": "Korea Career Hub",
+      "status": { "active": "Доступно" },
+      "cta": "Открыть",
+      "stats": {
+        "partnerCompanies": "Партнёры",
+        "successPlacements": "Успешные трудоустройства",
+        "satisfaction": "Удовлетворённость",
+        "aiSupport": "AI поддержка"
+      },
+      "premiumCta": {
+        "title": "Разблокировать Premium",
+        "description": "Полный доступ к функциям Korea Career"
+      },
+      "infoCards": {
+        "headhunters": {
+          "title": "Профессиональные рекрутеры",
+          "description": "Поддержка 1:1 от опытных хедхантеров"
+        },
+        "ai": {
+          "title": "AI-инсайты",
+          "description": "Быстрый ресёрч, тренировка интервью и фидбек"
+        }
+      },
+      "services": {
+        "headhunting": {
+          "title": "Хедхантинг",
+          "subtitle": "Поддержка 1:1",
+          "description": "Готовьтесь к работе в Корее вместе с экспертами.",
+          "features": {
+            "consulting": "Консультация",
+            "cvReview": "Проверка CV",
+            "interviewCoaching": "Подготовка к интервью",
+            "salaryNegotiation": "Переговоры о зарплате"
+          }
+        },
+        "companyReport": {
+          "title": "Отчёт о компании",
+          "subtitle": "Глубокий анализ",
+          "description": "Сгенерируйте подробный отчёт о компании в Корее.",
+          "features": {
+            "salary": "Зарплата",
+            "culture": "Культура",
+            "interviewReviews": "Инсайты интервью",
+            "news": "Новости"
+          }
+        },
+        "interviewSim": {
+          "title": "Симуляция интервью",
+          "subtitle": "Практика голоса",
+          "description": "Тренируйтесь с AI и получайте обратную связь.",
+          "features": {
+            "voice": "Голос",
+            "realtimeFeedback": "Фидбек в реальном времени",
+            "scoring": "Оценка",
+            "customQuestions": "Свои вопросы"
+          }
+        }
+      }
+    },
+    "companyReport": {
+      "premiumPreviewFeatureName": "Отчёт о компании",
+      "badge": "Подробный отчёт",
+      "title": "Отчёт о компании",
+      "description": "Найдите компанию и получите подробный отчёт.",
+      "inputPlaceholder": "Введите название компании…",
+      "searchButtonLabel": "Поиск",
+      "quickSearch": "Быстрый поиск",
+      "includes": "Что вы получите",
+      "loadingTitle": "Генерация отчёта…",
+      "loadingDesc": "Пожалуйста, подождите.",
+      "resultTitle": "Отчёт: {{company}}",
+      "citations": "Источники ({{count}})",
+      "sections": {
+        "overview": "Обзор",
+        "salary": "Зарплата",
+        "culture": "Культура",
+        "interviewReviews": "Инсайты интервью",
+        "latestNews": "Последние новости"
+      },
+      "toast": {
+        "enterCompanyTitle": "Введите название компании",
+        "enterCompanyDesc": "Пожалуйста, введите компанию для поиска.",
+        "searchErrorTitle": "Не удалось выполнить поиск",
+        "searchErrorDesc": "Не удалось сгенерировать отчёт. Попробуйте ещё раз."
+      }
+    }
   }
 }
