@@ -170,7 +170,19 @@ async function generateHash(content: string): Promise<string> {
   const data = encoder.encode(content);
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+// Large ArrayBuffer -> base64 safely (avoid "Maximum call stack size exceeded")
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  const chunkSize = 0x8000; // 32KB
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
+  return btoa(binary);
 }
 
 serve(async (req) => {
@@ -210,7 +222,7 @@ serve(async (req) => {
         try {
           const imgResponse = await fetch(answerImageUrl);
           const arrayBuffer = await imgResponse.arrayBuffer();
-          imageData = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+          imageData = arrayBufferToBase64(arrayBuffer);
           mimeType = imgResponse.headers.get("content-type") || "image/png";
         } catch (e) {
           console.error("Failed to fetch image for OCR:", e);
@@ -316,7 +328,7 @@ serve(async (req) => {
       try {
         const imgResponse = await fetch(questionImageUrl);
         const arrayBuffer = await imgResponse.arrayBuffer();
-        const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+        const base64 = arrayBufferToBase64(arrayBuffer);
         const mimeType = imgResponse.headers.get("content-type") || "image/png";
         
         contentParts.push({
@@ -336,7 +348,7 @@ serve(async (req) => {
       try {
         const imgResponse = await fetch(answerImageUrl);
         const arrayBuffer = await imgResponse.arrayBuffer();
-        const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+        const base64 = arrayBufferToBase64(arrayBuffer);
         const mimeType = imgResponse.headers.get("content-type") || "image/png";
         
         contentParts.push({
@@ -386,12 +398,12 @@ serve(async (req) => {
             }
           ],
           generationConfig: {
-            temperature: 0.15, // 🔥 최적화: 일관성 극대화 (0.1~0.2가 채점에 최적)
-            topP: 0.95,        // 🔥 추가: 확률 분포 제한으로 안정성 향상
-            topK: 40,          // 🔥 추가: 토큰 선택 범위 제한
+            temperature: 0.15, // 일관성 우선
+            topP: 0.95,
+            topK: 40,
             maxOutputTokens: 65536,
             thinkingConfig: {
-              thinkingBudget: 32768 // 🔥 증가: 더 정밀한 분석을 위한 사고 예산 확대
+              thinkingBudget: 24576 // ✅ 모델 상한(0~24576)
             }
           },
           safetySettings: [
