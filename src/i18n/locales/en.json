@@ -1543,7 +1543,7 @@
     "title": "Community",
     "subtitle": "Discussion & Sharing Forum",
     "stats": {
-      "categories": "4 Categories",
+      "categories": "5 Categories",
       "realtime": "Realtime",
       "upload": "File & Video Upload"
     },
@@ -1567,6 +1567,11 @@
         "title": "Resources",
         "subtitle": "학습자료실",
         "description": "Share useful TOPIK materials, videos and learning resources!"
+      },
+      "podcast": {
+        "title": "Podcast",
+        "subtitle": "AI Podcast",
+        "description": "Listen and share audio content for learning Korean!"
       },
       "anonymous": {
         "title": "Anonymous",

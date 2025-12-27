@@ -10,7 +10,8 @@ import {
   Loader2,
   Eye,
   Edit3,
-  Image
+  Image,
+  Music
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -24,7 +25,7 @@ import BlockEditor, { Block, blocksToHtml } from "@/components/board/BlockEditor
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
-type BoardType = "notice" | "free" | "resource" | "anonymous";
+type BoardType = "notice" | "free" | "resource" | "anonymous" | "podcast";
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -41,6 +42,8 @@ export default function BoardWrite() {
   ]);
   const [attachments, setAttachments] = useState<File[]>([]);
   const [existingAttachments, setExistingAttachments] = useState<string[]>([]);
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [existingAudioUrl, setExistingAudioUrl] = useState<string | null>(null);
   const [isPinned, setIsPinned] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [currentUser, setCurrentUser] = useState<string | null>(null);
@@ -93,6 +96,7 @@ export default function BoardWrite() {
         setBlocks([{ id: generateId(), type: 'text', content: data.content.replace(/<[^>]*>/g, '') }]);
       }
       setExistingAttachments(data.attachment_urls || []);
+      setExistingAudioUrl((data as any).audio_url || null);
       setIsPinned(data.is_pinned);
     } catch (error) {
       console.error("Error fetching post:", error);
@@ -136,6 +140,27 @@ export default function BoardWrite() {
     return urls;
   };
 
+  const uploadAudio = async (): Promise<string | null> => {
+    if (existingAudioUrl && !audioFile) return existingAudioUrl;
+    if (!audioFile) return null;
+    
+    const fileName = `${currentUser}/${Date.now()}_${audioFile.name}`;
+    const { error } = await supabase.storage
+      .from("podcast-audio")
+      .upload(fileName, audioFile);
+    
+    if (error) {
+      console.error("Audio upload error:", error);
+      return null;
+    }
+    
+    const { data: urlData } = supabase.storage
+      .from("podcast-audio")
+      .getPublicUrl(fileName);
+    
+    return urlData.publicUrl;
+  };
+
   const handleSubmit = async () => {
     if (!title.trim()) {
       toast({ title: t("boardWrite.enterTitle") });
@@ -161,10 +186,11 @@ export default function BoardWrite() {
     setSubmitting(true);
     try {
       const attachmentUrls = await uploadAttachments();
+      const audioUrl = boardType === "podcast" ? await uploadAudio() : null;
       const isAnonymousBoard = boardType === "anonymous";
       const htmlContent = blocksToHtml(blocks);
 
-      const postData = {
+      const postData: any = {
         board_type: boardType as BoardType,
         title: title.trim(),
         content: htmlContent,
@@ -174,6 +200,10 @@ export default function BoardWrite() {
         attachment_urls: attachmentUrls,
         is_pinned: isAdmin ? isPinned : false
       };
+
+      if (audioUrl) {
+        postData.audio_url = audioUrl;
+      }
 
       if (editId) {
         await supabase
@@ -288,6 +318,36 @@ export default function BoardWrite() {
                   </TabsContent>
                 </Tabs>
               </div>
+
+              {/* Audio Upload for Podcast */}
+              {boardType === "podcast" && (
+                <div className="space-y-2">
+                  <Label>{t("boardWrite.audioLabel") || "오디오 파일 (MP3)"}</Label>
+                  <div className="flex items-center gap-4">
+                    <label className="flex items-center gap-2 px-4 py-2 border border-dashed rounded-lg cursor-pointer hover:bg-muted transition-colors border-orange-500/30 hover:border-orange-500/50">
+                      <Music className="w-4 h-4 text-orange-500" />
+                      <span className="text-sm">{t("boardWrite.selectAudio") || "오디오 선택"}</span>
+                      <input
+                        type="file"
+                        onChange={(e) => e.target.files?.[0] && setAudioFile(e.target.files[0])}
+                        className="hidden"
+                        accept="audio/*"
+                      />
+                    </label>
+                  </div>
+                  {(audioFile || existingAudioUrl) && (
+                    <div className="flex items-center gap-2 mt-2 p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg">
+                      <Music className="w-4 h-4 text-orange-500" />
+                      <span className="text-sm text-foreground truncate flex-1">
+                        {audioFile ? audioFile.name : (t("boardWrite.existingAudio") || "기존 오디오 파일")}
+                      </span>
+                      <button onClick={() => { setAudioFile(null); setExistingAudioUrl(null); }}>
+                        <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Attachments */}
               <div className="space-y-2">

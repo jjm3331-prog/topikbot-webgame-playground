@@ -1841,7 +1841,7 @@
     "title": "커뮤니티",
     "subtitle": "교류 및 공유 포럼",
     "stats": {
-      "categories": "4개 카테고리",
+      "categories": "5개 카테고리",
       "realtime": "실시간",
       "upload": "파일 & 동영상 업로드"
     },
@@ -1865,6 +1865,11 @@
         "title": "학습자료실",
         "subtitle": "학습자료실",
         "description": "유용한 TOPIK 자료, 동영상, 학습 리소스를 공유하세요!"
+      },
+      "podcast": {
+        "title": "팟캐스트",
+        "subtitle": "AI 팟캐스트",
+        "description": "한국어 학습을 위한 오디오 콘텐츠를 듣고 공유하세요!"
       },
       "anonymous": {
         "title": "익명게시판",
