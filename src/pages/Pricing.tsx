@@ -183,18 +183,38 @@ const Pricing = () => {
     }
   };
 
+  const isVietnam = i18n.language === VIETNAM_LANG;
+
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("vi-VN").format(price);
+    if (isVietnam) {
+      return new Intl.NumberFormat("vi-VN").format(price);
+    }
+    return new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(price);
   };
 
+  const getCurrencySymbol = () => isVietnam ? "đ" : "$";
+
   const getPremiumPrice = () => {
-    switch (billingPeriod) {
-      case "1-month":
-        return { price: 299000, perMonth: 299000, savings: 0 };
-      case "6-months":
-        return { price: 1500000, perMonth: 250000, savings: 294000 };
-      case "12-months":
-        return { price: 2500000, perMonth: 208333, savings: 1088000 };
+    if (isVietnam) {
+      // VND pricing for Vietnam
+      switch (billingPeriod) {
+        case "1-month":
+          return { price: 299000, perMonth: 299000, savings: 0 };
+        case "6-months":
+          return { price: 1500000, perMonth: 250000, savings: 294000 };
+        case "12-months":
+          return { price: 2500000, perMonth: 208333, savings: 1088000 };
+      }
+    } else {
+      // USD pricing for all other countries
+      switch (billingPeriod) {
+        case "1-month":
+          return { price: 9.99, perMonth: 9.99, savings: 0 };
+        case "6-months":
+          return { price: 47.94, perMonth: 7.99, savings: 12.00 };
+        case "12-months":
+          return { price: 83.88, perMonth: 6.99, savings: 36.00 };
+      }
     }
   };
 
@@ -285,7 +305,7 @@ const Pricing = () => {
               <h3 className="text-center text-card-title-lg font-bold text-foreground mb-3">Free</h3>
 
               <div className="text-center mb-7">
-                <div className="text-4xl sm:text-5xl font-bold text-foreground">0đ</div>
+                <div className="text-4xl sm:text-5xl font-bold text-foreground">{isVietnam ? "0đ" : "$0"}</div>
                 <p className="text-card-caption text-muted-foreground mt-2">{t("pricing.free.forever")}</p>
               </div>
 
@@ -326,15 +346,17 @@ const Pricing = () => {
               <h3 className="text-center text-card-title-lg font-bold text-foreground mb-3">Premium</h3>
 
               <div className="text-center mb-7">
-                <div className="text-4xl sm:text-5xl font-bold text-korean-green">{formatPrice(premiumPrice.price)}đ</div>
+                <div className="text-4xl sm:text-5xl font-bold text-korean-green">
+                  {isVietnam ? `${formatPrice(premiumPrice.price)}đ` : `$${formatPrice(premiumPrice.price)}`}
+                </div>
                 {billingPeriod !== "1-month" && (
                   <p className="text-card-caption text-muted-foreground mt-2">
-                    ~{formatPrice(premiumPrice.perMonth)}đ/{t("pricing.perMonth")}
+                    ~{isVietnam ? `${formatPrice(premiumPrice.perMonth)}đ` : `$${formatPrice(premiumPrice.perMonth)}`}/{t("pricing.perMonth")}
                   </p>
                 )}
                 {premiumPrice.savings > 0 && (
                   <p className="text-card-caption text-korean-green mt-1">
-                    {t("pricing.save")} {formatPrice(premiumPrice.savings)}đ
+                    {t("pricing.save")} {isVietnam ? `${formatPrice(premiumPrice.savings)}đ` : `$${formatPrice(premiumPrice.savings)}`}
                   </p>
                 )}
               </div>
