@@ -552,45 +552,104 @@ export default function RoleplaySpeaking() {
           <Sparkles className="w-5 h-5 text-primary" />
           {t("roleplay.setup.scenarioTitle")}
         </h3>
-        <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-          {PRESET_SCENARIOS.map((scenario) => {
+        <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
+          {PRESET_SCENARIOS.map((scenario, index) => {
             const Icon = scenario.icon;
+            const isSelected = selectedScenario === scenario.id && !customScenario;
             return (
               <motion.button
                 key={scenario.id}
-                whileHover={{ scale: 1.05 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.03 }}
+                whileHover={{ 
+                  scale: 1.08, 
+                  y: -8,
+                  transition: { type: "spring", stiffness: 400, damping: 15 }
+                }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
                   setSelectedScenario(scenario.id);
                   setCustomScenario("");
                 }}
                 className={cn(
-                  "relative p-4 rounded-xl border-2 transition-all duration-300 flex flex-col items-center gap-2 group overflow-hidden",
-                  selectedScenario === scenario.id && !customScenario
-                    ? "border-primary shadow-lg shadow-primary/20"
-                    : "border-border hover:border-primary/40"
+                  "relative p-5 rounded-2xl border-2 transition-all duration-500 flex flex-col items-center gap-3 group overflow-hidden",
+                  isSelected
+                    ? "border-primary shadow-2xl shadow-primary/30 bg-primary/5"
+                    : "border-border/50 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/20 bg-card"
                 )}
               >
+                {/* Animated gradient background */}
                 <div className={cn(
-                  "absolute inset-0 bg-gradient-to-br transition-opacity duration-300",
+                  "absolute inset-0 bg-gradient-to-br transition-all duration-500",
                   scenario.bgGradient,
-                  selectedScenario === scenario.id && !customScenario ? "opacity-100" : "opacity-0 group-hover:opacity-50"
+                  isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-80"
                 )} />
-                <div className="relative z-10">
-                  <Icon className={cn("w-8 h-8 mb-1", scenario.color)} />
-                  <span className="text-xs font-medium text-center block">
-                    {t(`roleplay.scenarios.${scenario.id}`)}
-                  </span>
+                
+                {/* Shimmer effect on hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
                 </div>
-                {selectedScenario === scenario.id && !customScenario && (
+                
+                {/* Glow ring effect */}
+                <div className={cn(
+                  "absolute inset-0 rounded-2xl transition-all duration-500",
+                  isSelected 
+                    ? "ring-4 ring-primary/20 ring-offset-2 ring-offset-background" 
+                    : "ring-0 group-hover:ring-2 group-hover:ring-primary/10"
+                )} />
+                
+                {/* Icon with float animation */}
+                <motion.div 
+                  className="relative z-10"
+                  whileHover={{ rotate: [0, -10, 10, -5, 5, 0] }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <div className={cn(
+                    "w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300",
+                    isSelected 
+                      ? "bg-primary/20 shadow-lg shadow-primary/30" 
+                      : "bg-muted/50 group-hover:bg-primary/10 group-hover:shadow-md"
+                  )}>
+                    <Icon className={cn(
+                      "w-7 h-7 transition-all duration-300",
+                      scenario.color,
+                      "group-hover:scale-110"
+                    )} />
+                  </div>
+                </motion.div>
+                
+                {/* Label */}
+                <span className={cn(
+                  "relative z-10 text-xs font-semibold text-center transition-all duration-300",
+                  isSelected ? "text-primary" : "text-foreground/80 group-hover:text-foreground"
+                )}>
+                  {t(`roleplay.scenarios.${scenario.id}`)}
+                </span>
+                
+                {/* Selected indicator with pulse */}
+                {isSelected && (
                   <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute -top-1 -right-1"
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    className="absolute -top-2 -right-2"
                   >
-                    <CheckCircle2 className="w-5 h-5 text-primary fill-primary/20" />
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-primary rounded-full animate-ping opacity-30" />
+                      <div className="relative bg-primary rounded-full p-1 shadow-lg shadow-primary/50">
+                        <CheckCircle2 className="w-4 h-4 text-primary-foreground" />
+                      </div>
+                    </div>
                   </motion.div>
                 )}
+                
+                {/* Bottom accent line */}
+                <div className={cn(
+                  "absolute bottom-0 left-1/2 -translate-x-1/2 h-1 rounded-full transition-all duration-500",
+                  isSelected 
+                    ? "w-12 bg-primary" 
+                    : "w-0 group-hover:w-8 bg-primary/50"
+                )} />
               </motion.button>
             );
           })}
