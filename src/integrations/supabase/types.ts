@@ -398,6 +398,30 @@ export type Database = {
         }
         Relationships: []
       }
+      feature_usage: {
+        Row: {
+          created_at: string
+          feature_name: string
+          id: string
+          used_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feature_name: string
+          id?: string
+          used_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feature_name?: string
+          id?: string
+          used_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       headhunting_applications: {
         Row: {
           additional_skills: string | null
@@ -1108,8 +1132,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_use_feature: {
+        Args: { _feature_name: string; _user_id: string }
+        Returns: boolean
+      }
       cleanup_expired_cache: { Args: never; Returns: undefined }
       cleanup_old_quiz_history: { Args: never; Returns: undefined }
+      get_feature_cooldown: {
+        Args: { _feature_name: string; _user_id: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1120,6 +1152,10 @@ export type Database = {
       increment_cache_hit: { Args: { p_id: string }; Returns: undefined }
       is_plus_or_premium: { Args: { _user_id: string }; Returns: boolean }
       is_premium: { Args: { _user_id: string }; Returns: boolean }
+      record_feature_usage: {
+        Args: { _feature_name: string; _user_id: string }
+        Returns: undefined
+      }
       search_knowledge: {
         Args: {
           match_count?: number
