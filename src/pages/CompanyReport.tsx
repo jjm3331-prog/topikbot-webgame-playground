@@ -13,6 +13,7 @@ import {
   ArrowLeft,
   Sparkles,
   ExternalLink,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -25,10 +26,11 @@ import { PremiumPreviewBanner } from "@/components/PremiumPreviewBanner";
 import { useSubscription } from "@/hooks/useSubscription";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { generateCompanyReportPDF } from "@/lib/pdfGenerator";
 
 const CompanyReport = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const { isPremium } = useSubscription();
 
@@ -36,6 +38,7 @@ const CompanyReport = () => {
   const [searching, setSearching] = useState(false);
   const [report, setReport] = useState<string | null>(null);
   const [citations, setCitations] = useState<string[]>([]);
+  const [downloadingPDF, setDownloadingPDF] = useState(false);
 
   const quickSearches = useMemo(
     () => [
@@ -101,6 +104,33 @@ const CompanyReport = () => {
       });
     } finally {
       setSearching(false);
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!report || !companyName) return;
+    
+    setDownloadingPDF(true);
+    try {
+      await generateCompanyReportPDF({
+        companyName,
+        report,
+        citations,
+        language: i18n.language,
+      });
+      toast({
+        title: t("careerPages.companyReport.toast.pdfSuccessTitle") || "PDF Downloaded",
+        description: t("careerPages.companyReport.toast.pdfSuccessDesc") || "Report saved successfully",
+      });
+    } catch (error) {
+      console.error("PDF generation error:", error);
+      toast({
+        title: t("careerPages.companyReport.toast.pdfErrorTitle") || "PDF Error",
+        description: t("careerPages.companyReport.toast.pdfErrorDesc") || "Failed to generate PDF",
+        variant: "destructive",
+      });
+    } finally {
+      setDownloadingPDF(false);
     }
   };
 
@@ -235,11 +265,27 @@ const CompanyReport = () => {
               className="space-y-4"
             >
               <Card className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Sparkles className="w-5 h-5 text-purple-500" />
-                  <h2 className="text-title text-foreground">
-                    {t("careerPages.companyReport.resultTitle", { company: companyName })}
-                  </h2>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-purple-500" />
+                    <h2 className="text-title text-foreground">
+                      {t("careerPages.companyReport.resultTitle", { company: companyName })}
+                    </h2>
+                  </div>
+                  <Button
+                    onClick={handleDownloadPDF}
+                    disabled={downloadingPDF}
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                  >
+                    {downloadingPDF ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Download className="w-4 h-4" />
+                    )}
+                    {t("careerPages.companyReport.downloadPDF") || "PDF"}
+                  </Button>
                 </div>
 
                 <div className="prose-ai max-w-none">
