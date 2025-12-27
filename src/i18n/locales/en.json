@@ -139,6 +139,7 @@
       "headhunting": "Headhunting",
       "companyReport": "Company Report",
       "interviewSimulation": "Interview Simulation",
+      "practicalGuide": "Practical Guide",
       "learningHub": "TOPIK Learning Hub",
       "community": "Community",
       "gameHub": "Game Hub",
@@ -1756,10 +1757,11 @@
       "badge": "Korea Career",
       "title": "Korea Career Hub",
       "subtitle": "All-in-one Korea job services",
-      "subline": "Headhunting • Company reports • AI interview",
+      "subline": "Headhunting • Company reports • AI interview • Practical Guide",
       "premiumPreviewFeatureName": "Korea Career Hub",
-      "status": { "active": "Active" },
+      "status": { "active": "Active", "coming": "Coming Soon" },
       "cta": "Open",
+      "comingSoon": "Coming Soon",
       "stats": {
         "partnerCompanies": "Partner companies",
         "successPlacements": "Successful placements",
@@ -1812,6 +1814,17 @@
             "realtimeFeedback": "Real-time feedback",
             "scoring": "Scoring",
             "customQuestions": "Custom questions"
+          }
+        },
+        "practicalGuide": {
+          "title": "Practical Guide",
+          "subtitle": "Workplace Korean",
+          "description": "Learn practical Korean used in IT work environments.",
+          "features": {
+            "itTerms": "IT Terms",
+            "meetingSim": "Meeting Simulation",
+            "emailTemplates": "Email Templates",
+            "businessKorean": "Business Korean"
           }
         }
       }

@@ -15,6 +15,7 @@ import {
   TrendingUp,
   Clock,
   CheckCircle2,
+  BookOpen,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import CleanHeader from "@/components/CleanHeader";
@@ -86,6 +87,25 @@ const KoreaCareer = () => {
       status: "active" as const,
       emoji: "🎤",
     },
+    {
+      id: "practical-guide",
+      icon: BookOpen,
+      titleKey: "careerPages.hub.services.practicalGuide.title",
+      subtitleKey: "careerPages.hub.services.practicalGuide.subtitle",
+      descriptionKey: "careerPages.hub.services.practicalGuide.description",
+      featureKeys: [
+        "careerPages.hub.services.practicalGuide.features.itTerms",
+        "careerPages.hub.services.practicalGuide.features.meetingSim",
+        "careerPages.hub.services.practicalGuide.features.emailTemplates",
+        "careerPages.hub.services.practicalGuide.features.businessKorean",
+      ],
+      gradient: "from-emerald-500 to-teal-500",
+      bgGradient: "from-emerald-500/10 to-teal-500/10",
+      shadowColor: "shadow-emerald-500/20",
+      path: "/practical-guide",
+      status: "coming" as const,
+      emoji: "📖",
+    },
   ];
 
   const handleServiceClick = (service: (typeof services)[0]) => {
@@ -135,8 +155,8 @@ const KoreaCareer = () => {
             </p>
           </div>
 
-          {/* Service Cards with 3D Effect */}
-          <div className="grid gap-6 md:grid-cols-3">
+          {/* Service Cards with 2x2 Grid */}
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
             {services.map((service, idx) => (
               <motion.div
                 key={service.id}
@@ -172,10 +192,24 @@ const KoreaCareer = () => {
                     )}
 
                     {/* Status Badge */}
-                    <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-green-500/20 border border-green-500/50 flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3 text-green-500" />
-                      <span className="text-xs font-medium text-green-600 dark:text-green-400">
-                        {t("careerPages.hub.status.active")}
+                    <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-full flex items-center gap-1 ${
+                      service.status === "active" 
+                        ? "bg-green-500/20 border border-green-500/50" 
+                        : "bg-yellow-500/20 border border-yellow-500/50"
+                    }`}>
+                      {service.status === "active" ? (
+                        <CheckCircle2 className="w-3 h-3 text-green-500" />
+                      ) : (
+                        <Clock className="w-3 h-3 text-yellow-500" />
+                      )}
+                      <span className={`text-xs font-medium ${
+                        service.status === "active" 
+                          ? "text-green-600 dark:text-green-400" 
+                          : "text-yellow-600 dark:text-yellow-400"
+                      }`}>
+                        {service.status === "active" 
+                          ? t("careerPages.hub.status.active") 
+                          : t("careerPages.hub.status.coming")}
                       </span>
                     </div>
 
@@ -221,7 +255,7 @@ const KoreaCareer = () => {
                     </div>
 
                     {/* CTA */}
-                    {service.status === "active" && (
+                    {service.status === "active" ? (
                       <motion.div
                         className="flex items-center gap-2 text-primary font-semibold text-sm"
                         animate={{ x: hoveredCard === service.id ? 5 : 0 }}
@@ -229,6 +263,11 @@ const KoreaCareer = () => {
                         <span>{t("careerPages.hub.cta")}</span>
                         <ChevronRight className="w-4 h-4" />
                       </motion.div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-yellow-600 dark:text-yellow-400 font-semibold text-sm">
+                        <Clock className="w-4 h-4" />
+                        <span>{t("careerPages.hub.comingSoon")}</span>
+                      </div>
                     )}
                   </Card>
                 </motion.div>
