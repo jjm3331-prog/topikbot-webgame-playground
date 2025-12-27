@@ -1,4 +1,61 @@
 {
+  "questionVariant": {
+    "title": "题目变体AI",
+    "description": "上传TOPIK题目图片，AI将生成类似的变体题目",
+    "howToUse": "使用方法",
+    "examples": {
+      "reading": "阅读题",
+      "readingDesc": "分析文章并生成相似难度的新题目",
+      "grammar": "语法题",
+      "grammarDesc": "保持语法模式，用新例句变形",
+      "vocabulary": "词汇题",
+      "vocabularyDesc": "用不同单词生成相同类型的词汇题",
+      "listening": "听力题",
+      "listeningDesc": "分析听力文本并生成类似题目"
+    },
+    "uploadImage": "上传题目图片",
+    "clickToUpload": "点击选择图片",
+    "supportedFormats": "格式: JPG, PNG, GIF (最大10MB)",
+    "generate": "生成变体",
+    "generateButton": "AI生成变体",
+    "features": {
+      "analyze": "分析原题",
+      "generate": "生成类似变体",
+      "explain": "提供详细解释"
+    },
+    "premiumFeature": "高级功能",
+    "premiumDescription": "此功能仅限高级会员使用。",
+    "upgradePremium": "升级到高级版",
+    "result": "结果",
+    "sections": {
+      "originalAnalysis": "原题分析",
+      "variantQuestion": "变体题目",
+      "answer": "答案",
+      "explanation": "解释",
+      "learningPoints": "学习要点"
+    },
+    "pdf": {
+      "createdAt": "创建时间",
+      "translation": "翻译"
+    },
+    "success": {
+      "generated": "变体题目生成成功！",
+      "pdfOpened": "PDF预览已打开"
+    },
+    "errors": {
+      "imageTooLarge": "图片太大。请选择10MB以下的文件。",
+      "selectImage": "请先选择图片。",
+      "premiumRequired": "此功能仅限高级会员使用。",
+      "apiError": "生成题目时出错。",
+      "tryAgain": "发生错误。请重试。",
+      "noContent": "没有可下载的内容。",
+      "popupBlocked": "弹窗被阻止。请允许弹窗。",
+      "pdfError": "生成PDF时出错。"
+    },
+    "changeImage": "选择其他图片",
+    "generating": "AI正在生成变体题目...",
+    "downloadPDF": "下载PDF"
+  },
   "notifications": {
     "title": "通知",
     "markAllRead": "全部标为已读",
