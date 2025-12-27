@@ -1490,5 +1490,42 @@
     "cancel": "Cancel",
     "update": "Update",
     "submit": "Submit"
+  },
+  "boardHub": {
+    "back": "Back",
+    "title": "Community",
+    "subtitle": "Discussion & Sharing Forum",
+    "stats": {
+      "categories": "4 Categories",
+      "realtime": "Realtime",
+      "upload": "File & Video Upload"
+    },
+    "badges": {
+      "new": "NEW",
+      "official": "Official"
+    },
+    "viewNow": "View Now",
+    "boards": {
+      "notice": {
+        "title": "Notices",
+        "subtitle": "공지사항",
+        "description": "Important announcements from admins about updates, events and news!"
+      },
+      "free": {
+        "title": "Free Board",
+        "subtitle": "자유게시판",
+        "description": "Share experiences, ask questions and connect with the learner community!"
+      },
+      "resource": {
+        "title": "Resources",
+        "subtitle": "학습자료실",
+        "description": "Share useful TOPIK materials, videos and learning resources!"
+      },
+      "anonymous": {
+        "title": "Anonymous",
+        "subtitle": "익명게시판",
+        "description": "Share opinions and questions anonymously, freely!"
+      }
+    }
   }
 }

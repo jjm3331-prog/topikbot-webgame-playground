@@ -1255,5 +1255,42 @@
     "cancel": "取消",
     "update": "更新",
     "submit": "发布"
+  },
+  "boardHub": {
+    "back": "返回",
+    "title": "社区",
+    "subtitle": "交流 & 分享论坛",
+    "stats": {
+      "categories": "4个分类",
+      "realtime": "实时",
+      "upload": "文件 & 视频上传"
+    },
+    "badges": {
+      "new": "NEW",
+      "official": "Official"
+    },
+    "viewNow": "立即查看",
+    "boards": {
+      "notice": {
+        "title": "公告",
+        "subtitle": "공지사항",
+        "description": "管理员发布的重要公告！查看更新、活动和新闻！"
+      },
+      "free": {
+        "title": "自由讨论",
+        "subtitle": "자유게시판",
+        "description": "分享经验，提问，与学习者社区互动！"
+      },
+      "resource": {
+        "title": "学习资料",
+        "subtitle": "학습자료실",
+        "description": "分享有用的TOPIK资料、视频和学习资源！"
+      },
+      "anonymous": {
+        "title": "匿名版",
+        "subtitle": "익명게시판",
+        "description": "匿名自由地分享意见和问题！"
+      }
+    }
   }
 }

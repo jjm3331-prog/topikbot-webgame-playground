@@ -1255,5 +1255,42 @@
     "cancel": "キャンセル",
     "update": "更新",
     "submit": "投稿"
+  },
+  "boardHub": {
+    "back": "戻る",
+    "title": "コミュニティ",
+    "subtitle": "交流 & 共有フォーラム",
+    "stats": {
+      "categories": "4カテゴリ",
+      "realtime": "リアルタイム",
+      "upload": "ファイル & 動画アップロード"
+    },
+    "badges": {
+      "new": "NEW",
+      "official": "Official"
+    },
+    "viewNow": "今すぐ見る",
+    "boards": {
+      "notice": {
+        "title": "お知らせ",
+        "subtitle": "공지사항",
+        "description": "管理者からの重要なお知らせ！アップデート、イベント、ニュースをチェック！"
+      },
+      "free": {
+        "title": "自由掲示板",
+        "subtitle": "자유게시판",
+        "description": "経験を共有し、質問し、学習者コミュニティと交流しましょう！"
+      },
+      "resource": {
+        "title": "資料室",
+        "subtitle": "학습자료실",
+        "description": "便利なTOPIK資料、動画、学習リソースを共有しましょう！"
+      },
+      "anonymous": {
+        "title": "匿名掲示板",
+        "subtitle": "익명게시판",
+        "description": "匿名で気軽に意見や質問を共有しましょう！"
+      }
+    }
   }
 }

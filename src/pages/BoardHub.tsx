@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, 
@@ -21,9 +22,9 @@ import AppFooter from "@/components/AppFooter";
 const boardMenus = [
   {
     id: "notice",
-    title: "Thông báo",
-    subtitle: "공지사항",
-    description: "Thông báo quan trọng từ quản trị viên về cập nhật, sự kiện và tin tức!",
+    titleKey: "boardHub.boards.notice.title",
+    subtitleKey: "boardHub.boards.notice.subtitle",
+    descriptionKey: "boardHub.boards.notice.description",
     icon: Megaphone,
     color: "from-red-500 to-rose-600",
     bgColor: "bg-red-500/10",
@@ -33,9 +34,9 @@ const boardMenus = [
   },
   {
     id: "free",
-    title: "Tự do trao đổi",
-    subtitle: "자유게시판",
-    description: "Chia sẻ kinh nghiệm, hỏi đáp và giao lưu với cộng đồng học viên!",
+    titleKey: "boardHub.boards.free.title",
+    subtitleKey: "boardHub.boards.free.subtitle",
+    descriptionKey: "boardHub.boards.free.description",
     icon: MessageCircle,
     color: "from-blue-500 to-cyan-600",
     bgColor: "bg-blue-500/10",
@@ -45,9 +46,9 @@ const boardMenus = [
   },
   {
     id: "resource",
-    title: "Tài liệu học tập",
-    subtitle: "학습자료실",
-    description: "Chia sẻ tài liệu, video và nguồn học tập TOPIK hữu ích!",
+    titleKey: "boardHub.boards.resource.title",
+    subtitleKey: "boardHub.boards.resource.subtitle",
+    descriptionKey: "boardHub.boards.resource.description",
     icon: BookOpen,
     color: "from-emerald-500 to-teal-600",
     bgColor: "bg-emerald-500/10",
@@ -56,9 +57,9 @@ const boardMenus = [
   },
   {
     id: "anonymous",
-    title: "Ẩn danh",
-    subtitle: "익명게시판",
-    description: "Chia sẻ ý kiến và câu hỏi một cách ẩn danh, thoải mái!",
+    titleKey: "boardHub.boards.anonymous.title",
+    subtitleKey: "boardHub.boards.anonymous.subtitle",
+    descriptionKey: "boardHub.boards.anonymous.description",
     icon: Ghost,
     color: "from-purple-500 to-indigo-600",
     bgColor: "bg-purple-500/10",
@@ -89,6 +90,7 @@ const getIconColor = (color: string) => {
 };
 
 export default function BoardHub() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -110,7 +112,7 @@ export default function BoardHub() {
               className="mb-4 -ml-2"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Quay lại
+              {t("boardHub.back")}
             </Button>
             
             <div className="flex items-center gap-5 mb-5">
@@ -118,8 +120,8 @@ export default function BoardHub() {
                 <Users className="w-9 h-9 sm:w-10 sm:h-10 text-white" />
               </div>
               <div>
-                <h1 className="text-title font-bold text-foreground">💬 Cộng đồng</h1>
-                <p className="text-body text-muted-foreground mt-1">Diễn đàn giao lưu & chia sẻ</p>
+                <h1 className="text-title font-bold text-foreground">💬 {t("boardHub.title")}</h1>
+                <p className="text-body text-muted-foreground mt-1">{t("boardHub.subtitle")}</p>
               </div>
             </div>
 
@@ -127,15 +129,15 @@ export default function BoardHub() {
             <div className="flex flex-wrap gap-3 mt-5">
               <Badge variant="outline" className="gap-2 py-2 px-4 text-card-caption">
                 <FileText className="w-4 h-4 text-blue-500" />
-                <span>4 chuyên mục</span>
+                <span>{t("boardHub.stats.categories")}</span>
               </Badge>
               <Badge variant="outline" className="gap-2 py-2 px-4 text-card-caption">
                 <Sparkles className="w-4 h-4 text-purple-500" />
-                <span>Realtime</span>
+                <span>{t("boardHub.stats.realtime")}</span>
               </Badge>
               <Badge variant="outline" className="gap-2 py-2 px-4 text-card-caption">
                 <Zap className="w-4 h-4 text-green-500" />
-                <span>Upload tệp & video</span>
+                <span>{t("boardHub.stats.upload")}</span>
               </Badge>
             </div>
           </motion.div>
@@ -163,12 +165,12 @@ export default function BoardHub() {
                     <div className="absolute top-4 right-4 z-20 flex gap-2">
                       {menu.isNew && (
                         <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-badge px-3 py-1.5 font-semibold">
-                          ✨ NEW
+                          ✨ {t("boardHub.badges.new")}
                         </Badge>
                       )}
                       {menu.isAdmin && (
                         <Badge className="bg-gradient-to-r from-red-500 to-rose-500 text-white text-badge px-3 py-1.5 font-semibold">
-                          📢 Official
+                          📢 {t("boardHub.badges.official")}
                         </Badge>
                       )}
                     </div>
@@ -186,18 +188,18 @@ export default function BoardHub() {
                       </div>
                       
                       {/* Title */}
-                      <h3 className="font-bold text-foreground text-card-title-lg sm:text-2xl mb-1.5">{menu.title}</h3>
-                      <p className="text-card-caption sm:text-base text-muted-foreground mb-3">{menu.subtitle}</p>
+                      <h3 className="font-bold text-foreground text-card-title-lg sm:text-2xl mb-1.5">{t(menu.titleKey)}</h3>
+                      <p className="text-card-caption sm:text-base text-muted-foreground mb-3">{t(menu.subtitleKey)}</p>
 
                       {/* Description */}
                       <p className="text-card-body sm:text-lg text-muted-foreground/90 leading-relaxed flex-1">
-                        {menu.description}
+                        {t(menu.descriptionKey)}
                       </p>
                       
                       {/* Button indicator */}
                       <div className="mt-6 w-full">
                         <div className={`flex items-center justify-center gap-2 py-3 sm:py-3.5 rounded-xl bg-gradient-to-r ${menu.color} opacity-0 group-hover:opacity-100 transition-all duration-300`}>
-                          <span className="text-white text-button-lg font-bold">Xem ngay</span>
+                          <span className="text-white text-button-lg font-bold">{t("boardHub.viewNow")}</span>
                           <ChevronRight className="w-5 h-5 text-white" />
                         </div>
                       </div>
