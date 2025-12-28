@@ -145,7 +145,10 @@ serve(async (req) => {
         .order('seq_no')
         .limit(batchSize);
       
-      if (level) query.eq('level', level);
+      // level이 숫자인 경우에만 필터링 (all이면 전체 조회)
+      if (level && !isNaN(Number(level))) {
+        query.eq('level', Number(level));
+      }
       
       const { data: vocabItems, error: vocabError } = await query;
       
