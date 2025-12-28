@@ -250,13 +250,25 @@ const MiniCloze = ({ level, onMistake }: MiniClozeProps) => {
     );
   }
 
-  // Get hint for vocab mode
+  // Get hint for vocab mode - 정답을 직접 보여주지 않고 힌트만 제공
   const getHint = () => {
     if (useVocabMode) {
       const vocab = currentQuestion as VocabWord;
-      return getMeaning(vocab);
+      const word = vocab.word;
+      // 첫 글자 + ○ 형태로 힌트 제공 (예: "가○○" for "가지다")
+      if (word.length <= 1) return word[0] + '...';
+      const firstChar = word[0];
+      const circles = '○'.repeat(word.length - 1);
+      return `${firstChar}${circles} (${word.length}글자)`;
     }
-    return (currentQuestion as ClozeQuestion).hint;
+    const q = currentQuestion as ClozeQuestion;
+    // cloze_questions의 hint도 정답이면 첫글자 힌트로 변환
+    if (q.hint === q.blank_word) {
+      const word = q.blank_word;
+      if (word.length <= 1) return word[0] + '...';
+      return `${word[0]}${'○'.repeat(word.length - 1)} (${word.length}글자)`;
+    }
+    return q.hint || `${q.blank_word[0]}${'○'.repeat(q.blank_word.length - 1)} (${q.blank_word.length}글자)`;
   };
 
   return (
