@@ -167,35 +167,137 @@ const Vocabulary = () => {
               {activeModule ? "모듈 선택" : t('common.back')}
             </Button>
 
-            {/* Hero Section */}
-            <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600 p-4 sm:p-6 md:p-8 mb-6">
-              <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIiBzdHJva2Utd2lkdGg9IjIiLz48L2c+PC9zdmc+')] opacity-30" />
+            {/* Hero Section - Premium Agency Grade Design */}
+            <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl mb-8">
+              {/* Premium Gradient Background with Glass Effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-violet-950 to-slate-900" />
               
-              <div className="relative z-10 flex items-center gap-4 sm:gap-6">
-                <motion.div 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", delay: 0.2 }}
-                  className="w-14 h-14 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-2xl border border-white/30 shrink-0"
-                >
-                  <BookOpen className="w-7 h-7 sm:w-10 sm:h-10 text-white" />
-                </motion.div>
-                <div className="min-w-0">
+              {/* Animated Gradient Orbs */}
+              <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-violet-500/30 to-fuchsia-500/20 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2" />
+              <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-cyan-500/20 to-blue-500/10 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2" />
+              <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-r from-pink-500/10 to-orange-500/10 rounded-full blur-2xl transform -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+              
+              {/* Grid Pattern Overlay */}
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:44px_44px]" />
+              
+              {/* Content Container */}
+              <div className="relative z-10 p-6 sm:p-8 md:p-10 lg:p-12">
+                {/* Top Row - Badge + Language */}
+                <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                   <motion.div 
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="inline-flex items-center gap-2 px-2 sm:px-3 py-1 rounded-full bg-white/20 text-white text-[10px] sm:text-xs font-medium mb-2"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex items-center gap-3"
                   >
-                    <Sparkles className="w-3 h-3" />
-                    4개 학습 모듈 • 7개국 언어
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/10">
+                      <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="text-white/90 text-xs sm:text-sm font-medium tracking-wide">TOPIK 공식 어휘 100% 수록</span>
+                    </div>
                   </motion.div>
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1">어휘 학습</h1>
-                  <div className="flex items-center gap-2 text-white/80 text-sm">
-                    <Globe className="w-4 h-4" />
-                    <span>{languageLabels[currentLang]}</span>
+                  
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 border border-white/10"
+                  >
+                    <Globe className="w-4 h-4 text-violet-300" />
+                    <span className="text-white/90 text-sm font-medium">{languageLabels[currentLang]}</span>
+                  </motion.div>
+                </div>
+                
+                {/* Main Content */}
+                <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 lg:gap-10">
+                  {/* Icon Box */}
+                  <motion.div 
+                    initial={{ scale: 0, rotate: -10 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: "spring", delay: 0.2, stiffness: 200 }}
+                    className="relative shrink-0"
+                  >
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-violet-500 via-fuchsia-500 to-pink-500 p-0.5 shadow-2xl shadow-violet-500/30">
+                      <div className="w-full h-full rounded-2xl sm:rounded-[22px] bg-slate-900/90 backdrop-blur-xl flex items-center justify-center">
+                        <BookOpen className="w-9 h-9 sm:w-12 sm:h-12 text-white" />
+                      </div>
+                    </div>
+                    <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg">
+                      <Sparkles className="w-3 h-3 text-white" />
+                    </div>
+                  </motion.div>
+                  
+                  {/* Text Content */}
+                  <div className="flex-1 min-w-0">
+                    <motion.div 
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="mb-3"
+                    >
+                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-400/30 mb-3">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                        <span className="text-amber-200/90 text-xs sm:text-sm font-semibold tracking-wide">4개 학습 모듈 • 7개국 언어 지원</span>
+                      </div>
+                      <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-violet-200 leading-tight">
+                        어휘 학습
+                      </h1>
+                    </motion.div>
+                    
+                    {/* Premium Description */}
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className="relative mt-4 p-4 sm:p-5 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10"
+                    >
+                      <div className="absolute -top-3 left-4 px-3 py-1 rounded-full bg-gradient-to-r from-red-500 to-rose-600 text-white text-[10px] sm:text-xs font-bold tracking-wider shadow-lg">
+                        🇰🇷 MADE IN KOREA
+                      </div>
+                      <p className="text-white/80 text-sm sm:text-base leading-relaxed mt-2">
+                        <span className="text-white font-bold">TOPIK의 심장, 한국에서.</span>{" "}
+                        <span className="text-violet-200">출제위원급 한국 본사 연구진</span>이, TOPIK 주관 기관이 공식 발표한{" "}
+                        <span className="text-amber-300 font-semibold">'출제 어휘 목록' 전체</span>를, 이 하나의 서비스에{" "}
+                        <span className="text-emerald-300 font-bold">100% 완벽히</span> 담아냈습니다.
+                      </p>
+                      <p className="text-white/70 text-xs sm:text-sm mt-3 italic">
+                        이것이 당신이 찾던 유일한 <span className="text-white font-semibold">'진짜' TOPIK AI 서비스</span>입니다.
+                      </p>
+                    </motion.div>
                   </div>
                 </div>
+                
+                {/* Bottom Stats Bar */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="flex flex-wrap items-center gap-4 sm:gap-6 mt-6 pt-6 border-t border-white/10"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                      <span className="text-emerald-400 text-sm font-bold">✓</span>
+                    </div>
+                    <span className="text-white/70 text-xs sm:text-sm">10,435+ 어휘</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-violet-500/20 flex items-center justify-center">
+                      <span className="text-violet-400 text-sm font-bold">6</span>
+                    </div>
+                    <span className="text-white/70 text-xs sm:text-sm">TOPIK 급수</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                      <span className="text-amber-400 text-sm font-bold">7</span>
+                    </div>
+                    <span className="text-white/70 text-xs sm:text-sm">지원 언어</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-pink-500/20 flex items-center justify-center">
+                      <span className="text-pink-400 text-sm font-bold">AI</span>
+                    </div>
+                    <span className="text-white/70 text-xs sm:text-sm">프리미엄 TTS</span>
+                  </div>
+                </motion.div>
               </div>
             </div>
 
