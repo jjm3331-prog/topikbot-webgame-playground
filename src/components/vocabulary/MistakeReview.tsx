@@ -77,11 +77,12 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
         return;
       }
 
+      // 'vocabulary', 'cloze', 'flashcard' 등 모든 타입의 오답을 가져옴
       const { data, error } = await supabase
         .from('user_mistakes')
         .select('*')
         .eq('user_id', user.id)
-        .eq('item_type', 'vocabulary')
+        .in('item_type', ['vocabulary', 'cloze', 'flashcard', 'match'])
         .eq('mastered', false)
         .order('mistake_count', { ascending: false })
         .limit(20);
