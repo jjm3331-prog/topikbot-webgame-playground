@@ -12,42 +12,37 @@ import {
   Loader2,
   Zap,
   Eye,
-  EyeOff
+  EyeOff,
+  ThumbsUp,
+  ThumbsDown,
+  Globe
 } from "lucide-react";
-
-interface VocabWord {
-  id: string;
-  word: string;
-  pos: string;
-  level: number;
-  example_phrase: string;
-  meaning_vi?: string;
-  meaning_en?: string;
-  example_sentence?: string;
-  example_sentence_vi?: string;
-}
+import { useVocabulary, VocabWord } from "@/hooks/useVocabulary";
 
 interface FlashLoopProps {
   level: number;
   onMistake?: (word: VocabWord) => void;
 }
 
-type FlashPhase = 'word' | 'meaning' | 'example' | 'test';
+type FlashPhase = 'word' | 'meaning' | 'result';
 
 const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const { getMeaning, getCurrentLanguage, languageLabels } = useVocabulary();
+  
   const [words, setWords] = useState<VocabWord[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [phase, setPhase] = useState<FlashPhase>('word');
   const [isLoading, setIsLoading] = useState(true);
   const [showMeaning, setShowMeaning] = useState(false);
-  const [testAnswer, setTestAnswer] = useState('');
-  const [testResult, setTestResult] = useState<'correct' | 'wrong' | null>(null);
-  const [score, setScore] = useState(0);
-  const [autoPlay, setAutoPlay] = useState(true);
+  const [knownWords, setKnownWords] = useState<Set<string>>(new Set());
+  const [unknownWords, setUnknownWords] = useState<Set<string>>(new Set());
   const [sessionComplete, setSessionComplete] = useState(false);
+  const [autoPlay, setAutoPlay] = useState(true);
+  const [countdown, setCountdown] = useState(3);
 
   const currentWord = words[currentIndex];
+  const currentLang = getCurrentLanguage();
 
   // Fetch vocabulary from DB
   const fetchWords = useCallback(async () => {
@@ -57,18 +52,16 @@ const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
         .from('topik_vocabulary')
         .select('*')
         .eq('level', level)
-        .not('meaning_vi', 'is', null)
         .order('seq_no')
-        .limit(20);
+        .limit(100);
 
       if (error) throw error;
 
       if (data && data.length > 0) {
-        // Shuffle words
+        // Shuffle words and take 20
         const shuffled = [...data].sort(() => Math.random() - 0.5);
-        setWords(shuffled.slice(0, 10));
+        setWords(shuffled.slice(0, 20) as VocabWord[]);
       } else {
-        // Fallback to generated content if no pre-stored data
         setWords([]);
       }
     } catch (error) {
@@ -83,16 +76,20 @@ const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
     fetchWords();
   }, [fetchWords]);
 
-  // Auto-advance timer for word phase (3 seconds)
+  // Countdown timer for word phase
   useEffect(() => {
     if (!autoPlay || phase !== 'word' || !currentWord || sessionComplete) return;
 
-    const timer = setTimeout(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => {
+        setCountdown(prev => prev - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else {
       setPhase('meaning');
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [phase, currentWord, autoPlay, sessionComplete]);
+      setShowMeaning(true);
+    }
+  }, [phase, currentWord, autoPlay, sessionComplete, countdown]);
 
   // Play TTS
   const playTTS = async (text: string) => {
@@ -114,75 +111,43 @@ const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
     }
   };
 
-  // Get meaning based on current language
-  const getMeaning = (word: VocabWord) => {
-    const lang = i18n.language;
-    switch (lang) {
-      case 'vi': return word.meaning_vi || word.meaning_en || '뜻 없음';
-      case 'en': return word.meaning_en || word.meaning_vi || 'No meaning';
-      default: return word.meaning_vi || word.meaning_en || '뜻 없음';
-    }
+  const handleKnow = () => {
+    if (!currentWord) return;
+    setKnownWords(prev => new Set([...prev, currentWord.id]));
+    moveToNext();
   };
 
-  const handleNextPhase = () => {
-    switch (phase) {
-      case 'word':
-        setPhase('meaning');
-        break;
-      case 'meaning':
-        setPhase('example');
-        break;
-      case 'example':
-        setPhase('test');
-        break;
-      case 'test':
-        handleNext();
-        break;
-    }
+  const handleDontKnow = () => {
+    if (!currentWord) return;
+    setUnknownWords(prev => new Set([...prev, currentWord.id]));
+    onMistake?.(currentWord);
+    moveToNext();
   };
 
-  const handleNext = () => {
+  const moveToNext = () => {
     if (currentIndex < words.length - 1) {
       setCurrentIndex(prev => prev + 1);
       setPhase('word');
       setShowMeaning(false);
-      setTestAnswer('');
-      setTestResult(null);
+      setCountdown(3);
     } else {
       setSessionComplete(true);
     }
   };
 
-  const handleTestSubmit = () => {
-    if (!currentWord) return;
-
-    const normalizedAnswer = testAnswer.trim().toLowerCase();
-    const correctAnswer = getMeaning(currentWord).toLowerCase();
-    
-    // Simple matching - could be improved with fuzzy matching
-    const isCorrect = correctAnswer.includes(normalizedAnswer) || 
-                      normalizedAnswer.includes(correctAnswer.split(',')[0].trim());
-
-    if (isCorrect) {
-      setTestResult('correct');
-      setScore(prev => prev + 10);
-    } else {
-      setTestResult('wrong');
-      onMistake?.(currentWord);
-    }
-
-    setTimeout(() => {
-      handleNext();
-    }, 1500);
+  const handleShowMeaning = () => {
+    setPhase('meaning');
+    setShowMeaning(true);
   };
 
   const handleRestart = () => {
     setCurrentIndex(0);
     setPhase('word');
-    setScore(0);
+    setKnownWords(new Set());
+    setUnknownWords(new Set());
     setSessionComplete(false);
-    setTestAnswer('');
-    setTestResult(null);
+    setShowMeaning(false);
+    setCountdown(3);
     fetchWords();
   };
 
@@ -205,20 +170,41 @@ const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
   }
 
   if (sessionComplete) {
+    const knownCount = knownWords.size;
+    const unknownCount = unknownWords.size;
+    const total = words.length;
+    const percentage = Math.round((knownCount / total) * 100);
+
     return (
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         className="text-center py-12"
       >
-        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center mx-auto mb-6">
-          <CheckCircle2 className="w-12 h-12 text-white" />
+        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center mx-auto mb-6">
+          <Zap className="w-12 h-12 text-white" />
         </div>
-        <h2 className="text-2xl font-bold mb-2">세션 완료! 🎉</h2>
-        <p className="text-3xl font-bold text-primary mb-6">{score}점</p>
-        <p className="text-muted-foreground mb-6">
-          {words.length}개 단어를 학습했습니다
-        </p>
+        <h2 className="text-2xl font-bold mb-2">Flash Loop 완료! 🎉</h2>
+        
+        <div className="flex justify-center gap-8 my-6">
+          <div className="text-center">
+            <div className="text-3xl font-bold text-green-500">{knownCount}</div>
+            <div className="text-sm text-muted-foreground">알아요</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-red-500">{unknownCount}</div>
+            <div className="text-sm text-muted-foreground">몰라요</div>
+          </div>
+        </div>
+
+        <div className="w-48 h-3 bg-muted rounded-full mx-auto mb-4 overflow-hidden">
+          <div 
+            className="h-full bg-gradient-to-r from-green-400 to-green-500"
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+        <p className="text-muted-foreground mb-6">정답률 {percentage}%</p>
+
         <Button onClick={handleRestart} size="lg">
           <RotateCcw className="w-4 h-4 mr-2" />
           다시 시작
@@ -229,7 +215,7 @@ const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Progress & Controls */}
+      {/* Progress & Language Info */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-muted-foreground">
@@ -237,160 +223,160 @@ const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
           </span>
           <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
             <div 
-              className="h-full bg-primary transition-all"
+              className="h-full bg-gradient-to-r from-yellow-400 to-orange-500 transition-all"
               style={{ width: `${((currentIndex + 1) / words.length) * 100}%` }}
             />
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-bold text-primary">{score}점</span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setAutoPlay(!autoPlay)}
-          >
-            {autoPlay ? <Play className="w-4 h-4" /> : <Zap className="w-4 h-4" />}
-          </Button>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Globe className="w-4 h-4" />
+          <span>{languageLabels[currentLang]}</span>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="flex justify-center gap-6 text-sm">
+        <div className="flex items-center gap-1 text-green-500">
+          <ThumbsUp className="w-4 h-4" />
+          <span className="font-medium">{knownWords.size}</span>
+        </div>
+        <div className="flex items-center gap-1 text-red-500">
+          <ThumbsDown className="w-4 h-4" />
+          <span className="font-medium">{unknownWords.size}</span>
         </div>
       </div>
 
       {/* Flash Card */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={`${currentIndex}-${phase}`}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          className="bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-primary/20 rounded-3xl p-8 text-center min-h-[300px] flex flex-col justify-center"
+          key={currentIndex}
+          initial={{ opacity: 0, rotateY: -90 }}
+          animate={{ opacity: 1, rotateY: 0 }}
+          exit={{ opacity: 0, rotateY: 90 }}
+          transition={{ duration: 0.3 }}
+          className="bg-gradient-to-br from-yellow-500/10 via-orange-500/10 to-red-500/10 border-2 border-yellow-500/30 rounded-3xl p-8 text-center min-h-[320px] flex flex-col justify-center relative overflow-hidden"
         >
-          {phase === 'word' && (
-            <>
-              <motion.h1 
-                className="text-5xl font-bold mb-4"
-                initial={{ scale: 0.5 }}
-                animate={{ scale: 1 }}
-              >
-                {currentWord.word}
-              </motion.h1>
-              <p className="text-muted-foreground mb-4">{currentWord.pos}</p>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => playTTS(currentWord.word)}
-              >
-                <Volume2 className="w-5 h-5" />
-              </Button>
-              <p className="text-xs text-muted-foreground mt-4">3초 후 자동 진행...</p>
-            </>
+          {/* Background decoration */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-yellow-400/5 via-transparent to-transparent" />
+          
+          {/* Countdown indicator */}
+          {phase === 'word' && autoPlay && (
+            <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center">
+              <span className="text-sm font-bold text-yellow-600 dark:text-yellow-400">{countdown}</span>
+            </div>
           )}
 
-          {phase === 'meaning' && (
-            <>
-              <h2 className="text-3xl font-bold mb-2">{currentWord.word}</h2>
-              <div className="relative">
-                <button
-                  onClick={() => setShowMeaning(!showMeaning)}
-                  className="flex items-center gap-2 mx-auto text-lg text-muted-foreground hover:text-foreground transition"
-                >
-                  {showMeaning ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
-                  {showMeaning ? '숨기기' : '뜻 보기'}
-                </button>
-                <AnimatePresence>
-                  {showMeaning && (
-                    <motion.p
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="text-2xl font-medium text-primary mt-4"
-                    >
-                      {getMeaning(currentWord)}
-                    </motion.p>
-                  )}
-                </AnimatePresence>
-              </div>
-            </>
-          )}
+          <div className="relative z-10">
+            {/* Korean Word */}
+            <motion.h1 
+              className="text-5xl md:text-6xl font-bold mb-3"
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+            >
+              {currentWord.word}
+            </motion.h1>
+            
+            {/* Part of Speech */}
+            <motion.p 
+              className="text-muted-foreground mb-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              {currentWord.pos || ''}
+            </motion.p>
+            
+            {/* TTS Button */}
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => playTTS(currentWord.word)}
+              className="mb-6"
+            >
+              <Volume2 className="w-5 h-5 mr-2" />
+              발음 듣기
+            </Button>
 
-          {phase === 'example' && (
-            <>
-              <h2 className="text-2xl font-bold mb-4">{currentWord.word}</h2>
-              <p className="text-lg text-muted-foreground mb-2">예시:</p>
-              <p className="text-xl font-medium mb-2">
-                {currentWord.example_sentence || currentWord.example_phrase}
-              </p>
-              {currentWord.example_sentence_vi && showMeaning && (
-                <p className="text-muted-foreground">
-                  {currentWord.example_sentence_vi}
-                </p>
-              )}
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => playTTS(currentWord.example_sentence || currentWord.example_phrase)}
-                className="mt-4"
-              >
-                <Volume2 className="w-5 h-5 mr-2" />
-                발음 듣기
-              </Button>
-            </>
-          )}
-
-          {phase === 'test' && (
-            <>
-              <h2 className="text-3xl font-bold mb-6">{currentWord.word}</h2>
-              <p className="text-muted-foreground mb-4">이 단어의 뜻을 입력하세요:</p>
-              
-              {testResult === null ? (
-                <div className="space-y-4">
-                  <input
-                    type="text"
-                    value={testAnswer}
-                    onChange={(e) => setTestAnswer(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleTestSubmit()}
-                    placeholder="뜻 입력..."
-                    className="w-full max-w-xs mx-auto px-4 py-3 rounded-xl bg-background border-2 border-border focus:border-primary outline-none text-center text-lg"
-                    autoFocus
-                  />
-                  <div className="flex gap-2 justify-center">
-                    <Button onClick={handleTestSubmit} disabled={!testAnswer.trim()}>
-                      확인
-                    </Button>
-                    <Button variant="ghost" onClick={handleNext}>
-                      건너뛰기
-                    </Button>
-                  </div>
-                </div>
-              ) : (
+            {/* Meaning (shown when revealed) */}
+            <AnimatePresence>
+              {showMeaning && (
                 <motion.div
-                  initial={{ scale: 0.8 }}
-                  animate={{ scale: 1 }}
-                  className={`text-2xl font-bold ${
-                    testResult === 'correct' ? 'text-green-500' : 'text-red-500'
-                  }`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="mt-4 p-4 bg-background/50 rounded-xl border border-border"
                 >
-                  {testResult === 'correct' ? '정답! ✅' : `오답 ❌ 정답: ${getMeaning(currentWord)}`}
+                  <p className="text-sm text-muted-foreground mb-1">
+                    {languageLabels[currentLang]} 뜻:
+                  </p>
+                  <p className="text-2xl font-semibold text-primary">
+                    {getMeaning(currentWord)}
+                  </p>
+                  {currentWord.example_phrase && (
+                    <p className="text-sm text-muted-foreground mt-3 italic">
+                      예) {currentWord.example_phrase}
+                    </p>
+                  )}
                 </motion.div>
               )}
-            </>
-          )}
+            </AnimatePresence>
+          </div>
         </motion.div>
       </AnimatePresence>
 
-      {/* Phase Navigation */}
-      <div className="flex justify-between items-center">
-        <div className="flex gap-2">
-          {['word', 'meaning', 'example', 'test'].map((p, i) => (
-            <div
-              key={p}
-              className={`w-3 h-3 rounded-full transition-colors ${
-                phase === p ? 'bg-primary' : 
-                ['word', 'meaning', 'example', 'test'].indexOf(phase) > i ? 'bg-primary/50' : 'bg-muted'
-              }`}
-            />
-          ))}
-        </div>
-        <Button onClick={handleNextPhase}>
-          다음 <ChevronRight className="w-4 h-4 ml-1" />
+      {/* Action Buttons */}
+      <div className="space-y-3">
+        {phase === 'word' && !showMeaning && (
+          <div className="flex justify-center">
+            <Button 
+              variant="outline" 
+              onClick={handleShowMeaning}
+              className="gap-2"
+            >
+              <Eye className="w-4 h-4" />
+              뜻 보기
+            </Button>
+          </div>
+        )}
+
+        {showMeaning && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="grid grid-cols-2 gap-4"
+          >
+            <Button
+              onClick={handleDontKnow}
+              variant="outline"
+              size="lg"
+              className="h-16 text-lg border-red-500/50 hover:bg-red-500/10 hover:border-red-500"
+            >
+              <ThumbsDown className="w-5 h-5 mr-2 text-red-500" />
+              <span>몰라요</span>
+            </Button>
+            <Button
+              onClick={handleKnow}
+              size="lg"
+              className="h-16 text-lg bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+            >
+              <ThumbsUp className="w-5 h-5 mr-2" />
+              <span>알아요</span>
+            </Button>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Auto-play toggle */}
+      <div className="flex justify-center">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setAutoPlay(!autoPlay)}
+          className="text-muted-foreground"
+        >
+          {autoPlay ? <Play className="w-4 h-4 mr-2" /> : <Zap className="w-4 h-4 mr-2" />}
+          {autoPlay ? '자동 진행 ON' : '수동 모드'}
         </Button>
       </div>
     </div>
