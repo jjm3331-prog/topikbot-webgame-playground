@@ -48,6 +48,8 @@ interface MistakeReviewProps {
   onMistake?: (itemId: string, itemData: any) => void;
 }
 
+type ViewMode = 'review' | 'stats';
+
 const MASTERY_THRESHOLD = 3; // 연속 3회 정답 시 마스터
 
 const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
@@ -55,6 +57,7 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
   const { getMeaning } = useVocabulary();
   
   const [mistakes, setMistakes] = useState<MistakeItem[]>([]);
+  const [allMistakes, setAllMistakes] = useState<MistakeItem[]>([]); // 통계용 전체 데이터
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userInput, setUserInput] = useState('');
   const [showResult, setShowResult] = useState(false);
@@ -66,6 +69,8 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
   const [consecutiveCorrect, setConsecutiveCorrect] = useState<Record<string, number>>({});
   const [sessionComplete, setSessionComplete] = useState(false);
   const [masteredInSession, setMasteredInSession] = useState<string[]>([]);
+  const [showAllLevels, setShowAllLevels] = useState(false); // 전체 레벨 보기
+  const [viewMode, setViewMode] = useState<ViewMode>('review'); // 모드 전환
 
   // Fetch user's mistakes
   const fetchMistakes = useCallback(async () => {
@@ -85,7 +90,7 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
         .in('item_type', ['vocabulary', 'cloze', 'flashcard', 'match'])
         .eq('mastered', false)
         .order('mistake_count', { ascending: false })
-        .limit(20);
+        .limit(50);
 
       if (error) throw error;
 
@@ -95,14 +100,20 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
         item_data: item.item_data as MistakeItem['item_data']
       })) as MistakeItem[];
       
-      const filtered = items.filter((item) => {
-        const itemLevel = item.item_data?.level;
-        return !itemLevel || itemLevel === level;
-      });
+      // 전체 데이터 저장 (통계용)
+      setAllMistakes(items);
+      
+      // 레벨 필터 적용
+      const filtered = showAllLevels 
+        ? items 
+        : items.filter((item) => {
+            const itemLevel = item.item_data?.level;
+            return !itemLevel || itemLevel === level;
+          });
 
       // Shuffle for variety
       const shuffled = filtered.sort(() => Math.random() - 0.5);
-      setMistakes(shuffled);
+      setMistakes(shuffled.slice(0, 20));
       setCurrentIndex(0);
       setConsecutiveCorrect({});
     } catch (error) {
@@ -110,7 +121,7 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
     } finally {
       setLoading(false);
     }
-  }, [level]);
+  }, [level, showAllLevels]);
 
   useEffect(() => {
     fetchMistakes();
@@ -269,6 +280,27 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
     return word[0] + '...' + word[word.length - 1];
   };
 
+  // 통계 계산
+  const getStats = () => {
+    const levelCounts: Record<number, number> = {};
+    const wordCounts: { word: string; count: number; level: number }[] = [];
+    
+    allMistakes.forEach(item => {
+      const lvl = item.item_data?.level || 0;
+      levelCounts[lvl] = (levelCounts[lvl] || 0) + 1;
+      wordCounts.push({
+        word: item.item_data.word,
+        count: item.mistake_count,
+        level: lvl
+      });
+    });
+    
+    // 가장 많이 틀린 단어 순으로 정렬
+    const topMistakes = wordCounts.sort((a, b) => b.count - a.count).slice(0, 10);
+    
+    return { levelCounts, topMistakes, total: allMistakes.length };
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -277,25 +309,152 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
     );
   }
 
+  // 통계 대시보드 뷰
+  if (viewMode === 'stats') {
+    const stats = getStats();
+    
+    return (
+      <div className="space-y-6">
+        {/* 헤더 */}
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-bold flex items-center gap-2">
+            <Target className="w-5 h-5 text-primary" />
+            오답 통계
+          </h3>
+          <Button variant="outline" size="sm" onClick={() => setViewMode('review')}>
+            복습 모드
+          </Button>
+        </div>
+
+        {stats.total === 0 ? (
+          <Card className="p-8 text-center bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20">
+            <Trophy className="w-12 h-12 mx-auto text-yellow-500 mb-3" />
+            <p className="text-muted-foreground">아직 오답 기록이 없습니다!</p>
+          </Card>
+        ) : (
+          <>
+            {/* 전체 통계 */}
+            <Card className="p-4 bg-gradient-to-br from-primary/5 to-purple-500/5">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <div className="text-2xl font-bold text-primary">{stats.total}</div>
+                  <div className="text-xs text-muted-foreground">전체 오답</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-orange-500">
+                    {Object.keys(stats.levelCounts).length}
+                  </div>
+                  <div className="text-xs text-muted-foreground">레벨</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-red-500">
+                    {stats.topMistakes[0]?.count || 0}
+                  </div>
+                  <div className="text-xs text-muted-foreground">최다 오답</div>
+                </div>
+              </div>
+            </Card>
+
+            {/* 레벨별 분포 */}
+            <Card className="p-4">
+              <h4 className="font-semibold mb-3 flex items-center gap-2">
+                <Flame className="w-4 h-4 text-orange-500" />
+                레벨별 오답 분포
+              </h4>
+              <div className="space-y-2">
+                {Object.entries(stats.levelCounts)
+                  .sort(([a], [b]) => Number(a) - Number(b))
+                  .map(([lvl, count]) => (
+                    <div key={lvl} className="flex items-center gap-2">
+                      <Badge variant="outline" className="w-16 justify-center">
+                        {lvl}급
+                      </Badge>
+                      <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-orange-400 to-red-500"
+                          style={{ width: `${(count / stats.total) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-sm font-medium w-8 text-right">{count}</span>
+                    </div>
+                  ))}
+              </div>
+            </Card>
+
+            {/* 가장 많이 틀린 단어 */}
+            <Card className="p-4">
+              <h4 className="font-semibold mb-3 flex items-center gap-2">
+                <Brain className="w-4 h-4 text-red-500" />
+                가장 많이 틀린 단어 TOP 10
+              </h4>
+              <div className="space-y-2">
+                {stats.topMistakes.map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
+                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                      idx === 0 ? 'bg-red-500 text-white' :
+                      idx === 1 ? 'bg-orange-500 text-white' :
+                      idx === 2 ? 'bg-yellow-500 text-white' :
+                      'bg-muted-foreground/20 text-muted-foreground'
+                    }`}>
+                      {idx + 1}
+                    </span>
+                    <span className="font-medium flex-1">{item.word}</span>
+                    <Badge variant="outline" className="text-xs">{item.level}급</Badge>
+                    <Badge variant="destructive" className="text-xs">{item.count}회</Badge>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </>
+        )}
+      </div>
+    );
+  }
+
   if (mistakes.length === 0) {
     return (
-      <Card className="p-8 text-center bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', bounce: 0.5 }}
-        >
-          <Trophy className="w-16 h-16 mx-auto text-yellow-500 mb-4" />
-        </motion.div>
-        <h3 className="text-xl font-bold text-foreground mb-2">완벽해요! 🎉</h3>
-        <p className="text-muted-foreground mb-4">
-          복습할 오답이 없습니다. 다른 학습 모듈에서 더 연습해보세요!
-        </p>
-        <Button onClick={() => window.location.reload()} variant="outline">
-          <RotateCcw className="w-4 h-4 mr-2" />
-          새로고침
-        </Button>
-      </Card>
+      <div className="space-y-4">
+        {/* 레벨 필터 & 통계 버튼 */}
+        <div className="flex items-center justify-between">
+          <Button
+            variant={showAllLevels ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowAllLevels(!showAllLevels)}
+          >
+            {showAllLevels ? "전체 레벨" : `${level}급만`}
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setViewMode('stats')}>
+            <Target className="w-4 h-4 mr-1" />
+            통계
+          </Button>
+        </div>
+
+        <Card className="p-8 text-center bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', bounce: 0.5 }}
+          >
+            <Trophy className="w-16 h-16 mx-auto text-yellow-500 mb-4" />
+          </motion.div>
+          <h3 className="text-xl font-bold text-foreground mb-2">완벽해요! 🎉</h3>
+          <p className="text-muted-foreground mb-4">
+            {showAllLevels 
+              ? "복습할 오답이 없습니다. 다른 학습 모듈에서 더 연습해보세요!"
+              : `${level}급 복습할 오답이 없습니다. 전체 레벨을 확인해보세요!`
+            }
+          </p>
+          {!showAllLevels && allMistakes.length > 0 && (
+            <Button onClick={() => setShowAllLevels(true)} className="mb-2">
+              전체 레벨 보기 ({allMistakes.length}개)
+            </Button>
+          )}
+          <Button onClick={() => window.location.reload()} variant="outline">
+            <RotateCcw className="w-4 h-4 mr-2" />
+            새로고침
+          </Button>
+        </Card>
+      </div>
     );
   }
 
@@ -353,6 +512,21 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
 
   return (
     <div className="space-y-6">
+      {/* 레벨 필터 & 통계 버튼 */}
+      <div className="flex items-center justify-between">
+        <Button
+          variant={showAllLevels ? "default" : "outline"}
+          size="sm"
+          onClick={() => setShowAllLevels(!showAllLevels)}
+        >
+          {showAllLevels ? "전체 레벨" : `${level}급만`}
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => setViewMode('stats')}>
+          <Target className="w-4 h-4 mr-1" />
+          통계
+        </Button>
+      </div>
+
       {/* Progress and Stats */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
