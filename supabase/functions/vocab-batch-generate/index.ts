@@ -7,8 +7,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Gemini API 직접 호출 (Thinking Budget 최대치)
+// API Keys
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+const X_AI_API_KEY = Deno.env.get('X_AI_API_KEY');
 
 interface VocabItem {
   id: string;
@@ -71,13 +72,17 @@ JSON 형식으로 응답:
   "similar_expressions": ["유사표현1", "유사표현2"]
 }`;
 
+const TRANSLATE_SYSTEM_PROMPT = `당신은 한국어와 다국어 번역 전문가입니다. 
+TOPIK 한국어 능력시험 어휘를 다양한 언어로 정확하게 번역합니다.
+각 언어의 문화적 맥락과 뉘앙스를 고려하여 자연스러운 번역을 제공하세요.
+반드시 유효한 JSON 형식으로 응답하세요.`;
+
 // Gemini 2.5 Flash API 직접 호출
 async function callGemini(systemPrompt: string, userPrompt: string): Promise<string> {
   if (!GEMINI_API_KEY) {
     throw new Error("GEMINI_API_KEY is not configured");
   }
 
-  // 모델: gemini-2.5-flash
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
     {
@@ -108,8 +113,6 @@ async function callGemini(systemPrompt: string, userPrompt: string): Promise<str
   }
 
   const data = await response.json();
-  
-  // Gemini API 응답 구조 파싱
   const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
   if (!content) {
     console.error('[Batch Generate] No content in Gemini response:', JSON.stringify(data));
@@ -119,6 +122,55 @@ async function callGemini(systemPrompt: string, userPrompt: string): Promise<str
   console.log('[Batch Generate] Gemini response received, tokens:', data.usageMetadata?.totalTokenCount || 0);
   
   return content;
+}
+
+// Grok 4.1 Fast Reasoning API 호출
+async function callGrok(systemPrompt: string, userPrompt: string): Promise<string> {
+  if (!X_AI_API_KEY) {
+    throw new Error("X_AI_API_KEY is not configured");
+  }
+
+  const response = await fetch('https://api.x.ai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${X_AI_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'grok-4-1-fast-reasoning',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+      temperature: 0.7,
+      response_format: { type: 'json_object' },
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    console.error('[Batch Generate] Grok API error:', response.status, error);
+    throw new Error(`Grok API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content;
+  if (!content) {
+    console.error('[Batch Generate] No content in Grok response:', JSON.stringify(data));
+    throw new Error('No content in Grok response');
+  }
+  
+  console.log('[Batch Generate] Grok response received, usage:', data.usage?.total_tokens || 0);
+  
+  return content;
+}
+
+// Model-agnostic call function
+async function callLLM(model: string, systemPrompt: string, userPrompt: string): Promise<string> {
+  if (model === 'grok') {
+    return await callGrok(systemPrompt, userPrompt);
+  }
+  return await callGemini(systemPrompt, userPrompt);
 }
 
 function extractJSON(text: string): any {
@@ -147,7 +199,7 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { type, level, batchSize = 20 } = await req.json();
+    const { type, level, batchSize = 20, model = 'gemini' } = await req.json();
 
     if (!type) {
       return new Response(JSON.stringify({ error: 'type is required (cloze, ox, idiom, translate)' }), {
@@ -156,10 +208,11 @@ serve(async (req) => {
       });
     }
 
+    const modelName = model === 'grok' ? 'grok-4-1-fast-reasoning' : 'gemini-2.5-flash';
     console.log(`[Batch Generate] Starting ${type} generation for level ${level || 'all'}, batch size: ${batchSize}`);
-    console.log(`[Batch Generate] Using Gemini 2.5 Flash (gemini-2.5-flash)`);
+    console.log(`[Batch Generate] Using model: ${modelName}`);
 
-    let result: any = { success: true, generated: 0, errors: 0 };
+    let result: any = { success: true, generated: 0, errors: 0, model: modelName };
 
     if (type === 'cloze') {
       // Cloze 문제 생성
@@ -199,7 +252,7 @@ serve(async (req) => {
 
 이 단어를 사용한 빈칸 채우기 문제를 만들어주세요.`;
 
-          const response = await callGemini(CLOZE_SYSTEM_PROMPT, userPrompt);
+          const response = await callLLM(model, CLOZE_SYSTEM_PROMPT, userPrompt);
           const clozeData = extractJSON(response);
           
           const { error: insertError } = await supabase
@@ -243,7 +296,7 @@ ${targetLevel >= 3 && targetLevel <= 4 ? '- 연결 어미 (-면서, -기 때문�
 ${targetLevel >= 5 ? '- 고급 연결 어미 (-는 바, -기 마련이다)\n- 격식체\n- 한자어 관용 표현\n- 학술적 표현' : ''}`;
 
       try {
-        const response = await callGemini(OX_SYSTEM_PROMPT, userPrompt);
+        const response = await callLLM(model, OX_SYSTEM_PROMPT, userPrompt);
         const oxQuestions = extractJSON(response);
         
         if (Array.isArray(oxQuestions)) {
@@ -315,7 +368,7 @@ TOPIK 레벨: ${idiomItem.level}급
 
 이 관용표현의 상세 정보를 생성해주세요.`;
 
-          const response = await callGemini(IDIOM_SYSTEM_PROMPT, userPrompt);
+          const response = await callLLM(model, IDIOM_SYSTEM_PROMPT, userPrompt);
           const idiomData = extractJSON(response);
           
           const { error: insertError } = await supabase
@@ -398,13 +451,7 @@ JSON 형식:
   "example_sentence_vi": "예문 베트남어 번역"
 }`;
 
-          const response = await callGemini(
-            `당신은 한국어와 다국어 번역 전문가입니다. 
-TOPIK 한국어 능력시험 어휘를 다양한 언어로 정확하게 번역합니다.
-각 언어의 문화적 맥락과 뉘앙스를 고려하여 자연스러운 번역을 제공하세요.
-반드시 유효한 JSON 형식으로 응답하세요.`,
-            userPrompt
-          );
+          const response = await callLLM(model, TRANSLATE_SYSTEM_PROMPT, userPrompt);
           const translations = extractJSON(response);
           
           const { error: updateError } = await supabase
@@ -426,10 +473,9 @@ TOPIK 한국어 능력시험 어휘를 다양한 언어로 정확하게 번역�
             result.errors++;
           } else {
             result.generated++;
-            console.log(`[Batch Generate] Translated: ${vocab.word} (Level ${vocab.level})`);
+            console.log(`[Batch Generate] Translated: ${vocab.word} (Level ${vocab.level}) with ${modelName}`);
           }
           
-          // Thinking Budget 사용으로 더 긴 딜레이
           await new Promise(resolve => setTimeout(resolve, 500));
           
         } catch (e) {
@@ -439,7 +485,7 @@ TOPIK 한국어 능력시험 어휘를 다양한 언어로 정확하게 번역�
       }
     }
 
-    console.log(`[Batch Generate] Completed: ${result.generated} generated, ${result.errors} errors`);
+    console.log(`[Batch Generate] Completed with ${modelName}: ${result.generated} generated, ${result.errors} errors`);
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
