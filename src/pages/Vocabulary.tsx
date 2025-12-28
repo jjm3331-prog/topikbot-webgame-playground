@@ -22,10 +22,10 @@ import { useVocabulary, VocabWord } from "@/hooks/useVocabulary";
 import FlashLoop from "@/components/vocabulary/FlashLoop";
 import MeaningMatch from "@/components/vocabulary/MeaningMatch";
 import MiniCloze from "@/components/vocabulary/MiniCloze";
-import SentenceBuilder from "@/components/vocabulary/SentenceBuilder";
+import MistakeReview from "@/components/vocabulary/MistakeReview";
 
 // Module types - 4개 모듈만
-type ModuleType = "flash" | "match" | "cloze" | "sentence";
+type ModuleType = "flash" | "match" | "cloze" | "mistake";
 
 // 모듈 설정: 암기 영역 2개 + 맥락 영역 2개
 const moduleConfig = [
@@ -57,13 +57,13 @@ const moduleConfig = [
     color: "from-purple-400 to-pink-500",
   },
   { 
-    id: "sentence" as ModuleType, 
+    id: "mistake" as ModuleType, 
     icon: Puzzle, 
-    title: "Sentence Builder", 
-    titleKo: "문장 완성",
-    desc: "조각을 맞춰 문장 만들기",
+    title: "Mistake Review", 
+    titleKo: "오답 복습",
+    desc: "틀린 단어 집중 학습",
     category: "맥락",
-    color: "from-cyan-400 to-blue-500",
+    color: "from-red-400 to-orange-500",
   },
 ];
 
@@ -142,8 +142,8 @@ const Vocabulary = () => {
         return <MeaningMatch level={selectedLevel} onMistake={(word) => handleMistake(word, 'vocabulary')} />;
       case "cloze":
         return <MiniCloze level={selectedLevel} onMistake={(q) => handleMistake(q, 'cloze')} />;
-      case "sentence":
-        return <SentenceBuilder level={selectedLevel} onMistake={(word) => handleMistake(word, 'vocabulary')} />;
+      case "mistake":
+        return <MistakeReview level={selectedLevel} onMistake={(word) => handleMistake(word, 'vocabulary')} />;
       default:
         return null;
     }
