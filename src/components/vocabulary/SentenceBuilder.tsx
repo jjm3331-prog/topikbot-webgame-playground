@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,7 +13,9 @@ import {
   Sparkles,
   GripVertical,
   Lightbulb,
-  Trash2
+  Trash2,
+  Timer,
+  Zap
 } from "lucide-react";
 import { useVocabulary, VocabWord } from "@/hooks/useVocabulary";
 
@@ -25,18 +27,15 @@ interface SentenceBuilderProps {
 interface SentencePuzzle {
   word: VocabWord;
   sentence: string;
-  correctParts: string[]; // 정답 조각들
-  allParts: string[]; // 정답 + 교란 조각 (섞인 상태)
-  distractors: string[]; // 교란 조각들 (정답에 포함 안됨)
+  correctParts: string[];
+  allParts: string[];
+  distractors: string[];
 }
 
-// 교란 조각 생성용 한국어 패턴
-const DISTRACTOR_PATTERNS = [
-  "그리고", "하지만", "그래서", "또한", "게다가",
-  "를 위해", "때문에", "것처럼", "만큼", "에서는",
-  "했습니다", "되었다", "같이", "처럼", "보다",
-  "으로서", "에게", "부터", "까지", "동안"
-];
+// 타이머 설정 (초)
+const TIME_LIMIT = 30;
+const TIME_BONUS_THRESHOLD = 15; // 15초 이내 보너스
+const TIME_BONUS_PERFECT = 8; // 8초 이내 퍼펙트 보너스
 
 const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
   const { getMeaning, getCurrentLanguage, languageLabels } = useVocabulary();
@@ -53,26 +52,63 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
   const [sessionComplete, setSessionComplete] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [hintsUsed, setHintsUsed] = useState(0);
+  
+  // 타이머 관련 상태
+  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [timeBonus, setTimeBonus] = useState(0);
 
   const currentPuzzle = puzzles[currentIndex];
   const currentLang = getCurrentLanguage();
 
-  // 교란 조각 생성
-  const generateDistractors = useCallback((correctParts: string[], word: string): string[] => {
-    const distractors: string[] = [];
-    const numDistractors = Math.min(2, Math.ceil(correctParts.length * 0.5));
-    
-    // 랜덤 교란 조각 선택
-    const shuffledPatterns = [...DISTRACTOR_PATTERNS].sort(() => Math.random() - 0.5);
-    for (let i = 0; i < numDistractors && i < shuffledPatterns.length; i++) {
-      // 정답에 포함되지 않는 것만
-      if (!correctParts.some(p => p.includes(shuffledPatterns[i]))) {
-        distractors.push(shuffledPatterns[i]);
+  // AI 교란 조각 생성
+  const generateAIDistractors = useCallback(async (
+    word: VocabWord, 
+    correctParts: string[]
+  ): Promise<string[]> => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sentence-distractors`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            word: word.word,
+            pos: word.pos,
+            sentence: word.example_phrase,
+            correctParts,
+            count: 2
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error("Failed to generate AI distractors");
+        return getFallbackDistractors(word.pos);
       }
+
+      const data = await response.json();
+      return data.distractors || getFallbackDistractors(word.pos);
+    } catch (error) {
+      console.error("AI distractor error:", error);
+      return getFallbackDistractors(word.pos);
     }
-    
-    return distractors;
   }, []);
+
+  // 폴백 교란 조각
+  const getFallbackDistractors = (pos: string | null): string[] => {
+    const patterns: Record<string, string[]> = {
+      '동사': ["그리고 나서", "하지만"],
+      '명사': ["것처럼", "으로서"],
+      '형용사': ["더욱", "매우"],
+      '부사': ["또한", "게다가"],
+    };
+    return patterns[pos || ''] || ["그리고", "때문에"];
+  };
 
   // Generate sentence puzzles from vocabulary
   const fetchAndGeneratePuzzles = useCallback(async () => {
@@ -97,36 +133,37 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
         const shuffled = [...validWords].sort(() => Math.random() - 0.5);
         const selectedWords = shuffled.slice(0, 10);
 
-        const generatedPuzzles: SentencePuzzle[] = selectedWords.map(word => {
-          const sentence = word.example_phrase || `${word.word}을/를 사용합니다.`;
-          const words = sentence.split(/\s+/);
-          const parts: string[] = [];
-          
-          // 1-2 단어씩 조각으로 분리
-          let currentPart = '';
-          words.forEach((w, i) => {
-            currentPart += (currentPart ? ' ' : '') + w;
-            if (i === words.length - 1 || (currentPart.split(' ').length >= 2 && Math.random() > 0.4)) {
-              parts.push(currentPart);
-              currentPart = '';
-            }
-          });
-          if (currentPart) parts.push(currentPart);
+        // 퍼즐 생성 (AI 교란 조각 포함)
+        const generatedPuzzles: SentencePuzzle[] = await Promise.all(
+          selectedWords.map(async (word) => {
+            const sentence = word.example_phrase || `${word.word}을/를 사용합니다.`;
+            const words = sentence.split(/\s+/);
+            const parts: string[] = [];
+            
+            let currentPart = '';
+            words.forEach((w, i) => {
+              currentPart += (currentPart ? ' ' : '') + w;
+              if (i === words.length - 1 || (currentPart.split(' ').length >= 2 && Math.random() > 0.4)) {
+                parts.push(currentPart);
+                currentPart = '';
+              }
+            });
+            if (currentPart) parts.push(currentPart);
 
-          // 교란 조각 생성
-          const distractors = generateDistractors(parts, word.word);
-          
-          // 모든 조각 섞기 (정답 + 교란)
-          const allParts = [...parts, ...distractors].sort(() => Math.random() - 0.5);
+            // AI 교란 조각 생성
+            const distractors = await generateAIDistractors(word, parts);
+            
+            const allParts = [...parts, ...distractors].sort(() => Math.random() - 0.5);
 
-          return {
-            word,
-            sentence,
-            correctParts: parts,
-            allParts,
-            distractors
-          };
-        });
+            return {
+              word,
+              sentence,
+              correctParts: parts,
+              allParts,
+              distractors
+            };
+          })
+        );
 
         setPuzzles(generatedPuzzles);
       } else {
@@ -138,7 +175,7 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
     } finally {
       setIsLoading(false);
     }
-  }, [level, generateDistractors]);
+  }, [level, generateAIDistractors]);
 
   useEffect(() => {
     fetchAndGeneratePuzzles();
@@ -150,8 +187,52 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
       setOrderedParts([...currentPuzzle.allParts]);
       setDiscardedParts([]);
       setShowHint(false);
+      setTimeLeft(TIME_LIMIT);
+      setIsTimerRunning(true);
+      setTimeBonus(0);
     }
   }, [currentPuzzle]);
+
+  // 타이머 로직
+  useEffect(() => {
+    if (!isTimerRunning || showResult || timeLeft <= 0) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          setIsTimerRunning(false);
+          // 시간 초과 시 자동 채점
+          handleTimeUp();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isTimerRunning, showResult, timeLeft]);
+
+  // 시간 초과 처리
+  const handleTimeUp = () => {
+    if (!currentPuzzle || showResult) return;
+    
+    setIsCorrect(false);
+    setShowResult(true);
+    setStreak(0);
+    onMistake?.(currentPuzzle.word);
+  };
+
+  // 시간 보너스 계산
+  const calculateTimeBonus = (elapsedTime: number): number => {
+    const remainingTime = TIME_LIMIT - elapsedTime;
+    
+    if (remainingTime >= TIME_LIMIT - TIME_BONUS_PERFECT) {
+      return 10; // 퍼펙트 보너스 (8초 이내)
+    } else if (remainingTime >= TIME_LIMIT - TIME_BONUS_THRESHOLD) {
+      return 5; // 빠른 보너스 (15초 이내)
+    }
+    return 0;
+  };
 
   // 조각을 휴지통으로 이동
   const handleDiscardPart = (part: string) => {
@@ -168,11 +249,10 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
   const handleCheck = () => {
     if (!currentPuzzle) return;
     
-    // 버려진 조각 체크: 교란 조각만 버려야 함
+    setIsTimerRunning(false);
+    
     const correctlyDiscarded = discardedParts.every(p => currentPuzzle.distractors.includes(p));
     const allDistractorsDiscarded = currentPuzzle.distractors.every(p => discardedParts.includes(p));
-    
-    // 남은 조각 순서가 정답과 일치하는지
     const remainingCorrect = orderedParts.join(' ') === currentPuzzle.correctParts.join(' ');
     
     const correct = correctlyDiscarded && allDistractorsDiscarded && remainingCorrect;
@@ -181,9 +261,13 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
     setShowResult(true);
 
     if (correct) {
+      const elapsedTime = TIME_LIMIT - timeLeft;
+      const timeBonusPoints = calculateTimeBonus(elapsedTime);
+      setTimeBonus(timeBonusPoints);
+      
       const hintPenalty = hintsUsed * 3;
-      const bonus = Math.min(streak, 5) * 3;
-      const earnedScore = Math.max(5, 15 + bonus - hintPenalty);
+      const streakBonus = Math.min(streak, 5) * 3;
+      const earnedScore = Math.max(5, 15 + streakBonus + timeBonusPoints - hintPenalty);
       setScore(prev => prev + earnedScore);
       setStreak(prev => prev + 1);
     } else {
@@ -211,6 +295,7 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
     setShowResult(false);
     setIsCorrect(false);
     setHintsUsed(0);
+    setTimeLeft(TIME_LIMIT);
     fetchAndGeneratePuzzles();
   };
 
@@ -243,11 +328,18 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
     }
   };
 
+  // 타이머 색상 계산
+  const getTimerColor = () => {
+    if (timeLeft > 20) return "text-green-500";
+    if (timeLeft > 10) return "text-yellow-500";
+    return "text-red-500 animate-pulse";
+  };
+
   if (isLoading) {
     return (
       <div className="text-center py-12">
         <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
-        <p className="text-muted-foreground">문장 퍼즐 생성 중...</p>
+        <p className="text-muted-foreground">AI 교란 조각 생성 중...</p>
       </div>
     );
   }
@@ -262,7 +354,7 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
   }
 
   if (sessionComplete) {
-    const totalPossible = puzzles.length * 15;
+    const totalPossible = puzzles.length * 25;
     const percentage = Math.round((score / totalPossible) * 100);
 
     return (
@@ -289,20 +381,31 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Progress & Stats */}
+      {/* Progress & Stats & Timer */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-muted-foreground">
             {currentIndex + 1} / {puzzles.length}
           </span>
-          <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
+          <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
             <div 
               className="h-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all"
               style={{ width: `${((currentIndex + 1) / puzzles.length) * 100}%` }}
             />
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        
+        {/* 타이머 */}
+        <div className="flex items-center gap-4">
+          <motion.div 
+            className={`flex items-center gap-1.5 font-mono text-lg font-bold ${getTimerColor()}`}
+            animate={timeLeft <= 10 ? { scale: [1, 1.1, 1] } : {}}
+            transition={{ repeat: timeLeft <= 10 ? Infinity : 0, duration: 0.5 }}
+          >
+            <Timer className="w-5 h-5" />
+            <span>{timeLeft}s</span>
+          </motion.div>
+          
           {streak >= 2 && (
             <motion.span 
               initial={{ scale: 0 }}
@@ -316,10 +419,29 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
         </div>
       </div>
 
-      {/* Word Info - 뜻만 표시 (문장은 숨김) */}
+      {/* 시간 보너스 안내 */}
+      {!showResult && timeLeft > TIME_LIMIT - TIME_BONUS_PERFECT && (
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center"
+        >
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-500 text-sm font-medium">
+            <Zap className="w-4 h-4" />
+            {timeLeft > TIME_LIMIT - TIME_BONUS_PERFECT ? "⚡ 퍼펙트 보너스 +10점" : "빠른 보너스 +5점"}
+          </span>
+        </motion.div>
+      )}
+
+      {/* Word Info */}
       <div className="text-center bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-xl p-4 border border-cyan-500/20">
         <div className="flex items-center justify-center gap-3 mb-2">
           <span className="text-2xl font-bold">{currentPuzzle.word.word}</span>
+          {currentPuzzle.word.pos && (
+            <span className="px-2 py-0.5 rounded bg-primary/20 text-primary text-xs">
+              {currentPuzzle.word.pos}
+            </span>
+          )}
           <Button
             variant="ghost"
             size="sm"
@@ -333,7 +455,6 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
           <span>{languageLabels[currentLang]}: {getMeaning(currentPuzzle.word)}</span>
         </div>
         
-        {/* 힌트 표시 */}
         {showHint && (
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
@@ -350,7 +471,7 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
       {/* Instructions */}
       <div className="text-center text-sm text-muted-foreground">
         <p>드래그하여 올바른 순서로 배열하고, 불필요한 조각은 휴지통으로 버리세요</p>
-        <p className="text-xs mt-1 text-amber-500">⚠️ 오답 조각이 섞여 있습니다!</p>
+        <p className="text-xs mt-1 text-amber-500">⚠️ AI가 생성한 오답 조각이 섞여 있습니다!</p>
       </div>
 
       {/* Drag & Drop Reorder Area */}
@@ -399,7 +520,7 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
                   </Button>
                 )}
                 {showResult && currentPuzzle.distractors.includes(part) && (
-                  <span className="text-xs text-red-500 font-medium">오답 조각</span>
+                  <span className="text-xs text-red-500 font-medium">AI 오답</span>
                 )}
               </Reorder.Item>
             ))}
@@ -449,15 +570,30 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
           }`}
         >
           {isCorrect ? (
-            <div className="flex items-center justify-center gap-2">
-              <CheckCircle2 className="w-6 h-6" />
-              <span className="font-bold text-lg">완벽해요! +{Math.max(5, 15 + Math.min(streak - 1, 4) * 3 - hintsUsed * 3)}점</span>
+            <div>
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <CheckCircle2 className="w-6 h-6" />
+                <span className="font-bold text-lg">완벽해요!</span>
+              </div>
+              <div className="flex items-center justify-center gap-2 text-sm">
+                <span>기본 +15점</span>
+                {timeBonus > 0 && (
+                  <span className="text-amber-500 font-bold">
+                    ⚡ 시간 보너스 +{timeBonus}점
+                  </span>
+                )}
+                {streak > 1 && (
+                  <span className="text-orange-500">연속 +{Math.min(streak - 1, 4) * 3}점</span>
+                )}
+              </div>
             </div>
           ) : (
             <div>
               <div className="flex items-center justify-center gap-2 mb-2">
                 <XCircle className="w-6 h-6" />
-                <span className="font-bold text-lg">다시 도전!</span>
+                <span className="font-bold text-lg">
+                  {timeLeft === 0 ? "시간 초과!" : "다시 도전!"}
+                </span>
               </div>
               <p className="text-sm">
                 정답: {currentPuzzle.correctParts.join(' ')}
