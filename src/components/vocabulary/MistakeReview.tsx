@@ -9,7 +9,6 @@ import {
   RotateCcw, 
   Check, 
   X, 
-  Volume2, 
   Trophy, 
   Target,
   Flame,
@@ -17,7 +16,9 @@ import {
   Lightbulb,
   ArrowRight,
   Sparkles,
-  Loader2
+  BookOpen,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useVocabulary } from '@/hooks/useVocabulary';
@@ -74,7 +75,9 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
   const [wrongInSession, setWrongInSession] = useState<MistakeItem[]>([]); // 세션 중 틀린 단어들
   const [showAllLevels, setShowAllLevels] = useState(false); // 전체 레벨 보기
   const [viewMode, setViewMode] = useState<ViewMode>('review'); // 모드 전환
-  const [playingTTS, setPlayingTTS] = useState<string | null>(null); // TTS 재생 중인 단어
+  const [expandedWords, setExpandedWords] = useState<Set<string>>(new Set()); // 확장된 단어 (관련어 보기)
+  const [relatedWords, setRelatedWords] = useState<Record<string, { synonyms: string[]; antonyms: string[]; similar: string[] }>>({}); // 관련어 캐시
+  const [loadingRelated, setLoadingRelated] = useState<string | null>(null);
 
   // Fetch user's mistakes
   const fetchMistakes = useCallback(async () => {
@@ -151,23 +154,75 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
     return getMeaning(mockWord as any);
   };
 
-  const playTTS = async (text: string, trackWord?: string) => {
+  // 관련어 (동의어, 반의어, 유사어) 조회
+  const fetchRelatedWords = async (word: string) => {
+    if (relatedWords[word]) return; // 캐시된 경우 스킵
+    
+    setLoadingRelated(word);
     try {
-      if (trackWord) setPlayingTTS(trackWord);
-      const { data, error } = await supabase.functions.invoke('korean-tts', {
-        body: { text, speed: 0.9 }
-      });
-      if (data?.audio) {
-        const audio = new Audio(`data:audio/mp3;base64,${data.audio}`);
-        audio.onended = () => setPlayingTTS(null);
-        audio.play();
-      } else {
-        setPlayingTTS(null);
+      // topik_vocabulary에서 유사한 단어 찾기
+      const { data: vocabData } = await supabase
+        .from('topik_vocabulary')
+        .select('word, meaning_vi, meaning_en, pos')
+        .neq('word', word)
+        .limit(100);
+      
+      // 간단한 관련어 매칭 로직 (같은 품사, 비슷한 의미)
+      const currentItem = allMistakes.find(m => m.item_data.word === word);
+      const currentMeaning = currentItem?.item_data?.meaning_vi || currentItem?.item_data?.meaning_en || '';
+      const currentPos = currentItem?.item_data?.pos || '';
+      
+      const synonyms: string[] = [];
+      const antonyms: string[] = [];
+      const similar: string[] = [];
+      
+      if (vocabData) {
+        vocabData.forEach(v => {
+          const vMeaning = v.meaning_vi || v.meaning_en || '';
+          // 같은 품사면 유사어
+          if (v.pos === currentPos && similar.length < 5) {
+            similar.push(v.word);
+          }
+          // 의미에 공통 단어가 있으면 동의어 후보
+          const commonWords = currentMeaning.split(/[,;/ ]+/).filter(w => w.length > 2 && vMeaning.includes(w));
+          if (commonWords.length > 0 && synonyms.length < 3) {
+            synonyms.push(v.word);
+          }
+        });
+        
+        // 반의어 예시 (부정어)
+        const negativePatterns = ['không', 'chưa', 'un', 'im', 'dis', 'in', 'non'];
+        vocabData.forEach(v => {
+          const vMeaning = v.meaning_vi || v.meaning_en || '';
+          if (antonyms.length < 3) {
+            const hasNegative = negativePatterns.some(p => vMeaning.toLowerCase().includes(p) !== currentMeaning.toLowerCase().includes(p));
+            if (hasNegative && v.pos === currentPos) {
+              antonyms.push(v.word);
+            }
+          }
+        });
       }
+      
+      setRelatedWords(prev => ({
+        ...prev,
+        [word]: { synonyms, antonyms, similar }
+      }));
     } catch (error) {
-      console.error('TTS error:', error);
-      setPlayingTTS(null);
+      console.error('Error fetching related words:', error);
+    } finally {
+      setLoadingRelated(null);
     }
+  };
+
+  const toggleWordExpand = (word: string) => {
+    const newExpanded = new Set(expandedWords);
+    if (newExpanded.has(word)) {
+      newExpanded.delete(word);
+    } else {
+      newExpanded.add(word);
+      fetchRelatedWords(word);
+    }
+    setExpandedWords(newExpanded);
   };
 
   const normalizeKorean = (str: string): string => {
@@ -227,9 +282,6 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
       } catch (error) {
         console.error('Error updating mistake:', error);
       }
-
-      // Play correct sound
-      playTTS(currentMistake.item_data.word);
     } else {
       setStreak(0);
       // Reset consecutive count
@@ -472,29 +524,78 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
               </div>
             </Card>
 
-            {/* 전체 오답 리스트 + TTS */}
+            {/* 관련어 학습 (동의어/반의어/유사어) */}
             <Card className="p-4">
               <h4 className="font-semibold mb-3 flex items-center gap-2">
-                <Volume2 className="w-4 h-4 text-primary" />
-                전체 오답 단어 듣기
+                <BookOpen className="w-4 h-4 text-primary" />
+                관련어 학습
               </h4>
-              <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto">
+              <p className="text-xs text-muted-foreground mb-3">
+                단어를 클릭하여 동의어, 반의어, 유사어를 확인하세요
+              </p>
+              <div className="space-y-2 max-h-80 overflow-y-auto">
                 {stats.topMistakes.map((item, idx) => (
-                  <Button
-                    key={idx}
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => playTTS(item.word, item.word)}
-                    className="justify-start text-left"
-                  >
-                    {playingTTS === item.word ? (
-                      <Loader2 className="w-3 h-3 mr-2 animate-spin" />
-                    ) : (
-                      <Volume2 className="w-3 h-3 mr-2" />
+                  <div key={idx} className="border border-border rounded-lg overflow-hidden">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleWordExpand(item.word)}
+                      className="w-full justify-between text-left h-auto py-2"
+                    >
+                      <span className="flex items-center gap-2">
+                        <span className="font-medium">{item.word}</span>
+                        <Badge variant="outline" className="text-xs">{item.count}회</Badge>
+                      </span>
+                      {expandedWords.has(item.word) ? (
+                        <ChevronUp className="w-4 h-4" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4" />
+                      )}
+                    </Button>
+                    
+                    {expandedWords.has(item.word) && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="px-3 pb-3"
+                      >
+                        {loadingRelated === item.word ? (
+                          <div className="text-center py-2 text-sm text-muted-foreground">
+                            관련어 검색 중...
+                          </div>
+                        ) : relatedWords[item.word] ? (
+                          <div className="space-y-2 text-sm">
+                            {relatedWords[item.word].synonyms.length > 0 && (
+                              <div>
+                                <span className="text-green-600 font-medium">동의어: </span>
+                                {relatedWords[item.word].synonyms.join(', ')}
+                              </div>
+                            )}
+                            {relatedWords[item.word].antonyms.length > 0 && (
+                              <div>
+                                <span className="text-red-600 font-medium">반의어: </span>
+                                {relatedWords[item.word].antonyms.join(', ')}
+                              </div>
+                            )}
+                            {relatedWords[item.word].similar.length > 0 && (
+                              <div>
+                                <span className="text-blue-600 font-medium">유사어: </span>
+                                {relatedWords[item.word].similar.join(', ')}
+                              </div>
+                            )}
+                            {relatedWords[item.word].synonyms.length === 0 && 
+                             relatedWords[item.word].antonyms.length === 0 && 
+                             relatedWords[item.word].similar.length === 0 && (
+                              <div className="text-muted-foreground">
+                                관련어가 없습니다
+                              </div>
+                            )}
+                          </div>
+                        ) : null}
+                      </motion.div>
                     )}
-                    {item.word}
-                    <Badge variant="outline" className="ml-auto text-xs">{item.count}회</Badge>
-                  </Button>
+                  </div>
                 ))}
               </div>
             </Card>
@@ -588,20 +689,13 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
             </h4>
             <div className="flex flex-wrap gap-2">
               {masteredInSession.map((word, idx) => (
-                <Button
+                <Badge
                   key={idx}
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => playTTS(word, word)}
-                  className="bg-green-500/20 text-green-700 hover:bg-green-500/30"
+                  variant="secondary"
+                  className="bg-green-500/20 text-green-700 px-3 py-1"
                 >
-                  {playingTTS === word ? (
-                    <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                  ) : (
-                    <Volume2 className="w-3 h-3 mr-1" />
-                  )}
                   {word}
-                </Button>
+                </Badge>
               ))}
             </div>
           </Card>
@@ -617,21 +711,7 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
             <div className="space-y-2">
               {wrongInSession.map((item, idx) => (
                 <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-background/50">
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => playTTS(item.item_data.word, item.item_data.word)}
-                      className="h-8 w-8 p-0"
-                    >
-                      {playingTTS === item.item_data.word ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Volume2 className="w-4 h-4" />
-                      )}
-                    </Button>
-                    <span className="font-medium">{item.item_data.word}</span>
-                  </div>
+                  <span className="font-medium">{item.item_data.word}</span>
                   <div className="text-sm text-muted-foreground">
                     {getMeaningForItem(item)}
                   </div>
@@ -788,14 +868,6 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
                         <span className="font-bold text-foreground text-xl">
                           {currentMistake.item_data.word}
                         </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => playTTS(currentMistake.item_data.word)}
-                          className="ml-2"
-                        >
-                          <Volume2 className="w-4 h-4" />
-                        </Button>
                       </div>
                     </div>
                   )}
