@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -13,12 +12,9 @@ import {
   Target,
   Flame,
   Brain,
-  Lightbulb,
-  ArrowRight,
   Sparkles,
-  BookOpen,
-  ChevronDown,
-  ChevronUp
+  ExternalLink,
+  Loader2
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useVocabulary } from '@/hooks/useVocabulary';
@@ -46,38 +42,63 @@ interface MistakeItem {
   last_reviewed: string | null;
 }
 
+interface RelatedWord {
+  word: string;
+  meaning?: string;
+}
+
+interface RelatedWordsData {
+  word: string;
+  synonyms: RelatedWord[];
+  antonyms: RelatedWord[];
+  similar: RelatedWord[];
+  sourceUrl?: string;
+}
+
+interface QuizQuestion {
+  word: string;
+  meaning: string;
+  questionType: 'synonym' | 'antonym' | 'similar';
+  correctAnswer: string;
+  correctMeaning?: string;
+  options: { word: string; meaning?: string }[];
+  sourceUrl?: string;
+}
+
 interface MistakeReviewProps {
   level: number;
   onMistake?: (itemId: string, itemData: any) => void;
 }
 
 type ViewMode = 'review' | 'stats';
+type QuizType = 'synonym' | 'antonym' | 'similar';
 
-const MASTERY_THRESHOLD = 3; // 연속 3회 정답 시 마스터
+const QUIZ_TYPE_LABELS: Record<QuizType, { ko: string; color: string }> = {
+  synonym: { ko: '동의어', color: 'text-green-600' },
+  antonym: { ko: '반의어', color: 'text-red-600' },
+  similar: { ko: '유사어', color: 'text-blue-600' }
+};
 
 const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { getMeaning } = useVocabulary();
   
   const [mistakes, setMistakes] = useState<MistakeItem[]>([]);
-  const [allMistakes, setAllMistakes] = useState<MistakeItem[]>([]); // 통계용 전체 데이터
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [userInput, setUserInput] = useState('');
-  const [showResult, setShowResult] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
+  const [allMistakes, setAllMistakes] = useState<MistakeItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [streak, setStreak] = useState(0);
+  const [showAllLevels, setShowAllLevels] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('review');
+  
+  // Quiz state
+  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [showResult, setShowResult] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
-  const [showHint, setShowHint] = useState(false);
-  const [consecutiveCorrect, setConsecutiveCorrect] = useState<Record<string, number>>({});
+  const [streak, setStreak] = useState(0);
   const [sessionComplete, setSessionComplete] = useState(false);
-  const [masteredInSession, setMasteredInSession] = useState<string[]>([]);
-  const [wrongInSession, setWrongInSession] = useState<MistakeItem[]>([]); // 세션 중 틀린 단어들
-  const [showAllLevels, setShowAllLevels] = useState(false); // 전체 레벨 보기
-  const [viewMode, setViewMode] = useState<ViewMode>('review'); // 모드 전환
-  const [expandedWords, setExpandedWords] = useState<Set<string>>(new Set()); // 확장된 단어 (관련어 보기)
-  const [relatedWords, setRelatedWords] = useState<Record<string, { synonyms: string[]; antonyms: string[]; similar: string[] }>>({}); // 관련어 캐시
-  const [loadingRelated, setLoadingRelated] = useState<string | null>(null);
+  const [generatingQuiz, setGeneratingQuiz] = useState(false);
+  const [quizStarted, setQuizStarted] = useState(false);
 
   // Fetch user's mistakes
   const fetchMistakes = useCallback(async () => {
@@ -89,7 +110,6 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
         return;
       }
 
-      // 'vocabulary', 'cloze', 'flashcard' 등 모든 타입의 오답을 가져옴
       const { data, error } = await supabase
         .from('user_mistakes')
         .select('*')
@@ -101,16 +121,13 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
 
       if (error) throw error;
 
-      // Cast and filter by level if item_data has level info
       const items = (data || []).map(item => ({
         ...item,
         item_data: item.item_data as MistakeItem['item_data']
       })) as MistakeItem[];
       
-      // 전체 데이터 저장 (통계용)
       setAllMistakes(items);
       
-      // 레벨 필터 적용
       const filtered = showAllLevels 
         ? items 
         : items.filter((item) => {
@@ -118,11 +135,8 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
             return !itemLevel || itemLevel === level;
           });
 
-      // Shuffle for variety
       const shuffled = filtered.sort(() => Math.random() - 0.5);
       setMistakes(shuffled.slice(0, 20));
-      setCurrentIndex(0);
-      setConsecutiveCorrect({});
     } catch (error) {
       console.error('Error fetching mistakes:', error);
     } finally {
@@ -134,11 +148,8 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
     fetchMistakes();
   }, [fetchMistakes]);
 
-  const currentMistake = mistakes[currentIndex];
-
   const getMeaningForItem = (item: MistakeItem): string => {
     const data = item.item_data;
-    // Create a mock VocabWord to use getMeaning
     const mockWord = {
       id: item.item_id,
       word: data.word,
@@ -154,203 +165,173 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
     return getMeaning(mockWord as any);
   };
 
-  // 관련어 (동의어, 반의어, 유사어) 조회
-  const fetchRelatedWords = async (word: string) => {
-    if (relatedWords[word]) return; // 캐시된 경우 스킵
-    
-    setLoadingRelated(word);
+  // Get current language code for API
+  const getTargetLang = (): string => {
+    const lang = i18n.language;
+    if (lang.startsWith('vi')) return 'vi';
+    if (lang.startsWith('ja')) return 'ja';
+    if (lang.startsWith('zh')) return 'zh';
+    if (lang.startsWith('ru')) return 'ru';
+    if (lang.startsWith('uz')) return 'uz';
+    if (lang.startsWith('ko')) return 'ko';
+    return 'en';
+  };
+
+  // Fetch related words from API
+  const fetchRelatedWords = async (word: string): Promise<RelatedWordsData | null> => {
     try {
-      // topik_vocabulary에서 유사한 단어 찾기
-      const { data: vocabData } = await supabase
-        .from('topik_vocabulary')
-        .select('word, meaning_vi, meaning_en, pos')
-        .neq('word', word)
-        .limit(100);
+      const { data, error } = await supabase.functions.invoke('related-words', {
+        body: { word, targetLang: getTargetLang() }
+      });
+
+      if (error) {
+        console.error('Related words API error:', error);
+        return null;
+      }
+
+      return data?.data || null;
+    } catch (error) {
+      console.error('Failed to fetch related words:', error);
+      return null;
+    }
+  };
+
+  // Generate quiz questions
+  const generateQuiz = async () => {
+    setGeneratingQuiz(true);
+    const questions: QuizQuestion[] = [];
+    
+    // Take first 10 words
+    const wordsToQuiz = mistakes.slice(0, 10);
+    
+    for (const mistake of wordsToQuiz) {
+      const relatedData = await fetchRelatedWords(mistake.item_data.word);
       
-      // 간단한 관련어 매칭 로직 (같은 품사, 비슷한 의미)
-      const currentItem = allMistakes.find(m => m.item_data.word === word);
-      const currentMeaning = currentItem?.item_data?.meaning_vi || currentItem?.item_data?.meaning_en || '';
-      const currentPos = currentItem?.item_data?.pos || '';
+      if (!relatedData) continue;
       
-      const synonyms: string[] = [];
-      const antonyms: string[] = [];
-      const similar: string[] = [];
-      
-      if (vocabData) {
-        vocabData.forEach(v => {
-          const vMeaning = v.meaning_vi || v.meaning_en || '';
-          // 같은 품사면 유사어
-          if (v.pos === currentPos && similar.length < 5) {
-            similar.push(v.word);
-          }
-          // 의미에 공통 단어가 있으면 동의어 후보
-          const commonWords = currentMeaning.split(/[,;/ ]+/).filter(w => w.length > 2 && vMeaning.includes(w));
-          if (commonWords.length > 0 && synonyms.length < 3) {
-            synonyms.push(v.word);
-          }
-        });
-        
-        // 반의어 예시 (부정어)
-        const negativePatterns = ['không', 'chưa', 'un', 'im', 'dis', 'in', 'non'];
-        vocabData.forEach(v => {
-          const vMeaning = v.meaning_vi || v.meaning_en || '';
-          if (antonyms.length < 3) {
-            const hasNegative = negativePatterns.some(p => vMeaning.toLowerCase().includes(p) !== currentMeaning.toLowerCase().includes(p));
-            if (hasNegative && v.pos === currentPos) {
-              antonyms.push(v.word);
-            }
-          }
-        });
+      // Determine question type based on available data
+      const availableTypes: { type: QuizType; data: RelatedWord[] }[] = [];
+      if (relatedData.synonyms.length > 0) {
+        availableTypes.push({ type: 'synonym', data: relatedData.synonyms });
+      }
+      if (relatedData.antonyms.length > 0) {
+        availableTypes.push({ type: 'antonym', data: relatedData.antonyms });
+      }
+      if (relatedData.similar.length > 0) {
+        availableTypes.push({ type: 'similar', data: relatedData.similar });
       }
       
-      setRelatedWords(prev => ({
-        ...prev,
-        [word]: { synonyms, antonyms, similar }
-      }));
-    } catch (error) {
-      console.error('Error fetching related words:', error);
-    } finally {
-      setLoadingRelated(null);
-    }
-  };
-
-  const toggleWordExpand = (word: string) => {
-    const newExpanded = new Set(expandedWords);
-    if (newExpanded.has(word)) {
-      newExpanded.delete(word);
-    } else {
-      newExpanded.add(word);
-      fetchRelatedWords(word);
-    }
-    setExpandedWords(newExpanded);
-  };
-
-  const normalizeKorean = (str: string): string => {
-    return str.trim().toLowerCase().replace(/\s+/g, '');
-  };
-
-  const handleCheck = async () => {
-    if (!currentMistake || showResult) return;
-
-    const correct = normalizeKorean(userInput) === normalizeKorean(currentMistake.item_data.word);
-    setIsCorrect(correct);
-    setShowResult(true);
-
-    const itemId = currentMistake.id;
-
-    if (correct) {
-      setStreak(prev => prev + 1);
-      setCorrectCount(prev => prev + 1);
+      if (availableTypes.length === 0) continue;
       
-      // Track consecutive correct answers
-      const newConsecutive = (consecutiveCorrect[itemId] || 0) + 1;
-      setConsecutiveCorrect(prev => ({ ...prev, [itemId]: newConsecutive }));
-
-      // Update database
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          if (newConsecutive >= MASTERY_THRESHOLD) {
-            // Mark as mastered
-            await supabase
-              .from('user_mistakes')
-              .update({ 
-                mastered: true, 
-                last_reviewed: new Date().toISOString() 
-              })
-              .eq('id', itemId);
-            
-            setMasteredInSession(prev => [...prev, currentMistake.item_data.word]);
-            
-            // Celebration
-            confetti({
-              particleCount: 100,
-              spread: 70,
-              origin: { y: 0.6 }
-            });
-          } else {
-            // Just update last_reviewed
-            await supabase
-              .from('user_mistakes')
-              .update({ 
-                last_reviewed: new Date().toISOString(),
-                mistake_count: Math.max(1, currentMistake.mistake_count - 1)
-              })
-              .eq('id', itemId);
+      // Pick random type
+      const selected = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+      const correctAnswer = selected.data[0];
+      
+      // Generate wrong options from other words or other related words
+      const wrongOptions: RelatedWord[] = [];
+      
+      // Get wrong options from other mistakes
+      const otherMistakes = mistakes.filter(m => m.item_data.word !== mistake.item_data.word);
+      for (let i = 0; i < 2 && i < otherMistakes.length; i++) {
+        const randomIdx = Math.floor(Math.random() * otherMistakes.length);
+        const wrongWord = otherMistakes[randomIdx];
+        if (!wrongOptions.find(w => w.word === wrongWord.item_data.word)) {
+          wrongOptions.push({ 
+            word: wrongWord.item_data.word,
+            meaning: getMeaningForItem(wrongWord)
+          });
+        }
+      }
+      
+      // Add from other categories if needed
+      if (wrongOptions.length < 2) {
+        for (const otherType of availableTypes) {
+          if (otherType.type !== selected.type && otherType.data[0]) {
+            wrongOptions.push(otherType.data[0]);
+            if (wrongOptions.length >= 2) break;
           }
         }
-      } catch (error) {
-        console.error('Error updating mistake:', error);
+      }
+      
+      if (wrongOptions.length < 2) continue;
+      
+      // Shuffle options
+      const options = [correctAnswer, ...wrongOptions.slice(0, 2)].sort(() => Math.random() - 0.5);
+      
+      questions.push({
+        word: mistake.item_data.word,
+        meaning: getMeaningForItem(mistake),
+        questionType: selected.type,
+        correctAnswer: correctAnswer.word,
+        correctMeaning: correctAnswer.meaning,
+        options,
+        sourceUrl: relatedData.sourceUrl
+      });
+    }
+    
+    setQuizQuestions(questions);
+    setCurrentIndex(0);
+    setCorrectCount(0);
+    setStreak(0);
+    setSessionComplete(false);
+    setQuizStarted(true);
+    setGeneratingQuiz(false);
+  };
+
+  const handleAnswer = (answer: string) => {
+    if (showResult) return;
+    
+    setSelectedAnswer(answer);
+    setShowResult(true);
+    
+    const isCorrect = answer === quizQuestions[currentIndex].correctAnswer;
+    
+    if (isCorrect) {
+      setCorrectCount(prev => prev + 1);
+      setStreak(prev => prev + 1);
+      
+      if (streak >= 2) {
+        confetti({
+          particleCount: 50,
+          spread: 60,
+          origin: { y: 0.7 }
+        });
       }
     } else {
       setStreak(0);
-      // Reset consecutive count
-      setConsecutiveCorrect(prev => ({ ...prev, [itemId]: 0 }));
-      
-      // 세션 중 틀린 단어 기록
-      setWrongInSession(prev => {
-        if (!prev.find(m => m.id === currentMistake.id)) {
-          return [...prev, currentMistake];
-        }
-        return prev;
-      });
-
-      // Increase mistake count
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          await supabase
-            .from('user_mistakes')
-            .update({ 
-              mistake_count: currentMistake.mistake_count + 1,
-              last_reviewed: new Date().toISOString()
-            })
-            .eq('id', itemId);
-        }
-      } catch (error) {
-        console.error('Error updating mistake:', error);
-      }
     }
   };
 
   const handleNext = () => {
-    if (currentIndex < mistakes.length - 1) {
+    if (currentIndex < quizQuestions.length - 1) {
       setCurrentIndex(prev => prev + 1);
-      setUserInput('');
+      setSelectedAnswer(null);
       setShowResult(false);
-      setShowHint(false);
     } else {
       setSessionComplete(true);
-    }
-  };
-
-  const handleRestart = () => {
-    setSessionComplete(false);
-    setCorrectCount(0);
-    setStreak(0);
-    setMasteredInSession([]);
-    setWrongInSession([]);
-    fetchMistakes();
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      if (showResult) {
-        handleNext();
-      } else {
-        handleCheck();
+      if (correctCount >= quizQuestions.length * 0.8) {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
       }
     }
   };
 
-  const getHint = (): string => {
-    if (!currentMistake) return '';
-    const word = currentMistake.item_data.word;
-    if (word.length <= 2) return word[0] + '...';
-    return word[0] + '...' + word[word.length - 1];
+  const handleRestart = () => {
+    setQuizStarted(false);
+    setQuizQuestions([]);
+    setCurrentIndex(0);
+    setCorrectCount(0);
+    setStreak(0);
+    setSessionComplete(false);
+    setSelectedAnswer(null);
+    setShowResult(false);
+    fetchMistakes();
   };
 
-  // 통계 계산
+  // Stats calculation
   const getStats = () => {
     const levelCounts: Record<number, number> = {};
     const wordCounts: { word: string; count: number; level: number }[] = [];
@@ -365,7 +346,6 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
       });
     });
     
-    // 가장 많이 틀린 단어 순으로 정렬
     const topMistakes = wordCounts.sort((a, b) => b.count - a.count).slice(0, 10);
     
     return { levelCounts, topMistakes, total: allMistakes.length };
@@ -379,14 +359,12 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
     );
   }
 
-  // 차트 색상
   const CHART_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6'];
 
-  // 통계 대시보드 뷰
+  // Stats view
   if (viewMode === 'stats') {
     const stats = getStats();
     
-    // 파이 차트 데이터
     const pieData = Object.entries(stats.levelCounts)
       .sort(([a], [b]) => Number(a) - Number(b))
       .map(([lvl, count], idx) => ({
@@ -395,7 +373,6 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
         color: CHART_COLORS[idx % CHART_COLORS.length]
       }));
     
-    // 바 차트 데이터 (TOP 5)
     const barData = stats.topMistakes.slice(0, 5).map(item => ({
       word: item.word,
       count: item.count
@@ -403,14 +380,13 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
     
     return (
       <div className="space-y-6">
-        {/* 헤더 */}
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold flex items-center gap-2">
             <Target className="w-5 h-5 text-primary" />
             오답 통계
           </h3>
           <Button variant="outline" size="sm" onClick={() => setViewMode('review')}>
-            복습 모드
+            퀴즈 모드
           </Button>
         </div>
 
@@ -421,7 +397,6 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
           </Card>
         ) : (
           <>
-            {/* 전체 통계 */}
             <Card className="p-4 bg-gradient-to-br from-primary/5 to-purple-500/5">
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
@@ -443,7 +418,6 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
               </div>
             </Card>
 
-            {/* 레벨별 파이 차트 */}
             <Card className="p-4">
               <h4 className="font-semibold mb-3 flex items-center gap-2">
                 <Flame className="w-4 h-4 text-orange-500" />
@@ -478,18 +452,8 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              {/* 레전드 */}
-              <div className="flex flex-wrap justify-center gap-2 mt-2">
-                {pieData.map((entry, idx) => (
-                  <div key={idx} className="flex items-center gap-1 text-xs">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-                    <span>{entry.name}: {entry.value}</span>
-                  </div>
-                ))}
-              </div>
             </Card>
 
-            {/* 가장 많이 틀린 단어 바 차트 */}
             <Card className="p-4">
               <h4 className="font-semibold mb-3 flex items-center gap-2">
                 <Brain className="w-4 h-4 text-red-500" />
@@ -523,92 +487,16 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
                 </ResponsiveContainer>
               </div>
             </Card>
-
-            {/* 관련어 학습 (동의어/반의어/유사어) */}
-            <Card className="p-4">
-              <h4 className="font-semibold mb-3 flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-primary" />
-                관련어 학습
-              </h4>
-              <p className="text-xs text-muted-foreground mb-3">
-                단어를 클릭하여 동의어, 반의어, 유사어를 확인하세요
-              </p>
-              <div className="space-y-2 max-h-80 overflow-y-auto">
-                {stats.topMistakes.map((item, idx) => (
-                  <div key={idx} className="border border-border rounded-lg overflow-hidden">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleWordExpand(item.word)}
-                      className="w-full justify-between text-left h-auto py-2"
-                    >
-                      <span className="flex items-center gap-2">
-                        <span className="font-medium">{item.word}</span>
-                        <Badge variant="outline" className="text-xs">{item.count}회</Badge>
-                      </span>
-                      {expandedWords.has(item.word) ? (
-                        <ChevronUp className="w-4 h-4" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4" />
-                      )}
-                    </Button>
-                    
-                    {expandedWords.has(item.word) && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="px-3 pb-3"
-                      >
-                        {loadingRelated === item.word ? (
-                          <div className="text-center py-2 text-sm text-muted-foreground">
-                            관련어 검색 중...
-                          </div>
-                        ) : relatedWords[item.word] ? (
-                          <div className="space-y-2 text-sm">
-                            {relatedWords[item.word].synonyms.length > 0 && (
-                              <div>
-                                <span className="text-green-600 font-medium">동의어: </span>
-                                {relatedWords[item.word].synonyms.join(', ')}
-                              </div>
-                            )}
-                            {relatedWords[item.word].antonyms.length > 0 && (
-                              <div>
-                                <span className="text-red-600 font-medium">반의어: </span>
-                                {relatedWords[item.word].antonyms.join(', ')}
-                              </div>
-                            )}
-                            {relatedWords[item.word].similar.length > 0 && (
-                              <div>
-                                <span className="text-blue-600 font-medium">유사어: </span>
-                                {relatedWords[item.word].similar.join(', ')}
-                              </div>
-                            )}
-                            {relatedWords[item.word].synonyms.length === 0 && 
-                             relatedWords[item.word].antonyms.length === 0 && 
-                             relatedWords[item.word].similar.length === 0 && (
-                              <div className="text-muted-foreground">
-                                관련어가 없습니다
-                              </div>
-                            )}
-                          </div>
-                        ) : null}
-                      </motion.div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </Card>
           </>
         )}
       </div>
     );
   }
 
+  // No mistakes state
   if (mistakes.length === 0) {
     return (
       <div className="space-y-4">
-        {/* 레벨 필터 & 통계 버튼 */}
         <div className="flex items-center justify-between">
           <Button
             variant={showAllLevels ? "default" : "outline"}
@@ -643,18 +531,16 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
               전체 레벨 보기 ({allMistakes.length}개)
             </Button>
           )}
-          <Button onClick={() => window.location.reload()} variant="outline">
-            <RotateCcw className="w-4 h-4 mr-2" />
-            새로고침
-          </Button>
         </Card>
       </div>
     );
   }
 
+  // Session complete
   if (sessionComplete) {
-    const accuracy = mistakes.length > 0 ? Math.round((correctCount / mistakes.length) * 100) : 0;
-    const wrongCount = mistakes.length - correctCount;
+    const accuracy = quizQuestions.length > 0 
+      ? Math.round((correctCount / quizQuestions.length) * 100) 
+      : 0;
     
     return (
       <div className="space-y-6">
@@ -666,11 +552,11 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
           >
             <Sparkles className="w-12 h-12 mx-auto text-primary mb-3" />
           </motion.div>
-          <h3 className="text-xl font-bold text-foreground mb-4">복습 완료!</h3>
+          <h3 className="text-xl font-bold text-foreground mb-4">관련어 퀴즈 완료!</h3>
           
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div className="bg-background/50 rounded-lg p-3">
-              <div className="text-2xl font-bold text-primary">{correctCount}</div>
+              <div className="text-2xl font-bold text-primary">{correctCount}/{quizQuestions.length}</div>
               <div className="text-xs text-muted-foreground">정답</div>
             </div>
             <div className="bg-background/50 rounded-lg p-3">
@@ -678,83 +564,112 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
               <div className="text-xs text-muted-foreground">정확도</div>
             </div>
           </div>
+          
+          <p className="text-sm text-muted-foreground mb-4">
+            {accuracy >= 80 
+              ? '훌륭해요! 관련어를 잘 이해하고 있습니다!' 
+              : accuracy >= 50 
+                ? '좋아요! 조금 더 연습하면 완벽해질 거예요.' 
+                : '더 연습이 필요해요. 다시 도전해보세요!'}
+          </p>
         </Card>
-
-        {/* 마스터한 단어 */}
-        {masteredInSession.length > 0 && (
-          <Card className="p-4 bg-green-500/10 border-green-500/20">
-            <h4 className="font-semibold text-green-600 mb-3 flex items-center gap-2">
-              <Trophy className="w-4 h-4" />
-              마스터한 단어 ({masteredInSession.length}개)
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {masteredInSession.map((word, idx) => (
-                <Badge
-                  key={idx}
-                  variant="secondary"
-                  className="bg-green-500/20 text-green-700 px-3 py-1"
-                >
-                  {word}
-                </Badge>
-              ))}
-            </div>
-          </Card>
-        )}
-
-        {/* 이번 세션에서 틀린 단어 */}
-        {wrongInSession.length > 0 && (
-          <Card className="p-4 bg-red-500/10 border-red-500/20">
-            <h4 className="font-semibold text-red-600 mb-3 flex items-center gap-2">
-              <X className="w-4 h-4" />
-              다시 복습할 단어 ({wrongInSession.length}개)
-            </h4>
-            <div className="space-y-2">
-              {wrongInSession.map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-background/50">
-                  <span className="font-medium">{item.item_data.word}</span>
-                  <div className="text-sm text-muted-foreground">
-                    {getMeaningForItem(item)}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
 
         <Button onClick={handleRestart} className="w-full">
           <RotateCcw className="w-4 h-4 mr-2" />
-          다시 복습하기
+          다시 시작하기
         </Button>
       </div>
     );
   }
 
-  const meaning = getMeaningForItem(currentMistake);
-  const progress = ((currentIndex + 1) / mistakes.length) * 100;
+  // Quiz not started - show start screen
+  if (!quizStarted) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Button
+            variant={showAllLevels ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowAllLevels(!showAllLevels)}
+          >
+            {showAllLevels ? "전체 레벨" : `${level}급만`}
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setViewMode('stats')}>
+            <Target className="w-4 h-4 mr-1" />
+            통계
+          </Button>
+        </div>
 
-  return (
-    <div className="space-y-6">
-      {/* 레벨 필터 & 통계 버튼 */}
-      <div className="flex items-center justify-between">
-        <Button
-          variant={showAllLevels ? "default" : "outline"}
-          size="sm"
-          onClick={() => setShowAllLevels(!showAllLevels)}
-        >
-          {showAllLevels ? "전체 레벨" : `${level}급만`}
-        </Button>
-        <Button variant="outline" size="sm" onClick={() => setViewMode('stats')}>
-          <Target className="w-4 h-4 mr-1" />
-          통계
+        <Card className="p-6 bg-gradient-to-br from-primary/10 to-purple-500/10 border-primary/20">
+          <div className="text-center space-y-4">
+            <Brain className="w-12 h-12 mx-auto text-primary" />
+            <h3 className="text-xl font-bold">관련어 퀴즈</h3>
+            <p className="text-sm text-muted-foreground">
+              오답 단어의 동의어, 반의어, 유사어를 맞히는 퀴즈입니다.
+              <br />
+              AI 검색 기반으로 정확한 관련어를 찾아드립니다.
+            </p>
+            
+            <div className="flex flex-wrap justify-center gap-2">
+              <Badge className="bg-green-500/20 text-green-600">동의어</Badge>
+              <Badge className="bg-red-500/20 text-red-600">반의어</Badge>
+              <Badge className="bg-blue-500/20 text-blue-600">유사어</Badge>
+            </div>
+            
+            <div className="text-sm text-muted-foreground">
+              복습할 단어: <span className="font-bold text-foreground">{mistakes.length}개</span>
+            </div>
+
+            <Button 
+              onClick={generateQuiz} 
+              disabled={generatingQuiz}
+              className="w-full"
+              size="lg"
+            >
+              {generatingQuiz ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  퀴즈 생성 중...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  퀴즈 시작하기
+                </>
+              )}
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  // Quiz in progress
+  const currentQuestion = quizQuestions[currentIndex];
+  
+  if (!currentQuestion) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">퀴즈를 생성할 수 없습니다. 다시 시도해주세요.</p>
+        <Button onClick={handleRestart} className="mt-4">
+          <RotateCcw className="w-4 h-4 mr-2" />
+          다시 시작
         </Button>
       </div>
+    );
+  }
 
-      {/* Progress and Stats */}
+  const progress = ((currentIndex + 1) / quizQuestions.length) * 100;
+  const quizTypeInfo = QUIZ_TYPE_LABELS[currentQuestion.questionType];
+
+  return (
+    <div className="space-y-4">
+      {/* Progress header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <Badge variant="outline" className="flex items-center gap-1">
             <Target className="w-3 h-3" />
-            {currentIndex + 1}/{mistakes.length}
+            {currentIndex + 1}/{quizQuestions.length}
           </Badge>
           {streak > 0 && (
             <Badge className="bg-orange-500/20 text-orange-600 flex items-center gap-1">
@@ -763,13 +678,12 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
             </Badge>
           )}
         </div>
-        <Badge variant="secondary" className="flex items-center gap-1">
-          <Brain className="w-3 h-3" />
-          틀린 횟수: {currentMistake.mistake_count}
+        <Badge variant="secondary">
+          정답: {correctCount}
         </Badge>
       </div>
 
-      {/* Progress Bar */}
+      {/* Progress bar */}
       <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
         <motion.div 
           className="h-full bg-gradient-to-r from-primary to-purple-500"
@@ -779,7 +693,7 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
         />
       </div>
 
-      {/* Main Card */}
+      {/* Question card */}
       <Card className="p-6 bg-gradient-to-br from-background to-muted/30">
         <AnimatePresence mode="wait">
           <motion.div
@@ -789,138 +703,106 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
             exit={{ opacity: 0, x: -20 }}
             className="space-y-6"
           >
-            {/* Question: Show meaning */}
-            <div className="text-center space-y-2">
-              <p className="text-sm text-muted-foreground">이 뜻에 해당하는 한국어 단어를 입력하세요</p>
-              <h2 className="text-2xl font-bold text-foreground">{meaning}</h2>
-              {currentMistake.item_data.pos && (
-                <Badge variant="outline" className="text-xs">
-                  {currentMistake.item_data.pos}
-                </Badge>
-              )}
+            {/* Question type badge */}
+            <div className="text-center">
+              <Badge className={`${quizTypeInfo.color} bg-opacity-20`}>
+                {quizTypeInfo.ko} 찾기
+              </Badge>
             </div>
 
-            {/* Example sentence hint */}
-            {currentMistake.item_data.example_sentence && (
-              <div className="text-center text-sm text-muted-foreground italic">
-                예문: {currentMistake.item_data.example_sentence.replace(
-                  currentMistake.item_data.word, 
-                  '_____'
-                )}
-              </div>
-            )}
+            {/* Word and meaning */}
+            <div className="text-center space-y-2">
+              <h2 className="text-3xl font-bold text-foreground">{currentQuestion.word}</h2>
+              <p className="text-muted-foreground">{currentQuestion.meaning}</p>
+            </div>
 
-            {/* Hint */}
-            {showHint && (
+            {/* Question prompt */}
+            <p className="text-center text-sm text-muted-foreground">
+              위 단어의 <span className={`font-bold ${quizTypeInfo.color}`}>{quizTypeInfo.ko}</span>를 고르세요
+            </p>
+
+            {/* Options */}
+            <div className="space-y-3">
+              {currentQuestion.options.map((option, idx) => {
+                const isSelected = selectedAnswer === option.word;
+                const isCorrect = option.word === currentQuestion.correctAnswer;
+                
+                let buttonClass = "w-full p-4 text-left justify-start h-auto";
+                if (showResult) {
+                  if (isCorrect) {
+                    buttonClass += " bg-green-500/20 border-green-500 text-green-700";
+                  } else if (isSelected && !isCorrect) {
+                    buttonClass += " bg-red-500/20 border-red-500 text-red-700";
+                  }
+                }
+                
+                return (
+                  <Button
+                    key={idx}
+                    variant={isSelected ? "default" : "outline"}
+                    onClick={() => handleAnswer(option.word)}
+                    disabled={showResult}
+                    className={buttonClass}
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <div>
+                        <span className="font-medium text-lg">{option.word}</span>
+                        {option.meaning && (
+                          <span className="ml-2 text-sm opacity-70">({option.meaning})</span>
+                        )}
+                      </div>
+                      {showResult && isCorrect && <Check className="w-5 h-5 text-green-600" />}
+                      {showResult && isSelected && !isCorrect && <X className="w-5 h-5 text-red-600" />}
+                    </div>
+                  </Button>
+                );
+              })}
+            </div>
+
+            {/* Result feedback */}
+            {showResult && (
               <motion.div
-                initial={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-center"
+                className="space-y-3"
               >
-                <Badge className="bg-yellow-500/20 text-yellow-700">
-                  <Lightbulb className="w-3 h-3 mr-1" />
-                  힌트: {getHint()}
-                </Badge>
+                <div className={`text-center p-3 rounded-lg ${
+                  selectedAnswer === currentQuestion.correctAnswer 
+                    ? 'bg-green-500/20 text-green-700' 
+                    : 'bg-red-500/20 text-red-700'
+                }`}>
+                  {selectedAnswer === currentQuestion.correctAnswer ? (
+                    <span className="font-bold">정답입니다! ✓</span>
+                  ) : (
+                    <div>
+                      <span className="font-bold">오답입니다 ✗</span>
+                      <div className="text-sm mt-1">
+                        정답: <span className="font-bold">{currentQuestion.correctAnswer}</span>
+                        {currentQuestion.correctMeaning && (
+                          <span className="opacity-70"> ({currentQuestion.correctMeaning})</span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                {currentQuestion.sourceUrl && (
+                  <a 
+                    href={currentQuestion.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-primary"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    출처 확인
+                  </a>
+                )}
+
+                <Button onClick={handleNext} className="w-full">
+                  {currentIndex < quizQuestions.length - 1 ? '다음' : '결과 보기'}
+                </Button>
               </motion.div>
             )}
-
-            {/* Input */}
-            <div className="relative">
-              <Input
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="한국어 단어 입력..."
-                className={`text-center text-xl py-6 ${
-                  showResult
-                    ? isCorrect
-                      ? 'border-green-500 bg-green-500/10'
-                      : 'border-red-500 bg-red-500/10'
-                    : ''
-                }`}
-                disabled={showResult}
-                autoFocus
-              />
-            </div>
-
-            {/* Result */}
-            <AnimatePresence>
-              {showResult && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="space-y-4"
-                >
-                  {isCorrect ? (
-                    <div className="flex items-center justify-center gap-2 text-green-600">
-                      <Check className="w-6 h-6" />
-                      <span className="font-bold text-lg">정답!</span>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-center gap-2 text-red-500">
-                        <X className="w-6 h-6" />
-                        <span className="font-bold text-lg">오답</span>
-                      </div>
-                      <div className="text-center">
-                        <span className="text-muted-foreground">정답: </span>
-                        <span className="font-bold text-foreground text-xl">
-                          {currentMistake.item_data.word}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Consecutive correct tracker */}
-                  {isCorrect && (
-                    <div className="text-center text-sm text-muted-foreground">
-                      연속 정답: {consecutiveCorrect[currentMistake.id] || 0}/{MASTERY_THRESHOLD}
-                      {(consecutiveCorrect[currentMistake.id] || 0) >= MASTERY_THRESHOLD && (
-                        <Badge className="ml-2 bg-green-500">마스터!</Badge>
-                      )}
-                    </div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Actions */}
-            <div className="flex gap-3">
-              {!showResult ? (
-                <>
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowHint(true)}
-                    disabled={showHint}
-                    className="flex-1"
-                  >
-                    <Lightbulb className="w-4 h-4 mr-2" />
-                    힌트
-                  </Button>
-                  <Button
-                    onClick={handleCheck}
-                    disabled={!userInput.trim()}
-                    className="flex-1"
-                  >
-                    <Check className="w-4 h-4 mr-2" />
-                    확인
-                  </Button>
-                </>
-              ) : (
-                <Button onClick={handleNext} className="w-full">
-                  {currentIndex < mistakes.length - 1 ? (
-                    <>
-                      다음 <ArrowRight className="w-4 h-4 ml-2" />
-                    </>
-                  ) : (
-                    <>
-                      완료 <Trophy className="w-4 h-4 ml-2" />
-                    </>
-                  )}
-                </Button>
-              )}
-            </div>
           </motion.div>
         </AnimatePresence>
       </Card>
