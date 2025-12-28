@@ -301,44 +301,94 @@ const Vocabulary = () => {
               </div>
             </div>
 
-            {/* Level Group Selection */}
+            {/* Level Group Selection - Premium Design */}
             {!activeModule && (
-              <div className="mb-6">
-                <p className="text-sm text-muted-foreground mb-3">TOPIK 급수 선택</p>
-                <div className="flex gap-2 mb-4">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="mb-8"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-1.5 h-6 rounded-full bg-gradient-to-b from-violet-500 to-fuchsia-500" />
+                  <p className="text-sm font-semibold text-foreground tracking-wide">TOPIK 급수 선택</p>
+                </div>
+                
+                {/* Level Group Buttons - Premium Glass Design */}
+                <div className="grid grid-cols-3 gap-3 mb-4">
                   {levelGroups.map((group, idx) => (
-                    <button
+                    <motion.button
                       key={idx}
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => setSelectedLevelGroup(idx)}
-                      className={`flex-1 px-4 py-3 rounded-xl transition-all font-medium ${
+                      className={`relative overflow-hidden rounded-2xl p-4 transition-all duration-300 ${
                         selectedLevelGroup === idx
-                          ? `bg-gradient-to-r ${group.color} text-white shadow-lg`
-                          : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                          ? "shadow-xl"
+                          : "bg-card border border-border hover:border-primary/30"
                       }`}
                     >
-                      <span className="text-sm font-bold">{group.label}</span>
-                      <span className="block text-xs opacity-80">{group.sublabel}</span>
-                    </button>
+                      {/* Active State Background */}
+                      {selectedLevelGroup === idx && (
+                        <>
+                          <div className={`absolute inset-0 bg-gradient-to-br ${group.color}`} />
+                          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:20px_20px]" />
+                          <motion.div 
+                            className="absolute inset-0 opacity-30"
+                            animate={{ 
+                              background: [
+                                "radial-gradient(circle at 0% 0%, rgba(255,255,255,0.3) 0%, transparent 50%)",
+                                "radial-gradient(circle at 100% 100%, rgba(255,255,255,0.3) 0%, transparent 50%)",
+                                "radial-gradient(circle at 0% 0%, rgba(255,255,255,0.3) 0%, transparent 50%)"
+                              ]
+                            }}
+                            transition={{ duration: 3, repeat: Infinity }}
+                          />
+                        </>
+                      )}
+                      
+                      <div className="relative z-10">
+                        <span className={`text-lg font-black ${selectedLevelGroup === idx ? "text-white" : "text-foreground"}`}>
+                          {group.label}
+                        </span>
+                        <span className={`block text-xs font-medium mt-0.5 ${selectedLevelGroup === idx ? "text-white/80" : "text-muted-foreground"}`}>
+                          {group.sublabel}
+                        </span>
+                      </div>
+                      
+                      {/* Selection Indicator */}
+                      {selectedLevelGroup === idx && (
+                        <motion.div 
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="absolute top-2 right-2 w-5 h-5 rounded-full bg-white/20 flex items-center justify-center"
+                        >
+                          <div className="w-2 h-2 rounded-full bg-white" />
+                        </motion.div>
+                      )}
+                    </motion.button>
                   ))}
                 </div>
                 
-                {/* Individual Level Selection */}
-                <div className="flex gap-2">
+                {/* Individual Level Selection - Pill Design */}
+                <div className="flex gap-2 p-1.5 rounded-2xl bg-muted/50 border border-border">
                   {levelGroups[selectedLevelGroup].levels.map((level) => (
-                    <button
+                    <motion.button
                       key={level}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => setSelectedLevel(level)}
-                      className={`flex-1 px-4 py-2 rounded-lg transition-all text-sm font-medium ${
+                      className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${
                         selectedLevel === level
-                          ? "bg-foreground text-background"
-                          : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                          ? "bg-foreground text-background shadow-lg"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
                       }`}
                     >
                       {level}급
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             )}
           </motion.div>
 
@@ -381,11 +431,16 @@ const Vocabulary = () => {
                 exit={{ opacity: 0, y: -20 }}
               >
                 {/* 암기 영역 */}
-                <div className="mb-6">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-yellow-500" />
-                    암기 영역
-                  </h3>
+                <div className="mb-8">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
+                      <Zap className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-foreground">암기 영역</h3>
+                      <p className="text-xs text-muted-foreground">단어를 빠르게 암기하세요</p>
+                    </div>
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {moduleConfig.filter(m => m.category === "암기").map((module, idx) => (
                       <ModuleCard key={module.id} module={module} onClick={() => setActiveModule(module.id)} delay={idx * 0.1} />
@@ -395,10 +450,15 @@ const Vocabulary = () => {
 
                 {/* 맥락 영역 */}
                 <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
-                    <Brain className="w-4 h-4 text-purple-500" />
-                    맥락 영역
-                  </h3>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                      <Brain className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-foreground">맥락 영역</h3>
+                      <p className="text-xs text-muted-foreground">문장 속에서 어휘를 학습하세요</p>
+                    </div>
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {moduleConfig.filter(m => m.category === "맥락").map((module, idx) => (
                       <ModuleCard key={module.id} module={module} onClick={() => setActiveModule(module.id)} delay={idx * 0.1 + 0.2} />
@@ -416,27 +476,76 @@ const Vocabulary = () => {
   );
 };
 
-// Module Card Component
+// Module Card Component - Premium Design
 const ModuleCard = ({ module, onClick, delay }: { module: typeof moduleConfig[0]; onClick: () => void; delay: number }) => {
   const Icon = module.icon;
   
   return (
     <motion.button
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay }}
+      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ delay, type: "spring", stiffness: 200 }}
+      whileHover={{ y: -6, scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className="relative overflow-hidden rounded-2xl bg-card border border-border p-6 text-left transition-all group hover:border-primary/50 hover:shadow-lg hover:-translate-y-1"
+      className="relative overflow-hidden rounded-2xl bg-card border border-border p-6 text-left transition-all duration-300 group hover:border-transparent hover:shadow-2xl"
     >
-      <div className={`absolute inset-0 bg-gradient-to-br ${module.color} opacity-0 group-hover:opacity-5 transition-opacity`} />
-      <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${module.color} flex items-center justify-center mb-4 shadow-lg`}>
-        <Icon className="w-7 h-7 text-white" />
+      {/* Gradient Background on Hover */}
+      <div className={`absolute inset-0 bg-gradient-to-br ${module.color} opacity-0 group-hover:opacity-[0.08] transition-opacity duration-500`} />
+      
+      {/* Animated Glow Effect */}
+      <div className={`absolute -inset-1 bg-gradient-to-r ${module.color} opacity-0 group-hover:opacity-30 blur-xl transition-opacity duration-500`} />
+      
+      {/* Shimmer Effect */}
+      <motion.div 
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        style={{
+          background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%)",
+          backgroundSize: "200% 100%",
+        }}
+        animate={{ backgroundPosition: ["200% 0", "-200% 0"] }}
+        transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+      />
+      
+      {/* Content */}
+      <div className="relative z-10">
+        {/* Icon with Enhanced Styling */}
+        <div className="relative mb-5">
+          <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${module.color} flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300`}>
+            <Icon className="w-7 h-7 text-white" />
+          </div>
+          {/* Floating Sparkle */}
+          <motion.div 
+            className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gradient-to-br from-white/80 to-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100"
+            initial={{ scale: 0, rotate: -180 }}
+            whileHover={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring" }}
+          >
+            <Sparkles className="w-3 h-3 text-amber-500" />
+          </motion.div>
+        </div>
+        
+        {/* Text Content */}
+        <h3 className="text-lg font-bold mb-1 text-foreground group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-foreground group-hover:to-foreground/80 transition-all duration-300">
+          {module.titleKo}
+        </h3>
+        <p className="text-sm text-muted-foreground group-hover:text-muted-foreground/90 transition-colors duration-300">
+          {module.desc}
+        </p>
+        
+        {/* Arrow Indicator */}
+        <div className="absolute bottom-6 right-6">
+          <motion.div 
+            className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:bg-foreground"
+            whileHover={{ scale: 1.1 }}
+          >
+            <ArrowLeft className="w-5 h-5 rotate-180 text-muted-foreground group-hover:text-background transition-colors duration-300" />
+          </motion.div>
+        </div>
       </div>
-      <h3 className="text-lg font-bold mb-1">{module.titleKo}</h3>
-      <p className="text-sm text-muted-foreground">{module.desc}</p>
-      <div className="absolute bottom-6 right-6 w-8 h-8 rounded-full bg-muted flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-        <ArrowLeft className="w-4 h-4 rotate-180" />
-      </div>
+      
+      {/* Bottom Gradient Line */}
+      <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${module.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
     </motion.button>
   );
 };
