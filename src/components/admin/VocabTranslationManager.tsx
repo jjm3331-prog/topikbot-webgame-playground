@@ -21,7 +21,8 @@ import {
   XCircle,
   Languages,
   Sparkles,
-  AlertTriangle
+  AlertTriangle,
+  Zap
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -43,15 +44,23 @@ interface LevelStats {
   percentage: number;
 }
 
+interface GenerationResult {
+  generated: number;
+  errors: number;
+  model: string;
+}
+
 const VocabTranslationManager = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState(false);
+  const [generatingGemini, setGeneratingGemini] = useState(false);
+  const [generatingGrok, setGeneratingGrok] = useState(false);
   const [stats, setStats] = useState<VocabStats | null>(null);
   const [levelStats, setLevelStats] = useState<LevelStats[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<string>("all");
   const [batchSize, setBatchSize] = useState<string>("10");
-  const [lastResult, setLastResult] = useState<{ generated: number; errors: number } | null>(null);
+  const [geminiResult, setGeminiResult] = useState<GenerationResult | null>(null);
+  const [grokResult, setGrokResult] = useState<GenerationResult | null>(null);
 
   useEffect(() => {
     loadStats();
@@ -150,9 +159,12 @@ const VocabTranslationManager = () => {
     }
   };
 
-  const handleGenerateTranslations = async () => {
+  const handleGenerateTranslations = async (model: 'gemini' | 'grok') => {
+    const setGenerating = model === 'gemini' ? setGeneratingGemini : setGeneratingGrok;
+    const setResult = model === 'gemini' ? setGeminiResult : setGrokResult;
+    
     setGenerating(true);
-    setLastResult(null);
+    setResult(null);
     
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -169,6 +181,7 @@ const VocabTranslationManager = () => {
             type: "translate",
             level: selectedLevel === "all" ? null : parseInt(selectedLevel),
             batchSize: parseInt(batchSize),
+            model: model,
           }),
         }
       );
@@ -179,10 +192,10 @@ const VocabTranslationManager = () => {
         throw new Error(result.error || '번역 생성 실패');
       }
 
-      setLastResult({ generated: result.generated, errors: result.errors });
+      setResult({ generated: result.generated, errors: result.errors, model: result.model });
       
       toast({
-        title: "번역 생성 완료",
+        title: `${model === 'gemini' ? 'Gemini' : 'Grok'} 번역 완료`,
         description: `${result.generated}개 생성, ${result.errors}개 오류`,
       });
 
@@ -371,7 +384,7 @@ const VocabTranslationManager = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />
-            AI 번역 생성
+            AI 번역 생성 (병렬 실행 가능)
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -409,21 +422,41 @@ const VocabTranslationManager = () => {
               </Select>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
+              {/* Gemini Button */}
               <Button
-                onClick={handleGenerateTranslations}
-                disabled={generating}
+                onClick={() => handleGenerateTranslations('gemini')}
+                disabled={generatingGemini}
                 className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600"
               >
-                {generating ? (
+                {generatingGemini ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    생성 중...
+                    Gemini 생성 중...
                   </>
                 ) : (
                   <>
                     <Play className="w-4 h-4 mr-2" />
-                    번역 생성 시작
+                    Gemini 생성
+                  </>
+                )}
+              </Button>
+              
+              {/* Grok Button */}
+              <Button
+                onClick={() => handleGenerateTranslations('grok')}
+                disabled={generatingGrok}
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+              >
+                {generatingGrok ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Grok 생성 중...
+                  </>
+                ) : (
+                  <>
+                    <Zap className="w-4 h-4 mr-2" />
+                    Grok 생성
                   </>
                 )}
               </Button>
@@ -438,38 +471,70 @@ const VocabTranslationManager = () => {
             </div>
           </div>
 
-          {/* Last Result */}
-          {lastResult && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-4 p-4 rounded-xl bg-muted/50 border border-border"
-            >
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-green-500" />
-                  <span className="font-medium">{lastResult.generated}개 생성</span>
+          {/* Results */}
+          <div className="grid md:grid-cols-2 gap-4 mt-4">
+            {geminiResult && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-4 rounded-xl bg-violet-500/10 border border-violet-500/30"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-4 h-4 text-violet-500" />
+                  <span className="font-medium text-violet-600 dark:text-violet-400">Gemini 결과</span>
                 </div>
-                {lastResult.errors > 0 && (
+                <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
-                    <XCircle className="w-5 h-5 text-red-500" />
-                    <span className="text-muted-foreground">{lastResult.errors}개 오류</span>
+                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <span className="font-medium">{geminiResult.generated}개 생성</span>
                   </div>
-                )}
-              </div>
-            </motion.div>
-          )}
+                  {geminiResult.errors > 0 && (
+                    <div className="flex items-center gap-2">
+                      <XCircle className="w-5 h-5 text-red-500" />
+                      <span className="text-muted-foreground">{geminiResult.errors}개 오류</span>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
+            {grokResult && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-4 rounded-xl bg-orange-500/10 border border-orange-500/30"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap className="w-4 h-4 text-orange-500" />
+                  <span className="font-medium text-orange-600 dark:text-orange-400">Grok 결과</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <span className="font-medium">{grokResult.generated}개 생성</span>
+                  </div>
+                  {grokResult.errors > 0 && (
+                    <div className="flex items-center gap-2">
+                      <XCircle className="w-5 h-5 text-red-500" />
+                      <span className="text-muted-foreground">{grokResult.errors}개 오류</span>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </div>
 
           <div className="mt-4 p-4 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 rounded-xl border border-emerald-500/30">
             <div className="flex items-start gap-3">
               <Sparkles className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
               <div className="text-sm">
-                <p className="font-medium text-emerald-600 dark:text-emerald-400 mb-1">고품질 AI 번역 설정</p>
+                <p className="font-medium text-emerald-600 dark:text-emerald-400 mb-1">듀얼 AI 번역 시스템</p>
                 <ul className="text-muted-foreground space-y-1">
-                  <li>• <strong>Gemini 2.5 Flash API 직접 호출</strong> (Lovable AI 미사용)</li>
+                  <li>• <strong className="text-violet-500">Gemini 2.5 Flash</strong> - Google API 직접 호출</li>
+                  <li>• <strong className="text-orange-500">Grok 4.1 Fast Reasoning</strong> - xAI API 직접 호출</li>
+                  <li>• 두 버튼을 동시에 클릭하면 <strong>병렬로 실행</strong>됩니다</li>
                   <li>• 이미 번역된 단어는 건너뜁니다 (meaning_vi가 NULL인 경우만 처리)</li>
                   <li>• 7개국 언어 (vi, en, ja, zh, ru, uz)가 한 번에 생성됩니다</li>
-                  <li>• 배치당 약 5-10초 소요</li>
                 </ul>
               </div>
             </div>
