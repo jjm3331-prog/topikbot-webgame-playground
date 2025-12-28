@@ -12,11 +12,12 @@ import {
   Trash2, Loader2, ChevronLeft, Search, RefreshCw,
   TrendingUp, BookOpen, Gamepad2, MessageSquare, PenTool, Star,
   Briefcase, Eye, CheckCircle, XCircle, Clock, Download, FileDown,
-  Crown, UserCheck, ChevronRight, Shield, Send, Globe, User, AlertTriangle, Info
+  Crown, UserCheck, ChevronRight, Shield, Send, Globe, User, AlertTriangle, Info, Languages
 } from "lucide-react";
 import DocumentUploader from "@/components/admin/DocumentUploader";
 import DocumentList from "@/components/admin/DocumentList";
 import TestimonialsManager from "@/components/admin/TestimonialsManager";
+import VocabTranslationManager from "@/components/admin/VocabTranslationManager";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -631,7 +632,7 @@ const Admin = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-6 mb-8">
+          <TabsList className="grid w-full grid-cols-7 mb-8">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
               <span className="hidden sm:inline">대시보드</span>
@@ -643,6 +644,10 @@ const Admin = () => {
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
               <span className="hidden sm:inline">사용자</span>
+            </TabsTrigger>
+            <TabsTrigger value="vocabulary" className="flex items-center gap-2">
+              <Languages className="w-4 h-4" />
+              <span className="hidden sm:inline">어휘</span>
             </TabsTrigger>
             <TabsTrigger value="documents" className="flex items-center gap-2">
               <FileText className="w-4 h-4" />
@@ -1250,6 +1255,21 @@ const Admin = () => {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+
+          {/* Vocabulary Tab */}
+          <TabsContent value="vocabulary">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Languages className="w-5 h-5 text-primary" />
+                  어휘 7개국 번역 관리
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <VocabTranslationManager />
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Documents Tab */}
           <TabsContent value="documents">

@@ -178,18 +178,25 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
     }
   };
 
-  // Play TTS
+  // Play TTS - ElevenLabs 고품질 한국어 TTS
   const playTTS = async (text: string) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/korean-tts`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text, speed: 0.9 }),
+          headers: { 
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ text, speed: 0.85 }),
         }
       );
-      if (!response.ok) return;
+      if (!response.ok) {
+        console.error("ElevenLabs TTS error:", response.status);
+        return;
+      }
       const blob = await response.blob();
       const audio = new Audio(URL.createObjectURL(blob));
       await audio.play();
