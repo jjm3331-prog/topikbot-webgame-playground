@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -16,14 +17,34 @@ import {
   Clock,
   Star,
   ChevronRight,
-  Award
+  Award,
+  Volume2,
+  Loader2
 } from "lucide-react";
 import confetti from "canvas-confetti";
+import { useAutoTranslate } from "@/hooks/useAutoTranslate";
 
 interface Word {
   id: number;
   korean: string;
   meaning: string;
+  example?: string;
+  exampleMeaning?: string;
+  pronunciation?: string;
+}
+
+// Auto-translated text component
+function TranslatedText({ text, sourceLanguage = "ko" }: { text: string; sourceLanguage?: string }) {
+  const { i18n } = useTranslation();
+  const uiLang = (i18n.language || "ko").split("-")[0];
+
+  if (uiLang === sourceLanguage || uiLang === "ko") return <>{text}</>;
+  if (uiLang === "vi" && sourceLanguage === "vi") return <>{text}</>;
+
+  const { text: translatedText, isTranslating } = useAutoTranslate(text, { sourceLanguage });
+
+  if (isTranslating) return <span className="inline-flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" />{text}</span>;
+  return <>{translatedText}</>;
 }
 
 interface WordRacingProps {
@@ -45,6 +66,9 @@ interface TargetWord {
   id: number;
   korean: string;
   meaning: string;
+  example?: string;
+  exampleMeaning?: string;
+  pronunciation?: string;
   letters: string[];
   collectedLetters: string[];
 }
@@ -855,7 +879,34 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
                 </motion.span>
               ))}
             </div>
-            <p className="text-[10px] text-muted-foreground mt-1 line-clamp-1">{targetWord.meaning}</p>
+            <p className="text-[10px] text-muted-foreground mt-1 line-clamp-1">
+              <TranslatedText text={targetWord.meaning} sourceLanguage="vi" />
+            </p>
+            
+            {/* Show example when boosting (word completed) */}
+            <AnimatePresence>
+              {boosting && targetWord.example && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-2 pt-2 border-t border-border/50"
+                >
+                  {targetWord.pronunciation && (
+                    <p className="text-[10px] text-primary mb-1 flex items-center justify-center gap-1">
+                      <Volume2 className="w-3 h-3" />
+                      [{targetWord.pronunciation}]
+                    </p>
+                  )}
+                  <p className="text-[10px] text-foreground font-medium">{targetWord.example}</p>
+                  {targetWord.exampleMeaning && (
+                    <p className="text-[10px] text-muted-foreground">
+                      <TranslatedText text={targetWord.exampleMeaning} sourceLanguage="vi" />
+                    </p>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </Card>
         </motion.div>
       )}
