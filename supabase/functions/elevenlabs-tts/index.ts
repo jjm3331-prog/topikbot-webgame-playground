@@ -5,9 +5,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// ElevenLabs v3 (eleven_turbo_v2_5) - Korean-optimized native voices
-// Best Korean native voice: Seoyeon (Korean native speaker, natural accent)
-const KOREAN_VOICE_ID = "pFZP5JQG7iQjIQuC4Bku"; // Lily - multilingual, natural Korean
+// ElevenLabs v3 (eleven_turbo_v2_5) - Korean-optimized native voice
+// Custom Korean voice ID provided by user
+const KOREAN_VOICE_ID = "ksaI0TCD9BstzEzlxj4q";
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
