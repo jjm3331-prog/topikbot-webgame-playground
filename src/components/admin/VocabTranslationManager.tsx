@@ -60,6 +60,14 @@ interface StreamProgress {
   errors: number;
   usedModel: string;
   fallbacks: number;
+  modelType?: 'gemini' | 'grok';
+}
+
+interface ParallelProgress {
+  gemini: StreamProgress | null;
+  grok: StreamProgress | null;
+  geminiTotal: number;
+  grokTotal: number;
 }
 
 const VocabTranslationManager = () => {
@@ -77,7 +85,14 @@ const VocabTranslationManager = () => {
   // Streaming state
   const [geminiProgress, setGeminiProgress] = useState<StreamProgress | null>(null);
   const [grokProgress, setGrokProgress] = useState<StreamProgress | null>(null);
-  const [streamingModel, setStreamingModel] = useState<'gemini' | 'grok' | null>(null);
+  const [generatingParallel, setGeneratingParallel] = useState(false);
+  const [parallelResult, setParallelResult] = useState<{
+    geminiGenerated: number;
+    geminiErrors: number;
+    grokGenerated: number;
+    grokErrors: number;
+  } | null>(null);
+  
 
   useEffect(() => {
     loadStats();
@@ -184,7 +199,6 @@ const VocabTranslationManager = () => {
     setGenerating(true);
     setResult(null);
     setProgress(null);
-    setStreamingModel(model);
     
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -281,7 +295,114 @@ const VocabTranslationManager = () => {
     } finally {
       setGenerating(false);
       setProgress(null);
-      setStreamingModel(null);
+    }
+  };
+
+  // 병렬 실행 핸들러
+  const handleParallelGenerate = async () => {
+    setGeneratingParallel(true);
+    setGeminiProgress(null);
+    setGrokProgress(null);
+    setParallelResult(null);
+    
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/vocab-batch-generate`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({
+            type: "translate",
+            level: selectedLevel === "all" ? null : parseInt(selectedLevel),
+            batchSize: parseInt(batchSize),
+            stream: true,
+            parallel: true,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || '병렬 번역 생성 실패');
+      }
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n\n');
+          buffer = lines.pop() || '';
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.slice(6));
+                
+                if (data.type === 'start') {
+                  console.log(`[Parallel] Started: ${data.total} items, Gemini: ${data.geminiCount}, Grok: ${data.grokCount}`);
+                } else if (data.type === 'progress') {
+                  const progressData: StreamProgress = {
+                    word: data.word,
+                    level: data.level,
+                    index: data.index,
+                    total: data.total,
+                    generated: data.generated,
+                    errors: data.errors,
+                    usedModel: data.usedModel,
+                    fallbacks: data.fallbacks,
+                    modelType: data.modelType,
+                  };
+                  
+                  if (data.modelType === 'gemini') {
+                    setGeminiProgress(progressData);
+                  } else if (data.modelType === 'grok') {
+                    setGrokProgress(progressData);
+                  }
+                } else if (data.type === 'complete') {
+                  setParallelResult({
+                    geminiGenerated: data.geminiGenerated,
+                    geminiErrors: data.geminiErrors,
+                    grokGenerated: data.grokGenerated,
+                    grokErrors: data.grokErrors,
+                  });
+                  toast({
+                    title: "⚡ 병렬 번역 완료",
+                    description: `Gemini ${data.geminiGenerated}개 + Grok ${data.grokGenerated}개 = 총 ${data.generated}개 번역`,
+                  });
+                } else if (data.type === 'fatal') {
+                  throw new Error(data.error);
+                }
+              } catch (e) {
+                console.warn('Failed to parse SSE data:', line, e);
+              }
+            }
+          }
+        }
+      }
+
+      await loadStats();
+    } catch (error: any) {
+      console.error('Parallel generation error:', error);
+      toast({
+        title: "병렬 번역 실패",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setGeneratingParallel(false);
+      setGeminiProgress(null);
+      setGrokProgress(null);
     }
   };
 
@@ -495,21 +616,41 @@ const VocabTranslationManager = () => {
             </div>
 
             <div className="flex gap-2 flex-wrap">
+              {/* 병렬 실행 버튼 (추천) */}
+              <Button
+                onClick={handleParallelGenerate}
+                disabled={generatingParallel || generatingGemini || generatingGrok}
+                className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600"
+              >
+                {generatingParallel ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    병렬 실행 중...
+                  </>
+                ) : (
+                  <>
+                    <Zap className="w-4 h-4 mr-2" />
+                    ⚡ 병렬 2배속
+                  </>
+                )}
+              </Button>
+
               {/* Gemini Button */}
               <Button
                 onClick={() => handleGenerateTranslations('gemini')}
-                disabled={generatingGemini}
-                className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600"
+                disabled={generatingGemini || generatingParallel}
+                variant="outline"
+                className="border-violet-500/50 text-violet-600 hover:bg-violet-500/10"
               >
                 {generatingGemini ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Gemini 생성 중...
+                    Gemini...
                   </>
                 ) : (
                   <>
                     <Play className="w-4 h-4 mr-2" />
-                    Gemini 생성
+                    Gemini
                   </>
                 )}
               </Button>
@@ -517,18 +658,19 @@ const VocabTranslationManager = () => {
               {/* Grok Button */}
               <Button
                 onClick={() => handleGenerateTranslations('grok')}
-                disabled={generatingGrok}
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+                disabled={generatingGrok || generatingParallel}
+                variant="outline"
+                className="border-orange-500/50 text-orange-600 hover:bg-orange-500/10"
               >
                 {generatingGrok ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Grok 생성 중...
+                    Grok...
                   </>
                 ) : (
                   <>
                     <Zap className="w-4 h-4 mr-2" />
-                    Grok 생성
+                    Grok
                   </>
                 )}
               </Button>
@@ -543,8 +685,81 @@ const VocabTranslationManager = () => {
             </div>
           </div>
 
-          {/* Real-time Progress UI */}
-          {(geminiProgress || grokProgress) && (
+          {/* Real-time Progress UI - 병렬 모드 */}
+          {generatingParallel && (geminiProgress || grokProgress) && (
+            <div className="mt-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Zap className="w-5 h-5 text-emerald-500" />
+                <span className="font-medium text-emerald-600 dark:text-emerald-400">⚡ 병렬 실행 중 (2배속)</span>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                {/* Gemini Progress */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="p-4 rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-500/20 border border-violet-500/40"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <Loader2 className="w-4 h-4 text-violet-500 animate-spin" />
+                    <span className="font-medium text-violet-600 dark:text-violet-400">Gemini</span>
+                  </div>
+                  
+                  {geminiProgress ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">현재</span>
+                        <span className="font-bold">{geminiProgress.word}</span>
+                      </div>
+                      <Progress value={(geminiProgress.index / geminiProgress.total) * 100} className="h-2" />
+                      <div className="flex items-center justify-between text-xs">
+                        <span>{geminiProgress.index} / {geminiProgress.total}</span>
+                        <div className="flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-green-500" />
+                          <span>{geminiProgress.generated}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-muted-foreground">대기 중...</div>
+                  )}
+                </motion.div>
+                
+                {/* Grok Progress */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="p-4 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 border border-orange-500/40"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <Loader2 className="w-4 h-4 text-orange-500 animate-spin" />
+                    <span className="font-medium text-orange-600 dark:text-orange-400">Grok</span>
+                  </div>
+                  
+                  {grokProgress ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">현재</span>
+                        <span className="font-bold">{grokProgress.word}</span>
+                      </div>
+                      <Progress value={(grokProgress.index / grokProgress.total) * 100} className="h-2" />
+                      <div className="flex items-center justify-between text-xs">
+                        <span>{grokProgress.index} / {grokProgress.total}</span>
+                        <div className="flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-green-500" />
+                          <span>{grokProgress.generated}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-muted-foreground">대기 중...</div>
+                  )}
+                </motion.div>
+              </div>
+            </div>
+          )}
+
+          {/* Real-time Progress UI - 단일 모델 */}
+          {!generatingParallel && (geminiProgress || grokProgress) && (
             <div className="grid md:grid-cols-2 gap-4 mt-4">
               {geminiProgress && generatingGemini && (
                 <motion.div
@@ -655,7 +870,33 @@ const VocabTranslationManager = () => {
           )}
 
           {/* Results */}
-          <div className="grid md:grid-cols-2 gap-4 mt-4">
+          <div className="grid md:grid-cols-3 gap-4 mt-4">
+            {parallelResult && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-4 rounded-xl bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border border-emerald-500/30 md:col-span-3"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap className="w-4 h-4 text-emerald-500" />
+                  <span className="font-medium text-emerald-600 dark:text-emerald-400">⚡ 병렬 실행 결과</span>
+                </div>
+                <div className="flex items-center gap-6 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-violet-500" />
+                    <span>Gemini: {parallelResult.geminiGenerated}개</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-orange-500" />
+                    <span>Grok: {parallelResult.grokGenerated}개</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <span className="font-bold">총 {parallelResult.geminiGenerated + parallelResult.grokGenerated}개 번역</span>
+                  </div>
+                </div>
+              </motion.div>
+            )}
             {geminiResult && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -709,15 +950,14 @@ const VocabTranslationManager = () => {
 
           <div className="mt-4 p-4 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 rounded-xl border border-emerald-500/30">
             <div className="flex items-start gap-3">
-              <Sparkles className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+              <Zap className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
               <div className="text-sm">
-                <p className="font-medium text-emerald-600 dark:text-emerald-400 mb-1">듀얼 AI 번역 시스템</p>
+                <p className="font-medium text-emerald-600 dark:text-emerald-400 mb-1">⚡ 병렬 2배속 AI 번역 시스템</p>
                 <ul className="text-muted-foreground space-y-1">
-                  <li>• <strong className="text-violet-500">Gemini 2.5 Flash</strong> - Google API 직접 호출</li>
-                  <li>• <strong className="text-orange-500">Grok 4.1 Fast Reasoning</strong> - xAI API 직접 호출</li>
-                  <li>• 두 버튼을 동시에 클릭하면 <strong>병렬로 실행</strong>됩니다</li>
+                  <li>• <strong className="text-emerald-500">병렬 2배속</strong> - 배치를 반으로 나눠 Gemini + Grok 동시 실행 (추천!)</li>
+                  <li>• <strong className="text-violet-500">Gemini</strong> - Google Gemini 2.5 Flash 단독 실행</li>
+                  <li>• <strong className="text-orange-500">Grok</strong> - xAI Grok 4.1 Fast Reasoning 단독 실행</li>
                   <li>• 이미 번역된 단어는 건너뜁니다 (meaning_vi가 NULL인 경우만 처리)</li>
-                  <li>• 7개국 언어 (vi, en, ja, zh, ru, uz)가 한 번에 생성됩니다</li>
                 </ul>
               </div>
             </div>
