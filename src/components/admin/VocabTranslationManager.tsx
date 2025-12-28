@@ -48,6 +48,18 @@ interface GenerationResult {
   generated: number;
   errors: number;
   model: string;
+  fallbacks?: number;
+}
+
+interface StreamProgress {
+  word: string;
+  level: number;
+  index: number;
+  total: number;
+  generated: number;
+  errors: number;
+  usedModel: string;
+  fallbacks: number;
 }
 
 const VocabTranslationManager = () => {
@@ -61,6 +73,11 @@ const VocabTranslationManager = () => {
   const [batchSize, setBatchSize] = useState<string>("10");
   const [geminiResult, setGeminiResult] = useState<GenerationResult | null>(null);
   const [grokResult, setGrokResult] = useState<GenerationResult | null>(null);
+  
+  // Streaming state
+  const [geminiProgress, setGeminiProgress] = useState<StreamProgress | null>(null);
+  const [grokProgress, setGrokProgress] = useState<StreamProgress | null>(null);
+  const [streamingModel, setStreamingModel] = useState<'gemini' | 'grok' | null>(null);
 
   useEffect(() => {
     loadStats();
@@ -162,13 +179,17 @@ const VocabTranslationManager = () => {
   const handleGenerateTranslations = async (model: 'gemini' | 'grok') => {
     const setGenerating = model === 'gemini' ? setGeneratingGemini : setGeneratingGrok;
     const setResult = model === 'gemini' ? setGeminiResult : setGrokResult;
+    const setProgress = model === 'gemini' ? setGeminiProgress : setGrokProgress;
     
     setGenerating(true);
     setResult(null);
+    setProgress(null);
+    setStreamingModel(model);
     
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
+      // 스트리밍 요청
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/vocab-batch-generate`,
         {
@@ -182,22 +203,71 @@ const VocabTranslationManager = () => {
             level: selectedLevel === "all" ? null : parseInt(selectedLevel),
             batchSize: parseInt(batchSize),
             model: model,
+            stream: true,
           }),
         }
       );
 
-      const result = await response.json();
-      
       if (!response.ok) {
-        throw new Error(result.error || '번역 생성 실패');
+        const errorData = await response.json();
+        throw new Error(errorData.error || '번역 생성 실패');
       }
 
-      setResult({ generated: result.generated, errors: result.errors, model: result.model });
-      
-      toast({
-        title: `${model === 'gemini' ? 'Gemini' : 'Grok'} 번역 완료`,
-        description: `${result.generated}개 생성, ${result.errors}개 오류`,
-      });
+      // SSE 스트림 파싱
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n\n');
+          buffer = lines.pop() || '';
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.slice(6));
+                
+                if (data.type === 'start') {
+                  console.log(`[Stream] Started: ${data.total} items, model: ${data.model}`);
+                } else if (data.type === 'progress') {
+                  setProgress({
+                    word: data.word,
+                    level: data.level,
+                    index: data.index,
+                    total: data.total,
+                    generated: data.generated,
+                    errors: data.errors,
+                    usedModel: data.usedModel,
+                    fallbacks: data.fallbacks,
+                  });
+                } else if (data.type === 'error') {
+                  console.error(`[Stream] Error on ${data.word}:`, data.message);
+                } else if (data.type === 'complete') {
+                  setResult({ 
+                    generated: data.generated, 
+                    errors: data.errors, 
+                    model: data.model,
+                    fallbacks: data.fallbacks 
+                  });
+                  toast({
+                    title: `${model === 'gemini' ? 'Gemini' : 'Grok'} 번역 완료`,
+                    description: `${data.generated}개 생성, ${data.errors}개 오류${data.fallbacks > 0 ? `, ${data.fallbacks}개 fallback` : ''}`,
+                  });
+                } else if (data.type === 'fatal') {
+                  throw new Error(data.error);
+                }
+              } catch (e) {
+                console.warn('Failed to parse SSE data:', line, e);
+              }
+            }
+          }
+        }
+      }
 
       // Reload stats
       await loadStats();
@@ -210,6 +280,8 @@ const VocabTranslationManager = () => {
       });
     } finally {
       setGenerating(false);
+      setProgress(null);
+      setStreamingModel(null);
     }
   };
 
@@ -470,6 +542,117 @@ const VocabTranslationManager = () => {
               </Button>
             </div>
           </div>
+
+          {/* Real-time Progress UI */}
+          {(geminiProgress || grokProgress) && (
+            <div className="grid md:grid-cols-2 gap-4 mt-4">
+              {geminiProgress && generatingGemini && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="p-4 rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-500/20 border border-violet-500/40"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="relative">
+                      <Loader2 className="w-5 h-5 text-violet-500 animate-spin" />
+                      <div className="absolute inset-0 animate-ping opacity-30">
+                        <Sparkles className="w-5 h-5 text-violet-500" />
+                      </div>
+                    </div>
+                    <span className="font-medium text-violet-600 dark:text-violet-400">Gemini 실시간 진행</span>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">현재 단어</span>
+                      <span className="font-bold text-lg">{geminiProgress.word}</span>
+                    </div>
+                    
+                    <Progress 
+                      value={(geminiProgress.index / geminiProgress.total) * 100} 
+                      className="h-3"
+                    />
+                    
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">{geminiProgress.index} / {geminiProgress.total}</span>
+                      <span className="font-medium">{Math.round((geminiProgress.index / geminiProgress.total) * 100)}%</span>
+                    </div>
+                    
+                    <div className="flex gap-4 text-sm">
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                        <span>{geminiProgress.generated}</span>
+                      </div>
+                      {geminiProgress.errors > 0 && (
+                        <div className="flex items-center gap-1">
+                          <XCircle className="w-4 h-4 text-red-500" />
+                          <span>{geminiProgress.errors}</span>
+                        </div>
+                      )}
+                      {geminiProgress.fallbacks > 0 && (
+                        <div className="flex items-center gap-1">
+                          <Zap className="w-4 h-4 text-orange-500" />
+                          <span>Fallback: {geminiProgress.fallbacks}</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="text-xs text-muted-foreground">
+                      모델: {geminiProgress.usedModel === 'grok-fallback' ? 'Grok (Fallback)' : 'Gemini'}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+              
+              {grokProgress && generatingGrok && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="p-4 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 border border-orange-500/40"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="relative">
+                      <Loader2 className="w-5 h-5 text-orange-500 animate-spin" />
+                      <div className="absolute inset-0 animate-ping opacity-30">
+                        <Zap className="w-5 h-5 text-orange-500" />
+                      </div>
+                    </div>
+                    <span className="font-medium text-orange-600 dark:text-orange-400">Grok 실시간 진행</span>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">현재 단어</span>
+                      <span className="font-bold text-lg">{grokProgress.word}</span>
+                    </div>
+                    
+                    <Progress 
+                      value={(grokProgress.index / grokProgress.total) * 100} 
+                      className="h-3"
+                    />
+                    
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">{grokProgress.index} / {grokProgress.total}</span>
+                      <span className="font-medium">{Math.round((grokProgress.index / grokProgress.total) * 100)}%</span>
+                    </div>
+                    
+                    <div className="flex gap-4 text-sm">
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                        <span>{grokProgress.generated}</span>
+                      </div>
+                      {grokProgress.errors > 0 && (
+                        <div className="flex items-center gap-1">
+                          <XCircle className="w-4 h-4 text-red-500" />
+                          <span>{grokProgress.errors}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </div>
+          )}
 
           {/* Results */}
           <div className="grid md:grid-cols-2 gap-4 mt-4">

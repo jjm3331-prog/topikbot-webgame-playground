@@ -222,7 +222,7 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { type, level, batchSize = 20, model = 'gemini' } = await req.json();
+    const { type, level, batchSize = 20, model = 'gemini', stream = false } = await req.json();
 
     if (!type) {
       return new Response(JSON.stringify({ error: 'type is required (cloze, ox, idiom, translate)' }), {
@@ -232,9 +232,140 @@ serve(async (req) => {
     }
 
     const modelName = model === 'grok' ? 'grok-4-1-fast-reasoning' : 'gemini-2.5-flash';
-    console.log(`[Batch Generate] Starting ${type} generation for level ${level || 'all'}, batch size: ${batchSize}`);
+    console.log(`[Batch Generate] Starting ${type} generation for level ${level || 'all'}, batch size: ${batchSize}, stream: ${stream}`);
     console.log(`[Batch Generate] Using model: ${modelName}`);
 
+    // SSE 스트리밍 모드
+    if (stream && type === 'translate') {
+      const encoder = new TextEncoder();
+      const streamHeaders = {
+        ...corsHeaders,
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      };
+
+      const body = new ReadableStream({
+        async start(controller) {
+          const sendEvent = (data: any) => {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+          };
+
+          try {
+            let query = supabase
+              .from('topik_vocabulary')
+              .select('id, word, pos, example_phrase, level')
+              .is('meaning_vi', null)
+              .order('seq_no')
+              .limit(batchSize);
+            
+            if (level && !isNaN(Number(level))) {
+              query = query.eq('level', Number(level));
+            }
+            
+            const { data: vocabItems, error: vocabError } = await query;
+            
+            if (vocabError) throw vocabError;
+            
+            const total = vocabItems?.length || 0;
+            sendEvent({ type: 'start', total, model: modelName });
+            
+            let generated = 0;
+            let errors = 0;
+            let fallbacks = 0;
+            
+            for (let i = 0; i < (vocabItems || []).length; i++) {
+              const vocab = vocabItems![i];
+              try {
+                const userPrompt = `한국어 단어: ${vocab.word}
+품사: ${vocab.pos}
+TOPIK 레벨: ${vocab.level}급
+예시 구: ${vocab.example_phrase}
+
+다음 7개 언어로 이 단어의 의미와 예문을 번역해주세요.
+정확하고 자연스러운 번역이 중요합니다. 각 언어의 뉘앙스를 살려주세요.
+
+1. 베트남어 (vi) - 베트남어 원어민이 자연스럽게 이해할 수 있는 표현
+2. 영어 (en) - 간결하고 정확한 영어 번역
+3. 일본어 (ja) - 히라가나/가타카나/한자 적절히 사용
+4. 중국어 간체 (zh) - 중국 본토 표준 중국어
+5. 러시아어 (ru) - 러시아어 원어민 표현
+6. 우즈베크어 (uz) - 현대 우즈베크어 표현
+7. 예문 - 단어를 사용한 자연스러운 한국어 예문과 베트남어 번역
+
+JSON 형식:
+{
+  "meaning_vi": "베트남어 뜻",
+  "meaning_en": "영어 뜻",
+  "meaning_ja": "일본어 뜻",
+  "meaning_zh": "중국어 뜻",
+  "meaning_ru": "러시아어 뜻",
+  "meaning_uz": "우즈베크어 뜻",
+  "example_sentence": "한국어 예문 (완전한 문장)",
+  "example_sentence_vi": "예문 베트남어 번역"
+}`;
+
+                const { content: responseContent, usedModel } = await callLLM(model, TRANSLATE_SYSTEM_PROMPT, userPrompt);
+                const translations = extractJSON(responseContent);
+                
+                const { error: updateError } = await supabase
+                  .from('topik_vocabulary')
+                  .update({
+                    meaning_vi: translations.meaning_vi,
+                    meaning_en: translations.meaning_en,
+                    meaning_ja: translations.meaning_ja,
+                    meaning_zh: translations.meaning_zh,
+                    meaning_ru: translations.meaning_ru,
+                    meaning_uz: translations.meaning_uz,
+                    example_sentence: translations.example_sentence,
+                    example_sentence_vi: translations.example_sentence_vi,
+                  })
+                  .eq('id', vocab.id);
+                
+                if (updateError) {
+                  errors++;
+                  sendEvent({ type: 'error', word: vocab.word, index: i + 1, total });
+                } else {
+                  generated++;
+                  if (usedModel === 'grok-fallback') fallbacks++;
+                  sendEvent({ 
+                    type: 'progress', 
+                    word: vocab.word, 
+                    level: vocab.level,
+                    index: i + 1, 
+                    total, 
+                    generated, 
+                    errors,
+                    usedModel,
+                    fallbacks
+                  });
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+              } catch (e) {
+                console.error(`[Batch Generate] Error translating ${vocab.word}:`, e);
+                errors++;
+                sendEvent({ type: 'error', word: vocab.word, index: i + 1, total, message: e instanceof Error ? e.message : 'Unknown error' });
+              }
+            }
+            
+            sendEvent({ type: 'complete', generated, errors, fallbacks, model: modelName });
+            console.log(`[Batch Generate] Stream completed: ${generated} generated, ${errors} errors, ${fallbacks} fallbacks`);
+            
+          } catch (e) {
+            console.error('[Batch Generate] Stream error:', e);
+            sendEvent({ type: 'fatal', error: e instanceof Error ? e.message : 'Unknown error' });
+          } finally {
+            controller.close();
+          }
+        }
+      });
+
+      return new Response(body, { headers: streamHeaders });
+    }
+
+    // 기존 비스트리밍 모드
     let result: any = { success: true, generated: 0, errors: 0, model: modelName };
 
     if (type === 'cloze') {
