@@ -7,6 +7,8 @@ import AppFooter from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAutoTranslate } from "@/hooks/useAutoTranslate";
+import { languages } from "@/i18n/config";
 import { 
   ArrowLeft, 
   FileText,
@@ -36,7 +38,7 @@ type TopikLevel = "1-2" | "3-4" | "5-6";
 const ReadingB = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<TabKey>("arrangement");
   const [topikLevel, setTopikLevel] = useState<TopikLevel>("3-4");
@@ -158,6 +160,15 @@ const ReadingB = () => {
 
   const currentCategory = tabCategories[activeTab];
   const currentQuestion = questions[currentQuestionIndex];
+
+  // Language-based auto-translate for explanation
+  const uiLang = (i18n.language || "ko").split("-")[0];
+  const translatedExplanation = useAutoTranslate(currentQuestion?.explanationKo ?? "", {
+    sourceLanguage: "ko",
+  });
+  const targetMeta = languages.find((l) => l.code === uiLang);
+  const targetFlag = targetMeta?.flag ?? "🌐";
+  const targetLabel = targetMeta?.nativeName ?? uiLang;
 
   const handleTabChange = (tab: TabKey) => {
     setActiveTab(tab);
@@ -501,7 +512,45 @@ const ReadingB = () => {
                             </>
                           )}
                         </h4>
-                        <p className="text-foreground whitespace-pre-wrap">{currentQuestion.explanationKo}</p>
+
+                        {/* Korean Explanation (always shown) */}
+                        <div className="mb-3">
+                          <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mb-1 flex items-center gap-1">
+                            🇰🇷 {t('reading.explanationKo')}
+                          </p>
+                          <p className="text-foreground text-sm leading-relaxed whitespace-pre-wrap">
+                            {currentQuestion.explanationKo}
+                          </p>
+                        </div>
+
+                        {/* Localized explanation: vi uses provided field, others auto-translate */}
+                        {uiLang !== "ko" && (
+                          <>
+                            <div className="border-t border-border/50 my-3" />
+                            <div>
+                              <p className="text-xs font-semibold text-orange-600 dark:text-orange-400 mb-1 flex items-center gap-1">
+                                {uiLang === "vi" ? (
+                                  <>
+                                    🇻🇳 {t('reading.explanationVi')}
+                                  </>
+                                ) : (
+                                  <>
+                                    {targetFlag} {targetLabel}
+                                  </>
+                                )}
+                              </p>
+                              <p className="text-foreground text-sm leading-relaxed whitespace-pre-wrap">
+                                {uiLang === "vi" ? currentQuestion.explanationVi : translatedExplanation.text}
+                              </p>
+                              {uiLang !== "vi" && translatedExplanation.isTranslating && (
+                                <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                  {t('board.translation.translating')}
+                                </div>
+                              )}
+                            </div>
+                          </>
+                        )}
                       </motion.div>
                     )}
 

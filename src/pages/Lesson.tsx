@@ -1,12 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAutoTranslate } from "@/hooks/useAutoTranslate";
+import { languages } from "@/i18n/config";
 import { 
   ArrowLeft, 
   CheckCircle2, 
@@ -188,6 +191,7 @@ const Lesson = () => {
   const { lessonId } = useParams();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const { t, i18n } = useTranslation();
   
   const level = parseInt(searchParams.get("level") || "1");
   const category = searchParams.get("category") || "vocabulary";
@@ -204,6 +208,12 @@ const Lesson = () => {
   const [saving, setSaving] = useState(false);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
   const [ragGenerated, setRagGenerated] = useState(false);
+
+  // Language-aware translation
+  const uiLang = (i18n.language || "ko").split("-")[0];
+  const targetMeta = languages.find((l) => l.code === uiLang);
+  const targetFlag = targetMeta?.flag ?? "🌐";
+  const targetLabel = targetMeta?.nativeName ?? uiLang;
   
   // Fetch RAG-powered questions from edge function
   const fetchRagQuestions = async (lessonIdParam: string, categoryParam: string, levelParam: number) => {
@@ -273,7 +283,11 @@ const Lesson = () => {
   const correctCount = Object.values(answers).filter(a => a.correct).length;
   const totalQuestions = questions.length;
   const progressPercent = ((currentQuestionIndex + 1) / totalQuestions) * 100;
-  
+
+  // Auto-translate explanation from Korean for non-Korean/non-English users
+  const translatedExplanation = useAutoTranslate(currentQuestion?.explanationKo ?? "", {
+    sourceLanguage: "ko",
+  });
   const handleAnswerSelect = (value: string) => {
     if (showResult) return;
     setSelectedAnswer(value);
@@ -676,11 +690,46 @@ const Lesson = () => {
                       exit={{ opacity: 0, height: 0 }}
                       className="mb-6 p-4 rounded-xl bg-muted"
                     >
-                      <p className="font-medium text-foreground mb-1">
-                        {answers[currentQuestion.id]?.correct ? "정답입니다! 👏" : "오답입니다 😅"}
+                      <p className="font-medium text-foreground mb-2">
+                        {answers[currentQuestion.id]?.correct ? t("lesson.correct") : t("lesson.incorrect")}
                       </p>
-                      <p className="text-sm text-foreground">{currentQuestion.explanationKo}</p>
-                      <p className="text-sm text-muted-foreground">{currentQuestion.explanation}</p>
+
+                      {/* Korean Explanation */}
+                      <div className="mb-2">
+                        <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mb-1 flex items-center gap-1">
+                          🇰🇷 {t('reading.explanationKo')}
+                        </p>
+                        <p className="text-sm text-foreground">{currentQuestion.explanationKo}</p>
+                      </div>
+
+                      {/* Localized explanation */}
+                      {uiLang !== "ko" && (
+                        <>
+                          <div className="border-t border-border/50 my-2" />
+                          <div>
+                            <p className="text-xs font-semibold text-orange-600 dark:text-orange-400 mb-1 flex items-center gap-1">
+                              {uiLang === "en" ? (
+                                <>
+                                  🇺🇸 English
+                                </>
+                              ) : (
+                                <>
+                                  {targetFlag} {targetLabel}
+                                </>
+                              )}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {uiLang === "en" ? currentQuestion.explanation : translatedExplanation.text}
+                            </p>
+                            {uiLang !== "en" && translatedExplanation.isTranslating && (
+                              <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                {t('board.translation.translating')}
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -693,18 +742,18 @@ const Lesson = () => {
                       onClick={handleCheckAnswer}
                       disabled={!selectedAnswer}
                     >
-                      정답 확인
+                      {t("lesson.checkAnswer")}
                     </Button>
                   ) : (
                     <Button className="flex-1" onClick={handleNextQuestion}>
                       {currentQuestionIndex < totalQuestions - 1 ? (
                         <>
-                          다음 문제
+                          {t("lesson.nextQuestion")}
                           <ChevronRight className="w-4 h-4 ml-2" />
                         </>
                       ) : (
                         <>
-                          결과 보기
+                          {t("lesson.viewResults")}
                           <Trophy className="w-4 h-4 ml-2" />
                         </>
                       )}

@@ -698,6 +698,13 @@
     "pricing": { "title1": "Fair price,", "local": "local", "title2": "global quality", "free": "Free", "forever": "Free forever", "start": "Get started", "month": "month", "upgrade": "Upgrade" },
     "finalCta": { "title1": "TOPIK", "title2": "conquest", "desc": "TOPIK professors + LUKATO AI =", "noRival": "Unbeatable combo", "cta": "Start now" }
   },
+  "lesson": {
+    "correct": "Correct! 👏",
+    "incorrect": "Incorrect 😅",
+    "checkAnswer": "Check Answer",
+    "nextQuestion": "Next Question",
+    "viewResults": "View Results"
+  },
 "grammar": {
     "title": "Grammar Learning",
     "description": "Master grammar through mini-games",
