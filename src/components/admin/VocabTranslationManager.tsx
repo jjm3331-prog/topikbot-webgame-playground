@@ -466,11 +466,10 @@ const VocabTranslationManager = () => {
               <div className="text-sm">
                 <p className="font-medium text-emerald-600 dark:text-emerald-400 mb-1">고품질 AI 번역 설정</p>
                 <ul className="text-muted-foreground space-y-1">
-                  <li>• <strong>Gemini 2.5 Flash API 직접 호출</strong> (Lovable AI 미사용)</li>
-                  <li>• <strong>Thinking Budget 최대치 (24,576 토큰)</strong> - 복잡한 추론으로 정확도 향상</li>
+                  <li>• <strong>Gemini 2.0 Flash API 직접 호출</strong> (Lovable AI 미사용)</li>
                   <li>• 이미 번역된 단어는 건너뜁니다 (meaning_vi가 NULL인 경우만 처리)</li>
                   <li>• 7개국 언어 (vi, en, ja, zh, ru, uz)가 한 번에 생성됩니다</li>
-                  <li>• 배치당 약 10-20초 소요 (Thinking 시간 포함)</li>
+                  <li>• 배치당 약 5-10초 소요</li>
                 </ul>
               </div>
             </div>
