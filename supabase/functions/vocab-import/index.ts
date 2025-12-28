@@ -60,17 +60,48 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { csvData, action, csvUrl } = await req.json();
+const { csvData, action, csvUrl, batchStart, batchEnd, clearFirst } = await req.json();
 
     if (action === 'check') {
-      // Check current vocabulary count
+      // Check current vocabulary count by level
+      const { data: levelCounts } = await supabase
+        .from('topik_vocabulary')
+        .select('level');
+      
+      const counts: Record<number, number> = {};
+      if (levelCounts) {
+        levelCounts.forEach((item: { level: number }) => {
+          counts[item.level] = (counts[item.level] || 0) + 1;
+        });
+      }
+      
       const { count } = await supabase
         .from('topik_vocabulary')
         .select('*', { count: 'exact', head: true });
       
       return new Response(JSON.stringify({ 
         success: true, 
-        count: count || 0 
+        total: count || 0,
+        byLevel: counts
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (action === 'clear') {
+      // Clear all vocabulary data
+      const { error } = await supabase
+        .from('topik_vocabulary')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+      
+      if (error) {
+        throw new Error(`Failed to clear vocabulary: ${error.message}`);
+      }
+      
+      return new Response(JSON.stringify({ 
+        success: true, 
+        message: 'All vocabulary cleared'
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
