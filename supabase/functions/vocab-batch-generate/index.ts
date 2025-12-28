@@ -71,14 +71,15 @@ JSON 형식으로 응답:
   "similar_expressions": ["유사표현1", "유사표현2"]
 }`;
 
-// Gemini 2.5 Flash API 직접 호출 (Thinking Budget 최대치)
+// Gemini 2.5 Flash API 직접 호출
 async function callGemini(systemPrompt: string, userPrompt: string): Promise<string> {
   if (!GEMINI_API_KEY) {
     throw new Error("GEMINI_API_KEY is not configured");
   }
 
+  // Gemini 2.0 Flash 사용 (안정 버전)
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
     {
       method: 'POST',
       headers: {
@@ -96,10 +97,6 @@ async function callGemini(systemPrompt: string, userPrompt: string): Promise<str
           maxOutputTokens: 8192,
           responseMimeType: "application/json",
         },
-        // Thinking Budget 최대치 설정 (24576 토큰)
-        thinkingConfig: {
-          thinkingBudget: 24576
-        }
       }),
     }
   );
@@ -119,7 +116,7 @@ async function callGemini(systemPrompt: string, userPrompt: string): Promise<str
     throw new Error('No content in Gemini response');
   }
   
-  console.log('[Batch Generate] Gemini thinking tokens used:', data.usageMetadata?.thoughtsTokenCount || 0);
+  console.log('[Batch Generate] Gemini response received, tokens:', data.usageMetadata?.totalTokenCount || 0);
   
   return content;
 }
@@ -160,7 +157,7 @@ serve(async (req) => {
     }
 
     console.log(`[Batch Generate] Starting ${type} generation for level ${level || 'all'}, batch size: ${batchSize}`);
-    console.log(`[Batch Generate] Using Gemini 2.5 Flash with max thinking budget (24576 tokens)`);
+    console.log(`[Batch Generate] Using Gemini 2.0 Flash (stable version)`);
 
     let result: any = { success: true, generated: 0, errors: 0 };
 
