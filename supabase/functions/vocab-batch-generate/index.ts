@@ -7,8 +7,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Gemini 2.5 Flash를 사용한 고품질 콘텐츠 배치 생성
-const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+// Gemini API 직접 호출 (Thinking Budget 최대치)
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
 
 interface VocabItem {
   id: string;
@@ -71,31 +71,57 @@ JSON 형식으로 응답:
   "similar_expressions": ["유사표현1", "유사표현2"]
 }`;
 
+// Gemini 2.5 Flash API 직접 호출 (Thinking Budget 최대치)
 async function callGemini(systemPrompt: string, userPrompt: string): Promise<string> {
-  const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'google/gemini-2.5-flash',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-      temperature: 0.7,
-    }),
-  });
+  if (!GEMINI_API_KEY) {
+    throw new Error("GEMINI_API_KEY is not configured");
+  }
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }]
+          }
+        ],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 8192,
+          responseMimeType: "application/json",
+        },
+        // Thinking Budget 최대치 설정 (24576 토큰)
+        thinkingConfig: {
+          thinkingBudget: 24576
+        }
+      }),
+    }
+  );
 
   if (!response.ok) {
     const error = await response.text();
-    console.error('[Batch Generate] Gemini API error:', error);
+    console.error('[Batch Generate] Gemini API error:', response.status, error);
     throw new Error(`Gemini API error: ${response.status}`);
   }
 
   const data = await response.json();
-  return data.choices[0].message.content;
+  
+  // Gemini API 응답 구조 파싱
+  const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!content) {
+    console.error('[Batch Generate] No content in Gemini response:', JSON.stringify(data));
+    throw new Error('No content in Gemini response');
+  }
+  
+  console.log('[Batch Generate] Gemini thinking tokens used:', data.usageMetadata?.thoughtsTokenCount || 0);
+  
+  return content;
 }
 
 function extractJSON(text: string): any {
@@ -134,6 +160,7 @@ serve(async (req) => {
     }
 
     console.log(`[Batch Generate] Starting ${type} generation for level ${level || 'all'}, batch size: ${batchSize}`);
+    console.log(`[Batch Generate] Using Gemini 2.5 Flash with max thinking budget (24576 tokens)`);
 
     let result: any = { success: true, generated: 0, errors: 0 };
 
@@ -145,7 +172,6 @@ serve(async (req) => {
         .order('seq_no')
         .limit(batchSize);
       
-      // level이 숫자인 경우에만 필터링 (all이면 전체 조회)
       if (level && !isNaN(Number(level))) {
         query.eq('level', Number(level));
       }
@@ -158,7 +184,6 @@ serve(async (req) => {
       
       for (const vocab of (vocabItems || [])) {
         try {
-          // Check if cloze already exists for this vocabulary
           const { data: existing } = await supabase
             .from('cloze_questions')
             .select('id')
@@ -200,8 +225,7 @@ serve(async (req) => {
             console.log(`[Batch Generate] Generated cloze for: ${vocab.word}`);
           }
           
-          // Rate limiting - small delay between API calls
-          await new Promise(resolve => setTimeout(resolve, 200));
+          await new Promise(resolve => setTimeout(resolve, 300));
           
         } catch (e) {
           console.error(`[Batch Generate] Error generating cloze for ${vocab.word}:`, e);
@@ -211,7 +235,6 @@ serve(async (req) => {
     }
 
     if (type === 'ox') {
-      // O/X 문법 문제 생성
       const targetLevel = level || 1;
       const levelName = targetLevel <= 2 ? '초급' : targetLevel <= 4 ? '중급' : '고급';
       
@@ -255,23 +278,19 @@ ${targetLevel >= 5 ? '- 고급 연결 어미 (-는 바, -기 마련이다)\n- �
     }
 
     if (type === 'idiom') {
-      // 관용표현 생성
       const targetLevel = level || 3;
       
       const koreanIdioms = [
-        // 초급 (3급)
         { idiom: '발이 넓다', level: 3 },
         { idiom: '눈이 높다', level: 3 },
         { idiom: '손이 크다', level: 3 },
         { idiom: '입이 가볍다', level: 3 },
         { idiom: '귀가 얇다', level: 3 },
-        // 중급 (4급)
         { idiom: '배가 아프다', level: 4 },
         { idiom: '눈에 밟히다', level: 4 },
         { idiom: '발을 끊다', level: 4 },
         { idiom: '손을 놓다', level: 4 },
         { idiom: '가슴이 뜨겁다', level: 4 },
-        // 고급 (5-6급)
         { idiom: '목이 빠지게 기다리다', level: 5 },
         { idiom: '발 벗고 나서다', level: 5 },
         { idiom: '손에 땀을 쥐다', level: 5 },
@@ -283,7 +302,6 @@ ${targetLevel >= 5 ? '- 고급 연결 어미 (-는 바, -기 마련이다)\n- �
       
       for (const idiomItem of idiomToGenerate) {
         try {
-          // Check if idiom already exists
           const { data: existing } = await supabase
             .from('topik_idioms')
             .select('id')
@@ -324,7 +342,7 @@ TOPIK 레벨: ${idiomItem.level}급
             console.log(`[Batch Generate] Generated idiom: ${idiomItem.idiom}`);
           }
           
-          await new Promise(resolve => setTimeout(resolve, 200));
+          await new Promise(resolve => setTimeout(resolve, 300));
           
         } catch (e) {
           console.error(`[Batch Generate] Error generating idiom ${idiomItem.idiom}:`, e);
@@ -334,30 +352,42 @@ TOPIK 레벨: ${idiomItem.level}급
     }
 
     if (type === 'translate') {
-      // 번역 생성 (어휘에 다국어 번역 추가)
-      const { data: vocabItems, error: vocabError } = await supabase
+      // 번역 생성 (어휘에 다국어 번역 추가) - 고품질 번역
+      let query = supabase
         .from('topik_vocabulary')
-        .select('id, word, pos, example_phrase')
+        .select('id, word, pos, example_phrase, level')
         .is('meaning_vi', null)
         .order('seq_no')
         .limit(batchSize);
       
+      // level 필터링 추가
+      if (level && !isNaN(Number(level))) {
+        query = query.eq('level', Number(level));
+      }
+      
+      const { data: vocabItems, error: vocabError } = await query;
+      
       if (vocabError) throw vocabError;
+      
+      console.log(`[Batch Generate] Found ${vocabItems?.length || 0} vocabulary items for translation`);
       
       for (const vocab of (vocabItems || [])) {
         try {
           const userPrompt = `한국어 단어: ${vocab.word}
 품사: ${vocab.pos}
-예시: ${vocab.example_phrase}
+TOPIK 레벨: ${vocab.level}급
+예시 구: ${vocab.example_phrase}
 
-다음 7개 언어로 이 단어의 의미와 예문을 번역해주세요:
-1. 베트남어 (vi)
-2. 영어 (en)
-3. 일본어 (ja)
-4. 중국어 간체 (zh)
-5. 러시아어 (ru)
-6. 우즈베크어 (uz)
-7. 예문 베트남어 번역
+다음 7개 언어로 이 단어의 의미와 예문을 번역해주세요.
+정확하고 자연스러운 번역이 중요합니다. 각 언어의 뉘앙스를 살려주세요.
+
+1. 베트남어 (vi) - 베트남어 원어민이 자연스럽게 이해할 수 있는 표현
+2. 영어 (en) - 간결하고 정확한 영어 번역
+3. 일본어 (ja) - 히라가나/가타카나/한자 적절히 사용
+4. 중국어 간체 (zh) - 중국 본토 표준 중국어
+5. 러시아어 (ru) - 러시아어 원어민 표현
+6. 우즈베크어 (uz) - 현대 우즈베크어 표현
+7. 예문 - 단어를 사용한 자연스러운 한국어 예문과 베트남어 번역
 
 JSON 형식:
 {
@@ -372,7 +402,10 @@ JSON 형식:
 }`;
 
           const response = await callGemini(
-            '당신은 다국어 번역 전문가입니다. 정확하고 자연스러운 번역을 제공하세요.',
+            `당신은 한국어와 다국어 번역 전문가입니다. 
+TOPIK 한국어 능력시험 어휘를 다양한 언어로 정확하게 번역합니다.
+각 언어의 문화적 맥락과 뉘앙스를 고려하여 자연스러운 번역을 제공하세요.
+반드시 유효한 JSON 형식으로 응답하세요.`,
             userPrompt
           );
           const translations = extractJSON(response);
@@ -396,10 +429,11 @@ JSON 형식:
             result.errors++;
           } else {
             result.generated++;
-            console.log(`[Batch Generate] Translated: ${vocab.word}`);
+            console.log(`[Batch Generate] Translated: ${vocab.word} (Level ${vocab.level})`);
           }
           
-          await new Promise(resolve => setTimeout(resolve, 200));
+          // Thinking Budget 사용으로 더 긴 딜레이
+          await new Promise(resolve => setTimeout(resolve, 500));
           
         } catch (e) {
           console.error(`[Batch Generate] Error translating ${vocab.word}:`, e);
