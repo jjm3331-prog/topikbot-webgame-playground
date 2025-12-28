@@ -79,6 +79,9 @@ const QUIZ_TYPE_LABELS: Record<QuizType, { ko: string; color: string }> = {
   similar: { ko: '유사어', color: 'text-blue-600' }
 };
 
+// In-memory cache for related words (persists across quiz sessions)
+const relatedWordsCache = new Map<string, RelatedWordsData>();
+
 const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
   const { t, i18n } = useTranslation();
   const { getMeaning } = useVocabulary();
@@ -99,6 +102,7 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
   const [sessionComplete, setSessionComplete] = useState(false);
   const [generatingQuiz, setGeneratingQuiz] = useState(false);
   const [quizStarted, setQuizStarted] = useState(false);
+  const [preloadProgress, setPreloadProgress] = useState({ current: 0, total: 0 });
 
   // Fetch user's mistakes
   const fetchMistakes = useCallback(async () => {
@@ -177,8 +181,15 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
     return 'en';
   };
 
-  // Fetch related words from API
+  // Fetch related words from API with caching
   const fetchRelatedWords = async (word: string): Promise<RelatedWordsData | null> => {
+    const cacheKey = `${word}_${getTargetLang()}`;
+    
+    // Check cache first
+    if (relatedWordsCache.has(cacheKey)) {
+      return relatedWordsCache.get(cacheKey)!;
+    }
+    
     try {
       const { data, error } = await supabase.functions.invoke('related-words', {
         body: { word, targetLang: getTargetLang() }
@@ -189,23 +200,60 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
         return null;
       }
 
-      return data?.data || null;
+      const result = data?.data || null;
+      
+      // Cache the result
+      if (result) {
+        relatedWordsCache.set(cacheKey, result);
+      }
+      
+      return result;
     } catch (error) {
       console.error('Failed to fetch related words:', error);
       return null;
     }
   };
 
-  // Generate quiz questions
+  // Pre-load all related words before starting quiz
+  const preloadRelatedWords = async (wordsToLoad: MistakeItem[]): Promise<Map<string, RelatedWordsData>> => {
+    const results = new Map<string, RelatedWordsData>();
+    const total = Math.min(wordsToLoad.length, 10);
+    setPreloadProgress({ current: 0, total });
+    
+    // Load in parallel batches of 3 for speed
+    const batchSize = 3;
+    for (let i = 0; i < total; i += batchSize) {
+      const batch = wordsToLoad.slice(i, Math.min(i + batchSize, total));
+      const promises = batch.map(async (mistake) => {
+        const data = await fetchRelatedWords(mistake.item_data.word);
+        return { word: mistake.item_data.word, data };
+      });
+      
+      const batchResults = await Promise.all(promises);
+      batchResults.forEach(({ word, data }) => {
+        if (data) results.set(word, data);
+      });
+      
+      setPreloadProgress({ current: Math.min(i + batchSize, total), total });
+    }
+    
+    return results;
+  };
+
+  // Generate quiz questions with pre-loaded data
   const generateQuiz = async () => {
     setGeneratingQuiz(true);
-    const questions: QuizQuestion[] = [];
     
     // Take first 10 words
     const wordsToQuiz = mistakes.slice(0, 10);
     
+    // Pre-load all related words first
+    const preloadedData = await preloadRelatedWords(wordsToQuiz);
+    
+    const questions: QuizQuestion[] = [];
+    
     for (const mistake of wordsToQuiz) {
-      const relatedData = await fetchRelatedWords(mistake.item_data.word);
+      const relatedData = preloadedData.get(mistake.item_data.word);
       
       if (!relatedData) continue;
       
@@ -264,8 +312,7 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
         questionType: selected.type,
         correctAnswer: correctAnswer.word,
         correctMeaning: correctAnswer.meaning,
-        options,
-        sourceUrl: relatedData.sourceUrl
+        options
       });
     }
     
@@ -276,6 +323,7 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
     setSessionComplete(false);
     setQuizStarted(true);
     setGeneratingQuiz(false);
+    setPreloadProgress({ current: 0, total: 0 });
   };
 
   const handleAnswer = (answer: string) => {
@@ -627,10 +675,23 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
               size="lg"
             >
               {generatingQuiz ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  퀴즈 생성 중...
-                </>
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    {preloadProgress.total > 0 
+                      ? `관련어 로딩 중... (${preloadProgress.current}/${preloadProgress.total})`
+                      : '준비 중...'
+                    }
+                  </div>
+                  {preloadProgress.total > 0 && (
+                    <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-primary transition-all duration-300"
+                        style={{ width: `${(preloadProgress.current / preloadProgress.total) * 100}%` }}
+                      />
+                    </div>
+                  )}
+                </div>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4 mr-2" />
