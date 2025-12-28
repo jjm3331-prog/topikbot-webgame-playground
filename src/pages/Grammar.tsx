@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
@@ -15,10 +15,12 @@ import {
   ArrowLeft,
   Sparkles,
   GripVertical,
+  Loader2,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AppLayout from "@/components/AppLayout";
+import { useAutoTranslate } from "@/hooks/useAutoTranslate";
 
 type TopikLevel = "1-2" | "3-4" | "5-6";
 
@@ -51,11 +53,28 @@ function LocalizedText({
   className?: string;
 }) {
   const { i18n } = useTranslation();
-  const lang = (i18n.language || "ko").split("-")[0];
+  const uiLang = (i18n.language || "ko").split("-")[0];
 
-  if (lang === "vi") return <div className={className}>{vi || ko}</div>;
-  // default: show Korean only (prevents Vietnamese leaking into Korean/other UIs)
-  return <div className={className}>{ko || vi}</div>;
+  // 베트남어: 그대로 표시
+  if (uiLang === "vi") return <div className={className}>{vi || ko}</div>;
+  // 한국어: 한국어만 표시
+  if (uiLang === "ko") return <div className={className}>{ko || vi}</div>;
+
+  // 그 외 언어: 한국어 원문을 해당 언어로 자동번역
+  const { text: translatedText, isTranslating } = useAutoTranslate(ko || vi, { sourceLanguage: "ko" });
+
+  return (
+    <div className={className}>
+      {isTranslating ? (
+        <span className="inline-flex items-center gap-1 text-muted-foreground">
+          <Loader2 className="w-3 h-3 animate-spin" />
+          {ko || vi}
+        </span>
+      ) : (
+        translatedText
+      )}
+    </div>
+  );
 }
 
 // Custom Level Selector for Grammar
