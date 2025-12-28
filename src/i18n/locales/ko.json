@@ -698,6 +698,13 @@
     "pricing": { "title1": "합리적인 가격,", "local": "현지", "title2": "글로벌 품질", "free": "무료", "forever": "평생 무료", "start": "시작하기", "month": "월", "upgrade": "업그레이드" },
     "finalCta": { "title1": "TOPIK", "title2": "정복", "desc": "TOPIK 출제 교수 + LUKATO AI =", "noRival": "최강 조합", "cta": "지금 시작하기" }
   },
+  "lesson": {
+    "correct": "정답입니다! 👏",
+    "incorrect": "오답입니다 😅",
+    "checkAnswer": "정답 확인",
+    "nextQuestion": "다음 문제",
+    "viewResults": "결과 보기"
+  },
 "grammar": {
     "title": "문법 학습",
     "description": "미니 게임으로 문법을 마스터하세요",

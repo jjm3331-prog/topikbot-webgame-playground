@@ -788,6 +788,13 @@
       "cta": "Bắt đầu ngay"
     }
   },
+  "lesson": {
+    "correct": "Đúng rồi! 👏",
+    "incorrect": "Sai rồi 😅",
+    "checkAnswer": "Kiểm tra đáp án",
+    "nextQuestion": "Câu tiếp theo",
+    "viewResults": "Xem kết quả"
+  },
 "grammar": {
     "title": "Học ngữ pháp",
     "description": "Làm chủ ngữ pháp qua mini-game",

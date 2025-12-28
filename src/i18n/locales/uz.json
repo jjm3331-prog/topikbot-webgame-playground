@@ -662,6 +662,13 @@
     "pricing": { "title1": "Adolatli narx,", "local": "mahalliy", "title2": "global sifat", "free": "Bepul", "forever": "Abadiy bepul", "start": "Boshlash", "month": "oy", "upgrade": "Yangilash" },
     "finalCta": { "title1": "TOPIK", "title2": "zabt etish", "desc": "TOPIK professorlari + LUKATO AI =", "noRival": "Yengilmas kombinatsiya", "cta": "Hozir boshlash" }
   },
+  "lesson": {
+    "correct": "To'g'ri! 👏",
+    "incorrect": "Noto'g'ri 😅",
+    "checkAnswer": "Javobni tekshirish",
+    "nextQuestion": "Keyingi savol",
+    "viewResults": "Natijalarni ko'rish"
+  },
 "grammar": {
     "title": "Grammatika o'rganish",
     "description": "Mini-o'yinlar orqali grammatikani o'zlashtirang",

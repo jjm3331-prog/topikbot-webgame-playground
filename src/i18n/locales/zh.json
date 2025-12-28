@@ -698,6 +698,13 @@
     "noQuestionsLeft": "今日免费提问次数已用完", "upgradePremiumBtn": "升级Premium", "uploadImage": "上传图片", "voiceInput": "语音输入",
     "placeholder": "输入您的问题... 💬", "hint": "按Enter发送 • Shift+Enter换行"
   },
+  "lesson": {
+    "correct": "正确！ 👏",
+    "incorrect": "错误 😅",
+    "checkAnswer": "检查答案",
+    "nextQuestion": "下一题",
+    "viewResults": "查看结果"
+  },
   "writing": {
     "title": "写作批改", "subtitle": "TOPIK II 写作批改", "premiumFeature": "高级功能",
     "questionUpload": "题目上传", "answerInput": "答案输入",

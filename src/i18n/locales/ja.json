@@ -698,6 +698,13 @@
     "noQuestionsLeft": "本日の無料質問回数を使い切りました", "upgradePremiumBtn": "Premiumにアップグレード", "uploadImage": "画像をアップロード", "voiceInput": "音声入力",
     "placeholder": "質問を入力... 💬", "hint": "Enterで送信 • Shift+Enterで改行"
   },
+  "lesson": {
+    "correct": "正解！ 👏",
+    "incorrect": "不正解 😅",
+    "checkAnswer": "答えを確認",
+    "nextQuestion": "次の問題",
+    "viewResults": "結果を見る"
+  },
   "writing": {
     "title": "作文添削", "subtitle": "TOPIK II 作文添削", "premiumFeature": "プレミアム機能",
     "questionUpload": "問題アップロード", "answerInput": "答案入力",
