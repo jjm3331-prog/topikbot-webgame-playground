@@ -165,12 +165,35 @@ async function callGrok(systemPrompt: string, userPrompt: string): Promise<strin
   return content;
 }
 
-// Model-agnostic call function
-async function callLLM(model: string, systemPrompt: string, userPrompt: string): Promise<string> {
+// Model-agnostic call function with auto-fallback
+async function callLLM(model: string, systemPrompt: string, userPrompt: string): Promise<{ content: string; usedModel: string }> {
+  // Grok 직접 호출 (fallback 없음)
   if (model === 'grok') {
-    return await callGrok(systemPrompt, userPrompt);
+    const content = await callGrok(systemPrompt, userPrompt);
+    return { content, usedModel: 'grok' };
   }
-  return await callGemini(systemPrompt, userPrompt);
+  
+  // Gemini 호출 + Grok 자동 fallback
+  try {
+    const content = await callGemini(systemPrompt, userPrompt);
+    return { content, usedModel: 'gemini' };
+  } catch (geminiError) {
+    console.warn('[Batch Generate] Gemini failed, falling back to Grok:', geminiError);
+    
+    if (!X_AI_API_KEY) {
+      console.error('[Batch Generate] Grok fallback unavailable - X_AI_API_KEY not configured');
+      throw geminiError;
+    }
+    
+    try {
+      const content = await callGrok(systemPrompt, userPrompt);
+      console.log('[Batch Generate] Grok fallback succeeded');
+      return { content, usedModel: 'grok-fallback' };
+    } catch (grokError) {
+      console.error('[Batch Generate] Grok fallback also failed:', grokError);
+      throw grokError;
+    }
+  }
 }
 
 function extractJSON(text: string): any {
@@ -252,8 +275,8 @@ serve(async (req) => {
 
 이 단어를 사용한 빈칸 채우기 문제를 만들어주세요.`;
 
-          const response = await callLLM(model, CLOZE_SYSTEM_PROMPT, userPrompt);
-          const clozeData = extractJSON(response);
+          const { content: responseContent, usedModel } = await callLLM(model, CLOZE_SYSTEM_PROMPT, userPrompt);
+          const clozeData = extractJSON(responseContent);
           
           const { error: insertError } = await supabase
             .from('cloze_questions')
@@ -272,7 +295,8 @@ serve(async (req) => {
             result.errors++;
           } else {
             result.generated++;
-            console.log(`[Batch Generate] Generated cloze for: ${vocab.word}`);
+            if (usedModel === 'grok-fallback') result.fallbacks = (result.fallbacks || 0) + 1;
+            console.log(`[Batch Generate] Generated cloze for: ${vocab.word} (via ${usedModel})`);
           }
           
           await new Promise(resolve => setTimeout(resolve, 300));
@@ -296,8 +320,8 @@ ${targetLevel >= 3 && targetLevel <= 4 ? '- 연결 어미 (-면서, -기 때문�
 ${targetLevel >= 5 ? '- 고급 연결 어미 (-는 바, -기 마련이다)\n- 격식체\n- 한자어 관용 표현\n- 학술적 표현' : ''}`;
 
       try {
-        const response = await callLLM(model, OX_SYSTEM_PROMPT, userPrompt);
-        const oxQuestions = extractJSON(response);
+        const { content: responseContent, usedModel } = await callLLM(model, OX_SYSTEM_PROMPT, userPrompt);
+        const oxQuestions = extractJSON(responseContent);
         
         if (Array.isArray(oxQuestions)) {
           for (const q of oxQuestions) {
@@ -368,8 +392,8 @@ TOPIK 레벨: ${idiomItem.level}급
 
 이 관용표현의 상세 정보를 생성해주세요.`;
 
-          const response = await callLLM(model, IDIOM_SYSTEM_PROMPT, userPrompt);
-          const idiomData = extractJSON(response);
+          const { content: responseContent, usedModel } = await callLLM(model, IDIOM_SYSTEM_PROMPT, userPrompt);
+          const idiomData = extractJSON(responseContent);
           
           const { error: insertError } = await supabase
             .from('topik_idioms')
@@ -451,8 +475,8 @@ JSON 형식:
   "example_sentence_vi": "예문 베트남어 번역"
 }`;
 
-          const response = await callLLM(model, TRANSLATE_SYSTEM_PROMPT, userPrompt);
-          const translations = extractJSON(response);
+          const { content: responseContent, usedModel } = await callLLM(model, TRANSLATE_SYSTEM_PROMPT, userPrompt);
+          const translations = extractJSON(responseContent);
           
           const { error: updateError } = await supabase
             .from('topik_vocabulary')
@@ -473,7 +497,8 @@ JSON 형식:
             result.errors++;
           } else {
             result.generated++;
-            console.log(`[Batch Generate] Translated: ${vocab.word} (Level ${vocab.level}) with ${modelName}`);
+            if (usedModel === 'grok-fallback') result.fallbacks = (result.fallbacks || 0) + 1;
+            console.log(`[Batch Generate] Translated: ${vocab.word} (Level ${vocab.level}) via ${usedModel}`);
           }
           
           await new Promise(resolve => setTimeout(resolve, 500));
