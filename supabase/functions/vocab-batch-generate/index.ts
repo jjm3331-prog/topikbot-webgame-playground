@@ -77,9 +77,9 @@ async function callGemini(systemPrompt: string, userPrompt: string): Promise<str
     throw new Error("GEMINI_API_KEY is not configured");
   }
 
-  // Gemini 2.0 Flash 사용 (안정 버전)
+  // 모델: gemini-2.5-flash
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
     {
       method: 'POST',
       headers: {
@@ -157,7 +157,7 @@ serve(async (req) => {
     }
 
     console.log(`[Batch Generate] Starting ${type} generation for level ${level || 'all'}, batch size: ${batchSize}`);
-    console.log(`[Batch Generate] Using Gemini 2.0 Flash (stable version)`);
+    console.log(`[Batch Generate] Using Gemini 2.5 Flash (gemini-2.5-flash)`);
 
     let result: any = { success: true, generated: 0, errors: 0 };
 
