@@ -16,11 +16,13 @@ import {
   Brain,
   Lightbulb,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  Loader2
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useVocabulary } from '@/hooks/useVocabulary';
 import confetti from 'canvas-confetti';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface MistakeItem {
   id: string;
@@ -69,8 +71,10 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
   const [consecutiveCorrect, setConsecutiveCorrect] = useState<Record<string, number>>({});
   const [sessionComplete, setSessionComplete] = useState(false);
   const [masteredInSession, setMasteredInSession] = useState<string[]>([]);
+  const [wrongInSession, setWrongInSession] = useState<MistakeItem[]>([]); // 세션 중 틀린 단어들
   const [showAllLevels, setShowAllLevels] = useState(false); // 전체 레벨 보기
   const [viewMode, setViewMode] = useState<ViewMode>('review'); // 모드 전환
+  const [playingTTS, setPlayingTTS] = useState<string | null>(null); // TTS 재생 중인 단어
 
   // Fetch user's mistakes
   const fetchMistakes = useCallback(async () => {
@@ -147,17 +151,22 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
     return getMeaning(mockWord as any);
   };
 
-  const playTTS = async (text: string) => {
+  const playTTS = async (text: string, trackWord?: string) => {
     try {
+      if (trackWord) setPlayingTTS(trackWord);
       const { data, error } = await supabase.functions.invoke('korean-tts', {
         body: { text, speed: 0.9 }
       });
       if (data?.audio) {
         const audio = new Audio(`data:audio/mp3;base64,${data.audio}`);
+        audio.onended = () => setPlayingTTS(null);
         audio.play();
+      } else {
+        setPlayingTTS(null);
       }
     } catch (error) {
       console.error('TTS error:', error);
+      setPlayingTTS(null);
     }
   };
 
@@ -225,6 +234,14 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
       setStreak(0);
       // Reset consecutive count
       setConsecutiveCorrect(prev => ({ ...prev, [itemId]: 0 }));
+      
+      // 세션 중 틀린 단어 기록
+      setWrongInSession(prev => {
+        if (!prev.find(m => m.id === currentMistake.id)) {
+          return [...prev, currentMistake];
+        }
+        return prev;
+      });
 
       // Increase mistake count
       try {
@@ -260,6 +277,7 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
     setCorrectCount(0);
     setStreak(0);
     setMasteredInSession([]);
+    setWrongInSession([]);
     fetchMistakes();
   };
 
@@ -309,9 +327,27 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
     );
   }
 
+  // 차트 색상
+  const CHART_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6'];
+
   // 통계 대시보드 뷰
   if (viewMode === 'stats') {
     const stats = getStats();
+    
+    // 파이 차트 데이터
+    const pieData = Object.entries(stats.levelCounts)
+      .sort(([a], [b]) => Number(a) - Number(b))
+      .map(([lvl, count], idx) => ({
+        name: `${lvl}급`,
+        value: count,
+        color: CHART_COLORS[idx % CHART_COLORS.length]
+      }));
+    
+    // 바 차트 데이터 (TOP 5)
+    const barData = stats.topMistakes.slice(0, 5).map(item => ({
+      word: item.word,
+      count: item.count
+    }));
     
     return (
       <div className="space-y-6">
@@ -355,53 +391,110 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
               </div>
             </Card>
 
-            {/* 레벨별 분포 */}
+            {/* 레벨별 파이 차트 */}
             <Card className="p-4">
               <h4 className="font-semibold mb-3 flex items-center gap-2">
                 <Flame className="w-4 h-4 text-orange-500" />
                 레벨별 오답 분포
               </h4>
-              <div className="space-y-2">
-                {Object.entries(stats.levelCounts)
-                  .sort(([a], [b]) => Number(a) - Number(b))
-                  .map(([lvl, count]) => (
-                    <div key={lvl} className="flex items-center gap-2">
-                      <Badge variant="outline" className="w-16 justify-center">
-                        {lvl}급
-                      </Badge>
-                      <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-gradient-to-r from-orange-400 to-red-500"
-                          style={{ width: `${(count / stats.total) * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-sm font-medium w-8 text-right">{count}</span>
-                    </div>
-                  ))}
+              <div className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={70}
+                      paddingAngle={2}
+                      dataKey="value"
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      labelLine={false}
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      formatter={(value: number) => [`${value}개`, '오답 수']}
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--background))', 
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px'
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              {/* 레전드 */}
+              <div className="flex flex-wrap justify-center gap-2 mt-2">
+                {pieData.map((entry, idx) => (
+                  <div key={idx} className="flex items-center gap-1 text-xs">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
+                    <span>{entry.name}: {entry.value}</span>
+                  </div>
+                ))}
               </div>
             </Card>
 
-            {/* 가장 많이 틀린 단어 */}
+            {/* 가장 많이 틀린 단어 바 차트 */}
             <Card className="p-4">
               <h4 className="font-semibold mb-3 flex items-center gap-2">
                 <Brain className="w-4 h-4 text-red-500" />
-                가장 많이 틀린 단어 TOP 10
+                가장 많이 틀린 단어 TOP 5
               </h4>
-              <div className="space-y-2">
+              <div className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={barData} layout="vertical">
+                    <XAxis type="number" hide />
+                    <YAxis 
+                      type="category" 
+                      dataKey="word" 
+                      width={60}
+                      tick={{ fontSize: 12 }}
+                    />
+                    <Tooltip 
+                      formatter={(value: number) => [`${value}회`, '틀린 횟수']}
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--background))', 
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Bar 
+                      dataKey="count" 
+                      fill="#ef4444"
+                      radius={[0, 4, 4, 0]}
+                      label={{ position: 'right', fontSize: 11 }}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+
+            {/* 전체 오답 리스트 + TTS */}
+            <Card className="p-4">
+              <h4 className="font-semibold mb-3 flex items-center gap-2">
+                <Volume2 className="w-4 h-4 text-primary" />
+                전체 오답 단어 듣기
+              </h4>
+              <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto">
                 {stats.topMistakes.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
-                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                      idx === 0 ? 'bg-red-500 text-white' :
-                      idx === 1 ? 'bg-orange-500 text-white' :
-                      idx === 2 ? 'bg-yellow-500 text-white' :
-                      'bg-muted-foreground/20 text-muted-foreground'
-                    }`}>
-                      {idx + 1}
-                    </span>
-                    <span className="font-medium flex-1">{item.word}</span>
-                    <Badge variant="outline" className="text-xs">{item.level}급</Badge>
-                    <Badge variant="destructive" className="text-xs">{item.count}회</Badge>
-                  </div>
+                  <Button
+                    key={idx}
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => playTTS(item.word, item.word)}
+                    className="justify-start text-left"
+                  >
+                    {playingTTS === item.word ? (
+                      <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                    ) : (
+                      <Volume2 className="w-3 h-3 mr-2" />
+                    )}
+                    {item.word}
+                    <Badge variant="outline" className="ml-auto text-xs">{item.count}회</Badge>
+                  </Button>
                 ))}
               </div>
             </Card>
@@ -460,50 +553,99 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
 
   if (sessionComplete) {
     const accuracy = mistakes.length > 0 ? Math.round((correctCount / mistakes.length) * 100) : 0;
+    const wrongCount = mistakes.length - correctCount;
     
     return (
-      <Card className="p-8 text-center bg-gradient-to-br from-primary/10 to-purple-500/10 border-primary/20">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', bounce: 0.5 }}
-        >
-          <Sparkles className="w-16 h-16 mx-auto text-primary mb-4" />
-        </motion.div>
-        <h3 className="text-2xl font-bold text-foreground mb-4">복습 완료!</h3>
-        
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="bg-background/50 rounded-lg p-4">
-            <div className="text-3xl font-bold text-primary">{correctCount}</div>
-            <div className="text-sm text-muted-foreground">정답</div>
+      <div className="space-y-6">
+        <Card className="p-6 text-center bg-gradient-to-br from-primary/10 to-purple-500/10 border-primary/20">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', bounce: 0.5 }}
+          >
+            <Sparkles className="w-12 h-12 mx-auto text-primary mb-3" />
+          </motion.div>
+          <h3 className="text-xl font-bold text-foreground mb-4">복습 완료!</h3>
+          
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="bg-background/50 rounded-lg p-3">
+              <div className="text-2xl font-bold text-primary">{correctCount}</div>
+              <div className="text-xs text-muted-foreground">정답</div>
+            </div>
+            <div className="bg-background/50 rounded-lg p-3">
+              <div className="text-2xl font-bold text-green-500">{accuracy}%</div>
+              <div className="text-xs text-muted-foreground">정확도</div>
+            </div>
           </div>
-          <div className="bg-background/50 rounded-lg p-4">
-            <div className="text-3xl font-bold text-green-500">{accuracy}%</div>
-            <div className="text-sm text-muted-foreground">정확도</div>
-          </div>
-        </div>
+        </Card>
 
+        {/* 마스터한 단어 */}
         {masteredInSession.length > 0 && (
-          <div className="mb-6 p-4 bg-green-500/10 rounded-lg border border-green-500/20">
-            <h4 className="font-semibold text-green-600 mb-2 flex items-center justify-center gap-2">
+          <Card className="p-4 bg-green-500/10 border-green-500/20">
+            <h4 className="font-semibold text-green-600 mb-3 flex items-center gap-2">
               <Trophy className="w-4 h-4" />
               마스터한 단어 ({masteredInSession.length}개)
             </h4>
-            <div className="flex flex-wrap gap-2 justify-center">
+            <div className="flex flex-wrap gap-2">
               {masteredInSession.map((word, idx) => (
-                <Badge key={idx} variant="secondary" className="bg-green-500/20 text-green-700">
+                <Button
+                  key={idx}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => playTTS(word, word)}
+                  className="bg-green-500/20 text-green-700 hover:bg-green-500/30"
+                >
+                  {playingTTS === word ? (
+                    <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                  ) : (
+                    <Volume2 className="w-3 h-3 mr-1" />
+                  )}
                   {word}
-                </Badge>
+                </Button>
               ))}
             </div>
-          </div>
+          </Card>
+        )}
+
+        {/* 이번 세션에서 틀린 단어 */}
+        {wrongInSession.length > 0 && (
+          <Card className="p-4 bg-red-500/10 border-red-500/20">
+            <h4 className="font-semibold text-red-600 mb-3 flex items-center gap-2">
+              <X className="w-4 h-4" />
+              다시 복습할 단어 ({wrongInSession.length}개)
+            </h4>
+            <div className="space-y-2">
+              {wrongInSession.map((item, idx) => (
+                <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-background/50">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => playTTS(item.item_data.word, item.item_data.word)}
+                      className="h-8 w-8 p-0"
+                    >
+                      {playingTTS === item.item_data.word ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Volume2 className="w-4 h-4" />
+                      )}
+                    </Button>
+                    <span className="font-medium">{item.item_data.word}</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {getMeaningForItem(item)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
         )}
 
         <Button onClick={handleRestart} className="w-full">
           <RotateCcw className="w-4 h-4 mr-2" />
           다시 복습하기
         </Button>
-      </Card>
+      </div>
     );
   }
 
