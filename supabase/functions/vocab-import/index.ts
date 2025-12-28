@@ -6,7 +6,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// EUC-KR/CP949 디코딩을 위한 매핑 (한국어 CSV 파일용)
 // CSV 데이터 구조: 전체 번호, 등급별 번호, 등급, 표제어, 품사, 결합정보이름, 국제통용표준개발(1-4단계), 비고
 interface VocabularyRow {
   seq_no: number;
@@ -61,7 +60,7 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { csvData, action } = await req.json();
+    const { csvData, action, csvUrl } = await req.json();
 
     if (action === 'check') {
       // Check current vocabulary count
@@ -77,8 +76,21 @@ serve(async (req) => {
       });
     }
 
-    if (!csvData) {
-      return new Response(JSON.stringify({ error: 'csvData is required' }), {
+    // CSV URL에서 직접 가져오기 지원
+    let finalCsvData = csvData;
+    
+    if (csvUrl) {
+      console.log('[Vocab Import] Fetching CSV from URL:', csvUrl);
+      const csvResponse = await fetch(csvUrl);
+      if (!csvResponse.ok) {
+        throw new Error(`Failed to fetch CSV: ${csvResponse.statusText}`);
+      }
+      finalCsvData = await csvResponse.text();
+      console.log('[Vocab Import] CSV fetched, length:', finalCsvData.length);
+    }
+    
+    if (!finalCsvData) {
+      return new Response(JSON.stringify({ error: 'csvData or csvUrl is required' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -87,10 +99,11 @@ serve(async (req) => {
     console.log('[Vocab Import] Starting CSV parsing...');
     
     // Parse CSV data
-    const lines = csvData.split('\n').filter((line: string) => line.trim());
+    const lines = finalCsvData.split('\n').filter((line: string) => line.trim());
     const header = lines[0];
     const dataLines = lines.slice(1);
     
+    console.log(`[Vocab Import] Header: ${header.substring(0, 100)}...`);
     console.log(`[Vocab Import] Found ${dataLines.length} vocabulary entries`);
     
     const vocabularyItems: VocabularyRow[] = [];
