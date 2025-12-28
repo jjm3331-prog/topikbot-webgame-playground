@@ -115,7 +115,16 @@ verify_jwt = true
 verify_jwt = false
 
 [functions.vocab-import]
-verify_jwt = true
+verify_jwt = false
 
 [functions.vocab-batch-generate]
+verify_jwt = false
+
+[functions.semantic-validate]
+verify_jwt = false
+
+[functions.auto-translate]
+verify_jwt = false
+
+[functions.admin-users]
 verify_jwt = true
