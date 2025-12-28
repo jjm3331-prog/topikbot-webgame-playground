@@ -1,365 +1,94 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import { 
   ArrowLeft, 
   BookOpen,
   Sparkles,
-  Loader2,
-  RefreshCw,
-  Timer,
-  RotateCcw,
-  Trophy,
-  Flame,
-  Car
+  Zap,
+  Brain,
+  CheckSquare,
+  Lightbulb,
+  BookX,
+  Lock
 } from "lucide-react";
-import confetti from "canvas-confetti";
-import WordRacing from "@/components/vocabulary/WordRacing";
 
-// Word interface
-interface Word {
-  id: number;
-  korean: string;
-  meaning: string;
-  example?: string;
-  exampleMeaning?: string;
-  pronunciation?: string;
-}
+// Import new module components
+import FlashLoop from "@/components/vocabulary/FlashLoop";
+import MiniCloze from "@/components/vocabulary/MiniCloze";
+import OXSpeed from "@/components/vocabulary/OXSpeed";
+import IdiomMaster from "@/components/vocabulary/IdiomMaster";
+import MistakeNote from "@/components/vocabulary/MistakeNote";
 
-// TOPIK 급수 레벨 - labels will be translated in component
+// TOPIK level config
 const topikLevelConfig = {
-  "1-2": { color: "from-green-500 to-emerald-500" },
-  "3-4": { color: "from-blue-500 to-cyan-500" },
-  "5-6": { color: "from-purple-500 to-pink-500" },
+  1: { label: "1급", color: "from-green-400 to-emerald-500", desc: "입문" },
+  2: { label: "2급", color: "from-green-500 to-teal-500", desc: "초급" },
+  3: { label: "3급", color: "from-blue-400 to-cyan-500", desc: "중급I" },
+  4: { label: "4급", color: "from-blue-500 to-indigo-500", desc: "중급II" },
+  5: { label: "5급", color: "from-purple-500 to-violet-500", desc: "고급I" },
+  6: { label: "6급", color: "from-purple-600 to-pink-500", desc: "고급II" },
 };
 
 type TopikLevel = keyof typeof topikLevelConfig;
 
-// Tab types - labels will be translated
-const tabConfig = [
-  { id: "racing", icon: Car },
-  { id: "sprint", icon: Timer },
+// Module types
+type ModuleType = "flash" | "cloze" | "ox" | "idiom" | "mistake";
+
+const moduleConfig = [
+  { 
+    id: "flash" as ModuleType, 
+    icon: Zap, 
+    title: "Flash Loop", 
+    desc: "3초 플래시 암기",
+    color: "from-yellow-400 to-orange-500",
+    premium: false
+  },
+  { 
+    id: "cloze" as ModuleType, 
+    icon: Brain, 
+    title: "Mini Cloze", 
+    desc: "빈칸 퀴즈",
+    color: "from-purple-400 to-pink-500",
+    premium: false
+  },
+  { 
+    id: "ox" as ModuleType, 
+    icon: CheckSquare, 
+    title: "O/X Speed", 
+    desc: "5초 문법 판별",
+    color: "from-blue-400 to-cyan-500",
+    premium: false
+  },
+  { 
+    id: "idiom" as ModuleType, 
+    icon: Lightbulb, 
+    title: "Idiom Master", 
+    desc: "관용표현 마스터",
+    color: "from-amber-400 to-yellow-500",
+    premium: false
+  },
+  { 
+    id: "mistake" as ModuleType, 
+    icon: BookX, 
+    title: "실수 노트", 
+    desc: "60초 강제 복습",
+    color: "from-red-400 to-rose-500",
+    premium: false
+  },
 ];
 
-type TabType = "racing" | "sprint";
-
-
-
-// ================== SPRINT COMPONENT ==================
-interface SprintGameProps {
-  words: Word[];
-  onComplete: (score: number) => void;
-}
-
-const SprintGame = ({ words, onComplete }: SprintGameProps) => {
-  const { t } = useTranslation();
-  const [timeLeft, setTimeLeft] = useState(60);
-  const [score, setScore] = useState(0);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [options, setOptions] = useState<string[]>([]);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [showResult, setShowResult] = useState(false);
-  const [gameStarted, setGameStarted] = useState(false);
-  const [streak, setStreak] = useState(0);
-
-  const currentWord = words[currentIndex % words.length];
-
-  // Generate options
-  useEffect(() => {
-    if (!currentWord) return;
-    
-    const correctAnswer = currentWord.meaning;
-    const otherMeanings = words
-      .filter(w => w.id !== currentWord.id)
-      .map(w => w.meaning)
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 3);
-    
-    const allOptions = [correctAnswer, ...otherMeanings].sort(() => Math.random() - 0.5);
-    setOptions(allOptions);
-  }, [currentIndex, words, currentWord]);
-
-  // Timer
-  useEffect(() => {
-    if (!gameStarted || timeLeft <= 0) return;
-
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          onComplete(score);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [gameStarted, timeLeft, score, onComplete]);
-
-  const handleAnswer = (optionIndex: number) => {
-    if (showResult) return;
-    
-    setSelectedAnswer(optionIndex);
-    setShowResult(true);
-
-    const isCorrect = options[optionIndex] === currentWord.meaning;
-    
-    if (isCorrect) {
-      const bonusPoints = Math.min(streak, 5);
-      setScore(prev => prev + 10 + bonusPoints);
-      setStreak(prev => prev + 1);
-    } else {
-      setStreak(0);
-    }
-
-    setTimeout(() => {
-      setCurrentIndex(prev => prev + 1);
-      setSelectedAnswer(null);
-      setShowResult(false);
-    }, 500);
-  };
-
-  if (!gameStarted) {
-    return (
-      <div className="text-center py-12">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center mx-auto mb-6"
-        >
-          <Timer className="w-12 h-12 text-white" />
-        </motion.div>
-        <h2 className="text-2xl font-bold mb-2">{t('vocabulary.sprint')}</h2>
-        <p className="text-muted-foreground mb-6">{t('vocabulary.sprintChallenge')}</p>
-        <Button 
-          size="lg" 
-          onClick={() => setGameStarted(true)}
-          className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
-        >
-          {t('vocabulary.start')}
-        </Button>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      {/* Timer & Score */}
-      <div className="flex justify-between items-center mb-4 sm:mb-6">
-        <div className={`text-2xl sm:text-3xl font-bold ${timeLeft <= 10 ? "text-red-500 animate-pulse" : "text-foreground"}`}>
-          ⏱️ {timeLeft}s
-        </div>
-        <div className="text-right">
-          <div className="text-xl sm:text-2xl font-bold text-primary">{score} {t('vocabulary.score')}</div>
-          {streak >= 3 && (
-            <motion.div 
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="text-xs sm:text-sm text-orange-500 flex items-center gap-1"
-            >
-              <Flame className="w-3 h-3 sm:w-4 sm:h-4" /> {streak} {t('vocabulary.combo')}
-            </motion.div>
-          )}
-        </div>
-      </div>
-
-      {/* Question */}
-      <motion.div
-        key={currentIndex}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-card border-2 border-border rounded-2xl p-4 sm:p-6 md:p-8 text-center mb-4 sm:mb-6"
-      >
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">{currentWord.korean}</h2>
-      </motion.div>
-
-      {/* Options */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-        {options.map((option, idx) => {
-          const isCorrect = option === currentWord.meaning;
-          const isSelected = selectedAnswer === idx;
-          
-          return (
-            <motion.button
-              key={idx}
-              whileHover={{ scale: showResult ? 1 : 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => handleAnswer(idx)}
-              disabled={showResult}
-              className={`p-3 sm:p-4 rounded-xl text-left font-medium text-sm sm:text-base transition-all ${
-                showResult
-                  ? isCorrect
-                    ? "bg-green-100 dark:bg-green-900/30 border-2 border-green-500 text-green-700 dark:text-green-400"
-                    : isSelected
-                      ? "bg-red-100 dark:bg-red-900/30 border-2 border-red-500 text-red-700 dark:text-red-400"
-                      : "bg-muted border-2 border-border text-muted-foreground"
-                  : "bg-card border-2 border-border hover:border-primary/50"
-              }`}
-            >
-              {option}
-            </motion.button>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
-
-// ================== MAIN COMPONENT ==================
 const Vocabulary = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<TabType>("racing");
-  const [topikLevel, setTopikLevel] = useState<TopikLevel>("1-2");
-  const [words, setWords] = useState<Word[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [gameComplete, setGameComplete] = useState(false);
-  const [gameResult, setGameResult] = useState<any>(null);
-  
-  // URL 파라미터에서 멀티플레이어 모드 및 방 코드 확인
-  const urlMode = searchParams.get("mode");
-  const urlRoomCode = searchParams.get("room");
-  
-  // 이전에 학습한 단어들을 추적 (세션 동안 유지)
-  const [learnedWords, setLearnedWords] = useState<Record<TopikLevel, string[]>>({
-    "1-2": [],
-    "3-4": [],
-    "5-6": [],
-  });
-  const [sessionId] = useState(() => crypto.randomUUID());
-
-  // Ref to track learned words without causing re-renders
-  const learnedWordsRef = useRef(learnedWords);
-  useEffect(() => {
-    learnedWordsRef.current = learnedWords;
-  }, [learnedWords]);
-
-  // Fetch vocabulary words
-  const fetchWords = useCallback(async (level: TopikLevel, forceNew = false) => {
-    setIsLoading(true);
-    setGameComplete(false);
-    setGameResult(null);
-
-    const excludeWords = learnedWordsRef.current[level] || [];
-
-    const controller = new AbortController();
-    const timeoutId = window.setTimeout(() => controller.abort(), 15000);
-
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/vocabulary-content`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({
-            count: 12,
-            topikLevel: level,
-            sessionId,
-            excludeWords,
-            forceNew: forceNew || excludeWords.length > 0,
-          }),
-          signal: controller.signal,
-        }
-      );
-
-      if (!response.ok) {
-        const t = await response.text().catch(() => "");
-        throw new Error(`Failed to fetch words (${response.status}) ${t}`);
-      }
-
-      const data = await response.json();
-
-      if (data.success && data.words?.length > 0) {
-        setWords(data.words);
-        // 새로 받은 단어들을 학습 기록에 추가
-        const newKoreanWords = data.words.map((w: Word) => w.korean);
-        setLearnedWords((prev) => ({
-          ...prev,
-          [level]: [...prev[level], ...newKoreanWords],
-        }));
-        console.log(
-          `✅ Loaded ${data.words.length} NEW words for TOPIK ${level} (excluded ${excludeWords.length})`
-        );
-      } else {
-        setWords(getFallbackWords(level));
-      }
-    } catch (error) {
-      const isAbort = error instanceof DOMException && error.name === "AbortError";
-      console.error("Error fetching words:", error);
-      toast({
-        title: t('vocabulary.loadError'),
-        description: isAbort ? t('vocabulary.networkTimeout') : t('vocabulary.tryAgain'),
-        variant: "destructive",
-      });
-      setWords(getFallbackWords(level));
-    } finally {
-      window.clearTimeout(timeoutId);
-      setIsLoading(false);
-    }
-  }, [sessionId, toast]);
-
-  // Fallback words by level
-  const getFallbackWords = (level: TopikLevel): Word[] => {
-    const fallbacks: Record<TopikLevel, Word[]> = {
-      "1-2": [
-        { id: 1, korean: "사과", meaning: "Quả táo", example: "사과가 맛있어요.", exampleMeaning: "Táo ngon." },
-        { id: 2, korean: "학교", meaning: "Trường học", example: "학교에 가요.", exampleMeaning: "Tôi đi học." },
-        { id: 3, korean: "친구", meaning: "Bạn bè", example: "친구를 만나요.", exampleMeaning: "Tôi gặp bạn." },
-        { id: 4, korean: "음식", meaning: "Đồ ăn", example: "음식이 맛있어요.", exampleMeaning: "Đồ ăn ngon." },
-        { id: 5, korean: "날씨", meaning: "Thời tiết", example: "날씨가 좋아요.", exampleMeaning: "Thời tiết tốt." },
-        { id: 6, korean: "시간", meaning: "Thời gian", example: "시간이 없어요.", exampleMeaning: "Không có thời gian." },
-        { id: 7, korean: "가족", meaning: "Gia đình", example: "가족이 좋아요.", exampleMeaning: "Gia đình tốt." },
-        { id: 8, korean: "일", meaning: "Công việc", example: "일이 많아요.", exampleMeaning: "Nhiều việc." },
-        { id: 9, korean: "물", meaning: "Nước", example: "물을 마셔요.", exampleMeaning: "Tôi uống nước." },
-        { id: 10, korean: "집", meaning: "Nhà", example: "집에 가요.", exampleMeaning: "Tôi về nhà." },
-        { id: 11, korean: "책", meaning: "Sách", example: "책을 읽어요.", exampleMeaning: "Tôi đọc sách." },
-        { id: 12, korean: "전화", meaning: "Điện thoại", example: "전화가 와요.", exampleMeaning: "Có điện thoại." },
-      ],
-      "3-4": [
-        { id: 1, korean: "경험", meaning: "Kinh nghiệm", example: "좋은 경험이었어요.", exampleMeaning: "Đó là kinh nghiệm tốt." },
-        { id: 2, korean: "문화", meaning: "Văn hóa", example: "한국 문화를 배워요.", exampleMeaning: "Tôi học văn hóa Hàn." },
-        { id: 3, korean: "환경", meaning: "Môi trường", example: "환경을 보호해요.", exampleMeaning: "Bảo vệ môi trường." },
-        { id: 4, korean: "발전", meaning: "Phát triển", example: "경제가 발전해요.", exampleMeaning: "Kinh tế phát triển." },
-        { id: 5, korean: "관계", meaning: "Quan hệ", example: "좋은 관계를 유지해요.", exampleMeaning: "Duy trì quan hệ tốt." },
-        { id: 6, korean: "사회", meaning: "Xã hội", example: "사회 문제예요.", exampleMeaning: "Vấn đề xã hội." },
-        { id: 7, korean: "교육", meaning: "Giáo dục", example: "교육이 중요해요.", exampleMeaning: "Giáo dục quan trọng." },
-        { id: 8, korean: "결과", meaning: "Kết quả", example: "좋은 결과예요.", exampleMeaning: "Kết quả tốt." },
-        { id: 9, korean: "정보", meaning: "Thông tin", example: "정보를 찾아요.", exampleMeaning: "Tôi tìm thông tin." },
-        { id: 10, korean: "의견", meaning: "Ý kiến", example: "의견을 말해요.", exampleMeaning: "Tôi nói ý kiến." },
-        { id: 11, korean: "변화", meaning: "Thay đổi", example: "변화가 필요해요.", exampleMeaning: "Cần thay đổi." },
-        { id: 12, korean: "기회", meaning: "Cơ hội", example: "좋은 기회예요.", exampleMeaning: "Cơ hội tốt." },
-      ],
-      "5-6": [
-        { id: 1, korean: "지속가능성", meaning: "Tính bền vững", example: "지속가능성이 중요합니다.", exampleMeaning: "Tính bền vững quan trọng." },
-        { id: 2, korean: "패러다임", meaning: "Mô hình", example: "새로운 패러다임이 필요합니다.", exampleMeaning: "Cần mô hình mới." },
-        { id: 3, korean: "양극화", meaning: "Phân cực hóa", example: "사회 양극화가 심각합니다.", exampleMeaning: "Phân cực xã hội nghiêm trọng." },
-        { id: 4, korean: "본질", meaning: "Bản chất", example: "문제의 본질을 파악하세요.", exampleMeaning: "Nắm bắt bản chất vấn đề." },
-        { id: 5, korean: "함의", meaning: "Hàm ý", example: "이 결과의 함의가 큽니다.", exampleMeaning: "Hàm ý của kết quả này lớn." },
-        { id: 6, korean: "맥락", meaning: "Ngữ cảnh", example: "맥락을 이해하세요.", exampleMeaning: "Hãy hiểu ngữ cảnh." },
-        { id: 7, korean: "논거", meaning: "Luận cứ", example: "논거가 부족합니다.", exampleMeaning: "Thiếu luận cứ." },
-        { id: 8, korean: "담론", meaning: "Diễn ngôn", example: "새로운 담론이 필요합니다.", exampleMeaning: "Cần diễn ngôn mới." },
-        { id: 9, korean: "인프라", meaning: "Cơ sở hạ tầng", example: "인프라 투자가 필요합니다.", exampleMeaning: "Cần đầu tư cơ sở hạ tầng." },
-        { id: 10, korean: "귀결", meaning: "Kết quả, hệ quả", example: "이러한 귀결을 초래했습니다.", exampleMeaning: "Dẫn đến hệ quả như vậy." },
-        { id: 11, korean: "타당성", meaning: "Tính hợp lý", example: "타당성을 검토하세요.", exampleMeaning: "Kiểm tra tính hợp lý." },
-        { id: 12, korean: "메커니즘", meaning: "Cơ chế", example: "메커니즘을 분석합니다.", exampleMeaning: "Phân tích cơ chế." },
-      ],
-    };
-    return fallbacks[level];
-  };
+  const [activeModule, setActiveModule] = useState<ModuleType | null>(null);
+  const [topikLevel, setTopikLevel] = useState<TopikLevel>(1);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -369,73 +98,82 @@ const Vocabulary = () => {
     checkAuth();
   }, []);
 
-  // URL 파라미터 처리 제거 (체인리액션은 배틀 페이지로 이동)
-  useEffect(() => {
-    if (urlMode === "multiplayer" && urlRoomCode) {
-      // 배틀 페이지로 리다이렉트
-      navigate(`/battle?game=word-chain&room=${urlRoomCode}`);
-    }
-  }, [urlMode, urlRoomCode, navigate]);
+  const handleMistake = async (item: any, type: string) => {
+    if (!user) return;
 
-  useEffect(() => {
-    fetchWords(topikLevel);
-  }, [topikLevel]);
-
-  const handleLevelChange = (level: TopikLevel) => {
-    setTopikLevel(level);
-    setGameComplete(false);
-    setGameResult(null);
-  };
-
-  const handleTabChange = (tab: TabType) => {
-    setActiveTab(tab);
-    setGameComplete(false);
-    setGameResult(null);
-  };
-
-  const playTTS = async (text: string) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/korean-tts`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text, speed: 0.9 }),
-        }
-      );
-      if (!response.ok) throw new Error("TTS failed");
-      const blob = await response.blob();
-      const audio = new Audio(URL.createObjectURL(blob));
-      await audio.play();
+      // Check if mistake already exists
+      const { data: existing } = await supabase
+        .from('user_mistakes')
+        .select('id, mistake_count')
+        .eq('user_id', user.id)
+        .eq('item_type', type)
+        .eq('item_id', item.id)
+        .single();
+
+      if (existing) {
+        // Update mistake count
+        await supabase
+          .from('user_mistakes')
+          .update({ 
+            mistake_count: existing.mistake_count + 1,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existing.id);
+      } else {
+        // Create new mistake record
+        await supabase
+          .from('user_mistakes')
+          .insert({
+            user_id: user.id,
+            item_type: type,
+            item_id: item.id,
+            item_data: item,
+            mistake_count: 1
+          });
+      }
     } catch (error) {
-      console.error("TTS error:", error);
+      console.error('Error recording mistake:', error);
     }
   };
 
-  const handleRacingComplete = (score: number, wordsCompleted: number) => {
-    setGameComplete(true);
-    setGameResult({ type: "racing", score, wordsCompleted });
-    if (wordsCompleted >= 3) {
-      confetti({ particleCount: 100, spread: 70 });
+  const renderModuleContent = () => {
+    switch (activeModule) {
+      case "flash":
+        return (
+          <FlashLoop 
+            level={topikLevel} 
+            onMistake={(word) => handleMistake(word, 'vocabulary')}
+          />
+        );
+      case "cloze":
+        return (
+          <MiniCloze 
+            level={topikLevel}
+            onMistake={(question) => handleMistake(question, 'cloze')}
+          />
+        );
+      case "ox":
+        return (
+          <OXSpeed 
+            level={topikLevel}
+            onMistake={(question) => handleMistake(question, 'grammar_ox')}
+          />
+        );
+      case "idiom":
+        return (
+          <IdiomMaster 
+            level={topikLevel}
+            onMistake={(idiom) => handleMistake(idiom, 'idiom')}
+          />
+        );
+      case "mistake":
+        return (
+          <MistakeNote userId={user?.id} />
+        );
+      default:
+        return null;
     }
-  };
-
-
-  const handleSprintComplete = (score: number) => {
-    setGameComplete(true);
-    setGameResult({ type: "sprint", score });
-  };
-
-  const handleRestart = () => {
-    setGameComplete(false);
-    setGameResult(null);
-    // 다시 하기는 현재 단어 유지 (새 단어 로드 안함)
-  };
-  
-  const handleNewWords = () => {
-    setGameComplete(false);
-    setGameResult(null);
-    fetchWords(topikLevel, true); // forceNew = true로 항상 새 단어 생성
   };
 
   return (
@@ -453,11 +191,11 @@ const Vocabulary = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate("/dashboard")}
+              onClick={() => activeModule ? setActiveModule(null) : navigate("/dashboard")}
               className="mb-6 hover:bg-primary/10"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              {t('common.back')}
+              {activeModule ? "모듈 선택" : t('common.back')}
             </Button>
 
             {/* Hero Section */}
@@ -481,7 +219,7 @@ const Vocabulary = () => {
                     className="inline-flex items-center gap-2 px-2 sm:px-3 py-1 rounded-full bg-white/20 text-white text-[10px] sm:text-xs font-medium mb-2"
                   >
                     <Sparkles className="w-3 h-3" />
-                    {t('vocabulary.gamesCount')}
+                    5개 학습 모듈
                   </motion.div>
                   <motion.h1 
                     initial={{ opacity: 0, x: -20 }}
@@ -489,7 +227,7 @@ const Vocabulary = () => {
                     transition={{ delay: 0.4 }}
                     className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1"
                   >
-                    {t('vocabulary.title')}
+                    어휘 학습
                   </motion.h1>
                   <motion.p 
                     initial={{ opacity: 0, x: -20 }}
@@ -497,130 +235,127 @@ const Vocabulary = () => {
                     transition={{ delay: 0.5 }}
                     className="text-white/80 text-sm sm:text-base"
                   >
-                    {t('vocabulary.description')}
+                    TOPIK 급수별 체계적 어휘 학습
                   </motion.p>
                 </div>
               </div>
             </div>
 
             {/* TOPIK Level Selection */}
-            <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
-              {(Object.keys(topikLevelConfig) as TopikLevel[]).map((level) => (
-                <button
-                  key={level}
-                  onClick={() => handleLevelChange(level)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap transition-all font-medium ${
-                    topikLevel === level
-                      ? `bg-gradient-to-r ${topikLevelConfig[level].color} text-white shadow-lg`
-                      : "bg-muted hover:bg-muted/80 text-muted-foreground"
-                  }`}
-                >
-                  <span className="text-sm font-bold">{level}{t('vocabulary.level')}</span>
-                  <span className="text-xs opacity-80">{t(`vocabulary.${level === "1-2" ? "beginner" : level === "3-4" ? "intermediate" : "advanced"}`)}</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Tabs */}
-            <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
-              {tabConfig.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => handleTabChange(tab.id as TabType)}
-                  className={`flex items-center gap-2 px-4 py-3 rounded-xl whitespace-nowrap transition-all ${
-                    activeTab === tab.id
-                      ? "bg-primary text-primary-foreground shadow-lg"
-                      : "bg-card border border-border hover:bg-muted"
-                  }`}
-                >
-                  <tab.icon className="w-5 h-5" />
-                  <div className="text-left">
-                    <div className="text-sm font-bold">{t(`vocabulary.${tab.id}`)}</div>
-                    <div className="text-xs opacity-70">{t(`vocabulary.${tab.id}Desc`)}</div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Game Content */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="rounded-2xl sm:rounded-3xl bg-card border border-border p-4 sm:p-6 md:p-8"
-          >
-            {isLoading ? (
-              <div className="text-center py-12">
-                <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
-                <p className="text-muted-foreground">{t('vocabulary.loading')}</p>
-              </div>
-            ) : gameComplete ? (
-              /* Game Complete Screen */
-              <div className="text-center py-8">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center mx-auto mb-6"
-                >
-                  <Trophy className="w-10 h-10 text-white" />
-                </motion.div>
-                
-                <h2 className="text-2xl font-bold mb-4">{t('vocabulary.gameComplete')} 🎉</h2>
-                
-                {gameResult?.type === "racing" && (
-                  <div className="mb-6">
-                    <p className="text-3xl font-bold text-primary mb-2">{gameResult.score}{t('vocabulary.score')}</p>
-                    <p className="text-muted-foreground">
-                      {gameResult.wordsCompleted} {t('vocabulary.wordsCompleted')}
-                    </p>
-                  </div>
-                )}
-                
-                {gameResult?.type === "chain" && (
-                  <div className="mb-6">
-                    <p className="text-3xl font-bold text-primary mb-2">{gameResult.score}{t('vocabulary.score')}</p>
-                    <p className="text-muted-foreground">
-                      {gameResult.chainLength} {t('vocabulary.chain')}
-                    </p>
-                  </div>
-                )}
-                
-                {gameResult?.type === "sprint" && (
-                  <div className="mb-6">
-                    <p className="text-3xl font-bold text-primary">{gameResult.score}{t('vocabulary.score')}</p>
-                  </div>
-                )}
-
-                <div className="flex justify-center gap-4">
-                  <Button onClick={handleRestart} variant="outline">
-                    <RotateCcw className="w-4 h-4 mr-2" />
-                    {t('vocabulary.playAgain')}
-                  </Button>
-                  <Button onClick={handleNewWords}>
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    {t('vocabulary.newWords')}
-                  </Button>
+            {!activeModule && (
+              <div className="mb-6">
+                <p className="text-sm text-muted-foreground mb-3">TOPIK 급수 선택</p>
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                  {(Object.keys(topikLevelConfig) as unknown as TopikLevel[]).map((level) => {
+                    const numLevel = Number(level) as TopikLevel;
+                    const config = topikLevelConfig[numLevel];
+                    return (
+                      <button
+                        key={level}
+                        onClick={() => setTopikLevel(numLevel)}
+                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap transition-all font-medium ${
+                          topikLevel === numLevel
+                            ? `bg-gradient-to-r ${config.color} text-white shadow-lg`
+                            : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                        }`}
+                      >
+                        <span className="text-sm font-bold">{config.label}</span>
+                        <span className="text-xs opacity-80">{config.desc}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
-            ) : (
-              /* Game Components */
-              <>
-                {activeTab === "racing" && (
-                  <WordRacing 
-                    words={words} 
-                    onComplete={handleRacingComplete}
-                  />
-                )}
-                {activeTab === "sprint" && (
-                  <SprintGame 
-                    words={words} 
-                    onComplete={handleSprintComplete}
-                  />
-                )}
-              </>
             )}
           </motion.div>
+
+          {/* Module Content or Selection */}
+          <AnimatePresence mode="wait">
+            {activeModule ? (
+              <motion.div
+                key="module-content"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="rounded-2xl sm:rounded-3xl bg-card border border-border p-4 sm:p-6 md:p-8"
+              >
+                {/* Module Header */}
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border">
+                  {(() => {
+                    const module = moduleConfig.find(m => m.id === activeModule);
+                    if (!module) return null;
+                    const Icon = module.icon;
+                    return (
+                      <>
+                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${module.color} flex items-center justify-center`}>
+                          <Icon className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h2 className="font-bold text-lg">{module.title}</h2>
+                          <p className="text-sm text-muted-foreground">TOPIK {topikLevel}급</p>
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+
+                {renderModuleContent()}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="module-selection"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+              >
+                {moduleConfig.map((module, idx) => {
+                  const Icon = module.icon;
+                  const isLocked = module.premium && !user;
+                  
+                  return (
+                    <motion.button
+                      key={module.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      onClick={() => !isLocked && setActiveModule(module.id)}
+                      disabled={isLocked}
+                      className={`relative overflow-hidden rounded-2xl bg-card border border-border p-6 text-left transition-all group ${
+                        isLocked 
+                          ? 'opacity-60 cursor-not-allowed' 
+                          : 'hover:border-primary/50 hover:shadow-lg hover:-translate-y-1'
+                      }`}
+                    >
+                      {/* Background Gradient */}
+                      <div className={`absolute inset-0 bg-gradient-to-br ${module.color} opacity-0 group-hover:opacity-5 transition-opacity`} />
+                      
+                      {/* Lock Badge */}
+                      {isLocked && (
+                        <div className="absolute top-3 right-3">
+                          <Lock className="w-4 h-4 text-muted-foreground" />
+                        </div>
+                      )}
+
+                      {/* Icon */}
+                      <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${module.color} flex items-center justify-center mb-4 shadow-lg`}>
+                        <Icon className="w-7 h-7 text-white" />
+                      </div>
+
+                      {/* Content */}
+                      <h3 className="text-lg font-bold mb-1">{module.title}</h3>
+                      <p className="text-sm text-muted-foreground">{module.desc}</p>
+
+                      {/* Arrow */}
+                      <div className="absolute bottom-6 right-6 w-8 h-8 rounded-full bg-muted flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <ArrowLeft className="w-4 h-4 rotate-180" />
+                      </div>
+                    </motion.button>
+                  );
+                })}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </main>
       
