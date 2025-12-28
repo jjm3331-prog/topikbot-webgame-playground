@@ -113,3 +113,9 @@ verify_jwt = true
 
 [functions.payment-webhook]
 verify_jwt = false
+
+[functions.vocab-import]
+verify_jwt = true
+
+[functions.vocab-batch-generate]
+verify_jwt = true

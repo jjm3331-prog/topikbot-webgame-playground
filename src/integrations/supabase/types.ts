@@ -398,6 +398,50 @@ export type Database = {
         }
         Relationships: []
       }
+      cloze_questions: {
+        Row: {
+          blank_word: string
+          created_at: string
+          difficulty: string | null
+          hint: string | null
+          id: string
+          level: number
+          sentence: string
+          vocabulary_id: string | null
+          wrong_answer: string
+        }
+        Insert: {
+          blank_word: string
+          created_at?: string
+          difficulty?: string | null
+          hint?: string | null
+          id?: string
+          level: number
+          sentence: string
+          vocabulary_id?: string | null
+          wrong_answer: string
+        }
+        Update: {
+          blank_word?: string
+          created_at?: string
+          difficulty?: string | null
+          hint?: string | null
+          id?: string
+          level?: number
+          sentence?: string
+          vocabulary_id?: string | null
+          wrong_answer?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cloze_questions_vocabulary_id_fkey"
+            columns: ["vocabulary_id"]
+            isOneToOne: false
+            referencedRelation: "topik_vocabulary"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       feature_usage: {
         Row: {
           created_at: string
@@ -419,6 +463,42 @@ export type Database = {
           id?: string
           used_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      grammar_ox_questions: {
+        Row: {
+          created_at: string
+          difficulty: string | null
+          explanation: string
+          explanation_vi: string | null
+          grammar_point: string | null
+          id: string
+          is_correct: boolean
+          level: number
+          statement: string
+        }
+        Insert: {
+          created_at?: string
+          difficulty?: string | null
+          explanation: string
+          explanation_vi?: string | null
+          grammar_point?: string | null
+          id?: string
+          is_correct: boolean
+          level: number
+          statement: string
+        }
+        Update: {
+          created_at?: string
+          difficulty?: string | null
+          explanation?: string
+          explanation_vi?: string | null
+          grammar_point?: string | null
+          id?: string
+          is_correct?: boolean
+          level?: number
+          statement?: string
         }
         Relationships: []
       }
@@ -975,6 +1055,150 @@ export type Database = {
           rating?: number
           role?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      topik_idioms: {
+        Row: {
+          actual_meaning: string
+          actual_meaning_vi: string | null
+          created_at: string
+          difficulty: string | null
+          id: string
+          idiom: string
+          level: number
+          literal_meaning: string
+          similar_expressions: string[] | null
+          situation_example: string | null
+        }
+        Insert: {
+          actual_meaning: string
+          actual_meaning_vi?: string | null
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          idiom: string
+          level: number
+          literal_meaning: string
+          similar_expressions?: string[] | null
+          situation_example?: string | null
+        }
+        Update: {
+          actual_meaning?: string
+          actual_meaning_vi?: string | null
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          idiom?: string
+          level?: number
+          literal_meaning?: string
+          similar_expressions?: string[] | null
+          situation_example?: string | null
+        }
+        Relationships: []
+      }
+      topik_vocabulary: {
+        Row: {
+          created_at: string
+          difficulty: string | null
+          example_phrase: string | null
+          example_sentence: string | null
+          example_sentence_vi: string | null
+          id: string
+          level: number
+          level_seq: number | null
+          meaning_en: string | null
+          meaning_ja: string | null
+          meaning_ru: string | null
+          meaning_uz: string | null
+          meaning_vi: string | null
+          meaning_zh: string | null
+          pos: string | null
+          seq_no: number
+          word: string
+          word_code: string | null
+        }
+        Insert: {
+          created_at?: string
+          difficulty?: string | null
+          example_phrase?: string | null
+          example_sentence?: string | null
+          example_sentence_vi?: string | null
+          id?: string
+          level: number
+          level_seq?: number | null
+          meaning_en?: string | null
+          meaning_ja?: string | null
+          meaning_ru?: string | null
+          meaning_uz?: string | null
+          meaning_vi?: string | null
+          meaning_zh?: string | null
+          pos?: string | null
+          seq_no: number
+          word: string
+          word_code?: string | null
+        }
+        Update: {
+          created_at?: string
+          difficulty?: string | null
+          example_phrase?: string | null
+          example_sentence?: string | null
+          example_sentence_vi?: string | null
+          id?: string
+          level?: number
+          level_seq?: number | null
+          meaning_en?: string | null
+          meaning_ja?: string | null
+          meaning_ru?: string | null
+          meaning_uz?: string | null
+          meaning_vi?: string | null
+          meaning_zh?: string | null
+          pos?: string | null
+          seq_no?: number
+          word?: string
+          word_code?: string | null
+        }
+        Relationships: []
+      }
+      user_mistakes: {
+        Row: {
+          created_at: string
+          id: string
+          item_data: Json
+          item_id: string
+          item_type: string
+          last_reviewed: string | null
+          mastered: boolean
+          mistake_count: number
+          next_review: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_data?: Json
+          item_id: string
+          item_type: string
+          last_reviewed?: string | null
+          mastered?: boolean
+          mistake_count?: number
+          next_review?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_data?: Json
+          item_id?: string
+          item_type?: string
+          last_reviewed?: string | null
+          mastered?: boolean
+          mistake_count?: number
+          next_review?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
