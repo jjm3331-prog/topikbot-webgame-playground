@@ -26,6 +26,34 @@ import {
   RefreshCw,
   Gauge
 } from "lucide-react";
+import { useAutoTranslate } from "@/hooks/useAutoTranslate";
+
+// Auto-translated explanation component
+function TranslatedExplanation({ explanationKo, explanationVi }: { explanationKo: string; explanationVi?: string }) {
+  const { i18n } = useTranslation();
+  const uiLang = (i18n.language || "ko").split("-")[0];
+
+  // 베트남어: 그대로 표시
+  if (uiLang === "vi") return <p className="text-muted-foreground">{explanationVi || explanationKo}</p>;
+  // 한국어: 한국어만 표시
+  if (uiLang === "ko") return <p className="text-muted-foreground">{explanationKo}</p>;
+
+  // 그 외 언어: 한국어 원문을 해당 언어로 자동번역
+  const { text: translatedText, isTranslating } = useAutoTranslate(explanationKo, { sourceLanguage: "ko" });
+
+  return (
+    <p className="text-muted-foreground">
+      {isTranslating ? (
+        <span className="inline-flex items-center gap-1">
+          <Loader2 className="w-3 h-3 animate-spin" />
+          {explanationKo}
+        </span>
+      ) : (
+        translatedText
+      )}
+    </p>
+  );
+}
 
 interface Question {
   id?: number;
@@ -783,7 +811,10 @@ const ListeningPractice = () => {
                             </div>
                             <div>
                               <p className="font-bold text-foreground mb-1">{t('listening.explanation')}</p>
-                              <p className="text-muted-foreground">{currentQuestion.explanation}</p>
+                              <TranslatedExplanation 
+                                explanationKo={currentQuestion.explanation} 
+                                explanationVi={currentQuestion.explanationVi} 
+                              />
                             </div>
                           </div>
                         </motion.div>
