@@ -2509,6 +2509,7 @@
       "sectionTitle": "학습 영상",
       "sectionSubtitle": "인기 한국어 학습 영상을 만나보세요",
       "viewAll": "전체 보기",
+      "count": "{{count}}개",
       "noVideos": "아직 등록된 영상이 없습니다",
       "comingSoon": "곧 다양한 학습 영상이 추가됩니다!"
     },
@@ -2518,7 +2519,9 @@
       "news": "뉴스",
       "education": "교육",
       "variety": "예능",
-      "music": "음악"
+      "music": "음악",
+      "culture": "문화",
+      "travel": "여행"
     },
     "difficulty": {
       "beginner": "초급",

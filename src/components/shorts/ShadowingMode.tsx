@@ -4,8 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Mic, MicOff, Play, Pause, SkipForward, Volume2, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
-import { playElevenLabsTTS } from '@/lib/elevenlabsTts';
+import { Mic, MicOff, Play, Pause, SkipForward, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 
 interface Subtitle {
   start: number;
@@ -143,14 +142,6 @@ export default function ShadowingMode({
     }
   };
 
-  const speakOriginal = async () => {
-    if (!currentSub) return;
-    try {
-      await playElevenLabsTTS(currentSub.text, { speed: 0.8, truncate: 260 });
-    } catch (e) {
-      console.error('TTS error:', e);
-    }
-  };
 
   if (subtitles.length === 0) {
     return (
@@ -181,9 +172,6 @@ export default function ShadowingMode({
           <p className="text-lg font-medium">
             {currentSub?.text || '자막 없음'}
           </p>
-          <Button size="sm" variant="ghost" className="mt-2" onClick={speakOriginal}>
-            <Volume2 className="w-4 h-4 mr-1" /> 다시 듣기
-          </Button>
         </div>
 
         {/* Step Indicator */}

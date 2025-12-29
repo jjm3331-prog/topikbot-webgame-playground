@@ -2121,6 +2121,7 @@
       "sectionTitle": "学習動画",
       "sectionSubtitle": "人気韓国語学習動画を見つけよう",
       "viewAll": "全て見る",
+      "count": "{{count}}本",
       "noVideos": "まだ登録された動画がありません",
       "comingSoon": "様々な学習動画がまもなく追加されます！"
     },
@@ -2130,7 +2131,9 @@
       "news": "ニュース",
       "education": "教育",
       "variety": "バラエティ",
-      "music": "音楽"
+      "music": "音楽",
+      "culture": "文化",
+      "travel": "旅行"
     },
     "difficulty": {
       "beginner": "初級",
