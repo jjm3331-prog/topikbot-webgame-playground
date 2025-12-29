@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -64,6 +64,9 @@ const ReadingB = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [dbQuestionCount, setDbQuestionCount] = useState(0);
+  
+  // 세션 내 푼 문제 ID 추적 (중복 방지)
+  const sessionSeenQuestions = useRef<Set<string>>(new Set());
 
   const tabCategories = {
     arrangement: {
@@ -167,9 +170,18 @@ const ReadingB = () => {
       if (data && data.length > 0) {
         setDbQuestionCount(data.length);
         
-        // Shuffle and pick 5 random questions
-        const shuffled = [...data].sort(() => Math.random() - 0.5);
+        // 이미 본 문제 제외 (중복 방지)
+        const unseenQuestions = data.filter(q => !sessionSeenQuestions.current.has(q.id));
+        
+        // 새 문제가 충분하면 새 문제만, 부족하면 전체에서 선택
+        const pool = unseenQuestions.length >= 5 ? unseenQuestions : data;
+        const shuffled = [...pool].sort(() => Math.random() - 0.5);
         const selected = shuffled.slice(0, 5);
+        
+        // 선택된 문제 ID를 세션에 기록
+        selected.forEach(q => sessionSeenQuestions.current.add(q.id));
+        
+        console.log(`[ReadingB] 새 문제: ${unseenQuestions.length}/${data.length}, 선택: ${selected.length}`);
 
         const formattedQuestions: Question[] = selected.map((q, idx) => {
           const opts = Array.isArray(q.options) ? q.options : [];

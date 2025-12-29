@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -159,6 +159,9 @@ const ListeningPractice = () => {
   // RAG-powered questions
   const [listeningQuestions, setListeningQuestions] = useState<Question[]>(fallbackQuestions);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
+  
+  // 세션 내 푼 문제 ID 추적 (중복 방지)
+  const sessionSeenQuestions = useRef<Set<string>>(new Set());
 
   // Fetch pre-generated listening questions from DB (mock_question_bank)
   const fetchListeningQuestions = useCallback(async (level: TopikLevel) => {
@@ -194,9 +197,18 @@ const ListeningPractice = () => {
       }
       
       if (dbQuestions && dbQuestions.length > 0) {
-        // Randomly shuffle and pick 5 questions
-        const shuffled = dbQuestions.sort(() => Math.random() - 0.5);
+        // 이미 본 문제 제외 (중복 방지)
+        const unseenQuestions = dbQuestions.filter(q => !sessionSeenQuestions.current.has(q.id));
+        
+        // 새 문제가 충분하면 새 문제만, 부족하면 전체에서 선택
+        const pool = unseenQuestions.length >= 5 ? unseenQuestions : dbQuestions;
+        const shuffled = pool.sort(() => Math.random() - 0.5);
         const selected = shuffled.slice(0, 5);
+        
+        // 선택된 문제 ID를 세션에 기록
+        selected.forEach(q => sessionSeenQuestions.current.add(q.id));
+        
+        console.log(`[ListeningPractice] 새 문제: ${unseenQuestions.length}/${dbQuestions.length}, 선택: ${selected.length}`);
         
         // Transform DB format to component format
         const transformedQuestions: Question[] = selected.map((q, idx) => {
