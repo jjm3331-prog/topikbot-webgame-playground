@@ -35,9 +35,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { mapExamTypeToDb } from "@/lib/mockExamDb";
 import { cn } from "@/lib/utils";
 
-interface Question {
   id: string;
   question_text: string;
   options: string[];
@@ -168,16 +168,17 @@ const MockExamTest = () => {
       }
       setUser(user);
       
-      // Check for existing incomplete attempt
-      const { data: existingAttempt } = await supabase
-        .from('mock_exam_attempts')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('exam_type', examType)
-        .eq('is_completed', false)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
+       // Check for existing incomplete attempt
+       const dbExamType = mapExamTypeToDb(examType || 'topik1');
+       const { data: existingAttempt } = await supabase
+         .from('mock_exam_attempts')
+         .select('*')
+         .eq('user_id', user.id)
+         .eq('exam_type', dbExamType)
+         .eq('is_completed', false)
+         .order('created_at', { ascending: false })
+         .limit(1)
+         .single();
       
       if (existingAttempt) {
         // Resume existing attempt
@@ -199,10 +200,11 @@ const MockExamTest = () => {
   const startNewAttempt = async (userId: string) => {
     try {
       // Fetch questions from database
+      const dbExamType = mapExamTypeToDb(examType || 'topik1');
       let query = supabase
         .from('mock_question_bank')
         .select('*')
-        .eq('exam_type', examType)
+        .eq('exam_type', dbExamType)
         .eq('is_active', true);
       
       if (section) {
@@ -254,11 +256,13 @@ const MockExamTest = () => {
       const timeLimit = getTimeLimit();
       
       // Create attempt record
+      const timeLimit = getTimeLimit();
+      const dbExamType = mapExamTypeToDb(examType || 'topik1');
       const { data: newAttempt, error: attemptError } = await supabase
         .from('mock_exam_attempts')
         .insert({
           user_id: userId,
-          exam_type: examType,
+          exam_type: dbExamType,
           exam_mode: mode,
           section: section || null,
           part_number: partNumber,
