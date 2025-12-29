@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { Play, Eye, Globe, Tv, Mic, Newspaper, Music, Film, Utensils, Plane, Sparkles, BookOpen } from 'lucide-react';
+import { Play, Eye, Globe, Tv, Mic, Newspaper, Music, Utensils, Plane, Sparkles } from 'lucide-react';
 
 interface ShortsVideo {
   id: string;
@@ -21,17 +21,15 @@ interface ShortsVideo {
   category: string;
 }
 
-// 카테고리 정의
+// 카테고리 정의 (kdrama + movie 합침, education 삭제)
 const CATEGORIES = [
   { id: 'all', label: '전체', icon: Sparkles, color: 'from-primary to-primary' },
-  { id: 'kdrama', label: 'K드라마', icon: Tv, color: 'from-pink-500 to-rose-500' },
+  { id: 'kdrama', label: 'K드라마/영화', icon: Tv, color: 'from-pink-500 to-rose-500' },
   { id: 'variety', label: '예능', icon: Mic, color: 'from-yellow-500 to-orange-500' },
   { id: 'news', label: '뉴스', icon: Newspaper, color: 'from-blue-500 to-cyan-500' },
   { id: 'kpop', label: 'K팝', icon: Music, color: 'from-purple-500 to-pink-500' },
-  { id: 'movie', label: '영화', icon: Film, color: 'from-red-500 to-orange-500' },
   { id: 'food', label: '먹방/요리', icon: Utensils, color: 'from-green-500 to-emerald-500' },
   { id: 'travel', label: '여행', icon: Plane, color: 'from-sky-500 to-blue-500' },
-  { id: 'education', label: '교육', icon: BookOpen, color: 'from-indigo-500 to-purple-500' },
 ];
 
 export default function ShortsHub() {
@@ -62,14 +60,19 @@ export default function ShortsHub() {
     }
   };
 
-  // 카테고리별 필터링
+  // 카테고리별 필터링 (kdrama = kdrama + movie 포함)
   const filteredVideos = selectedCategory === 'all'
     ? videos
-    : videos.filter(v => v.category === selectedCategory);
+    : selectedCategory === 'kdrama'
+      ? videos.filter(v => v.category === 'kdrama' || v.category === 'movie')
+      : videos.filter(v => v.category === selectedCategory);
 
-  // 카테고리별 개수 계산
+  // 카테고리별 개수 계산 (kdrama = kdrama + movie 합산)
   const getCategoryCount = (categoryId: string) => {
     if (categoryId === 'all') return videos.length;
+    if (categoryId === 'kdrama') {
+      return videos.filter(v => v.category === 'kdrama' || v.category === 'movie').length;
+    }
     return videos.filter(v => v.category === categoryId).length;
   };
 
