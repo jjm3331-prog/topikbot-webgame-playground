@@ -242,6 +242,13 @@
     "premiumDescription": "Sahifani ko'rishingiz mumkin, lekin to'liq foydalanish uchun Premium-ga yangilang.",
     "upgrade": "Yangilash"
   },
+  "mobileMenu": {
+    "items": { "koreaCareer": "Koreya ishi", "headhunting": "Headhunting", "learningHub": "TOPIK o'rganish", "community": "Jamoa", "gameHub": "O'yin markazi" },
+    "sections": { "career": "Karyera", "topik": "TOPIK o'rganish", "game": "O'yinlar", "installApp": "Ilovani o'rnatish" },
+    "stats": { "money": "Pul", "missions": "Vazifalar", "points": "Ball" },
+    "pwa": { "android": "Android o'rnatish", "ios": "iOS o'rnatish", "androidGuideTitle": "Androidda o'rnatish", "androidStep1": "Chrome menyusini bosing (⋮)", "androidStep2": "'Bosh ekranga qo'shish'ni tanlang", "androidStep3": "'Qo'shish'ni bosing", "iosGuideTitle": "iOSda o'rnatish", "iosStep1": "Safarida Ulashish tugmasini bosing", "iosStep2": "'Bosh ekranga qo'shish'ni tanlang", "iosStep3": "Ilova nomini tasdiqlang", "iosStep4": "'Qo'shish'ni bosing" },
+    "logout": "Chiqish"
+  },
   "toast": {
     "premiumFeature": "Premium Xususiyat",
     "premiumDescription": "Sahifani ko'rishingiz mumkin, lekin to'liq foydalanish uchun Premium-ga yangilang.",
@@ -880,7 +887,7 @@
     "thinking": "O'ylayapman...", "inputPlaceholder": "Javobingizni kiriting...", "stopRecording": "Yozishni to'xtatish", "answerByVoice": "Ovoz bilan javob berish", "endInterview": "Tugatish",
     "analyzingResults": "Natijalar tahlil qilinmoqda...", "aiEvaluating": "AI intervyungizni to'liq baholayapti", "interviewComplete": "Intervyu yakunlandi!", "simulationFor": "Intervyu simulyatsiyasi",
     "grade": "Daraja", "pointsUnit": "ball", "overallScore": "Umumiy ball", "scoresByCategory": "Kategoriya bo'yicha balllar", "overallFeedback": "Umumiy fikr-mulohaza",
-    "strengths": "Kuchli tomonlar", "improvements": "Yaxshilash kerak", "tipsForNext": "Keyingi intervyu uchun maslahatlar", "restart": "Qayta intervyu", "startAgain": "Qayta boshlash",
+    "strengths": "Kuchli tomonlar", "improvements": "Yaxshilash kerak", "tipsForNext": "Keyingi intervyu uchun maslahatlar", "backToCareerHub": "Korea Career Hub", "restart": "Qayta intervyu", "startAgain": "Qayta boshlash",
     "companies": { "samsung": "Samsung Electronics", "lg": "LG Electronics", "hyundai": "Hyundai Motor", "naver": "Naver", "kakao": "Kakao", "coupang": "Coupang", "skhynix": "SK Hynix", "other": "Boshqa" },
     "companyTypes": { "conglomerate": "Katta korporatsiya", "tech": "IT kompaniya", "ecommerce": "Elektron tijorat", "semiconductor": "Yarim o'tkazgich", "custom": "O'zingiz kiriting" },
     "positions": { "software": "Dasturiy ta'minot", "marketing": "Marketing / PR", "sales": "Sotish", "hr": "HR", "design": "Dizayn / UX", "finance": "Moliya / Buxgalteriya", "production": "Ishlab chiqarish", "office": "Ofis ishi" },
@@ -2172,6 +2179,9 @@
       "beginner": "Boshlang'ich",
       "intermediate": "O'rta",
       "advanced": "Yuqori"
+    },
+    "duration": {
+      "lessThanOneMin": "< 1 daq"
     },
     "cta": {
       "title": "Hozir boshlang!",

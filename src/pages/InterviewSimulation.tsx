@@ -413,7 +413,7 @@ const InterviewSimulation = () => {
             className="gap-2 text-card-body text-muted-foreground hover:text-foreground transition-colors -ml-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Korea Career Hub</span>
+            <span>{t('interview.backToCareerHub')}</span>
           </Button>
 
           {/* Premium Banner */}
@@ -546,8 +546,7 @@ const InterviewSimulation = () => {
                     >
                       <span className="text-2xl sm:text-3xl shrink-0">{interviewer.emoji}</span>
                       <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
-                        <p className="text-sm sm:text-base font-bold truncate">{t(interviewer.nameKey)}</p>
-                        <p className="text-xs sm:text-sm opacity-60">{interviewer.name}</p>
+                                        <p className="text-sm sm:text-base font-bold truncate">{t(interviewer.nameKey)}</p>
                         <p className={`text-xs sm:text-sm mt-1 leading-relaxed line-clamp-2 ${selectedInterviewer === interviewer.id ? 'opacity-90' : 'text-muted-foreground'}`}>
                           {t(interviewer.descKey)}
                         </p>

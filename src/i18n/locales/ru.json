@@ -242,6 +242,13 @@
     "premiumDescription": "Вы можете просматривать страницу, но для полного доступа обновитесь до Премиум.",
     "upgrade": "Обновить"
   },
+  "mobileMenu": {
+    "items": { "koreaCareer": "Работа в Корее", "headhunting": "Хедхантинг", "learningHub": "Учить TOPIK", "community": "Сообщество", "gameHub": "Игровой центр" },
+    "sections": { "career": "Карьера", "topik": "Учить TOPIK", "game": "Игры", "installApp": "Установить приложение" },
+    "stats": { "money": "Деньги", "missions": "Миссии", "points": "Баллы" },
+    "pwa": { "android": "Установить Android", "ios": "Установить iOS", "androidGuideTitle": "Как установить на Android", "androidStep1": "Нажмите меню Chrome (⋮)", "androidStep2": "Выберите 'Добавить на главный экран'", "androidStep3": "Нажмите 'Добавить'", "iosGuideTitle": "Как установить на iOS", "iosStep1": "Нажмите кнопку Поделиться в Safari", "iosStep2": "Выберите 'На экран Домой'", "iosStep3": "Подтвердите название", "iosStep4": "Нажмите 'Добавить'" },
+    "logout": "Выйти"
+  },
   "toast": {
     "premiumFeature": "Премиум функция",
     "premiumDescription": "Вы можете просматривать страницу, но для полного доступа обновитесь до Премиум.",
@@ -880,7 +887,7 @@
     "thinking": "Думаю...", "inputPlaceholder": "Введите ваш ответ...", "stopRecording": "Остановить запись", "answerByVoice": "Ответить голосом", "endInterview": "Завершить",
     "analyzingResults": "Анализ результатов...", "aiEvaluating": "ИИ комплексно оценивает ваше интервью", "interviewComplete": "Интервью завершено!", "simulationFor": "Симуляция интервью",
     "grade": "Оценка", "pointsUnit": "баллов", "overallScore": "Общий балл", "scoresByCategory": "Баллы по категориям", "overallFeedback": "Общий отзыв",
-    "strengths": "Сильные стороны", "improvements": "Области для улучшения", "tipsForNext": "Советы для следующего интервью", "restart": "Попробовать снова", "startAgain": "Начать заново",
+    "strengths": "Сильные стороны", "improvements": "Области для улучшения", "tipsForNext": "Советы для следующего интервью", "backToCareerHub": "Korea Career Hub", "restart": "Попробовать снова", "startAgain": "Начать заново",
     "companies": { "samsung": "Samsung Electronics", "lg": "LG Electronics", "hyundai": "Hyundai Motor", "naver": "Naver", "kakao": "Kakao", "coupang": "Coupang", "skhynix": "SK Hynix", "other": "Другое" },
     "companyTypes": { "conglomerate": "Крупная корпорация", "tech": "IT компания", "ecommerce": "Электронная коммерция", "semiconductor": "Полупроводники", "custom": "Ввести вручную" },
     "positions": { "software": "Разработка ПО", "marketing": "Маркетинг / PR", "sales": "Продажи", "hr": "HR", "design": "Дизайн / UX", "finance": "Финансы / Бухгалтерия", "production": "Производство", "office": "Офисная работа" },
@@ -2172,6 +2179,9 @@
       "beginner": "Начальный",
       "intermediate": "Средний",
       "advanced": "Продвинутый"
+    },
+    "duration": {
+      "lessThanOneMin": "< 1 мин"
     },
     "cta": {
       "title": "Начните прямо сейчас!",
