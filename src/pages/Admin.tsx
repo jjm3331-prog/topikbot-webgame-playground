@@ -707,18 +707,6 @@ const Admin = () => {
                 </CardContent>
               </Card>
 
-              <Card className="cursor-pointer hover:shadow-lg transition-all">
-                <CardContent className="p-6 flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <TrendingUp className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold">최근 활동</h3>
-                    <p className="text-sm text-muted-foreground">활동 통계 보기</p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
-                </CardContent>
-              </Card>
 
               <Card className="cursor-pointer hover:shadow-lg transition-all">
                 <CardContent className="p-6 flex items-center gap-4">
