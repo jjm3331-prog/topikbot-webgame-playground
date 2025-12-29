@@ -2718,7 +2718,7 @@
     "features": {
       "aiGeneration": {
         "title": "AI 문제 생성",
-        "description": "RAG + Gemini로 무한한 신규 문제 생성"
+        "description": "LUKATO RAG AI로 무한한 신규 문제 생성"
       },
       "multiLanguage": {
         "title": "7개 언어 해설",

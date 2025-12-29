@@ -2334,7 +2334,7 @@
     "features": {
       "aiGeneration": {
         "title": "AI savol yaratish",
-        "description": "RAG + Gemini bilan cheksiz yangi savollar yaratish"
+        "description": "LUKATO RAG AI bilan cheksiz yangi savollar yaratish"
       },
       "multiLanguage": {
         "title": "7 tilda tushuntirish",

@@ -269,7 +269,7 @@ const VocabTranslationManager = () => {
                     fallbacks: data.fallbacks 
                   });
                   toast({
-                    title: `${model === 'gemini' ? 'Gemini' : 'Grok'} 번역 완료`,
+                    title: `${model === 'gemini' ? 'LUKATO AI' : 'Grok'} 번역 완료`,
                     description: `${data.generated}개 생성, ${data.errors}개 오류${data.fallbacks > 0 ? `, ${data.fallbacks}개 fallback` : ''}`,
                   });
                 } else if (data.type === 'fatal') {
@@ -378,7 +378,7 @@ const VocabTranslationManager = () => {
                   });
                   toast({
                     title: "⚡ 병렬 번역 완료",
-                    description: `Gemini ${data.geminiGenerated}개 + Grok ${data.grokGenerated}개 = 총 ${data.generated}개 번역`,
+                    description: `LUKATO AI ${data.geminiGenerated}개 + Grok ${data.grokGenerated}개 = 총 ${data.generated}개 번역`,
                   });
                 } else if (data.type === 'fatal') {
                   throw new Error(data.error);
@@ -635,7 +635,7 @@ const VocabTranslationManager = () => {
                 )}
               </Button>
 
-              {/* Gemini Button */}
+              {/* LUKATO AI Button */}
               <Button
                 onClick={() => handleGenerateTranslations('gemini')}
                 disabled={generatingGemini || generatingParallel}
@@ -645,12 +645,12 @@ const VocabTranslationManager = () => {
                 {generatingGemini ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Gemini...
+                    LUKATO AI...
                   </>
                 ) : (
                   <>
                     <Play className="w-4 h-4 mr-2" />
-                    Gemini
+                    LUKATO AI
                   </>
                 )}
               </Button>
@@ -701,7 +701,7 @@ const VocabTranslationManager = () => {
                 >
                   <div className="flex items-center gap-2 mb-3">
                     <Loader2 className="w-4 h-4 text-violet-500 animate-spin" />
-                    <span className="font-medium text-violet-600 dark:text-violet-400">Gemini</span>
+                    <span className="font-medium text-violet-600 dark:text-violet-400">LUKATO AI</span>
                   </div>
                   
                   {geminiProgress ? (
@@ -774,7 +774,7 @@ const VocabTranslationManager = () => {
                         <Sparkles className="w-5 h-5 text-violet-500" />
                       </div>
                     </div>
-                    <span className="font-medium text-violet-600 dark:text-violet-400">Gemini 실시간 진행</span>
+                    <span className="font-medium text-violet-600 dark:text-violet-400">LUKATO AI 실시간 진행</span>
                   </div>
                   
                   <div className="space-y-3">
@@ -813,7 +813,7 @@ const VocabTranslationManager = () => {
                     </div>
                     
                     <div className="text-xs text-muted-foreground">
-                      모델: {geminiProgress.usedModel === 'grok-fallback' ? 'Grok (Fallback)' : 'Gemini'}
+                      모델: {geminiProgress.usedModel === 'grok-fallback' ? 'Grok (Fallback)' : 'LUKATO AI'}
                     </div>
                   </div>
                 </motion.div>
@@ -884,7 +884,7 @@ const VocabTranslationManager = () => {
                 <div className="flex items-center gap-6 flex-wrap">
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-violet-500" />
-                    <span>Gemini: {parallelResult.geminiGenerated}개</span>
+                    <span>LUKATO AI: {parallelResult.geminiGenerated}개</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Zap className="w-4 h-4 text-orange-500" />
@@ -905,7 +905,7 @@ const VocabTranslationManager = () => {
               >
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles className="w-4 h-4 text-violet-500" />
-                  <span className="font-medium text-violet-600 dark:text-violet-400">Gemini 결과</span>
+                  <span className="font-medium text-violet-600 dark:text-violet-400">LUKATO AI 결과</span>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
@@ -954,8 +954,8 @@ const VocabTranslationManager = () => {
               <div className="text-sm">
                 <p className="font-medium text-emerald-600 dark:text-emerald-400 mb-1">⚡ 병렬 2배속 AI 번역 시스템</p>
                 <ul className="text-muted-foreground space-y-1">
-                  <li>• <strong className="text-emerald-500">병렬 2배속</strong> - 배치를 반으로 나눠 Gemini + Grok 동시 실행 (추천!)</li>
-                  <li>• <strong className="text-violet-500">Gemini</strong> - Google Gemini 2.5 Flash 단독 실행</li>
+                  <li>• <strong className="text-emerald-500">병렬 2배속</strong> - 배치를 반으로 나눠 LUKATO AI + Grok 동시 실행 (추천!)</li>
+                  <li>• <strong className="text-violet-500">LUKATO AI</strong> - LUKATO RAG AI 단독 실행</li>
                   <li>• <strong className="text-orange-500">Grok</strong> - xAI Grok 4.1 Fast Reasoning 단독 실행</li>
                   <li>• 이미 번역된 단어는 건너뜁니다 (meaning_vi가 NULL인 경우만 처리)</li>
                 </ul>

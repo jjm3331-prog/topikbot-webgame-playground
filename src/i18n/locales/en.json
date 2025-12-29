@@ -2580,7 +2580,7 @@
     "features": {
       "aiGeneration": {
         "title": "AI Question Generation",
-        "description": "Generate unlimited new questions with RAG + Gemini"
+        "description": "Generate unlimited new questions with LUKATO RAG AI"
       },
       "multiLanguage": {
         "title": "7 Language Explanations",

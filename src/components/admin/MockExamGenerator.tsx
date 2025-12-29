@@ -501,7 +501,7 @@ const MockExamGenerator = () => {
             AI 문제 자동 생성 시스템
           </CardTitle>
           <CardDescription>
-            Gemini 2.5 Pro + RAG 기반 TOPIK 모의고사 문제 자동 생성 및 검증 (스트리밍)
+            LUKATO RAG AI 기반 TOPIK 모의고사 문제 자동 생성 및 검증 (스트리밍)
           </CardDescription>
         </CardHeader>
       </Card>

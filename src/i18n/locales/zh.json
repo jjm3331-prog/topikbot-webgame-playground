@@ -2343,7 +2343,7 @@
     "features": {
       "aiGeneration": {
         "title": "AI生成题目",
-        "description": "使用RAG + Gemini生成无限新题目"
+        "description": "使用LUKATO RAG AI生成无限新题目"
       },
       "multiLanguage": {
         "title": "7种语言解析",

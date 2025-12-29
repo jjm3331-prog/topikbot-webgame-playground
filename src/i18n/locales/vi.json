@@ -2599,7 +2599,7 @@
     "features": {
       "aiGeneration": {
         "title": "Tạo câu hỏi AI",
-        "description": "Tạo câu hỏi mới không giới hạn với RAG + Gemini"
+        "description": "Tạo câu hỏi mới không giới hạn với LUKATO RAG AI"
       },
       "multiLanguage": {
         "title": "Giải thích 7 ngôn ngữ",
