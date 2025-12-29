@@ -205,8 +205,8 @@ export const LanguageSelector = () => {
                 stiffness: 400, 
                 damping: 25 
               }}
-              className="absolute right-0 top-full mt-3 z-50 min-w-[260px] bg-gradient-to-br from-popover via-popover to-muted/30 backdrop-blur-xl border border-border/30 rounded-2xl shadow-2xl shadow-primary/5 overflow-hidden"
-              style={{ transformOrigin: 'top right' }}
+              className="absolute left-1/2 -translate-x-1/2 top-full mt-3 z-50 min-w-[260px] bg-gradient-to-br from-popover via-popover to-muted/30 backdrop-blur-xl border border-border/30 rounded-2xl shadow-2xl shadow-primary/5 overflow-hidden"
+              style={{ transformOrigin: 'top center' }}
             >
               {/* Decorative Top Gradient */}
               <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
