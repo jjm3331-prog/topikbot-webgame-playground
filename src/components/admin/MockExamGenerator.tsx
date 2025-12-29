@@ -381,6 +381,22 @@ const MockExamGenerator = () => {
     setGenState({ step: "idle", progress: 0, message: "취소됨" });
   };
 
+  // Map difficulty to DB-allowed values
+  const mapDifficultyToDb = (difficulty: string): string => {
+    const mapping: Record<string, string> = {
+      'beginner': 'easy',
+      'easy': 'easy',
+      'intermediate': 'medium',
+      'medium': 'medium',
+      'advanced': 'hard',
+      'hard': 'hard',
+      '초급': 'easy',
+      '중급': 'medium',
+      '고급': 'hard',
+    };
+    return mapping[difficulty.toLowerCase()] || 'medium';
+  };
+
   // Save approved questions to database
   const handleSaveApproved = async () => {
     if (selectedQuestions.size === 0) {
@@ -411,7 +427,7 @@ const MockExamGenerator = () => {
           explanation_ko: q.explanation_ko,
           explanation_en: q.explanation_en || null,
           explanation_vi: q.explanation_vi || null,
-          difficulty: q.difficulty,
+          difficulty: mapDifficultyToDb(q.difficulty),
           topic: q.topic || topic || null,
           grammar_points: q.grammar_points || [],
           vocabulary: q.vocabulary || [],
