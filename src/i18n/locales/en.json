@@ -260,6 +260,18 @@
     "checkInError": "Failed to check in. Please try again.",
     "weeklyBonusHint": "Check in today to get 7-day streak bonus!",
     "pointsToNextLevel": "{{points}} points to next level",
+    "video": {
+      "badge": "7 Languages Subtitles",
+      "new": "NEW",
+      "title": "Video Learning",
+      "description": "Learn Korean naturally with YouTube videos"
+    },
+    "mockExam": {
+      "badge": "TOPIK I·II·EPS",
+      "new": "NEW",
+      "title": "TOPIK Mock Exam",
+      "description": "Practice with 100% authentic AI-generated questions"
+    },
     "battle": {
       "realtime": "⚔️ 1:1 Real-time",
       "hot": "HOT",
