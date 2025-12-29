@@ -6,11 +6,39 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface Expression {
+interface KeySentence {
   korean: string;
   translation: string;
-  context: string;
+  explanation: string;
   timestamp: number;
+}
+
+interface Vocabulary {
+  word: string;
+  meaning: string;
+  partOfSpeech: string;
+  example: string;
+  exampleTranslation: string;
+}
+
+interface Idiom {
+  korean: string;
+  literal: string;
+  meaning: string;
+  usage: string;
+}
+
+interface CulturalNote {
+  topic: string;
+  explanation: string;
+  tip: string;
+}
+
+interface LearningContent {
+  keySentences: KeySentence[];
+  vocabulary: Vocabulary[];
+  idioms: Idiom[];
+  culturalNotes: CulturalNote[];
 }
 
 serve(async (req) => {
@@ -39,7 +67,7 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const cacheKey = `shorts-expressions-${videoId}-${targetLanguage}`;
+    const cacheKey = `shorts-learning-v2-${videoId}-${targetLanguage}`;
     
     const { data: cached } = await supabase
       .from("ai_response_cache")
@@ -52,54 +80,96 @@ serve(async (req) => {
     if (cached?.response) {
       console.log("Cache hit for", cacheKey);
       return new Response(
-        JSON.stringify({ expressions: cached.response, source: "cache" }),
+        JSON.stringify({ ...cached.response, source: "cache" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Prepare subtitles for LLM
+    // Prepare subtitles for LLM - clean up and combine
     const subtitleText = subtitles
       .map((s: { text: string; start: number }, idx: number) => 
-        `[${idx}] ${Math.floor(s.start)}초: "${s.text}"`
+        `[${Math.floor(s.start)}초] ${s.text}`
       )
       .join("\n");
 
     const languageNames: Record<string, string> = {
-      vi: "베트남어",
-      en: "영어",
-      ja: "일본어",
-      zh: "중국어",
-      ru: "러시아어",
-      uz: "우즈베크어",
+      vi: "Vietnamese",
+      en: "English",
+      ja: "Japanese",
+      zh: "Chinese",
+      ru: "Russian",
+      uz: "Uzbek",
     };
 
-    const targetLangName = languageNames[targetLanguage] || "영어";
+    const targetLangName = languageNames[targetLanguage] || "English";
 
-    const systemPrompt = `당신은 한국어 교육 전문가입니다. 유튜브 쇼츠 영상의 자막에서 외국인 학습자에게 가장 유용한 핵심 표현 4개를 선별합니다.
+    const systemPrompt = `You are an expert Korean language educator. Analyze YouTube Shorts video subtitles and create comprehensive learning content for foreign learners.
 
-선별 기준:
-1. 일상 회화에서 자주 사용되는 표현
-2. 한국 문화나 드라마에서 흔히 등장하는 표현
-3. 문법적으로 배울 가치가 있는 표현
-4. 감정이나 상황을 잘 전달하는 표현
+Your task is to extract and create:
 
-출력 형식은 반드시 JSON 배열로:
-[
-  {
-    "korean": "깔끔하게 정리된 한국어 표현",
-    "translation": "${targetLangName}로 번역된 자연스러운 표현",
-    "context": "이 표현이 어떤 상황에서 사용되는지 ${targetLangName}로 간단한 설명",
-    "timestamp": 해당_자막의_시작_초_숫자
-  }
-]
+1. **Key Sentences (핵심 문장)**: 3-4 important, natural Korean sentences from the video
+   - Clean up any fragmented or incomplete sentences
+   - Make them grammatically correct and natural
+   - Include timestamp where they appear
 
-중요:
-- 자막 그대로가 아닌, 핵심 표현만 추출하여 깔끔하게 정리
-- 불완전한 문장은 자연스럽게 완성
-- 반드시 4개만 선별
-- JSON만 출력, 다른 텍스트 없이`;
+2. **Vocabulary (어휘)**: 4-6 useful words/phrases
+   - Focus on commonly used words
+   - Include part of speech
+   - Provide example sentences
 
-    const userPrompt = `다음 한국어 자막에서 핵심 표현 4개를 선별해주세요:\n\n${subtitleText}`;
+3. **Idioms/Expressions (관용어)**: 1-2 Korean expressions or slang
+   - Explain literal vs actual meaning
+   - When this expression is typically used
+
+4. **Cultural Notes (문화적 맥락)**: 1-2 cultural insights
+   - Explain any Korean cultural context in the video
+   - Tips for understanding Korean culture
+
+IMPORTANT:
+- All translations and explanations must be in ${targetLangName}
+- Clean up messy or incomplete subtitles - extract the MEANING
+- Focus on practical, useful learning content
+- Do NOT use romanization for Korean text
+
+Output ONLY valid JSON in this exact format:
+{
+  "keySentences": [
+    {
+      "korean": "깔끔한 한국어 문장",
+      "translation": "${targetLangName} translation",
+      "explanation": "Grammar or usage explanation in ${targetLangName}",
+      "timestamp": 5
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "단어",
+      "meaning": "meaning in ${targetLangName}",
+      "partOfSpeech": "noun/verb/adjective/etc",
+      "example": "예문",
+      "exampleTranslation": "example translation"
+    }
+  ],
+  "idioms": [
+    {
+      "korean": "관용 표현",
+      "literal": "literal meaning in ${targetLangName}",
+      "meaning": "actual meaning in ${targetLangName}",
+      "usage": "when/how to use in ${targetLangName}"
+    }
+  ],
+  "culturalNotes": [
+    {
+      "topic": "Topic name",
+      "explanation": "Cultural explanation in ${targetLangName}",
+      "tip": "Practical tip for learners in ${targetLangName}"
+    }
+  ]
+}`;
+
+    const userPrompt = `Analyze these Korean subtitles and create learning content:\n\n${subtitleText}`;
+
+    console.log("Requesting learning content for video:", videoId, "language:", targetLanguage);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -113,6 +183,7 @@ serve(async (req) => {
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
+        max_tokens: 4096,
       }),
     });
 
@@ -139,28 +210,47 @@ serve(async (req) => {
     const content = data.choices?.[0]?.message?.content || "";
 
     // Parse JSON from response
-    let expressions: Expression[] = [];
+    let learningContent: LearningContent = {
+      keySentences: [],
+      vocabulary: [],
+      idioms: [],
+      culturalNotes: [],
+    };
+
     try {
-      const jsonMatch = content.match(/\[[\s\S]*\]/);
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        expressions = JSON.parse(jsonMatch[0]);
+        const parsed = JSON.parse(jsonMatch[0]);
+        learningContent = {
+          keySentences: parsed.keySentences || [],
+          vocabulary: parsed.vocabulary || [],
+          idioms: parsed.idioms || [],
+          culturalNotes: parsed.culturalNotes || [],
+        };
       }
     } catch (parseError) {
-      console.error("Failed to parse expressions:", parseError, content);
+      console.error("Failed to parse learning content:", parseError, content);
       throw new Error("Failed to parse AI response");
     }
+
+    console.log("Generated learning content:", {
+      sentences: learningContent.keySentences.length,
+      vocab: learningContent.vocabulary.length,
+      idioms: learningContent.idioms.length,
+      cultural: learningContent.culturalNotes.length,
+    });
 
     // Cache the result for 7 days
     await supabase.from("ai_response_cache").upsert({
       cache_key: cacheKey,
       function_name: "shorts-expressions",
-      response: expressions,
+      response: learningContent,
       request_params: { videoId, targetLanguage },
       expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
     }, { onConflict: "cache_key" });
 
     return new Response(
-      JSON.stringify({ expressions, source: "llm" }),
+      JSON.stringify({ ...learningContent, source: "llm" }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
