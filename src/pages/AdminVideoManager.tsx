@@ -87,6 +87,8 @@ export default function AdminVideoManager() {
   const [srtFile, setSrtFile] = useState<File | null>(null);
   const [srtLanguage, setSrtLanguage] = useState('ko');
   const [srtUploading, setSrtUploading] = useState(false);
+  const [srtAutoTranslate, setSrtAutoTranslate] = useState(true);
+  const [srtPreview, setSrtPreview] = useState<Array<{ start: number; end: number; text: string }>>([]);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -530,7 +532,28 @@ export default function AdminVideoManager() {
     setSrtUploadVideo(video);
     setSrtFile(null);
     setSrtLanguage('ko');
+    setSrtAutoTranslate(true);
+    setSrtPreview([]);
     setSrtUploadOpen(true);
+  };
+
+  const handleSrtFileChange = async (file: File | null) => {
+    setSrtFile(file);
+    if (file) {
+      const content = await file.text();
+      const parsed = parseSRT(content);
+      setSrtPreview(parsed.slice(0, 10)); // Show first 10 for preview
+    } else {
+      setSrtPreview([]);
+    }
+  };
+
+  const formatTime = (seconds: number): string => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    const ms = Math.floor((seconds % 1) * 1000);
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')},${ms.toString().padStart(3, '0')}`;
   };
 
   const parseSRT = (content: string): Array<{ start: number; end: number; text: string }> => {
@@ -583,6 +606,7 @@ export default function AdminVideoManager() {
 
       if (subtitles.length === 0) {
         toast.error('SRT 파일을 파싱할 수 없습니다');
+        setSrtUploading(false);
         return;
       }
 
@@ -601,6 +625,24 @@ export default function AdminVideoManager() {
       if (error) throw error;
 
       toast.success(`${subtitles.length}개 자막이 저장되었습니다 (${srtLanguage.toUpperCase()})`);
+      
+      // Auto-translate if enabled
+      if (srtAutoTranslate && srtLanguage === 'ko') {
+        toast.info('🌍 6개 언어 번역 시작...');
+        
+        try {
+          const { error: translateError } = await supabase.functions.invoke('video-translate', {
+            body: { video_id: srtUploadVideo.id }
+          });
+          
+          if (translateError) throw translateError;
+          toast.success('모든 언어 번역 완료!');
+        } catch (transErr: any) {
+          console.error('Translation error:', transErr);
+          toast.error('번역 실패: ' + (transErr.message || '알 수 없는 오류'));
+        }
+      }
+      
       setSrtUploadOpen(false);
       fetchVideos();
     } catch (error: any) {
@@ -996,7 +1038,7 @@ export default function AdminVideoManager() {
               <Input
                 type="file"
                 accept=".srt"
-                onChange={(e) => setSrtFile(e.target.files?.[0] || null)}
+                onChange={(e) => handleSrtFileChange(e.target.files?.[0] || null)}
               />
               {srtFile && (
                 <p className="text-xs text-muted-foreground mt-1">
@@ -1004,6 +1046,39 @@ export default function AdminVideoManager() {
                 </p>
               )}
             </div>
+
+            {/* Preview */}
+            {srtPreview.length > 0 && (
+              <div>
+                <Label className="text-sm font-medium mb-2 block">
+                  미리보기 ({srtPreview.length}개 / 전체)
+                </Label>
+                <div className="max-h-40 overflow-y-auto border rounded-lg p-2 space-y-2 bg-muted/30">
+                  {srtPreview.map((sub, idx) => (
+                    <div key={idx} className="text-xs border-b border-border/50 pb-1 last:border-0">
+                      <span className="text-muted-foreground font-mono">
+                        {formatTime(sub.start)} → {formatTime(sub.end)}
+                      </span>
+                      <p className="mt-0.5">{sub.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Auto translate option */}
+            {srtLanguage === 'ko' && (
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="auto-translate"
+                  checked={srtAutoTranslate}
+                  onCheckedChange={setSrtAutoTranslate}
+                />
+                <Label htmlFor="auto-translate" className="text-sm">
+                  업로드 후 6개 언어 자동 번역
+                </Label>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setSrtUploadOpen(false)}>
@@ -1015,7 +1090,7 @@ export default function AdminVideoManager() {
               ) : (
                 <Upload className="w-4 h-4 mr-2" />
               )}
-              업로드
+              {srtAutoTranslate && srtLanguage === 'ko' ? '업로드 + 번역' : '업로드'}
             </Button>
           </DialogFooter>
         </DialogContent>
