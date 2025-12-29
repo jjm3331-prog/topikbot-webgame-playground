@@ -12,102 +12,161 @@ type Subtitle = { start: number; end: number; text: string };
 // Multiple YouTube audio extraction services for reliability
 const AUDIO_EXTRACTORS = [
   {
-    name: "yt-download.org",
+    name: "cobalt-api",
     getAudioUrl: async (videoId: string) => {
-      const resp = await fetch(`https://api.yt-download.org/get-links?url=https://www.youtube.com/watch?v=${videoId}`, {
-        headers: { "User-Agent": "Mozilla/5.0" }
-      });
-      if (!resp.ok) return null;
-      const data = await resp.json();
-      // Find audio format
-      const audio = data?.formats?.find((f: any) => f.mimeType?.includes("audio"));
-      return audio?.url || null;
-    }
-  },
-  {
-    name: "y2mate-api",
-    getAudioUrl: async (videoId: string) => {
-      // Use rapidapi y2mate
-      const resp = await fetch(`https://youtube-mp36.p.rapidapi.com/dl?id=${videoId}`, {
-        headers: {
-          "X-RapidAPI-Key": Deno.env.get("RAPIDAPI_KEY") || "",
-          "X-RapidAPI-Host": "youtube-mp36.p.rapidapi.com",
-          "User-Agent": "Mozilla/5.0"
-        }
-      });
-      if (!resp.ok) return null;
-      const data = await resp.json();
-      return data?.link || null;
-    }
-  },
-  {
-    name: "ssyoutube",
-    getAudioUrl: async (videoId: string) => {
-      const resp = await fetch(`https://ssyoutube.com/api/convert?url=https://www.youtube.com/watch?v=${videoId}`, {
-        headers: { "User-Agent": "Mozilla/5.0" }
-      });
-      if (!resp.ok) return null;
-      const data = await resp.json();
-      const audio = data?.url?.find((u: any) => u.type === "mp3" || u.audio);
-      return audio?.url || null;
-    }
-  },
-  {
-    name: "loader.to",
-    getAudioUrl: async (videoId: string) => {
-      // Step 1: Request conversion
-      const initResp = await fetch(`https://loader.to/api/init`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": "Mozilla/5.0"
-        },
-        body: JSON.stringify({
-          url: `https://www.youtube.com/watch?v=${videoId}`,
-          format: "mp3"
-        })
-      });
-      if (!initResp.ok) return null;
-      const initData = await initResp.json();
-      if (!initData?.id) return null;
+      // Cobalt is one of the most reliable YouTube downloaders
+      const cobaltInstances = [
+        "https://api.cobalt.tools",
+        "https://co.wuk.sh",
+      ];
       
-      // Step 2: Poll for result
-      for (let i = 0; i < 30; i++) {
-        await new Promise(r => setTimeout(r, 2000));
-        const statusResp = await fetch(`https://loader.to/api/status?id=${initData.id}`, {
-          headers: { "User-Agent": "Mozilla/5.0" }
-        });
-        if (!statusResp.ok) continue;
-        const statusData = await statusResp.json();
-        if (statusData?.download_url) return statusData.download_url;
-        if (statusData?.status === "error") break;
+      for (const instance of cobaltInstances) {
+        try {
+          console.log(`[Whisper] Trying Cobalt instance: ${instance}`);
+          const resp = await fetch(`${instance}/api/json`, {
+            method: "POST",
+            headers: {
+              "Accept": "application/json",
+              "Content-Type": "application/json",
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            },
+            body: JSON.stringify({
+              url: `https://www.youtube.com/watch?v=${videoId}`,
+              isAudioOnly: true,
+              aFormat: "mp3",
+              filenamePattern: "basic"
+            })
+          });
+          
+          if (!resp.ok) {
+            console.log(`[Whisper] Cobalt ${instance} returned ${resp.status}`);
+            continue;
+          }
+          
+          const data = await resp.json();
+          console.log(`[Whisper] Cobalt response:`, JSON.stringify(data).slice(0, 200));
+          
+          if (data?.url) return data.url;
+          if (data?.audio) return data.audio;
+        } catch (e) {
+          console.log(`[Whisper] Cobalt ${instance} error:`, e);
+        }
       }
       return null;
     }
   },
   {
-    name: "ytdl-core-api",
+    name: "invidious-api",
     getAudioUrl: async (videoId: string) => {
-      // Try public ytdl API instances
+      // Invidious instances provide direct audio URLs
+      const instances = [
+        "https://invidious.snopyta.org",
+        "https://vid.puffyan.us",
+        "https://invidious.kavin.rocks",
+        "https://y.com.sb",
+        "https://inv.riverside.rocks"
+      ];
+      
+      for (const instance of instances) {
+        try {
+          console.log(`[Whisper] Trying Invidious: ${instance}`);
+          const resp = await fetch(`${instance}/api/v1/videos/${videoId}`, {
+            headers: { 
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+              "Accept": "application/json"
+            }
+          });
+          
+          if (!resp.ok) continue;
+          
+          const data = await resp.json();
+          const formats = data?.adaptiveFormats || [];
+          
+          // Find audio format (prefer higher quality)
+          const audioFormats = formats
+            .filter((f: any) => f.type?.includes("audio"))
+            .sort((a: any, b: any) => (b.bitrate || 0) - (a.bitrate || 0));
+          
+          if (audioFormats.length > 0 && audioFormats[0].url) {
+            console.log(`[Whisper] Found audio from ${instance}`);
+            return audioFormats[0].url;
+          }
+        } catch (e) {
+          console.log(`[Whisper] Invidious ${instance} error:`, e);
+        }
+      }
+      return null;
+    }
+  },
+  {
+    name: "piped-api",
+    getAudioUrl: async (videoId: string) => {
+      // Piped is another privacy-focused YouTube frontend with API
+      const instances = [
+        "https://pipedapi.kavin.rocks",
+        "https://api.piped.yt",
+        "https://pipedapi.adminforge.de"
+      ];
+      
+      for (const instance of instances) {
+        try {
+          console.log(`[Whisper] Trying Piped: ${instance}`);
+          const resp = await fetch(`${instance}/streams/${videoId}`, {
+            headers: { 
+              "User-Agent": "Mozilla/5.0",
+              "Accept": "application/json"
+            }
+          });
+          
+          if (!resp.ok) continue;
+          
+          const data = await resp.json();
+          const audioStreams = data?.audioStreams || [];
+          
+          // Sort by bitrate, prefer higher quality
+          const sorted = audioStreams
+            .filter((s: any) => s.url)
+            .sort((a: any, b: any) => (b.bitrate || 0) - (a.bitrate || 0));
+          
+          if (sorted.length > 0) {
+            console.log(`[Whisper] Found audio from Piped ${instance}`);
+            return sorted[0].url;
+          }
+        } catch (e) {
+          console.log(`[Whisper] Piped ${instance} error:`, e);
+        }
+      }
+      return null;
+    }
+  },
+  {
+    name: "ytdl-org-api",
+    getAudioUrl: async (videoId: string) => {
+      // Try public yt-dlp API wrappers
       const apis = [
-        `https://ytdl-core-api.onrender.com/api/info?url=https://www.youtube.com/watch?v=${videoId}`,
-        `https://yt-dlp-api.onrender.com/api/info?url=https://www.youtube.com/watch?v=${videoId}`,
+        `https://ytdlp-api.fly.dev/api/info?url=https://www.youtube.com/watch?v=${videoId}`,
+        `https://yt-dlp.fly.dev/api/info?url=https://www.youtube.com/watch?v=${videoId}`,
       ];
       
       for (const api of apis) {
         try {
+          console.log(`[Whisper] Trying yt-dlp API: ${api.split('/api')[0]}`);
           const resp = await fetch(api, {
             headers: { "User-Agent": "Mozilla/5.0" }
           });
           if (!resp.ok) continue;
+          
           const data = await resp.json();
-          const formats = data?.formats || data?.info?.formats || [];
+          const formats = data?.formats || [];
           const audio = formats.find((f: any) => 
-            f.mimeType?.includes("audio") || f.audioCodec || f.acodec
+            f.acodec && f.acodec !== "none" && !f.vcodec
           );
-          if (audio?.url) return audio.url;
-        } catch {
-          continue;
+          if (audio?.url) {
+            console.log(`[Whisper] Found audio from yt-dlp API`);
+            return audio.url;
+          }
+        } catch (e) {
+          console.log(`[Whisper] yt-dlp API error:`, e);
         }
       }
       return null;
@@ -197,16 +256,18 @@ serve(async (req) => {
     let successExtractor: string | null = null;
 
     for (const extractor of AUDIO_EXTRACTORS) {
-      console.log(`[Whisper] Trying extractor: ${extractor.name}`);
+      console.log(`[Whisper] === Trying extractor: ${extractor.name} ===`);
       try {
         audioUrl = await extractor.getAudioUrl(youtube_id);
         if (audioUrl) {
           successExtractor = extractor.name;
-          console.log(`[Whisper] Success with ${extractor.name}: ${audioUrl.slice(0, 100)}...`);
+          console.log(`[Whisper] ✓ Success with ${extractor.name}`);
           break;
+        } else {
+          console.log(`[Whisper] ✗ ${extractor.name} returned no URL`);
         }
       } catch (e) {
-        console.log(`[Whisper] ${extractor.name} failed:`, e);
+        console.log(`[Whisper] ✗ ${extractor.name} threw error:`, e);
       }
     }
 
@@ -214,8 +275,9 @@ serve(async (req) => {
       console.error("[Whisper] All audio extractors failed");
       return new Response(
         JSON.stringify({
-          error: "모든 오디오 추출 서비스가 실패했습니다. 잠시 후 다시 시도해주세요.",
+          error: "모든 오디오 추출 서비스가 실패했습니다. YouTube 영상이 비공개이거나 지역 제한이 있을 수 있습니다.",
           tried: AUDIO_EXTRACTORS.map(e => e.name),
+          suggestion: "수동으로 SRT 파일을 업로드하거나, 다른 영상을 시도해주세요."
         }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
@@ -225,12 +287,15 @@ serve(async (req) => {
     console.log(`[Whisper] Downloading audio from ${successExtractor}...`);
     const audioResp = await fetch(audioUrl, {
       method: "GET",
-      headers: { "User-Agent": "Mozilla/5.0" },
+      headers: { 
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Accept": "*/*"
+      },
     });
 
     if (!audioResp.ok) {
       const t = await safeText(audioResp);
-      console.error("[Whisper] Audio download failed:", audioResp.status, t);
+      console.error("[Whisper] Audio download failed:", audioResp.status, t.slice(0, 500));
       return new Response(
         JSON.stringify({ error: `오디오 다운로드 실패 (${audioResp.status})` }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -249,9 +314,16 @@ serve(async (req) => {
       );
     }
 
-    console.log(`[Whisper] Audio downloaded: ${Math.round(audioBuf.byteLength / 1024)}KB`);
+    console.log(`[Whisper] Audio downloaded: ${Math.round(audioBuf.byteLength / 1024)}KB, type: ${contentType}`);
 
-    const filename = "audio.mp3";
+    // Determine file extension based on content type
+    let ext = "mp3";
+    if (contentType.includes("webm")) ext = "webm";
+    else if (contentType.includes("opus")) ext = "opus";
+    else if (contentType.includes("m4a")) ext = "m4a";
+    else if (contentType.includes("aac")) ext = "aac";
+
+    const filename = `audio.${ext}`;
     const file = new File([audioBuf], filename, { type: contentType });
 
     const form = new FormData();
@@ -260,7 +332,7 @@ serve(async (req) => {
     form.append("response_format", "verbose_json");
     form.append("language", "ko");
 
-    console.log(`[Whisper] Sending to OpenAI Whisper...`);
+    console.log(`[Whisper] Sending ${filename} to OpenAI Whisper...`);
 
     const whisperResp = await fetch("https://api.openai.com/v1/audio/transcriptions", {
       method: "POST",
@@ -272,7 +344,7 @@ serve(async (req) => {
 
     const whisperText = await safeText(whisperResp);
     if (!whisperResp.ok) {
-      console.error("[Whisper] OpenAI error:", whisperResp.status, whisperText);
+      console.error("[Whisper] OpenAI error:", whisperResp.status, whisperText.slice(0, 1000));
       return new Response(
         JSON.stringify({ error: `Whisper API error (${whisperResp.status})`, details: whisperText.slice(0, 2000) }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -331,6 +403,8 @@ serve(async (req) => {
       console.error("[Whisper] DB upsert error:", upsertError);
       throw new Error(upsertError.message);
     }
+
+    console.log(`[Whisper] ✓ Complete! Saved ${subtitles.length} subtitles via ${successExtractor}`);
 
     return new Response(
       JSON.stringify({
