@@ -2178,6 +2178,49 @@
     "subtitleList": "字幕列表",
     "clickToJump": "点击跳转到该区间",
     "noSubtitles": "没有字幕",
-    "subtitlesComingSoon": "字幕即将添加"
+    "subtitlesComingSoon": "字幕即将添加",
+    "categories": {
+      "kdrama": "韩剧",
+      "movie": "电影",
+      "variety": "综艺",
+      "news": "新闻",
+      "kpop": "K-POP",
+      "culture": "韩国文化",
+      "travel": "旅游"
+    },
+    "aiLearning": {
+      "title": "AI学习内容",
+      "description": "从视频提取的核心学习资料",
+      "loading": "AI正在分析内容...",
+      "loadError": "无法加载学习内容",
+      "loadFailed": "加载学习内容失败",
+      "retry": "重新分析"
+    },
+    "tabs": {
+      "sentences": "核心句",
+      "vocabulary": "词汇",
+      "idioms": "惯用语",
+      "culture": "文化"
+    },
+    "empty": {
+      "sentences": "没有核心句子",
+      "vocabulary": "没有词汇",
+      "idioms": "没有惯用语",
+      "culture": "没有文化笔记"
+    },
+    "tooltips": {
+      "listenPronunciation": "听发音",
+      "watchInVideo": "在视频中观看"
+    },
+    "idiomLabels": {
+      "literal": "直译",
+      "meaning": "含义"
+    },
+    "learningTips": {
+      "title": "学习技巧",
+      "tip1": "点击发音按钮听韩语发音",
+      "tip2": "点击播放按钮跳转到该场景",
+      "tip3": "在文化标签中学习韩国文化"
+    }
   }
 }

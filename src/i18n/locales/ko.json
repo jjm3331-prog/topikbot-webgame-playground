@@ -2552,6 +2552,49 @@
     "subtitleList": "자막 목록",
     "clickToJump": "클릭하면 해당 구간으로 이동합니다",
     "noSubtitles": "자막이 없습니다",
-    "subtitlesComingSoon": "자막이 곧 추가됩니다"
+    "subtitlesComingSoon": "자막이 곧 추가됩니다",
+    "categories": {
+      "kdrama": "K드라마",
+      "movie": "영화",
+      "variety": "예능",
+      "news": "뉴스",
+      "kpop": "K팝",
+      "culture": "한국문화",
+      "travel": "여행"
+    },
+    "aiLearning": {
+      "title": "AI 학습 콘텐츠",
+      "description": "영상에서 추출한 핵심 학습 자료",
+      "loading": "AI가 학습 콘텐츠를 분석 중...",
+      "loadError": "학습 콘텐츠를 불러오지 못했습니다",
+      "loadFailed": "학습 콘텐츠를 불러오는데 실패했습니다",
+      "retry": "다시 분석하기"
+    },
+    "tabs": {
+      "sentences": "핵심문장",
+      "vocabulary": "어휘",
+      "idioms": "관용어",
+      "culture": "문화"
+    },
+    "empty": {
+      "sentences": "핵심 문장이 없습니다",
+      "vocabulary": "어휘가 없습니다",
+      "idioms": "관용어가 없습니다",
+      "culture": "문화 노트가 없습니다"
+    },
+    "tooltips": {
+      "listenPronunciation": "발음 듣기",
+      "watchInVideo": "영상에서 보기"
+    },
+    "idiomLabels": {
+      "literal": "직역",
+      "meaning": "의미"
+    },
+    "learningTips": {
+      "title": "학습 Tip",
+      "tip1": "발음 버튼으로 한국어 발음을 들어보세요",
+      "tip2": "재생 버튼으로 해당 장면으로 바로 이동",
+      "tip3": "문화 탭에서 한국 문화도 함께 학습"
+    }
   }
 }

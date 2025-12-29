@@ -2196,6 +2196,49 @@
     "subtitleList": "Subtitrlar ro'yxati",
     "clickToJump": "Ushbu bo'limga o'tish uchun bosing",
     "noSubtitles": "Subtitrlar mavjud emas",
-    "subtitlesComingSoon": "Subtitrlar tez orada qo'shiladi"
+    "subtitlesComingSoon": "Subtitrlar tez orada qo'shiladi",
+    "categories": {
+      "kdrama": "Koreya drammasi",
+      "movie": "Film",
+      "variety": "Ko'ngilochar",
+      "news": "Yangiliklar",
+      "kpop": "K-POP",
+      "culture": "Koreya madaniyati",
+      "travel": "Sayohat"
+    },
+    "aiLearning": {
+      "title": "AI o'quv kontenti",
+      "description": "Videodan olingan asosiy materiallar",
+      "loading": "AI kontentni tahlil qilmoqda...",
+      "loadError": "O'quv kontentini yuklab bo'lmadi",
+      "loadFailed": "O'quv kontentini yuklashda xato",
+      "retry": "Qayta tahlil"
+    },
+    "tabs": {
+      "sentences": "Asosiy jumlalar",
+      "vocabulary": "Lug'at",
+      "idioms": "Iboralar",
+      "culture": "Madaniyat"
+    },
+    "empty": {
+      "sentences": "Asosiy jumlalar yo'q",
+      "vocabulary": "Lug'at yo'q",
+      "idioms": "Iboralar yo'q",
+      "culture": "Madaniyat eslatmalari yo'q"
+    },
+    "tooltips": {
+      "listenPronunciation": "Talaffuzni tinglang",
+      "watchInVideo": "Videoda ko'ring"
+    },
+    "idiomLabels": {
+      "literal": "To'g'ridan-to'g'ri",
+      "meaning": "Ma'no"
+    },
+    "learningTips": {
+      "title": "O'rganish maslahatlari",
+      "tip1": "Koreys talaffuzini tinglash uchun tovush tugmasini bosing",
+      "tip2": "O'sha sahnaga o'tish uchun ijro tugmasini bosing",
+      "tip3": "Madaniyat bo'limida Koreya madaniyatini o'rganing"
+    }
   }
 }
