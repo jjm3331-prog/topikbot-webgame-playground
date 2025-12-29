@@ -96,6 +96,8 @@ interface GeneratedQuestion {
   topic: string;
   listening_script?: string;
   question_audio_url?: string;
+  question_image_url?: string;
+  image_description?: string; // AI가 생성할 이미지 설명
 }
 
 // Generate embedding using OpenAI
@@ -411,6 +413,98 @@ async function generateListeningAudio(
   }
 }
 
+// Generate image for picture dialogue questions [5-8] using Lovable AI (Gemini Image)
+async function generateQuestionImage(
+  imageDescription: string,
+  questionNumber: number,
+  examType: string,
+  examRound: number,
+  supabase: any,
+): Promise<string | null> {
+  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+  if (!LOVABLE_API_KEY || !imageDescription) return null;
+
+  try {
+    console.log(`🖼️ Generating image for Q${questionNumber}: ${imageDescription.slice(0, 50)}...`);
+
+    // Create a prompt for Korean language test picture dialogue
+    const imagePrompt = `Create a simple, clear illustration for a Korean language test (TOPIK). 
+The scene: ${imageDescription}
+Style requirements:
+- Clean, simple line art or illustration style suitable for educational materials
+- No text or speech bubbles in the image
+- Clear visual elements that match the dialogue context
+- Appropriate for all ages
+- Similar to official TOPIK test illustrations
+- Neutral, professional educational look`;
+
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-image-preview",
+        messages: [
+          {
+            role: "user",
+            content: imagePrompt,
+          },
+        ],
+        modalities: ["image", "text"],
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("Lovable AI image generation error:", response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    const imageBase64 = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+
+    if (!imageBase64 || !imageBase64.startsWith("data:image/")) {
+      console.error("No valid image in response");
+      return null;
+    }
+
+    // Extract base64 data and convert to Uint8Array
+    const base64Data = imageBase64.split(",")[1];
+    const binaryString = atob(base64Data);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    // Determine file extension from data URL
+    const mimeMatch = imageBase64.match(/data:image\/(\w+);/);
+    const extension = mimeMatch ? mimeMatch[1] : "png";
+
+    const fileName = `mock-exam/${examType}/${examRound}/picture_q${questionNumber}_${Date.now()}.${extension}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("podcast-audio") // Reuse existing bucket
+      .upload(fileName, bytes.buffer, {
+        contentType: `image/${extension}`,
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error("Image upload error:", uploadError);
+      return null;
+    }
+
+    const { data: urlData } = supabase.storage.from("podcast-audio").getPublicUrl(fileName);
+
+    console.log(`✅ Image generated for Q${questionNumber}`);
+    return urlData.publicUrl;
+  } catch (error) {
+    console.error("Image generation error:", error);
+    return null;
+  }
+}
+
 // Build system prompt for Gemini
 function buildSystemPrompt(params: GenerateRequest, ragContext: string): string {
   const levelInfo = {
@@ -597,10 +691,16 @@ ${params.referenceDocContent}
       "vocabulary": ["어휘1 (뜻)", "어휘2 (뜻)"],
       "difficulty": "${params.difficulty}",
       "topic": "${params.topic || '일반'}"${params.section === 'listening' ? `,
-      "listening_script": "남자: ...\\n여자: ..."` : ''}
+      "listening_script": "남자: ...\\n여자: ...",
+      "image_description": "[5-8번 그림 문제일 경우만] 그림에 나타나야 할 장면/상황 설명 (예: '책상 위에 책을 놓는 남자와 그것을 가리키는 여자')"` : ''}
     }
   ]
 }
+
+⚠️ [5-8번 그림 문제] 필수 지침:
+- image_description 필드에 그림으로 그려질 장면을 자세히 한국어로 설명하세요.
+- 대화 내용이 시각적으로 표현될 수 있는 장면이어야 합니다.
+- 예: "카페에서 커피를 주문하는 손님과 바리스타", "도서관에서 책을 찾는 학생"
 
 모든 필드를 반드시 채우세요. 빈 값이 있으면 안 됩니다.`;
 
@@ -741,7 +841,30 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
           );
         });
 
-        sendProgress("audio", 90, `✅ ${validQuestions.length}개 문제 생성 완료`);
+        sendProgress("audio", 88, `✅ ${validQuestions.length}개 문제 생성 완료`);
+
+        // Generate images for picture dialogue questions [5-8]
+        if (params.section === 'listening' && params.listeningQuestionType === '5-8' && params.examRound) {
+          sendProgress("image", 89, "🖼️ 그림 문제 이미지 생성 중...");
+          
+          for (let i = 0; i < validQuestions.length; i++) {
+            const q = validQuestions[i];
+            if (q.image_description) {
+              sendProgress("image", 89 + (i / validQuestions.length) * 3, `🖼️ Q${i + 1} 이미지 생성 중...`);
+              
+              const imageUrl = await generateQuestionImage(
+                q.image_description,
+                q.question_number || i + 1,
+                params.examType,
+                params.examRound,
+                supabase
+              );
+              if (imageUrl) {
+                validQuestions[i].question_image_url = imageUrl;
+              }
+            }
+          }
+        }
 
         // Generate audio for listening questions
         if (params.section === 'listening' && params.generateAudio !== false && ELEVENLABS_API_KEY && params.examRound) {
