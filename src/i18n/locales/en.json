@@ -2302,5 +2302,106 @@
     "goHome": "Go to Home",
     "goBack": "Go Back",
     "path": "Path"
+  },
+  "videoHub": {
+    "hero": {
+      "badge": "Overwhelming Learning System",
+      "title1": "Video Learning",
+      "title2": "Perfect in 7 Languages",
+      "subtitle": "Learn Korean with YouTube videos • Real-time subtitle sync • TOPIK vocabulary in one click • AI-powered personalized feedback",
+      "startButton": "Start Learning",
+      "guideButton": "View Guide"
+    },
+    "stats": {
+      "languages": "Languages",
+      "pronunciation": "Pronunciation Feedback",
+      "repeat": "Loop Sections",
+      "vocabulary": "Vocabulary Link"
+    },
+    "features": {
+      "sectionTitle": "Differentiated Learning Features",
+      "sectionSubtitle": "Beyond simple video watching, an all-in-one system for perfect Korean mastery",
+      "subtitle": {
+        "title": "7-Language Subtitles",
+        "description": "Real-time switching: Korean, Vietnamese, English, Japanese, Chinese, Russian, Uzbek"
+      },
+      "topik": {
+        "title": "TOPIK Vocabulary Link",
+        "description": "Click subtitles to see meaning, examples, and pronunciation from TOPIK wordbook"
+      },
+      "shadowing": {
+        "title": "Shadowing Practice",
+        "description": "Loop playback + STT-based pronunciation practice to speak like a native"
+      },
+      "aiQa": {
+        "title": "AI Q&A",
+        "description": "\"When do I use this expression?\" Deep learning with RAG-based custom answers"
+      },
+      "mistakes": {
+        "title": "Mistake Notes",
+        "description": "Auto-save unknown words, perfect memorization with video-based review"
+      },
+      "quiz": {
+        "title": "Section Quiz",
+        "description": "Auto-generated quizzes after watching maximize learning effectiveness"
+      }
+    },
+    "howTo": {
+      "sectionTitle": "User Guide",
+      "sectionSubtitle": "Start perfect video learning in 5 steps",
+      "step1": { "title": "Select Video", "description": "Choose Korean videos by category" },
+      "step2": { "title": "Set Subtitle Language", "description": "Select subtitles from 7 languages" },
+      "step3": { "title": "Click Words to Learn", "description": "Click unknown words to see meaning and examples" },
+      "step4": { "title": "Shadowing Practice", "description": "Select sections to repeat and record to compare" },
+      "step5": { "title": "Review Mistake Notes", "description": "Review saved words and master them" }
+    },
+    "videos": {
+      "sectionTitle": "Learning Videos",
+      "sectionSubtitle": "Discover popular Korean learning videos",
+      "viewAll": "View All",
+      "noVideos": "No videos registered yet",
+      "comingSoon": "Various learning videos coming soon!"
+    },
+    "categories": {
+      "all": "All",
+      "drama": "Drama",
+      "news": "News",
+      "education": "Education",
+      "variety": "Variety",
+      "music": "Music"
+    },
+    "difficulty": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "cta": {
+      "title": "Start Now!",
+      "description": "Naturally improve your Korean while watching videos. 7-language subtitles and AI learning tools included.",
+      "button": "Start for Free"
+    }
+  },
+  "videoPlayer": {
+    "backToHub": "Back to List",
+    "error": "Error",
+    "videoNotFound": "Video not found",
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced",
+    "unknownDuration": "Unknown",
+    "views": "views",
+    "subtitleLanguage": "Subtitle Language",
+    "hideSubtitle": "Hide Subtitle",
+    "showSubtitle": "Show Subtitle",
+    "shadowing": "Shadowing",
+    "shadowingDesc": "Speaking practice",
+    "vocabulary": "Vocabulary",
+    "vocabularyDesc": "Save TOPIK words",
+    "aiQa": "AI Q&A",
+    "aiQaDesc": "Answer questions",
+    "subtitleList": "Subtitle List",
+    "clickToJump": "Click to jump to that section",
+    "noSubtitles": "No subtitles available",
+    "subtitlesComingSoon": "Subtitles coming soon"
   }
 }

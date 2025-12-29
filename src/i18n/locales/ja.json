@@ -2052,5 +2052,106 @@
     "goHome": "ホームに戻る",
     "goBack": "前のページ",
     "path": "パス"
+  },
+  "videoHub": {
+    "hero": {
+      "badge": "圧倒的な学習システム",
+      "title1": "ビデオ学習",
+      "title2": "7か国語で完璧に",
+      "subtitle": "YouTubeで韓国語学習 • リアルタイム字幕同期 • ワンクリックでTOPIK単語学習 • AI基盤カスタムフィードバック",
+      "startButton": "学習開始",
+      "guideButton": "使い方を見る"
+    },
+    "stats": {
+      "languages": "対応言語",
+      "pronunciation": "発音フィードバック",
+      "repeat": "区間リピート",
+      "vocabulary": "語彙連動"
+    },
+    "features": {
+      "sectionTitle": "差別化された学習機能",
+      "sectionSubtitle": "単なる動画視聴を超え、完璧な韓国語習得のためのオールインワンシステム",
+      "subtitle": {
+        "title": "7か国語字幕",
+        "description": "韓国語、ベトナム語、英語、日本語、中国語、ロシア語、ウズベク語リアルタイム切替"
+      },
+      "topik": {
+        "title": "TOPIK語彙連動",
+        "description": "字幕クリックでTOPIK単語帳と連動した意味、例文、発音ポップアップ"
+      },
+      "shadowing": {
+        "title": "シャドーイング練習",
+        "description": "区間リピート再生 + STT基盤発音練習でネイティブのように話す"
+      },
+      "aiQa": {
+        "title": "AI Q&A",
+        "description": "「この表現いつ使う？」RAG基盤カスタム回答で深い学習"
+      },
+      "mistakes": {
+        "title": "間違いノート",
+        "description": "知らない単語自動保存、動画別復習で完璧な暗記"
+      },
+      "quiz": {
+        "title": "区間クイズ",
+        "description": "視聴後自動生成クイズで学習効果最大化"
+      }
+    },
+    "howTo": {
+      "sectionTitle": "使用ガイド",
+      "sectionSubtitle": "5ステップで完璧なビデオ学習を始めましょう",
+      "step1": { "title": "動画選択", "description": "カテゴリ別に韓国語動画を選択してください" },
+      "step2": { "title": "字幕言語設定", "description": "7言語から字幕を選択してください" },
+      "step3": { "title": "単語クリック学習", "description": "知らない単語をクリックすると意味と例文がポップアップ" },
+      "step4": { "title": "シャドーイング練習", "description": "区間を選択してリピート聞き、録音して比較" },
+      "step5": { "title": "間違いノート確認", "description": "保存した単語を復習してマスター" }
+    },
+    "videos": {
+      "sectionTitle": "学習動画",
+      "sectionSubtitle": "人気韓国語学習動画を見つけよう",
+      "viewAll": "全て見る",
+      "noVideos": "まだ登録された動画がありません",
+      "comingSoon": "様々な学習動画がまもなく追加されます！"
+    },
+    "categories": {
+      "all": "全て",
+      "drama": "ドラマ",
+      "news": "ニュース",
+      "education": "教育",
+      "variety": "バラエティ",
+      "music": "音楽"
+    },
+    "difficulty": {
+      "beginner": "初級",
+      "intermediate": "中級",
+      "advanced": "上級"
+    },
+    "cta": {
+      "title": "今すぐ始めよう！",
+      "description": "動画を見ながら自然に韓国語力をアップ。7か国語字幕とAI学習ツールが一緒です。",
+      "button": "無料で始める"
+    }
+  },
+  "videoPlayer": {
+    "backToHub": "リストに戻る",
+    "error": "エラー",
+    "videoNotFound": "動画が見つかりません",
+    "beginner": "初級",
+    "intermediate": "中級",
+    "advanced": "上級",
+    "unknownDuration": "時間未定",
+    "views": "回視聴",
+    "subtitleLanguage": "字幕言語",
+    "hideSubtitle": "字幕を隠す",
+    "showSubtitle": "字幕を表示",
+    "shadowing": "シャドーイング",
+    "shadowingDesc": "話す練習",
+    "vocabulary": "単語帳",
+    "vocabularyDesc": "TOPIK語彙保存",
+    "aiQa": "AI質問",
+    "aiQaDesc": "表現の疑問解決",
+    "subtitleList": "字幕リスト",
+    "clickToJump": "クリックで該当区間に移動",
+    "noSubtitles": "字幕がありません",
+    "subtitlesComingSoon": "字幕がまもなく追加されます"
   }
 }

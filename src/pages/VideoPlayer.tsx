@@ -1,0 +1,455 @@
+import { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
+import { supabase } from '@/integrations/supabase/client';
+import CleanHeader from '@/components/CleanHeader';
+import AppFooter from '@/components/AppFooter';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { 
+  Play, 
+  Pause,
+  SkipBack,
+  SkipForward,
+  Volume2,
+  VolumeX,
+  Maximize,
+  Globe,
+  BookOpen,
+  Mic,
+  ChevronLeft,
+  RotateCcw,
+  CheckCircle,
+  Bookmark,
+  MessageSquare,
+  Settings,
+  Clock
+} from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from '@/hooks/use-toast';
+
+interface VideoLesson {
+  id: string;
+  title: string;
+  description: string | null;
+  youtube_id: string;
+  youtube_url: string;
+  thumbnail_url: string | null;
+  category: string;
+  difficulty: string;
+  duration_seconds: number | null;
+  view_count: number;
+}
+
+interface Subtitle {
+  start: number;
+  end: number;
+  text: string;
+}
+
+interface SubtitleData {
+  language: string;
+  subtitles: Subtitle[];
+}
+
+const LANGUAGES = [
+  { code: 'ko', name: '한국어', flag: '🇰🇷' },
+  { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'ja', name: '日本語', flag: '🇯🇵' },
+  { code: 'zh', name: '中文', flag: '🇨🇳' },
+  { code: 'ru', name: 'Русский', flag: '🇷🇺' },
+  { code: 'uz', name: "O'zbek", flag: '🇺🇿' },
+];
+
+export default function VideoPlayer() {
+  const { videoId } = useParams<{ videoId: string }>();
+  const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+  
+  const [video, setVideo] = useState<VideoLesson | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [subtitles, setSubtitles] = useState<SubtitleData[]>([]);
+  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language.split('-')[0] || 'ko');
+  const [currentSubtitle, setCurrentSubtitle] = useState<Subtitle | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [showSubtitle, setShowSubtitle] = useState(true);
+  
+  const playerRef = useRef<any>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (videoId) {
+      fetchVideo();
+      fetchSubtitles();
+      incrementViewCount();
+    }
+  }, [videoId]);
+
+  useEffect(() => {
+    // Load YouTube IFrame API
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (video && (window as any).YT && (window as any).YT.Player) {
+      initPlayer();
+    } else if (video) {
+      (window as any).onYouTubeIframeAPIReady = initPlayer;
+    }
+  }, [video]);
+
+  const initPlayer = () => {
+    if (!video) return;
+    
+    playerRef.current = new (window as any).YT.Player('youtube-player', {
+      videoId: video.youtube_id,
+      playerVars: {
+        autoplay: 0,
+        controls: 1,
+        modestbranding: 1,
+        rel: 0,
+        cc_load_policy: 0,
+      },
+      events: {
+        onStateChange: onPlayerStateChange,
+      },
+    });
+  };
+
+  const onPlayerStateChange = (event: any) => {
+    if (event.data === 1) { // Playing
+      setIsPlaying(true);
+      startTimeUpdate();
+    } else {
+      setIsPlaying(false);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    }
+  };
+
+  const startTimeUpdate = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    
+    intervalRef.current = setInterval(() => {
+      if (playerRef.current && playerRef.current.getCurrentTime) {
+        const time = playerRef.current.getCurrentTime();
+        setCurrentTime(time);
+        updateCurrentSubtitle(time);
+      }
+    }, 100);
+  };
+
+  const updateCurrentSubtitle = (time: number) => {
+    const currentSubs = subtitles.find(s => s.language === selectedLanguage);
+    if (!currentSubs) return;
+
+    const subtitle = currentSubs.subtitles.find(
+      sub => time >= sub.start && time <= sub.end
+    );
+    setCurrentSubtitle(subtitle || null);
+  };
+
+  const fetchVideo = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('video_lessons')
+        .select('*')
+        .eq('id', videoId)
+        .single();
+
+      if (error) throw error;
+      setVideo(data);
+    } catch (error) {
+      console.error('Error fetching video:', error);
+      toast({
+        title: t('videoPlayer.error'),
+        description: t('videoPlayer.videoNotFound'),
+        variant: 'destructive',
+      });
+      navigate('/video-hub');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchSubtitles = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('video_subtitles')
+        .select('language, subtitles')
+        .eq('video_id', videoId);
+
+      if (error) throw error;
+      
+      const parsedData = (data || []).map(item => ({
+        language: item.language,
+        subtitles: Array.isArray(item.subtitles) 
+          ? (item.subtitles as unknown as Subtitle[])
+          : []
+      }));
+      
+      setSubtitles(parsedData);
+    } catch (error) {
+      console.error('Error fetching subtitles:', error);
+    }
+  };
+
+  const incrementViewCount = async () => {
+    try {
+      await supabase.rpc('increment_cache_hit', { p_id: videoId });
+    } catch (error) {
+      // Silent fail for view count
+    }
+  };
+
+  const seekTo = (time: number) => {
+    if (playerRef.current && playerRef.current.seekTo) {
+      playerRef.current.seekTo(time, true);
+    }
+  };
+
+  const handleSubtitleClick = (subtitle: Subtitle) => {
+    seekTo(subtitle.start);
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const currentSubtitles = subtitles.find(s => s.language === selectedLanguage)?.subtitles || [];
+  const koreanSubtitles = subtitles.find(s => s.language === 'ko')?.subtitles || [];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <CleanHeader />
+        <main className="max-w-7xl mx-auto px-4 py-8">
+          <Skeleton className="w-full aspect-video rounded-xl mb-6" />
+          <Skeleton className="h-8 w-3/4 mb-4" />
+          <Skeleton className="h-4 w-1/2" />
+        </main>
+      </div>
+    );
+  }
+
+  if (!video) {
+    return null;
+  }
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <CleanHeader />
+      
+      <main className="flex-1">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          {/* Back Button */}
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/video-hub')}
+            className="mb-4"
+          >
+            <ChevronLeft className="w-5 h-5 mr-1" />
+            {t('videoPlayer.backToHub')}
+          </Button>
+
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Main Video Section */}
+            <div className="lg:col-span-2 space-y-4">
+              {/* Video Player */}
+              <div className="relative rounded-2xl overflow-hidden bg-black shadow-2xl">
+                <div className="aspect-video">
+                  <div id="youtube-player" className="w-full h-full" />
+                </div>
+                
+                {/* Subtitle Overlay */}
+                {showSubtitle && currentSubtitle && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="absolute bottom-20 left-0 right-0 px-4"
+                  >
+                    <div className="bg-black/80 backdrop-blur-sm text-white text-center py-3 px-6 rounded-lg max-w-3xl mx-auto">
+                      <p className="text-lg sm:text-xl font-medium">
+                        {currentSubtitle.text}
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Video Info */}
+              <Card className="border-0 shadow-lg">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <h1 className="text-2xl font-bold mb-2">{video.title}</h1>
+                      <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                        <Badge variant="secondary">
+                          {video.difficulty === 'beginner' 
+                            ? t('videoPlayer.beginner')
+                            : video.difficulty === 'intermediate'
+                            ? t('videoPlayer.intermediate')
+                            : t('videoPlayer.advanced')}
+                        </Badge>
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-4 h-4" />
+                          {video.duration_seconds 
+                            ? formatTime(video.duration_seconds)
+                            : t('videoPlayer.unknownDuration')}
+                        </span>
+                        <span>{video.view_count.toLocaleString()} {t('videoPlayer.views')}</span>
+                      </div>
+                      {video.description && (
+                        <p className="mt-4 text-muted-foreground">{video.description}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Language Selector */}
+                  <div className="mt-6 flex flex-wrap items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-5 h-5 text-primary" />
+                      <span className="font-medium">{t('videoPlayer.subtitleLanguage')}</span>
+                    </div>
+                    <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {LANGUAGES.map((lang) => (
+                          <SelectItem key={lang.code} value={lang.code}>
+                            <span className="flex items-center gap-2">
+                              <span>{lang.flag}</span>
+                              <span>{lang.name}</span>
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowSubtitle(!showSubtitle)}
+                    >
+                      {showSubtitle ? t('videoPlayer.hideSubtitle') : t('videoPlayer.showSubtitle')}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Features Cards */}
+              <div className="grid sm:grid-cols-3 gap-4">
+                <Card className="border-0 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 hover:shadow-lg transition-shadow cursor-pointer">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
+                      <Mic className="w-5 h-5 text-blue-500" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">{t('videoPlayer.shadowing')}</h3>
+                      <p className="text-xs text-muted-foreground">{t('videoPlayer.shadowingDesc')}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="border-0 bg-gradient-to-br from-green-500/10 to-emerald-500/10 hover:shadow-lg transition-shadow cursor-pointer">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                      <BookOpen className="w-5 h-5 text-green-500" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">{t('videoPlayer.vocabulary')}</h3>
+                      <p className="text-xs text-muted-foreground">{t('videoPlayer.vocabularyDesc')}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="border-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 hover:shadow-lg transition-shadow cursor-pointer">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                      <MessageSquare className="w-5 h-5 text-purple-500" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">{t('videoPlayer.aiQa')}</h3>
+                      <p className="text-xs text-muted-foreground">{t('videoPlayer.aiQaDesc')}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+
+            {/* Subtitle List Sidebar */}
+            <div className="lg:col-span-1">
+              <Card className="border-0 shadow-lg sticky top-4">
+                <CardContent className="p-0">
+                  <div className="p-4 border-b bg-muted/50">
+                    <h2 className="font-bold flex items-center gap-2">
+                      <Globe className="w-5 h-5 text-primary" />
+                      {t('videoPlayer.subtitleList')}
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {t('videoPlayer.clickToJump')}
+                    </p>
+                  </div>
+                  <div className="max-h-[600px] overflow-y-auto">
+                    {currentSubtitles.length > 0 ? (
+                      currentSubtitles.map((sub, index) => (
+                        <motion.button
+                          key={index}
+                          onClick={() => handleSubtitleClick(sub)}
+                          className={`w-full text-left p-4 border-b last:border-b-0 hover:bg-muted/50 transition-colors ${
+                            currentSubtitle?.start === sub.start
+                              ? 'bg-primary/10 border-l-4 border-l-primary'
+                              : ''
+                          }`}
+                          whileHover={{ x: 4 }}
+                        >
+                          <div className="flex items-start gap-3">
+                            <span className="text-xs text-muted-foreground font-mono shrink-0 mt-1">
+                              {formatTime(sub.start)}
+                            </span>
+                            <p className="text-sm leading-relaxed">{sub.text}</p>
+                          </div>
+                        </motion.button>
+                      ))
+                    ) : (
+                      <div className="p-8 text-center text-muted-foreground">
+                        <Globe className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                        <p>{t('videoPlayer.noSubtitles')}</p>
+                        <p className="text-sm mt-1">{t('videoPlayer.subtitlesComingSoon')}</p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <AppFooter />
+    </div>
+  );
+}

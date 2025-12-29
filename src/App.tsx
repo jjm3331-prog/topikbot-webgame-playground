@@ -60,6 +60,7 @@ import Battle from "./pages/Battle";
 import AdminVideoManager from "./pages/AdminVideoManager";
 import AdminVideoSubtitles from "./pages/AdminVideoSubtitles";
 import VideoLearningHub from "./pages/VideoLearningHub";
+import VideoPlayer from "./pages/VideoPlayer";
 import MockExamHub from "./pages/MockExamHub";
 import MockExamTest from "./pages/MockExamTest";
 import MockExamReport from "./pages/MockExamReport";
@@ -221,6 +222,7 @@ const App = () => {
               <Route path="/admin/video-manager" element={<ProtectedRoute><AdminVideoManager /></ProtectedRoute>} />
               <Route path="/admin/video/:videoId/subtitles" element={<ProtectedRoute><AdminVideoSubtitles /></ProtectedRoute>} />
               <Route path="/video-hub" element={<ProtectedRoute><VideoLearningHub /></ProtectedRoute>} />
+              <Route path="/video-hub/:videoId" element={<ProtectedRoute><VideoPlayer /></ProtectedRoute>} />
               <Route path="/video-learning" element={<Navigate to="/video-hub" replace />} />
               <Route path="/mock-exam" element={<ProtectedRoute><MockExamHub /></ProtectedRoute>} />
               <Route path="/mock-exam/:examType" element={<ProtectedRoute><MockExamTest /></ProtectedRoute>} />

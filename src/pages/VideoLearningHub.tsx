@@ -18,14 +18,10 @@ import {
   ChevronRight,
   Sparkles,
   Languages,
-  Volume2,
   PenLine,
-  Clock,
   CheckCircle,
-  Star,
   Zap,
-  Users,
-  Target
+  Users
 } from 'lucide-react';
 
 interface VideoLesson {
@@ -37,93 +33,68 @@ interface VideoLesson {
   view_count: number;
 }
 
-const CATEGORIES = [
-  { value: 'all', label: '전체', emoji: '📺' },
-  { value: 'drama', label: '드라마', emoji: '🎭' },
-  { value: 'news', label: '뉴스', emoji: '📰' },
-  { value: 'education', label: '교육', emoji: '📚' },
-  { value: 'variety', label: '예능', emoji: '🎪' },
-  { value: 'music', label: '음악', emoji: '🎵' },
-];
-
-const FEATURES = [
-  {
-    icon: Languages,
-    title: '7개국어 자막',
-    description: '한국어, 베트남어, 영어, 일본어, 중국어, 러시아어, 우즈베크어 실시간 전환',
-    color: 'from-blue-500 to-cyan-500',
-  },
-  {
-    icon: BookOpen,
-    title: 'TOPIK 어휘 연동',
-    description: '자막 클릭 시 TOPIK 단어장과 연동된 의미, 예문, 발음 팝업',
-    color: 'from-green-500 to-emerald-500',
-  },
-  {
-    icon: Mic,
-    title: '쉐도잉 연습',
-    description: '구간 반복 재생 + STT 기반 발음 연습으로 원어민처럼 말하기',
-    color: 'from-purple-500 to-pink-500',
-  },
-  {
-    icon: MessageSquare,
-    title: 'AI Q&A',
-    description: '"이 표현 언제 써요?" RAG 기반 맞춤 답변으로 깊이 있는 학습',
-    color: 'from-orange-500 to-red-500',
-  },
-  {
-    icon: PenLine,
-    title: '오답노트',
-    description: '모르는 단어 자동 저장, 영상별 복습으로 완벽한 암기',
-    color: 'from-indigo-500 to-violet-500',
-  },
-  {
-    icon: Trophy,
-    title: '구간 퀴즈',
-    description: '시청 후 자동 생성 퀴즈로 학습 효과 극대화',
-    color: 'from-yellow-500 to-amber-500',
-  },
-];
-
-const HOW_TO_USE = [
-  {
-    step: 1,
-    title: '영상 선택',
-    description: '카테고리별로 원하는 한국어 영상을 선택하세요',
-    icon: Play,
-  },
-  {
-    step: 2,
-    title: '자막 언어 설정',
-    description: '7개 언어 중 원하는 자막을 선택하세요',
-    icon: Globe,
-  },
-  {
-    step: 3,
-    title: '단어 클릭 학습',
-    description: '모르는 단어를 클릭하면 의미와 예문이 팝업됩니다',
-    icon: BookOpen,
-  },
-  {
-    step: 4,
-    title: '쉐도잉 연습',
-    description: '구간을 선택해 반복 듣고, 녹음해 비교하세요',
-    icon: Mic,
-  },
-  {
-    step: 5,
-    title: '오답노트 확인',
-    description: '저장된 단어들을 복습하고 마스터하세요',
-    icon: CheckCircle,
-  },
-];
-
 export default function VideoLearningHub() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [videos, setVideos] = useState<VideoLesson[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
+
+  const CATEGORIES = [
+    { value: 'all', labelKey: 'videoHub.categories.all', emoji: '📺' },
+    { value: 'drama', labelKey: 'videoHub.categories.drama', emoji: '🎭' },
+    { value: 'news', labelKey: 'videoHub.categories.news', emoji: '📰' },
+    { value: 'education', labelKey: 'videoHub.categories.education', emoji: '📚' },
+    { value: 'variety', labelKey: 'videoHub.categories.variety', emoji: '🎪' },
+    { value: 'music', labelKey: 'videoHub.categories.music', emoji: '🎵' },
+  ];
+
+  const FEATURES = [
+    {
+      icon: Languages,
+      titleKey: 'videoHub.features.subtitle.title',
+      descriptionKey: 'videoHub.features.subtitle.description',
+      color: 'from-blue-500 to-cyan-500',
+    },
+    {
+      icon: BookOpen,
+      titleKey: 'videoHub.features.topik.title',
+      descriptionKey: 'videoHub.features.topik.description',
+      color: 'from-green-500 to-emerald-500',
+    },
+    {
+      icon: Mic,
+      titleKey: 'videoHub.features.shadowing.title',
+      descriptionKey: 'videoHub.features.shadowing.description',
+      color: 'from-purple-500 to-pink-500',
+    },
+    {
+      icon: MessageSquare,
+      titleKey: 'videoHub.features.aiQa.title',
+      descriptionKey: 'videoHub.features.aiQa.description',
+      color: 'from-orange-500 to-red-500',
+    },
+    {
+      icon: PenLine,
+      titleKey: 'videoHub.features.mistakes.title',
+      descriptionKey: 'videoHub.features.mistakes.description',
+      color: 'from-indigo-500 to-violet-500',
+    },
+    {
+      icon: Trophy,
+      titleKey: 'videoHub.features.quiz.title',
+      descriptionKey: 'videoHub.features.quiz.description',
+      color: 'from-yellow-500 to-amber-500',
+    },
+  ];
+
+  const HOW_TO_USE = [
+    { step: 1, titleKey: 'videoHub.howTo.step1.title', descriptionKey: 'videoHub.howTo.step1.description', icon: Play },
+    { step: 2, titleKey: 'videoHub.howTo.step2.title', descriptionKey: 'videoHub.howTo.step2.description', icon: Globe },
+    { step: 3, titleKey: 'videoHub.howTo.step3.title', descriptionKey: 'videoHub.howTo.step3.description', icon: BookOpen },
+    { step: 4, titleKey: 'videoHub.howTo.step4.title', descriptionKey: 'videoHub.howTo.step4.description', icon: Mic },
+    { step: 5, titleKey: 'videoHub.howTo.step5.title', descriptionKey: 'videoHub.howTo.step5.description', icon: CheckCircle },
+  ];
 
   useEffect(() => {
     fetchVideos();
@@ -151,6 +122,15 @@ export default function VideoLearningHub() {
     ? videos 
     : videos.filter(v => v.category === selectedCategory);
 
+  const getDifficultyLabel = (difficulty: string) => {
+    switch (difficulty) {
+      case 'beginner': return t('videoHub.difficulty.beginner');
+      case 'intermediate': return t('videoHub.difficulty.intermediate');
+      case 'advanced': return t('videoHub.difficulty.advanced');
+      default: return difficulty;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <CleanHeader />
@@ -158,7 +138,6 @@ export default function VideoLearningHub() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative overflow-hidden py-16 sm:py-24">
-          {/* Animated Background */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
           <div className="absolute inset-0">
             <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
@@ -171,7 +150,6 @@ export default function VideoLearningHub() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center"
             >
-              {/* Badge */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -179,34 +157,29 @@ export default function VideoLearningHub() {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6"
               >
                 <Sparkles className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-primary">미기를 압도하는 학습 시스템</span>
+                <span className="text-sm font-medium text-primary">{t('videoHub.hero.badge')}</span>
               </motion.div>
 
-              {/* Title */}
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
                 <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                  비디오 학습
+                  {t('videoHub.hero.title1')}
                 </span>
                 <br />
-                <span className="text-foreground">7개국어로 완벽하게</span>
+                <span className="text-foreground">{t('videoHub.hero.title2')}</span>
               </h1>
 
-              {/* Subtitle */}
               <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-                유튜브 영상으로 한국어 학습 • 실시간 자막 싱크 • 
-                <br className="hidden sm:block" />
-                클릭 한 번으로 TOPIK 단어 학습 • AI 기반 맞춤 피드백
+                {t('videoHub.hero.subtitle')}
               </p>
 
-              {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
                   size="lg" 
                   className="text-lg px-8 h-14 rounded-2xl bg-gradient-to-r from-primary to-accent hover:opacity-90 shadow-lg shadow-primary/25"
-                  onClick={() => navigate('/video-learning')}
+                  onClick={() => document.getElementById('videos')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   <Play className="w-5 h-5 mr-2" />
-                  학습 시작하기
+                  {t('videoHub.hero.startButton')}
                 </Button>
                 <Button 
                   size="lg" 
@@ -214,11 +187,10 @@ export default function VideoLearningHub() {
                   className="text-lg px-8 h-14 rounded-2xl"
                   onClick={() => document.getElementById('how-to-use')?.scrollIntoView({ behavior: 'smooth' })}
                 >
-                  사용법 보기
+                  {t('videoHub.hero.guideButton')}
                 </Button>
               </div>
 
-              {/* Stats */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -227,19 +199,19 @@ export default function VideoLearningHub() {
               >
                 <div className="text-center">
                   <div className="text-3xl font-bold text-primary">7</div>
-                  <div className="text-sm text-muted-foreground">지원 언어</div>
+                  <div className="text-sm text-muted-foreground">{t('videoHub.stats.languages')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-primary">AI</div>
-                  <div className="text-sm text-muted-foreground">발음 피드백</div>
+                  <div className="text-sm text-muted-foreground">{t('videoHub.stats.pronunciation')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-primary">∞</div>
-                  <div className="text-sm text-muted-foreground">구간 반복</div>
+                  <div className="text-sm text-muted-foreground">{t('videoHub.stats.repeat')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-primary">TOPIK</div>
-                  <div className="text-sm text-muted-foreground">어휘 연동</div>
+                  <div className="text-sm text-muted-foreground">{t('videoHub.stats.vocabulary')}</div>
                 </div>
               </motion.div>
             </motion.div>
@@ -256,17 +228,17 @@ export default function VideoLearningHub() {
               className="text-center mb-12"
             >
               <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-                🚀 차별화된 학습 기능
+                🚀 {t('videoHub.features.sectionTitle')}
               </h2>
               <p className="text-muted-foreground text-lg">
-                단순한 영상 시청을 넘어, 완벽한 한국어 습득을 위한 올인원 시스템
+                {t('videoHub.features.sectionSubtitle')}
               </p>
             </motion.div>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {FEATURES.map((feature, index) => (
                 <motion.div
-                  key={feature.title}
+                  key={feature.titleKey}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -277,8 +249,8 @@ export default function VideoLearningHub() {
                       <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                         <feature.icon className="w-7 h-7 text-white" />
                       </div>
-                      <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                      <p className="text-muted-foreground">{feature.description}</p>
+                      <h3 className="text-xl font-bold mb-2">{t(feature.titleKey)}</h3>
+                      <p className="text-muted-foreground">{t(feature.descriptionKey)}</p>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -297,15 +269,14 @@ export default function VideoLearningHub() {
               className="text-center mb-12"
             >
               <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-                📖 사용 가이드
+                📖 {t('videoHub.howTo.sectionTitle')}
               </h2>
               <p className="text-muted-foreground text-lg">
-                5단계로 완벽한 비디오 학습을 시작하세요
+                {t('videoHub.howTo.sectionSubtitle')}
               </p>
             </motion.div>
 
             <div className="relative">
-              {/* Connection Line */}
               <div className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-primary/20 via-primary to-primary/20 hidden lg:block -translate-y-1/2" />
               
               <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
@@ -320,15 +291,14 @@ export default function VideoLearningHub() {
                   >
                     <Card className="h-full text-center hover:shadow-lg transition-all border-0 bg-card">
                       <CardContent className="p-6">
-                        {/* Step Number */}
                         <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xl font-bold mx-auto mb-4 relative z-10">
                           {step.step}
                         </div>
                         <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                           <step.icon className="w-7 h-7 text-primary" />
                         </div>
-                        <h3 className="font-bold text-lg mb-2">{step.title}</h3>
-                        <p className="text-sm text-muted-foreground">{step.description}</p>
+                        <h3 className="font-bold text-lg mb-2">{t(step.titleKey)}</h3>
+                        <p className="text-sm text-muted-foreground">{t(step.descriptionKey)}</p>
                       </CardContent>
                     </Card>
                   </motion.div>
@@ -340,7 +310,7 @@ export default function VideoLearningHub() {
 
         {/* Video Preview Section */}
         {videos.length > 0 && (
-          <section className="py-16 sm:py-20 bg-muted/30">
+          <section id="videos" className="py-16 sm:py-20 bg-muted/30">
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -349,17 +319,9 @@ export default function VideoLearningHub() {
                 className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8"
               >
                 <div>
-                  <h2 className="text-3xl font-bold mb-2">🎬 학습 영상</h2>
-                  <p className="text-muted-foreground">인기 한국어 학습 영상을 만나보세요</p>
+                  <h2 className="text-3xl font-bold mb-2">🎬 {t('videoHub.videos.sectionTitle')}</h2>
+                  <p className="text-muted-foreground">{t('videoHub.videos.sectionSubtitle')}</p>
                 </div>
-                <Button 
-                  variant="outline" 
-                  onClick={() => navigate('/video-learning')}
-                  className="rounded-xl"
-                >
-                  전체 보기
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
               </motion.div>
 
               {/* Category Tabs */}
@@ -372,7 +334,7 @@ export default function VideoLearningHub() {
                     onClick={() => setSelectedCategory(cat.value)}
                     className="rounded-full"
                   >
-                    {cat.emoji} {cat.label}
+                    {cat.emoji} {t(cat.labelKey)}
                   </Button>
                 ))}
               </div>
@@ -389,7 +351,7 @@ export default function VideoLearningHub() {
                   >
                     <Card 
                       className="overflow-hidden cursor-pointer group hover:shadow-xl transition-all border-0"
-                      onClick={() => navigate(`/video-learning/${video.id}`)}
+                      onClick={() => navigate(`/video-hub/${video.id}`)}
                     >
                       <div className="relative aspect-video bg-muted">
                         {video.thumbnail_url ? (
@@ -409,7 +371,7 @@ export default function VideoLearningHub() {
                           </div>
                         </div>
                         <Badge className="absolute top-3 left-3 bg-black/60 backdrop-blur">
-                          {CATEGORIES.find(c => c.value === video.category)?.emoji} {CATEGORIES.find(c => c.value === video.category)?.label}
+                          {CATEGORIES.find(c => c.value === video.category)?.emoji} {t(CATEGORIES.find(c => c.value === video.category)?.labelKey || '')}
                         </Badge>
                       </div>
                       <CardContent className="p-4">
@@ -422,7 +384,7 @@ export default function VideoLearningHub() {
                             {video.view_count}
                           </span>
                           <Badge variant="outline" className="text-xs">
-                            {video.difficulty === 'beginner' ? '초급' : video.difficulty === 'intermediate' ? '중급' : '고급'}
+                            {getDifficultyLabel(video.difficulty)}
                           </Badge>
                         </div>
                       </CardContent>
@@ -434,8 +396,8 @@ export default function VideoLearningHub() {
               {filteredVideos.length === 0 && !loading && (
                 <div className="text-center py-12 text-muted-foreground">
                   <Play className="w-16 h-16 mx-auto mb-4 opacity-30" />
-                  <p>아직 등록된 영상이 없습니다</p>
-                  <p className="text-sm mt-2">곧 다양한 학습 영상이 추가됩니다!</p>
+                  <p>{t('videoHub.videos.noVideos')}</p>
+                  <p className="text-sm mt-2">{t('videoHub.videos.comingSoon')}</p>
                 </div>
               )}
             </div>
@@ -455,21 +417,19 @@ export default function VideoLearningHub() {
                 <CardContent className="relative z-10 p-8 sm:p-12 text-center">
                   <Zap className="w-16 h-16 mx-auto mb-6 opacity-80" />
                   <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-                    지금 바로 시작하세요!
+                    {t('videoHub.cta.title')}
                   </h2>
                   <p className="text-lg opacity-90 mb-8 max-w-xl mx-auto">
-                    영상을 보면서 자연스럽게 한국어 실력을 키워보세요.
-                    <br />
-                    7개국어 자막과 AI 기반 학습 도구가 함께합니다.
+                    {t('videoHub.cta.description')}
                   </p>
                   <Button 
                     size="lg"
                     variant="secondary"
                     className="text-lg px-8 h-14 rounded-2xl"
-                    onClick={() => navigate('/video-learning')}
+                    onClick={() => document.getElementById('videos')?.scrollIntoView({ behavior: 'smooth' })}
                   >
                     <Play className="w-5 h-5 mr-2" />
-                    무료로 시작하기
+                    {t('videoHub.cta.button')}
                   </Button>
                 </CardContent>
               </Card>
