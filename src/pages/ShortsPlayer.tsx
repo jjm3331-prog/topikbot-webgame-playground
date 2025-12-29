@@ -8,8 +8,15 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ChevronLeft, Globe, BookOpen, Volume2, Play, Eye, MessageSquareText, Lightbulb, GraduationCap, Languages } from 'lucide-react';
+import { ChevronLeft, Globe, BookOpen, Volume2, Play, Eye, Lightbulb, GraduationCap, Languages, Sparkles, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+
+interface KeyExpression {
+  korean: string;
+  translation: string;
+  context: string;
+  timestamp: number;
+}
 
 interface ShortsVideo {
   id: string;
@@ -59,6 +66,8 @@ export default function ShortsPlayer() {
   const [currentTime, setCurrentTime] = useState(0);
   const [ytReady, setYtReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [keyExpressions, setKeyExpressions] = useState<KeyExpression[]>([]);
+  const [loadingExpressions, setLoadingExpressions] = useState(false);
 
   const playerRef = useRef<any>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -221,6 +230,42 @@ export default function ShortsPlayer() {
     const available = new Set(subtitles.map(s => s.language));
     return LANGUAGES.filter(l => available.has(l.code));
   }, [subtitles]);
+
+  // Fetch key expressions from LLM
+  const fetchKeyExpressions = useCallback(async () => {
+    if (!videoId || koreanSubtitles.length === 0) return;
+    
+    setLoadingExpressions(true);
+    try {
+      const targetLang = selectedLanguage === 'ko' ? 'en' : selectedLanguage;
+      
+      const { data, error } = await supabase.functions.invoke('shorts-expressions', {
+        body: {
+          videoId,
+          subtitles: koreanSubtitles,
+          targetLanguage: targetLang,
+        },
+      });
+
+      if (error) throw error;
+      
+      if (data?.expressions && Array.isArray(data.expressions)) {
+        setKeyExpressions(data.expressions);
+      }
+    } catch (error) {
+      console.error('Error fetching expressions:', error);
+      toast.error('핵심 표현을 불러오는데 실패했습니다');
+    } finally {
+      setLoadingExpressions(false);
+    }
+  }, [videoId, koreanSubtitles, selectedLanguage]);
+
+  // Load expressions when subtitles are ready
+  useEffect(() => {
+    if (koreanSubtitles.length > 0 && keyExpressions.length === 0 && !loadingExpressions) {
+      fetchKeyExpressions();
+    }
+  }, [koreanSubtitles, keyExpressions.length, loadingExpressions, fetchKeyExpressions]);
 
   // Speak Korean text
   const speakText = (text: string) => {
@@ -471,127 +516,148 @@ export default function ShortsPlayer() {
             </motion.div>
           </div>
 
-          {/* Learning Section - Below Player */}
-          {koreanSubtitles.length > 0 && (
-            <motion.section
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="mt-12"
-            >
-              <div className="text-center mb-8">
-                <Badge variant="outline" className="mb-4 px-4 py-1.5">
-                  <GraduationCap className="w-4 h-4 mr-2" />
-                  학습 콘텐츠
-                </Badge>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                  이 영상에서 배울 수 있는 표현
-                </h2>
-                <p className="text-muted-foreground mt-2">
-                  영상 속 핵심 문장들을 정리했어요
-                </p>
+          {/* Learning Section - LLM Curated Key Expressions */}
+          <motion.section
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="mt-12"
+          >
+            <div className="text-center mb-8">
+              <Badge variant="outline" className="mb-4 px-4 py-1.5 gap-2">
+                <Sparkles className="w-4 h-4" />
+                AI 추천 학습
+              </Badge>
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                핵심 표현 4선
+              </h2>
+              <p className="text-muted-foreground mt-2">
+                AI가 선별한 가장 유용한 한국어 표현
+              </p>
+            </div>
+
+            {loadingExpressions ? (
+              <div className="flex flex-col items-center justify-center py-16">
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                    <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                  </div>
+                  <div className="absolute inset-0 rounded-full bg-primary/10 animate-ping" />
+                </div>
+                <p className="text-muted-foreground mt-4">AI가 핵심 표현을 분석 중...</p>
               </div>
+            ) : keyExpressions.length > 0 ? (
+              <div className="grid md:grid-cols-2 gap-5">
+                {keyExpressions.map((expr, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 * idx }}
+                    className="group relative p-6 rounded-2xl bg-card border border-border/50 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300"
+                  >
+                    {/* Index Badge */}
+                    <div className="absolute -top-3 -left-3 w-10 h-10 rounded-2xl bg-gradient-to-br from-primary via-korean-orange to-secondary flex items-center justify-center text-white text-lg font-bold shadow-lg">
+                      {idx + 1}
+                    </div>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {koreanSubtitles.slice(0, 9).map((sub, idx) => {
-                  const translatedText = subtitles.find(s => s.language === (selectedLanguage === 'ko' ? 'en' : selectedLanguage))?.subtitles[idx]?.text;
-                  
-                  return (
-                    <motion.div
-                      key={idx}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 * idx }}
-                      className="group relative p-5 rounded-2xl bg-card border border-border/50 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
-                    >
-                      {/* Index Badge */}
-                      <div className="absolute -top-2 -left-2 w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center text-white text-sm font-bold shadow-lg">
-                        {idx + 1}
-                      </div>
+                    {/* Actions */}
+                    <div className="absolute top-4 right-4 flex gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          speakText(expr.korean);
+                        }}
+                        className="p-2.5 rounded-xl bg-muted/50 hover:bg-primary hover:text-white text-muted-foreground transition-all"
+                        title="발음 듣기"
+                      >
+                        <Volume2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          seekTo(expr.timestamp);
+                        }}
+                        className="p-2.5 rounded-xl bg-muted/50 hover:bg-primary hover:text-white text-muted-foreground transition-all"
+                        title="영상에서 보기"
+                      >
+                        <Play className="w-4 h-4" />
+                      </button>
+                    </div>
 
-                      {/* Actions */}
-                      <div className="absolute top-3 right-3 flex gap-1">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            speakText(sub.text);
-                          }}
-                          className="p-2 rounded-xl bg-muted/50 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
-                          title="발음 듣기"
-                        >
-                          <Volume2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            seekTo(sub.start);
-                          }}
-                          className="p-2 rounded-xl bg-muted/50 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
-                          title="영상에서 보기"
-                        >
-                          <Play className="w-4 h-4" />
-                        </button>
-                      </div>
+                    {/* Time */}
+                    <span className="inline-block px-3 py-1.5 rounded-lg bg-muted text-xs font-mono text-muted-foreground mb-4">
+                      {formatTime(expr.timestamp)}
+                    </span>
 
-                      {/* Time */}
-                      <span className="inline-block px-2.5 py-1 rounded-lg bg-muted text-xs font-mono text-muted-foreground mb-3">
-                        {formatTime(sub.start)}
-                      </span>
+                    {/* Korean Text */}
+                    <p className="text-xl font-bold text-foreground leading-relaxed mb-4 pr-20">
+                      {expr.korean}
+                    </p>
 
-                      {/* Korean Text */}
-                      <p className="text-lg font-medium text-foreground leading-relaxed mb-3">
-                        {sub.text}
+                    {/* Translation */}
+                    <div className="flex items-start gap-2 p-4 rounded-xl bg-primary/5 border border-primary/10">
+                      <Languages className="w-5 h-5 text-primary mt-0.5 shrink-0" />
+                      <p className="text-base text-foreground/90 font-medium">
+                        {expr.translation}
                       </p>
+                    </div>
 
-                      {/* Translation */}
-                      {translatedText && (
-                        <div className="flex items-start gap-2 pt-3 border-t border-border/50">
-                          <Languages className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                          <p className="text-sm text-muted-foreground">
-                            {translatedText}
-                          </p>
-                        </div>
-                      )}
-                    </motion.div>
-                  );
-                })}
+                    {/* Context */}
+                    <div className="flex items-start gap-2 mt-3 pt-3 border-t border-border/30">
+                      <Lightbulb className="w-4 h-4 text-korean-orange mt-0.5 shrink-0" />
+                      <p className="text-sm text-muted-foreground">
+                        {expr.context}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
-
-              {koreanSubtitles.length > 9 && (
-                <div className="text-center mt-8">
-                  <p className="text-sm text-muted-foreground">
-                    총 {koreanSubtitles.length}개의 문장 중 9개를 표시 중
-                  </p>
+            ) : koreanSubtitles.length > 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                  <GraduationCap className="w-8 h-8 text-muted-foreground" />
                 </div>
-              )}
+                <p className="text-muted-foreground mb-4">
+                  핵심 표현을 불러오지 못했습니다
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={fetchKeyExpressions}
+                  className="gap-2"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  다시 분석하기
+                </Button>
+              </div>
+            ) : null}
 
-              {/* Learning Tips */}
-              <div className="mt-10 p-6 rounded-3xl bg-gradient-to-br from-primary/5 to-secondary/5 border border-border/50">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center shrink-0">
-                    <Lightbulb className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-foreground mb-2">학습 Tip</h3>
-                    <ul className="space-y-2 text-sm text-muted-foreground">
-                      <li className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                        문장의 <span className="font-medium text-foreground">발음 버튼</span>을 눌러 원어민 발음을 들어보세요
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                        <span className="font-medium text-foreground">재생 버튼</span>을 누르면 해당 장면으로 바로 이동해요
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                        영상을 보면서 따라 말해보는 연습을 해보세요
-                      </li>
-                    </ul>
-                  </div>
+            {/* Learning Tips */}
+            <div className="mt-10 p-6 rounded-3xl bg-gradient-to-br from-primary/5 to-secondary/5 border border-border/50">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center shrink-0">
+                  <Lightbulb className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-foreground mb-2">학습 Tip</h3>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                      <span className="font-medium text-foreground">발음 버튼</span>을 눌러 한국어 발음을 들어보세요
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                      <span className="font-medium text-foreground">재생 버튼</span>을 누르면 해당 장면으로 바로 이동해요
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                      상황 설명을 읽고 어떤 상황에서 쓰는지 이해해보세요
+                    </li>
+                  </ul>
                 </div>
               </div>
-            </motion.section>
-          )}
+            </div>
+          </motion.section>
         </div>
       </main>
     </div>
