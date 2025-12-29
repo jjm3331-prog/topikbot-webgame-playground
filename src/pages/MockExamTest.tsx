@@ -1072,14 +1072,11 @@ const MockExamTest = () => {
             </div>
           </div>
           <DialogFooter className="flex-col gap-2 sm:flex-col">
-            <Button className="w-full" onClick={() => navigate('/mock-exam')}>
-              모의고사 허브로 이동
+            <Button className="w-full" onClick={() => navigate(`/mock-exam/report/${attempt?.id}`)}>
+              AI 리포트 보기
             </Button>
-            <Button variant="outline" className="w-full" onClick={() => {
-              setShowResultDialog(false);
-              // Navigate to review mode
-            }}>
-              오답 복습하기
+            <Button variant="outline" className="w-full" onClick={() => navigate('/mock-exam/mistakes')}>
+              오답노트로 이동
             </Button>
           </DialogFooter>
         </DialogContent>
