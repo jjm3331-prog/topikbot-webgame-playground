@@ -501,7 +501,8 @@ const MockExamTest = () => {
   const handleAnswer = (optionIndex: number) => {
     if (!currentQuestion) return;
     
-    const isCorrect = optionIndex === currentQuestion.correct_answer;
+    // DB stores correct_answer as 1-based (1,2,3,4), optionIndex is 0-based (0,1,2,3)
+    const isCorrect = (optionIndex + 1) === currentQuestion.correct_answer;
     
     const newAnswer: AnswerData = {
       question_id: currentQuestion.id,
@@ -988,7 +989,8 @@ const MockExamTest = () => {
                   {currentQuestion.options.map((option, idx) => {
                     const answer = answers.get(currentQuestion.id);
                     const isSelected = answer?.user_answer === idx;
-                    const isCorrect = idx === currentQuestion.correct_answer;
+                    // DB stores correct_answer as 1-based (1,2,3,4), idx is 0-based (0,1,2,3)
+                    const isCorrect = (idx + 1) === currentQuestion.correct_answer;
                     const showResult = isPracticeMode && answer !== undefined;
                     const circledNumbers = ['①', '②', '③', '④'];
                     

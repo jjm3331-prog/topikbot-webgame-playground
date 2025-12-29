@@ -293,29 +293,34 @@ const MockExamMistakes = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {question?.options?.map((option: string, idx: number) => (
-                  <div
-                    key={idx}
-                    className={cn(
-                      "p-4 rounded-lg border transition-all",
-                      showAnswer && idx === question.correct_answer && "border-green-500 bg-green-50 dark:bg-green-950/30",
-                      showAnswer && currentMistake.userAnswer === idx && idx !== question.correct_answer && "border-red-500 bg-red-50 dark:bg-red-950/30"
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-sm font-medium">
-                        {idx + 1}
-                      </span>
-                      <span>{option}</span>
-                      {showAnswer && idx === question.correct_answer && (
-                        <CheckCircle2 className="w-5 h-5 text-green-500 ml-auto" />
+                {question?.options?.map((option: string, idx: number) => {
+                  // DB stores correct_answer as 1-based (1,2,3,4), idx is 0-based (0,1,2,3)
+                  const isCorrectAnswer = (idx + 1) === question.correct_answer;
+                  const isUserAnswer = currentMistake.userAnswer === idx;
+                  return (
+                    <div
+                      key={idx}
+                      className={cn(
+                        "p-4 rounded-lg border transition-all",
+                        showAnswer && isCorrectAnswer && "border-green-500 bg-green-50 dark:bg-green-950/30",
+                        showAnswer && isUserAnswer && !isCorrectAnswer && "border-red-500 bg-red-50 dark:bg-red-950/30"
                       )}
-                      {showAnswer && currentMistake.userAnswer === idx && idx !== question.correct_answer && (
-                        <X className="w-5 h-5 text-red-500 ml-auto" />
-                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-sm font-medium">
+                          {idx + 1}
+                        </span>
+                        <span>{option}</span>
+                        {showAnswer && isCorrectAnswer && (
+                          <CheckCircle2 className="w-5 h-5 text-green-500 ml-auto" />
+                        )}
+                        {showAnswer && isUserAnswer && !isCorrectAnswer && (
+                          <X className="w-5 h-5 text-red-500 ml-auto" />
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {showAnswer && (
