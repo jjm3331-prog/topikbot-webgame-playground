@@ -309,37 +309,37 @@ export default function VideoLearningHub() {
         </section>
 
         {/* Video Preview Section */}
-        {videos.length > 0 && (
-          <section id="videos" className="py-16 sm:py-20 bg-muted/30">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8"
-              >
-                <div>
-                  <h2 className="text-3xl font-bold mb-2">🎬 {t('videoHub.videos.sectionTitle')}</h2>
-                  <p className="text-muted-foreground">{t('videoHub.videos.sectionSubtitle')}</p>
-                </div>
-              </motion.div>
-
-              {/* Category Tabs */}
-              <div className="flex flex-wrap gap-2 mb-8">
-                {CATEGORIES.map((cat) => (
-                  <Button
-                    key={cat.value}
-                    variant={selectedCategory === cat.value ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setSelectedCategory(cat.value)}
-                    className="rounded-full"
-                  >
-                    {cat.emoji} {t(cat.labelKey)}
-                  </Button>
-                ))}
+        <section id="videos" className="py-16 sm:py-20 bg-muted/30">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8"
+            >
+              <div>
+                <h2 className="text-3xl font-bold mb-2">🎬 {t('videoHub.videos.sectionTitle')}</h2>
+                <p className="text-muted-foreground">{t('videoHub.videos.sectionSubtitle')}</p>
               </div>
+            </motion.div>
 
-              {/* Video Grid */}
+            {/* Category Tabs */}
+            <div className="flex flex-wrap gap-2 mb-8">
+              {CATEGORIES.map((cat) => (
+                <Button
+                  key={cat.value}
+                  variant={selectedCategory === cat.value ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedCategory(cat.value)}
+                  className="rounded-full"
+                >
+                  {cat.emoji} {t(cat.labelKey)}
+                </Button>
+              ))}
+            </div>
+
+            {/* Video Grid */}
+            {videos.length > 0 ? (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {filteredVideos.map((video, index) => (
                   <motion.div
@@ -349,16 +349,17 @@ export default function VideoLearningHub() {
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <Card 
+                    <Card
                       className="overflow-hidden cursor-pointer group hover:shadow-xl transition-all border-0"
                       onClick={() => navigate(`/video-hub/${video.id}`)}
                     >
                       <div className="relative aspect-video bg-muted">
                         {video.thumbnail_url ? (
-                          <img 
-                            src={video.thumbnail_url} 
+                          <img
+                            src={video.thumbnail_url}
                             alt={video.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
@@ -371,7 +372,8 @@ export default function VideoLearningHub() {
                           </div>
                         </div>
                         <Badge className="absolute top-3 left-3 bg-black/60 backdrop-blur">
-                          {CATEGORIES.find(c => c.value === video.category)?.emoji} {t(CATEGORIES.find(c => c.value === video.category)?.labelKey || '')}
+                          {CATEGORIES.find(c => c.value === video.category)?.emoji}{' '}
+                          {t(CATEGORIES.find(c => c.value === video.category)?.labelKey || '')}
                         </Badge>
                       </div>
                       <CardContent className="p-4">
@@ -392,19 +394,24 @@ export default function VideoLearningHub() {
                   </motion.div>
                 ))}
               </div>
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                <Play className="w-16 h-16 mx-auto mb-4 opacity-30" />
+                <p>{t('videoHub.videos.noVideos')}</p>
+                <p className="text-sm mt-2">{t('videoHub.videos.comingSoon')}</p>
+              </div>
+            )}
 
-              {filteredVideos.length === 0 && !loading && (
-                <div className="text-center py-12 text-muted-foreground">
-                  <Play className="w-16 h-16 mx-auto mb-4 opacity-30" />
-                  <p>{t('videoHub.videos.noVideos')}</p>
-                  <p className="text-sm mt-2">{t('videoHub.videos.comingSoon')}</p>
-                </div>
-              )}
-            </div>
-          </section>
-        )}
+            {filteredVideos.length === 0 && videos.length > 0 && !loading && (
+              <div className="text-center py-12 text-muted-foreground">
+                <Play className="w-16 h-16 mx-auto mb-4 opacity-30" />
+                <p>{t('videoHub.videos.noVideos')}</p>
+                <p className="text-sm mt-2">{t('videoHub.videos.comingSoon')}</p>
+              </div>
+            )}
+          </div>
+        </section>
 
-        {/* CTA Section */}
         <section className="py-16 sm:py-20">
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             <motion.div
