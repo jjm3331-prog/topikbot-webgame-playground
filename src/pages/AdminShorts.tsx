@@ -6,9 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Trash2, Edit, Loader2, Upload, Globe, CheckCircle, AlertCircle, Tv, Mic, Newspaper, Music, Landmark, Plane } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Edit, Loader2, Upload, CheckCircle, AlertCircle, Tv, Mic, Newspaper, Music, Landmark, Plane, FileText } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface ShortsVideo {
@@ -23,17 +24,7 @@ interface ShortsVideo {
   category: string;
 }
 
-interface SubtitleStatus {
-  language: string;
-  exists: boolean;
-}
-
-const LANGUAGES = ['ko', 'vi', 'en', 'ja', 'zh', 'ru', 'uz'];
-const LANGUAGE_FLAGS: Record<string, string> = {
-  ko: '🇰🇷', vi: '🇻🇳', en: '🇺🇸', ja: '🇯🇵', zh: '🇨🇳', ru: '🇷🇺', uz: '🇺🇿'
-};
-
-// 카테고리 정의 (kdrama + movie 합침, education 삭제)
+// 카테고리 정의
 const CATEGORIES = [
   { id: 'kdrama', label: 'K드라마/영화', icon: Tv },
   { id: 'variety', label: '예능', icon: Mic },
@@ -49,19 +40,18 @@ export default function AdminShorts() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [subtitleStatuses, setSubtitleStatuses] = useState<Record<string, SubtitleStatus[]>>({});
-  const [translatingId, setTranslatingId] = useState<string | null>(null);
+  const [scriptStatuses, setScriptStatuses] = useState<Record<string, boolean>>({});
 
   // Form state
   const [formData, setFormData] = useState({ youtube_url: '', title: '', category: 'kdrama' });
   const [editingVideo, setEditingVideo] = useState<ShortsVideo | null>(null);
 
-  // SRT Upload state
-  const [srtDialogOpen, setSrtDialogOpen] = useState(false);
-  const [srtVideo, setSrtVideo] = useState<ShortsVideo | null>(null);
-  const [srtFile, setSrtFile] = useState<File | null>(null);
-  const [srtUploading, setSrtUploading] = useState(false);
-  const [srtPreview, setSrtPreview] = useState<Array<{ start: number; end: number; text: string }>>([]);
+  // Script Upload state
+  const [scriptDialogOpen, setScriptDialogOpen] = useState(false);
+  const [scriptVideo, setScriptVideo] = useState<ShortsVideo | null>(null);
+  const [scriptFile, setScriptFile] = useState<File | null>(null);
+  const [scriptText, setScriptText] = useState('');
+  const [scriptUploading, setScriptUploading] = useState(false);
 
   useEffect(() => {
     checkAdmin();
@@ -89,7 +79,6 @@ export default function AdminShorts() {
 
   const fetchVideos = async () => {
     try {
-      // 모든 숏츠 카테고리 가져오기
       const { data, error } = await supabase
         .from('video_lessons')
         .select('id, youtube_url, youtube_id, title, thumbnail_url, is_published, view_count, created_at, category')
@@ -98,21 +87,20 @@ export default function AdminShorts() {
       if (error) throw error;
       setVideos(data || []);
 
-      // Fetch subtitle statuses
+      // Fetch script statuses (check if Korean script exists)
       if (data) {
-        const statuses: Record<string, SubtitleStatus[]> = {};
+        const statuses: Record<string, boolean> = {};
         for (const video of data) {
           const { data: subs } = await supabase
             .from('video_subtitles')
             .select('language')
-            .eq('video_id', video.id);
+            .eq('video_id', video.id)
+            .eq('language', 'ko')
+            .single();
 
-          statuses[video.id] = LANGUAGES.map(lang => ({
-            language: lang,
-            exists: subs?.some(s => s.language === lang) || false,
-          }));
+          statuses[video.id] = !!subs;
         }
-        setSubtitleStatuses(statuses);
+        setScriptStatuses(statuses);
       }
     } catch (error) {
       console.error('Error fetching shorts:', error);
@@ -193,6 +181,9 @@ export default function AdminShorts() {
   const handleDelete = async (video: ShortsVideo) => {
     if (!confirm('정말 삭제하시겠습니까?')) return;
     try {
+      // Delete subtitles first
+      await supabase.from('video_subtitles').delete().eq('video_id', video.id);
+      // Delete video
       const { error } = await supabase.from('video_lessons').delete().eq('id', video.id);
       if (error) throw error;
       toast.success('삭제되었습니다');
@@ -216,147 +207,128 @@ export default function AdminShorts() {
     }
   };
 
-  // SRT Functions
-  const openSrtDialog = (video: ShortsVideo) => {
-    setSrtVideo(video);
-    setSrtFile(null);
-    setSrtPreview([]);
-    setSrtDialogOpen(true);
-  };
+  // Script Functions
+  const openScriptDialog = async (video: ShortsVideo) => {
+    setScriptVideo(video);
+    setScriptFile(null);
+    setScriptText('');
+    setScriptDialogOpen(true);
 
-  const parseSRT = (content: string): Array<{ start: number; end: number; text: string }> => {
-    const subtitles: Array<{ start: number; end: number; text: string }> = [];
-    const normalized = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
-    const blocks = normalized.split(/\n\n+/);
+    // Load existing script if available
+    const { data } = await supabase
+      .from('video_subtitles')
+      .select('subtitles')
+      .eq('video_id', video.id)
+      .eq('language', 'ko')
+      .single();
 
-    for (const block of blocks) {
-      const lines = block.split(/\n/).map(l => l.trim()).filter(Boolean);
-      if (lines.length < 2) continue;
-
-      const timestampLine = lines.find(l => l.includes('-->'));
-      if (!timestampLine) continue;
-
-      const [startStr, endStr] = timestampLine.split('-->').map(s => s.trim());
-      if (!startStr || !endStr) continue;
-
-      const parseTimestamp = (ts: string): number => {
-        const match = ts.match(/(\d{2}):(\d{2}):(\d{2})[,.](\d{3})/);
-        if (!match) return 0;
-        const [, h, m, s, ms] = match;
-        return parseInt(h) * 3600 + parseInt(m) * 60 + parseInt(s) + parseInt(ms) / 1000;
-      };
-
-      const start = parseTimestamp(startStr);
-      const end = parseTimestamp(endStr);
-      const timestampIndex = lines.indexOf(timestampLine);
-      const textLines = lines.slice(timestampIndex + 1).filter(l => !/^[0-9]+$/.test(l));
-      const text = textLines.join(' ').trim();
-
-      if (text) {
-        subtitles.push({ start, end, text });
-      }
+    if (data?.subtitles) {
+      // Convert subtitles array to plain text
+      const subtitles = data.subtitles as Array<{ text?: string }>;
+      const text = subtitles.map(s => s.text || '').filter(Boolean).join('\n');
+      setScriptText(text);
     }
-    return subtitles;
   };
 
-  const handleSrtFileChange = async (file: File | null) => {
-    setSrtFile(file);
+  // Parse text content - works for both SRT and plain TXT
+  const parseTextContent = (content: string): Array<{ start: number; end: number; text: string }> => {
+    // Check if it's SRT format
+    const hasSrtTimestamps = content.includes('-->');
+    
+    if (hasSrtTimestamps) {
+      // Parse as SRT
+      const subtitles: Array<{ start: number; end: number; text: string }> = [];
+      const normalized = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+      const blocks = normalized.split(/\n\n+/);
+
+      for (const block of blocks) {
+        const lines = block.split(/\n/).map(l => l.trim()).filter(Boolean);
+        if (lines.length < 2) continue;
+
+        const timestampLine = lines.find(l => l.includes('-->'));
+        if (!timestampLine) continue;
+
+        const [startStr, endStr] = timestampLine.split('-->').map(s => s.trim());
+        if (!startStr || !endStr) continue;
+
+        const parseTimestamp = (ts: string): number => {
+          const match = ts.match(/(\d{2}):(\d{2}):(\d{2})[,.](\d{3})/);
+          if (!match) return 0;
+          const [, h, m, s, ms] = match;
+          return parseInt(h) * 3600 + parseInt(m) * 60 + parseInt(s) + parseInt(ms) / 1000;
+        };
+
+        const start = parseTimestamp(startStr);
+        const end = parseTimestamp(endStr);
+        const timestampIndex = lines.indexOf(timestampLine);
+        const textLines = lines.slice(timestampIndex + 1).filter(l => !/^[0-9]+$/.test(l));
+        const text = textLines.join(' ').trim();
+
+        if (text) {
+          subtitles.push({ start, end, text });
+        }
+      }
+      return subtitles;
+    } else {
+      // Parse as plain text - each line or paragraph becomes a segment
+      const lines = content.split(/\n+/).map(l => l.trim()).filter(Boolean);
+      return lines.map((text, idx) => ({
+        start: idx * 5, // Assign dummy timestamps (5 seconds apart)
+        end: (idx + 1) * 5,
+        text
+      }));
+    }
+  };
+
+  const handleFileChange = async (file: File | null) => {
+    setScriptFile(file);
     if (file) {
       const content = await file.text();
-      const parsed = parseSRT(content);
-      setSrtPreview(parsed.slice(0, 5));
-    } else {
-      setSrtPreview([]);
+      setScriptText(content);
     }
   };
 
-  const handleSrtUpload = async () => {
-    if (!srtFile || !srtVideo) return;
+  const handleScriptUpload = async () => {
+    if (!scriptText.trim() || !scriptVideo) return;
 
-    setSrtUploading(true);
+    setScriptUploading(true);
     try {
-      const content = await srtFile.text();
-      const subtitles = parseSRT(content);
+      const parsed = parseTextContent(scriptText);
 
-      if (subtitles.length === 0) {
-        toast.error('SRT 파싱 실패');
-        setSrtUploading(false);
+      if (parsed.length === 0) {
+        toast.error('스크립트 파싱 실패 - 내용을 확인해주세요');
+        setScriptUploading(false);
         return;
       }
 
-      // 한국어 자막 저장
+      // Save Korean script
       const { error } = await supabase
         .from('video_subtitles')
         .upsert({
-          video_id: srtVideo.id,
+          video_id: scriptVideo.id,
           language: 'ko',
-          subtitles: subtitles,
-          is_reviewed: false,
+          subtitles: parsed,
+          is_reviewed: true,
         }, { onConflict: 'video_id,language' });
 
       if (error) throw error;
 
-      toast.success(`${subtitles.length}개 자막 저장 완료!`);
-      
-      // 자동 번역 시작
-      toast.info('🌍 6개 언어 번역 시작...');
-      
-      const { error: translateError } = await supabase.functions.invoke('video-translate', {
-        body: { video_id: srtVideo.id }
-      });
-      
-      if (translateError) {
-        console.error('Translation error:', translateError);
-        toast.error('번역 실패: ' + translateError.message);
-      } else {
-        toast.success('✅ 7개국어 번역 완료!');
-      }
+      // Clear old cache for this video (so AI regenerates learning content)
+      await supabase
+        .from('ai_response_cache')
+        .delete()
+        .like('cache_key', `shorts-learning-%${scriptVideo.id}%`);
 
-      setSrtDialogOpen(false);
+      toast.success(`✅ ${parsed.length}줄 스크립트 저장 완료! AI가 학습 콘텐츠를 생성할 준비가 되었습니다.`);
+      
+      setScriptDialogOpen(false);
       fetchVideos();
     } catch (error: any) {
-      console.error('SRT upload error:', error);
-      toast.error(error.message || 'SRT 업로드 실패');
+      console.error('Script upload error:', error);
+      toast.error(error.message || '스크립트 업로드 실패');
     } finally {
-      setSrtUploading(false);
+      setScriptUploading(false);
     }
-  };
-
-  // Translate all languages
-  const handleTranslateAll = async (video: ShortsVideo) => {
-    const hasKorean = subtitleStatuses[video.id]?.find(s => s.language === 'ko')?.exists;
-    if (!hasKorean) {
-      toast.error('먼저 한국어 SRT를 업로드하세요');
-      return;
-    }
-
-    setTranslatingId(video.id);
-    toast.info('🌍 번역 중...');
-
-    try {
-      const { error, data } = await supabase.functions.invoke('video-translate', {
-        body: { video_id: video.id }
-      });
-
-      if (error) throw error;
-      
-      const successCount = data?.results 
-        ? Object.values(data.results).filter(Boolean).length 
-        : 0;
-      
-      toast.success(`✅ ${successCount}/6 언어 번역 완료!`);
-      fetchVideos();
-    } catch (err: any) {
-      toast.error('번역 실패: ' + (err.message || '알 수 없는 오류'));
-    } finally {
-      setTranslatingId(null);
-    }
-  };
-
-  const formatTime = (seconds: number): string => {
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
   if (!isAdmin) {
@@ -484,22 +456,23 @@ export default function AdminShorts() {
                           조회수 {video.view_count.toLocaleString()}
                         </p>
 
-                        {/* Subtitle Status */}
-                        <div className="flex flex-wrap gap-1 mb-3">
-                          {subtitleStatuses[video.id]?.map((status) => (
-                            <Badge 
-                              key={status.language}
-                              variant={status.exists ? 'default' : 'outline'}
-                              className="text-xs"
-                            >
-                              {LANGUAGE_FLAGS[status.language]}
-                              {status.exists ? (
-                                <CheckCircle className="w-3 h-3 ml-1" />
-                              ) : (
-                                <AlertCircle className="w-3 h-3 ml-1 opacity-50" />
-                              )}
-                            </Badge>
-                          ))}
+                        {/* Script Status */}
+                        <div className="flex items-center gap-2 mb-3">
+                          <Badge 
+                            variant={scriptStatuses[video.id] ? 'default' : 'outline'}
+                            className="gap-1"
+                          >
+                            <FileText className="w-3 h-3" />
+                            스크립트
+                            {scriptStatuses[video.id] ? (
+                              <CheckCircle className="w-3 h-3 ml-1" />
+                            ) : (
+                              <AlertCircle className="w-3 h-3 ml-1 opacity-50" />
+                            )}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {scriptStatuses[video.id] ? 'AI 학습 준비 완료' : '스크립트 업로드 필요'}
+                          </span>
                         </div>
 
                         {/* Actions */}
@@ -507,24 +480,10 @@ export default function AdminShorts() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => openSrtDialog(video)}
+                            onClick={() => openScriptDialog(video)}
                           >
                             <Upload className="w-4 h-4 mr-1" />
-                            SRT 업로드
-                          </Button>
-                          
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleTranslateAll(video)}
-                            disabled={translatingId === video.id}
-                          >
-                            {translatingId === video.id ? (
-                              <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-                            ) : (
-                              <Globe className="w-4 h-4 mr-1" />
-                            )}
-                            번역
+                            {scriptStatuses[video.id] ? '스크립트 수정' : '스크립트 업로드'}
                           </Button>
                           
                           <Button
@@ -562,55 +521,73 @@ export default function AdminShorts() {
         </div>
       </div>
 
-      {/* SRT Upload Dialog */}
-      <Dialog open={srtDialogOpen} onOpenChange={setSrtDialogOpen}>
-        <DialogContent className="max-w-lg">
+      {/* Script Upload Dialog */}
+      <Dialog open={scriptDialogOpen} onOpenChange={setScriptDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>🇰🇷 한국어 SRT 업로드</DialogTitle>
+            <DialogTitle>📝 스크립트 업로드</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              한국어 SRT 파일을 업로드하면 자동으로 6개 언어로 번역됩니다.
-            </p>
+            <div className="p-4 rounded-xl bg-muted/50 border border-border">
+              <h4 className="font-medium mb-2">💡 스크립트 사용 안내</h4>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• 이 스크립트는 AI가 학습 콘텐츠를 생성할 때 참고 자료로 사용됩니다</li>
+                <li>• <strong>SRT 파일</strong> 또는 <strong>일반 텍스트(TXT)</strong> 모두 지원됩니다</li>
+                <li>• 타임스탬프 없이 대화 내용만 입력해도 됩니다</li>
+                <li>• 비문이나 불완전한 문장도 AI가 정리해서 학습 콘텐츠로 만듭니다</li>
+              </ul>
+            </div>
             
             <div>
-              <Label>SRT 파일 선택</Label>
+              <Label>파일 업로드 (SRT 또는 TXT)</Label>
               <Input
                 type="file"
-                accept=".srt,.vtt"
-                onChange={(e) => handleSrtFileChange(e.target.files?.[0] || null)}
+                accept=".srt,.vtt,.txt"
+                onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
+                className="mt-1"
               />
             </div>
 
-            {srtPreview.length > 0 && (
-              <div className="bg-muted rounded-lg p-3 max-h-48 overflow-y-auto">
-                <p className="text-xs text-muted-foreground mb-2">미리보기 (처음 5개)</p>
-                {srtPreview.map((sub, idx) => (
-                  <div key={idx} className="text-sm mb-2">
-                    <span className="text-primary font-mono text-xs">
-                      {formatTime(sub.start)} → {formatTime(sub.end)}
-                    </span>
-                    <p className="mt-0.5">{sub.text}</p>
-                  </div>
-                ))}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <Label>스크립트 내용</Label>
+                <span className="text-xs text-muted-foreground">
+                  {scriptText.split('\n').filter(l => l.trim()).length}줄
+                </span>
               </div>
-            )}
+              <Textarea
+                value={scriptText}
+                onChange={(e) => setScriptText(e.target.value)}
+                placeholder={`영상의 대화 내용을 입력하세요...
+
+예시:
+아 진짜 이거 너무 맛있다
+노량진에서 회를 먹었는데요
+진짜 이렇게 먹고 있었어요
+
+또는 SRT 형식:
+1
+00:00:01,000 --> 00:00:03,000
+아 진짜 이거 너무 맛있다`}
+                className="min-h-[250px] font-mono text-sm"
+              />
+            </div>
 
             <Button 
-              onClick={handleSrtUpload} 
-              disabled={!srtFile || srtUploading}
+              onClick={handleScriptUpload} 
+              disabled={!scriptText.trim() || scriptUploading}
               className="w-full"
             >
-              {srtUploading ? (
+              {scriptUploading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  업로드 및 번역 중...
+                  저장 중...
                 </>
               ) : (
                 <>
                   <Upload className="w-4 h-4 mr-2" />
-                  업로드 + 7개국어 번역
+                  스크립트 저장
                 </>
               )}
             </Button>
