@@ -38,6 +38,7 @@ import { useToast } from "@/hooks/use-toast";
 import { mapExamTypeToDb } from "@/lib/mockExamDb";
 import { cn } from "@/lib/utils";
 
+interface Question {
   id: string;
   question_text: string;
   options: string[];
@@ -253,11 +254,9 @@ const MockExamTest = () => {
       
       setQuestions(formattedQuestions);
       
-      const timeLimit = getTimeLimit();
+      const attemptTimeLimit = getTimeLimit();
       
       // Create attempt record
-      const timeLimit = getTimeLimit();
-      const dbExamType = mapExamTypeToDb(examType || 'topik1');
       const { data: newAttempt, error: attemptError } = await supabase
         .from('mock_exam_attempts')
         .insert({
@@ -268,7 +267,7 @@ const MockExamTest = () => {
           part_number: partNumber,
           total_questions: formattedQuestions.length,
           correct_count: 0,
-          time_limit_seconds: timeLimit,
+          time_limit_seconds: attemptTimeLimit,
           is_completed: false
         })
         .select()
@@ -277,11 +276,11 @@ const MockExamTest = () => {
       if (attemptError) throw attemptError;
       
       setAttempt(newAttempt);
-      setTimeRemaining(timeLimit);
+      setTimeRemaining(attemptTimeLimit);
       setLoading(false);
       
       // Start timer if not practice mode
-      if (timeLimit) {
+      if (attemptTimeLimit) {
         startTimer();
       }
       
