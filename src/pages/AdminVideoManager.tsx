@@ -62,6 +62,7 @@ export default function AdminVideoManager() {
   const [selectedVideo, setSelectedVideo] = useState<VideoLesson | null>(null);
   const [subtitleStatuses, setSubtitleStatuses] = useState<Record<string, SubtitleStatus[]>>({});
   const [isAdmin, setIsAdmin] = useState(false);
+  const [translatingVideoId, setTranslatingVideoId] = useState<string | null>(null);
   
 
   // SRT Upload state
@@ -404,6 +405,39 @@ export default function AdminVideoManager() {
     }
   };
 
+  // Translate video subtitles to 7 languages
+  const handleTranslateAll = async (video: VideoLesson) => {
+    // Check if Korean subtitle exists first
+    const hasKorean = subtitleStatuses[video.id]?.find(s => s.language === 'ko')?.exists;
+    if (!hasKorean) {
+      toast.error('먼저 한국어(ko) SRT 자막을 업로드해주세요');
+      return;
+    }
+
+    setTranslatingVideoId(video.id);
+    toast.info('🌍 6개 언어 번역 중... (약 30초~1분 소요)');
+    
+    try {
+      const { error, data } = await supabase.functions.invoke('video-translate', {
+        body: { video_id: video.id }
+      });
+      
+      if (error) throw error;
+      
+      const successCount = data?.results 
+        ? Object.values(data.results).filter(Boolean).length 
+        : 0;
+      
+      toast.success(`✅ ${successCount}/6 언어 번역 완료!`);
+      fetchVideos();
+    } catch (err: any) {
+      console.error('Translation error:', err);
+      toast.error('번역 실패: ' + (err.message || '알 수 없는 오류'));
+    } finally {
+      setTranslatingVideoId(null);
+    }
+  };
+
   if (!isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -610,6 +644,22 @@ export default function AdminVideoManager() {
                               >
                                 <Upload className="w-4 h-4 mr-1" />
                                 SRT 업로드
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="default"
+                                className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600"
+                                onClick={() => handleTranslateAll(video)}
+                                disabled={translatingVideoId === video.id}
+                              >
+                                {translatingVideoId === video.id ? (
+                                  <>
+                                    <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                                    번역 중...
+                                  </>
+                                ) : (
+                                  <>🌍 7개국어 번역</>
+                                )}
                               </Button>
                               <Button
                                 size="sm"
