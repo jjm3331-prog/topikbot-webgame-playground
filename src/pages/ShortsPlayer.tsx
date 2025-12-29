@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,8 +9,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ChevronLeft, Globe, BookOpen, Sparkles, Volume2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ChevronLeft, Globe, BookOpen, Sparkles, Volume2, Repeat, Mic } from 'lucide-react';
 import { toast } from 'sonner';
+import WordPopup from '@/components/shorts/WordPopup';
+import ABRepeatControls from '@/components/shorts/ABRepeatControls';
+import ShadowingMode from '@/components/shorts/ShadowingMode';
 
 interface ShortsVideo {
   id: string;
@@ -28,6 +32,11 @@ interface Subtitle {
 interface SubtitleData {
   language: string;
   subtitles: Subtitle[];
+}
+
+interface WordPopupState {
+  word: string;
+  position: { x: number; y: number };
 }
 
 const LANGUAGES = [
@@ -58,6 +67,18 @@ export default function ShortsPlayer() {
   const [selectedLanguage, setSelectedLanguage] = useState(() => normalizeLang(i18n.language));
   const [currentTime, setCurrentTime] = useState(0);
   const [ytReady, setYtReady] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  // A-B Repeat state
+  const [pointA, setPointA] = useState<number | null>(null);
+  const [pointB, setPointB] = useState<number | null>(null);
+  const [isRepeating, setIsRepeating] = useState(false);
+
+  // Word popup state
+  const [wordPopup, setWordPopup] = useState<WordPopupState | null>(null);
+
+  // Active tab
+  const [activeTab, setActiveTab] = useState<'subtitles' | 'shadowing'>('subtitles');
 
   const playerRef = useRef<any>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -103,6 +124,15 @@ export default function ShortsPlayer() {
     }
   }, [video, ytReady]);
 
+  // A-B Repeat logic
+  useEffect(() => {
+    if (isRepeating && pointA !== null && pointB !== null) {
+      if (currentTime >= pointB) {
+        playerRef.current?.seekTo?.(pointA, true);
+      }
+    }
+  }, [currentTime, isRepeating, pointA, pointB]);
+
   const initPlayer = () => {
     if (!video) return;
     try { playerRef.current?.destroy?.(); } catch { }
@@ -121,8 +151,10 @@ export default function ShortsPlayer() {
       events: {
         onStateChange: (event: any) => {
           if (event.data === 1) {
+            setIsPlaying(true);
             startTimeUpdate();
           } else {
+            setIsPlaying(false);
             if (intervalRef.current) clearInterval(intervalRef.current);
           }
         },
@@ -180,14 +212,81 @@ export default function ShortsPlayer() {
     }
   };
 
-  const seekTo = (time: number) => {
+  const seekTo = useCallback((time: number) => {
     playerRef.current?.seekTo?.(time, true);
-  };
+  }, []);
+
+  const pauseVideo = useCallback(() => {
+    playerRef.current?.pauseVideo?.();
+  }, []);
+
+  const playVideo = useCallback(() => {
+    playerRef.current?.playVideo?.();
+  }, []);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = Math.floor(seconds % 60);
     return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
+  // A-B Repeat handlers
+  const handleSetA = () => {
+    setPointA(currentTime);
+    toast.success(`A 지점 설정: ${formatTime(currentTime)}`);
+  };
+
+  const handleSetB = () => {
+    if (pointA !== null && currentTime > pointA) {
+      setPointB(currentTime);
+      toast.success(`B 지점 설정: ${formatTime(currentTime)}`);
+    } else {
+      toast.error('B 지점은 A 지점 이후여야 합니다');
+    }
+  };
+
+  const handleClearAB = () => {
+    setPointA(null);
+    setPointB(null);
+    setIsRepeating(false);
+    toast.info('A-B 구간 초기화');
+  };
+
+  const handleToggleRepeat = () => {
+    if (pointA !== null && pointB !== null) {
+      setIsRepeating(!isRepeating);
+      if (!isRepeating) {
+        seekTo(pointA);
+        playVideo();
+      }
+    }
+  };
+
+  // Set A-B from subtitle click
+  const handleSubtitleABSet = (sub: Subtitle, isA: boolean) => {
+    if (isA) {
+      setPointA(sub.start);
+      setPointB(null);
+      toast.success(`A 지점: ${formatTime(sub.start)}`);
+    } else {
+      if (pointA !== null && sub.end > pointA) {
+        setPointB(sub.end);
+        toast.success(`B 지점: ${formatTime(sub.end)}`);
+      }
+    }
+  };
+
+  // Word click handler
+  const handleWordClick = (word: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    // 한글만 추출
+    const cleanWord = word.replace(/[^\uAC00-\uD7AF]/g, '');
+    if (cleanWord.length === 0) return;
+
+    setWordPopup({
+      word: cleanWord,
+      position: { x: event.clientX, y: event.clientY },
+    });
   };
 
   // Get current subtitles for selected language
@@ -218,6 +317,27 @@ export default function ShortsPlayer() {
     const available = new Set(subtitles.map(s => s.language));
     return LANGUAGES.filter(l => available.has(l.code));
   }, [subtitles]);
+
+  // Render clickable words in subtitle
+  const renderClickableText = (text: string, isKorean: boolean) => {
+    if (!isKorean) return text;
+
+    const words = text.split(/(\s+)/);
+    return words.map((word, i) => {
+      const isWord = /[\uAC00-\uD7AF]/.test(word);
+      if (!isWord) return word;
+
+      return (
+        <span
+          key={i}
+          onClick={(e) => handleWordClick(word, e)}
+          className="cursor-pointer hover:bg-primary/20 hover:text-primary rounded px-0.5 transition-colors"
+        >
+          {word}
+        </span>
+      );
+    });
+  };
 
   if (loading) {
     return (
@@ -265,9 +385,31 @@ export default function ShortsPlayer() {
                   조회수 {video.view_count.toLocaleString()}회
                 </p>
               </div>
+
+              {/* A-B Repeat Controls */}
+              <Card className="mt-4 w-full max-w-[400px]">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Repeat className="w-4 h-4" />
+                    A-B 반복 구간
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ABRepeatControls
+                    pointA={pointA}
+                    pointB={pointB}
+                    isRepeating={isRepeating}
+                    onSetA={handleSetA}
+                    onSetB={handleSetB}
+                    onClear={handleClearAB}
+                    onToggleRepeat={handleToggleRepeat}
+                    formatTime={formatTime}
+                  />
+                </CardContent>
+              </Card>
             </div>
 
-            {/* Right: Subtitle Panel */}
+            {/* Right: Subtitle Panel + Shadowing */}
             <div className="space-y-4">
               {/* Language Selector */}
               <Card>
@@ -296,89 +438,128 @@ export default function ShortsPlayer() {
                 </CardContent>
               </Card>
 
-              {/* Subtitle List */}
-              <Card className="flex-1">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <BookOpen className="w-5 h-5" />
-                    자막 타임라인
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <ScrollArea className="h-[50vh] px-4 pb-4">
-                    <div className="space-y-2">
-                      {currentSubtitles.map((sub, idx) => {
-                        const isActive = idx === activeIndex;
-                        const koreanText = koreanSubtitles[idx]?.text;
-                        const showDual = selectedLanguage !== 'ko' && koreanText;
+              {/* Tabs: Subtitles vs Shadowing */}
+              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="subtitles" className="gap-2">
+                    <BookOpen className="w-4 h-4" />
+                    자막
+                  </TabsTrigger>
+                  <TabsTrigger value="shadowing" className="gap-2">
+                    <Mic className="w-4 h-4" />
+                    섀도잉
+                  </TabsTrigger>
+                </TabsList>
 
-                        return (
-                          <motion.button
-                            key={idx}
-                            ref={isActive ? activeSubRef : null}
-                            onClick={() => seekTo(sub.start)}
-                            className={`w-full text-left p-3 rounded-xl transition-all ${
-                              isActive 
-                                ? 'bg-primary/10 border-2 border-primary shadow-lg' 
-                                : 'bg-muted/50 hover:bg-muted border border-transparent'
-                            }`}
-                            animate={isActive ? { scale: 1.02 } : { scale: 1 }}
-                          >
-                            <div className="flex items-center gap-2 mb-1">
-                              <Badge variant="outline" className="text-xs font-mono">
-                                {formatTime(sub.start)}
-                              </Badge>
-                              {isActive && (
-                                <Badge variant="default" className="text-xs">
-                                  <Volume2 className="w-3 h-3 mr-1" />
-                                  재생 중
-                                </Badge>
-                              )}
+                <TabsContent value="subtitles" className="mt-4">
+                  {/* Subtitle List */}
+                  <Card className="flex-1">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <BookOpen className="w-5 h-5" />
+                        자막 타임라인
+                        <span className="text-xs text-muted-foreground font-normal ml-2">
+                          💡 한글 단어 클릭 = 뜻 보기 | 더블클릭 = A/B 설정
+                        </span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <ScrollArea className="h-[50vh] px-4 pb-4">
+                        <div className="space-y-2">
+                          {currentSubtitles.map((sub, idx) => {
+                            const isActive = idx === activeIndex;
+                            const koreanText = koreanSubtitles[idx]?.text;
+                            const showDual = selectedLanguage !== 'ko' && koreanText;
+                            const isPointA = pointA !== null && Math.abs(sub.start - pointA) < 0.5;
+                            const isPointB = pointB !== null && Math.abs(sub.end - pointB) < 0.5;
+
+                            return (
+                              <motion.button
+                                key={idx}
+                                ref={isActive ? activeSubRef : null}
+                                onClick={() => seekTo(sub.start)}
+                                onDoubleClick={() => handleSubtitleABSet(sub, pointA === null)}
+                                className={`w-full text-left p-3 rounded-xl transition-all ${
+                                  isActive 
+                                    ? 'bg-primary/10 border-2 border-primary shadow-lg' 
+                                    : isPointA || isPointB
+                                    ? 'bg-yellow-500/10 border-2 border-yellow-500/50'
+                                    : 'bg-muted/50 hover:bg-muted border border-transparent'
+                                }`}
+                                animate={isActive ? { scale: 1.02 } : { scale: 1 }}
+                              >
+                                <div className="flex items-center gap-2 mb-1">
+                                  <Badge variant="outline" className="text-xs font-mono">
+                                    {formatTime(sub.start)}
+                                  </Badge>
+                                  {isActive && (
+                                    <Badge variant="default" className="text-xs">
+                                      <Volume2 className="w-3 h-3 mr-1" />
+                                      재생 중
+                                    </Badge>
+                                  )}
+                                  {isPointA && (
+                                    <Badge className="bg-yellow-500 text-xs">A</Badge>
+                                  )}
+                                  {isPointB && (
+                                    <Badge className="bg-yellow-500 text-xs">B</Badge>
+                                  )}
+                                </div>
+                                
+                                {/* Main subtitle text - clickable words for Korean */}
+                                <p className={`font-medium ${isActive ? 'text-primary' : ''}`}>
+                                  {selectedLanguage === 'ko' 
+                                    ? renderClickableText(sub.text, true)
+                                    : sub.text
+                                  }
+                                </p>
+                                
+                                {/* Korean (if dual mode) - also clickable */}
+                                {showDual && (
+                                  <p className="text-sm text-muted-foreground mt-1">
+                                    🇰🇷 {renderClickableText(koreanText!, true)}
+                                  </p>
+                                )}
+                              </motion.button>
+                            );
+                          })}
+
+                          {currentSubtitles.length === 0 && (
+                            <div className="text-center py-12 text-muted-foreground">
+                              선택한 언어의 자막이 없습니다
                             </div>
-                            
-                            {/* Translation */}
-                            <p className={`font-medium ${isActive ? 'text-primary' : ''}`}>
-                              {sub.text}
-                            </p>
-                            
-                            {/* Korean (if dual mode) */}
-                            {showDual && (
-                              <p className="text-sm text-muted-foreground mt-1">
-                                🇰🇷 {koreanText}
-                              </p>
-                            )}
-                          </motion.button>
-                        );
-                      })}
-
-                      {currentSubtitles.length === 0 && (
-                        <div className="text-center py-12 text-muted-foreground">
-                          선택한 언어의 자막이 없습니다
+                          )}
                         </div>
-                      )}
-                    </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
+                      </ScrollArea>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
 
-              {/* Learning Features Placeholder */}
-              <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
-                <CardContent className="py-4">
-                  <div className="flex items-center gap-3">
-                    <Sparkles className="w-6 h-6 text-primary" />
-                    <div>
-                      <p className="font-medium">🚧 학습 콘텐츠 준비 중</p>
-                      <p className="text-sm text-muted-foreground">
-                        문법, 어휘, 관용어 자동 추출 기능이 곧 추가됩니다
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                <TabsContent value="shadowing" className="mt-4">
+                  <ShadowingMode
+                    subtitles={koreanSubtitles}
+                    currentTime={currentTime}
+                    onSeekTo={seekTo}
+                    onPause={pauseVideo}
+                    onPlay={playVideo}
+                    isPlaying={isPlaying}
+                  />
+                </TabsContent>
+              </Tabs>
             </div>
           </div>
         </div>
       </main>
+
+      {/* Word Popup */}
+      {wordPopup && (
+        <WordPopup
+          word={wordPopup.word}
+          position={wordPopup.position}
+          onClose={() => setWordPopup(null)}
+          videoId={videoId}
+        />
+      )}
     </div>
   );
 }
