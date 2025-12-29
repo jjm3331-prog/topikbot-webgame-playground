@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
@@ -26,7 +26,8 @@ import {
   ArrowRight,
   Star,
   Crown,
-  Flame
+  Flame,
+  Loader2
 } from "lucide-react";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
@@ -36,6 +37,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { cn } from "@/lib/utils";
 import { useSubscription } from "@/hooks/useSubscription";
 import { PremiumPreviewBanner } from "@/components/PremiumPreviewBanner";
+import { supabase } from "@/integrations/supabase/client";
+import { mapExamTypeToDb } from "@/lib/mockExamDb";
+import { analyzeUserWeakness, type WeaknessAnalysis, getWeaknessReasonText } from "@/lib/weaknessAnalyzer";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 // 3D 틸트 카드 컴포넌트
 const TiltCard = ({ 
@@ -144,8 +149,17 @@ const MockExamHub = () => {
   const [selectedExam, setSelectedExam] = useState<string>("topik1");
   const [selectedMode, setSelectedMode] = useState<string>("full");
   const [showModeDialog, setShowModeDialog] = useState(false);
+  const [showPartDialog, setShowPartDialog] = useState(false);
+  const [showWeaknessDialog, setShowWeaknessDialog] = useState(false);
   const [hoveredExam, setHoveredExam] = useState<string | null>(null);
   const [hoveredMode, setHoveredMode] = useState<string | null>(null);
+  
+  // 약점 분석 상태
+  const [weaknessAnalysis, setWeaknessAnalysis] = useState<WeaknessAnalysis | null>(null);
+  const [loadingWeakness, setLoadingWeakness] = useState(false);
+  
+  // 파트 목록
+  const [availableParts, setAvailableParts] = useState<{ partNumber: number; section: string; count: number }[]>([]);
 
   const examTypes = [
     {
@@ -275,6 +289,54 @@ const MockExamHub = () => {
 
   const selectedExamData = examTypes.find(e => e.id === selectedExam);
 
+  // 파트별 문제 개수 로드
+  const loadAvailableParts = async () => {
+    const dbExamType = mapExamTypeToDb(selectedExam);
+    const { data } = await supabase
+      .from('mock_question_bank')
+      .select('part_number, section')
+      .eq('exam_type', dbExamType)
+      .eq('is_active', true);
+    
+    if (data) {
+      const partCounts = new Map<string, { partNumber: number; section: string; count: number }>();
+      data.forEach(q => {
+        const key = `${q.section}-${q.part_number}`;
+        const existing = partCounts.get(key);
+        if (existing) {
+          existing.count++;
+        } else {
+          partCounts.set(key, { partNumber: q.part_number, section: q.section, count: 1 });
+        }
+      });
+      setAvailableParts(
+        Array.from(partCounts.values()).sort((a, b) => {
+          if (a.section !== b.section) return a.section.localeCompare(b.section);
+          return a.partNumber - b.partNumber;
+        })
+      );
+    }
+  };
+
+  // 약점 분석 로드
+  const loadWeaknessAnalysis = async () => {
+    setLoadingWeakness(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setLoadingWeakness(false);
+        return;
+      }
+      
+      const dbExamType = mapExamTypeToDb(selectedExam);
+      const analysis = await analyzeUserWeakness(user.id, dbExamType, 20);
+      setWeaknessAnalysis(analysis);
+    } catch (error) {
+      console.error('Failed to load weakness analysis:', error);
+    }
+    setLoadingWeakness(false);
+  };
+
   const handleStartExam = () => {
     if (!isPremium) {
       navigate("/pricing");
@@ -283,6 +345,12 @@ const MockExamHub = () => {
     
     if (selectedMode === 'section') {
       setShowModeDialog(true);
+    } else if (selectedMode === 'part') {
+      loadAvailableParts();
+      setShowPartDialog(true);
+    } else if (selectedMode === 'weakness') {
+      loadWeaknessAnalysis();
+      setShowWeaknessDialog(true);
     } else {
       navigate(`/mock-exam/${selectedExam}?mode=${selectedMode}`);
     }
@@ -792,6 +860,163 @@ const MockExamHub = () => {
                 </motion.button>
               )}
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Part Selection Dialog */}
+        <Dialog open={showPartDialog} onOpenChange={setShowPartDialog}>
+          <DialogContent className="sm:max-w-lg bg-card/95 backdrop-blur-xl border-white/10">
+            <DialogHeader>
+              <DialogTitle className="text-xl flex items-center gap-2">
+                <Zap className="w-5 h-5 text-amber-500" />
+                파트별 연습
+              </DialogTitle>
+              <DialogDescription>집중 연습할 파트를 선택하세요</DialogDescription>
+            </DialogHeader>
+            <ScrollArea className="max-h-[400px]">
+              <div className="grid grid-cols-2 gap-3 py-4">
+                {availableParts.map(part => (
+                  <motion.button
+                    key={`${part.section}-${part.partNumber}`}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      setShowPartDialog(false);
+                      navigate(`/mock-exam/${selectedExam}?mode=part&section=${part.section}&part=${part.partNumber}`);
+                    }}
+                    className={cn(
+                      "p-4 flex flex-col items-start gap-2 rounded-xl border transition-all",
+                      part.section === 'listening' 
+                        ? "bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20 hover:border-blue-500/40"
+                        : part.section === 'reading'
+                        ? "bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border-emerald-500/20 hover:border-emerald-500/40"
+                        : "bg-gradient-to-br from-purple-500/10 to-violet-500/10 border-purple-500/20 hover:border-purple-500/40"
+                    )}
+                  >
+                    <div className="flex items-center gap-2">
+                      {part.section === 'listening' ? (
+                        <Headphones className="w-4 h-4 text-blue-500" />
+                      ) : part.section === 'reading' ? (
+                        <BookOpen className="w-4 h-4 text-emerald-500" />
+                      ) : (
+                        <PenTool className="w-4 h-4 text-purple-500" />
+                      )}
+                      <span className="font-medium capitalize">{part.section}</span>
+                    </div>
+                    <div className="text-lg font-bold">Part {part.partNumber}</div>
+                    <Badge variant="secondary" className="text-xs">{part.count}문항</Badge>
+                  </motion.button>
+                ))}
+              </div>
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+
+        {/* Weakness Analysis Dialog */}
+        <Dialog open={showWeaknessDialog} onOpenChange={setShowWeaknessDialog}>
+          <DialogContent className="sm:max-w-xl bg-card/95 backdrop-blur-xl border-white/10">
+            <DialogHeader>
+              <DialogTitle className="text-xl flex items-center gap-2">
+                <Brain className="w-5 h-5 text-purple-500" />
+                약점 집중 분석
+              </DialogTitle>
+              <DialogDescription>AI가 분석한 취약 유형 맞춤 문제입니다</DialogDescription>
+            </DialogHeader>
+            
+            {loadingWeakness ? (
+              <div className="py-12 text-center">
+                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+                <p className="text-muted-foreground">약점 분석 중...</p>
+              </div>
+            ) : weaknessAnalysis && weaknessAnalysis.questions.length > 0 ? (
+              <div className="space-y-4 py-4">
+                {/* Summary */}
+                <div className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl border border-purple-500/20">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-purple-500/20 rounded-lg">
+                      <TrendingUp className="w-5 h-5 text-purple-500" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">분석 결과</p>
+                      <p className="text-sm text-muted-foreground">
+                        {weaknessAnalysis.totalAnalyzed}개 취약 문제 발견
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {weaknessAnalysis.weakestSections.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      <span className="text-sm text-muted-foreground">취약 영역:</span>
+                      {weaknessAnalysis.weakestSections.map(sec => (
+                        <Badge key={sec} variant="outline" className="text-xs capitalize">
+                          {sec}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {weaknessAnalysis.weakestParts.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      <span className="text-sm text-muted-foreground">취약 파트:</span>
+                      {weaknessAnalysis.weakestParts.map(part => (
+                        <Badge key={part} variant="secondary" className="text-xs">
+                          Part {part}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Top weakness questions preview */}
+                <ScrollArea className="max-h-[200px]">
+                  <div className="space-y-2">
+                    {weaknessAnalysis.questions.slice(0, 5).map((ws, idx) => (
+                      <div key={ws.questionId} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">#{idx + 1}</span>
+                          <Badge variant="destructive" className="text-xs">
+                            점수 {ws.score}
+                          </Badge>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {getWeaknessReasonText(ws.reasons, 'ko')}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+
+                <Button
+                  onClick={() => {
+                    setShowWeaknessDialog(false);
+                    const questionIds = weaknessAnalysis.questions.map(q => q.questionId).join(',');
+                    navigate(`/mock-exam/${selectedExam}?mode=weakness&questions=${questionIds}`);
+                  }}
+                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                >
+                  <Brain className="w-4 h-4 mr-2" />
+                  {weaknessAnalysis.totalAnalyzed}개 약점 문제 풀기
+                </Button>
+              </div>
+            ) : (
+              <div className="py-12 text-center">
+                <CheckCircle2 className="w-12 h-12 mx-auto mb-4 text-green-500" />
+                <p className="font-semibold text-lg mb-2">분석할 오답 데이터가 없습니다</p>
+                <p className="text-sm text-muted-foreground">
+                  먼저 실전 모의고사나 영역별 연습을 진행해주세요
+                </p>
+                <Button
+                  onClick={() => {
+                    setShowWeaknessDialog(false);
+                    setSelectedMode('full');
+                  }}
+                  variant="outline"
+                  className="mt-4"
+                >
+                  실전 모의고사 시작
+                </Button>
+              </div>
+            )}
           </DialogContent>
         </Dialog>
       </main>

@@ -98,9 +98,10 @@ const MockExamTest = () => {
   const { toast } = useToast();
   
   // Mode from URL params
-  const mode = searchParams.get('mode') || 'full'; // full, section, part
+  const mode = searchParams.get('mode') || 'full'; // full, section, part, weakness
   const section = searchParams.get('section'); // listening, reading
   const partNumber = searchParams.get('part') ? parseInt(searchParams.get('part')!) : null;
+  const weaknessQuestionIds = searchParams.get('questions')?.split(',') || []; // for weakness mode
   
   // State
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -126,7 +127,7 @@ const MockExamTest = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
   // Practice mode state
-  const isPracticeMode = mode === 'section' || mode === 'part';
+  const isPracticeMode = mode === 'section' || mode === 'part' || mode === 'weakness';
   const [showExplanation, setShowExplanation] = useState<Map<string, boolean>>(new Map());
   
   // Auto-save interval
@@ -208,11 +209,20 @@ const MockExamTest = () => {
         .eq('exam_type', dbExamType)
         .eq('is_active', true);
       
-      if (section) {
-        query = query.eq('section', section);
-      }
-      if (partNumber) {
-        query = query.eq('part_number', partNumber);
+      // Weakness mode: fetch specific questions
+      if (mode === 'weakness' && weaknessQuestionIds.length > 0) {
+        query = supabase
+          .from('mock_question_bank')
+          .select('*')
+          .in('id', weaknessQuestionIds)
+          .eq('is_active', true);
+      } else {
+        if (section) {
+          query = query.eq('section', section);
+        }
+        if (partNumber) {
+          query = query.eq('part_number', partNumber);
+        }
       }
       
       const { data: questionData, error } = await query.order('section').order('part_number').order('question_number');
