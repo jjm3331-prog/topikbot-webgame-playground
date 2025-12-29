@@ -622,14 +622,6 @@ const Admin = () => {
               <h1 className="font-heading font-bold text-xl">관리자 대시보드</h1>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => loadDashboardData()}
-          >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            새로고침
-          </Button>
         </div>
       </header>
 
