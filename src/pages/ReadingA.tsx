@@ -19,11 +19,12 @@ import {
   Sparkles,
   ChevronRight,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  Database
 } from "lucide-react";
 
 interface Question {
-  id: number;
+  id: string;
   passage: string;
   question: string;
   options: string[];
@@ -32,35 +33,44 @@ interface Question {
   explanationVi: string;
 }
 
-// Tab categories - will be populated with i18n
+// Tab categories mapping to part_numbers
+// Reading A: 기초 읽기 (Part 1-5)
+// grammar: part 1-2 (문법 빈칸)
+// vocabulary: part 3 (어휘)
+// topic: part 4-5 (주제/화제)
+// advertisement: part 1-2 (안내문/공고)
 const getTabCategories = (t: (key: string) => string) => ({
   grammar: {
     label: t('reading.tabs.grammar'),
     sublabel: t('reading.tabs.grammarSub'),
     emoji: "📝",
+    partNumbers: [1, 2],
   },
   vocabulary: {
     label: t('reading.tabs.vocabulary'),
     sublabel: t('reading.tabs.vocabularySub'),
     emoji: "📚",
+    partNumbers: [3],
   },
   topic: {
     label: t('reading.tabs.topic'),
     sublabel: t('reading.tabs.topicSub'),
     emoji: "🎯",
+    partNumbers: [4, 5],
   },
   advertisement: {
     label: t('reading.tabs.advertisement'),
     sublabel: t('reading.tabs.advertisementSub'),
     emoji: "📰",
+    partNumbers: [1, 2],
   },
 });
 
-// Fallback questions
+// Fallback questions (minimal - DB should be primary source)
 const fallbackQuestions: Record<string, Question[]> = {
   grammar: [
     {
-      id: 1,
+      id: "fallback-1",
       passage: "저는 매일 아침 7시에 일어나서 운동( ) 합니다.",
       question: "빈칸에 들어갈 알맞은 것을 고르세요.",
       options: ["을", "를", "이", "가"],
@@ -71,7 +81,7 @@ const fallbackQuestions: Record<string, Question[]> = {
   ],
   vocabulary: [
     {
-      id: 1,
+      id: "fallback-2",
       passage: "오늘 날씨가 매우 춥습니다.",
       question: "'매우'와 의미가 비슷한 것을 고르세요.",
       options: ["아주", "조금", "별로", "전혀"],
@@ -82,7 +92,7 @@ const fallbackQuestions: Record<string, Question[]> = {
   ],
   topic: [
     {
-      id: 1,
+      id: "fallback-3",
       passage: "서울에는 많은 박물관이 있습니다. 국립중앙박물관에서는 한국의 역사를 배울 수 있습니다.",
       question: "이 글의 주제는 무엇입니까?",
       options: ["서울의 박물관", "한국의 역사", "한국 전쟁", "서울 여행"],
@@ -93,7 +103,7 @@ const fallbackQuestions: Record<string, Question[]> = {
   ],
   advertisement: [
     {
-      id: 1,
+      id: "fallback-4",
       passage: "📚 서울도서관\n운영: 09:00-21:00\n휴관: 매주 월요일",
       question: "이 안내문에 대한 설명으로 맞는 것은?",
       options: ["월요일에 쉽니다", "24시간 운영합니다", "화요일에 쉽니다", "주말에만 운영합니다"],
@@ -106,6 +116,13 @@ const fallbackQuestions: Record<string, Question[]> = {
 
 type TabKey = "grammar" | "vocabulary" | "topic" | "advertisement";
 type TopikLevel = "1-2" | "3-4" | "5-6";
+
+// Map TopikLevel to exam_type
+const levelToExamType: Record<TopikLevel, string> = {
+  "1-2": "TOPIK_I",
+  "3-4": "TOPIK_II",
+  "5-6": "TOPIK_II",
+};
 
 const ReadingA = () => {
   const navigate = useNavigate();
@@ -121,6 +138,7 @@ const ReadingA = () => {
   const [isQuizComplete, setIsQuizComplete] = useState(false);
   const [questions, setQuestions] = useState<Question[]>(fallbackQuestions.grammar);
   const [isLoading, setIsLoading] = useState(false);
+  const [dbQuestionCount, setDbQuestionCount] = useState(0);
 
   // Get localized data
   const tabCategories = getTabCategories(t);
@@ -130,24 +148,59 @@ const ReadingA = () => {
     "5-6": { label: t('reading.levels.5-6'), sublabel: t('reading.levels.advanced'), color: "from-purple-500 to-pink-500" },
   };
 
-  // RAG에서 문제 가져오기
-  const fetchQuestions = useCallback(async (tabType: string, level: TopikLevel) => {
+  // DB에서 읽기 문제 가져오기
+  const fetchQuestions = useCallback(async (tabType: TabKey, level: TopikLevel) => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('reading-content', {
-        body: { type: 'readingA', tabType, topikLevel: level, count: 5 }
-      });
+      const examType = levelToExamType[level];
+      const partNumbers = tabCategories[tabType].partNumbers;
+
+      // Fetch questions from mock_question_bank
+      const { data, error } = await supabase
+        .from('mock_question_bank')
+        .select('id, question_text, options, correct_answer, explanation_ko, explanation_vi, instruction_text')
+        .eq('section', 'reading')
+        .eq('exam_type', examType)
+        .eq('is_active', true)
+        .in('part_number', partNumbers)
+        .limit(50);
 
       if (error) throw error;
 
-      if (data?.questions && data.questions.length > 0) {
-        setQuestions(data.questions);
-        console.log(`✅ Loaded ${data.questions.length} questions for TOPIK ${level}`);
+      if (data && data.length > 0) {
+        setDbQuestionCount(data.length);
+        
+        // Shuffle and pick 5 random questions
+        const shuffled = [...data].sort(() => Math.random() - 0.5);
+        const selected = shuffled.slice(0, 5);
+
+        const formattedQuestions: Question[] = selected.map((q, idx) => {
+          const opts = Array.isArray(q.options) ? q.options : [];
+          return {
+            id: q.id,
+            passage: q.instruction_text || q.question_text,
+            question: q.instruction_text ? q.question_text : "다음 질문에 답하세요.",
+            options: opts.map((o: any) => typeof o === 'string' ? o : o.text || String(o)),
+            answer: q.correct_answer - 1, // DB is 1-indexed, UI is 0-indexed
+            explanationKo: q.explanation_ko || "해설이 준비 중입니다.",
+            explanationVi: q.explanation_vi || "Giải thích đang được chuẩn bị.",
+          };
+        });
+
+        setQuestions(formattedQuestions);
+        console.log(`✅ DB에서 ${formattedQuestions.length}개 읽기A 문제 로드 (전체: ${data.length}개)`);
       } else {
+        // No DB questions, use fallback
+        setDbQuestionCount(0);
         setQuestions(fallbackQuestions[tabType] || fallbackQuestions.grammar);
+        toast({
+          title: "DB 문제 없음",
+          description: "해당 조건의 문제가 없어 샘플 문제를 사용합니다.",
+        });
       }
     } catch (error) {
-      console.error('Error fetching questions:', error);
+      console.error('Error fetching questions from DB:', error);
+      setDbQuestionCount(0);
       setQuestions(fallbackQuestions[tabType] || fallbackQuestions.grammar);
       toast({
         title: t('reading.usingSampleQuestions'),
@@ -353,9 +406,9 @@ const ReadingA = () => {
                 exit={{ opacity: 0 }}
                 className="rounded-3xl bg-gradient-to-b from-card to-card/50 border border-border/50 shadow-2xl p-12 text-center"
               >
-              <Loader2 className="w-16 h-16 animate-spin text-primary mx-auto mb-6" />
-                <h3 className="text-xl font-bold text-foreground mb-2">{t('reading.loading')}</h3>
-                <p className="text-muted-foreground">{t('reading.loadingDesc')}</p>
+                <Database className="w-16 h-16 animate-pulse text-primary mx-auto mb-6" />
+                <h3 className="text-xl font-bold text-foreground mb-2">문제 불러오는 중...</h3>
+                <p className="text-muted-foreground">DB에서 읽기 문제를 불러오고 있습니다</p>
               </motion.div>
             ) : !currentQuestion ? (
               <motion.div
