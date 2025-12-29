@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -295,11 +295,24 @@ export default function VideoPlayer() {
   const koreanSubtitles = subtitles.find(s => s.language === 'ko')?.subtitles || [];
 
   // Get Korean subtitle at current time for dual mode
-  const getCurrentKoreanSubtitle = (): Subtitle | null => {
+  const koreanSubtitleNow = useMemo(() => {
     if (!dualSubtitle || selectedLanguage === 'ko') return null;
     return koreanSubtitles.find(sub => currentTime >= sub.start && currentTime <= sub.end) || null;
-  };
-  const koreanSubtitleNow = getCurrentKoreanSubtitle();
+  }, [dualSubtitle, selectedLanguage, koreanSubtitles, currentTime]);
+
+  // Debug log
+  useEffect(() => {
+    if (dualSubtitle && selectedLanguage !== 'ko') {
+      console.log('[Dual Subtitle Debug]', {
+        currentTime,
+        selectedLanguage,
+        koreanSubtitles: koreanSubtitles.length,
+        currentSubtitles: currentSubtitles.length,
+        koreanNow: koreanSubtitleNow?.text,
+        translatedNow: currentSubtitle?.text,
+      });
+    }
+  }, [currentTime, dualSubtitle, selectedLanguage]);
 
   if (loading) {
     return (
