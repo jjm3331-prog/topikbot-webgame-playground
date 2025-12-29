@@ -66,6 +66,7 @@ interface Question {
   answer: number;
   explanation: string;
   explanationVi?: string;
+  audioUrl?: string; // Pre-generated audio URL from DB
 }
 
 // Fallback TOPIK style questions
@@ -159,42 +160,163 @@ const ListeningPractice = () => {
   const [listeningQuestions, setListeningQuestions] = useState<Question[]>(fallbackQuestions);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
-  // Fetch RAG-powered listening questions
+  // Fetch pre-generated listening questions from DB (mock_question_bank)
   const fetchListeningQuestions = useCallback(async (level: TopikLevel) => {
     setIsLoadingQuestions(true);
     
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/listening-content`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ count: 5, topikLevel: level }),
-        }
-      );
+      // Map TOPIK level to difficulty
+      const difficultyMap: Record<TopikLevel, string> = {
+        "1-2": "beginner",
+        "3-4": "intermediate",
+        "5-6": "advanced",
+      };
+      const difficulty = difficultyMap[level];
       
-      if (!response.ok) throw new Error('Failed to fetch questions');
+      // Map TOPIK level to exam_type
+      const examType = level === "1-2" ? "TOPIK_I" : "TOPIK_II";
       
-      const data = await response.json();
+      // Query pre-generated questions from mock_question_bank
+      // Randomly select 5 listening questions with matching difficulty
+      const { data: dbQuestions, error } = await supabase
+        .from("mock_question_bank")
+        .select("*")
+        .eq("section", "listening")
+        .eq("exam_type", examType)
+        .eq("is_active", true)
+        .not("question_audio_url", "is", null) // Only questions with audio
+        .order("created_at", { ascending: false })
+        .limit(50); // Get more to randomize
       
-      if (data.success && data.questions?.length > 0) {
-        // Add IDs to questions
-        const questionsWithIds = data.questions.map((q: Question, idx: number) => ({
-          ...q,
-          id: idx + 1,
-        }));
-        setListeningQuestions(questionsWithIds);
-        console.log(`✅ Loaded ${questionsWithIds.length} listening questions for TOPIK ${level}`);
+      if (error) {
+        console.error("DB query error:", error);
+        throw error;
+      }
+      
+      if (dbQuestions && dbQuestions.length > 0) {
+        // Randomly shuffle and pick 5 questions
+        const shuffled = dbQuestions.sort(() => Math.random() - 0.5);
+        const selected = shuffled.slice(0, 5);
+        
+        // Transform DB format to component format
+        const transformedQuestions: Question[] = selected.map((q, idx) => {
+          // Parse listening_script to extract dialogue
+          const script = (q as any).listening_script || "";
+          const lines = script.split(/\\n|\n/).filter((l: string) => l.trim());
+          
+          // Check if it's a dialogue or monologue
+          const isDialogue = lines.some((line: string) => 
+            line.includes("남자:") || line.includes("남:") || 
+            line.includes("여자:") || line.includes("여:")
+          );
+          
+          if (isDialogue && lines.length >= 2) {
+            // Extract speaker lines
+            const speaker1Text = lines[0]?.replace(/^(남자:|남:|여자:|여:)\s*/, "") || "";
+            const speaker2Text = lines[1]?.replace(/^(남자:|남:|여자:|여:)\s*/, "") || "";
+            
+            return {
+              id: idx + 1,
+              type: "dialogue" as const,
+              speaker1Text,
+              speaker2Text,
+              question: q.question_text,
+              options: (q.options as string[]) || [],
+              answer: (q.correct_answer || 1) - 1, // DB uses 1-indexed, component uses 0-indexed
+              explanation: q.explanation_ko || "",
+              explanationVi: q.explanation_vi || "",
+              audioUrl: q.question_audio_url,
+            };
+          } else {
+            // Single speaker / monologue
+            return {
+              id: idx + 1,
+              type: "single" as const,
+              singleText: script.replace(/^(남자:|남:|여자:|여:|화자:)\s*/gm, "").trim() || q.question_text,
+              question: q.question_text,
+              options: (q.options as string[]) || [],
+              answer: (q.correct_answer || 1) - 1,
+              explanation: q.explanation_ko || "",
+              explanationVi: q.explanation_vi || "",
+              audioUrl: q.question_audio_url,
+            };
+          }
+        });
+        
+        setListeningQuestions(transformedQuestions);
+        console.log(`✅ Loaded ${transformedQuestions.length} pre-generated listening questions from DB`);
       } else {
-        setListeningQuestions(fallbackQuestions);
+        // Fallback: try without audio filter
+        const { data: fallbackDbQuestions, error: fallbackError } = await supabase
+          .from("mock_question_bank")
+          .select("*")
+          .eq("section", "listening")
+          .eq("is_active", true)
+          .order("created_at", { ascending: false })
+          .limit(30);
+        
+        if (fallbackDbQuestions && fallbackDbQuestions.length > 0) {
+          const shuffled = fallbackDbQuestions.sort(() => Math.random() - 0.5);
+          const selected = shuffled.slice(0, 5);
+          
+          const transformedQuestions: Question[] = selected.map((q, idx) => {
+            const script = (q as any).listening_script || "";
+            const lines = script.split(/\\n|\n/).filter((l: string) => l.trim());
+            const isDialogue = lines.some((line: string) => 
+              line.includes("남자:") || line.includes("남:") || 
+              line.includes("여자:") || line.includes("여:")
+            );
+            
+            if (isDialogue && lines.length >= 2) {
+              const speaker1Text = lines[0]?.replace(/^(남자:|남:|여자:|여:)\s*/, "") || "";
+              const speaker2Text = lines[1]?.replace(/^(남자:|남:|여자:|여:)\s*/, "") || "";
+              
+              return {
+                id: idx + 1,
+                type: "dialogue" as const,
+                speaker1Text,
+                speaker2Text,
+                question: q.question_text,
+                options: (q.options as string[]) || [],
+                answer: (q.correct_answer || 1) - 1,
+                explanation: q.explanation_ko || "",
+                explanationVi: q.explanation_vi || "",
+                audioUrl: q.question_audio_url,
+              };
+            } else {
+              return {
+                id: idx + 1,
+                type: "single" as const,
+                singleText: script.replace(/^(남자:|남:|여자:|여:|화자:)\s*/gm, "").trim() || q.question_text,
+                question: q.question_text,
+                options: (q.options as string[]) || [],
+                answer: (q.correct_answer || 1) - 1,
+                explanation: q.explanation_ko || "",
+                explanationVi: q.explanation_vi || "",
+                audioUrl: q.question_audio_url,
+              };
+            }
+          });
+          
+          setListeningQuestions(transformedQuestions);
+          console.log(`✅ Loaded ${transformedQuestions.length} listening questions (without audio filter)`);
+        } else {
+          console.log("No questions in DB, using fallback");
+          setListeningQuestions(fallbackQuestions);
+        }
       }
     } catch (error) {
-      console.error('Error fetching listening questions:', error);
+      console.error('Error fetching listening questions from DB:', error);
       setListeningQuestions(fallbackQuestions);
+      toast({
+        title: "DB 문제 로드 실패",
+        description: "기본 문제로 연습합니다.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoadingQuestions(false);
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -273,9 +395,55 @@ const ListeningPractice = () => {
     });
   };
 
+  // Play pre-generated audio URL directly
+  const playPreGeneratedAudio = async (audioUrl: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      try {
+        setIsLoading(true);
+        const audio = new Audio(audioUrl);
+        audio.playbackRate = ttsSpeed;
+        
+        audio.oncanplaythrough = () => {
+          setIsLoading(false);
+          setIsPlaying(true);
+          audio.play();
+        };
+        
+        audio.onended = () => {
+          setIsPlaying(false);
+          resolve();
+        };
+        
+        audio.onerror = () => {
+          setIsPlaying(false);
+          setIsLoading(false);
+          reject(new Error("Audio playback failed"));
+        };
+        
+        audio.load();
+      } catch (error) {
+        setIsLoading(false);
+        setIsPlaying(false);
+        reject(error);
+      }
+    });
+  };
+
   const playFullAudio = async () => {
     setPlayedAudio(true);
     
+    // If pre-generated audio exists, use it (more stable, no LLM cost)
+    if (currentQuestion.audioUrl) {
+      try {
+        await playPreGeneratedAudio(currentQuestion.audioUrl);
+        return;
+      } catch (error) {
+        console.error("Pre-generated audio failed, falling back to TTS:", error);
+        // Fall through to TTS fallback
+      }
+    }
+    
+    // Fallback: Generate TTS on-the-fly (for questions without pre-generated audio)
     if (currentQuestion.type === "dialogue") {
       if (currentQuestion.speaker1Text) {
         // Speaker 1 is male (Daniel)
