@@ -23,6 +23,7 @@ import {
   Search,
   Mic,
   Swords,
+  Smartphone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -59,6 +60,7 @@ const baseMenuCategories: MenuCategory[] = [
     emoji: "📚",
     items: [
       { icon: Sparkles, labelKey: "menu.items.learningHub", href: "/learning-hub", isHighlight: true },
+      { icon: Smartphone, labelKey: "menu.items.shorts", href: "/shorts", isHighlight: true },
       { icon: MessageSquare, labelKey: "menu.items.community", href: "/board-hub", isHighlight: true },
     ]
   },
