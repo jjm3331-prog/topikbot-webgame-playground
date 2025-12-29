@@ -1,18 +1,15 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import CleanHeader from '@/components/CleanHeader';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ChevronLeft, Globe, BookOpen, Volume2, Mic, Play, Eye, ArrowRight, Sparkles } from 'lucide-react';
+import { ChevronLeft, Globe, BookOpen, Volume2, Play, Eye, MessageSquareText, Lightbulb, GraduationCap, Languages } from 'lucide-react';
 import { toast } from 'sonner';
-import WordPopup from '@/components/shorts/WordPopup';
-import ShadowingMode from '@/components/shorts/ShadowingMode';
 
 interface ShortsVideo {
   id: string;
@@ -31,11 +28,6 @@ interface Subtitle {
 interface SubtitleData {
   language: string;
   subtitles: Subtitle[];
-}
-
-interface WordPopupState {
-  word: string;
-  position: { x: number; y: number };
 }
 
 const LANGUAGES = [
@@ -67,12 +59,6 @@ export default function ShortsPlayer() {
   const [currentTime, setCurrentTime] = useState(0);
   const [ytReady, setYtReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-
-  // Word popup state
-  const [wordPopup, setWordPopup] = useState<WordPopupState | null>(null);
-
-  // Active tab
-  const [activeTab, setActiveTab] = useState<'subtitles' | 'shadowing'>('subtitles');
 
   const playerRef = useRef<any>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -201,30 +187,10 @@ export default function ShortsPlayer() {
     playerRef.current?.seekTo?.(time, true);
   }, []);
 
-  const pauseVideo = useCallback(() => {
-    playerRef.current?.pauseVideo?.();
-  }, []);
-
-  const playVideo = useCallback(() => {
-    playerRef.current?.playVideo?.();
-  }, []);
-
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = Math.floor(seconds % 60);
     return `${m}:${s.toString().padStart(2, '0')}`;
-  };
-
-  // Word click handler
-  const handleWordClick = (word: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-    const cleanWord = word.replace(/[^\uAC00-\uD7AF]/g, '');
-    if (cleanWord.length === 0) return;
-
-    setWordPopup({
-      word: cleanWord,
-      position: { x: event.clientX, y: event.clientY },
-    });
   };
 
   // Get current subtitles for selected language
@@ -256,25 +222,15 @@ export default function ShortsPlayer() {
     return LANGUAGES.filter(l => available.has(l.code));
   }, [subtitles]);
 
-  // Render clickable words in subtitle
-  const renderClickableText = (text: string, isKorean: boolean) => {
-    if (!isKorean) return text;
-
-    const words = text.split(/(\s+)/);
-    return words.map((word, i) => {
-      const isWord = /[\uAC00-\uD7AF]/.test(word);
-      if (!isWord) return word;
-
-      return (
-        <span
-          key={i}
-          onClick={(e) => handleWordClick(word, e)}
-          className="cursor-pointer hover:bg-primary/20 hover:text-primary rounded px-0.5 transition-colors"
-        >
-          {word}
-        </span>
-      );
-    });
+  // Speak Korean text
+  const speakText = (text: string) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ko-KR';
+      utterance.rate = 0.85;
+      window.speechSynthesis.speak(utterance);
+    }
   };
 
   if (loading) {
@@ -297,8 +253,6 @@ export default function ShortsPlayer() {
   }
 
   if (!video) return null;
-
-  const selectedLangInfo = LANGUAGES.find(l => l.code === selectedLanguage);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -374,7 +328,7 @@ export default function ShortsPlayer() {
               </motion.div>
             </motion.div>
 
-            {/* Right: Controls & Subtitles */}
+            {/* Right: Language Selector & Subtitle Timeline */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -431,153 +385,215 @@ export default function ShortsPlayer() {
                 )}
               </div>
 
-              {/* Mode Tabs */}
-              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
-                <TabsList className="grid w-full grid-cols-2 h-14 p-1.5 bg-muted/50 rounded-2xl">
-                  <TabsTrigger 
-                    value="subtitles" 
-                    className="gap-2 rounded-xl text-sm font-semibold data-[state=active]:bg-background data-[state=active]:shadow-lg transition-all"
-                  >
-                    <BookOpen className="w-4 h-4" />
-                    자막 학습
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="shadowing" 
-                    className="gap-2 rounded-xl text-sm font-semibold data-[state=active]:bg-background data-[state=active]:shadow-lg transition-all"
-                  >
-                    <Mic className="w-4 h-4" />
-                    섀도잉 연습
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="subtitles" className="mt-4">
-                  {/* Subtitle List */}
-                  <div className="rounded-3xl bg-card border border-border/50 shadow-lg overflow-hidden">
-                    <div className="p-5 border-b border-border/50">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-secondary to-korean-cyan flex items-center justify-center">
-                            <BookOpen className="w-5 h-5 text-white" />
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-foreground">자막 타임라인</h3>
-                            <p className="text-xs text-muted-foreground">클릭하여 해당 구간으로 이동</p>
-                          </div>
-                        </div>
-                        <Badge variant="secondary" className="gap-1">
-                          <Sparkles className="w-3 h-3" />
-                          단어 클릭 = 뜻 보기
-                        </Badge>
-                      </div>
+              {/* Subtitle Timeline */}
+              <div className="rounded-3xl bg-card border border-border/50 shadow-lg overflow-hidden">
+                <div className="p-5 border-b border-border/50">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-secondary to-korean-cyan flex items-center justify-center">
+                      <BookOpen className="w-5 h-5 text-white" />
                     </div>
-                    
-                    <ScrollArea className="h-[45vh] md:h-[50vh]">
-                      <div className="p-4 space-y-2">
-                        {currentSubtitles.map((sub, idx) => {
-                          const isActive = idx === activeIndex;
-                          const koreanText = koreanSubtitles[idx]?.text;
-                          const showDual = selectedLanguage !== 'ko' && koreanText;
+                    <div>
+                      <h3 className="font-semibold text-foreground">자막 타임라인</h3>
+                      <p className="text-xs text-muted-foreground">클릭하여 해당 구간으로 이동</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <ScrollArea className="h-[40vh] md:h-[45vh]">
+                  <div className="p-4 space-y-2">
+                    {currentSubtitles.map((sub, idx) => {
+                      const isActive = idx === activeIndex;
+                      const koreanText = koreanSubtitles[idx]?.text;
+                      const showDual = selectedLanguage !== 'ko' && koreanText;
 
-                          return (
-                            <motion.button
-                              key={idx}
-                              ref={isActive ? activeSubRef : null}
-                              onClick={() => seekTo(sub.start)}
-                              className={`
-                                w-full text-left p-4 rounded-2xl transition-all duration-300 group
-                                ${isActive 
-                                  ? 'bg-gradient-to-r from-primary/10 to-primary/5 ring-2 ring-primary shadow-lg shadow-primary/10' 
-                                  : 'bg-muted/30 hover:bg-muted/60'
-                                }
-                              `}
-                              animate={isActive ? { scale: 1.01 } : { scale: 1 }}
-                              whileHover={{ x: 4 }}
-                            >
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className={`
-                                  px-2.5 py-1 rounded-lg text-xs font-mono font-semibold
-                                  ${isActive ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'}
-                                `}>
-                                  {formatTime(sub.start)}
-                                </span>
-                                {isActive && (
-                                  <motion.span
-                                    initial={{ opacity: 0, scale: 0.8 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary text-white text-xs font-medium"
-                                  >
-                                    <Volume2 className="w-3 h-3" />
-                                    재생 중
-                                  </motion.span>
-                                )}
-                                <ArrowRight className={`
-                                  w-4 h-4 ml-auto transition-all
-                                  ${isActive ? 'text-primary opacity-100' : 'text-muted-foreground opacity-0 group-hover:opacity-100'}
-                                `} />
-                              </div>
-                              
-                              {/* Main subtitle */}
-                              <p className={`font-medium leading-relaxed ${isActive ? 'text-foreground' : 'text-foreground/80'}`}>
-                                {selectedLanguage === 'ko' 
-                                  ? renderClickableText(sub.text, true)
-                                  : sub.text
-                                }
-                              </p>
-                              
-                              {/* Korean (dual mode) */}
-                              {showDual && (
-                                <p className="text-sm text-muted-foreground mt-2 pt-2 border-t border-border/30">
-                                  🇰🇷 {renderClickableText(koreanText!, true)}
-                                </p>
-                              )}
-                            </motion.button>
-                          );
-                        })}
-
-                        {currentSubtitles.length === 0 && (
-                          <div className="flex flex-col items-center justify-center py-16 text-center">
-                            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                              <Globe className="w-8 h-8 text-muted-foreground" />
-                            </div>
-                            <p className="text-muted-foreground">
-                              선택한 언어의 자막이 없습니다
-                            </p>
+                      return (
+                        <motion.button
+                          key={idx}
+                          ref={isActive ? activeSubRef : null}
+                          onClick={() => seekTo(sub.start)}
+                          className={`
+                            w-full text-left p-4 rounded-2xl transition-all duration-300 group
+                            ${isActive 
+                              ? 'bg-gradient-to-r from-primary/10 to-primary/5 ring-2 ring-primary shadow-lg shadow-primary/10' 
+                              : 'bg-muted/30 hover:bg-muted/60'
+                            }
+                          `}
+                          animate={isActive ? { scale: 1.01 } : { scale: 1 }}
+                          whileHover={{ x: 4 }}
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className={`
+                              px-2.5 py-1 rounded-lg text-xs font-mono font-semibold
+                              ${isActive ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'}
+                            `}>
+                              {formatTime(sub.start)}
+                            </span>
+                            {isActive && (
+                              <motion.span
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary text-white text-xs font-medium"
+                              >
+                                <Volume2 className="w-3 h-3" />
+                                재생 중
+                              </motion.span>
+                            )}
                           </div>
-                        )}
-                      </div>
-                    </ScrollArea>
-                  </div>
-                </TabsContent>
+                          
+                          {/* Main subtitle */}
+                          <p className={`font-medium leading-relaxed ${isActive ? 'text-foreground' : 'text-foreground/80'}`}>
+                            {sub.text}
+                          </p>
+                          
+                          {/* Korean (dual mode) */}
+                          {showDual && (
+                            <p className="text-sm text-muted-foreground mt-2 pt-2 border-t border-border/30">
+                              🇰🇷 {koreanText}
+                            </p>
+                          )}
+                        </motion.button>
+                      );
+                    })}
 
-                <TabsContent value="shadowing" className="mt-4">
-                  <div className="rounded-3xl bg-card border border-border/50 shadow-lg overflow-hidden">
-                    <ShadowingMode
-                      subtitles={koreanSubtitles}
-                      currentTime={currentTime}
-                      onSeekTo={seekTo}
-                      onPause={pauseVideo}
-                      onPlay={playVideo}
-                      isPlaying={isPlaying}
-                    />
+                    {currentSubtitles.length === 0 && (
+                      <div className="flex flex-col items-center justify-center py-16 text-center">
+                        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                          <Globe className="w-8 h-8 text-muted-foreground" />
+                        </div>
+                        <p className="text-muted-foreground">
+                          선택한 언어의 자막이 없습니다
+                        </p>
+                      </div>
+                    )}
                   </div>
-                </TabsContent>
-              </Tabs>
+                </ScrollArea>
+              </div>
             </motion.div>
           </div>
+
+          {/* Learning Section - Below Player */}
+          {koreanSubtitles.length > 0 && (
+            <motion.section
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="mt-12"
+            >
+              <div className="text-center mb-8">
+                <Badge variant="outline" className="mb-4 px-4 py-1.5">
+                  <GraduationCap className="w-4 h-4 mr-2" />
+                  학습 콘텐츠
+                </Badge>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                  이 영상에서 배울 수 있는 표현
+                </h2>
+                <p className="text-muted-foreground mt-2">
+                  영상 속 핵심 문장들을 정리했어요
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {koreanSubtitles.slice(0, 9).map((sub, idx) => {
+                  const translatedText = subtitles.find(s => s.language === (selectedLanguage === 'ko' ? 'en' : selectedLanguage))?.subtitles[idx]?.text;
+                  
+                  return (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 * idx }}
+                      className="group relative p-5 rounded-2xl bg-card border border-border/50 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
+                    >
+                      {/* Index Badge */}
+                      <div className="absolute -top-2 -left-2 w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center text-white text-sm font-bold shadow-lg">
+                        {idx + 1}
+                      </div>
+
+                      {/* Actions */}
+                      <div className="absolute top-3 right-3 flex gap-1">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            speakText(sub.text);
+                          }}
+                          className="p-2 rounded-xl bg-muted/50 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
+                          title="발음 듣기"
+                        >
+                          <Volume2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            seekTo(sub.start);
+                          }}
+                          className="p-2 rounded-xl bg-muted/50 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
+                          title="영상에서 보기"
+                        >
+                          <Play className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      {/* Time */}
+                      <span className="inline-block px-2.5 py-1 rounded-lg bg-muted text-xs font-mono text-muted-foreground mb-3">
+                        {formatTime(sub.start)}
+                      </span>
+
+                      {/* Korean Text */}
+                      <p className="text-lg font-medium text-foreground leading-relaxed mb-3">
+                        {sub.text}
+                      </p>
+
+                      {/* Translation */}
+                      {translatedText && (
+                        <div className="flex items-start gap-2 pt-3 border-t border-border/50">
+                          <Languages className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                          <p className="text-sm text-muted-foreground">
+                            {translatedText}
+                          </p>
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </div>
+
+              {koreanSubtitles.length > 9 && (
+                <div className="text-center mt-8">
+                  <p className="text-sm text-muted-foreground">
+                    총 {koreanSubtitles.length}개의 문장 중 9개를 표시 중
+                  </p>
+                </div>
+              )}
+
+              {/* Learning Tips */}
+              <div className="mt-10 p-6 rounded-3xl bg-gradient-to-br from-primary/5 to-secondary/5 border border-border/50">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-korean-orange flex items-center justify-center shrink-0">
+                    <Lightbulb className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground mb-2">학습 Tip</h3>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                        문장의 <span className="font-medium text-foreground">발음 버튼</span>을 눌러 원어민 발음을 들어보세요
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                        <span className="font-medium text-foreground">재생 버튼</span>을 누르면 해당 장면으로 바로 이동해요
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                        영상을 보면서 따라 말해보는 연습을 해보세요
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </motion.section>
+          )}
         </div>
       </main>
-
-      {/* Word Popup */}
-      <AnimatePresence>
-        {wordPopup && (
-          <WordPopup
-            word={wordPopup.word}
-            position={wordPopup.position}
-            onClose={() => setWordPopup(null)}
-            videoId={videoId}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }
