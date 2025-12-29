@@ -402,25 +402,20 @@ export default function VideoPlayer() {
                     key={`${currentSubtitle?.start}-${koreanSubtitleNow?.start}`}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="absolute bottom-4 left-0 right-0 px-4 z-50"
+                    className={`absolute left-0 right-0 px-4 z-50 ${hideBurnedInSubs ? 'bottom-24' : 'bottom-4'}`}
                   >
                     <div className="bg-gradient-to-r from-black/90 to-black/80 backdrop-blur-md text-white text-center py-4 px-8 rounded-xl max-w-3xl mx-auto space-y-2 border border-white/10 shadow-2xl">
-                      {/* Korean (support line) */}
+                      {/* Selected language (main line) - ALWAYS the translation in dual mode */}
+                      {currentSubtitle && (
+                        <p className={`font-semibold ${dualSubtitle && selectedLanguage !== 'ko' ? 'text-xl sm:text-2xl text-yellow-400' : 'text-xl sm:text-2xl text-white'}`}>
+                          {currentSubtitle.text}
+                        </p>
+                      )}
+
+                      {/* Korean (support line) - show under translation */}
                       {dualSubtitle && selectedLanguage !== 'ko' && koreanSubtitleNow && (
                         <p className="text-base sm:text-lg font-medium text-white/90">
                           {koreanSubtitleNow.text}
-                        </p>
-                      )}
-                      {/* Selected language (main line) */}
-                      {currentSubtitle && (
-                        <p
-                          className={`font-semibold ${
-                            dualSubtitle && selectedLanguage !== 'ko'
-                              ? 'text-xl sm:text-2xl text-yellow-400'
-                              : 'text-xl sm:text-2xl text-white'
-                          }`}
-                        >
-                          {currentSubtitle.text}
                         </p>
                       )}
                     </div>
