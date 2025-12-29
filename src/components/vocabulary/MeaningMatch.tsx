@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,11 +43,14 @@ const MeaningMatch = ({ level, onMistake }: MeaningMatchProps) => {
   // Current round words (5 at a time)
   const [currentWords, setCurrentWords] = useState<VocabWord[]>([]);
   const [shuffledMeanings, setShuffledMeanings] = useState<MatchPair[]>([]);
+  
+  // 세션 내 이미 본 단어 ID 추적 (중복 방지)
+  const sessionSeenWords = useRef<Set<string>>(new Set());
 
   const currentLang = getCurrentLanguage();
   const totalRounds = Math.ceil(words.length / 5);
 
-  // Fetch vocabulary from DB
+  // Fetch vocabulary from DB with deduplication
   const fetchWords = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -56,13 +59,26 @@ const MeaningMatch = ({ level, onMistake }: MeaningMatchProps) => {
         .select('*')
         .eq('level', level)
         .order('seq_no')
-        .limit(50);
+        .limit(100); // 더 많이 가져와서 중복 제거 후 필터링
 
       if (error) throw error;
 
       if (data && data.length > 0) {
-        const shuffled = [...data].sort(() => Math.random() - 0.5);
-        setWords(shuffled.slice(0, 20) as VocabWord[]);
+        // 세션 내 이미 본 단어 제외
+        const unseenWords = data.filter(w => !sessionSeenWords.current.has(w.id));
+        
+        console.log(`[MeaningMatch] Level ${level}: ${unseenWords.length}/${data.length} new words`);
+        
+        // 충분한 단어가 있으면 미본 단어만 사용
+        const wordsToUse = unseenWords.length >= 20 ? unseenWords : data;
+        
+        const shuffled = [...wordsToUse].sort(() => Math.random() - 0.5);
+        const selected = shuffled.slice(0, 20) as VocabWord[];
+        
+        // 선택된 단어들을 세션 기록에 추가
+        selected.forEach(w => sessionSeenWords.current.add(w.id));
+        
+        setWords(selected);
       } else {
         setWords([]);
       }

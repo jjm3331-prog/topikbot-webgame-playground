@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,11 +43,14 @@ const MiniCloze = ({ level, onMistake }: MiniClozeProps) => {
   const [streak, setStreak] = useState(0);
   const [sessionComplete, setSessionComplete] = useState(false);
   const [options, setOptions] = useState<string[]>([]);
+  
+  // 세션 내 이미 본 문제 ID 추적 (중복 방지)
+  const sessionSeenQuestions = useRef<Set<string>>(new Set());
 
   const currentQuestion = useVocabMode ? vocabQuestions[currentIndex] : questions[currentIndex];
   const currentLang = getCurrentLanguage();
 
-  // Fetch cloze questions from DB, fallback to vocab-based
+  // Fetch cloze questions from DB, fallback to vocab-based, with deduplication
   const fetchQuestions = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -56,11 +59,21 @@ const MiniCloze = ({ level, onMistake }: MiniClozeProps) => {
         .from('cloze_questions')
         .select('*')
         .eq('level', level)
-        .limit(20);
+        .limit(50); // 더 많이 가져와서 중복 제거
 
       if (!clozeError && clozeData && clozeData.length > 0) {
-        const shuffled = [...clozeData].sort(() => Math.random() - 0.5);
-        setQuestions(shuffled.slice(0, 10));
+        // 세션 내 이미 본 문제 제외
+        const unseenQuestions = clozeData.filter(q => !sessionSeenQuestions.current.has(q.id));
+        console.log(`[MiniCloze] Level ${level}: ${unseenQuestions.length}/${clozeData.length} new cloze questions`);
+        
+        const questionsToUse = unseenQuestions.length >= 10 ? unseenQuestions : clozeData;
+        const shuffled = [...questionsToUse].sort(() => Math.random() - 0.5);
+        const selected = shuffled.slice(0, 10);
+        
+        // 선택된 문제들을 세션 기록에 추가
+        selected.forEach(q => sessionSeenQuestions.current.add(q.id));
+        
+        setQuestions(selected);
         setUseVocabMode(false);
       } else {
         // Fallback: Generate from vocabulary
@@ -70,11 +83,21 @@ const MiniCloze = ({ level, onMistake }: MiniClozeProps) => {
           .eq('level', level)
           .not('example_phrase', 'is', null)
           .order('seq_no')
-          .limit(50);
+          .limit(100); // 더 많이 가져와서 중복 제거
 
         if (!vocabError && vocabData && vocabData.length > 0) {
-          const shuffled = [...vocabData].sort(() => Math.random() - 0.5);
-          setVocabQuestions(shuffled.slice(0, 10) as VocabWord[]);
+          // 세션 내 이미 본 어휘 제외
+          const unseenVocab = vocabData.filter(v => !sessionSeenQuestions.current.has(v.id));
+          console.log(`[MiniCloze] Level ${level}: ${unseenVocab.length}/${vocabData.length} new vocab`);
+          
+          const vocabToUse = unseenVocab.length >= 10 ? unseenVocab : vocabData;
+          const shuffled = [...vocabToUse].sort(() => Math.random() - 0.5);
+          const selected = shuffled.slice(0, 10) as VocabWord[];
+          
+          // 선택된 어휘들을 세션 기록에 추가
+          selected.forEach(v => sessionSeenQuestions.current.add(v.id));
+          
+          setVocabQuestions(selected);
           setUseVocabMode(true);
         } else {
           setQuestions([]);
