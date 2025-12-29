@@ -66,13 +66,14 @@ interface SubtitleData {
 }
 
 const LANGUAGES = [
+  { code: 'ko', name: '한국어', flag: '🇰🇷', gradient: 'from-slate-700 to-slate-900' },
   { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳', gradient: 'from-red-500 to-yellow-500' },
   { code: 'en', name: 'English', flag: '🇺🇸', gradient: 'from-blue-500 to-indigo-500' },
   { code: 'ja', name: '日本語', flag: '🇯🇵', gradient: 'from-pink-500 to-red-500' },
   { code: 'zh', name: '中文', flag: '🇨🇳', gradient: 'from-red-500 to-orange-500' },
   { code: 'ru', name: 'Русский', flag: '🇷🇺', gradient: 'from-blue-500 to-red-500' },
   { code: 'uz', name: "O'zbek", flag: '🇺🇿', gradient: 'from-cyan-500 to-green-500' },
-];
+] as const;
 
 const CATEGORY_LABELS: Record<string, string> = {
   kdrama: 'K드라마',
@@ -87,13 +88,13 @@ const CATEGORY_LABELS: Record<string, string> = {
 export default function ShortsPlayer() {
   const { videoId } = useParams<{ videoId: string }>();
   const navigate = useNavigate();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const normalizeLang = (code: string) => {
-    const base = (code || 'vi').split('-')[0].toLowerCase();
+    const base = (code || 'ko').split('-')[0].toLowerCase();
     if (base === 'vn') return 'vi';
     if (base === 'cn') return 'zh';
-    if (base === 'ko') return 'vi';
+    if (base === 'kr') return 'ko';
     return base;
   };
 
@@ -115,6 +116,10 @@ export default function ShortsPlayer() {
       fetchSubtitles();
     }
   }, [videoId]);
+
+  useEffect(() => {
+    setSelectedLanguage(normalizeLang(i18n.language));
+  }, [i18n.language]);
 
   useEffect(() => {
     if ((window as any).YT?.Player) {
@@ -176,7 +181,7 @@ export default function ShortsPlayer() {
       setVideo(data);
     } catch (error) {
       console.error('Error fetching video:', error);
-      toast.error('영상을 찾을 수 없습니다');
+      toast.error(t('videoPlayer.videoNotFound'));
       navigate('/shorts');
     } finally {
       setLoading(false);
@@ -220,12 +225,8 @@ export default function ShortsPlayer() {
     return subtitles.find(s => s.language === 'ko')?.subtitles || [];
   }, [subtitles]);
 
-  // 현재 앱 언어만 표시 (영어는 제외하고 해당 언어 페이지의 언어만)
-  const availableLanguages = useMemo(() => {
-    const currentAppLang = normalizeLang(i18n.language);
-    // 현재 앱 언어만 반환 (해당 국가 페이지에서는 그 언어만)
-    return LANGUAGES.filter(l => l.code === currentAppLang);
-  }, [i18n.language]);
+  // Show all supported learning languages (7+Korean)
+  const availableLanguages = useMemo(() => LANGUAGES, []);
 
   const fetchLearningContent = useCallback(async () => {
     if (!videoId || koreanSubtitles.length === 0) return;
@@ -323,7 +324,7 @@ export default function ShortsPlayer() {
               className="group gap-1.5 text-muted-foreground hover:text-foreground"
             >
               <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              <span>목록으로</span>
+              <span>{t('videoPlayer.backToHub')}</span>
             </Button>
           </motion.div>
 
@@ -360,10 +361,10 @@ export default function ShortsPlayer() {
                 <h1 className="text-base md:text-lg font-bold text-foreground leading-snug line-clamp-2">
                   {video.title}
                 </h1>
-                <div className="flex items-center justify-center gap-3 mt-2 text-xs text-muted-foreground">
+                 <div className="flex items-center justify-center gap-3 mt-2 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Eye className="w-3.5 h-3.5" />
-                    {video.view_count.toLocaleString()}회
+                    {video.view_count.toLocaleString()} {t('videoPlayer.views')}
                   </span>
                   <Badge variant="secondary" className="text-xs px-2 py-0.5">
                     {getCategoryLabel(video.category)}
@@ -387,7 +388,7 @@ export default function ShortsPlayer() {
                       <Languages className="w-4 h-4 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-semibold text-foreground">학습 언어</h3>
+                      <h3 className="text-sm font-semibold text-foreground">{t('videoPlayer.subtitleLanguage')}</h3>
                     </div>
                   </div>
                   
