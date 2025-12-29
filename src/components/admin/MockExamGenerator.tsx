@@ -305,7 +305,7 @@ const MockExamGenerator = () => {
     }
   }, []);
 
-  // Generate questions using AI with streaming
+  // Generate questions using AI with streaming - PRODUCTION LEVEL
   const handleGenerate = async () => {
     if (!examRound.trim()) {
       toast({
@@ -321,21 +321,28 @@ const MockExamGenerator = () => {
     setValidationResults([]);
     setSelectedQuestions(new Set());
     setStreamingContent("");
-    setGenState({ step: "generating", progress: 10, message: "🚀 AI 문제 생성 시작..." });
+    setGenState({ step: "generating", progress: 5, message: "🚀 AI 문제 생성 시작..." });
 
     abortControllerRef.current = new AbortController();
+    const timeoutDuration = 300000; // 5 minutes timeout for large batches
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
-      // Step 1: Generate questions with streaming
-      const generateResponse = await fetch(
+      if (!session?.access_token) {
+        throw new Error("인증 세션이 없습니다. 다시 로그인해주세요.");
+      }
+      
+      setGenState({ step: "rag", progress: 10, message: "📚 RAG 검색 중..." });
+
+      // Step 1: Generate questions with streaming + timeout
+      const generatePromise = fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mock-exam-generate`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${session?.access_token}`,
+            "Authorization": `Bearer ${session.access_token}`,
           },
           body: JSON.stringify({
             examType,
@@ -348,7 +355,6 @@ const MockExamGenerator = () => {
             examRound: parseInt(examRound, 10),
             referenceDocContent: referenceContent || undefined,
             ttsPreset: section === 'listening' ? ttsPreset : undefined,
-            // 듣기 세부 설정
             listeningQuestionType: section === 'listening' ? listeningQuestionType : undefined,
             dialogueLength: section === 'listening' ? dialogueLength : undefined,
             speakerCount: section === 'listening' ? speakerCount : undefined,
@@ -358,17 +364,32 @@ const MockExamGenerator = () => {
         }
       );
 
+      // Timeout wrapper
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error("요청 시간 초과 (5분). 문제 수를 줄이거나 다시 시도해주세요.")), timeoutDuration);
+      });
+
+      const generateResponse = await Promise.race([generatePromise, timeoutPromise]) as Response;
+
       if (!generateResponse.ok) {
-        const errorData = await generateResponse.json();
-        throw new Error(errorData.error || "문제 생성 실패");
+        const errorText = await generateResponse.text();
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { error: errorText || `HTTP ${generateResponse.status}` };
+        }
+        throw new Error(errorData.error || `문제 생성 실패 (${generateResponse.status})`);
       }
 
       let generatedData: any = null;
+      let lastProgress = 10;
 
       await processSSEStream(
         generateResponse,
         (step, progress, message) => {
-          setGenState({ step: step as any, progress, message, tokenCount: undefined });
+          lastProgress = Math.max(lastProgress, progress);
+          setGenState({ step: step as any, progress: lastProgress, message, tokenCount: undefined });
         },
         (content) => {
           setStreamingContent(prev => prev + content);
@@ -377,6 +398,7 @@ const MockExamGenerator = () => {
           generatedData = data;
           if (data.questions) {
             setGeneratedQuestions(data.questions);
+            console.log(`✅ ${data.questions.length}개 문제 생성 완료`);
           }
         },
         (error) => {
@@ -385,91 +407,108 @@ const MockExamGenerator = () => {
       );
 
       if (!generatedData?.questions || generatedData.questions.length === 0) {
-        throw new Error("생성된 문제가 없습니다.");
+        throw new Error("생성된 문제가 없습니다. 다시 시도해주세요.");
       }
 
-      // Step 2: Validate questions with streaming
+      // Step 2: Validate questions with streaming (optional, can fail gracefully)
       setGenState({ step: "validating", progress: 60, message: "🔍 AI 검증 시작..." });
       setStreamingContent("");
 
-      const validateResponse = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mock-exam-validate`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${session?.access_token}`,
-          },
-          body: JSON.stringify({
-            questions: generatedData.questions,
-            examType,
-            section,
-            stream: true,
-          }),
-          signal: abortControllerRef.current.signal,
-        }
-      );
-
-      if (!validateResponse.ok) {
-        console.warn("Validation request failed, using generated questions as-is");
-        setSelectedQuestions(new Set(generatedData.questions.map((_: any, i: number) => i)));
-      } else {
-        let validateData: any = null;
-
-        await processSSEStream(
-          validateResponse,
-          (step, progress, message) => {
-            setGenState({ step: "validating", progress: 60 + (progress * 0.4), message });
-          },
-          (content) => {
-            setStreamingContent(prev => prev + content);
-          },
-          (data) => {
-            validateData = data;
-          },
-          (error) => {
-            console.warn("Validation stream error:", error);
+      try {
+        const validateResponse = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mock-exam-validate`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({
+              questions: generatedData.questions,
+              examType,
+              section,
+              stream: true,
+            }),
+            signal: abortControllerRef.current.signal,
           }
         );
 
-        if (validateData?.validations) {
-          setValidationResults(validateData.validations);
-          
-          // Auto-select questions that passed validation
-          const passedIndices = new Set<number>();
-          validateData.validations.forEach((v: ValidationResult, i: number) => {
-            if (v.score >= 80) passedIndices.add(i);
-          });
-          setSelectedQuestions(passedIndices);
-          
-          // Apply corrections
-          const correctedQuestions = generatedData.questions.map((q: GeneratedQuestion, i: number) => {
-            const validation = validateData.validations[i];
-            return validation?.correctedQuestion ? { ...q, ...validation.correctedQuestion } : q;
-          });
-          setGeneratedQuestions(correctedQuestions);
+        if (validateResponse.ok) {
+          let validateData: any = null;
 
+          await processSSEStream(
+            validateResponse,
+            (step, progress, message) => {
+              setGenState({ step: "validating", progress: 60 + (progress * 0.35), message });
+            },
+            (content) => {
+              setStreamingContent(prev => prev + content);
+            },
+            (data) => {
+              validateData = data;
+            },
+            (error) => {
+              console.warn("Validation stream error:", error);
+            }
+          );
+
+          if (validateData?.validations) {
+            setValidationResults(validateData.validations);
+            
+            // Auto-select questions that passed validation (80+ score)
+            const passedIndices = new Set<number>();
+            validateData.validations.forEach((v: ValidationResult, i: number) => {
+              if (v.score >= 80) passedIndices.add(i);
+            });
+            setSelectedQuestions(passedIndices);
+            
+            // Apply corrections from validation
+            const correctedQuestions = generatedData.questions.map((q: GeneratedQuestion, i: number) => {
+              const validation = validateData.validations[i];
+              return validation?.correctedQuestion ? { ...q, ...validation.correctedQuestion } : q;
+            });
+            setGeneratedQuestions(correctedQuestions);
+
+            toast({
+              title: "✅ 검증 완료",
+              description: `${validateData.passedCount || passedIndices.size}개 통과, ${validateData.failedCount || (generatedData.questions.length - passedIndices.size)}개 검토 필요`,
+            });
+          }
+        } else {
+          // Validation failed but generation succeeded - use all questions
+          console.warn("Validation request failed, selecting all generated questions");
+          setSelectedQuestions(new Set(generatedData.questions.map((_: any, i: number) => i)));
           toast({
-            title: "검증 완료",
-            description: `${validateData.passedCount}개 통과, ${validateData.failedCount}개 검토 필요`,
+            title: "⚠️ 검증 스킵됨",
+            description: "검증에 실패했지만 생성된 문제는 사용 가능합니다.",
           });
         }
+      } catch (validationError) {
+        // Validation error - still use generated questions
+        console.warn("Validation error:", validationError);
+        setSelectedQuestions(new Set(generatedData.questions.map((_: any, i: number) => i)));
       }
 
-      setGenState({ step: "ready", progress: 100, message: "✅ 생성 및 검증 완료!" });
+      setGenState({ step: "ready", progress: 100, message: `✅ ${generatedData.questions.length}개 문제 생성 완료!` });
       setStreamingContent("");
+
+      toast({
+        title: "🎉 생성 완료!",
+        description: `${generatedData.questions.length}개 문제가 생성되었습니다. 검토 후 저장하세요.`,
+      });
 
     } catch (error: any) {
       if (error.name === 'AbortError') {
         setGenState({ step: "idle", progress: 0, message: "취소됨" });
+        toast({ title: "생성 취소됨", description: "사용자가 생성을 취소했습니다." });
         return;
       }
       
       console.error("Generation error:", error);
       setGenState({ step: "idle", progress: 0, message: "" });
       toast({
-        title: "생성 실패",
-        description: error.message,
+        title: "❌ 생성 실패",
+        description: error.message || "알 수 없는 오류가 발생했습니다.",
         variant: "destructive",
       });
     }
@@ -515,7 +554,7 @@ const MockExamGenerator = () => {
     return { validations, hasIssues };
   };
 
-  // Save approved questions to database
+  // Save approved questions to database - PRODUCTION LEVEL with chunking & retry
   const handleSaveApproved = async () => {
     if (selectedQuestions.size === 0) {
       toast({
@@ -530,7 +569,6 @@ const MockExamGenerator = () => {
     const { validations, hasIssues } = validateAllExplanations();
     
     if (hasIssues) {
-      const issueCount = validations.filter(v => !v.isValid).length;
       const selectedWithIssues = Array.from(selectedQuestions).filter(i => 
         validations[i] && !validations[i].isValid
       ).length;
@@ -538,61 +576,78 @@ const MockExamGenerator = () => {
       if (selectedWithIssues > 0) {
         toast({
           title: "⚠️ 해설 누락 경고",
-          description: `선택된 문제 중 ${selectedWithIssues}개에 7개국어 해설이 누락되어 있습니다. 자동 보정 후 저장합니다.`,
-          variant: "destructive",
+          description: `선택된 문제 중 ${selectedWithIssues}개에 해설이 누락되어 있습니다. 자동 번역 후 저장합니다.`,
         });
       }
     }
 
-    setGenState({ step: "saving", progress: 10, message: "🌐 7개국어 해설 AI 번역 중..." });
+    setGenState({ step: "saving", progress: 5, message: "🔄 저장 준비 중..." });
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
       const { data: { session } } = await supabase.auth.getSession();
       
+      if (!session?.access_token) {
+        throw new Error("인증 세션이 없습니다. 다시 로그인해주세요.");
+      }
+
       // Filter selected questions
       const selectedQuestionsArray = generatedQuestions.filter((_, i) => selectedQuestions.has(i));
       const totalQuestions = selectedQuestionsArray.length;
       
-      // Translate explanations for each question
+      setGenState({ step: "saving", progress: 10, message: `🌐 ${totalQuestions}개 문제 번역 시작...` });
+
+      // Translate explanations for each question with retry logic
       const translatedQuestions = [];
+      let translationSuccessCount = 0;
+      let translationFailCount = 0;
+
       for (let i = 0; i < selectedQuestionsArray.length; i++) {
         const q = selectedQuestionsArray[i];
-        const progress = 10 + Math.floor((i / totalQuestions) * 70);
+        const progress = 10 + Math.floor((i / totalQuestions) * 65);
         setGenState({ 
           step: "saving", 
           progress, 
-          message: `🌐 ${i + 1}/${totalQuestions} 번역 중... (${q.question_text.substring(0, 30)}...)` 
+          message: `🌐 ${i + 1}/${totalQuestions} 번역 중...` 
         });
 
         let translations: Record<string, string> = {};
         
-        // Only translate if we have Korean explanation
+        // Translate with retry (max 2 attempts)
         if (q.explanation_ko && q.explanation_ko.trim()) {
-          try {
-            const translateResponse = await fetch(
-              `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/translate-explanations`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": `Bearer ${session?.access_token}`,
-                },
-                body: JSON.stringify({
-                  explanation_ko: q.explanation_ko,
-                  targetLanguages: ['vi', 'en', 'ja', 'zh', 'ru', 'uz']
-                }),
-              }
-            );
+          for (let attempt = 0; attempt < 2; attempt++) {
+            try {
+              const translateResponse = await fetch(
+                `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/translate-explanations`,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${session.access_token}`,
+                  },
+                  body: JSON.stringify({
+                    explanation_ko: q.explanation_ko,
+                    targetLanguages: ['vi', 'en', 'ja', 'zh', 'ru', 'uz']
+                  }),
+                }
+              );
 
-            if (translateResponse.ok) {
-              translations = await translateResponse.json();
-              console.log(`✅ Question ${i + 1} translated successfully`);
-            } else {
-              console.warn(`⚠️ Translation failed for question ${i + 1}, using fallback`);
+              if (translateResponse.ok) {
+                translations = await translateResponse.json();
+                translationSuccessCount++;
+                break;
+              } else if (attempt === 1) {
+                translationFailCount++;
+              }
+            } catch (translateError) {
+              if (attempt === 1) {
+                console.warn(`⚠️ Translation failed for Q${i + 1}:`, translateError);
+                translationFailCount++;
+              }
             }
-          } catch (translateError) {
-            console.warn(`⚠️ Translation error for question ${i + 1}:`, translateError);
+            
+            // Short delay before retry
+            if (attempt === 0) await new Promise(r => setTimeout(r, 500));
           }
         }
 
@@ -600,25 +655,26 @@ const MockExamGenerator = () => {
           exam_type: mapExamTypeToDb(examType),
           section,
           exam_round: parseInt(examRound, 10),
-          part_number: q.part_number,
+          part_number: q.part_number || 1,
           question_number: q.question_number || i + 1,
           question_text: q.question_text,
           options: q.options,
           correct_answer: q.correct_answer,
-          explanation_ko: q.explanation_ko,
-          explanation_en: translations.explanation_en || q.explanation_en || q.explanation_ko,
-          explanation_vi: translations.explanation_vi || q.explanation_vi || q.explanation_ko,
-          explanation_ja: translations.explanation_ja || q.explanation_ko,
-          explanation_zh: translations.explanation_zh || q.explanation_ko,
-          explanation_ru: translations.explanation_ru || q.explanation_ko,
-          explanation_uz: translations.explanation_uz || q.explanation_ko,
-          difficulty: mapDifficultyToDb(q.difficulty),
+          explanation_ko: q.explanation_ko || "",
+          explanation_en: translations.explanation_en || q.explanation_en || q.explanation_ko || "",
+          explanation_vi: translations.explanation_vi || q.explanation_vi || q.explanation_ko || "",
+          explanation_ja: translations.explanation_ja || q.explanation_ko || "",
+          explanation_zh: translations.explanation_zh || q.explanation_ko || "",
+          explanation_ru: translations.explanation_ru || q.explanation_ko || "",
+          explanation_uz: translations.explanation_uz || q.explanation_ko || "",
+          difficulty: mapDifficultyToDb(q.difficulty || difficulty),
           topic: q.topic || topic || null,
           grammar_points: q.grammar_points || [],
           vocabulary: q.vocabulary || [],
           question_audio_url: q.question_audio_url || null,
           question_image_url: q.question_image_url || null,
           option_images: q.option_images || [],
+          instruction_text: q.listening_script || null, // listening script goes here
           generation_source: referenceContent ? "ai_from_reference" : "ai_generated",
           status: "approved",
           approved_by: user?.id,
@@ -627,36 +683,88 @@ const MockExamGenerator = () => {
         });
       }
 
-      setGenState({ step: "saving", progress: 85, message: "💾 데이터베이스에 저장 중..." });
+      // Save in chunks of 10 to avoid timeout
+      const CHUNK_SIZE = 10;
+      const chunks = [];
+      for (let i = 0; i < translatedQuestions.length; i += CHUNK_SIZE) {
+        chunks.push(translatedQuestions.slice(i, i + CHUNK_SIZE));
+      }
 
-      const { error } = await supabase
-        .from("mock_question_bank")
-        .insert(translatedQuestions);
+      setGenState({ step: "saving", progress: 80, message: `💾 ${chunks.length}개 청크로 분할 저장 중...` });
 
-      if (error) throw error;
+      let savedCount = 0;
+      let failedChunks: number[] = [];
 
-      toast({
-        title: "저장 완료! 🎉",
-        description: `${translatedQuestions.length}개의 문제가 7개국어 해설과 함께 저장되었습니다.`,
-      });
+      for (let chunkIdx = 0; chunkIdx < chunks.length; chunkIdx++) {
+        const chunk = chunks[chunkIdx];
+        const progress = 80 + Math.floor((chunkIdx / chunks.length) * 18);
+        setGenState({ 
+          step: "saving", 
+          progress, 
+          message: `💾 청크 ${chunkIdx + 1}/${chunks.length} 저장 중... (${chunk.length}문제)` 
+        });
 
-      // Reset state
-      setGenState({ step: "idle", progress: 0, message: "" });
-      setGeneratedQuestions([]);
-      setValidationResults([]);
-      setSelectedQuestions(new Set());
-      setExplanationValidations([]);
-      setShowExplanationWarning(false);
-      setReferenceContent("");
-      setReferenceFile(null);
-      setStreamingContent("");
+        // Retry each chunk up to 2 times
+        let chunkSaved = false;
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            const { error } = await supabase
+              .from("mock_question_bank")
+              .insert(chunk);
+
+            if (!error) {
+              savedCount += chunk.length;
+              chunkSaved = true;
+              console.log(`✅ Chunk ${chunkIdx + 1} saved (${chunk.length} questions)`);
+              break;
+            } else {
+              console.warn(`⚠️ Chunk ${chunkIdx + 1} attempt ${attempt + 1} failed:`, error.message);
+            }
+          } catch (err) {
+            console.warn(`⚠️ Chunk ${chunkIdx + 1} attempt ${attempt + 1} error:`, err);
+          }
+          
+          // Short delay before retry
+          if (attempt === 0) await new Promise(r => setTimeout(r, 1000));
+        }
+
+        if (!chunkSaved) {
+          failedChunks.push(chunkIdx);
+        }
+      }
+
+      setGenState({ step: "idle", progress: 100, message: "" });
+
+      if (failedChunks.length > 0) {
+        const failedCount = failedChunks.length * CHUNK_SIZE;
+        toast({
+          title: "⚠️ 일부 저장 실패",
+          description: `${savedCount}개 저장됨, ${failedCount}개 실패. 실패한 문제는 다시 시도해주세요.`,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "🎉 저장 완료!",
+          description: `${savedCount}개 문제 저장됨 (번역 성공: ${translationSuccessCount}, 실패: ${translationFailCount})`,
+        });
+        
+        // Reset state only on full success
+        setGeneratedQuestions([]);
+        setValidationResults([]);
+        setSelectedQuestions(new Set());
+        setExplanationValidations([]);
+        setShowExplanationWarning(false);
+        setReferenceContent("");
+        setReferenceFile(null);
+        setStreamingContent("");
+      }
 
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
       console.error("Save error:", errorMessage);
       setGenState({ step: "ready", progress: 100, message: "저장 실패" });
       toast({
-        title: "저장 실패",
+        title: "❌ 저장 실패",
         description: errorMessage,
         variant: "destructive",
       });
