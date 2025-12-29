@@ -58,7 +58,6 @@ interface MockQuestion {
   is_active: boolean;
   created_at: string;
   exam_round: number | null;
-  exam_year: number | null;
 }
 
 // Helper to safely get options as string array
@@ -90,7 +89,6 @@ const MockExamManager = () => {
   const [examType, setExamType] = useState<string>("topik1");
   const [section, setSection] = useState<string>("reading");
   const [examRound, setExamRound] = useState<string>("");
-  const [examYear, setExamYear] = useState<string>(new Date().getFullYear().toString());
   const [questionText, setQuestionText] = useState("");
   const [explanationText, setExplanationText] = useState("");
   
@@ -134,7 +132,7 @@ const MockExamManager = () => {
     if (!examRound.trim()) {
       toast({
         title: "입력 오류",
-        description: "회차를 입력해주세요. (예: 83)",
+        description: "회차를 입력해주세요. (예: 1, 2, 3...)",
         variant: "destructive",
       });
       return;
@@ -210,7 +208,6 @@ const MockExamManager = () => {
         exam_type: examType,
         section,
         exam_round: parseInt(examRound, 10),
-        exam_year: examYear ? parseInt(examYear, 10) : null,
         part_number: q.part_number,
         question_number: q.question_number,
         question_text: q.question_text,
@@ -365,34 +362,23 @@ const MockExamManager = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Exam Round & Year Selection */}
+              {/* Exam Round Selection */}
               <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
                 <h4 className="font-semibold text-primary mb-3 flex items-center gap-2">
                   📋 시험 정보 (필수)
                 </h4>
-                <div className="grid sm:grid-cols-4 gap-4">
+                <div className="grid sm:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-foreground">회차 *</Label>
+                    <Label className="text-foreground">LUKATO 회차 *</Label>
                     <Input
                       type="number"
-                      placeholder="예: 83"
+                      placeholder="예: 1, 2, 3..."
                       value={examRound}
                       onChange={(e) => setExamRound(e.target.value)}
                       className="font-bold text-lg"
                       min={1}
                     />
-                    <p className="text-xs text-muted-foreground">제83회 → 83 입력</p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-foreground">연도</Label>
-                    <Input
-                      type="number"
-                      placeholder="예: 2024"
-                      value={examYear}
-                      onChange={(e) => setExamYear(e.target.value)}
-                      min={2000}
-                      max={2100}
-                    />
+                    <p className="text-xs text-muted-foreground">LUKATO 제1회 → 1 입력</p>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-foreground">시험 유형</Label>
@@ -426,7 +412,7 @@ const MockExamManager = () => {
                   <div className="mt-3 p-2 bg-background rounded border">
                     <span className="text-sm text-muted-foreground">저장될 시험: </span>
                     <span className="font-semibold text-primary">
-                      제{examRound}회 ({examYear}년) {examType === 'topik1' ? 'TOPIK I' : 'TOPIK II'} {section === 'listening' ? '듣기' : section === 'reading' ? '읽기' : '쓰기'}
+                      LUKATO 제{examRound}회 {examType === 'topik1' ? 'TOPIK I' : 'TOPIK II'} {section === 'listening' ? '듣기' : section === 'reading' ? '읽기' : '쓰기'}
                     </span>
                   </div>
                 )}
@@ -578,11 +564,8 @@ const MockExamManager = () => {
                           <div className="flex items-center gap-2 mb-2 flex-wrap">
                             {q.exam_round && (
                               <Badge className="bg-primary text-primary-foreground">
-                                제{q.exam_round}회
+                                LUKATO 제{q.exam_round}회
                               </Badge>
-                            )}
-                            {q.exam_year && (
-                              <Badge variant="outline">{q.exam_year}년</Badge>
                             )}
                             {getExamTypeBadge(q.exam_type)}
                             {getSectionBadge(q.section)}
