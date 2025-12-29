@@ -163,6 +163,14 @@ export default function VideoPlayer() {
       },
       events: {
         onReady: () => {
+          // Try to force-disable YouTube captions (many videos default to EN)
+          try {
+            playerRef.current?.unloadModule?.('captions');
+            playerRef.current?.setOption?.('captions', 'track', {});
+          } catch {
+            // ignore
+          }
+
           // Ensure subtitle syncing starts immediately when user hits play
           updateCurrentSubtitle(playerRef.current?.getCurrentTime?.() ?? 0);
         },
@@ -377,13 +385,13 @@ export default function VideoPlayer() {
                   <div id="youtube-player" className="w-full h-full" />
                 </div>
 
-                {/* Mask for burned-in (hardcoded) subtitles inside the video */}
+                {/* Mask for burned-in / YouTube captions area */}
                 {hideBurnedInSubs && showSubtitle && (
                   <div
-                    className="absolute bottom-0 left-0 right-0 h-[22%] pointer-events-none z-[5]"
+                    className="absolute bottom-0 left-0 right-0 h-[34%] pointer-events-none z-40"
                     style={{
                       background:
-                        'linear-gradient(to top, rgba(0,0,0,0.92), rgba(0,0,0,0.65), rgba(0,0,0,0))',
+                        'linear-gradient(to top, rgba(0,0,0,0.96), rgba(0,0,0,0.86), rgba(0,0,0,0))',
                     }}
                   />
                 )}
@@ -394,7 +402,7 @@ export default function VideoPlayer() {
                     key={`${currentSubtitle?.start}-${koreanSubtitleNow?.start}`}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="absolute bottom-4 left-0 right-0 px-4 z-10"
+                    className="absolute bottom-4 left-0 right-0 px-4 z-50"
                   >
                     <div className="bg-gradient-to-r from-black/90 to-black/80 backdrop-blur-md text-white text-center py-4 px-8 rounded-xl max-w-3xl mx-auto space-y-2 border border-white/10 shadow-2xl">
                       {/* Korean (support line) */}
