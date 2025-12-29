@@ -84,6 +84,7 @@ export default function VideoPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [showSubtitle, setShowSubtitle] = useState(true);
+  const [dualSubtitle, setDualSubtitle] = useState(false); // Show KO + translated
   const [ytReady, setYtReady] = useState(false);
   
   const playerRef = useRef<any>(null);
@@ -293,6 +294,13 @@ export default function VideoPlayer() {
   const currentSubtitles = subtitles.find(s => s.language === selectedLanguage)?.subtitles || [];
   const koreanSubtitles = subtitles.find(s => s.language === 'ko')?.subtitles || [];
 
+  // Get Korean subtitle at current time for dual mode
+  const getCurrentKoreanSubtitle = (): Subtitle | null => {
+    if (!dualSubtitle || selectedLanguage === 'ko') return null;
+    return koreanSubtitles.find(sub => currentTime >= sub.start && currentTime <= sub.end) || null;
+  };
+  const koreanSubtitleNow = getCurrentKoreanSubtitle();
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -336,16 +344,25 @@ export default function VideoPlayer() {
                 </div>
                 
                 {/* Subtitle Overlay */}
-                {showSubtitle && currentSubtitle && (
+                {showSubtitle && (currentSubtitle || koreanSubtitleNow) && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="absolute bottom-20 left-0 right-0 px-4"
+                    className="absolute bottom-16 left-0 right-0 px-4"
                   >
-                    <div className="bg-black/80 backdrop-blur-sm text-white text-center py-3 px-6 rounded-lg max-w-3xl mx-auto">
-                      <p className="text-lg sm:text-xl font-medium">
-                        {currentSubtitle.text}
-                      </p>
+                    <div className="bg-black/80 backdrop-blur-sm text-white text-center py-3 px-6 rounded-lg max-w-3xl mx-auto space-y-1">
+                      {/* Korean (top) - only in dual mode and not already Korean */}
+                      {dualSubtitle && selectedLanguage !== 'ko' && koreanSubtitleNow && (
+                        <p className="text-base sm:text-lg font-medium text-yellow-300">
+                          {koreanSubtitleNow.text}
+                        </p>
+                      )}
+                      {/* Selected language (bottom or only) */}
+                      {currentSubtitle && (
+                        <p className={`font-medium ${dualSubtitle && selectedLanguage !== 'ko' ? 'text-sm sm:text-base text-white/90' : 'text-lg sm:text-xl'}`}>
+                          {currentSubtitle.text}
+                        </p>
+                      )}
                     </div>
                   </motion.div>
                 )}
@@ -407,6 +424,17 @@ export default function VideoPlayer() {
                     >
                       {showSubtitle ? t('videoPlayer.hideSubtitle') : t('videoPlayer.showSubtitle')}
                     </Button>
+                    {/* Dual subtitle toggle - only when not Korean */}
+                    {selectedLanguage !== 'ko' && (
+                      <Button
+                        variant={dualSubtitle ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setDualSubtitle(!dualSubtitle)}
+                        className={dualSubtitle ? 'bg-yellow-500 hover:bg-yellow-600 text-black' : ''}
+                      >
+                        🇰🇷 + {LANGUAGES.find(l => l.code === selectedLanguage)?.flag || '🌍'}
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
