@@ -2295,5 +2295,12 @@
       "privacy": "Privacy",
       "helpCenter": "Help Center"
     }
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "The page you requested doesn't exist or has been moved.",
+    "goHome": "Go to Home",
+    "goBack": "Go Back",
+    "path": "Path"
   }
 }

@@ -221,6 +221,7 @@ const App = () => {
               <Route path="/admin/video-manager" element={<ProtectedRoute><AdminVideoManager /></ProtectedRoute>} />
               <Route path="/admin/video/:videoId/subtitles" element={<ProtectedRoute><AdminVideoSubtitles /></ProtectedRoute>} />
               <Route path="/video-hub" element={<ProtectedRoute><VideoLearningHub /></ProtectedRoute>} />
+              <Route path="/video-learning" element={<Navigate to="/video-hub" replace />} />
               <Route path="/mock-exam" element={<ProtectedRoute><MockExamHub /></ProtectedRoute>} />
               <Route path="/mock-exam/:examType" element={<ProtectedRoute><MockExamTest /></ProtectedRoute>} />
               <Route path="/mock-exam/report/:attemptId" element={<ProtectedRoute><MockExamReport /></ProtectedRoute>} />

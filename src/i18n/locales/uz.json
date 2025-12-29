@@ -2077,5 +2077,12 @@
       "privacy": "Maxfiylik",
       "helpCenter": "Yordam markazi"
     }
+  },
+  "notFound": {
+    "title": "Sahifa topilmadi",
+    "description": "Siz so'ragan sahifa mavjud emas yoki ko'chirilgan.",
+    "goHome": "Bosh sahifaga",
+    "goBack": "Orqaga",
+    "path": "Yo'l"
   }
 }
