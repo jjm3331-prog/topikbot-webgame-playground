@@ -161,37 +161,13 @@ const InterviewSimulation = () => {
 
   const speakText = async (text: string) => {
     if (!ttsEnabled) return;
-    
+
     setIsSpeaking(true);
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`
-          },
-          body: JSON.stringify({ 
-            text: text.slice(0, 800),
-            voiceId: "onwK4e9ZLuTAKqWW03F9"
-          })
-        }
-      );
-      
-      if (response.ok) {
-        const audioBlob = await response.blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
-        audio.onended = () => setIsSpeaking(false);
-        audio.onerror = () => setIsSpeaking(false);
-        await audio.play();
-      } else {
-        setIsSpeaking(false);
-      }
+      await playElevenLabsTTS(text, { speed: 0.85, truncate: 800 });
     } catch (error) {
       console.error("TTS error:", error);
+    } finally {
       setIsSpeaking(false);
     }
   };

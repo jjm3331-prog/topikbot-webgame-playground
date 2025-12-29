@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Mic, MicOff, Play, Pause, SkipForward, Volume2, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { playElevenLabsTTS } from '@/lib/elevenlabsTts';
 
 interface Subtitle {
   start: number;
@@ -142,12 +143,13 @@ export default function ShadowingMode({
     }
   };
 
-  const speakOriginal = () => {
-    if (!currentSub || !('speechSynthesis' in window)) return;
-    const utterance = new SpeechSynthesisUtterance(currentSub.text);
-    utterance.lang = 'ko-KR';
-    utterance.rate = 0.8;
-    speechSynthesis.speak(utterance);
+  const speakOriginal = async () => {
+    if (!currentSub) return;
+    try {
+      await playElevenLabsTTS(currentSub.text, { speed: 0.8, truncate: 260 });
+    } catch (e) {
+      console.error('TTS error:', e);
+    }
   };
 
   if (subtitles.length === 0) {

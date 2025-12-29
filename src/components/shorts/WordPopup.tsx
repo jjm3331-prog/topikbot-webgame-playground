@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { X, BookmarkPlus, Volume2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { playElevenLabsTTS } from '@/lib/elevenlabsTts';
 
 interface WordPopupProps {
   word: string;
@@ -97,12 +98,11 @@ export default function WordPopup({ word, position, onClose, videoId }: WordPopu
     }
   };
 
-  const speakWord = () => {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(word);
-      utterance.lang = 'ko-KR';
-      utterance.rate = 0.8;
-      speechSynthesis.speak(utterance);
+  const speakWord = async () => {
+    try {
+      await playElevenLabsTTS(word, { speed: 0.8, truncate: 80 });
+    } catch (e) {
+      console.error('TTS error:', e);
     }
   };
 
