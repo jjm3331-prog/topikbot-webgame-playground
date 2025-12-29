@@ -6,7 +6,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+// Direct Gemini API Key
+const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 
 interface Question {
   question_text: string;
@@ -21,14 +22,7 @@ interface Question {
   vocabulary?: string[];
   difficulty: string;
   topic?: string;
-}
-
-interface ValidationResult {
-  isValid: boolean;
-  score: number; // 0-100
-  issues: string[];
-  suggestions: string[];
-  correctedQuestion?: Question;
+  listening_script?: string;
 }
 
 serve(async (req) => {
@@ -46,8 +40,8 @@ serve(async (req) => {
       );
     }
 
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY not configured");
+    if (!GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY not configured");
     }
 
     console.log(`🔍 Validating ${questions.length} questions for ${examType} ${section}`);
@@ -104,52 +98,68 @@ ${JSON.stringify(questions, null, 2)}
 
 각 문제를 철저히 검토하고 검증 결과를 반환하세요.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        response_format: { type: "json_object" },
-      }),
-    });
+    // 🚀 Call Gemini 2.5 Pro directly for validation
+    console.log("🤖 Calling Gemini 2.5 Pro for validation...");
+    
+    const geminiResponse = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-preview-06-05:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: `${systemPrompt}\n\n---\n\n${userPrompt}` }]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.3,
+            topP: 0.9,
+            maxOutputTokens: 32768,
+            responseMimeType: "application/json",
+            thinkingConfig: {
+              thinkingBudget: 16384
+            }
+          },
+          safetySettings: [
+            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+          ],
+        }),
+      }
+    );
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("AI API error:", response.status, errorText);
-      
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "API credits exhausted. Please add credits." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      
-      throw new Error(`AI API error: ${response.status}`);
+    if (!geminiResponse.ok) {
+      const errorText = await geminiResponse.text();
+      console.error("Gemini API error:", geminiResponse.status, errorText);
+      throw new Error(`Gemini API error: ${geminiResponse.status}`);
     }
 
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
+    const geminiData = await geminiResponse.json();
+    const content = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!content) {
-      throw new Error("No content in AI response");
+      throw new Error("No content in Gemini response");
     }
 
     let parsed;
     try {
-      parsed = JSON.parse(content);
+      let jsonContent = content;
+      if (jsonContent.startsWith("```json")) {
+        jsonContent = jsonContent.slice(7);
+      }
+      if (jsonContent.startsWith("```")) {
+        jsonContent = jsonContent.slice(3);
+      }
+      if (jsonContent.endsWith("```")) {
+        jsonContent = jsonContent.slice(0, -3);
+      }
+      parsed = JSON.parse(jsonContent.trim());
     } catch (e) {
       console.error("Failed to parse validation response:", content);
       throw new Error("Failed to parse validation response");
@@ -161,6 +171,7 @@ ${JSON.stringify(questions, null, 2)}
       JSON.stringify({
         success: true,
         ...parsed,
+        model: "gemini-2.5-pro-preview-06-05",
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
