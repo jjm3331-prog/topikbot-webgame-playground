@@ -52,6 +52,7 @@ export default function AdminVideoSubtitles() {
   const [currentTime, setCurrentTime] = useState(0);
   const [player, setPlayer] = useState<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [ytReady, setYtReady] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -59,9 +60,25 @@ export default function AdminVideoSubtitles() {
   }, [videoId]);
 
   const loadYouTubeAPI = () => {
-    if (window.YT) return;
+    // If already ready
+    if (window.YT?.Player) {
+      setYtReady(true);
+      return;
+    }
+
+    // Avoid injecting multiple times
+    if (document.getElementById('yt-iframe-api')) return;
+
     const tag = document.createElement('script');
+    tag.id = 'yt-iframe-api';
     tag.src = 'https://www.youtube.com/iframe_api';
+    tag.async = true;
+
+    // The API calls this global when ready
+    window.onYouTubeIframeAPIReady = () => {
+      setYtReady(true);
+    };
+
     const firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
   };
@@ -75,9 +92,14 @@ export default function AdminVideoSubtitles() {
         .from('video_lessons')
         .select('id, youtube_id, title')
         .eq('id', videoId)
-        .single();
+        .maybeSingle();
 
       if (videoError) throw videoError;
+      if (!videoData) {
+        setVideo(null);
+        setLoading(false);
+        return;
+      }
       setVideo(videoData);
 
       // Fetch subtitles
@@ -108,9 +130,13 @@ export default function AdminVideoSubtitles() {
   };
 
   useEffect(() => {
-    if (!video || !window.YT) return;
+    if (!video || !ytReady || !window.YT?.Player) return;
 
     const initPlayer = () => {
+      // Prevent multiple players on re-render
+      const existing = document.getElementById('youtube-player');
+      if (!existing) return;
+
       new window.YT.Player('youtube-player', {
         videoId: video.youtube_id,
         height: '100%',
@@ -131,12 +157,8 @@ export default function AdminVideoSubtitles() {
       });
     };
 
-    if (window.YT.Player) {
-      initPlayer();
-    } else {
-      window.onYouTubeIframeAPIReady = initPlayer;
-    }
-  }, [video]);
+    initPlayer();
+  }, [video, ytReady]);
 
   useEffect(() => {
     if (!player || !isPlaying) return;
