@@ -362,6 +362,73 @@ const Dashboard = () => {
             </div>
           </motion.div>
 
+          {/* Video Learning Banner - NEW */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.11 }}
+            onClick={() => navigate("/video-hub")}
+            className="relative overflow-hidden rounded-2xl cursor-pointer group"
+          >
+            {/* Vibrant gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-blue-500 to-violet-600" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/30" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_25%,rgba(255,255,255,0.25),transparent_35%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_75%,rgba(147,51,234,0.3),transparent_35%)]" />
+            
+            {/* Floating elements */}
+            <div className="absolute inset-0 overflow-hidden">
+              <div className="absolute top-1/4 left-1/6 w-3 h-3 bg-white/20 rounded-full animate-bounce" style={{ animationDuration: '2s' }} />
+              <div className="absolute top-1/3 right-1/4 w-2 h-2 bg-cyan-300/40 rounded-full animate-bounce" style={{ animationDuration: '2.5s', animationDelay: '0.3s' }} />
+              <div className="absolute bottom-1/4 left-1/3 w-2.5 h-2.5 bg-violet-300/30 rounded-full animate-bounce" style={{ animationDuration: '3s', animationDelay: '0.6s' }} />
+              <div className="absolute top-1/2 right-1/6 w-1.5 h-1.5 bg-white/30 rounded-full animate-pulse" />
+            </div>
+            
+            {/* Shimmer effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+            
+            <div className="relative z-10 p-5 sm:p-6 flex items-center justify-between">
+              <div className="flex items-center gap-4 sm:gap-5">
+                {/* Icon with glow */}
+                <div className="relative">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-lg shadow-cyan-500/20">
+                    <svg className="w-7 h-7 sm:w-8 sm:h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polygon points="5 3 19 12 5 21 5 3" />
+                    </svg>
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center border-2 border-white/50 shadow-md">
+                    <span className="text-[10px] font-bold text-white">7</span>
+                  </div>
+                </div>
+                
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1.5 sm:mb-2 flex-wrap">
+                    <span className="text-badge px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white/25 text-white font-bold backdrop-blur-sm">
+                      7개국어 자막
+                    </span>
+                    <span className="text-badge px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-white font-bold shadow-sm">
+                      NEW
+                    </span>
+                  </div>
+                  <h3 className="font-bold text-white text-lg sm:text-xl lg:text-2xl tracking-tight">비디오 학습</h3>
+                  <p className="text-white/85 text-sm sm:text-base mt-0.5 sm:mt-1">
+                    YouTube 영상으로 자연스럽게 한국어 학습
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="hidden sm:flex flex-col items-end mr-2">
+                  <span className="text-card-caption text-white/80 font-medium">TOPIK 어휘 연동</span>
+                  <span className="text-badge text-cyan-200 font-semibold">AI 쉐도잉</span>
+                </div>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/25 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/35 transition-colors shadow-lg">
+                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
           {/* Battle Arena Banner - HOT */}
           <motion.div 
             initial={{ opacity: 0, y: 10 }}

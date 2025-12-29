@@ -14,6 +14,7 @@ import {
   Briefcase,
   Clapperboard,
   Music,
+  Video,
   MessageSquare,
   Languages,
   User,
@@ -81,6 +82,7 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
       emoji: "📚",
       items: [
         { icon: Sparkles, labelKey: "sidebar.items.learningHub", href: "/learning-hub", isHighlight: true },
+        { icon: Video, labelKey: "sidebar.items.videoLearning", href: "/video-hub", isHighlight: true },
         { icon: MessageSquare, labelKey: "sidebar.items.community", href: "/board-hub", isHighlight: true },
       ],
       defaultOpen: true
