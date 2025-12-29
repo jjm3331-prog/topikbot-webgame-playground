@@ -148,11 +148,13 @@ const MockExamHub = () => {
   const { isPremium, loading } = useSubscription();
   const [selectedExam, setSelectedExam] = useState<string>("topik1");
   const [selectedMode, setSelectedMode] = useState<string>("full");
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>("intermediate");
   const [showModeDialog, setShowModeDialog] = useState(false);
   const [showPartDialog, setShowPartDialog] = useState(false);
   const [showWeaknessDialog, setShowWeaknessDialog] = useState(false);
   const [hoveredExam, setHoveredExam] = useState<string | null>(null);
   const [hoveredMode, setHoveredMode] = useState<string | null>(null);
+  const [hoveredDifficulty, setHoveredDifficulty] = useState<string | null>(null);
   
   // 약점 분석 상태
   const [weaknessAnalysis, setWeaknessAnalysis] = useState<WeaknessAnalysis | null>(null);
@@ -337,6 +339,33 @@ const MockExamHub = () => {
     setLoadingWeakness(false);
   };
 
+  const difficultyOptions = [
+    {
+      id: "beginner",
+      label: "하 (Easy)",
+      description: "기초 문법과 일상 어휘 중심",
+      gradient: "from-green-400 to-emerald-500",
+      glowColor: "#10b981",
+      icon: "🌱"
+    },
+    {
+      id: "intermediate", 
+      label: "중 (Normal)",
+      description: "실전 수준의 중급 문제",
+      gradient: "from-blue-400 to-cyan-500",
+      glowColor: "#3b82f6",
+      icon: "⚡"
+    },
+    {
+      id: "advanced",
+      label: "상 (Hard)",
+      description: "고급 어휘와 복잡한 문법",
+      gradient: "from-purple-400 to-pink-500",
+      glowColor: "#a855f7",
+      icon: "🔥"
+    }
+  ];
+
   const handleStartExam = () => {
     if (!isPremium) {
       navigate("/pricing");
@@ -352,7 +381,7 @@ const MockExamHub = () => {
       loadWeaknessAnalysis();
       setShowWeaknessDialog(true);
     } else {
-      navigate(`/mock-exam/${selectedExam}?mode=${selectedMode}`);
+      navigate(`/mock-exam/${selectedExam}?mode=${selectedMode}&difficulty=${selectedDifficulty}`);
     }
   };
 
@@ -630,6 +659,64 @@ const MockExamHub = () => {
           </div>
         </motion.section>
 
+        {/* Difficulty Selection */}
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.45 }}
+          className="mb-20"
+        >
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold mb-3">난이도 선택</h2>
+            <p className="text-muted-foreground">본인 수준에 맞는 난이도를 선택하세요</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {difficultyOptions.map((diff, index) => (
+              <motion.div
+                key={diff.id}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 * index }}
+                whileHover={{ y: -8, scale: 1.02 }}
+                onHoverStart={() => setHoveredDifficulty(diff.id)}
+                onHoverEnd={() => setHoveredDifficulty(null)}
+                onClick={() => setSelectedDifficulty(diff.id)}
+                className={cn(
+                  "relative cursor-pointer p-6 rounded-2xl overflow-hidden transition-all duration-300",
+                  "bg-card/50 backdrop-blur-sm border border-white/10 hover:border-white/20",
+                  selectedDifficulty === diff.id && "ring-2 ring-primary"
+                )}
+              >
+                {/* 호버 글로우 */}
+                <motion.div 
+                  className="absolute inset-0 opacity-0"
+                  animate={{ opacity: hoveredDifficulty === diff.id ? 0.15 : 0 }}
+                  style={{ background: `linear-gradient(135deg, ${diff.glowColor}, transparent)` }}
+                />
+
+                <div className="relative text-center">
+                  <div className="text-4xl mb-4">{diff.icon}</div>
+                  <h3 className="font-bold text-xl mb-2 text-foreground">{diff.label}</h3>
+                  <p className="text-sm text-foreground/70">{diff.description}</p>
+                </div>
+
+                {selectedDifficulty === diff.id && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute top-3 right-3"
+                  >
+                    <div className="p-1.5 bg-primary rounded-full">
+                      <CheckCircle2 className="w-4 h-4 text-primary-foreground" />
+                    </div>
+                  </motion.div>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
+
         {/* CTA Button */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -826,7 +913,7 @@ const MockExamHub = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={() => {
                   setShowModeDialog(false);
-                  navigate(`/mock-exam/${selectedExam}?mode=section&section=listening`);
+                  navigate(`/mock-exam/${selectedExam}?mode=section&section=listening&difficulty=${selectedDifficulty}`);
                 }}
                 className="h-28 flex flex-col items-center justify-center gap-3 rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 hover:border-blue-500/40 transition-all"
               >
@@ -838,7 +925,7 @@ const MockExamHub = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={() => {
                   setShowModeDialog(false);
-                  navigate(`/mock-exam/${selectedExam}?mode=section&section=reading`);
+                  navigate(`/mock-exam/${selectedExam}?mode=section&section=reading&difficulty=${selectedDifficulty}`);
                 }}
                 className="h-28 flex flex-col items-center justify-center gap-3 rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 hover:border-emerald-500/40 transition-all"
               >
@@ -882,7 +969,7 @@ const MockExamHub = () => {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => {
                       setShowPartDialog(false);
-                      navigate(`/mock-exam/${selectedExam}?mode=part&section=${part.section}&part=${part.partNumber}`);
+                      navigate(`/mock-exam/${selectedExam}?mode=part&section=${part.section}&part=${part.partNumber}&difficulty=${selectedDifficulty}`);
                     }}
                     className={cn(
                       "p-4 flex flex-col items-start gap-2 rounded-xl border transition-all",

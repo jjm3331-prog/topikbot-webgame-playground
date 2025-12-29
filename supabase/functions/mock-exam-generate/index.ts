@@ -72,7 +72,6 @@ interface GenerateRequest {
   referenceDocContent?: string;
   useRag?: boolean;
   generateAudio?: boolean;
-  examRound?: number;
   ttsPreset?: keyof typeof TTS_PRESETS;
   stream?: boolean;
   // 듣기 세부 설정
@@ -281,7 +280,6 @@ async function generateListeningAudio(
   script: string,
   questionNumber: number,
   examType: string,
-  examRound: number,
   supabase: any,
   preset: keyof typeof TTS_PRESETS = "exam",
 ): Promise<string | null> {
@@ -398,7 +396,7 @@ async function generateListeningAudio(
 
     const finalBytes = audioParts.length === 1 ? audioParts[0] : concatBytes(audioParts);
 
-    const fileName = `mock-exam/${examType}/${examRound}/listening_q${questionNumber}_${Date.now()}.mp3`;
+    const fileName = `mock-exam/${examType}/listening_q${questionNumber}_${Date.now()}.mp3`;
 
     const { error: uploadError } = await supabase.storage
       .from("podcast-audio")
@@ -467,7 +465,6 @@ async function generateSceneImage(
   questionNumber: number,
   optionNumber: number,
   examType: string,
-  examRound: number,
   supabase: any,
 ): Promise<string | null> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -530,7 +527,7 @@ Reference style: Similar to TOPIK listening section picture dialogues - simple e
 
     const mimeMatch = imageBase64.match(/data:image\/(\w+);/);
     const extension = mimeMatch ? mimeMatch[1] : "png";
-    const fileName = `mock-exam/${examType}/${examRound}/scene_q${questionNumber}_opt${optionNumber}_${Date.now()}.${extension}`;
+    const fileName = `mock-exam/${examType}/scene_q${questionNumber}_opt${optionNumber}_${Date.now()}.${extension}`;
 
     const { error: uploadError } = await supabase.storage
       .from("podcast-audio")
@@ -559,7 +556,6 @@ async function generateGraphImage(
   questionNumber: number,
   optionNumber: number,
   examType: string,
-  examRound: number,
   supabase: any,
 ): Promise<string | null> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -635,7 +631,7 @@ The graphs must clearly match the data described. Different options should show 
 
     const mimeMatch = imageBase64.match(/data:image\/(\w+);/);
     const extension = mimeMatch ? mimeMatch[1] : "png";
-    const fileName = `mock-exam/${examType}/${examRound}/graph_q${questionNumber}_opt${optionNumber}_${Date.now()}.${extension}`;
+    const fileName = `mock-exam/${examType}/graph_q${questionNumber}_opt${optionNumber}_${Date.now()}.${extension}`;
 
     const { error: uploadError } = await supabase.storage
       .from("podcast-audio")
@@ -665,13 +661,12 @@ async function generatePictureQuestionImage(
   optionNumber: number,
   pictureType: PictureQuestionType,
   examType: string,
-  examRound: number,
   supabase: any,
 ): Promise<string | null> {
   if (pictureType === "graph") {
-    return generateGraphImage(description, questionNumber, optionNumber, examType, examRound, supabase);
+    return generateGraphImage(description, questionNumber, optionNumber, examType, supabase);
   } else {
-    return generateSceneImage(description, questionNumber, optionNumber, examType, examRound, supabase);
+    return generateSceneImage(description, questionNumber, optionNumber, examType, supabase);
   }
 }
 
@@ -1290,7 +1285,7 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
 
         // Generate 4 images for picture dialogue questions [5-8]
         // TOPIK II: 문항 1-2는 장면 그림(scene), 문항 3은 그래프(graph)
-        if (params.section === 'listening' && params.listeningQuestionType === '5-8' && params.examRound) {
+        if (params.section === 'listening' && params.listeningQuestionType === '5-8') {
           sendProgress("image", 89, "🖼️ 그림 문제 이미지 생성 중...");
           
           for (let i = 0; i < validQuestions.length; i++) {
@@ -1299,8 +1294,6 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
               const optionImages: string[] = [];
               const questionNum = q.question_number || i + 1;
               
-              // Determine picture type: AI가 지정한 picture_type 사용, 없으면 문항 번호로 결정
-              // 문항 1-2: scene (장면/행동), 문항 3: graph (그래프/도표)
               let pictureType: PictureQuestionType;
               if (q.picture_type === "graph" || q.picture_type === "scene") {
                 pictureType = q.picture_type;
@@ -1322,7 +1315,6 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
                   j + 1,
                   pictureType,
                   params.examType,
-                  params.examRound,
                   supabase
                 );
                 optionImages.push(imageUrl || '');
@@ -1334,7 +1326,7 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
         }
 
         // Generate audio for listening questions
-        if (params.section === 'listening' && params.generateAudio !== false && ELEVENLABS_API_KEY && params.examRound) {
+        if (params.section === 'listening' && params.generateAudio !== false && ELEVENLABS_API_KEY) {
           sendProgress("audio", 92, "🎵 TTS 음성 생성 중...");
           
           const ttsPreset = params.ttsPreset || 'exam';
@@ -1348,7 +1340,6 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
                 q.listening_script,
                 q.question_number || i + 1,
                 params.examType,
-                params.examRound,
                 supabase,
                 ttsPreset
               );
@@ -1515,7 +1506,7 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
     console.log(`✅ Generated ${validQuestions.length} valid questions`);
 
     // Generate audio for listening questions
-    if (params.section === 'listening' && params.generateAudio !== false && ELEVENLABS_API_KEY && params.examRound) {
+    if (params.section === 'listening' && params.generateAudio !== false && ELEVENLABS_API_KEY) {
       const ttsPreset = params.ttsPreset || 'exam';
       
       for (let i = 0; i < validQuestions.length; i++) {
@@ -1525,7 +1516,6 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
             q.listening_script,
             q.question_number || i + 1,
             params.examType,
-            params.examRound,
             supabase,
             ttsPreset
           );

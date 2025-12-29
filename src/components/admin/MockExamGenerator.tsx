@@ -180,7 +180,6 @@ const MockExamGenerator = () => {
   const [difficulty, setDifficulty] = useState<string>("intermediate");
   const [topic, setTopic] = useState<string>("");
   const [questionCount, setQuestionCount] = useState<number>(10);
-  const [examRound, setExamRound] = useState<string>("");
   const [useRag, setUseRag] = useState<boolean>(true);
   const [generateAudio, setGenerateAudio] = useState<boolean>(true);
   const [ttsPreset, setTtsPreset] = useState<keyof typeof TTS_PRESETS>("exam");
@@ -307,15 +306,6 @@ const MockExamGenerator = () => {
 
   // Generate questions using AI with streaming - PRODUCTION LEVEL
   const handleGenerate = async () => {
-    if (!examRound.trim()) {
-      toast({
-        title: "입력 오류",
-        description: "회차를 입력해주세요.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     // Reset state
     setGeneratedQuestions([]);
     setValidationResults([]);
@@ -352,7 +342,6 @@ const MockExamGenerator = () => {
             questionCount,
             useRag,
             generateAudio: section === 'listening' ? generateAudio : false,
-            examRound: parseInt(examRound, 10),
             referenceDocContent: referenceContent || undefined,
             ttsPreset: section === 'listening' ? ttsPreset : undefined,
             listeningQuestionType: section === 'listening' ? listeningQuestionType : undefined,
@@ -654,7 +643,6 @@ const MockExamGenerator = () => {
         translatedQuestions.push({
           exam_type: mapExamTypeToDb(examType),
           section,
-          exam_round: parseInt(examRound, 10),
           part_number: q.part_number || 1,
           question_number: q.question_number || i + 1,
           question_text: q.question_text,
@@ -959,17 +947,7 @@ const MockExamGenerator = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Basic Settings */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <Label>LUKATO 회차 *</Label>
-              <Input
-                type="number"
-                placeholder="예: 1, 2, 3..."
-                value={examRound}
-                onChange={(e) => setExamRound(e.target.value)}
-                min={1}
-              />
-            </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>시험 유형</Label>
               <Select value={examType} onValueChange={setExamType}>
@@ -1002,9 +980,9 @@ const MockExamGenerator = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="beginner">초급 (1-2급)</SelectItem>
-                  <SelectItem value="intermediate">중급 (3-4급)</SelectItem>
-                  <SelectItem value="advanced">고급 (5-6급)</SelectItem>
+                  <SelectItem value="beginner">하 (초급 1-2급)</SelectItem>
+                  <SelectItem value="intermediate">중 (중급 3-4급)</SelectItem>
+                  <SelectItem value="advanced">상 (고급 5-6급)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1446,7 +1424,7 @@ const MockExamGenerator = () => {
                                               if (!file) return;
                                               
                                               try {
-                                                const fileName = `mock-exam/${examType}/${examRound}/picture_q${question.question_number || index + 1}_opt${optIdx + 1}_${Date.now()}.${file.name.split('.').pop()}`;
+                                                const fileName = `mock-exam/${examType}/picture_q${question.question_number || index + 1}_opt${optIdx + 1}_${Date.now()}.${file.name.split('.').pop()}`;
                                                 const { error } = await supabase.storage
                                                   .from("podcast-audio")
                                                   .upload(fileName, file, { upsert: true });
