@@ -97,10 +97,12 @@ interface GeneratedQuestion {
   listening_script?: string;
   question_audio_url?: string;
   question_image_url?: string;
-  // [5-8] 그림 문제용 - 4개 이미지 URL
+  // [1-3번] 그림 문제용 - 4개 이미지 URL
   option_images?: string[];
-  // [5-8] 그림 문제용 - 4개 장면 설명 (AI 이미지 생성용)
+  // [1-3번] 그림 문제용 - 4개 장면/그래프 설명 (AI 이미지 생성용)
   option_image_descriptions?: string[];
+  // [1-3번] 그림 문제 유형: "scene" (장면/행동) 또는 "graph" (그래프/도표)
+  picture_type?: "scene" | "graph";
 }
 
 // Generate embedding using OpenAI
@@ -416,30 +418,77 @@ async function generateListeningAudio(
   }
 }
 
-// Generate image for picture dialogue questions [5-8] using Lovable AI (Gemini Image)
-async function generateQuestionImage(
-  imageDescription: string,
+/**
+ * TOPIK II 듣기 그림 문제 유형 (1-3번 문항)
+ * 
+ * 문항 1-2: 장면/행동 그림 (Scene Pictures)
+ *   - 대화 듣고 4개 그림 중 알맞은 것 선택
+ *   - 만화/일러스트 스타일, 흑백 또는 컬러
+ *   - 인물의 행동, 상황 묘사
+ * 
+ * 문항 3: 그래프/도표 그림 (Graph/Chart Pictures)
+ *   - 담화(뉴스, 강연) 듣고 알맞은 그래프/도표 선택
+ *   - 선 그래프 + 원형 차트 조합
+ *   - 통계 데이터, 수치 비교
+ */
+
+// 그림 문제 유형 정의
+type PictureQuestionType = "scene" | "graph";
+
+interface PictureQuestionConfig {
+  type: PictureQuestionType;
+  questionNumbers: number[];  // 문항 번호
+  description: string;
+  imageStyle: string;
+}
+
+const TOPIK2_PICTURE_QUESTION_TYPES: PictureQuestionConfig[] = [
+  {
+    type: "scene",
+    questionNumbers: [1, 2],
+    description: "장면/행동 그림 - 대화 듣고 알맞은 그림 선택",
+    imageStyle: "만화/일러스트 스타일, 교육용 흑백 또는 간단한 컬러"
+  },
+  {
+    type: "graph",
+    questionNumbers: [3],
+    description: "그래프/도표 - 담화 듣고 알맞은 통계 그래프 선택",
+    imageStyle: "선 그래프 + 원형 차트 조합, 깔끔한 비즈니스 스타일"
+  }
+];
+
+// Generate image for SCENE type picture questions (문항 1-2)
+async function generateSceneImage(
+  sceneDescription: string,
   questionNumber: number,
+  optionNumber: number,
   examType: string,
   examRound: number,
   supabase: any,
 ): Promise<string | null> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  if (!LOVABLE_API_KEY || !imageDescription) return null;
+  if (!LOVABLE_API_KEY || !sceneDescription) return null;
 
   try {
-    console.log(`🖼️ Generating image for Q${questionNumber}: ${imageDescription.slice(0, 50)}...`);
+    console.log(`🎨 [Scene Q${questionNumber}-${optionNumber}] ${sceneDescription.slice(0, 50)}...`);
 
-    // Create a prompt for Korean language test picture dialogue
-    const imagePrompt = `Create a simple, clear illustration for a Korean language test (TOPIK). 
-The scene: ${imageDescription}
-Style requirements:
-- Clean, simple line art or illustration style suitable for educational materials
-- No text or speech bubbles in the image
-- Clear visual elements that match the dialogue context
-- Appropriate for all ages
-- Similar to official TOPIK test illustrations
-- Neutral, professional educational look`;
+    // TOPIK 스타일 장면 그림 프롬프트
+    const imagePrompt = `Create a TOPIK Korean language test illustration.
+
+Scene to illustrate: ${sceneDescription}
+
+CRITICAL STYLE REQUIREMENTS:
+1. Simple, clean LINE ART illustration (like official TOPIK test images)
+2. Educational material style - suitable for language testing
+3. NO text, NO speech bubbles, NO Korean/English words anywhere
+4. Black and white or simple grayscale (like newspaper illustrations)
+5. Clear, distinct actions that can be easily identified
+6. 2D flat style, NOT 3D or photorealistic
+7. Character proportions: simple, clear, cartoon-like
+8. Background: minimal, just enough context for the scene
+9. The illustration should look like it belongs in an official Korean language proficiency test
+
+Reference style: Similar to TOPIK listening section picture dialogues - simple educational illustrations showing everyday situations.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -449,18 +498,13 @@ Style requirements:
       },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash-image-preview",
-        messages: [
-          {
-            role: "user",
-            content: imagePrompt,
-          },
-        ],
+        messages: [{ role: "user", content: imagePrompt }],
         modalities: ["image", "text"],
       }),
     });
 
     if (!response.ok) {
-      console.error("Lovable AI image generation error:", response.status);
+      console.error(`Scene image API error: ${response.status}`);
       return null;
     }
 
@@ -468,11 +512,11 @@ Style requirements:
     const imageBase64 = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
 
     if (!imageBase64 || !imageBase64.startsWith("data:image/")) {
-      console.error("No valid image in response");
+      console.error("No valid scene image in response");
       return null;
     }
 
-    // Extract base64 data and convert to Uint8Array
+    // Upload to storage
     const base64Data = imageBase64.split(",")[1];
     const binaryString = atob(base64Data);
     const bytes = new Uint8Array(binaryString.length);
@@ -480,31 +524,150 @@ Style requirements:
       bytes[i] = binaryString.charCodeAt(i);
     }
 
-    // Determine file extension from data URL
     const mimeMatch = imageBase64.match(/data:image\/(\w+);/);
     const extension = mimeMatch ? mimeMatch[1] : "png";
-
-    const fileName = `mock-exam/${examType}/${examRound}/picture_q${questionNumber}_${Date.now()}.${extension}`;
+    const fileName = `mock-exam/${examType}/${examRound}/scene_q${questionNumber}_opt${optionNumber}_${Date.now()}.${extension}`;
 
     const { error: uploadError } = await supabase.storage
-      .from("podcast-audio") // Reuse existing bucket
+      .from("podcast-audio")
       .upload(fileName, bytes.buffer, {
         contentType: `image/${extension}`,
         upsert: true,
       });
 
     if (uploadError) {
-      console.error("Image upload error:", uploadError);
+      console.error("Scene image upload error:", uploadError);
       return null;
     }
 
     const { data: urlData } = supabase.storage.from("podcast-audio").getPublicUrl(fileName);
-
-    console.log(`✅ Image generated for Q${questionNumber}`);
+    console.log(`✅ Scene image Q${questionNumber}-${optionNumber} uploaded`);
     return urlData.publicUrl;
   } catch (error) {
-    console.error("Image generation error:", error);
+    console.error("Scene image generation error:", error);
     return null;
+  }
+}
+
+// Generate image for GRAPH type picture questions (문항 3)
+async function generateGraphImage(
+  graphDescription: string,
+  questionNumber: number,
+  optionNumber: number,
+  examType: string,
+  examRound: number,
+  supabase: any,
+): Promise<string | null> {
+  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+  if (!LOVABLE_API_KEY || !graphDescription) return null;
+
+  try {
+    console.log(`📊 [Graph Q${questionNumber}-${optionNumber}] ${graphDescription.slice(0, 50)}...`);
+
+    // TOPIK 스타일 그래프/도표 프롬프트
+    const imagePrompt = `Create a TOPIK Korean language test GRAPH/CHART combination image.
+
+Chart data to visualize: ${graphDescription}
+
+CRITICAL REQUIREMENTS:
+1. LAYOUT: The image must contain TWO charts side by side:
+   - TOP or LEFT: A LINE GRAPH with title "서비스 이용자 수" (Service Users)
+   - BOTTOM or RIGHT: A PIE/DONUT CHART with title "서비스를 이용하는 이유" (Reasons for Using Service)
+
+2. LINE GRAPH specifications:
+   - X-axis: Years (2020, 2021, 2022, 2023)
+   - Y-axis: Numbers in 만명 (ten thousands) from 0-12
+   - Show the trend described in the data
+   - Korean labels: (만명) for y-axis, (연도) for x-axis
+
+3. PIE/DONUT CHART specifications:
+   - Show percentage breakdown for reasons
+   - Labels should be in Korean with percentages
+   - Common reasons: 신선하고 품질이 좋아서 (Fresh/Good quality), 가격이 합리적이어서 (Reasonable price), 편리해서 (Convenient)
+
+4. STYLE:
+   - Clean, professional business chart style
+   - Grayscale or minimal colors
+   - Clear Korean text labels
+   - Like official TOPIK II test materials
+
+5. NO decorative elements, just clean data visualization
+
+The graphs must clearly match the data described. Different options should show different trends or percentage distributions.`;
+
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-image-preview",
+        messages: [{ role: "user", content: imagePrompt }],
+        modalities: ["image", "text"],
+      }),
+    });
+
+    if (!response.ok) {
+      console.error(`Graph image API error: ${response.status}`);
+      return null;
+    }
+
+    const data = await response.json();
+    const imageBase64 = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+
+    if (!imageBase64 || !imageBase64.startsWith("data:image/")) {
+      console.error("No valid graph image in response");
+      return null;
+    }
+
+    // Upload to storage
+    const base64Data = imageBase64.split(",")[1];
+    const binaryString = atob(base64Data);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    const mimeMatch = imageBase64.match(/data:image\/(\w+);/);
+    const extension = mimeMatch ? mimeMatch[1] : "png";
+    const fileName = `mock-exam/${examType}/${examRound}/graph_q${questionNumber}_opt${optionNumber}_${Date.now()}.${extension}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("podcast-audio")
+      .upload(fileName, bytes.buffer, {
+        contentType: `image/${extension}`,
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error("Graph image upload error:", uploadError);
+      return null;
+    }
+
+    const { data: urlData } = supabase.storage.from("podcast-audio").getPublicUrl(fileName);
+    console.log(`✅ Graph image Q${questionNumber}-${optionNumber} uploaded`);
+    return urlData.publicUrl;
+  } catch (error) {
+    console.error("Graph image generation error:", error);
+    return null;
+  }
+}
+
+// Unified function to generate picture question images based on type
+async function generatePictureQuestionImage(
+  description: string,
+  questionNumber: number,
+  optionNumber: number,
+  pictureType: PictureQuestionType,
+  examType: string,
+  examRound: number,
+  supabase: any,
+): Promise<string | null> {
+  if (pictureType === "graph") {
+    return generateGraphImage(description, questionNumber, optionNumber, examType, examRound, supabase);
+  } else {
+    return generateSceneImage(description, questionNumber, optionNumber, examType, examRound, supabase);
   }
 }
 
@@ -695,37 +858,67 @@ ${params.referenceDocContent}
       "difficulty": "${params.difficulty}",
       "topic": "${params.topic || '일반'}"${params.section === 'listening' ? `,
       "listening_script": "남자: ...\\n여자: ..."${params.listeningQuestionType === '5-8' ? `,
+      "picture_type": "scene 또는 graph",
       "option_image_descriptions": [
-        "보기 ① 장면 설명 (정답이면 대화와 일치, 오답이면 불일치하는 상황)",
-        "보기 ② 장면 설명",
-        "보기 ③ 장면 설명",
-        "보기 ④ 장면 설명"
+        "보기 ① 설명",
+        "보기 ② 설명",
+        "보기 ③ 설명",
+        "보기 ④ 설명"
       ]` : ''}` : ''}
     }
   ]
 }
 
 ${params.listeningQuestionType === '5-8' ? `
-⚠️ [5-8번 그림 문제] 필수 지침 - 매우 중요!
+⚠️ [1-3번 그림 문제] 필수 지침 - TOPIK II 실제 시험 형식 준수!
 
-실제 TOPIK 그림 문제는 **4개의 그림 중 1개를 선택**하는 형식입니다.
+TOPIK II 듣기 영역에서 그림 문제는 **3문항**이 출제됩니다:
 
-1. **option_image_descriptions**: 4개의 서로 다른 장면/상황을 설명
-   - 정답 번호에 해당하는 장면은 대화 내용과 완전히 일치
-   - 나머지 3개는 비슷하지만 세부사항이 다른 오답 장면
-   
-2. **예시** (대화: "남자: 이 책 어디에 놓을까요? 여자: 저 책상 위에 놓아 주세요."):
-   - ① "남자가 책을 책상 위에 놓고 있고, 여자가 가리키는 장면" (정답)
-   - ② "남자가 책을 바닥에 놓고 있는 장면" (오답: 위치 다름)
-   - ③ "남자가 책을 읽고 있는 장면" (오답: 행동 다름)
-   - ④ "여자가 책을 들고 있는 장면" (오답: 주체 다름)
-   
-3. **장면 설명 지침**:
-   - 각 장면은 시각적으로 명확하게 구분 가능해야 함
-   - 인물의 행동, 위치, 물건의 상태 등을 구체적으로 기술
-   - 정답과 오답이 비슷하지만 핵심 요소가 다르게
+## 📌 문항별 유형 (매우 중요!)
 
-4. **options 필드**: 이 유형에서는 이미지가 보기이므로 options는 ["①", "②", "③", "④"]로 설정
+### 문항 1-2: 장면/행동 그림 (picture_type: "scene")
+- **형식**: 짧은 대화를 듣고 4개 그림 중 알맞은 것 선택
+- **그림 스타일**: 만화/일러스트, 교육용 흑백 스타일
+- **대화 특징**: 
+  - 2인 대화 (남자-여자)
+  - 2-3턴의 짧은 대화
+  - 일상 상황 (과일 가게, 가구 만들기 등)
+- **listening_script 예시**:
+  \`\`\`
+  여자: 손님, 수박 보고 가세요. 아주 맛있어요.
+  남자: 여기 접시 위에 있는 거 한번 먹어 봐도 돼요?
+  여자: 그럼요. 드셔 보세요.
+  \`\`\`
+- **option_image_descriptions 예시**:
+  - ① "과일 가게에서 여자 판매원이 남자에게 수박 조각을 건네고, 남자가 맛보는 장면"
+  - ② "남자가 수박을 들고 계산대로 가는 장면"
+  - ③ "여자가 수박을 자르고 있고 남자가 지켜보는 장면"
+  - ④ "남자가 수박을 비닐봉지에 담는 장면"
+
+### 문항 3: 그래프/도표 그림 (picture_type: "graph")
+- **형식**: 담화(뉴스, 보도)를 듣고 4개 그래프/도표 중 알맞은 것 선택
+- **그림 스타일**: 선 그래프 + 원형(도넛) 차트 조합
+- **담화 특징**:
+  - 1인 담화 (뉴스 앵커, 리포터)
+  - 통계 데이터 언급 (연도별 추이, 비율 등)
+  - 공식적 어투
+- **listening_script 예시**:
+  \`\`\`
+  남자: 채소, 달걀 등의 식품을 정기적으로 배달 받는 서비스가 인기를 끌며 최근 4년간 이용자가 꾸준히 증가하고 있습니다. 이 서비스를 이용하는 이유로는 '신선하고 품질이 좋아서'가 가장 많았으며, '가격이 합리적이어서', '편리해서'가 그 뒤를 이었습니다.
+  \`\`\`
+- **option_image_descriptions 예시** (4개 모두 다른 데이터 조합):
+  - ① "선그래프: 2020년 3만명 → 2021년 6만명 → 2022년 9만명 → 2023년 12만명 (꾸준히 증가). 원차트: 신선/품질 43%, 편리 36%, 가격 21%"
+  - ② "선그래프: 2020년 12만명 → 2021년 9만명 → 2022년 6만명 → 2023년 12만명 (V자 형태). 원차트: 동일"
+  - ③ "선그래프: 꾸준히 증가. 원차트: 가격 43%, 품질 21%, 편리 36% (순서 다름)"
+  - ④ "선그래프: 꾸준히 증가. 원차트: 품질 21%, 편리 36%, 가격 43% (비율 다름)"
+
+## ⚠️ 필수 준수 사항
+
+1. **question_number 1, 2**: picture_type="scene", 대화형 스크립트
+2. **question_number 3**: picture_type="graph", 담화형 스크립트
+3. **options 필드**: ["①", "②", "③", "④"]로 고정
+4. **option_image_descriptions**: 정답 번호에 해당하는 설명만 스크립트와 완전히 일치
+5. **오답 3개**: 비슷하지만 핵심 요소(행동/위치/수치/비율)가 다르게 설계
 ` : ''}
 모든 필드를 반드시 채우세요. 빈 값이 있으면 안 됩니다.`;
 
@@ -869,22 +1062,38 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
         sendProgress("audio", 88, `✅ ${validQuestions.length}개 문제 생성 완료`);
 
         // Generate 4 images for picture dialogue questions [5-8]
+        // TOPIK II: 문항 1-2는 장면 그림(scene), 문항 3은 그래프(graph)
         if (params.section === 'listening' && params.listeningQuestionType === '5-8' && params.examRound) {
-          sendProgress("image", 89, "🖼️ 그림 문제 이미지 4개 생성 중...");
+          sendProgress("image", 89, "🖼️ 그림 문제 이미지 생성 중...");
           
           for (let i = 0; i < validQuestions.length; i++) {
             const q = validQuestions[i];
             if (q.option_image_descriptions && q.option_image_descriptions.length === 4) {
               const optionImages: string[] = [];
+              const questionNum = q.question_number || i + 1;
+              
+              // Determine picture type: AI가 지정한 picture_type 사용, 없으면 문항 번호로 결정
+              // 문항 1-2: scene (장면/행동), 문항 3: graph (그래프/도표)
+              let pictureType: PictureQuestionType;
+              if (q.picture_type === "graph" || q.picture_type === "scene") {
+                pictureType = q.picture_type;
+              } else {
+                pictureType = (questionNum === 3) ? "graph" : "scene";
+              }
+              const typeLabel = pictureType === "graph" ? "📊 그래프" : "🎨 장면";
+              
+              console.log(`[Q${questionNum}] Picture type: ${pictureType}`);
               
               for (let j = 0; j < 4; j++) {
                 const desc = q.option_image_descriptions[j];
                 sendProgress("image", 89 + ((i * 4 + j) / (validQuestions.length * 4)) * 3, 
-                  `🖼️ Q${i + 1} 보기 ${j + 1} 이미지 생성 중...`);
+                  `${typeLabel} Q${questionNum} 보기 ${j + 1} 생성 중...`);
                 
-                const imageUrl = await generateQuestionImage(
+                const imageUrl = await generatePictureQuestionImage(
                   desc,
-                  (q.question_number || i + 1) * 10 + (j + 1), // unique number per option
+                  questionNum,
+                  j + 1,
+                  pictureType,
                   params.examType,
                   params.examRound,
                   supabase
