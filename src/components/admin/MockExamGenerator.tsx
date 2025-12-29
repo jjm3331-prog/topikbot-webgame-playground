@@ -92,6 +92,68 @@ const TTS_PRESETS = {
   },
 };
 
+// 듣기 문제 유형 설정
+const LISTENING_QUESTION_TYPES = {
+  "1-4": {
+    label: "[1~4] 적절한 대답",
+    description: "질문 듣고 적절한 대답 고르기",
+    turns: "1-2턴",
+    speakers: 2,
+  },
+  "5-8": {
+    label: "[5~8] 그림 대화",
+    description: "그림 보고 알맞은 대화 고르기",
+    turns: "2-3턴",
+    speakers: 2,
+  },
+  "9-12": {
+    label: "[9~12] 장소/화제/목적",
+    description: "대화의 장소, 화제, 목적 파악",
+    turns: "3-4턴",
+    speakers: 2,
+  },
+  "13-16": {
+    label: "[13~16] 세부 내용",
+    description: "대화 내용과 같은 것 찾기",
+    turns: "4-6턴",
+    speakers: 2,
+  },
+  "17-20": {
+    label: "[17~20] 화자 의도/태도",
+    description: "화자의 의도, 태도, 후속 행동 파악",
+    turns: "5-8턴",
+    speakers: 2,
+  },
+  "21-30": {
+    label: "[21~30] 종합 이해",
+    description: "긴 대화/담화 종합 이해",
+    turns: "6-10턴",
+    speakers: "2-3",
+  },
+  "mixed": {
+    label: "혼합 (자동)",
+    description: "다양한 유형 자동 생성",
+    turns: "자동",
+    speakers: "자동",
+  },
+};
+
+// 대화 길이 설정
+const DIALOGUE_LENGTH_OPTIONS = {
+  short: { label: "짧은 대화", turns: "1-3턴", icon: "💬" },
+  medium: { label: "중간 대화", turns: "4-6턴", icon: "🗣️" },
+  long: { label: "긴 대화", turns: "7-10턴", icon: "📢" },
+  auto: { label: "자동 (유형별)", turns: "유형에 따라", icon: "🔄" },
+};
+
+// 화자 수 설정
+const SPEAKER_OPTIONS = {
+  2: { label: "2인 대화", description: "남자-여자 대화" },
+  3: { label: "3인 대화", description: "다자간 대화" },
+  monologue: { label: "1인 담화", description: "강의, 뉴스, 안내" },
+  auto: { label: "자동", description: "유형별 자동 설정" },
+};
+
 const MockExamGenerator = () => {
   const { toast } = useToast();
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -106,6 +168,11 @@ const MockExamGenerator = () => {
   const [useRag, setUseRag] = useState<boolean>(true);
   const [generateAudio, setGenerateAudio] = useState<boolean>(true);
   const [ttsPreset, setTtsPreset] = useState<keyof typeof TTS_PRESETS>("exam");
+  
+  // 듣기 세부 설정
+  const [listeningQuestionType, setListeningQuestionType] = useState<string>("mixed");
+  const [dialogueLength, setDialogueLength] = useState<string>("auto");
+  const [speakerCount, setSpeakerCount] = useState<string>("auto");
   
   // Reference document
   const [referenceFile, setReferenceFile] = useState<File | null>(null);
@@ -265,6 +332,10 @@ const MockExamGenerator = () => {
             examRound: parseInt(examRound, 10),
             referenceDocContent: referenceContent || undefined,
             ttsPreset: section === 'listening' ? ttsPreset : undefined,
+            // 듣기 세부 설정
+            listeningQuestionType: section === 'listening' ? listeningQuestionType : undefined,
+            dialogueLength: section === 'listening' ? dialogueLength : undefined,
+            speakerCount: section === 'listening' ? speakerCount : undefined,
             stream: true,
           }),
           signal: abortControllerRef.current.signal,
@@ -858,50 +929,134 @@ const MockExamGenerator = () => {
             </div>
           </div>
 
-          {/* Audio Generation & TTS Preset (for listening section) */}
+          {/* Listening Section Advanced Settings */}
           {section === 'listening' && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 p-3 bg-cyan-500/10 border border-cyan-500/20 rounded-lg">
-                <Checkbox
-                  id="generateAudio"
-                  checked={generateAudio}
-                  onCheckedChange={(checked) => setGenerateAudio(checked === true)}
-                />
-                <div className="flex-1">
-                  <Label htmlFor="generateAudio" className="cursor-pointer flex items-center gap-2">
-                    <Headphones className="w-4 h-4 text-cyan-500" />
-                    ElevenLabs TTS 음성 자동 생성
-                  </Label>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    듣기 문제의 대화 스크립트를 자연스러운 한국어 음성으로 자동 생성합니다.
-                  </p>
+            <div className="space-y-4 p-4 bg-gradient-to-r from-cyan-500/5 to-blue-500/5 border border-cyan-500/20 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Headphones className="w-5 h-5 text-cyan-500" />
+                <span className="font-medium text-cyan-600">듣기 문제 세부 설정</span>
+              </div>
+              
+              {/* 문제 유형 선택 */}
+              <div className="space-y-3">
+                <Label className="flex items-center gap-2">
+                  <Target className="w-4 h-4 text-cyan-500" />
+                  문제 유형 선택
+                </Label>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                  {Object.entries(LISTENING_QUESTION_TYPES).map(([key, type]) => (
+                    <div
+                      key={key}
+                      onClick={() => setListeningQuestionType(key)}
+                      className={`p-3 rounded-lg border cursor-pointer transition-all ${
+                        listeningQuestionType === key 
+                          ? 'border-cyan-500 bg-cyan-500/10 ring-2 ring-cyan-500/30' 
+                          : 'border-border hover:border-cyan-500/50 hover:bg-muted/50'
+                      }`}
+                    >
+                      <div className="font-medium text-xs">{type.label}</div>
+                      <div className="text-xs text-muted-foreground mt-1">{type.description}</div>
+                      <div className="flex items-center gap-2 mt-2 text-xs text-cyan-600">
+                        <span>{type.turns}</span>
+                        <span>•</span>
+                        <span>{typeof type.speakers === 'number' ? `${type.speakers}인` : type.speakers}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {generateAudio && (
-                <div className="space-y-3 p-4 bg-gradient-to-r from-cyan-500/5 to-blue-500/5 border border-cyan-500/20 rounded-lg">
+              {/* 대화 길이 & 화자 수 설정 */}
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
                   <Label className="flex items-center gap-2">
-                    <Volume2 className="w-4 h-4 text-cyan-500" />
-                    TTS 음성 프리셋
+                    <Radio className="w-4 h-4 text-cyan-500" />
+                    대화 길이
                   </Label>
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                    {Object.entries(TTS_PRESETS).map(([key, preset]) => (
+                  <div className="grid grid-cols-2 gap-2">
+                    {Object.entries(DIALOGUE_LENGTH_OPTIONS).map(([key, opt]) => (
                       <div
                         key={key}
-                        onClick={() => setTtsPreset(key as keyof typeof TTS_PRESETS)}
-                        className={`p-3 rounded-lg border cursor-pointer transition-all ${
-                          ttsPreset === key 
-                            ? 'border-cyan-500 bg-cyan-500/10 ring-2 ring-cyan-500/30' 
-                            : 'border-border hover:border-cyan-500/50 hover:bg-muted/50'
+                        onClick={() => setDialogueLength(key)}
+                        className={`p-2 rounded-lg border cursor-pointer transition-all text-center ${
+                          dialogueLength === key 
+                            ? 'border-cyan-500 bg-cyan-500/10' 
+                            : 'border-border hover:border-cyan-500/50'
                         }`}
                       >
-                        <div className="font-medium text-sm">{preset.label}</div>
-                        <div className="text-xs text-muted-foreground mt-1">{preset.description}</div>
+                        <div className="text-lg">{opt.icon}</div>
+                        <div className="text-xs font-medium">{opt.label}</div>
+                        <div className="text-xs text-muted-foreground">{opt.turns}</div>
                       </div>
                     ))}
                   </div>
                 </div>
-              )}
+
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <Mic2 className="w-4 h-4 text-cyan-500" />
+                    화자 수
+                  </Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {Object.entries(SPEAKER_OPTIONS).map(([key, opt]) => (
+                      <div
+                        key={key}
+                        onClick={() => setSpeakerCount(key)}
+                        className={`p-2 rounded-lg border cursor-pointer transition-all ${
+                          speakerCount === key 
+                            ? 'border-cyan-500 bg-cyan-500/10' 
+                            : 'border-border hover:border-cyan-500/50'
+                        }`}
+                      >
+                        <div className="text-xs font-medium">{opt.label}</div>
+                        <div className="text-xs text-muted-foreground">{opt.description}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* TTS 토글 & 프리셋 */}
+              <div className="pt-3 border-t border-cyan-500/20">
+                <div className="flex items-center gap-3 p-3 bg-cyan-500/10 rounded-lg">
+                  <Checkbox
+                    id="generateAudio"
+                    checked={generateAudio}
+                    onCheckedChange={(checked) => setGenerateAudio(checked === true)}
+                  />
+                  <div className="flex-1">
+                    <Label htmlFor="generateAudio" className="cursor-pointer flex items-center gap-2">
+                      <Volume2 className="w-4 h-4 text-cyan-500" />
+                      ElevenLabs TTS 음성 자동 생성
+                    </Label>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      생성된 대화 스크립트를 자연스러운 한국어 음성으로 변환합니다.
+                    </p>
+                  </div>
+                </div>
+
+                {generateAudio && (
+                  <div className="mt-3 space-y-2">
+                    <Label className="text-xs">TTS 음성 프리셋</Label>
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                      {Object.entries(TTS_PRESETS).map(([key, preset]) => (
+                        <div
+                          key={key}
+                          onClick={() => setTtsPreset(key as keyof typeof TTS_PRESETS)}
+                          className={`p-2 rounded-lg border cursor-pointer transition-all ${
+                            ttsPreset === key 
+                              ? 'border-cyan-500 bg-cyan-500/10 ring-1 ring-cyan-500/30' 
+                              : 'border-border hover:border-cyan-500/50 hover:bg-muted/50'
+                          }`}
+                        >
+                          <div className="font-medium text-xs">{preset.label}</div>
+                          <div className="text-xs text-muted-foreground">{preset.description}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
