@@ -2314,5 +2314,12 @@
       "privacy": "Chính sách",
       "helpCenter": "Trung tâm Hỗ trợ"
     }
+  },
+  "notFound": {
+    "title": "Không tìm thấy trang",
+    "description": "Trang bạn yêu cầu không tồn tại hoặc đã được di chuyển.",
+    "goHome": "Về trang chủ",
+    "goBack": "Trang trước",
+    "path": "Đường dẫn"
   }
 }
