@@ -85,6 +85,7 @@ export default function VideoPlayer() {
   const [currentTime, setCurrentTime] = useState(0);
   const [showSubtitle, setShowSubtitle] = useState(true);
   const [dualSubtitle, setDualSubtitle] = useState(false); // Show KO + translated
+  const [hideBurnedInSubs, setHideBurnedInSubs] = useState(true); // Hide hardcoded/burned-in subs area
   const [ytReady, setYtReady] = useState(false);
   
   const playerRef = useRef<any>(null);
@@ -375,7 +376,18 @@ export default function VideoPlayer() {
                 <div className="aspect-video">
                   <div id="youtube-player" className="w-full h-full" />
                 </div>
-                
+
+                {/* Mask for burned-in (hardcoded) subtitles inside the video */}
+                {hideBurnedInSubs && showSubtitle && (
+                  <div
+                    className="absolute bottom-0 left-0 right-0 h-[22%] pointer-events-none z-[5]"
+                    style={{
+                      background:
+                        'linear-gradient(to top, rgba(0,0,0,0.92), rgba(0,0,0,0.65), rgba(0,0,0,0))',
+                    }}
+                  />
+                )}
+
                 {/* Subtitle Overlay - Our custom subtitles */}
                 {showSubtitle && (currentSubtitle || koreanSubtitleNow) && (
                   <motion.div
@@ -385,15 +397,21 @@ export default function VideoPlayer() {
                     className="absolute bottom-4 left-0 right-0 px-4 z-10"
                   >
                     <div className="bg-gradient-to-r from-black/90 to-black/80 backdrop-blur-md text-white text-center py-4 px-8 rounded-xl max-w-3xl mx-auto space-y-2 border border-white/10 shadow-2xl">
-                      {/* Korean (top) - only in dual mode and not already Korean */}
+                      {/* Korean (support line) */}
                       {dualSubtitle && selectedLanguage !== 'ko' && koreanSubtitleNow && (
-                        <p className="text-lg sm:text-xl font-bold text-yellow-400">
+                        <p className="text-base sm:text-lg font-medium text-white/90">
                           {koreanSubtitleNow.text}
                         </p>
                       )}
-                      {/* Selected language (bottom or only) */}
+                      {/* Selected language (main line) */}
                       {currentSubtitle && (
-                        <p className={`font-medium ${dualSubtitle && selectedLanguage !== 'ko' ? 'text-base sm:text-lg text-white' : 'text-xl sm:text-2xl text-white'}`}>
+                        <p
+                          className={`font-semibold ${
+                            dualSubtitle && selectedLanguage !== 'ko'
+                              ? 'text-xl sm:text-2xl text-yellow-400'
+                              : 'text-xl sm:text-2xl text-white'
+                          }`}
+                        >
                           {currentSubtitle.text}
                         </p>
                       )}
@@ -458,6 +476,17 @@ export default function VideoPlayer() {
                     >
                       {showSubtitle ? t('videoPlayer.hideSubtitle') : t('videoPlayer.showSubtitle')}
                     </Button>
+
+                    {showSubtitle && (
+                      <Button
+                        variant={hideBurnedInSubs ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setHideBurnedInSubs(!hideBurnedInSubs)}
+                      >
+                        원본 자막 가리기
+                      </Button>
+                    )}
+
                     {/* Dual subtitle toggle - only when not Korean */}
                     {selectedLanguage !== 'ko' && (
                       <Button
