@@ -685,7 +685,7 @@ const Admin = () => {
             </div>
 
             {/* Quick Access Cards */}
-            <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
               <Card 
                 className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-cyan-500/50 bg-gradient-to-br from-cyan-500/10 to-blue-500/10"
                 onClick={() => navigate('/admin/video-manager')}
@@ -699,6 +699,24 @@ const Admin = () => {
                   <div>
                     <h3 className="font-bold">비디오 관리</h3>
                     <p className="text-sm text-muted-foreground">영상 등록 및 자막 관리</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+                </CardContent>
+              </Card>
+
+              <Card 
+                className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-pink-500/50 bg-gradient-to-br from-pink-500/10 to-rose-500/10"
+                onClick={() => navigate('/admin/shorts')}
+              >
+                <CardContent className="p-6 flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-bold">숏츠 관리</h3>
+                    <p className="text-sm text-muted-foreground">YouTube Shorts 등록</p>
                   </div>
                   <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
                 </CardContent>
