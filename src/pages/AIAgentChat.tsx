@@ -790,15 +790,45 @@ const AIAgentChat = () => {
                                   remarkPlugins={[remarkGfm]}
                                   components={{
                                     table: ({ children }) => (
-                                      <div className="overflow-x-auto -mx-2">
-                                        <table>{children}</table>
+                                      <div className="overflow-x-auto -mx-2 my-4">
+                                        <table className="w-full border-collapse text-sm">
+                                          {children}
+                                        </table>
                                       </div>
+                                    ),
+                                    thead: ({ children }) => (
+                                      <thead className="bg-muted/70 border-b-2 border-border">
+                                        {children}
+                                      </thead>
+                                    ),
+                                    tbody: ({ children }) => (
+                                      <tbody className="divide-y divide-border/50">
+                                        {children}
+                                      </tbody>
+                                    ),
+                                    tr: ({ children }) => (
+                                      <tr className="hover:bg-muted/40 transition-colors">
+                                        {children}
+                                      </tr>
+                                    ),
+                                    th: ({ children }) => (
+                                      <th className="px-4 py-3 text-left font-semibold text-foreground whitespace-nowrap">
+                                        {children}
+                                      </th>
+                                    ),
+                                    td: ({ children }) => (
+                                      <td className="px-4 py-3 text-foreground">
+                                        {children}
+                                      </td>
                                     ),
                                     li: ({ children, ...props }) => (
                                       <li className="pl-1" {...props}>{children}</li>
                                     ),
                                     strong: ({ children }) => (
                                       <strong className="font-bold text-foreground">{children}</strong>
+                                    ),
+                                    p: ({ children }) => (
+                                      <p className="my-3 leading-relaxed">{children}</p>
                                     ),
                                   }}
                                 >
