@@ -1079,6 +1079,7 @@ export type Database = {
           id: string
           instruction_text: string | null
           is_active: boolean
+          option_images: Json | null
           options: Json
           part_number: number
           point_value: number | null
@@ -1118,6 +1119,7 @@ export type Database = {
           id?: string
           instruction_text?: string | null
           is_active?: boolean
+          option_images?: Json | null
           options?: Json
           part_number: number
           point_value?: number | null
@@ -1157,6 +1159,7 @@ export type Database = {
           id?: string
           instruction_text?: string | null
           is_active?: boolean
+          option_images?: Json | null
           options?: Json
           part_number?: number
           point_value?: number | null

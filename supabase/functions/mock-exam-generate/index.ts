@@ -97,7 +97,10 @@ interface GeneratedQuestion {
   listening_script?: string;
   question_audio_url?: string;
   question_image_url?: string;
-  image_description?: string; // AI가 생성할 이미지 설명
+  // [5-8] 그림 문제용 - 4개 이미지 URL
+  option_images?: string[];
+  // [5-8] 그림 문제용 - 4개 장면 설명 (AI 이미지 생성용)
+  option_image_descriptions?: string[];
 }
 
 // Generate embedding using OpenAI
@@ -691,17 +694,39 @@ ${params.referenceDocContent}
       "vocabulary": ["어휘1 (뜻)", "어휘2 (뜻)"],
       "difficulty": "${params.difficulty}",
       "topic": "${params.topic || '일반'}"${params.section === 'listening' ? `,
-      "listening_script": "남자: ...\\n여자: ...",
-      "image_description": "[5-8번 그림 문제일 경우만] 그림에 나타나야 할 장면/상황 설명 (예: '책상 위에 책을 놓는 남자와 그것을 가리키는 여자')"` : ''}
+      "listening_script": "남자: ...\\n여자: ..."${params.listeningQuestionType === '5-8' ? `,
+      "option_image_descriptions": [
+        "보기 ① 장면 설명 (정답이면 대화와 일치, 오답이면 불일치하는 상황)",
+        "보기 ② 장면 설명",
+        "보기 ③ 장면 설명",
+        "보기 ④ 장면 설명"
+      ]` : ''}` : ''}
     }
   ]
 }
 
-⚠️ [5-8번 그림 문제] 필수 지침:
-- image_description 필드에 그림으로 그려질 장면을 자세히 한국어로 설명하세요.
-- 대화 내용이 시각적으로 표현될 수 있는 장면이어야 합니다.
-- 예: "카페에서 커피를 주문하는 손님과 바리스타", "도서관에서 책을 찾는 학생"
+${params.listeningQuestionType === '5-8' ? `
+⚠️ [5-8번 그림 문제] 필수 지침 - 매우 중요!
 
+실제 TOPIK 그림 문제는 **4개의 그림 중 1개를 선택**하는 형식입니다.
+
+1. **option_image_descriptions**: 4개의 서로 다른 장면/상황을 설명
+   - 정답 번호에 해당하는 장면은 대화 내용과 완전히 일치
+   - 나머지 3개는 비슷하지만 세부사항이 다른 오답 장면
+   
+2. **예시** (대화: "남자: 이 책 어디에 놓을까요? 여자: 저 책상 위에 놓아 주세요."):
+   - ① "남자가 책을 책상 위에 놓고 있고, 여자가 가리키는 장면" (정답)
+   - ② "남자가 책을 바닥에 놓고 있는 장면" (오답: 위치 다름)
+   - ③ "남자가 책을 읽고 있는 장면" (오답: 행동 다름)
+   - ④ "여자가 책을 들고 있는 장면" (오답: 주체 다름)
+   
+3. **장면 설명 지침**:
+   - 각 장면은 시각적으로 명확하게 구분 가능해야 함
+   - 인물의 행동, 위치, 물건의 상태 등을 구체적으로 기술
+   - 정답과 오답이 비슷하지만 핵심 요소가 다르게
+
+4. **options 필드**: 이 유형에서는 이미지가 보기이므로 options는 ["①", "②", "③", "④"]로 설정
+` : ''}
 모든 필드를 반드시 채우세요. 빈 값이 있으면 안 됩니다.`;
 
   return prompt;
@@ -843,25 +868,31 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
 
         sendProgress("audio", 88, `✅ ${validQuestions.length}개 문제 생성 완료`);
 
-        // Generate images for picture dialogue questions [5-8]
+        // Generate 4 images for picture dialogue questions [5-8]
         if (params.section === 'listening' && params.listeningQuestionType === '5-8' && params.examRound) {
-          sendProgress("image", 89, "🖼️ 그림 문제 이미지 생성 중...");
+          sendProgress("image", 89, "🖼️ 그림 문제 이미지 4개 생성 중...");
           
           for (let i = 0; i < validQuestions.length; i++) {
             const q = validQuestions[i];
-            if (q.image_description) {
-              sendProgress("image", 89 + (i / validQuestions.length) * 3, `🖼️ Q${i + 1} 이미지 생성 중...`);
+            if (q.option_image_descriptions && q.option_image_descriptions.length === 4) {
+              const optionImages: string[] = [];
               
-              const imageUrl = await generateQuestionImage(
-                q.image_description,
-                q.question_number || i + 1,
-                params.examType,
-                params.examRound,
-                supabase
-              );
-              if (imageUrl) {
-                validQuestions[i].question_image_url = imageUrl;
+              for (let j = 0; j < 4; j++) {
+                const desc = q.option_image_descriptions[j];
+                sendProgress("image", 89 + ((i * 4 + j) / (validQuestions.length * 4)) * 3, 
+                  `🖼️ Q${i + 1} 보기 ${j + 1} 이미지 생성 중...`);
+                
+                const imageUrl = await generateQuestionImage(
+                  desc,
+                  (q.question_number || i + 1) * 10 + (j + 1), // unique number per option
+                  params.examType,
+                  params.examRound,
+                  supabase
+                );
+                optionImages.push(imageUrl || '');
               }
+              
+              validQuestions[i].option_images = optionImages;
             }
           }
         }
