@@ -675,39 +675,89 @@ const AIAgentChat = () => {
                               : "bg-muted/50 px-4 py-3"
                           }`}
                         >
-                          {message.role === "assistant" ? (
-                            <div className="prose-sm prose-neutral dark:prose-invert max-w-none">
+                        {message.role === "assistant" ? (
+                            <div className="ai-response-content text-sm leading-[1.8] text-foreground">
                               <ReactMarkdown 
                                 remarkPlugins={[remarkGfm]}
                                 components={{
+                                  // Headers - 더 명확한 구분
+                                  h1: ({ children }) => (
+                                    <h1 className="text-xl font-bold mt-6 mb-3 text-foreground border-b border-border/30 pb-2">{children}</h1>
+                                  ),
+                                  h2: ({ children }) => (
+                                    <h2 className="text-lg font-bold mt-5 mb-2.5 text-foreground">{children}</h2>
+                                  ),
+                                  h3: ({ children }) => (
+                                    <h3 className="text-base font-semibold mt-4 mb-2 text-foreground">{children}</h3>
+                                  ),
+                                  h4: ({ children }) => (
+                                    <h4 className="text-sm font-semibold mt-3 mb-1.5 text-foreground">{children}</h4>
+                                  ),
+                                  // 문단 - 넉넉한 간격
+                                  p: ({ children }) => (
+                                    <p className="my-3 leading-[1.8] text-foreground">{children}</p>
+                                  ),
+                                  // 리스트 - 읽기 쉬운 스타일
+                                  ul: ({ children }) => (
+                                    <ul className="my-3 ml-4 space-y-2 list-disc marker:text-primary/70">{children}</ul>
+                                  ),
+                                  ol: ({ children }) => (
+                                    <ol className="my-3 ml-4 space-y-2 list-decimal marker:text-primary/70 marker:font-semibold">{children}</ol>
+                                  ),
+                                  li: ({ children }) => (
+                                    <li className="text-foreground pl-1 leading-[1.7]">{children}</li>
+                                  ),
+                                  // 강조 - Bold는 색상으로 구분
+                                  strong: ({ children }) => (
+                                    <strong className="font-bold text-primary">{children}</strong>
+                                  ),
+                                  em: ({ children }) => (
+                                    <em className="italic text-muted-foreground">{children}</em>
+                                  ),
+                                  // 코드블록
+                                  code: ({ className, children }) => {
+                                    const isInline = !className;
+                                    return isInline ? (
+                                      <code className="px-1.5 py-0.5 rounded bg-muted text-sm font-mono text-primary">{children}</code>
+                                    ) : (
+                                      <code className="block my-3 p-3 rounded-lg bg-muted/70 text-sm font-mono overflow-x-auto">{children}</code>
+                                    );
+                                  },
+                                  pre: ({ children }) => (
+                                    <pre className="my-3 p-4 rounded-xl bg-muted/50 overflow-x-auto border border-border/30">{children}</pre>
+                                  ),
+                                  // 인용
+                                  blockquote: ({ children }) => (
+                                    <blockquote className="my-4 pl-4 border-l-3 border-primary/50 text-muted-foreground italic">{children}</blockquote>
+                                  ),
+                                  // 구분선
+                                  hr: () => (
+                                    <hr className="my-5 border-border/50" />
+                                  ),
+                                  // 링크
+                                  a: ({ href, children }) => (
+                                    <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">{children}</a>
+                                  ),
+                                  // 테이블 - 깔끔한 스타일
                                   table: ({ children }) => (
-                                    <div className="overflow-x-auto my-3">
+                                    <div className="overflow-x-auto my-4 rounded-lg border border-border/50">
                                       <table className="w-full border-collapse text-sm">{children}</table>
                                     </div>
                                   ),
                                   thead: ({ children }) => (
-                                    <thead className="bg-muted/70 border-b border-border">{children}</thead>
+                                    <thead className="bg-muted/70">{children}</thead>
                                   ),
                                   tbody: ({ children }) => (
-                                    <tbody className="divide-y divide-border/50">{children}</tbody>
+                                    <tbody className="divide-y divide-border/30">{children}</tbody>
                                   ),
                                   tr: ({ children }) => (
-                                    <tr className="hover:bg-muted/40">{children}</tr>
+                                    <tr className="hover:bg-muted/30 transition-colors">{children}</tr>
                                   ),
                                   th: ({ children }) => (
-                                    <th className="px-3 py-2 text-left font-semibold text-foreground whitespace-nowrap">{children}</th>
+                                    <th className="px-4 py-2.5 text-left font-semibold text-foreground whitespace-nowrap border-b border-border/50">{children}</th>
                                   ),
                                   td: ({ children }) => (
-                                    <td className="px-3 py-2 text-foreground">{children}</td>
-                                  ),
-                                  p: ({ children }) => (
-                                    <p className="my-2 leading-relaxed text-foreground">{children}</p>
-                                  ),
-                                  strong: ({ children }) => (
-                                    <strong className="font-bold text-foreground">{children}</strong>
-                                  ),
-                                  li: ({ children }) => (
-                                    <li className="text-foreground">{children}</li>
+                                    <td className="px-4 py-2.5 text-foreground">{children}</td>
                                   ),
                                 }}
                               >
