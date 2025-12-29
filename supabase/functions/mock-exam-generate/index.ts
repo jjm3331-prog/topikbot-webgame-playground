@@ -372,9 +372,11 @@ serve(async (req) => {
 
     // 🚀 Call Gemini 2.5 Pro DIRECTLY with maximum thinking budget
     console.log("🤖 Calling Gemini 2.5 Pro directly with maximum thinking budget...");
-    
+
+    const geminiModel = Deno.env.get("GEMINI_MODEL") || "gemini-2.5-pro";
+
     const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-preview-06-05:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {
@@ -488,12 +490,12 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
     }
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         success: true,
         questions: validQuestions,
         ragUsed: !!ragContext,
         ragDocCount: ragContext ? ragContext.split('---').length : 0,
-        model: "gemini-2.5-pro-preview-06-05",
+        model: Deno.env.get("GEMINI_MODEL") || "gemini-2.5-pro",
         thinkingBudget: 24576,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }

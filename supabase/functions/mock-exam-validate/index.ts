@@ -100,9 +100,11 @@ ${JSON.stringify(questions, null, 2)}
 
     // 🚀 Call Gemini 2.5 Pro directly for validation
     console.log("🤖 Calling Gemini 2.5 Pro for validation...");
-    
+
+    const geminiModel = Deno.env.get("GEMINI_MODEL") || "gemini-2.5-pro";
+
     const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-preview-06-05:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {
@@ -171,7 +173,7 @@ ${JSON.stringify(questions, null, 2)}
       JSON.stringify({
         success: true,
         ...parsed,
-        model: "gemini-2.5-pro-preview-06-05",
+        model: Deno.env.get("GEMINI_MODEL") || "gemini-2.5-pro",
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
