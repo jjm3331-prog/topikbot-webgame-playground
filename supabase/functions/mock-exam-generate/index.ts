@@ -7,9 +7,11 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+// Direct API Keys
+const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 const COHERE_API_KEY = Deno.env.get("COHERE_API_KEY");
+const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
 // RAG Configuration
 const RAG_CONFIG = {
@@ -30,6 +32,8 @@ interface GenerateRequest {
   referenceDocUrl?: string;
   referenceDocContent?: string;
   useRag?: boolean;
+  generateAudio?: boolean;
+  examRound?: number;
 }
 
 interface GeneratedQuestion {
@@ -45,6 +49,8 @@ interface GeneratedQuestion {
   vocabulary: string[];
   difficulty: string;
   topic: string;
+  listening_script?: string;
+  question_audio_url?: string;
 }
 
 // Generate embedding using OpenAI
@@ -140,6 +146,77 @@ async function ragSearch(query: string, supabase: any): Promise<string> {
   }
 }
 
+// Generate TTS audio using ElevenLabs
+async function generateListeningAudio(
+  script: string, 
+  questionNumber: number,
+  examType: string,
+  examRound: number,
+  supabase: any
+): Promise<string | null> {
+  if (!ELEVENLABS_API_KEY || !script) return null;
+
+  try {
+    console.log(`🎵 Generating audio for Q${questionNumber}...`);
+    
+    // Use Korean female voice (Jessica - good for Korean)
+    const voiceId = "cgSgspJ2msm6clMCkdW9"; // Jessica voice
+    
+    const response = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+      {
+        method: "POST",
+        headers: {
+          "xi-api-key": ELEVENLABS_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: script,
+          model_id: "eleven_multilingual_v2",
+          output_format: "mp3_44100_128",
+          voice_settings: {
+            stability: 0.7,
+            similarity_boost: 0.8,
+            style: 0.3,
+            speed: 0.85, // Slightly slower for learners
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      console.error("ElevenLabs TTS error:", response.status);
+      return null;
+    }
+
+    const audioBuffer = await response.arrayBuffer();
+    const fileName = `mock-exam/${examType}/${examRound}/listening_q${questionNumber}_${Date.now()}.mp3`;
+    
+    // Upload to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("podcast-audio")
+      .upload(fileName, audioBuffer, {
+        contentType: "audio/mpeg",
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error("Audio upload error:", uploadError);
+      return null;
+    }
+
+    const { data: urlData } = supabase.storage
+      .from("podcast-audio")
+      .getPublicUrl(fileName);
+
+    console.log(`✅ Audio generated for Q${questionNumber}`);
+    return urlData.publicUrl;
+  } catch (error) {
+    console.error("TTS generation error:", error);
+    return null;
+  }
+}
+
 // Build system prompt for Gemini
 function buildSystemPrompt(params: GenerateRequest, ragContext: string): string {
   const levelInfo = {
@@ -197,8 +274,12 @@ ${params.topic ? `- 주제/문법: ${params.topic}` : ''}
 - [13~16] 대화의 주제 파악
 - [17~20] 대화 후 적절한 응답 고르기
 
-각 문제에는 대화 스크립트가 question_text에 포함되어야 합니다.
-예: "남자: 오늘 날씨가 어때요?\n여자: 비가 올 것 같아요."`;
+### 🎵 듣기 스크립트 (listening_script) - 필수!
+듣기 문제는 반드시 listening_script 필드에 대화 스크립트를 포함해야 합니다.
+예시:
+"listening_script": "남자: 오늘 날씨가 어때요?\\n여자: 비가 올 것 같아요. 우산을 가져가세요.\\n남자: 고마워요."
+
+question_text에는 질문만 넣으세요. 예: "남자는 왜 우산을 가져갑니까?"`;
   }
 
   if (ragContext) {
@@ -230,7 +311,7 @@ ${params.referenceDocContent}
 {
   "questions": [
     {
-      "question_text": "문제 전체 텍스트 (지문 포함)",
+      "question_text": "문제 텍스트 (읽기: 지문+질문, 듣기: 질문만)",
       "options": ["① 선지1", "② 선지2", "③ 선지3", "④ 선지4"],
       "correct_answer": 1-4 중 정답 번호,
       "explanation_ko": "상세한 한국어 해설",
@@ -241,7 +322,8 @@ ${params.referenceDocContent}
       "grammar_points": ["문법 포인트1", "문법 포인트2"],
       "vocabulary": ["어휘1 (뜻)", "어휘2 (뜻)"],
       "difficulty": "${params.difficulty}",
-      "topic": "${params.topic || '일반'}"
+      "topic": "${params.topic || '일반'}"${params.section === 'listening' ? `,
+      "listening_script": "남자: ...\\n여자: ..."` : ''}
     }
   ]
 }
@@ -266,11 +348,12 @@ serve(async (req) => {
       topic: params.topic,
       questionCount: params.questionCount,
       useRag: params.useRag,
+      generateAudio: params.generateAudio,
       hasReference: !!params.referenceDocContent,
     });
 
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY not configured");
+    if (!GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY not configured");
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -279,7 +362,7 @@ serve(async (req) => {
 
     // RAG Search for context
     let ragContext = '';
-    if (params.useRag !== false) {
+    if (params.useRag !== false && OPENAI_API_KEY) {
       const searchQuery = `TOPIK ${params.examType === 'topik1' ? 'I' : 'II'} ${params.section} ${params.difficulty} ${params.topic || ''}`.trim();
       ragContext = await ragSearch(searchQuery, supabase);
     }
@@ -287,68 +370,89 @@ serve(async (req) => {
     // Build prompt with RAG context
     const systemPrompt = buildSystemPrompt(params, ragContext);
 
-    // Use Gemini 2.5 Pro with thinking budget
-    console.log("🤖 Calling Gemini 2.5 Pro with extended thinking...");
+    // 🚀 Call Gemini 2.5 Pro DIRECTLY with maximum thinking budget
+    console.log("🤖 Calling Gemini 2.5 Pro directly with maximum thinking budget...");
     
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { 
-            role: "user", 
-            content: `${params.questionCount}개의 ${params.section} 문제를 생성해주세요. 
+    const geminiResponse = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-preview-06-05:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [
+                {
+                  text: `${systemPrompt}\n\n---\n\n${params.questionCount}개의 ${params.section} 문제를 생성해주세요.
 ${params.topic ? `주제/문법: ${params.topic}` : ''}
 난이도: ${params.difficulty}
-모든 문제는 실제 TOPIK 시험과 동일한 형식이어야 합니다.` 
-          }
-        ],
-        response_format: { type: "json_object" },
-      }),
-    });
+모든 문제는 실제 TOPIK 시험과 동일한 형식이어야 합니다.`
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            topP: 0.95,
+            topK: 40,
+            maxOutputTokens: 65536,
+            responseMimeType: "application/json",
+            // Maximum thinking budget for best quality
+            thinkingConfig: {
+              thinkingBudget: 24576
+            }
+          },
+          safetySettings: [
+            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+          ],
+        }),
+      }
+    );
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("AI API error:", response.status, errorText);
-      
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "API credits exhausted. Please add credits." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      
-      throw new Error(`AI API error: ${response.status}`);
+    if (!geminiResponse.ok) {
+      const errorText = await geminiResponse.text();
+      console.error("Gemini API error:", geminiResponse.status, errorText);
+      throw new Error(`Gemini API error: ${geminiResponse.status} - ${errorText}`);
     }
 
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
+    const geminiData = await geminiResponse.json();
+    console.log("Gemini response received, processing...");
 
+    // Extract content from Gemini response
+    const content = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+    
     if (!content) {
-      throw new Error("No content in AI response");
+      console.error("No content in Gemini response:", JSON.stringify(geminiData));
+      throw new Error("No content in Gemini response");
     }
 
     let parsed: { questions: GeneratedQuestion[] };
     try {
-      parsed = JSON.parse(content);
+      // Clean JSON if needed
+      let jsonContent = content;
+      if (jsonContent.startsWith("```json")) {
+        jsonContent = jsonContent.slice(7);
+      }
+      if (jsonContent.startsWith("```")) {
+        jsonContent = jsonContent.slice(3);
+      }
+      if (jsonContent.endsWith("```")) {
+        jsonContent = jsonContent.slice(0, -3);
+      }
+      parsed = JSON.parse(jsonContent.trim());
     } catch (e) {
-      console.error("Failed to parse AI response:", content);
-      throw new Error("Failed to parse AI response as JSON");
+      console.error("Failed to parse Gemini response:", content);
+      throw new Error("Failed to parse Gemini response as JSON");
     }
 
     // Validate questions
-    const validQuestions = (parsed.questions || []).filter((q) => {
+    let validQuestions = (parsed.questions || []).filter((q) => {
       return (
         q.question_text &&
         Array.isArray(q.options) &&
@@ -362,12 +466,35 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
 
     console.log(`✅ Generated ${validQuestions.length} valid questions`);
 
+    // Generate audio for listening questions
+    if (params.section === 'listening' && params.generateAudio !== false && ELEVENLABS_API_KEY && params.examRound) {
+      console.log("🎵 Generating audio for listening questions...");
+      
+      for (let i = 0; i < validQuestions.length; i++) {
+        const q = validQuestions[i];
+        if (q.listening_script) {
+          const audioUrl = await generateListeningAudio(
+            q.listening_script,
+            q.question_number || i + 1,
+            params.examType,
+            params.examRound,
+            supabase
+          );
+          if (audioUrl) {
+            validQuestions[i].question_audio_url = audioUrl;
+          }
+        }
+      }
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true,
         questions: validQuestions,
         ragUsed: !!ragContext,
         ragDocCount: ragContext ? ragContext.split('---').length : 0,
+        model: "gemini-2.5-pro-preview-06-05",
+        thinkingBudget: 24576,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

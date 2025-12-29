@@ -13,13 +13,14 @@ import {
   TrendingUp, BookOpen, Gamepad2, MessageSquare, PenTool, Star,
   Briefcase, Eye, CheckCircle, XCircle, Clock, Download, FileDown,
   Crown, UserCheck, ChevronRight, Shield, Send, Globe, User, AlertTriangle, Info, Languages,
-  ClipboardList
+  ClipboardList, Sparkles
 } from "lucide-react";
 import DocumentUploader from "@/components/admin/DocumentUploader";
 import DocumentList from "@/components/admin/DocumentList";
 import TestimonialsManager from "@/components/admin/TestimonialsManager";
 import VocabTranslationManager from "@/components/admin/VocabTranslationManager";
 import MockExamManager from "@/components/admin/MockExamManager";
+import MockExamGenerator from "@/components/admin/MockExamGenerator";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -634,7 +635,7 @@ const Admin = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-8 mb-8">
+          <TabsList className="grid w-full grid-cols-9 mb-8">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
               <span className="hidden sm:inline">대시보드</span>
@@ -650,6 +651,10 @@ const Admin = () => {
             <TabsTrigger value="mockexam" className="flex items-center gap-2">
               <ClipboardList className="w-4 h-4" />
               <span className="hidden sm:inline">모의고사</span>
+            </TabsTrigger>
+            <TabsTrigger value="ai-generate" className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              <span className="hidden sm:inline">AI생성</span>
             </TabsTrigger>
             <TabsTrigger value="vocabulary" className="flex items-center gap-2">
               <Languages className="w-4 h-4" />
@@ -1521,6 +1526,11 @@ const Admin = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* AI Generate Tab */}
+          <TabsContent value="ai-generate">
+            <MockExamGenerator />
           </TabsContent>
 
           {/* Testimonials Tab */}

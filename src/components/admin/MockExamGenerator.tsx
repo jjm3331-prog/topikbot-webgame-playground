@@ -52,6 +52,8 @@ interface GeneratedQuestion {
   vocabulary: string[];
   difficulty: string;
   topic: string;
+  listening_script?: string;
+  question_audio_url?: string;
 }
 
 interface ValidationResult {
@@ -80,6 +82,7 @@ const MockExamGenerator = () => {
   const [questionCount, setQuestionCount] = useState<number>(10);
   const [examRound, setExamRound] = useState<string>("");
   const [useRag, setUseRag] = useState<boolean>(true);
+  const [generateAudio, setGenerateAudio] = useState<boolean>(true);
   
   // Reference document
   const [referenceFile, setReferenceFile] = useState<File | null>(null);
@@ -183,6 +186,8 @@ const MockExamGenerator = () => {
             topic: topic.trim() || undefined,
             questionCount,
             useRag,
+            generateAudio: section === 'listening' ? generateAudio : false,
+            examRound: parseInt(examRound, 10),
             referenceDocContent: referenceContent || undefined,
           }),
         }
@@ -502,7 +507,26 @@ const MockExamGenerator = () => {
             </div>
           </div>
 
-          {/* Reference Document Upload */}
+          {/* Audio Generation Toggle (for listening section) */}
+          {section === 'listening' && (
+            <div className="flex items-center gap-3 p-3 bg-cyan-500/10 border border-cyan-500/20 rounded-lg">
+              <Checkbox
+                id="generateAudio"
+                checked={generateAudio}
+                onCheckedChange={(checked) => setGenerateAudio(checked === true)}
+              />
+              <div className="flex-1">
+                <Label htmlFor="generateAudio" className="cursor-pointer flex items-center gap-2">
+                  <Headphones className="w-4 h-4 text-cyan-500" />
+                  ElevenLabs TTS 음성 자동 생성
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  듣기 문제의 대화 스크립트를 자연스러운 한국어 음성으로 자동 생성합니다.
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="space-y-3">
             <Label className="flex items-center gap-2">
               <FileUp className="w-4 h-4" />
