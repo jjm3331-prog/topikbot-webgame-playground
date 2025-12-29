@@ -34,7 +34,7 @@ import {
   Loader2, Sparkles, FileText, CheckCircle, 
   AlertTriangle, XCircle, Brain, Wand2, Save,
   RefreshCw, FileUp, BookOpen, Headphones, PenLine,
-  Target, ThumbsUp, Volume2, Mic2, Radio, Zap, TrendingUp, Globe
+  Target, ThumbsUp, Volume2, Mic2, Radio, Zap, TrendingUp, Globe, Image, Upload, X
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { motion, AnimatePresence } from "framer-motion";
@@ -54,6 +54,8 @@ interface GeneratedQuestion {
   topic: string;
   listening_script?: string;
   question_audio_url?: string;
+  question_image_url?: string;
+  image_description?: string;
 }
 
 interface ValidationResult {
@@ -601,6 +603,7 @@ const MockExamGenerator = () => {
           grammar_points: q.grammar_points || [],
           vocabulary: q.vocabulary || [],
           question_audio_url: q.question_audio_url || null,
+          question_image_url: q.question_image_url || null,
           generation_source: referenceContent ? "ai_from_reference" : "ai_generated",
           status: "approved",
           approved_by: user?.id,
@@ -1207,6 +1210,12 @@ const MockExamGenerator = () => {
                                 <span className="text-sm truncate max-w-md">
                                   {question.question_text.slice(0, 60)}...
                                 </span>
+                                {question.question_image_url && (
+                                  <Badge variant="outline" className="text-purple-600 text-xs">
+                                    <Image className="w-3 h-3 mr-1" />
+                                    그림
+                                  </Badge>
+                                )}
                                 {question.question_audio_url && (
                                   <Badge variant="outline" className="text-cyan-600 text-xs">
                                     <Volume2 className="w-3 h-3 mr-1" />
@@ -1232,6 +1241,148 @@ const MockExamGenerator = () => {
                                 <Label className="text-xs text-muted-foreground">문제</Label>
                                 <p className="mt-1 whitespace-pre-wrap">{question.question_text}</p>
                               </div>
+
+                              {/* Question Image for Picture Dialogue [5-8] */}
+                              {(question.question_image_url || question.image_description) && (
+                                <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                                  <Label className="text-xs text-purple-600 flex items-center gap-1 mb-2">
+                                    <Image className="w-3 h-3" />
+                                    그림 문제 이미지
+                                  </Label>
+                                  
+                                  {question.question_image_url ? (
+                                    <div className="space-y-2">
+                                      <div className="relative group">
+                                        <img 
+                                          src={question.question_image_url} 
+                                          alt="문제 이미지" 
+                                          className="max-h-48 rounded-lg border"
+                                        />
+                                        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                          <Button
+                                            size="sm"
+                                            variant="destructive"
+                                            className="h-7 w-7 p-0"
+                                            onClick={() => {
+                                              const updated = [...generatedQuestions];
+                                              updated[index].question_image_url = undefined;
+                                              setGeneratedQuestions(updated);
+                                            }}
+                                          >
+                                            <X className="w-3 h-3" />
+                                          </Button>
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Replace Image Button */}
+                                      <div className="flex items-center gap-2">
+                                        <Label 
+                                          htmlFor={`image-replace-${index}`}
+                                          className="cursor-pointer flex items-center gap-2 px-3 py-1.5 text-xs bg-purple-100 dark:bg-purple-800 hover:bg-purple-200 dark:hover:bg-purple-700 rounded-md transition-colors"
+                                        >
+                                          <Upload className="w-3 h-3" />
+                                          이미지 교체
+                                        </Label>
+                                        <input
+                                          id={`image-replace-${index}`}
+                                          type="file"
+                                          accept="image/*"
+                                          className="hidden"
+                                          onChange={async (e) => {
+                                            const file = e.target.files?.[0];
+                                            if (!file) return;
+                                            
+                                            try {
+                                              const fileName = `mock-exam/${examType}/${examRound}/picture_q${question.question_number || index + 1}_manual_${Date.now()}.${file.name.split('.').pop()}`;
+                                              const { error } = await supabase.storage
+                                                .from("podcast-audio")
+                                                .upload(fileName, file, { upsert: true });
+                                              
+                                              if (error) throw error;
+                                              
+                                              const { data: urlData } = supabase.storage
+                                                .from("podcast-audio")
+                                                .getPublicUrl(fileName);
+                                              
+                                              const updated = [...generatedQuestions];
+                                              updated[index].question_image_url = urlData.publicUrl;
+                                              setGeneratedQuestions(updated);
+                                              
+                                              toast({
+                                                title: "이미지 교체 완료",
+                                                description: "새 이미지가 업로드되었습니다.",
+                                              });
+                                            } catch (err: any) {
+                                              toast({
+                                                title: "업로드 실패",
+                                                description: err.message,
+                                                variant: "destructive",
+                                              });
+                                            }
+                                          }}
+                                        />
+                                        <span className="text-xs text-muted-foreground">
+                                          AI 생성 이미지가 마음에 안 들면 직접 업로드
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="space-y-2">
+                                      <p className="text-sm text-muted-foreground italic">
+                                        이미지 설명: {question.image_description}
+                                      </p>
+                                      <p className="text-xs text-yellow-600">
+                                        ⚠️ 이미지 생성에 실패했습니다. 직접 업로드해주세요.
+                                      </p>
+                                      <Label 
+                                        htmlFor={`image-upload-${index}`}
+                                        className="cursor-pointer inline-flex items-center gap-2 px-3 py-1.5 text-xs bg-purple-100 dark:bg-purple-800 hover:bg-purple-200 dark:hover:bg-purple-700 rounded-md transition-colors"
+                                      >
+                                        <Upload className="w-3 h-3" />
+                                        이미지 업로드
+                                      </Label>
+                                      <input
+                                        id={`image-upload-${index}`}
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={async (e) => {
+                                          const file = e.target.files?.[0];
+                                          if (!file) return;
+                                          
+                                          try {
+                                            const fileName = `mock-exam/${examType}/${examRound}/picture_q${question.question_number || index + 1}_manual_${Date.now()}.${file.name.split('.').pop()}`;
+                                            const { error } = await supabase.storage
+                                              .from("podcast-audio")
+                                              .upload(fileName, file, { upsert: true });
+                                            
+                                            if (error) throw error;
+                                            
+                                            const { data: urlData } = supabase.storage
+                                              .from("podcast-audio")
+                                              .getPublicUrl(fileName);
+                                            
+                                            const updated = [...generatedQuestions];
+                                            updated[index].question_image_url = urlData.publicUrl;
+                                            setGeneratedQuestions(updated);
+                                            
+                                            toast({
+                                              title: "이미지 업로드 완료",
+                                              description: "이미지가 추가되었습니다.",
+                                            });
+                                          } catch (err: any) {
+                                            toast({
+                                              title: "업로드 실패",
+                                              description: err.message,
+                                              variant: "destructive",
+                                            });
+                                          }
+                                        }}
+                                      />
+                                    </div>
+                                  )}
+                                </div>
+                              )}
 
                               {/* Listening Script & Audio */}
                               {question.listening_script && (
