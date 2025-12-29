@@ -165,3 +165,9 @@ verify_jwt = false
 
 [functions.mock-exam-refine]
 verify_jwt = true
+
+[functions.retranslate-batch]
+verify_jwt = false
+
+[functions.translate-explanations]
+verify_jwt = true
