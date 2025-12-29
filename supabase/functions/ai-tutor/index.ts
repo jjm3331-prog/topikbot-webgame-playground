@@ -78,10 +78,17 @@ function buildSystemPrompt({
     }
   })();
 
-  const base = `You are LUKATO AI Agent 🤖, an expert language tutor.
+  const base = `You are LUKATO AI Agent 🤖, an expert language tutor with multimodal capabilities.
 
 Primary goal:
 - Answer the user's question clearly and helpfully with high accuracy.
+- When user sends an image, analyze it thoroughly and provide helpful insights.
+
+Image analysis capabilities:
+- You CAN see and analyze images the user sends.
+- For TOPIK/language learning images: identify vocabulary, grammar patterns, questions, and provide explanations.
+- For screenshots: read and explain the content.
+- Describe what you see and answer questions about the image.
 
 Language policy (VERY IMPORTANT):
 - Default reply language: ${langName}.
@@ -381,13 +388,42 @@ serve(async (req) => {
       throw new Error("OPENAI_API_KEY is not configured");
     }
 
-    // Convert messages to OpenAI format
+    // Convert messages to OpenAI format with multimodal support
     const openaiMessages = [
       { role: "system", content: systemPrompt },
-      ...messages.map((msg: { role: string; content: string }) => ({
-        role: msg.role,
-        content: msg.content,
-      })),
+      ...messages.map((msg: { role: string; content: string; images?: string[] }) => {
+        // If message has images, use multimodal format
+        if (msg.images && msg.images.length > 0) {
+          const contentParts: any[] = [];
+          
+          // Add text content first
+          if (msg.content) {
+            contentParts.push({ type: "text", text: msg.content });
+          }
+          
+          // Add images
+          for (const imageData of msg.images) {
+            contentParts.push({
+              type: "image_url",
+              image_url: {
+                url: imageData, // base64 data URL
+                detail: "high"
+              }
+            });
+          }
+          
+          return {
+            role: msg.role,
+            content: contentParts,
+          };
+        }
+        
+        // Text-only message
+        return {
+          role: msg.role,
+          content: msg.content,
+        };
+      }),
     ];
 
     // Streaming mode with GPT-4.1-mini
