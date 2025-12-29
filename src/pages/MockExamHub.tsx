@@ -31,7 +31,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 const MockExamHub = () => {
   const navigate = useNavigate();
@@ -424,7 +425,10 @@ const MockExamHub = () => {
               <DialogTitle>영역 선택</DialogTitle>
               <DialogDescription>연습할 영역을 선택하세요</DialogDescription>
             </DialogHeader>
-            <div className="grid grid-cols-2 gap-4 py-4">
+            <div className={cn(
+              "grid gap-4 py-4",
+              selectedExam === 'TOPIK_II' ? "grid-cols-3" : "grid-cols-2"
+            )}>
               <Button 
                 variant="outline" 
                 className="h-24 flex flex-col gap-2"
@@ -441,6 +445,16 @@ const MockExamHub = () => {
                 <BookOpen className="w-8 h-8" />
                 <span>읽기</span>
               </Button>
+              {selectedExam === 'TOPIK_II' && (
+                <Button 
+                  variant="outline" 
+                  className="h-24 flex flex-col gap-2"
+                  onClick={() => navigate(`/mock-exam/${selectedExam}?mode=section&section=writing`)}
+                >
+                  <PenTool className="w-8 h-8" />
+                  <span>쓰기</span>
+                </Button>
+              )}
             </div>
           </DialogContent>
         </Dialog>
