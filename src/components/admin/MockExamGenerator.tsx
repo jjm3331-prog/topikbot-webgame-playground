@@ -908,6 +908,10 @@ const MockExamGenerator = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
+                  {/* 그림 문제(5-8)일 때 2문제 옵션 추가 */}
+                  {section === 'listening' && listeningQuestionType === '5-8' && (
+                    <SelectItem value="2">2문제 (그림 문제 권장)</SelectItem>
+                  )}
                   <SelectItem value="5">5문제</SelectItem>
                   <SelectItem value="10">10문제</SelectItem>
                   <SelectItem value="15">15문제</SelectItem>
