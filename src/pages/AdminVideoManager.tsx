@@ -752,10 +752,10 @@ export default function AdminVideoManager() {
               </Select>
             </div>
             <div>
-              <Label className="text-sm font-medium mb-2 block">SRT 파일</Label>
+              <Label className="text-sm font-medium mb-2 block">자막 파일 (SRT 또는 VTT)</Label>
               <Input
                 type="file"
-                accept=".srt"
+                accept=".srt,.vtt"
                 onChange={(e) => handleSrtFileChange(e.target.files?.[0] || null)}
               />
               {srtFile && (
