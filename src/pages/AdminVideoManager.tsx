@@ -405,6 +405,23 @@ export default function AdminVideoManager() {
     }
   };
 
+  // Refresh subtitle statuses for a single video
+  const refreshSubtitleStatus = async (videoId: string) => {
+    const { data: subs } = await supabase
+      .from('video_subtitles')
+      .select('language, is_reviewed')
+      .eq('video_id', videoId);
+
+    setSubtitleStatuses(prev => ({
+      ...prev,
+      [videoId]: LANGUAGES.map(lang => ({
+        language: lang,
+        exists: subs?.some(s => s.language === lang) || false,
+        is_reviewed: subs?.find(s => s.language === lang)?.is_reviewed || false,
+      })),
+    }));
+  };
+
   // Translate video subtitles to 7 languages
   const handleTranslateAll = async (video: VideoLesson) => {
     // Check if Korean subtitle exists first
@@ -429,7 +446,9 @@ export default function AdminVideoManager() {
         : 0;
       
       toast.success(`✅ ${successCount}/6 언어 번역 완료!`);
-      fetchVideos();
+      
+      // Immediately refresh subtitle status for this video
+      await refreshSubtitleStatus(video.id);
     } catch (err: any) {
       console.error('Translation error:', err);
       toast.error('번역 실패: ' + (err.message || '알 수 없는 오류'));
