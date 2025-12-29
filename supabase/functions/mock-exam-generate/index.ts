@@ -737,6 +737,10 @@ serve(async (req) => {
       ttsPreset: params.ttsPreset,
       stream: params.stream,
       hasReference: !!params.referenceDocContent,
+      // 듣기 세부 설정
+      listeningQuestionType: params.listeningQuestionType,
+      dialogueLength: params.dialogueLength,
+      speakerCount: params.speakerCount,
     });
 
     if (!GEMINI_API_KEY) {
