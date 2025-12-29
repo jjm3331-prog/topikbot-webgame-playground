@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Trash2, Edit, Play, Loader2, Languages, CheckCircle, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Edit, Play, Loader2, Languages, CheckCircle, AlertCircle, Zap } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 
 interface VideoLesson {
@@ -61,6 +62,14 @@ export default function AdminVideoManager() {
   const [selectedVideo, setSelectedVideo] = useState<VideoLesson | null>(null);
   const [subtitleStatuses, setSubtitleStatuses] = useState<Record<string, SubtitleStatus[]>>({});
   const [isAdmin, setIsAdmin] = useState(false);
+  
+  // Progress tracking for chain generation
+  const [chainProgress, setChainProgress] = useState<{
+    videoId: string;
+    step: 'extracting' | 'transcribing' | 'translating' | 'done';
+    progress: number;
+    message: string;
+  } | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -192,28 +201,115 @@ export default function AdminVideoManager() {
     }
   };
 
-  // Fully automatic subtitle generation - just click the button!
-  const handleGenerateSubtitles = async (video: VideoLesson) => {
+  // Fully automatic subtitle generation + translation chain
+  const handleGenerateAndTranslate = async (video: VideoLesson) => {
     setGenerating(video.id);
+    setChainProgress({
+      videoId: video.id,
+      step: 'extracting',
+      progress: 10,
+      message: '🎵 YouTube에서 오디오 추출 중...'
+    });
+
     try {
-      toast.info('YouTube에서 오디오 추출 중... 잠시 기다려주세요');
+      // Step 1: Generate subtitles
+      setChainProgress({
+        videoId: video.id,
+        step: 'transcribing',
+        progress: 30,
+        message: '🎤 Whisper로 자막 생성 중...'
+      });
+      
+      const { data: whisperData, error: whisperError } = await supabase.functions.invoke('video-whisper', {
+        body: { video_id: video.id, youtube_id: video.youtube_id }
+      });
+
+      if (whisperError) throw whisperError;
+      if (whisperData?.error) throw new Error(whisperData.error);
+
+      setChainProgress({
+        videoId: video.id,
+        step: 'translating',
+        progress: 60,
+        message: `✅ 자막 생성 완료! 🌍 6개 언어 번역 중...`
+      });
+
+      // Step 2: Auto-translate to all languages
+      const { data: translateData, error: translateError } = await supabase.functions.invoke('video-translate', {
+        body: { video_id: video.id }
+      });
+
+      if (translateError) throw translateError;
+
+      setChainProgress({
+        videoId: video.id,
+        step: 'done',
+        progress: 100,
+        message: '🎉 자막 생성 + 번역 완료!'
+      });
+
+      toast.success(`자막 생성 및 번역 완료! (${whisperData?.subtitles_count || '?'}개 세그먼트)`);
+      
+      // Clear progress after 2 seconds
+      setTimeout(() => {
+        setChainProgress(null);
+      }, 2000);
+      
+      fetchVideos();
+    } catch (error: any) {
+      console.error('Error in chain generation:', error);
+      const msg = error?.message || '자막 생성에 실패했습니다';
+      toast.error(msg);
+      setChainProgress(null);
+    } finally {
+      setGenerating(null);
+    }
+  };
+
+  // Just generate subtitles (no translation)
+  const handleGenerateSubtitlesOnly = async (video: VideoLesson) => {
+    setGenerating(video.id);
+    setChainProgress({
+      videoId: video.id,
+      step: 'extracting',
+      progress: 20,
+      message: '🎵 YouTube에서 오디오 추출 중...'
+    });
+
+    try {
+      setChainProgress({
+        videoId: video.id,
+        step: 'transcribing',
+        progress: 50,
+        message: '🎤 Whisper로 자막 생성 중...'
+      });
       
       const { data, error } = await supabase.functions.invoke('video-whisper', {
         body: { video_id: video.id, youtube_id: video.youtube_id }
       });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
-      if (data?.error) {
-        throw new Error(data.error);
-      }
+      setChainProgress({
+        videoId: video.id,
+        step: 'done',
+        progress: 100,
+        message: '✅ 자막 생성 완료!'
+      });
 
       toast.success(data?.message || '자막이 생성되었습니다');
+      
+      setTimeout(() => {
+        setChainProgress(null);
+      }, 1500);
+      
       fetchVideos();
     } catch (error: any) {
       console.error('Error generating subtitles:', error);
       const msg = error?.message || '자막 생성에 실패했습니다';
       toast.error(msg);
+      setChainProgress(null);
     } finally {
       setGenerating(null);
     }
@@ -221,6 +317,13 @@ export default function AdminVideoManager() {
 
   const handleTranslate = async (video: VideoLesson) => {
     setTranslating(video.id);
+    setChainProgress({
+      videoId: video.id,
+      step: 'translating',
+      progress: 50,
+      message: '🌍 6개 언어 번역 중...'
+    });
+
     try {
       const { data, error } = await supabase.functions.invoke('video-translate', {
         body: { video_id: video.id }
@@ -228,11 +331,24 @@ export default function AdminVideoManager() {
 
       if (error) throw error;
       
+      setChainProgress({
+        videoId: video.id,
+        step: 'done',
+        progress: 100,
+        message: '✅ 번역 완료!'
+      });
+
       toast.success(data.message);
+      
+      setTimeout(() => {
+        setChainProgress(null);
+      }, 1500);
+      
       fetchVideos();
     } catch (error) {
       console.error('Error translating:', error);
       toast.error('번역에 실패했습니다');
+      setChainProgress(null);
     } finally {
       setTranslating(null);
     }
@@ -491,18 +607,43 @@ export default function AdminVideoManager() {
                               ))}
                             </div>
 
+                            {/* Progress Bar */}
+                            {chainProgress?.videoId === video.id && (
+                              <div className="mb-3 space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                                  <span className="text-sm font-medium">{chainProgress.message}</span>
+                                </div>
+                                <Progress value={chainProgress.progress} className="h-2" />
+                              </div>
+                            )}
+
                             {/* Actions */}
                             <div className="flex flex-wrap gap-2">
                               <Button
                                 size="sm"
-                                variant="outline"
-                                onClick={() => handleGenerateSubtitles(video)}
-                                disabled={generating === video.id}
+                                variant="default"
+                                onClick={() => handleGenerateAndTranslate(video)}
+                                disabled={generating === video.id || translating === video.id}
+                                className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
                               >
                                 {generating === video.id ? (
                                   <Loader2 className="w-4 h-4 animate-spin mr-1" />
+                                ) : (
+                                  <Zap className="w-4 h-4 mr-1" />
+                                )}
+                                ⚡ 자막+번역 원클릭
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleGenerateSubtitlesOnly(video)}
+                                disabled={generating === video.id}
+                              >
+                                {generating === video.id && chainProgress?.step !== 'translating' ? (
+                                  <Loader2 className="w-4 h-4 animate-spin mr-1" />
                                 ) : null}
-                                🎤 자막 생성
+                                🎤 자막만
                               </Button>
                               <Button
                                 size="sm"
@@ -522,7 +663,7 @@ export default function AdminVideoManager() {
                                 variant="outline"
                                 onClick={() => navigate(`/admin/video/${video.id}/subtitles`)}
                               >
-                                ✏️ 자막 검수
+                                ✏️ 검수
                               </Button>
                               <Button
                                 size="sm"
