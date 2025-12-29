@@ -62,6 +62,8 @@ import AdminVideoSubtitles from "./pages/AdminVideoSubtitles";
 import VideoLearningHub from "./pages/VideoLearningHub";
 import MockExamHub from "./pages/MockExamHub";
 import MockExamTest from "./pages/MockExamTest";
+import MockExamReport from "./pages/MockExamReport";
+import MockExamMistakes from "./pages/MockExamMistakes";
 import AdminMockExam from "./pages/AdminMockExam";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWAWelcome from "./components/PWAWelcome";
@@ -221,6 +223,8 @@ const App = () => {
               <Route path="/video-hub" element={<ProtectedRoute><VideoLearningHub /></ProtectedRoute>} />
               <Route path="/mock-exam" element={<ProtectedRoute><MockExamHub /></ProtectedRoute>} />
               <Route path="/mock-exam/:examType" element={<ProtectedRoute><MockExamTest /></ProtectedRoute>} />
+              <Route path="/mock-exam/report/:attemptId" element={<ProtectedRoute><MockExamReport /></ProtectedRoute>} />
+              <Route path="/mock-exam/mistakes" element={<ProtectedRoute><MockExamMistakes /></ProtectedRoute>} />
               <Route path="/admin/mock-exam" element={<ProtectedRoute><AdminMockExam /></ProtectedRoute>} />
               <Route path="/board-hub" element={<ProtectedRoute><BoardHub /></ProtectedRoute>} />
               <Route path="/board/:boardType" element={<ProtectedRoute><Board /></ProtectedRoute>} />
