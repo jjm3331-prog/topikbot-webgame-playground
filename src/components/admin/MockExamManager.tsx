@@ -75,6 +75,7 @@ interface ParsedQuestion {
   explanation: string;
   part_number: number;
   question_number: number;
+  listening_script?: string;
 }
 
 const MockExamManager = () => {
@@ -91,6 +92,8 @@ const MockExamManager = () => {
   const [examRound, setExamRound] = useState<string>("");
   const [questionText, setQuestionText] = useState("");
   const [explanationText, setExplanationText] = useState("");
+  const [listeningScript, setListeningScript] = useState("");
+  const [generatingAudio, setGeneratingAudio] = useState(false);
   
   // Preview state
   const [parsedQuestions, setParsedQuestions] = useState<ParsedQuestion[]>([]);
@@ -204,6 +207,69 @@ const MockExamManager = () => {
 
     setSavingQuestions(true);
     try {
+      // If listening section and script provided, generate audio for each question
+      let audioUrls: Record<number, string> = {};
+      
+      if (section === "listening" && listeningScript.trim()) {
+        setGeneratingAudio(true);
+        toast({
+          title: "🎵 음성 생성 중...",
+          description: "ElevenLabs TTS로 듣기 음원을 생성하고 있습니다.",
+        });
+
+        // Parse listening scripts for each question
+        const scriptLines = listeningScript.split(/\n(?=\d+\.)/);
+        
+        for (const line of scriptLines) {
+          const match = line.match(/^(\d+)\.\s*([\s\S]+)/);
+          if (match) {
+            const qNum = parseInt(match[1], 10);
+            const script = match[2].trim();
+            
+            if (script) {
+              try {
+                // Generate TTS audio
+                const response = await fetch(
+                  `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+                    },
+                    body: JSON.stringify({ text: script, speed: 0.85 }),
+                  }
+                );
+
+                if (response.ok) {
+                  const audioBlob = await response.blob();
+                  const fileName = `mock-exam/${examType}/${examRound}/${section}_q${qNum}_${Date.now()}.mp3`;
+                  
+                  // Upload to Supabase Storage
+                  const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from("podcast-audio")
+                    .upload(fileName, audioBlob, {
+                      contentType: "audio/mpeg",
+                      upsert: true,
+                    });
+
+                  if (!uploadError && uploadData) {
+                    const { data: urlData } = supabase.storage
+                      .from("podcast-audio")
+                      .getPublicUrl(fileName);
+                    audioUrls[qNum] = urlData.publicUrl;
+                    console.log(`Audio generated for Q${qNum}:`, urlData.publicUrl);
+                  }
+                }
+              } catch (err) {
+                console.error(`Failed to generate audio for Q${qNum}:`, err);
+              }
+            }
+          }
+        }
+        setGeneratingAudio(false);
+      }
+
       const questionsToInsert = parsedQuestions.map((q) => ({
         exam_type: examType,
         section,
@@ -214,6 +280,7 @@ const MockExamManager = () => {
         options: q.options,
         correct_answer: q.correct_answer,
         explanation_ko: q.explanation,
+        question_audio_url: audioUrls[q.question_number] || null,
         is_active: true,
       }));
 
@@ -223,14 +290,16 @@ const MockExamManager = () => {
 
       if (error) throw error;
 
+      const audioCount = Object.keys(audioUrls).length;
       toast({
         title: "저장 완료",
-        description: `${parsedQuestions.length}개의 문제가 저장되었습니다.`,
+        description: `${parsedQuestions.length}개의 문제가 저장되었습니다.${audioCount > 0 ? ` (음성 ${audioCount}개 생성)` : ""}`,
       });
 
       // Reset form
       setQuestionText("");
       setExplanationText("");
+      setListeningScript("");
       setExamRound("");
       setParsedQuestions([]);
       setShowPreview(false);
@@ -247,6 +316,7 @@ const MockExamManager = () => {
       });
     } finally {
       setSavingQuestions(false);
+      setGeneratingAudio(false);
     }
   };
 
@@ -447,6 +517,42 @@ const MockExamManager = () => {
                   여러 문제를 한 번에 입력할 수 있습니다. 문제 번호와 선택지를 포함해주세요.
                 </p>
               </div>
+
+              {/* Listening Script Input (only for listening section) */}
+              {section === "listening" && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="flex items-center gap-2">
+                      <Headphones className="w-4 h-4 text-cyan-500" />
+                      듣기 스크립트 (TTS 자동 생성)
+                    </Label>
+                    <Badge className="bg-cyan-500/20 text-cyan-600 border-cyan-500/30">
+                      🎵 ElevenLabs 한국어 TTS
+                    </Badge>
+                  </div>
+                  <Textarea
+                    placeholder={`각 문제별 듣기 스크립트를 입력하세요.
+
+예시:
+1. 여자: 처음 뵙겠습니다.
+   남자: _____________
+
+2. 남자: 가족이 몇 명이에요?
+   여자: _____________
+
+3. 여자: 오늘 날씨가 좋네요.
+   남자: 네, 정말 좋아요.
+
+...`}
+                    value={listeningScript}
+                    onChange={(e) => setListeningScript(e.target.value)}
+                    className="min-h-[200px] font-mono text-sm border-cyan-500/30"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    💡 저장 시 각 문제의 스크립트가 ElevenLabs TTS로 자동 음성 변환되어 Storage에 저장됩니다.
+                  </p>
+                </div>
+              )}
 
               {/* Explanation Text Input with Language Tabs */}
               <div className="space-y-3">
@@ -665,8 +771,13 @@ const MockExamManager = () => {
             <Button variant="outline" onClick={() => setShowPreview(false)}>
               취소
             </Button>
-            <Button onClick={handleSaveQuestions} disabled={savingQuestions}>
-              {savingQuestions ? (
+            <Button onClick={handleSaveQuestions} disabled={savingQuestions || generatingAudio}>
+              {generatingAudio ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  🎵 음성 생성 중...
+                </>
+              ) : savingQuestions ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   저장 중...
@@ -675,6 +786,7 @@ const MockExamManager = () => {
                 <>
                   <CheckCircle className="w-4 h-4 mr-2" />
                   {parsedQuestions.length}개 문제 저장
+                  {section === "listening" && listeningScript.trim() && " (+ TTS 생성)"}
                 </>
               )}
             </Button>
