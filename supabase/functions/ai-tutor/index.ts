@@ -389,20 +389,24 @@ serve(async (req) => {
     }
 
     // Convert messages to OpenAI format with multimodal support
+    let hasImages = false;
     const openaiMessages = [
       { role: "system", content: systemPrompt },
       ...messages.map((msg: { role: string; content: string; images?: string[] }) => {
         // If message has images, use multimodal format
         if (msg.images && msg.images.length > 0) {
+          hasImages = true;
           const contentParts: any[] = [];
           
-          // Add text content first
-          if (msg.content) {
-            contentParts.push({ type: "text", text: msg.content });
-          }
+          // Add text content first (if no text, add a default prompt)
+          contentParts.push({ 
+            type: "text", 
+            text: msg.content || "이 이미지를 분석해주세요." 
+          });
           
           // Add images
           for (const imageData of msg.images) {
+            console.log("Processing image, length:", imageData.length, "starts with:", imageData.substring(0, 50));
             contentParts.push({
               type: "image_url",
               image_url: {
@@ -426,16 +430,11 @@ serve(async (req) => {
       }),
     ];
 
+    console.log("Request - hasImages:", hasImages, "language:", language, "agent:", agentId, "messageCount:", openaiMessages.length);
+
     // Streaming mode with GPT-4.1-mini
     if (stream) {
-      console.log(
-        "Streaming with gpt-4.1-mini, language:",
-        language,
-        "agent:",
-        agentId,
-        "RAG:",
-        ragContext.length > 0
-      );
+      console.log("Streaming with gpt-4.1-mini, hasImages:", hasImages, "RAG:", ragContext.length > 0);
 
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
