@@ -362,398 +362,207 @@ const Dashboard = () => {
             </div>
           </motion.div>
 
-          {/* Video Learning Banner - NEW */}
-          <motion.div 
+          {/* Feature Banners Grid - 2 columns */}
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.11 }}
-            onClick={() => navigate("/video-hub")}
-            className="relative overflow-hidden rounded-2xl cursor-pointer group"
+            className="grid grid-cols-1 sm:grid-cols-2 gap-4"
           >
-            {/* Vibrant gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-blue-500 to-violet-600" />
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/30" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_25%,rgba(255,255,255,0.25),transparent_35%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_75%,rgba(147,51,234,0.3),transparent_35%)]" />
-            
-            {/* Floating elements */}
-            <div className="absolute inset-0 overflow-hidden">
-              <div className="absolute top-1/4 left-1/6 w-3 h-3 bg-white/20 rounded-full animate-bounce" style={{ animationDuration: '2s' }} />
-              <div className="absolute top-1/3 right-1/4 w-2 h-2 bg-cyan-300/40 rounded-full animate-bounce" style={{ animationDuration: '2.5s', animationDelay: '0.3s' }} />
-              <div className="absolute bottom-1/4 left-1/3 w-2.5 h-2.5 bg-violet-300/30 rounded-full animate-bounce" style={{ animationDuration: '3s', animationDelay: '0.6s' }} />
-              <div className="absolute top-1/2 right-1/6 w-1.5 h-1.5 bg-white/30 rounded-full animate-pulse" />
-            </div>
-            
-            {/* Shimmer effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-            
-            <div className="relative z-10 p-5 sm:p-6 flex items-center justify-between">
-              <div className="flex items-center gap-4 sm:gap-5">
-                {/* Icon with glow */}
-                <div className="relative">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-lg shadow-cyan-500/20">
-                    <svg className="w-7 h-7 sm:w-8 sm:h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <polygon points="5 3 19 12 5 21 5 3" />
-                    </svg>
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center border-2 border-white/50 shadow-md">
-                    <span className="text-[10px] font-bold text-white">7</span>
-                  </div>
-                </div>
-                
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1.5 sm:mb-2 flex-wrap">
-                    <span className="text-badge px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white/25 text-white font-bold backdrop-blur-sm">
-                      7개국어 자막
-                    </span>
-                    <span className="text-badge px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-white font-bold shadow-sm">
-                      NEW
-                    </span>
-                  </div>
-                  <h3 className="font-bold text-white text-lg sm:text-xl lg:text-2xl tracking-tight">비디오 학습</h3>
-                  <p className="text-white/85 text-sm sm:text-base mt-0.5 sm:mt-1">
-                    YouTube 영상으로 자연스럽게 한국어 학습
-                  </p>
-                </div>
-              </div>
+            {/* Video Learning Banner */}
+            <div 
+              onClick={() => navigate("/video-hub")}
+              className="relative overflow-hidden rounded-2xl cursor-pointer group h-[140px]"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 via-blue-500 to-violet-600" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
               
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="hidden sm:flex flex-col items-end mr-2">
-                  <span className="text-card-caption text-white/80 font-medium">TOPIK 어휘 연동</span>
-                  <span className="text-badge text-cyan-200 font-semibold">AI 쉐도잉</span>
+              <div className="relative z-10 p-4 h-full flex flex-col justify-between">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                      <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polygon points="5 3 19 12 5 21 5 3" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/25 text-white font-bold">7개국어 자막</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-cyan-400 text-white font-bold">NEW</span>
+                      </div>
+                      <h3 className="font-bold text-white text-base sm:text-lg">비디오 학습</h3>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-white/70 group-hover:translate-x-1 transition-transform" />
                 </div>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/25 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/35 transition-colors shadow-lg">
-                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:translate-x-0.5 transition-transform" />
-                </div>
+                <p className="text-white/80 text-xs sm:text-sm">YouTube 영상으로 자연스럽게 한국어 학습</p>
               </div>
             </div>
-          </motion.div>
 
-          {/* Mock Exam Banner - NEW */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.115 }}
-            onClick={() => navigate("/mock-exam")}
-            className="relative overflow-hidden rounded-2xl cursor-pointer group"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600" />
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/30" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_25%,rgba(255,255,255,0.2),transparent_35%)]" />
-            
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-            
-            <div className="relative z-10 p-5 sm:p-6 flex items-center justify-between">
-              <div className="flex items-center gap-4 sm:gap-5">
-                <div className="relative">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-lg">
-                    <GraduationCap className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center border-2 border-white/50 shadow-md">
-                    <span className="text-[10px] font-bold text-white">AI</span>
-                  </div>
-                </div>
-                
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1.5 sm:mb-2 flex-wrap">
-                    <span className="text-badge px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white/25 text-white font-bold backdrop-blur-sm">
-                      TOPIK I · II · EPS
-                    </span>
-                    <span className="text-badge px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold shadow-sm">
-                      NEW
-                    </span>
-                  </div>
-                  <h3 className="font-bold text-white text-lg sm:text-xl lg:text-2xl tracking-tight">TOPIK 모의고사</h3>
-                  <p className="text-white/85 text-sm sm:text-base mt-0.5 sm:mt-1">
-                    실전과 100% 동일한 AI 생성 문제로 완벽 대비
-                  </p>
-                </div>
-              </div>
+            {/* Mock Exam Banner */}
+            <div 
+              onClick={() => navigate("/mock-exam")}
+              className="relative overflow-hidden rounded-2xl cursor-pointer group h-[140px]"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
               
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="hidden sm:flex flex-col items-end mr-2">
-                  <span className="text-card-caption text-white/80 font-medium">7개 언어 해설</span>
-                  <span className="text-badge text-emerald-200 font-semibold">스마트 오답노트</span>
+              <div className="relative z-10 p-4 h-full flex flex-col justify-between">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                      <GraduationCap className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/25 text-white font-bold">TOPIK I·II·EPS</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500 text-white font-bold">NEW</span>
+                      </div>
+                      <h3 className="font-bold text-white text-base sm:text-lg">TOPIK 모의고사</h3>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-white/70 group-hover:translate-x-1 transition-transform" />
                 </div>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/25 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/35 transition-colors shadow-lg">
-                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:translate-x-0.5 transition-transform" />
-                </div>
+                <p className="text-white/80 text-xs sm:text-sm">실전과 100% 동일한 AI 생성 문제로 완벽 대비</p>
               </div>
             </div>
-          </motion.div>
 
-          {/* Battle Arena Banner - HOT */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.12 }}
-            onClick={() => navigate("/battle")}
-            className="relative overflow-hidden rounded-2xl cursor-pointer group"
-          >
-            {/* Dark intense gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-600 via-orange-500 to-red-600" />
-            <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-transparent to-black/40" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,0,0.3),transparent_40%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(255,50,50,0.3),transparent_40%)]" />
-            
-            {/* Fire particles */}
-            <div className="absolute inset-0 overflow-hidden">
-              <div className="absolute top-1/4 left-1/5 w-2 h-2 bg-yellow-400/50 rounded-full animate-pulse" />
-              <div className="absolute top-1/3 right-1/4 w-1.5 h-1.5 bg-orange-400/60 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
-              <div className="absolute bottom-1/4 left-1/3 w-1 h-1 bg-red-400/50 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
-              <div className="absolute top-1/2 right-1/5 w-2 h-2 bg-yellow-300/40 rounded-full animate-pulse" style={{ animationDelay: '0.6s' }} />
-            </div>
-            
-            {/* Shimmer effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-            
-            <div className="relative z-10 p-5 sm:p-6 flex items-center justify-between">
-              <div className="flex items-center gap-4 sm:gap-5">
-                {/* Icon with heartbeat */}
-                <div className="relative">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-lg animate-heartbeat">
-                    <Swords className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center border-2 border-white/50 shadow-md animate-heartbeat" style={{ animationDelay: '0.15s' }}>
-                    <Flame className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />
-                  </div>
-                </div>
-                
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1.5 sm:mb-2 flex-wrap">
-                    <span className="text-badge px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white/25 text-white font-bold backdrop-blur-sm">
-                      {t('dashboard.battle.realtime')}
-                    </span>
-                    <span className="text-badge px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold shadow-sm animate-pulse">
-                      {t('dashboard.battle.hot')}
-                    </span>
-                  </div>
-                  <h3 className="font-bold text-white text-lg sm:text-xl lg:text-2xl tracking-tight">{t('dashboard.battle.title')}</h3>
-                  <p className="text-white/85 text-sm sm:text-base mt-0.5 sm:mt-1">
-                    {t('dashboard.battle.description')}
-                  </p>
-                </div>
-              </div>
+            {/* Battle Arena Banner */}
+            <div 
+              onClick={() => navigate("/battle")}
+              className="relative overflow-hidden rounded-2xl cursor-pointer group h-[140px]"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-600 via-orange-500 to-red-600" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
               
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="hidden sm:flex flex-col items-end mr-2">
-                  <span className="text-card-caption text-white/80 font-medium">{t('dashboard.battle.games')}</span>
-                  <span className="text-badge text-yellow-300 font-semibold">{t('dashboard.battle.winPoints')}</span>
+              <div className="relative z-10 p-4 h-full flex flex-col justify-between">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 animate-heartbeat">
+                      <Swords className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/25 text-white font-bold">{t('dashboard.battle.realtime')}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-red-500 text-white font-bold animate-pulse">{t('dashboard.battle.hot')}</span>
+                      </div>
+                      <h3 className="font-bold text-white text-base sm:text-lg">{t('dashboard.battle.title')}</h3>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-white/70 group-hover:translate-x-1 transition-transform" />
                 </div>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/25 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/35 transition-colors shadow-lg">
-                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:translate-x-0.5 transition-transform" />
-                </div>
+                <p className="text-white/80 text-xs sm:text-sm">{t('dashboard.battle.description')}</p>
               </div>
             </div>
-          </motion.div>
 
-          {/* TOPIK Learning Hub Banner - NEW */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.14 }}
-            onClick={() => navigate("/learning-hub")}
-            className="relative overflow-hidden rounded-2xl cursor-pointer group"
-          >
-            {/* Elegant gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-r from-korean-purple via-korean-pink to-korean-orange" />
-            <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-black/20" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_20%,rgba(255,255,255,0.2),transparent_30%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_80%,rgba(255,107,107,0.2),transparent_30%)]" />
-            
-            {/* Animated particles */}
-            <div className="absolute inset-0 overflow-hidden">
-              <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-white/30 rounded-full animate-pulse" />
-              <div className="absolute top-1/2 right-1/3 w-1.5 h-1.5 bg-white/40 rounded-full animate-pulse" style={{ animationDelay: '0.3s' }} />
-              <div className="absolute bottom-1/3 left-1/2 w-1 h-1 bg-white/50 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
-            </div>
-            
-            {/* Shimmer effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-            
-            <div className="relative z-10 p-6 flex items-center justify-between">
-              <div className="flex items-center gap-5">
-                {/* Icon cluster */}
-                <div className="relative">
-                  <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-lg group-hover:scale-105 transition-transform">
-                    <GraduationCap className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center border-2 border-white/50 shadow-md">
-                    <Sparkles className="w-3.5 h-3.5 text-white" />
-                  </div>
-                </div>
-                
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-badge px-3 py-1 rounded-full bg-white/25 text-white font-bold backdrop-blur-sm">
-                      {t('dashboard.topik.allInOne')}
-                    </span>
-                    <span className="text-badge px-2.5 py-1 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 text-white font-bold shadow-sm">
-                      {t('dashboard.topik.new')}
-                    </span>
-                  </div>
-                  <h3 className="font-bold text-white text-card-title-lg sm:text-2xl tracking-tight">{t('dashboard.topik.title')}</h3>
-                  <p className="text-white/85 text-card-body sm:text-lg mt-1">
-                    {t('dashboard.topik.description')}
-                  </p>
-                </div>
-              </div>
+            {/* TOPIK Learning Hub Banner */}
+            <div 
+              onClick={() => navigate("/learning-hub")}
+              className="relative overflow-hidden rounded-2xl cursor-pointer group h-[140px]"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-korean-purple via-korean-pink to-korean-orange" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
               
-              <div className="flex items-center gap-3">
-                <div className="hidden sm:flex flex-col items-end mr-2">
-                  <span className="text-card-caption text-white/80 font-medium">{t('dashboard.topik.lessons')}</span>
-                  <span className="text-badge text-white/60">{t('dashboard.topik.learnWithAI')}</span>
+              <div className="relative z-10 p-4 h-full flex flex-col justify-between">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                      <BookOpen className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/25 text-white font-bold">{t('dashboard.topik.allInOne')}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-500 text-white font-bold">{t('dashboard.topik.new')}</span>
+                      </div>
+                      <h3 className="font-bold text-white text-base sm:text-lg">{t('dashboard.topik.title')}</h3>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-white/70 group-hover:translate-x-1 transition-transform" />
                 </div>
-                <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/35 transition-colors shadow-lg">
-                  <ChevronRight className="w-6 h-6 text-white group-hover:translate-x-0.5 transition-transform" />
-                </div>
+                <p className="text-white/80 text-xs sm:text-sm">{t('dashboard.topik.description')}</p>
               </div>
             </div>
-          </motion.div>
 
-          {/* Game Hub Banner - NEW */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.18 }}
-            onClick={() => navigate("/game-hub")}
-            className="relative overflow-hidden rounded-2xl cursor-pointer group"
-          >
-            {/* Elegant gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-r from-korean-orange via-pink-500 to-purple-600" />
-            <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-black/20" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_20%,rgba(255,255,255,0.2),transparent_30%)]" />
-            
-            {/* Animated particles */}
-            <div className="absolute inset-0 overflow-hidden">
-              <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-white/30 rounded-full animate-pulse" />
-              <div className="absolute top-1/2 right-1/3 w-1.5 h-1.5 bg-white/40 rounded-full animate-pulse" style={{ animationDelay: '0.3s' }} />
-            </div>
-            
-            {/* Shimmer effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-            
-            <div className="relative z-10 p-6 flex items-center justify-between">
-              <div className="flex items-center gap-5">
-                {/* Icon cluster */}
-                <div className="relative">
-                  <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-lg group-hover:scale-105 transition-transform">
-                    <Gamepad2 className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center border-2 border-white/50 shadow-md">
-                    <Sparkles className="w-3.5 h-3.5 text-white" />
-                  </div>
-                </div>
-                
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-badge px-3 py-1 rounded-full bg-white/25 text-white font-bold backdrop-blur-sm">
-                      {t('dashboard.game.badge')}
-                    </span>
-                    <span className="text-badge px-2.5 py-1 rounded-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold shadow-sm">
-                      {t('dashboard.game.hot')}
-                    </span>
-                  </div>
-                  <h3 className="font-bold text-white text-card-title-lg sm:text-2xl tracking-tight">{t('dashboard.game.title')}</h3>
-                  <p className="text-white/85 text-card-body sm:text-lg mt-1">
-                    {t('dashboard.game.description')}
-                  </p>
-                </div>
-              </div>
+            {/* Game Hub Banner */}
+            <div 
+              onClick={() => navigate("/game-hub")}
+              className="relative overflow-hidden rounded-2xl cursor-pointer group h-[140px]"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-korean-orange via-pink-500 to-purple-600" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
               
-              <div className="flex items-center gap-3">
-                <div className="hidden sm:flex flex-col items-end mr-2">
-                  <span className="text-card-caption text-white/80 font-medium">{t('dashboard.game.games')}</span>
-                  <span className="text-badge text-white/60">{t('dashboard.game.learnPlay')}</span>
+              <div className="relative z-10 p-4 h-full flex flex-col justify-between">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                      <Gamepad2 className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/25 text-white font-bold">{t('dashboard.game.badge')}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-red-500 text-white font-bold">{t('dashboard.game.hot')}</span>
+                      </div>
+                      <h3 className="font-bold text-white text-base sm:text-lg">{t('dashboard.game.title')}</h3>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-white/70 group-hover:translate-x-1 transition-transform" />
                 </div>
-                <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/35 transition-colors shadow-lg">
-                  <ChevronRight className="w-6 h-6 text-white group-hover:translate-x-0.5 transition-transform" />
-                </div>
+                <p className="text-white/80 text-xs sm:text-sm">{t('dashboard.game.description')}</p>
               </div>
             </div>
-          </motion.div>
 
-          {/* Korea Career Hub Banner */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.16 }}
-            onClick={() => navigate("/korea-career")}
-            className="relative overflow-hidden rounded-2xl cursor-pointer group"
-          >
-            {/* Premium gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600" />
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/20" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,255,0.15),transparent_40%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(147,51,234,0.3),transparent_40%)]" />
-            
-            {/* Animated shimmer effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-            
-            <div className="relative z-10 p-6 flex items-center justify-between">
-              <div className="flex items-center gap-5">
-                {/* Icon cluster */}
-                <div className="relative">
-                  <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-lg">
-                    <Briefcase className="w-7 h-7 text-white" />
-                  </div>
-                  <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-korean-green flex items-center justify-center border-2 border-white/50">
-                    <span className="text-[10px]">🇰🇷</span>
-                  </div>
-                </div>
-                
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span className="text-badge px-3 py-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold shadow-md">
-                      {t('dashboard.career.allInOne')}
-                    </span>
-                    <span className="text-badge px-2.5 py-1 rounded-full bg-white/20 text-white font-medium backdrop-blur-sm">
-                      {t('dashboard.career.koreaJob')}
-                    </span>
-                  </div>
-                  <h3 className="font-bold text-white text-card-title-lg sm:text-xl tracking-tight">{t('dashboard.career.title')}</h3>
-                  <p className="text-white/80 text-card-body sm:text-base mt-1">
-                    {t('dashboard.career.description')}
-                  </p>
-                </div>
-              </div>
+            {/* Korea Career Hub Banner */}
+            <div 
+              onClick={() => navigate("/korea-career")}
+              className="relative overflow-hidden rounded-2xl cursor-pointer group h-[140px]"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
               
-              <div className="flex items-center gap-2">
-                <div className="hidden sm:flex flex-col items-end mr-2">
-                  <span className="text-badge text-white/60">{t('dashboard.career.successCount')}</span>
-                  <span className="text-badge text-white/60">{t('dashboard.career.satisfaction')}</span>
+              <div className="relative z-10 p-4 h-full flex flex-col justify-between">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                      <Briefcase className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500 text-white font-bold">{t('dashboard.career.allInOne')}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/20 text-white font-medium">{t('dashboard.career.koreaJob')}</span>
+                      </div>
+                      <h3 className="font-bold text-white text-base sm:text-lg">{t('dashboard.career.title')}</h3>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-white/70 group-hover:translate-x-1 transition-transform" />
                 </div>
-                <div className="w-11 h-11 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                  <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-0.5 transition-transform" />
-                </div>
+                <p className="text-white/80 text-xs sm:text-sm">{t('dashboard.career.description')}</p>
               </div>
             </div>
-          </motion.div>
 
-          {/* AI Chat Banner */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.18 }}
-            onClick={() => navigate("/ai-chat")}
-            className="relative overflow-hidden rounded-2xl cursor-pointer group"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.15),transparent)]" />
-            <div className="relative z-10 p-6 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
-                  <MessageCircle className="w-7 h-7 text-white" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-badge px-2.5 py-0.5 rounded-full bg-white/20 text-white font-bold">{t('dashboard.ai.badge')}</span>
+            {/* AI Chat Banner - spans full width on larger screens */}
+            <div 
+              onClick={() => navigate("/ai-chat")}
+              className="relative overflow-hidden rounded-2xl cursor-pointer group h-[140px] sm:col-span-2"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.15),transparent)]" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+              
+              <div className="relative z-10 p-4 h-full flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
+                    <MessageCircle className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="font-bold text-white text-card-title-lg">{t('dashboard.ai.title')}</h3>
-                  <p className="text-white/70 text-card-body mt-0.5">{t('dashboard.ai.description')}</p>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-white/20 text-white font-bold">{t('dashboard.ai.badge')}</span>
+                    </div>
+                    <h3 className="font-bold text-white text-lg sm:text-xl">{t('dashboard.ai.title')}</h3>
+                    <p className="text-white/70 text-sm mt-0.5">{t('dashboard.ai.description')}</p>
+                  </div>
                 </div>
+                <ChevronRight className="w-6 h-6 text-white/70 group-hover:translate-x-1 transition-transform" />
               </div>
-              <ChevronRight className="w-6 h-6 text-white/70 group-hover:translate-x-1 transition-transform" />
             </div>
           </motion.div>
 
