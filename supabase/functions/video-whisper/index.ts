@@ -9,170 +9,215 @@ const corsHeaders = {
 
 type Subtitle = { start: number; end: number; text: string };
 
-// Multiple YouTube audio extraction services for reliability
-const AUDIO_EXTRACTORS = [
-  {
-    name: "cobalt-api",
-    getAudioUrl: async (videoId: string) => {
-      // Cobalt is one of the most reliable YouTube downloaders
-      const cobaltInstances = [
-        "https://api.cobalt.tools",
-        "https://co.wuk.sh",
-      ];
+// 오디오 URL + 다운로드까지 함께 시도하는 구조
+type AudioResult = { url: string; buffer: ArrayBuffer; contentType: string; source: string };
+
+// 다운로드 시도 함수 (재시도 포함)
+async function tryDownloadAudio(url: string, source: string): Promise<{ buffer: ArrayBuffer; contentType: string } | null> {
+  const MAX_RETRIES = 2;
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      console.log(`[Whisper] Downloading from ${source} (attempt ${attempt}/${MAX_RETRIES})...`);
+      const resp = await fetch(url, {
+        method: "GET",
+        headers: { 
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+          "Accept": "*/*",
+          "Referer": "https://www.youtube.com/"
+        },
+      });
       
-      for (const instance of cobaltInstances) {
-        try {
-          console.log(`[Whisper] Trying Cobalt instance: ${instance}`);
-          const resp = await fetch(`${instance}/api/json`, {
-            method: "POST",
-            headers: {
-              "Accept": "application/json",
-              "Content-Type": "application/json",
-              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-            },
-            body: JSON.stringify({
-              url: `https://www.youtube.com/watch?v=${videoId}`,
-              isAudioOnly: true,
-              aFormat: "mp3",
-              filenamePattern: "basic"
-            })
-          });
-          
-          if (!resp.ok) {
-            console.log(`[Whisper] Cobalt ${instance} returned ${resp.status}`);
-            continue;
-          }
-          
-          const data = await resp.json();
-          console.log(`[Whisper] Cobalt response:`, JSON.stringify(data).slice(0, 200));
-          
-          if (data?.url) return data.url;
-          if (data?.audio) return data.audio;
-        } catch (e) {
-          console.log(`[Whisper] Cobalt ${instance} error:`, e);
+      if (!resp.ok) {
+        console.log(`[Whisper] Download failed: ${resp.status}`);
+        if (attempt < MAX_RETRIES) {
+          await new Promise(r => setTimeout(r, 500));
+          continue;
         }
+        return null;
       }
-      return null;
-    }
-  },
-  {
-    name: "invidious-api",
-    getAudioUrl: async (videoId: string) => {
-      // Invidious instances provide direct audio URLs
-      const instances = [
-        "https://invidious.snopyta.org",
-        "https://vid.puffyan.us",
-        "https://invidious.kavin.rocks",
-        "https://y.com.sb",
-        "https://inv.riverside.rocks"
-      ];
       
-      for (const instance of instances) {
-        try {
-          console.log(`[Whisper] Trying Invidious: ${instance}`);
-          const resp = await fetch(`${instance}/api/v1/videos/${videoId}`, {
-            headers: { 
-              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-              "Accept": "application/json"
-            }
-          });
-          
-          if (!resp.ok) continue;
-          
-          const data = await resp.json();
-          const formats = data?.adaptiveFormats || [];
-          
-          // Find audio format (prefer higher quality)
-          const audioFormats = formats
-            .filter((f: any) => f.type?.includes("audio"))
-            .sort((a: any, b: any) => (b.bitrate || 0) - (a.bitrate || 0));
-          
-          if (audioFormats.length > 0 && audioFormats[0].url) {
-            console.log(`[Whisper] Found audio from ${instance}`);
-            return audioFormats[0].url;
-          }
-        } catch (e) {
-          console.log(`[Whisper] Invidious ${instance} error:`, e);
-        }
-      }
-      return null;
-    }
-  },
-  {
-    name: "piped-api",
-    getAudioUrl: async (videoId: string) => {
-      // Piped is another privacy-focused YouTube frontend with API
-      const instances = [
-        "https://pipedapi.kavin.rocks",
-        "https://api.piped.yt",
-        "https://pipedapi.adminforge.de"
-      ];
+      const contentType = resp.headers.get("content-type") || "audio/mpeg";
+      const buffer = await resp.arrayBuffer();
       
-      for (const instance of instances) {
-        try {
-          console.log(`[Whisper] Trying Piped: ${instance}`);
-          const resp = await fetch(`${instance}/streams/${videoId}`, {
-            headers: { 
-              "User-Agent": "Mozilla/5.0",
-              "Accept": "application/json"
-            }
-          });
-          
-          if (!resp.ok) continue;
-          
-          const data = await resp.json();
-          const audioStreams = data?.audioStreams || [];
-          
-          // Sort by bitrate, prefer higher quality
-          const sorted = audioStreams
-            .filter((s: any) => s.url)
-            .sort((a: any, b: any) => (b.bitrate || 0) - (a.bitrate || 0));
-          
-          if (sorted.length > 0) {
-            console.log(`[Whisper] Found audio from Piped ${instance}`);
-            return sorted[0].url;
-          }
-        } catch (e) {
-          console.log(`[Whisper] Piped ${instance} error:`, e);
-        }
+      // 최소 10KB 이상이어야 유효한 오디오
+      if (buffer.byteLength < 10 * 1024) {
+        console.log(`[Whisper] Downloaded file too small: ${buffer.byteLength} bytes`);
+        return null;
       }
-      return null;
-    }
-  },
-  {
-    name: "ytdl-org-api",
-    getAudioUrl: async (videoId: string) => {
-      // Try public yt-dlp API wrappers
-      const apis = [
-        `https://ytdlp-api.fly.dev/api/info?url=https://www.youtube.com/watch?v=${videoId}`,
-        `https://yt-dlp.fly.dev/api/info?url=https://www.youtube.com/watch?v=${videoId}`,
-      ];
       
-      for (const api of apis) {
-        try {
-          console.log(`[Whisper] Trying yt-dlp API: ${api.split('/api')[0]}`);
-          const resp = await fetch(api, {
-            headers: { "User-Agent": "Mozilla/5.0" }
-          });
-          if (!resp.ok) continue;
-          
-          const data = await resp.json();
-          const formats = data?.formats || [];
-          const audio = formats.find((f: any) => 
-            f.acodec && f.acodec !== "none" && !f.vcodec
-          );
-          if (audio?.url) {
-            console.log(`[Whisper] Found audio from yt-dlp API`);
-            return audio.url;
-          }
-        } catch (e) {
-          console.log(`[Whisper] yt-dlp API error:`, e);
-        }
+      console.log(`[Whisper] ✓ Downloaded ${Math.round(buffer.byteLength / 1024)}KB from ${source}`);
+      return { buffer, contentType };
+    } catch (e) {
+      console.log(`[Whisper] Download error:`, e);
+      if (attempt < MAX_RETRIES) {
+        await new Promise(r => setTimeout(r, 500));
       }
-      return null;
     }
   }
-];
+  return null;
+}
+
+// Piped 인스턴스들 - 다운로드까지 시도
+async function tryPipedInstances(videoId: string): Promise<AudioResult | null> {
+  const instances = [
+    "https://pipedapi.kavin.rocks",
+    "https://api.piped.yt",
+    "https://pipedapi.adminforge.de",
+    "https://pipedapi.in.projectsegfau.lt",
+    "https://pipedapi.darkness.services"
+  ];
+  
+  for (const instance of instances) {
+    try {
+      console.log(`[Whisper] Trying Piped: ${instance}`);
+      const resp = await fetch(`${instance}/streams/${videoId}`, {
+        headers: { 
+          "User-Agent": "Mozilla/5.0",
+          "Accept": "application/json"
+        }
+      });
+      
+      if (!resp.ok) {
+        console.log(`[Whisper] Piped ${instance} returned ${resp.status}`);
+        continue;
+      }
+      
+      const data = await resp.json();
+      const audioStreams = data?.audioStreams || [];
+      
+      // Sort by bitrate, prefer higher quality
+      const sorted = audioStreams
+        .filter((s: any) => s.url)
+        .sort((a: any, b: any) => (b.bitrate || 0) - (a.bitrate || 0));
+      
+      // 각 오디오 URL에 대해 다운로드 시도
+      for (const stream of sorted) {
+        const source = `piped-${instance.split('//')[1]}`;
+        const result = await tryDownloadAudio(stream.url, source);
+        if (result) {
+          return { url: stream.url, ...result, source };
+        }
+        console.log(`[Whisper] Piped URL failed, trying next stream...`);
+      }
+    } catch (e) {
+      console.log(`[Whisper] Piped ${instance} error:`, e);
+    }
+  }
+  return null;
+}
+
+// Invidious 인스턴스들 - 다운로드까지 시도
+async function tryInvidiousInstances(videoId: string): Promise<AudioResult | null> {
+  const instances = [
+    "https://vid.puffyan.us",
+    "https://invidious.kavin.rocks",
+    "https://y.com.sb",
+    "https://inv.riverside.rocks",
+    "https://invidious.nerdvpn.de",
+    "https://inv.tux.pizza"
+  ];
+  
+  for (const instance of instances) {
+    try {
+      console.log(`[Whisper] Trying Invidious: ${instance}`);
+      const resp = await fetch(`${instance}/api/v1/videos/${videoId}`, {
+        headers: { 
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+          "Accept": "application/json"
+        }
+      });
+      
+      if (!resp.ok) continue;
+      
+      const data = await resp.json();
+      const formats = data?.adaptiveFormats || [];
+      
+      // Find audio formats (prefer higher quality)
+      const audioFormats = formats
+        .filter((f: any) => f.type?.includes("audio"))
+        .sort((a: any, b: any) => (b.bitrate || 0) - (a.bitrate || 0));
+      
+      for (const format of audioFormats) {
+        if (!format.url) continue;
+        const source = `invidious-${instance.split('//')[1]}`;
+        const result = await tryDownloadAudio(format.url, source);
+        if (result) {
+          return { url: format.url, ...result, source };
+        }
+      }
+    } catch (e) {
+      console.log(`[Whisper] Invidious ${instance} error:`, e);
+    }
+  }
+  return null;
+}
+
+// Cobalt API - 다운로드까지 시도
+async function tryCobaltInstances(videoId: string): Promise<AudioResult | null> {
+  const instances = [
+    { url: "https://api.cobalt.tools/api/json", version: "new" },
+    { url: "https://cobalt.api.timelessnesses.me/api/json", version: "new" }
+  ];
+  
+  for (const inst of instances) {
+    try {
+      console.log(`[Whisper] Trying Cobalt: ${inst.url}`);
+      const resp = await fetch(inst.url, {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        },
+        body: JSON.stringify({
+          url: `https://www.youtube.com/watch?v=${videoId}`,
+          isAudioOnly: true,
+          aFormat: "mp3",
+          filenamePattern: "basic"
+        })
+      });
+      
+      if (!resp.ok) {
+        console.log(`[Whisper] Cobalt returned ${resp.status}`);
+        continue;
+      }
+      
+      const data = await resp.json();
+      const audioUrl = data?.url || data?.audio;
+      
+      if (audioUrl) {
+        const source = `cobalt`;
+        const result = await tryDownloadAudio(audioUrl, source);
+        if (result) {
+          return { url: audioUrl, ...result, source };
+        }
+      }
+    } catch (e) {
+      console.log(`[Whisper] Cobalt error:`, e);
+    }
+  }
+  return null;
+}
+
+// 모든 추출기를 순차 시도 (URL 획득 + 다운로드까지 성공해야 반환)
+async function extractAndDownloadAudio(videoId: string): Promise<AudioResult | null> {
+  // 1. Piped (가장 안정적)
+  console.log(`[Whisper] === Phase 1: Piped ===`);
+  const pipedResult = await tryPipedInstances(videoId);
+  if (pipedResult) return pipedResult;
+  
+  // 2. Invidious
+  console.log(`[Whisper] === Phase 2: Invidious ===`);
+  const invResult = await tryInvidiousInstances(videoId);
+  if (invResult) return invResult;
+  
+  // 3. Cobalt
+  console.log(`[Whisper] === Phase 3: Cobalt ===`);
+  const cobaltResult = await tryCobaltInstances(videoId);
+  if (cobaltResult) return cobaltResult;
+  
+  return null;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -251,59 +296,23 @@ serve(async (req) => {
 
     console.log(`[Whisper] Starting automatic extraction for YouTube: ${youtube_id}`);
 
-    // Try each audio extractor until one succeeds
-    let audioUrl: string | null = null;
-    let successExtractor: string | null = null;
+    // URL 획득 + 다운로드까지 성공해야 반환 (실패 시 다른 인스턴스로 자동 재시도)
+    const audioResult = await extractAndDownloadAudio(youtube_id);
 
-    for (const extractor of AUDIO_EXTRACTORS) {
-      console.log(`[Whisper] === Trying extractor: ${extractor.name} ===`);
-      try {
-        audioUrl = await extractor.getAudioUrl(youtube_id);
-        if (audioUrl) {
-          successExtractor = extractor.name;
-          console.log(`[Whisper] ✓ Success with ${extractor.name}`);
-          break;
-        } else {
-          console.log(`[Whisper] ✗ ${extractor.name} returned no URL`);
-        }
-      } catch (e) {
-        console.log(`[Whisper] ✗ ${extractor.name} threw error:`, e);
-      }
-    }
-
-    if (!audioUrl) {
-      console.error("[Whisper] All audio extractors failed");
+    if (!audioResult) {
+      console.error("[Whisper] All audio extraction and download attempts failed");
       return new Response(
         JSON.stringify({
           error: "모든 오디오 추출 서비스가 실패했습니다. YouTube 영상이 비공개이거나 지역 제한이 있을 수 있습니다.",
-          tried: AUDIO_EXTRACTORS.map(e => e.name),
+          tried: ["piped", "invidious", "cobalt"],
           suggestion: "수동으로 SRT 파일을 업로드하거나, 다른 영상을 시도해주세요."
         }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    // Download audio
-    console.log(`[Whisper] Downloading audio from ${successExtractor}...`);
-    const audioResp = await fetch(audioUrl, {
-      method: "GET",
-      headers: { 
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        "Accept": "*/*"
-      },
-    });
+    const { buffer: audioBuf, contentType, source: successExtractor } = audioResult;
 
-    if (!audioResp.ok) {
-      const t = await safeText(audioResp);
-      console.error("[Whisper] Audio download failed:", audioResp.status, t.slice(0, 500));
-      return new Response(
-        JSON.stringify({ error: `오디오 다운로드 실패 (${audioResp.status})` }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
-
-    const contentType = audioResp.headers.get("content-type") || "audio/mpeg";
-    const audioBuf = await audioResp.arrayBuffer();
     
     // OpenAI Whisper file limit is ~25MB
     const MAX_BYTES = 25 * 1024 * 1024;
