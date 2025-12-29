@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -20,13 +20,14 @@ import {
   BookOpen,
   Trophy,
   RefreshCw,
-  Loader2
+  Loader2,
+  Database
 } from "lucide-react";
 import HangulTracing, { type CharacterItem } from "@/components/learning/HangulTracing";
 
 type TabType = "consonants" | "words" | "sentences";
 
-// Static data for consonants/vowels (these don't need RAG)
+// Static data for consonants/vowels (these don't need DB)
 const consonantsData = {
   basic: ["ㄱ", "ㄴ", "ㄷ", "ㄹ", "ㅁ", "ㅂ", "ㅅ", "ㅇ", "ㅈ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"],
   double: ["ㄲ", "ㄸ", "ㅃ", "ㅆ", "ㅉ"],
@@ -64,13 +65,16 @@ const HandwritingPractice = () => {
   const [activeTab, setActiveTab] = useState<TabType>("consonants");
   const [completedTabs, setCompletedTabs] = useState<TabType[]>([]);
   
-  // RAG-powered content states
+  // DB-powered content states
   const [wordsData, setWordsData] = useState<CharacterItem[]>(fallbackWords);
   const [sentencesData, setSentencesData] = useState<CharacterItem[]>(fallbackSentences);
   const [isLoadingWords, setIsLoadingWords] = useState(false);
   const [isLoadingSentences, setIsLoadingSentences] = useState(false);
-  const [usedWords, setUsedWords] = useState<string[]>([]);
-  const [usedSentences, setUsedSentences] = useState<string[]>([]);
+  const [dbTotal, setDbTotal] = useState({ words: 0, sentences: 0 });
+  
+  // 세션 내 중복 방지용
+  const sessionSeenWords = useRef<Set<string>>(new Set());
+  const sessionSeenSentences = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -80,76 +84,120 @@ const HandwritingPractice = () => {
     checkAuth();
   }, []);
 
-  // Fetch RAG content for words/sentences
-  const fetchRagContent = useCallback(async (type: 'words' | 'sentences', exclude: string[] = []) => {
+  // DB에서 단어/문장 직접 가져오기 (빠르고 안정적)
+  const fetchDbContent = useCallback(async (type: 'words' | 'sentences') => {
     const setLoading = type === 'words' ? setIsLoadingWords : setIsLoadingSentences;
     const setData = type === 'words' ? setWordsData : setSentencesData;
-    const setUsed = type === 'words' ? setUsedWords : setUsedSentences;
+    const sessionSeen = type === 'words' ? sessionSeenWords : sessionSeenSentences;
     const fallback = type === 'words' ? fallbackWords : fallbackSentences;
+    const count = type === 'words' ? 10 : 5;
     
     setLoading(true);
     
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/handwriting-content`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            type, 
-            count: type === 'words' ? 10 : 5,
-            exclude 
-          }),
-        }
-      );
-      
-      if (!response.ok) throw new Error('Failed to fetch content');
-      
-      const data = await response.json();
-      
-      if (data.success && data.content?.length > 0) {
-        const contentItems: CharacterItem[] = data.content.map((item: { korean: string; vietnamese: string }) => ({
-          korean: item.korean,
-          vietnamese: item.vietnamese,
-        }));
-        setData(contentItems);
+      if (type === 'words') {
+        // 단어: topik_vocabulary 테이블에서 직접 쿼리
+        const { data: vocabData, error } = await supabase
+          .from('topik_vocabulary')
+          .select('id, word, meaning_vi, meaning_en, level')
+          .not('word', 'is', null)
+          .limit(200);
         
-        // Track used content
-        const koreanContent = contentItems.map(item => item.korean);
-        setUsed(prev => [...new Set([...prev, ...koreanContent])]);
+        if (error) throw error;
         
-        if (data.source === 'rag') {
-          toast({
-            title: type === 'words' ? t("handwriting.wordsLoaded") : t("handwriting.sentencesLoaded"),
-            description: t("handwriting.aiGenerated", { count: contentItems.length }),
-          });
+        if (vocabData && vocabData.length > 0) {
+          // 2-6글자 단어만 필터
+          let filtered = vocabData.filter(v => 
+            v.word && v.word.length >= 2 && v.word.length <= 6
+          );
+          
+          // 이미 본 단어 제외
+          const unseen = filtered.filter(v => !sessionSeen.current.has(v.word));
+          const pool = unseen.length >= count ? unseen : filtered;
+          
+          // 랜덤 셔플 후 선택
+          const shuffled = pool.sort(() => Math.random() - 0.5);
+          const selected = shuffled.slice(0, count);
+          
+          // 세션에 기록
+          selected.forEach(v => sessionSeen.current.add(v.word));
+          
+          const contentItems: CharacterItem[] = selected.map(v => ({
+            korean: v.word,
+            vietnamese: v.meaning_vi || v.meaning_en || '',
+          }));
+          
+          setData(contentItems);
+          setDbTotal(prev => ({ ...prev, words: vocabData.length }));
+          console.log(`[Handwriting] 단어: ${unseen.length}/${vocabData.length} 새 항목, ${selected.length}개 선택`);
+          return;
         }
       } else {
-        setData(fallback);
+        // 문장: example_sentence 필드 사용
+        const { data: sentenceData, error } = await supabase
+          .from('topik_vocabulary')
+          .select('id, word, example_sentence, example_sentence_vi, meaning_vi, meaning_en, level')
+          .not('example_sentence', 'is', null)
+          .limit(100);
+        
+        if (error) throw error;
+        
+        if (sentenceData && sentenceData.length > 0) {
+          // 5-20글자 문장만 필터
+          let filtered = sentenceData.filter(s => {
+            const len = s.example_sentence?.length || 0;
+            return len >= 5 && len <= 20;
+          });
+          
+          // 이미 본 문장 제외
+          const unseen = filtered.filter(s => !sessionSeen.current.has(s.example_sentence || ''));
+          const pool = unseen.length >= count ? unseen : filtered;
+          
+          // 랜덤 셔플 후 선택
+          const shuffled = pool.sort(() => Math.random() - 0.5);
+          const selected = shuffled.slice(0, count);
+          
+          // 세션에 기록
+          selected.forEach(s => sessionSeen.current.add(s.example_sentence || ''));
+          
+          const contentItems: CharacterItem[] = selected.map(s => ({
+            korean: s.example_sentence || '',
+            vietnamese: s.example_sentence_vi || s.meaning_vi || '',
+          }));
+          
+          setData(contentItems);
+          setDbTotal(prev => ({ ...prev, sentences: sentenceData.length }));
+          console.log(`[Handwriting] 문장: ${unseen.length}/${sentenceData.length} 새 항목, ${selected.length}개 선택`);
+          return;
+        }
       }
+      
+      // DB에서 못 찾으면 폴백
+      console.log(`[Handwriting] DB 없음, 폴백 사용`);
+      setData(fallback);
     } catch (error) {
-      console.error('Error fetching RAG content:', error);
+      console.error('Error fetching DB content:', error);
       setData(fallback);
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, []);
 
   // Load initial content when tab changes
   useEffect(() => {
     if (activeTab === 'words' && wordsData === fallbackWords) {
-      fetchRagContent('words', usedWords);
+      fetchDbContent('words');
     } else if (activeTab === 'sentences' && sentencesData === fallbackSentences) {
-      fetchRagContent('sentences', usedSentences);
+      fetchDbContent('sentences');
     }
-  }, [activeTab]);
+  }, [activeTab, fetchDbContent, wordsData, sentencesData]);
 
   // Refresh content with new items
   const handleRefreshContent = () => {
     if (activeTab === 'words') {
-      fetchRagContent('words', usedWords);
+      fetchDbContent('words');
     } else if (activeTab === 'sentences') {
-      fetchRagContent('sentences', usedSentences);
+      fetchDbContent('sentences');
     }
   };
 
@@ -185,7 +233,7 @@ const HandwritingPractice = () => {
     // Auto-refresh content after completion for words/sentences
     if (activeTab === 'words' || activeTab === 'sentences') {
       setTimeout(() => {
-        fetchRagContent(activeTab, activeTab === 'words' ? usedWords : usedSentences);
+        fetchDbContent(activeTab);
       }, 2000);
     }
   };
@@ -208,7 +256,8 @@ const HandwritingPractice = () => {
       icon: BookOpen,
       count: wordsData.length,
       color: "from-blue-500 to-cyan-500",
-      isRag: true
+      isDb: true,
+      dbTotal: dbTotal.words
     },
     { 
       id: "sentences" as TabType, 
@@ -217,7 +266,8 @@ const HandwritingPractice = () => {
       icon: FileText,
       count: sentencesData.length,
       color: "from-emerald-500 to-teal-500",
-      isRag: true
+      isDb: true,
+      dbTotal: dbTotal.sentences
     },
   ];
 
@@ -288,8 +338,8 @@ const HandwritingPractice = () => {
                   <span className="text-sm">{t("handwriting.completedCount", { count: completedTabs.length })}</span>
                 </div>
                 <div className="flex items-center gap-2 text-white/90">
-                  <Star className="w-5 h-5" />
-                  <span className="text-sm">AI-Powered RAG</span>
+                  <Database className="w-5 h-5" />
+                  <span className="text-sm">10,000+ 어휘 DB</span>
                 </div>
               </motion.div>
             </div>
@@ -357,10 +407,10 @@ const HandwritingPractice = () => {
                             {tab.count}{t("handwriting.count")}
                           </span>
                           
-                          {/* RAG badge */}
-                          {'isRag' in tab && tab.isRag && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-medium">
-                              AI
+                          {/* DB badge */}
+                          {'isDb' in tab && tab.isDb && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium">
+                              DB
                             </span>
                           )}
                           
