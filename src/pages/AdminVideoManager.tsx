@@ -10,8 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Trash2, Edit, Play, Loader2, Languages, CheckCircle, AlertCircle, Zap, Youtube, Mic } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Edit, Play, Loader2, Languages, CheckCircle, AlertCircle, Zap, Youtube, Mic, Upload } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
 
 interface VideoLesson {
@@ -79,6 +80,13 @@ export default function AdminVideoManager() {
     progress: number;
     message: string;
   } | null>(null);
+
+  // SRT Upload state
+  const [srtUploadOpen, setSrtUploadOpen] = useState(false);
+  const [srtUploadVideo, setSrtUploadVideo] = useState<VideoLesson | null>(null);
+  const [srtFile, setSrtFile] = useState<File | null>(null);
+  const [srtLanguage, setSrtLanguage] = useState('ko');
+  const [srtUploading, setSrtUploading] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -517,6 +525,92 @@ export default function AdminVideoManager() {
     });
   };
 
+  // SRT Upload functions
+  const openSrtUpload = (video: VideoLesson) => {
+    setSrtUploadVideo(video);
+    setSrtFile(null);
+    setSrtLanguage('ko');
+    setSrtUploadOpen(true);
+  };
+
+  const parseSRT = (content: string): Array<{ start: number; end: number; text: string }> => {
+    const subtitles: Array<{ start: number; end: number; text: string }> = [];
+    const blocks = content.trim().split(/\n\n+/);
+
+    for (const block of blocks) {
+      const lines = block.split('\n').filter(l => l.trim());
+      if (lines.length < 2) continue;
+
+      // Find timestamp line (format: 00:00:00,000 --> 00:00:03,240)
+      const timestampLine = lines.find(l => l.includes('-->'));
+      if (!timestampLine) continue;
+
+      const [startStr, endStr] = timestampLine.split('-->').map(s => s.trim());
+      if (!startStr || !endStr) continue;
+
+      const parseTimestamp = (ts: string): number => {
+        const match = ts.match(/(\d{2}):(\d{2}):(\d{2})[,.](\d{3})/);
+        if (!match) return 0;
+        const [, h, m, s, ms] = match;
+        return parseInt(h) * 3600 + parseInt(m) * 60 + parseInt(s) + parseInt(ms) / 1000;
+      };
+
+      const start = parseTimestamp(startStr);
+      const end = parseTimestamp(endStr);
+
+      // Get text lines (everything after timestamp)
+      const timestampIndex = lines.indexOf(timestampLine);
+      const textLines = lines.slice(timestampIndex + 1);
+      
+      // For bilingual SRT, take only the first line (Korean)
+      const text = textLines[0]?.trim() || '';
+      
+      if (text && !text.match(/^\d+$/)) {
+        subtitles.push({ start, end, text });
+      }
+    }
+
+    return subtitles;
+  };
+
+  const handleSrtUpload = async () => {
+    if (!srtFile || !srtUploadVideo) return;
+
+    setSrtUploading(true);
+    try {
+      const content = await srtFile.text();
+      const subtitles = parseSRT(content);
+
+      if (subtitles.length === 0) {
+        toast.error('SRT 파일을 파싱할 수 없습니다');
+        return;
+      }
+
+      // Save to video_subtitles table
+      const { error } = await supabase
+        .from('video_subtitles')
+        .upsert({
+          video_id: srtUploadVideo.id,
+          language: srtLanguage,
+          subtitles: subtitles,
+          is_reviewed: false,
+        }, {
+          onConflict: 'video_id,language'
+        });
+
+      if (error) throw error;
+
+      toast.success(`${subtitles.length}개 자막이 저장되었습니다 (${srtLanguage.toUpperCase()})`);
+      setSrtUploadOpen(false);
+      fetchVideos();
+    } catch (error: any) {
+      console.error('Error uploading SRT:', error);
+      toast.error(error.message || 'SRT 업로드 실패');
+    } finally {
+      setSrtUploading(false);
+    }
+  };
+
   if (!isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -821,6 +915,14 @@ export default function AdminVideoManager() {
                               <Button
                                 size="sm"
                                 variant="outline"
+                                onClick={() => openSrtUpload(video)}
+                              >
+                                <Upload className="w-4 h-4 mr-1" />
+                                SRT
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
                                 onClick={() => navigate(`/admin/video/${video.id}/subtitles`)}
                               >
                                 ✏️ 검수
@@ -852,6 +954,72 @@ export default function AdminVideoManager() {
           </div>
         </div>
       </div>
+
+      {/* SRT Upload Dialog */}
+      <Dialog open={srtUploadOpen} onOpenChange={setSrtUploadOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Upload className="w-5 h-5" />
+              SRT 자막 업로드
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label className="text-sm font-medium mb-2 block">영상</Label>
+              <p className="text-sm text-muted-foreground truncate">{srtUploadVideo?.title}</p>
+            </div>
+            <div>
+              <Label className="text-sm font-medium mb-2 block">언어 선택</Label>
+              <Select value={srtLanguage} onValueChange={setSrtLanguage}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {LANGUAGES.map((lang) => (
+                    <SelectItem key={lang} value={lang}>
+                      {lang.toUpperCase()} - {
+                        lang === 'ko' ? '한국어' :
+                        lang === 'vi' ? 'Tiếng Việt' :
+                        lang === 'en' ? 'English' :
+                        lang === 'ja' ? '日本語' :
+                        lang === 'zh' ? '中文' :
+                        lang === 'ru' ? 'Русский' : "O'zbek"
+                      }
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-sm font-medium mb-2 block">SRT 파일</Label>
+              <Input
+                type="file"
+                accept=".srt"
+                onChange={(e) => setSrtFile(e.target.files?.[0] || null)}
+              />
+              {srtFile && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  선택됨: {srtFile.name}
+                </p>
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSrtUploadOpen(false)}>
+              취소
+            </Button>
+            <Button onClick={handleSrtUpload} disabled={!srtFile || srtUploading}>
+              {srtUploading ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              ) : (
+                <Upload className="w-4 h-4 mr-2" />
+              )}
+              업로드
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
