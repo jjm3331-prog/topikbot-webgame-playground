@@ -59,6 +59,10 @@ interface GeneratedQuestion {
   option_images?: string[];
   // [5-8] 그림 문제용 - 4개 장면 설명
   option_image_descriptions?: string[];
+  // [21-50] 세트형 문제용 - 같은 세트 ID는 동일한 스크립트를 공유
+  set_id?: string;
+  // [21-50] 세트 내 질문 유형
+  question_type_in_set?: "intent" | "detail" | "central_idea" | "attitude" | "speaking_style";
 }
 
 interface ValidationResult {
@@ -104,42 +108,49 @@ const LISTENING_QUESTION_TYPES = {
     description: "질문 듣고 적절한 대답 고르기",
     turns: "1-2턴",
     speakers: 2,
+    isSet: false,
   },
   "5-8": {
     label: "[5~8] 그림 대화",
     description: "그림 보고 알맞은 대화 고르기",
     turns: "2-3턴",
     speakers: 2,
+    isSet: false,
   },
   "9-12": {
     label: "[9~12] 장소/화제/목적",
     description: "대화의 장소, 화제, 목적 파악",
     turns: "3-4턴",
     speakers: 2,
+    isSet: false,
   },
   "13-16": {
     label: "[13~16] 세부 내용",
     description: "대화 내용과 같은 것 찾기",
     turns: "4-6턴",
     speakers: 2,
+    isSet: false,
   },
   "17-20": {
     label: "[17~20] 화자 의도/태도",
     description: "화자의 의도, 태도, 후속 행동 파악",
     turns: "5-8턴",
     speakers: 2,
+    isSet: false,
   },
-  "21-30": {
-    label: "[21~30] 종합 이해",
-    description: "긴 대화/담화 종합 이해",
+  "21-50-set": {
+    label: "[21~50] 세트형 문제",
+    description: "2문항 1세트 (대화/담화 공유)",
     turns: "6-10턴",
-    speakers: "2-3",
+    speakers: "2인 또는 1인",
+    isSet: true,
   },
   "mixed": {
     label: "혼합 (자동)",
     description: "다양한 유형 자동 생성",
     turns: "자동",
     speakers: "자동",
+    isSet: false,
   },
 };
 
