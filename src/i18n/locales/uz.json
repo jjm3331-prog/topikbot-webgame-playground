@@ -270,6 +270,18 @@
     "checkInError": "Belgilashda xato. Qayta urinib ko'ring.",
     "weeklyBonusHint": "7 kunlik ketma-ket bonus olish uchun bugun belgilaning!",
     "pointsToNextLevel": "Keyingi darajagacha {{points}} ball",
+    "video": {
+      "badge": "7 tilda subtitrlar",
+      "new": "YANGI",
+      "title": "Video O'rganish",
+      "description": "YouTube videolari bilan koreys tilini tabiiy o'rganing"
+    },
+    "mockExam": {
+      "badge": "TOPIK I·II·EPS",
+      "new": "YANGI",
+      "title": "TOPIK Sinov Imtihoni",
+      "description": "AI yaratgan 100% asl savollari bilan mashq qiling"
+    },
     "battle": {
       "realtime": "⚔️ 1:1 Real-time",
       "hot": "HOT",

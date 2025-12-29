@@ -260,6 +260,18 @@
     "checkInError": "Không thể điểm danh. Vui lòng thử lại.",
     "weeklyBonusHint": "Điểm danh hôm nay để nhận thưởng 7 ngày liên tiếp!",
     "pointsToNextLevel": "Còn {{points}} điểm để lên level tiếp",
+    "video": {
+      "badge": "Phụ đề 7 ngôn ngữ",
+      "new": "NEW",
+      "title": "Video học tiếng Hàn",
+      "description": "Học tiếng Hàn tự nhiên qua video YouTube"
+    },
+    "mockExam": {
+      "badge": "TOPIK I·II·EPS",
+      "new": "NEW",
+      "title": "Thi thử TOPIK",
+      "description": "Luyện thi với đề 100% giống thật do AI tạo"
+    },
     "battle": {
       "realtime": "⚔️ 1:1 Real-time",
       "hot": "HOT",

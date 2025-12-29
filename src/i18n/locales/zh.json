@@ -245,6 +245,18 @@
     "checkInError": "签到失败，请重试。",
     "weeklyBonusHint": "今天签到即可获得7天连续奖励！",
     "pointsToNextLevel": "距离下一级还需{{points}}分",
+    "video": {
+      "badge": "7种语言字幕",
+      "new": "新",
+      "title": "视频学习",
+      "description": "通过YouTube视频自然学习韩语"
+    },
+    "mockExam": {
+      "badge": "TOPIK I·II·EPS",
+      "new": "新",
+      "title": "TOPIK模拟考试",
+      "description": "使用AI生成的100%真实题目完美备考"
+    },
     "battle": {
       "realtime": "⚔️ 1:1 实时",
       "hot": "热门",

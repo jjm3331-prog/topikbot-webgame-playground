@@ -245,6 +245,18 @@
     "checkInError": "チェックインに失敗しました。再試行してください。",
     "weeklyBonusHint": "今日チェックインすると7日連続ボーナスがもらえます！",
     "pointsToNextLevel": "次のレベルまであと{{points}}pt",
+    "video": {
+      "badge": "7言語字幕",
+      "new": "NEW",
+      "title": "動画学習",
+      "description": "YouTube動画で自然に韓国語学習"
+    },
+    "mockExam": {
+      "badge": "TOPIK I·II·EPS",
+      "new": "NEW",
+      "title": "TOPIK模擬試験",
+      "description": "AIが作成した100%本番同様の問題で完璧対策"
+    },
     "battle": {
       "realtime": "⚔️ 1:1 リアルタイム",
       "hot": "HOT",

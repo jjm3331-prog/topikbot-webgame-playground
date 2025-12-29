@@ -391,17 +391,17 @@ const Dashboard = () => {
                     </div>
                     <div>
                       <div className="flex items-center gap-1.5 mb-0.5 sm:mb-1">
-                        <span className="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-white/25 text-white font-bold">7개국어 자막</span>
-                        <span className="text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0.5 rounded-full bg-cyan-400 text-white font-bold">NEW</span>
+                        <span className="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-white/25 text-white font-bold">{t('dashboard.video.badge')}</span>
+                        <span className="text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0.5 rounded-full bg-cyan-400 text-white font-bold">{t('dashboard.video.new')}</span>
                       </div>
-                      <h3 className="font-bold text-white text-sm sm:text-lg">비디오 학습</h3>
+                      <h3 className="font-bold text-white text-sm sm:text-lg">{t('dashboard.video.title')}</h3>
                     </div>
                   </div>
                   <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/25 transition-all duration-300">
                     <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-white group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
-                <p className="text-white/80 text-[11px] sm:text-sm line-clamp-1">YouTube 영상으로 자연스럽게 한국어 학습</p>
+                <p className="text-white/80 text-[11px] sm:text-sm line-clamp-1">{t('dashboard.video.description')}</p>
               </div>
             </motion.div>
 
@@ -425,17 +425,17 @@ const Dashboard = () => {
                     </div>
                     <div>
                       <div className="flex items-center gap-1.5 mb-0.5 sm:mb-1">
-                        <span className="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-white/25 text-white font-bold">TOPIK I·II·EPS</span>
-                        <span className="text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0.5 rounded-full bg-amber-500 text-white font-bold">NEW</span>
+                        <span className="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-white/25 text-white font-bold">{t('dashboard.mockExam.badge')}</span>
+                        <span className="text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0.5 rounded-full bg-amber-500 text-white font-bold">{t('dashboard.mockExam.new')}</span>
                       </div>
-                      <h3 className="font-bold text-white text-sm sm:text-lg">TOPIK 모의고사</h3>
+                      <h3 className="font-bold text-white text-sm sm:text-lg">{t('dashboard.mockExam.title')}</h3>
                     </div>
                   </div>
                   <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/25 transition-all duration-300">
                     <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-white group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
-                <p className="text-white/80 text-[11px] sm:text-sm line-clamp-1">실전과 100% 동일한 AI 생성 문제로 완벽 대비</p>
+                <p className="text-white/80 text-[11px] sm:text-sm line-clamp-1">{t('dashboard.mockExam.description')}</p>
               </div>
             </motion.div>
 
