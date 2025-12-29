@@ -111,6 +111,16 @@ export default function ShortsPlayer() {
   const [loadingContent, setLoadingContent] = useState(false);
   const [activeTab, setActiveTab] = useState('sentences');
 
+  const playerRef = useRef<any>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (videoId) {
+      fetchVideo();
+      fetchSubtitles();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [videoId]);
 
   useEffect(() => {
     if ((window as any).YT?.Player) {
@@ -132,9 +142,14 @@ export default function ShortsPlayer() {
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
-      try { playerRef.current?.destroy?.(); } catch { }
+      try {
+        playerRef.current?.destroy?.();
+      } catch {
+        // ignore
+      }
     };
   }, []);
+
 
   useEffect(() => {
     if (video && ytReady && (window as any).YT?.Player) {
