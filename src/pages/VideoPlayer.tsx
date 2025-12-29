@@ -89,6 +89,8 @@ export default function VideoPlayer() {
   
   const playerRef = useRef<any>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const subtitleListRef = useRef<HTMLDivElement>(null);
+  const activeSubtitleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (videoId) {
@@ -293,6 +295,22 @@ export default function VideoPlayer() {
 
   const currentSubtitles = subtitles.find(s => s.language === selectedLanguage)?.subtitles || [];
   const koreanSubtitles = subtitles.find(s => s.language === 'ko')?.subtitles || [];
+
+  // Find current subtitle index for highlighting
+  const currentSubtitleIndex = useMemo(() => {
+    if (!currentSubtitle) return -1;
+    return currentSubtitles.findIndex(sub => sub.start === currentSubtitle.start);
+  }, [currentSubtitle, currentSubtitles]);
+
+  // Auto-scroll to current subtitle
+  useEffect(() => {
+    if (activeSubtitleRef.current && subtitleListRef.current) {
+      activeSubtitleRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  }, [currentSubtitleIndex]);
 
   // Get Korean subtitle at current time for dual mode
   const koreanSubtitleNow = useMemo(() => {
@@ -503,27 +521,50 @@ export default function VideoPlayer() {
                       {t('videoPlayer.clickToJump')}
                     </p>
                   </div>
-                  <div className="max-h-[600px] overflow-y-auto">
+                  <div ref={subtitleListRef} className="max-h-[600px] overflow-y-auto scroll-smooth">
                     {currentSubtitles.length > 0 ? (
-                      currentSubtitles.map((sub, index) => (
-                        <motion.button
-                          key={index}
-                          onClick={() => handleSubtitleClick(sub)}
-                          className={`w-full text-left p-4 border-b last:border-b-0 hover:bg-muted/50 transition-colors ${
-                            currentSubtitle?.start === sub.start
-                              ? 'bg-primary/10 border-l-4 border-l-primary'
-                              : ''
-                          }`}
-                          whileHover={{ x: 4 }}
-                        >
-                          <div className="flex items-start gap-3">
-                            <span className="text-xs text-muted-foreground font-mono shrink-0 mt-1">
-                              {formatTime(sub.start)}
-                            </span>
-                            <p className="text-sm leading-relaxed">{sub.text}</p>
-                          </div>
-                        </motion.button>
-                      ))
+                      currentSubtitles.map((sub, index) => {
+                        const isActive = currentSubtitleIndex === index;
+                        return (
+                          <motion.button
+                            key={index}
+                            ref={isActive ? activeSubtitleRef : null}
+                            onClick={() => handleSubtitleClick(sub)}
+                            className={`w-full text-left p-4 border-b last:border-b-0 transition-all duration-300 ${
+                              isActive
+                                ? 'bg-primary/20 border-l-4 border-l-primary shadow-inner'
+                                : 'hover:bg-muted/50'
+                            }`}
+                            animate={isActive ? { scale: 1.02 } : { scale: 1 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <div className="flex items-start gap-3">
+                              <span className={`text-xs font-mono shrink-0 mt-1 px-1.5 py-0.5 rounded ${
+                                isActive 
+                                  ? 'bg-primary text-primary-foreground font-bold' 
+                                  : 'text-muted-foreground'
+                              }`}>
+                                {formatTime(sub.start)}
+                              </span>
+                              <p className={`text-sm leading-relaxed transition-all ${
+                                isActive 
+                                  ? 'text-foreground font-medium' 
+                                  : 'text-muted-foreground'
+                              }`}>
+                                {sub.text}
+                              </p>
+                            </div>
+                            {isActive && (
+                              <motion.div 
+                                className="absolute left-0 top-0 bottom-0 w-1 bg-primary"
+                                layoutId="activeIndicator"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                              />
+                            )}
+                          </motion.button>
+                        );
+                      })
                     ) : (
                       <div className="p-8 text-center text-muted-foreground">
                         <Globe className="w-12 h-12 mx-auto mb-3 opacity-30" />
