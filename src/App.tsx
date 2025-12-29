@@ -57,10 +57,6 @@ import Board from "./pages/Board";
 import BoardPost from "./pages/BoardPost";
 import BoardWrite from "./pages/BoardWrite";
 import Battle from "./pages/Battle";
-import AdminVideoManager from "./pages/AdminVideoManager";
-import AdminVideoSubtitles from "./pages/AdminVideoSubtitles";
-import VideoLearningHub from "./pages/VideoLearningHub";
-import VideoPlayer from "./pages/VideoPlayer";
 import AdminShorts from "./pages/AdminShorts";
 import ShortsHub from "./pages/ShortsHub";
 import ShortsPlayer from "./pages/ShortsPlayer";
@@ -222,14 +218,12 @@ const App = () => {
               <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
               <Route path="/points-system" element={<ProtectedRoute><PointsSystem /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-              <Route path="/admin/video-manager" element={<ProtectedRoute><AdminVideoManager /></ProtectedRoute>} />
-              <Route path="/admin/video/:videoId/subtitles" element={<ProtectedRoute><AdminVideoSubtitles /></ProtectedRoute>} />
-              <Route path="/video-hub" element={<ProtectedRoute><VideoLearningHub /></ProtectedRoute>} />
-              <Route path="/video-hub/:videoId" element={<ProtectedRoute><VideoPlayer /></ProtectedRoute>} />
-              <Route path="/video-learning" element={<Navigate to="/video-hub" replace />} />
               <Route path="/admin/shorts" element={<ProtectedRoute><AdminShorts /></ProtectedRoute>} />
               <Route path="/shorts" element={<ProtectedRoute><ShortsHub /></ProtectedRoute>} />
               <Route path="/shorts/:videoId" element={<ProtectedRoute><ShortsPlayer /></ProtectedRoute>} />
+              <Route path="/video-hub" element={<Navigate to="/shorts" replace />} />
+              <Route path="/video-hub/:videoId" element={<Navigate to="/shorts" replace />} />
+              <Route path="/video-learning" element={<Navigate to="/shorts" replace />} />
               <Route path="/mock-exam" element={<ProtectedRoute><MockExamHub /></ProtectedRoute>} />
               <Route path="/mock-exam/:examType" element={<ProtectedRoute><MockExamTest /></ProtectedRoute>} />
               <Route path="/mock-exam/report/:attemptId" element={<ProtectedRoute><MockExamReport /></ProtectedRoute>} />

@@ -685,25 +685,7 @@ const Admin = () => {
             </div>
 
             {/* Quick Access Cards */}
-            <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              <Card 
-                className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-cyan-500/50 bg-gradient-to-br from-cyan-500/10 to-blue-500/10"
-                onClick={() => navigate('/admin/video-manager')}
-              >
-                <CardContent className="p-6 flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <polygon points="5 3 19 12 5 21 5 3" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-bold">비디오 관리</h3>
-                    <p className="text-sm text-muted-foreground">영상 등록 및 자막 관리</p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
-                </CardContent>
-              </Card>
-
+            <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <Card 
                 className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-pink-500/50 bg-gradient-to-br from-pink-500/10 to-rose-500/10"
                 onClick={() => navigate('/admin/shorts')}
