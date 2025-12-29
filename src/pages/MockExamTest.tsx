@@ -12,6 +12,7 @@ import {
   Pause,
   BookOpen,
   Headphones,
+  PenTool,
   Flag,
   CheckCircle2,
   AlertCircle,
@@ -21,6 +22,7 @@ import {
   Send,
   Home,
   Eye,
+  FileText,
   EyeOff,
   Lightbulb
 } from "lucide-react";
@@ -47,6 +49,10 @@ interface Question {
   explanation_ko?: string;
   explanation_vi?: string;
   explanation_en?: string;
+  // Writing section specific
+  question_type?: 'multiple_choice' | 'short_answer' | 'essay';
+  word_limit?: number;
+  sample_answer?: string;
 }
 
 interface AttemptData {
@@ -70,6 +76,8 @@ interface AnswerData {
   user_answer: number | null;
   is_correct?: boolean;
   time_spent_seconds?: number;
+  // Writing answer
+  text_answer?: string;
 }
 
 const MockExamTest = () => {
@@ -116,6 +124,11 @@ const MockExamTest = () => {
 
   const currentQuestion = questions[currentIndex];
   const isListeningSection = currentQuestion?.section === 'listening';
+  const isWritingSection = currentQuestion?.section === 'writing';
+  const isReadingSection = currentQuestion?.section === 'reading';
+  
+  // Writing state
+  const [writingAnswers, setWritingAnswers] = useState<Map<string, string>>(new Map());
   
   // Time limits based on exam type and mode
   const getTimeLimit = useCallback(() => {
@@ -208,7 +221,13 @@ const MockExamTest = () => {
         question_image_url: q.question_image_url || undefined,
         explanation_ko: q.explanation_ko || undefined,
         explanation_vi: q.explanation_vi || undefined,
-        explanation_en: q.explanation_en || undefined
+        explanation_en: q.explanation_en || undefined,
+        // Writing section questions
+        question_type: q.section === 'writing' ? 
+          (q.part_number <= 2 ? 'short_answer' : 'essay') : 'multiple_choice',
+        word_limit: q.section === 'writing' ? 
+          (q.part_number === 1 ? 30 : q.part_number === 2 ? 50 : q.part_number === 3 ? 300 : 700) : undefined,
+        sample_answer: undefined
       }));
       
       setQuestions(formattedQuestions);
@@ -624,7 +643,7 @@ const MockExamTest = () => {
             <ScrollArea className="flex-1 p-4">
               <div className="space-y-4">
                 {/* Group by section */}
-                {['listening', 'reading'].map(sec => {
+                {['listening', 'reading', 'writing'].map(sec => {
                   const sectionQuestions = questions.filter(q => q.section === sec);
                   if (sectionQuestions.length === 0) return null;
                   
@@ -633,16 +652,20 @@ const MockExamTest = () => {
                       <div className="flex items-center gap-2 mb-2 text-sm font-medium text-muted-foreground">
                         {sec === 'listening' ? (
                           <Headphones className="w-4 h-4" />
-                        ) : (
+                        ) : sec === 'reading' ? (
                           <BookOpen className="w-4 h-4" />
+                        ) : (
+                          <PenTool className="w-4 h-4" />
                         )}
-                        <span>{sec === 'listening' ? '듣기' : '읽기'}</span>
+                        <span>{sec === 'listening' ? '듣기' : sec === 'reading' ? '읽기' : '쓰기'}</span>
                       </div>
                       <div className="grid grid-cols-5 gap-1.5">
                         {sectionQuestions.map((q, idx) => {
                           const globalIndex = questions.indexOf(q);
                           const status = getAnswerStatus(q.id);
                           const isFlagged = flagged.has(q.id);
+                          // For writing questions, check if text answer exists
+                          const hasWritingAnswer = sec === 'writing' && writingAnswers.has(q.id) && (writingAnswers.get(q.id)?.length || 0) > 0;
                           
                           return (
                             <button
@@ -651,13 +674,13 @@ const MockExamTest = () => {
                               className={cn(
                                 "w-10 h-10 rounded-lg text-sm font-medium transition-all relative",
                                 globalIndex === currentIndex && "ring-2 ring-primary",
-                                status === 'unanswered' && "bg-muted hover:bg-muted/80",
-                                status === 'answered' && "bg-primary text-primary-foreground",
+                                !hasWritingAnswer && status === 'unanswered' && "bg-muted hover:bg-muted/80",
+                                (status === 'answered' || hasWritingAnswer) && "bg-primary text-primary-foreground",
                                 status === 'correct' && "bg-green-500 text-white",
                                 status === 'incorrect' && "bg-destructive text-white"
                               )}
                             >
-                              {globalIndex + 1}
+                              {sec === 'writing' ? `${51 + idx}` : globalIndex + 1}
                               {isFlagged && (
                                 <Flag className="w-3 h-3 absolute -top-1 -right-1 text-amber-500 fill-amber-500" />
                               )}
@@ -706,9 +729,12 @@ const MockExamTest = () => {
             </Button>
             <div>
               <span className="text-sm text-muted-foreground">
-                {currentQuestion?.section === 'listening' ? '듣기' : '읽기'} - Part {currentQuestion?.part_number}
+                {currentQuestion?.section === 'listening' ? '듣기' : 
+                 currentQuestion?.section === 'reading' ? '읽기' : '쓰기'} - Part {currentQuestion?.part_number}
               </span>
-              <h2 className="font-bold">문제 {currentIndex + 1}</h2>
+              <h2 className="font-bold">
+                문제 {isWritingSection ? 50 + (questions.filter(q => q.section === 'writing').indexOf(currentQuestion!) + 1) : currentIndex + 1}
+              </h2>
             </div>
           </div>
           
@@ -769,47 +795,119 @@ const MockExamTest = () => {
                 </CardContent>
               </Card>
               
-              {/* Options */}
-              <div className="space-y-3">
-                {currentQuestion.options.map((option, idx) => {
-                  const answer = answers.get(currentQuestion.id);
-                  const isSelected = answer?.user_answer === idx;
-                  const isCorrect = idx === currentQuestion.correct_answer;
-                  const showResult = isPracticeMode && answer !== undefined;
-                  
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => handleAnswer(idx)}
-                      disabled={isPracticeMode && answer !== undefined}
-                      className={cn(
-                        "w-full p-4 rounded-lg border text-left transition-all flex items-start gap-3",
-                        !showResult && isSelected && "border-primary bg-primary/5",
-                        !showResult && !isSelected && "hover:border-primary/50 hover:bg-muted/50",
-                        showResult && isCorrect && "border-green-500 bg-green-50 dark:bg-green-950/30",
-                        showResult && isSelected && !isCorrect && "border-destructive bg-destructive/10"
-                      )}
-                    >
-                      <span className={cn(
-                        "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium shrink-0",
-                        isSelected ? "bg-primary text-primary-foreground" : "bg-muted"
-                      )}>
-                        {idx + 1}
-                      </span>
-                      <span className="flex-1 pt-1">{option}</span>
-                      {showResult && isCorrect && (
-                        <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
-                      )}
-                      {showResult && isSelected && !isCorrect && (
-                        <X className="w-5 h-5 text-destructive shrink-0" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
+              {/* Multiple Choice Options (Listening/Reading) */}
+              {!isWritingSection && (
+                <div className="space-y-3">
+                  {currentQuestion.options.map((option, idx) => {
+                    const answer = answers.get(currentQuestion.id);
+                    const isSelected = answer?.user_answer === idx;
+                    const isCorrect = idx === currentQuestion.correct_answer;
+                    const showResult = isPracticeMode && answer !== undefined;
+                    
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => handleAnswer(idx)}
+                        disabled={isPracticeMode && answer !== undefined}
+                        className={cn(
+                          "w-full p-4 rounded-lg border text-left transition-all flex items-start gap-3",
+                          !showResult && isSelected && "border-primary bg-primary/5",
+                          !showResult && !isSelected && "hover:border-primary/50 hover:bg-muted/50",
+                          showResult && isCorrect && "border-green-500 bg-green-50 dark:bg-green-950/30",
+                          showResult && isSelected && !isCorrect && "border-destructive bg-destructive/10"
+                        )}
+                      >
+                        <span className={cn(
+                          "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium shrink-0",
+                          isSelected ? "bg-primary text-primary-foreground" : "bg-muted"
+                        )}>
+                          {idx + 1}
+                        </span>
+                        <span className="flex-1 pt-1">{option}</span>
+                        {showResult && isCorrect && (
+                          <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
+                        )}
+                        {showResult && isSelected && !isCorrect && (
+                          <X className="w-5 h-5 text-destructive shrink-0" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
               
-              {/* Explanation (Practice Mode) */}
-              {isPracticeMode && answers.has(currentQuestion.id) && (
+              {/* Writing Section - Text Input */}
+              {isWritingSection && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <PenTool className="w-5 h-5 text-primary" />
+                      <span className="font-medium">
+                        {currentQuestion.question_type === 'short_answer' ? '단답형' : '서술형'}
+                      </span>
+                    </div>
+                    {currentQuestion.word_limit && (
+                      <Badge variant="outline">
+                        권장 {currentQuestion.word_limit}자
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  <div className="relative">
+                    <textarea
+                      value={writingAnswers.get(currentQuestion.id) || ''}
+                      onChange={(e) => {
+                        const newText = e.target.value;
+                        setWritingAnswers(prev => new Map(prev).set(currentQuestion.id, newText));
+                        // Also update answers map for tracking
+                        setAnswers(prev => new Map(prev).set(currentQuestion.id, {
+                          question_id: currentQuestion.id,
+                          user_answer: null,
+                          text_answer: newText
+                        }));
+                      }}
+                      placeholder={currentQuestion.question_type === 'short_answer' 
+                        ? "빈칸에 알맞은 내용을 쓰세요..." 
+                        : "주어진 주제에 대해 글을 작성하세요..."}
+                      className={cn(
+                        "w-full rounded-lg border bg-background p-4 text-base resize-none focus:outline-none focus:ring-2 focus:ring-primary/50",
+                        currentQuestion.question_type === 'short_answer' ? "h-32" : "h-64 md:h-96"
+                      )}
+                    />
+                    <div className="absolute bottom-3 right-3 text-sm text-muted-foreground">
+                      {(writingAnswers.get(currentQuestion.id) || '').length}자
+                      {currentQuestion.word_limit && ` / ${currentQuestion.word_limit}자`}
+                    </div>
+                  </div>
+                  
+                  {/* Writing Tips */}
+                  <Card className="border-primary/20 bg-primary/5">
+                    <CardContent className="pt-4">
+                      <div className="flex items-start gap-3">
+                        <FileText className="w-5 h-5 text-primary mt-0.5" />
+                        <div className="text-sm">
+                          <p className="font-medium mb-1">작성 안내</p>
+                          {currentQuestion.question_type === 'short_answer' ? (
+                            <ul className="text-muted-foreground space-y-1">
+                              <li>• 빈칸에 적절한 표현을 완성하세요.</li>
+                              <li>• 문맥에 맞는 문법과 어휘를 사용하세요.</li>
+                            </ul>
+                          ) : (
+                            <ul className="text-muted-foreground space-y-1">
+                              <li>• 주제에 맞게 서론-본론-결론 구조로 작성하세요.</li>
+                              <li>• 다양한 문법과 어휘를 사용하세요.</li>
+                              <li>• 제출 후 AI 첨삭을 받을 수 있습니다.</li>
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+              
+              {/* Explanation (Practice Mode) - Only for multiple choice */}
+              {isPracticeMode && !isWritingSection && answers.has(currentQuestion.id) && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -940,7 +1038,10 @@ const MockExamTest = () => {
             <p className="text-lg font-medium mb-2">
               {Array.from(answers.values()).filter(a => a.is_correct).length} / {questions.length} 정답
             </p>
-            <div className="grid grid-cols-2 gap-4 mt-6 text-sm">
+            <div className={cn(
+              "grid gap-4 mt-6 text-sm",
+              questions.some(q => q.section === 'writing') ? "grid-cols-3" : "grid-cols-2"
+            )}>
               <div className="p-3 rounded-lg bg-muted">
                 <p className="text-muted-foreground">듣기</p>
                 <p className="font-bold text-lg">
@@ -959,6 +1060,15 @@ const MockExamTest = () => {
                   }).length} / {questions.filter(q => q.section === 'reading').length}
                 </p>
               </div>
+              {questions.some(q => q.section === 'writing') && (
+                <div className="p-3 rounded-lg bg-muted">
+                  <p className="text-muted-foreground">쓰기</p>
+                  <p className="font-bold text-lg">
+                    {writingAnswers.size} / {questions.filter(q => q.section === 'writing').length}
+                    <span className="text-xs font-normal ml-1 text-primary">작성</span>
+                  </p>
+                </div>
+              )}
             </div>
           </div>
           <DialogFooter className="flex-col gap-2 sm:flex-col">
