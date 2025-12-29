@@ -31,11 +31,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 const MockExamHub = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [selectedExam, setSelectedExam] = useState<string>("TOPIK_I");
+  const [selectedMode, setSelectedMode] = useState<string>("full");
+  const [showModeDialog, setShowModeDialog] = useState(false);
 
   const examTypes = [
     {
@@ -260,7 +263,10 @@ const MockExamHub = () => {
             {learningModes.map((mode) => (
               <Card 
                 key={mode.id}
-                className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                className={`cursor-pointer hover:shadow-lg transition-all duration-300 hover:-translate-y-1 ${
+                  selectedMode === mode.id ? 'ring-2 ring-primary' : ''
+                }`}
+                onClick={() => setSelectedMode(mode.id)}
               >
                 <CardContent className="pt-6">
                   <div className={`w-12 h-12 rounded-xl ${mode.color} flex items-center justify-center mb-4`}>
@@ -281,7 +287,6 @@ const MockExamHub = () => {
           </div>
         </motion.div>
 
-        {/* Start Button */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -291,7 +296,13 @@ const MockExamHub = () => {
           <Button 
             size="lg" 
             className="text-lg px-8 py-6 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
-            onClick={() => navigate(`/mock-exam/${selectedExam}`)}
+            onClick={() => {
+              if (selectedMode === 'section') {
+                setShowModeDialog(true);
+              } else {
+                navigate(`/mock-exam/${selectedExam}?mode=${selectedMode}`);
+              }
+            }}
           >
             <Play className="w-5 h-5 mr-2" />
             {selectedExamData?.title} 시작하기
@@ -405,6 +416,34 @@ const MockExamHub = () => {
             랭킹 보기
           </Button>
         </motion.div>
+
+        {/* Section Selection Dialog */}
+        <Dialog open={showModeDialog} onOpenChange={setShowModeDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>영역 선택</DialogTitle>
+              <DialogDescription>연습할 영역을 선택하세요</DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-2 gap-4 py-4">
+              <Button 
+                variant="outline" 
+                className="h-24 flex flex-col gap-2"
+                onClick={() => navigate(`/mock-exam/${selectedExam}?mode=section&section=listening`)}
+              >
+                <Headphones className="w-8 h-8" />
+                <span>듣기</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-24 flex flex-col gap-2"
+                onClick={() => navigate(`/mock-exam/${selectedExam}?mode=section&section=reading`)}
+              >
+                <BookOpen className="w-8 h-8" />
+                <span>읽기</span>
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
 
       <AppFooter />
