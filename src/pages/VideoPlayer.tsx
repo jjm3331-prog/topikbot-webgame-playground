@@ -75,11 +75,18 @@ export default function VideoPlayer() {
   const { videoId } = useParams<{ videoId: string }>();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+
+  const normalizeLang = (code: string) => {
+    const base = (code || 'ko').split('-')[0].toLowerCase();
+    if (base === 'vn') return 'vi';
+    if (base === 'cn') return 'zh';
+    return base;
+  };
   
   const [video, setVideo] = useState<VideoLesson | null>(null);
   const [loading, setLoading] = useState(true);
   const [subtitles, setSubtitles] = useState<SubtitleData[]>([]);
-  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language.split('-')[0] || 'ko');
+  const [selectedLanguage, setSelectedLanguage] = useState(() => normalizeLang(i18n.language) || 'ko');
   const [currentSubtitle, setCurrentSubtitle] = useState<Subtitle | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -226,6 +233,26 @@ export default function VideoPlayer() {
 
   // Re-evaluate subtitle when language/subtitles change
   useEffect(() => {
+    const available = new Set(subtitles.map((s) => s.language));
+    const normalized = normalizeLang(selectedLanguage);
+
+    // Fix mismatched codes (e.g. VN -> VI)
+    if (normalized !== selectedLanguage) {
+      setSelectedLanguage(normalized);
+      return;
+    }
+
+    // If selected language isn't available for this video, fall back to Korean
+    if (subtitles.length > 0 && !available.has(selectedLanguage)) {
+      setSelectedLanguage('ko');
+      toast({
+        title: '자막 언어 없음',
+        description: '이 영상에는 선택한 언어 자막이 없어 한국어로 전환했어.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     updateCurrentSubtitle(currentTime);
   }, [selectedLanguage, subtitles]);
 
@@ -453,27 +480,31 @@ export default function VideoPlayer() {
                     </div>
                   </div>
 
-                  {/* Language Selector */}
-                  <div className="mt-6 flex flex-wrap items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <Globe className="w-5 h-5 text-primary" />
-                      <span className="font-medium">{t('videoPlayer.subtitleLanguage')}</span>
-                    </div>
-                    <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {LANGUAGES.map((lang) => (
-                          <SelectItem key={lang.code} value={lang.code}>
-                            <span className="flex items-center gap-2">
-                              <span>{lang.flag}</span>
-                              <span>{lang.name}</span>
-                            </span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {/* Language Selector */}
+                    <div className="mt-6 flex flex-wrap items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <Globe className="w-5 h-5 text-primary" />
+                        <span className="font-medium">{t('videoPlayer.subtitleLanguage')}</span>
+                      </div>
+
+                      <Select
+                        value={selectedLanguage}
+                        onValueChange={(val) => setSelectedLanguage(normalizeLang(val))}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {LANGUAGES.map((lang) => (
+                            <SelectItem key={lang.code} value={lang.code}>
+                              <span className="flex items-center gap-2">
+                                <span>{lang.flag}</span>
+                                <span>{lang.name}</span>
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     <Button
                       variant="outline"
                       size="sm"
