@@ -511,6 +511,45 @@ const AIAgentChat = () => {
     }
   };
 
+  // Handle paste event for clipboard images
+  const handlePaste = useCallback((e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    const imageItems = Array.from(items).filter(item => item.type.startsWith('image/'));
+    
+    if (imageItems.length > 0) {
+      e.preventDefault(); // Prevent default paste behavior when there are images
+      
+      imageItems.forEach((item) => {
+        const file = item.getAsFile();
+        if (!file) return;
+
+        if (file.size > 5 * 1024 * 1024) {
+          toast({
+            title: t("aiAgent.fileTooLarge"),
+            description: t("aiAgent.fileSizeLimit"),
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          if (ev.target?.result) {
+            setSelectedImages((prev) => [...prev, ev.target!.result as string]);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+
+      toast({
+        title: "이미지 추가됨",
+        description: "클립보드에서 이미지를 붙여넣었습니다.",
+      });
+    }
+  }, [toast, t]);
+
   const clearChat = () => {
     setMessages([]);
     setCurrentSessionId(null);
@@ -909,7 +948,8 @@ const AIAgentChat = () => {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder={t("aiAgent.placeholder")}
+                        onPaste={handlePaste}
+                        placeholder={t("aiAgent.placeholder") + " (Ctrl+V로 이미지 붙여넣기 가능)"}
                         disabled={isLoading}
                         className="min-h-[100px] max-h-[300px] resize-none pr-16 rounded-2xl text-base py-4 px-4 border-2 focus:border-primary/50 transition-colors leading-relaxed"
                         rows={3}
