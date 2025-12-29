@@ -57,6 +57,8 @@ import Board from "./pages/Board";
 import BoardPost from "./pages/BoardPost";
 import BoardWrite from "./pages/BoardWrite";
 import Battle from "./pages/Battle";
+import AdminVideoManager from "./pages/AdminVideoManager";
+import AdminVideoSubtitles from "./pages/AdminVideoSubtitles";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWAWelcome from "./components/PWAWelcome";
 import SplashScreen from "./components/SplashScreen";
@@ -210,6 +212,8 @@ const App = () => {
               <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
               <Route path="/points-system" element={<ProtectedRoute><PointsSystem /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+              <Route path="/admin/video-manager" element={<ProtectedRoute><AdminVideoManager /></ProtectedRoute>} />
+              <Route path="/admin/video/:videoId/subtitles" element={<ProtectedRoute><AdminVideoSubtitles /></ProtectedRoute>} />
               <Route path="/board-hub" element={<ProtectedRoute><BoardHub /></ProtectedRoute>} />
               <Route path="/board/:boardType" element={<ProtectedRoute><Board /></ProtectedRoute>} />
               <Route path="/board/:boardType/:postId" element={<ProtectedRoute><BoardPost /></ProtectedRoute>} />
