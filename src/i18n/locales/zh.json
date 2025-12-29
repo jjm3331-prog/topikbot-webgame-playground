@@ -2264,5 +2264,142 @@
       "tip2": "点击播放按钮跳转到该场景",
       "tip3": "在文化标签中学习韩国文化"
     }
+  },
+  "mockExam": {
+    "featureName": "TOPIK模拟考试",
+    "badge": "AI驱动模拟考试系统",
+    "title": "TOPIK模拟考试",
+    "subtitle": "以与真实TOPIK考试相同的格式\n使用AI生成的无限题目完美准备",
+    "selectExamType": "选择考试类型",
+    "selectMode": "学习模式",
+    "total": "总计",
+    "startButton": "开始",
+    "upgradeToPremium": "升级高级版",
+    "coreFeatures": "核心功能",
+    "units": {
+      "questions": "道题",
+      "minutes": "分钟"
+    },
+    "examTypes": {
+      "topik1": {
+        "title": "TOPIK I",
+        "subtitle": "初级 (1-2级)",
+        "description": "韩语基础能力评估"
+      },
+      "topik2": {
+        "title": "TOPIK II",
+        "subtitle": "中高级 (3-6级)",
+        "description": "韩语高级能力评估"
+      },
+      "eps": {
+        "title": "EPS-TOPIK",
+        "subtitle": "雇佣许可制",
+        "description": "海外就业韩语能力考试"
+      }
+    },
+    "sections": {
+      "listening": "听力",
+      "reading": "阅读",
+      "writing": "写作"
+    },
+    "modes": {
+      "full": {
+        "title": "实战模拟考试",
+        "description": "在真实考试环境中完成所有题目",
+        "features": {
+          "timeLimit": "限时",
+          "allQuestions": "全部题目",
+          "realExam": "实战环境"
+        }
+      },
+      "section": {
+        "title": "分区练习",
+        "description": "专注听力/阅读部分",
+        "features": {
+          "selectSection": "选择部分",
+          "noTimeLimit": "不限时",
+          "instantExplanation": "即时解析"
+        }
+      },
+      "part": {
+        "title": "Part练习",
+        "description": "专注特定题型",
+        "features": {
+          "typePractice": "题型练习",
+          "repeatLearning": "重复学习",
+          "weaknessImprovement": "弱点改进"
+        }
+      },
+      "weakness": {
+        "title": "弱点集中",
+        "description": "AI分析的弱点题目",
+        "features": {
+          "aiAnalysis": "AI分析",
+          "customRecommend": "定制推荐",
+          "efficientLearning": "高效学习"
+        }
+      }
+    },
+    "features": {
+      "aiGeneration": {
+        "title": "AI生成题目",
+        "description": "使用RAG + Gemini生成无限新题目"
+      },
+      "multiLanguage": {
+        "title": "7种语言解析",
+        "description": "韩语、越南语、英语、日语、中文、俄语、乌兹别克语"
+      },
+      "detailedAnalysis": {
+        "title": "详细分析",
+        "description": "分区弱点分析和预测等级"
+      },
+      "smartMistakeNote": {
+        "title": "智能错题本",
+        "description": "自动保存错题以便复习"
+      }
+    },
+    "userGuide": {
+      "title": "使用指南",
+      "description": "逐步指导使用TOPIK模拟考试系统"
+    },
+    "tutorial": {
+      "step1": {
+        "title": "选择考试类型",
+        "description": "从TOPIK I、TOPIK II或EPS-TOPIK中选择。"
+      },
+      "step2": {
+        "title": "选择模式",
+        "description": "从实战、分区、Part或弱点集中中选择。"
+      },
+      "step3": {
+        "title": "做题",
+        "description": "在时间内答题并标记不确定的题目。"
+      },
+      "step4": {
+        "title": "查看结果",
+        "description": "查看分数、预测等级和分区分析。"
+      },
+      "step5": {
+        "title": "复习错题",
+        "description": "查看解析并保存到错题本。"
+      }
+    },
+    "notice": {
+      "title": "重要提示",
+      "item1": "实战模拟考试模式有与真实考试相同的时间限制。",
+      "item2": "听力部分音频自动播放，只能播放一次。",
+      "item3": "写作部分与'写作批改'菜单关联。",
+      "item4": "错题本自动保存，随时可以复习。",
+      "item5": "AI生成题目对高级会员无限制。"
+    },
+    "quickLinks": {
+      "writing": "写作批改",
+      "speaking": "口语练习",
+      "ranking": "查看排行"
+    },
+    "dialog": {
+      "title": "选择部分",
+      "description": "选择要练习的部分"
+    }
   }
 }

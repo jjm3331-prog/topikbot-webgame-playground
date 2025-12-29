@@ -29,14 +29,15 @@ import AppFooter from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { useSubscription } from "@/hooks/useSubscription";
+import { PremiumPreviewBanner } from "@/components/PremiumPreviewBanner";
 
 const MockExamHub = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { isPremium, loading } = useSubscription();
   const [selectedExam, setSelectedExam] = useState<string>("TOPIK_I");
   const [selectedMode, setSelectedMode] = useState<string>("full");
   const [showModeDialog, setShowModeDialog] = useState(false);
@@ -44,43 +45,43 @@ const MockExamHub = () => {
   const examTypes = [
     {
       id: "TOPIK_I",
-      title: "TOPIK I",
-      subtitle: "초급 (1-2급)",
-      description: "한국어 기초 능력 평가",
+      titleKey: "mockExam.examTypes.topik1.title",
+      subtitleKey: "mockExam.examTypes.topik1.subtitle",
+      descriptionKey: "mockExam.examTypes.topik1.description",
       color: "from-emerald-500 to-teal-600",
       icon: GraduationCap,
       sections: [
-        { name: "듣기", questions: 30, time: 40, icon: Headphones },
-        { name: "읽기", questions: 40, time: 60, icon: BookOpen }
+        { nameKey: "mockExam.sections.listening", questions: 30, time: 40, icon: Headphones },
+        { nameKey: "mockExam.sections.reading", questions: 40, time: 60, icon: BookOpen }
       ],
       totalTime: 100,
       totalQuestions: 70
     },
     {
       id: "TOPIK_II",
-      title: "TOPIK II",
-      subtitle: "중고급 (3-6급)",
-      description: "한국어 심화 능력 평가",
+      titleKey: "mockExam.examTypes.topik2.title",
+      subtitleKey: "mockExam.examTypes.topik2.subtitle",
+      descriptionKey: "mockExam.examTypes.topik2.description",
       color: "from-blue-500 to-indigo-600",
       icon: Trophy,
       sections: [
-        { name: "듣기", questions: 50, time: 60, icon: Headphones },
-        { name: "읽기", questions: 50, time: 70, icon: BookOpen },
-        { name: "쓰기", questions: 4, time: 50, icon: PenTool }
+        { nameKey: "mockExam.sections.listening", questions: 50, time: 60, icon: Headphones },
+        { nameKey: "mockExam.sections.reading", questions: 50, time: 70, icon: BookOpen },
+        { nameKey: "mockExam.sections.writing", questions: 4, time: 50, icon: PenTool }
       ],
       totalTime: 180,
       totalQuestions: 104
     },
     {
       id: "TOPIK_EPS",
-      title: "EPS-TOPIK",
-      subtitle: "고용허가제",
-      description: "해외취업 한국어능력시험",
+      titleKey: "mockExam.examTypes.eps.title",
+      subtitleKey: "mockExam.examTypes.eps.subtitle",
+      descriptionKey: "mockExam.examTypes.eps.description",
       color: "from-orange-500 to-red-600",
       icon: Target,
       sections: [
-        { name: "듣기", questions: 25, time: 25, icon: Headphones },
-        { name: "읽기", questions: 25, time: 25, icon: BookOpen }
+        { nameKey: "mockExam.sections.listening", questions: 25, time: 25, icon: Headphones },
+        { nameKey: "mockExam.sections.reading", questions: 25, time: 25, icon: BookOpen }
       ],
       totalTime: 50,
       totalQuestions: 50
@@ -90,96 +91,114 @@ const MockExamHub = () => {
   const learningModes = [
     {
       id: "full",
-      title: "실전 모의고사",
-      description: "실제 시험과 동일한 환경에서 전체 문항 풀기",
+      titleKey: "mockExam.modes.full.title",
+      descriptionKey: "mockExam.modes.full.description",
       icon: Clock,
       color: "bg-gradient-to-br from-red-500 to-pink-600",
-      features: ["시간 제한", "전체 문항", "실전 환경"]
+      featureKeys: ["mockExam.modes.full.features.timeLimit", "mockExam.modes.full.features.allQuestions", "mockExam.modes.full.features.realExam"]
     },
     {
       id: "section",
-      title: "영역별 연습",
-      description: "듣기/읽기 영역을 선택해서 집중 훈련",
+      titleKey: "mockExam.modes.section.title",
+      descriptionKey: "mockExam.modes.section.description",
       icon: Target,
       color: "bg-gradient-to-br from-blue-500 to-cyan-600",
-      features: ["영역 선택", "시간 무제한", "즉시 해설"]
+      featureKeys: ["mockExam.modes.section.features.selectSection", "mockExam.modes.section.features.noTimeLimit", "mockExam.modes.section.features.instantExplanation"]
     },
     {
       id: "part",
-      title: "Part별 연습",
-      description: "특정 문제 유형만 집중적으로 훈련",
+      titleKey: "mockExam.modes.part.title",
+      descriptionKey: "mockExam.modes.part.description",
       icon: Zap,
       color: "bg-gradient-to-br from-amber-500 to-orange-600",
-      features: ["유형별 훈련", "반복 학습", "취약점 보완"]
+      featureKeys: ["mockExam.modes.part.features.typePractice", "mockExam.modes.part.features.repeatLearning", "mockExam.modes.part.features.weaknessImprovement"]
     },
     {
       id: "weakness",
-      title: "약점 집중",
-      description: "AI가 분석한 취약 유형 맞춤 문제",
+      titleKey: "mockExam.modes.weakness.title",
+      descriptionKey: "mockExam.modes.weakness.description",
       icon: Brain,
       color: "bg-gradient-to-br from-purple-500 to-violet-600",
-      features: ["AI 분석", "맞춤 추천", "효율적 학습"]
+      featureKeys: ["mockExam.modes.weakness.features.aiAnalysis", "mockExam.modes.weakness.features.customRecommend", "mockExam.modes.weakness.features.efficientLearning"]
     }
   ];
 
   const features = [
     {
       icon: Sparkles,
-      title: "AI 문제 생성",
-      description: "RAG + Gemini로 무한한 신규 문제 생성"
+      titleKey: "mockExam.features.aiGeneration.title",
+      descriptionKey: "mockExam.features.aiGeneration.description"
     },
     {
       icon: Volume2,
-      title: "7개 언어 해설",
-      description: "한국어, 베트남어, 영어, 일본어, 중국어, 러시아어, 우즈베크어"
+      titleKey: "mockExam.features.multiLanguage.title",
+      descriptionKey: "mockExam.features.multiLanguage.description"
     },
     {
       icon: BarChart3,
-      title: "상세 분석",
-      description: "영역별 취약점 분석 및 예상 등급 산출"
+      titleKey: "mockExam.features.detailedAnalysis.title",
+      descriptionKey: "mockExam.features.detailedAnalysis.description"
     },
     {
       icon: BookMarked,
-      title: "스마트 오답노트",
-      description: "틀린 문제 자동 저장 및 반복 학습 관리"
+      titleKey: "mockExam.features.smartMistakeNote.title",
+      descriptionKey: "mockExam.features.smartMistakeNote.description"
     }
   ];
 
   const tutorialSteps = [
     {
       step: 1,
-      title: "시험 유형 선택",
-      description: "TOPIK I (초급), TOPIK II (중고급), EPS-TOPIK 중 선택하세요."
+      titleKey: "mockExam.tutorial.step1.title",
+      descriptionKey: "mockExam.tutorial.step1.description"
     },
     {
       step: 2,
-      title: "학습 모드 선택",
-      description: "실전 모의고사, 영역별, Part별, 약점 집중 중 원하는 모드를 선택하세요."
+      titleKey: "mockExam.tutorial.step2.title",
+      descriptionKey: "mockExam.tutorial.step2.description"
     },
     {
       step: 3,
-      title: "문제 풀기",
-      description: "시간 내에 문제를 풀고, 모르는 문제는 표시해두세요."
+      titleKey: "mockExam.tutorial.step3.title",
+      descriptionKey: "mockExam.tutorial.step3.description"
     },
     {
       step: 4,
-      title: "결과 확인",
-      description: "점수, 예상 등급, 영역별 분석을 확인하세요."
+      titleKey: "mockExam.tutorial.step4.title",
+      descriptionKey: "mockExam.tutorial.step4.description"
     },
     {
       step: 5,
-      title: "오답 복습",
-      description: "틀린 문제는 해설을 확인하고 오답노트에 저장하세요."
+      titleKey: "mockExam.tutorial.step5.title",
+      descriptionKey: "mockExam.tutorial.step5.description"
     }
   ];
 
   const selectedExamData = examTypes.find(e => e.id === selectedExam);
+
+  const handleStartExam = () => {
+    if (!isPremium) {
+      navigate("/pricing");
+      return;
+    }
+    
+    if (selectedMode === 'section') {
+      setShowModeDialog(true);
+    } else {
+      navigate(`/mock-exam/${selectedExam}?mode=${selectedMode}`);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <CleanHeader />
       
       <main className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Premium Preview Banner */}
+        {!loading && !isPremium && (
+          <PremiumPreviewBanner featureName={t('mockExam.featureName')} />
+        )}
+
         {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -187,14 +206,13 @@ const MockExamHub = () => {
           className="text-center mb-12"
         >
           <Badge className="mb-4 bg-gradient-to-r from-primary to-purple-600 text-white border-0">
-            AI 기반 모의고사 시스템
+            {t('mockExam.badge')}
           </Badge>
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
-            TOPIK 모의고사
+            {t('mockExam.title')}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            실제 TOPIK 시험과 100% 동일한 유형으로<br />
-            AI가 생성하는 무한한 문제로 완벽하게 대비하세요
+            {t('mockExam.subtitle')}
           </p>
         </motion.div>
 
@@ -205,7 +223,7 @@ const MockExamHub = () => {
           transition={{ delay: 0.1 }}
           className="mb-12"
         >
-          <h2 className="text-2xl font-bold mb-6 text-center">시험 유형 선택</h2>
+          <h2 className="text-2xl font-bold mb-6 text-center">{t('mockExam.selectExamType')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {examTypes.map((exam) => (
               <Card 
@@ -224,27 +242,27 @@ const MockExamHub = () => {
                       <CheckCircle2 className="w-6 h-6" />
                     )}
                   </div>
-                  <CardTitle className="text-2xl">{exam.title}</CardTitle>
-                  <CardDescription className="text-white/90">{exam.subtitle}</CardDescription>
+                  <CardTitle className="text-2xl">{t(exam.titleKey)}</CardTitle>
+                  <CardDescription className="text-white/90">{t(exam.subtitleKey)}</CardDescription>
                 </CardHeader>
                 <CardContent className="pt-4">
-                  <p className="text-muted-foreground mb-4">{exam.description}</p>
+                  <p className="text-muted-foreground mb-4">{t(exam.descriptionKey)}</p>
                   <div className="space-y-2">
                     {exam.sections.map((section) => (
-                      <div key={section.name} className="flex items-center justify-between text-sm">
+                      <div key={section.nameKey} className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2">
                           <section.icon className="w-4 h-4 text-muted-foreground" />
-                          <span>{section.name}</span>
+                          <span>{t(section.nameKey)}</span>
                         </div>
                         <span className="text-muted-foreground">
-                          {section.questions}문항 / {section.time}분
+                          {section.questions}{t('mockExam.units.questions')} / {section.time}{t('mockExam.units.minutes')}
                         </span>
                       </div>
                     ))}
                   </div>
                   <div className="mt-4 pt-4 border-t flex justify-between text-sm font-medium">
-                    <span>총 {exam.totalQuestions}문항</span>
-                    <span>{exam.totalTime}분</span>
+                    <span>{t('mockExam.total')} {exam.totalQuestions}{t('mockExam.units.questions')}</span>
+                    <span>{exam.totalTime}{t('mockExam.units.minutes')}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -259,7 +277,7 @@ const MockExamHub = () => {
           transition={{ delay: 0.2 }}
           className="mb-12"
         >
-          <h2 className="text-2xl font-bold mb-6 text-center">학습 모드</h2>
+          <h2 className="text-2xl font-bold mb-6 text-center">{t('mockExam.selectMode')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {learningModes.map((mode) => (
               <Card 
@@ -273,12 +291,12 @@ const MockExamHub = () => {
                   <div className={`w-12 h-12 rounded-xl ${mode.color} flex items-center justify-center mb-4`}>
                     <mode.icon className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="font-bold mb-2">{mode.title}</h3>
-                  <p className="text-sm text-muted-foreground mb-4">{mode.description}</p>
+                  <h3 className="font-bold mb-2">{t(mode.titleKey)}</h3>
+                  <p className="text-sm text-muted-foreground mb-4">{t(mode.descriptionKey)}</p>
                   <div className="flex flex-wrap gap-1">
-                    {mode.features.map((feature) => (
-                      <Badge key={feature} variant="secondary" className="text-xs">
-                        {feature}
+                    {mode.featureKeys.map((featureKey) => (
+                      <Badge key={featureKey} variant="secondary" className="text-xs">
+                        {t(featureKey)}
                       </Badge>
                     ))}
                   </div>
@@ -297,16 +315,13 @@ const MockExamHub = () => {
           <Button 
             size="lg" 
             className="text-lg px-8 py-6 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
-            onClick={() => {
-              if (selectedMode === 'section') {
-                setShowModeDialog(true);
-              } else {
-                navigate(`/mock-exam/${selectedExam}?mode=${selectedMode}`);
-              }
-            }}
+            onClick={handleStartExam}
           >
             <Play className="w-5 h-5 mr-2" />
-            {selectedExamData?.title} 시작하기
+            {isPremium 
+              ? `${t(selectedExamData?.titleKey || '')} ${t('mockExam.startButton')}`
+              : t('mockExam.upgradeToPremium')
+            }
             <ChevronRight className="w-5 h-5 ml-2" />
           </Button>
         </motion.div>
@@ -318,7 +333,7 @@ const MockExamHub = () => {
           transition={{ delay: 0.4 }}
           className="mb-12"
         >
-          <h2 className="text-2xl font-bold mb-6 text-center">핵심 기능</h2>
+          <h2 className="text-2xl font-bold mb-6 text-center">{t('mockExam.coreFeatures')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {features.map((feature, index) => (
               <Card key={index} className="text-center">
@@ -326,8 +341,8 @@ const MockExamHub = () => {
                   <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                     <feature.icon className="w-6 h-6 text-primary" />
                   </div>
-                  <h3 className="font-bold mb-2">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground">{feature.description}</p>
+                  <h3 className="font-bold mb-2">{t(feature.titleKey)}</h3>
+                  <p className="text-sm text-muted-foreground">{t(feature.descriptionKey)}</p>
                 </CardContent>
               </Card>
             ))}
@@ -345,10 +360,10 @@ const MockExamHub = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="w-6 h-6 text-primary" />
-                사용 가이드
+                {t('mockExam.userGuide.title')}
               </CardTitle>
               <CardDescription>
-                TOPIK 모의고사 시스템 사용법을 단계별로 안내합니다
+                {t('mockExam.userGuide.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -359,8 +374,8 @@ const MockExamHub = () => {
                       <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold mb-3">
                         {step.step}
                       </div>
-                      <h4 className="font-medium mb-2">{step.title}</h4>
-                      <p className="text-xs text-muted-foreground">{step.description}</p>
+                      <h4 className="font-medium mb-2">{t(step.titleKey)}</h4>
+                      <p className="text-xs text-muted-foreground">{t(step.descriptionKey)}</p>
                     </div>
                     {index < tutorialSteps.length - 1 && (
                       <ChevronRight className="hidden md:block absolute top-5 -right-2 w-4 h-4 text-muted-foreground" />
@@ -383,13 +398,13 @@ const MockExamHub = () => {
               <div className="flex items-start gap-4">
                 <AlertCircle className="w-6 h-6 text-amber-500 flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="font-bold mb-2 text-amber-700 dark:text-amber-400">중요 안내</h3>
+                  <h3 className="font-bold mb-2 text-amber-700 dark:text-amber-400">{t('mockExam.notice.title')}</h3>
                   <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• 실전 모의고사 모드는 실제 시험과 동일한 시간 제한이 적용됩니다.</li>
-                    <li>• 듣기 영역은 오디오가 자동 재생되며, 한 번만 들을 수 있습니다.</li>
-                    <li>• 쓰기 영역은 기존 '쓰기 첨삭' 메뉴와 연동됩니다.</li>
-                    <li>• 오답노트는 자동으로 저장되며, 언제든 복습할 수 있습니다.</li>
-                    <li>• AI 문제 생성 기능은 Premium 회원에게 무제한 제공됩니다.</li>
+                    <li>• {t('mockExam.notice.item1')}</li>
+                    <li>• {t('mockExam.notice.item2')}</li>
+                    <li>• {t('mockExam.notice.item3')}</li>
+                    <li>• {t('mockExam.notice.item4')}</li>
+                    <li>• {t('mockExam.notice.item5')}</li>
                   </ul>
                 </div>
               </div>
@@ -406,15 +421,15 @@ const MockExamHub = () => {
         >
           <Button variant="outline" onClick={() => navigate('/writing-correction')}>
             <PenTool className="w-4 h-4 mr-2" />
-            쓰기 첨삭
+            {t('mockExam.quickLinks.writing')}
           </Button>
           <Button variant="outline" onClick={() => navigate('/roleplay-speaking')}>
             <Mic className="w-4 h-4 mr-2" />
-            말하기 연습
+            {t('mockExam.quickLinks.speaking')}
           </Button>
           <Button variant="outline" onClick={() => navigate('/ranking')}>
             <TrendingUp className="w-4 h-4 mr-2" />
-            랭킹 보기
+            {t('mockExam.quickLinks.ranking')}
           </Button>
         </motion.div>
 
@@ -422,8 +437,8 @@ const MockExamHub = () => {
         <Dialog open={showModeDialog} onOpenChange={setShowModeDialog}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>영역 선택</DialogTitle>
-              <DialogDescription>연습할 영역을 선택하세요</DialogDescription>
+              <DialogTitle>{t('mockExam.dialog.title')}</DialogTitle>
+              <DialogDescription>{t('mockExam.dialog.description')}</DialogDescription>
             </DialogHeader>
             <div className={cn(
               "grid gap-4 py-4",
@@ -435,7 +450,7 @@ const MockExamHub = () => {
                 onClick={() => navigate(`/mock-exam/${selectedExam}?mode=section&section=listening`)}
               >
                 <Headphones className="w-8 h-8" />
-                <span>듣기</span>
+                <span>{t('mockExam.sections.listening')}</span>
               </Button>
               <Button 
                 variant="outline" 
@@ -443,7 +458,7 @@ const MockExamHub = () => {
                 onClick={() => navigate(`/mock-exam/${selectedExam}?mode=section&section=reading`)}
               >
                 <BookOpen className="w-8 h-8" />
-                <span>읽기</span>
+                <span>{t('mockExam.sections.reading')}</span>
               </Button>
               {selectedExam === 'TOPIK_II' && (
                 <Button 
@@ -452,7 +467,7 @@ const MockExamHub = () => {
                   onClick={() => navigate(`/mock-exam/${selectedExam}?mode=section&section=writing`)}
                 >
                   <PenTool className="w-8 h-8" />
-                  <span>쓰기</span>
+                  <span>{t('mockExam.sections.writing')}</span>
                 </Button>
               )}
             </div>

@@ -2520,5 +2520,142 @@
       "tip2": "Nhấn nút phát để chuyển đến cảnh đó",
       "tip3": "Tìm hiểu văn hóa Hàn trong tab Văn hóa"
     }
+  },
+  "mockExam": {
+    "featureName": "Thi thử TOPIK",
+    "badge": "Hệ thống thi thử AI",
+    "title": "Thi thử TOPIK",
+    "subtitle": "Chuẩn bị hoàn hảo với câu hỏi AI không giới hạn\ntheo đúng định dạng kỳ thi TOPIK thật",
+    "selectExamType": "Chọn loại kỳ thi",
+    "selectMode": "Chế độ học",
+    "total": "Tổng",
+    "startButton": "Bắt đầu",
+    "upgradeToPremium": "Nâng cấp Premium",
+    "coreFeatures": "Tính năng chính",
+    "units": {
+      "questions": " câu",
+      "minutes": " phút"
+    },
+    "examTypes": {
+      "topik1": {
+        "title": "TOPIK I",
+        "subtitle": "Sơ cấp (Cấp 1-2)",
+        "description": "Đánh giá trình độ tiếng Hàn cơ bản"
+      },
+      "topik2": {
+        "title": "TOPIK II",
+        "subtitle": "Trung-Cao cấp (Cấp 3-6)",
+        "description": "Đánh giá trình độ tiếng Hàn nâng cao"
+      },
+      "eps": {
+        "title": "EPS-TOPIK",
+        "subtitle": "Hệ thống cấp phép lao động",
+        "description": "Bài thi tiếng Hàn cho việc làm ở nước ngoài"
+      }
+    },
+    "sections": {
+      "listening": "Nghe",
+      "reading": "Đọc",
+      "writing": "Viết"
+    },
+    "modes": {
+      "full": {
+        "title": "Thi thử thực tế",
+        "description": "Hoàn thành tất cả câu hỏi như thi thật",
+        "features": {
+          "timeLimit": "Giới hạn thời gian",
+          "allQuestions": "Tất cả câu hỏi",
+          "realExam": "Thi thật"
+        }
+      },
+      "section": {
+        "title": "Luyện theo phần",
+        "description": "Tập trung vào phần nghe/đọc",
+        "features": {
+          "selectSection": "Chọn phần",
+          "noTimeLimit": "Không giới hạn",
+          "instantExplanation": "Giải thích ngay"
+        }
+      },
+      "part": {
+        "title": "Luyện theo Part",
+        "description": "Tập trung vào loại câu hỏi cụ thể",
+        "features": {
+          "typePractice": "Luyện theo loại",
+          "repeatLearning": "Học lặp lại",
+          "weaknessImprovement": "Khắc phục điểm yếu"
+        }
+      },
+      "weakness": {
+        "title": "Tập trung điểm yếu",
+        "description": "Câu hỏi phân tích AI cho điểm yếu",
+        "features": {
+          "aiAnalysis": "Phân tích AI",
+          "customRecommend": "Đề xuất riêng",
+          "efficientLearning": "Học hiệu quả"
+        }
+      }
+    },
+    "features": {
+      "aiGeneration": {
+        "title": "Tạo câu hỏi AI",
+        "description": "Tạo câu hỏi mới không giới hạn với RAG + Gemini"
+      },
+      "multiLanguage": {
+        "title": "Giải thích 7 ngôn ngữ",
+        "description": "Hàn, Việt, Anh, Nhật, Trung, Nga, Uzbek"
+      },
+      "detailedAnalysis": {
+        "title": "Phân tích chi tiết",
+        "description": "Phân tích điểm yếu và dự đoán cấp độ"
+      },
+      "smartMistakeNote": {
+        "title": "Ghi chú lỗi thông minh",
+        "description": "Tự động lưu câu sai để ôn tập"
+      }
+    },
+    "userGuide": {
+      "title": "Hướng dẫn sử dụng",
+      "description": "Hướng dẫn từng bước sử dụng hệ thống thi thử TOPIK"
+    },
+    "tutorial": {
+      "step1": {
+        "title": "Chọn loại kỳ thi",
+        "description": "Chọn TOPIK I, TOPIK II hoặc EPS-TOPIK."
+      },
+      "step2": {
+        "title": "Chọn chế độ",
+        "description": "Chọn Thi thử, Theo phần, Theo Part hoặc Điểm yếu."
+      },
+      "step3": {
+        "title": "Làm bài",
+        "description": "Trả lời câu hỏi trong thời gian và đánh dấu câu chưa chắc."
+      },
+      "step4": {
+        "title": "Xem kết quả",
+        "description": "Xem điểm, cấp độ dự đoán và phân tích."
+      },
+      "step5": {
+        "title": "Ôn lại câu sai",
+        "description": "Xem giải thích và lưu vào ghi chú lỗi."
+      }
+    },
+    "notice": {
+      "title": "Lưu ý quan trọng",
+      "item1": "Chế độ thi thử có giới hạn thời gian như thi thật.",
+      "item2": "Phần nghe tự động phát và chỉ nghe được một lần.",
+      "item3": "Phần viết liên kết với menu 'Chấm bài viết'.",
+      "item4": "Ghi chú lỗi được lưu tự động để ôn tập.",
+      "item5": "Tạo câu hỏi AI không giới hạn cho thành viên Premium."
+    },
+    "quickLinks": {
+      "writing": "Chấm bài viết",
+      "speaking": "Luyện nói",
+      "ranking": "Xem bảng xếp hạng"
+    },
+    "dialog": {
+      "title": "Chọn phần",
+      "description": "Chọn phần để luyện tập"
+    }
   }
 }
