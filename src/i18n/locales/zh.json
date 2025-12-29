@@ -217,6 +217,40 @@
     "premiumDescription": "您可以查看此页面，但需升级高级版以获得完整访问权限。",
     "upgrade": "升级"
   },
+  "mobileMenu": {
+    "items": {
+      "koreaCareer": "韩国就业",
+      "headhunting": "猎头服务",
+      "learningHub": "TOPIK学习",
+      "community": "社区",
+      "gameHub": "游戏中心"
+    },
+    "sections": {
+      "career": "就业",
+      "topik": "TOPIK学习",
+      "game": "游戏",
+      "installApp": "安装应用"
+    },
+    "stats": {
+      "money": "资金",
+      "missions": "任务",
+      "points": "积分"
+    },
+    "pwa": {
+      "android": "Android安装",
+      "ios": "iOS安装",
+      "androidGuideTitle": "Android安装方法",
+      "androidStep1": "点击Chrome菜单按钮(⋮)",
+      "androidStep2": "选择'添加到主屏幕'",
+      "androidStep3": "点击'添加'",
+      "iosGuideTitle": "iOS安装方法",
+      "iosStep1": "在Safari中点击分享按钮",
+      "iosStep2": "选择'添加到主屏幕'",
+      "iosStep3": "确认应用名称",
+      "iosStep4": "点击'添加'"
+    },
+    "logout": "退出登录"
+  },
   "toast": {
     "premiumFeature": "高级功能",
     "premiumDescription": "您可以查看此页面，但需升级高级版以获得完整访问权限。",
@@ -855,7 +889,7 @@
     "thinking": "思考中...", "inputPlaceholder": "输入您的回答...", "stopRecording": "停止录音", "answerByVoice": "语音回答", "endInterview": "结束",
     "analyzingResults": "正在分析结果...", "aiEvaluating": "AI正在全面评估您的面试表现", "interviewComplete": "面试完成！", "simulationFor": "面试模拟",
     "grade": "等级", "pointsUnit": "分", "overallScore": "综合得分", "scoresByCategory": "各项得分", "overallFeedback": "综合反馈",
-    "strengths": "优势", "improvements": "待改进", "tipsForNext": "下次面试建议", "restart": "重新面试", "startAgain": "重新开始",
+    "strengths": "优势", "improvements": "待改进", "tipsForNext": "下次面试建议", "backToCareerHub": "Korea Career Hub", "restart": "重新面试", "startAgain": "重新开始",
     "companies": { "samsung": "三星电子", "lg": "LG电子", "hyundai": "现代汽车", "naver": "Naver", "kakao": "Kakao", "coupang": "酷澎", "skhynix": "SK海力士", "other": "其他" },
     "companyTypes": { "conglomerate": "大企业", "tech": "科技公司", "ecommerce": "电商", "semiconductor": "半导体", "custom": "自定义" },
     "positions": { "software": "软件开发", "marketing": "市场营销/公关", "sales": "销售", "hr": "人力资源", "design": "设计/UX", "finance": "财务/会计", "production": "生产/制造", "office": "行政" },
@@ -2154,6 +2188,9 @@
       "beginner": "初级",
       "intermediate": "中级",
       "advanced": "高级"
+    },
+    "duration": {
+      "lessThanOneMin": "< 1 分钟"
     },
     "cta": {
       "title": "立即开始！",

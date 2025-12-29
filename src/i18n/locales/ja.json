@@ -217,6 +217,40 @@
     "premiumDescription": "ページは閲覧できますが、全機能はプレミアムでご利用いただけます。",
     "upgrade": "アップグレード"
   },
+  "mobileMenu": {
+    "items": {
+      "koreaCareer": "韓国就職",
+      "headhunting": "ヘッドハンティング",
+      "learningHub": "TOPIK学習",
+      "community": "コミュニティ",
+      "gameHub": "ゲームハブ"
+    },
+    "sections": {
+      "career": "就職",
+      "topik": "TOPIK学習",
+      "game": "ゲーム",
+      "installApp": "アプリインストール"
+    },
+    "stats": {
+      "money": "資金",
+      "missions": "ミッション",
+      "points": "ポイント"
+    },
+    "pwa": {
+      "android": "Android インストール",
+      "ios": "iOS インストール",
+      "androidGuideTitle": "Androidでのインストール方法",
+      "androidStep1": "Chromeメニューボタン(⋮)をタップ",
+      "androidStep2": "「ホーム画面に追加」を選択",
+      "androidStep3": "「追加」をタップ",
+      "iosGuideTitle": "iOSでのインストール方法",
+      "iosStep1": "Safariで共有ボタンをタップ",
+      "iosStep2": "「ホーム画面に追加」を選択",
+      "iosStep3": "アプリ名を確認",
+      "iosStep4": "「追加」をタップ"
+    },
+    "logout": "ログアウト"
+  },
   "toast": {
     "premiumFeature": "プレミアム機能",
     "premiumDescription": "ページは閲覧できますが、全機能はプレミアムでご利用いただけます。",
@@ -855,7 +889,7 @@
     "thinking": "考え中...", "inputPlaceholder": "回答を入力...", "stopRecording": "録音停止", "answerByVoice": "音声で回答", "endInterview": "終了",
     "analyzingResults": "結果分析中...", "aiEvaluating": "AIが面接を総合評価しています", "interviewComplete": "面接完了！", "simulationFor": "面接シミュレーション",
     "grade": "ランク", "pointsUnit": "点", "overallScore": "総合点", "scoresByCategory": "項目別スコア", "overallFeedback": "総合フィードバック",
-    "strengths": "強み", "improvements": "改善点", "tipsForNext": "次回面接へのアドバイス", "restart": "もう一度面接", "startAgain": "やり直す",
+    "strengths": "強み", "improvements": "改善点", "tipsForNext": "次回面接へのアドバイス", "backToCareerHub": "Korea Career Hub", "restart": "もう一度面接", "startAgain": "やり直す",
     "companies": { "samsung": "サムスン電子", "lg": "LG電子", "hyundai": "現代自動車", "naver": "NAVER", "kakao": "カカオ", "coupang": "クーパン", "skhynix": "SKハイニックス", "other": "その他" },
     "companyTypes": { "conglomerate": "大企業", "tech": "IT企業", "ecommerce": "Eコマース", "semiconductor": "半導体", "custom": "直接入力" },
     "positions": { "software": "ソフトウェア開発", "marketing": "マーケティング/PR", "sales": "営業/セールス", "hr": "人事/HR", "design": "デザイン/UX", "finance": "財務/会計", "production": "生産/製造", "office": "一般事務" },
@@ -2140,6 +2174,9 @@
       "beginner": "初級",
       "intermediate": "中級",
       "advanced": "上級"
+    },
+    "duration": {
+      "lessThanOneMin": "< 1分"
     },
     "cta": {
       "title": "今すぐ始めよう！",

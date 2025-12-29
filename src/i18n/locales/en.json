@@ -232,6 +232,40 @@
     "premiumDescription": "You can view this page, but upgrade to Premium for full access.",
     "upgrade": "Upgrade"
   },
+  "mobileMenu": {
+    "items": {
+      "koreaCareer": "Korea Career",
+      "headhunting": "Headhunting",
+      "learningHub": "TOPIK Study",
+      "community": "Community",
+      "gameHub": "Game Hub"
+    },
+    "sections": {
+      "career": "Career",
+      "topik": "TOPIK Study",
+      "game": "Games",
+      "installApp": "Install App"
+    },
+    "stats": {
+      "money": "Money",
+      "missions": "Missions",
+      "points": "Points"
+    },
+    "pwa": {
+      "android": "Android Install",
+      "ios": "iOS Install",
+      "androidGuideTitle": "How to Install on Android",
+      "androidStep1": "Tap Chrome menu button (⋮)",
+      "androidStep2": "Select 'Add to Home screen'",
+      "androidStep3": "Tap 'Add'",
+      "iosGuideTitle": "How to Install on iOS",
+      "iosStep1": "Tap the Share button in Safari",
+      "iosStep2": "Select 'Add to Home Screen'",
+      "iosStep3": "Confirm the app name",
+      "iosStep4": "Tap 'Add'"
+    },
+    "logout": "Logout"
+  },
   "toast": {
     "premiumFeature": "Premium Feature",
     "premiumDescription": "You can view this page, but upgrade to Premium for full access.",
@@ -979,6 +1013,7 @@
     "strengths": "Strengths",
     "improvements": "Areas for Improvement",
     "tipsForNext": "Tips for Your Next Interview",
+    "backToCareerHub": "Korea Career Hub",
     "restart": "Try Again",
     "startAgain": "Start Over",
     "companies": { "samsung": "Samsung Electronics", "lg": "LG Electronics", "hyundai": "Hyundai Motor", "naver": "Naver", "kakao": "Kakao", "coupang": "Coupang", "skhynix": "SK Hynix", "other": "Other" },
@@ -2390,6 +2425,9 @@
       "beginner": "Beginner",
       "intermediate": "Intermediate",
       "advanced": "Advanced"
+    },
+    "duration": {
+      "lessThanOneMin": "< 1 min"
     },
     "cta": {
       "title": "Start Now!",

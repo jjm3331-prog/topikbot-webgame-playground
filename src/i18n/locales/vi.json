@@ -232,6 +232,40 @@
     "premiumDescription": "Bạn vẫn có thể xem trang, nhưng để sử dụng đầy đủ tính năng vui lòng nâng cấp Premium.",
     "upgrade": "Nâng cấp"
   },
+  "mobileMenu": {
+    "items": {
+      "koreaCareer": "Việc làm Hàn Quốc",
+      "headhunting": "Headhunting",
+      "learningHub": "Học TOPIK",
+      "community": "Cộng đồng",
+      "gameHub": "Trung tâm Game"
+    },
+    "sections": {
+      "career": "Việc làm",
+      "topik": "Học TOPIK",
+      "game": "Game",
+      "installApp": "Cài đặt ứng dụng"
+    },
+    "stats": {
+      "money": "Tiền",
+      "missions": "Nhiệm vụ",
+      "points": "Điểm"
+    },
+    "pwa": {
+      "android": "Cài Android",
+      "ios": "Cài iOS",
+      "androidGuideTitle": "Cách cài trên Android",
+      "androidStep1": "Nhấn nút menu Chrome (⋮)",
+      "androidStep2": "Chọn 'Thêm vào màn hình chính'",
+      "androidStep3": "Nhấn 'Thêm'",
+      "iosGuideTitle": "Cách cài trên iOS",
+      "iosStep1": "Nhấn nút Chia sẻ trong Safari",
+      "iosStep2": "Chọn 'Thêm vào Màn hình chính'",
+      "iosStep3": "Xác nhận tên ứng dụng",
+      "iosStep4": "Nhấn 'Thêm'"
+    },
+    "logout": "Đăng xuất"
+  },
   "toast": {
     "premiumFeature": "Tính năng Premium",
     "premiumDescription": "Bạn vẫn có thể xem trang, nhưng để sử dụng đầy đủ tính năng vui lòng nâng cấp Premium.",
@@ -1070,6 +1104,7 @@
     "strengths": "Điểm mạnh",
     "improvements": "Cần cải thiện",
     "tipsForNext": "Lời khuyên cho buổi phỏng vấn tiếp theo",
+    "backToCareerHub": "Korea Career Hub",
     "restart": "Phỏng vấn lại",
     "startAgain": "Bắt đầu lại",
     "companies": { "samsung": "Samsung Electronics", "lg": "LG Electronics", "hyundai": "Hyundai Motor", "naver": "Naver", "kakao": "Kakao", "coupang": "Coupang", "skhynix": "SK Hynix", "other": "Khác" },
@@ -2409,6 +2444,9 @@
       "beginner": "Sơ cấp",
       "intermediate": "Trung cấp",
       "advanced": "Cao cấp"
+    },
+    "duration": {
+      "lessThanOneMin": "< 1 phút"
     },
     "cta": {
       "title": "Bắt đầu ngay!",

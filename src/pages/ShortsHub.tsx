@@ -337,7 +337,7 @@ export default function ShortsHub() {
                               </div>
                               <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full">
                                 <Clock className="w-3.5 h-3.5" />
-                                <span className="font-medium">&lt; 1분</span>
+                                <span className="font-medium">{t('videoHub.duration.lessThanOneMin')}</span>
                               </div>
                             </div>
                           </div>
