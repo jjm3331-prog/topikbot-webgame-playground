@@ -2321,5 +2321,106 @@
     "goHome": "Về trang chủ",
     "goBack": "Trang trước",
     "path": "Đường dẫn"
+  },
+  "videoHub": {
+    "hero": {
+      "badge": "Hệ thống học tập vượt trội",
+      "title1": "Video Learning",
+      "title2": "Hoàn hảo với 7 ngôn ngữ",
+      "subtitle": "Học tiếng Hàn qua video YouTube • Đồng bộ phụ đề thời gian thực • Học từ vựng TOPIK chỉ với một cú nhấp • Phản hồi AI tùy chỉnh",
+      "startButton": "Bắt đầu học",
+      "guideButton": "Xem hướng dẫn"
+    },
+    "stats": {
+      "languages": "Ngôn ngữ",
+      "pronunciation": "Phản hồi phát âm",
+      "repeat": "Lặp đoạn",
+      "vocabulary": "Liên kết từ vựng"
+    },
+    "features": {
+      "sectionTitle": "Tính năng học tập khác biệt",
+      "sectionSubtitle": "Không chỉ xem video, đây là hệ thống all-in-one để thành thạo tiếng Hàn",
+      "subtitle": {
+        "title": "Phụ đề 7 ngôn ngữ",
+        "description": "Chuyển đổi thời gian thực: Hàn, Việt, Anh, Nhật, Trung, Nga, Uzbek"
+      },
+      "topik": {
+        "title": "Liên kết TOPIK",
+        "description": "Nhấp vào phụ đề để xem nghĩa, ví dụ và phát âm từ TOPIK"
+      },
+      "shadowing": {
+        "title": "Luyện Shadowing",
+        "description": "Lặp đoạn + Luyện phát âm STT để nói như người bản xứ"
+      },
+      "aiQa": {
+        "title": "AI Q&A",
+        "description": "\"Biểu hiện này dùng khi nào?\" Học sâu với câu trả lời tùy chỉnh RAG"
+      },
+      "mistakes": {
+        "title": "Sổ lỗi",
+        "description": "Tự động lưu từ chưa biết, ôn tập theo video để ghi nhớ hoàn hảo"
+      },
+      "quiz": {
+        "title": "Quiz đoạn",
+        "description": "Quiz tự động sau khi xem để tối đa hiệu quả học"
+      }
+    },
+    "howTo": {
+      "sectionTitle": "Hướng dẫn sử dụng",
+      "sectionSubtitle": "Bắt đầu học video hoàn hảo chỉ với 5 bước",
+      "step1": { "title": "Chọn video", "description": "Chọn video tiếng Hàn theo danh mục" },
+      "step2": { "title": "Đặt ngôn ngữ phụ đề", "description": "Chọn phụ đề từ 7 ngôn ngữ" },
+      "step3": { "title": "Nhấp từ để học", "description": "Nhấp vào từ chưa biết để xem nghĩa và ví dụ" },
+      "step4": { "title": "Luyện Shadowing", "description": "Chọn đoạn để lặp lại và ghi âm so sánh" },
+      "step5": { "title": "Xem sổ lỗi", "description": "Ôn tập từ đã lưu và master" }
+    },
+    "videos": {
+      "sectionTitle": "Video học tập",
+      "sectionSubtitle": "Khám phá video học tiếng Hàn phổ biến",
+      "viewAll": "Xem tất cả",
+      "noVideos": "Chưa có video nào",
+      "comingSoon": "Video học tập đa dạng sắp được thêm!"
+    },
+    "categories": {
+      "all": "Tất cả",
+      "drama": "Phim",
+      "news": "Tin tức",
+      "education": "Giáo dục",
+      "variety": "Giải trí",
+      "music": "Âm nhạc"
+    },
+    "difficulty": {
+      "beginner": "Sơ cấp",
+      "intermediate": "Trung cấp",
+      "advanced": "Cao cấp"
+    },
+    "cta": {
+      "title": "Bắt đầu ngay!",
+      "description": "Nâng cao tiếng Hàn tự nhiên qua video. Phụ đề 7 ngôn ngữ và công cụ AI đồng hành.",
+      "button": "Bắt đầu miễn phí"
+    }
+  },
+  "videoPlayer": {
+    "backToHub": "Quay lại danh sách",
+    "error": "Lỗi",
+    "videoNotFound": "Không tìm thấy video",
+    "beginner": "Sơ cấp",
+    "intermediate": "Trung cấp",
+    "advanced": "Cao cấp",
+    "unknownDuration": "Chưa xác định",
+    "views": "lượt xem",
+    "subtitleLanguage": "Ngôn ngữ phụ đề",
+    "hideSubtitle": "Ẩn phụ đề",
+    "showSubtitle": "Hiện phụ đề",
+    "shadowing": "Shadowing",
+    "shadowingDesc": "Luyện nói theo",
+    "vocabulary": "Từ vựng",
+    "vocabularyDesc": "Lưu từ TOPIK",
+    "aiQa": "Hỏi AI",
+    "aiQaDesc": "Giải đáp thắc mắc",
+    "subtitleList": "Danh sách phụ đề",
+    "clickToJump": "Nhấp để chuyển đến đoạn đó",
+    "noSubtitles": "Chưa có phụ đề",
+    "subtitlesComingSoon": "Phụ đề sắp được thêm"
   }
 }

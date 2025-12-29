@@ -2440,5 +2440,106 @@
     "goHome": "홈으로 돌아가기",
     "goBack": "이전 페이지",
     "path": "경로"
+  },
+  "videoHub": {
+    "hero": {
+      "badge": "압도적인 학습 시스템",
+      "title1": "비디오 학습",
+      "title2": "7개국어로 완벽하게",
+      "subtitle": "유튜브 영상으로 한국어 학습 • 실시간 자막 싱크 • 클릭 한 번으로 TOPIK 단어 학습 • AI 기반 맞춤 피드백",
+      "startButton": "학습 시작하기",
+      "guideButton": "사용법 보기"
+    },
+    "stats": {
+      "languages": "지원 언어",
+      "pronunciation": "발음 피드백",
+      "repeat": "구간 반복",
+      "vocabulary": "어휘 연동"
+    },
+    "features": {
+      "sectionTitle": "차별화된 학습 기능",
+      "sectionSubtitle": "단순한 영상 시청을 넘어, 완벽한 한국어 습득을 위한 올인원 시스템",
+      "subtitle": {
+        "title": "7개국어 자막",
+        "description": "한국어, 베트남어, 영어, 일본어, 중국어, 러시아어, 우즈베크어 실시간 전환"
+      },
+      "topik": {
+        "title": "TOPIK 어휘 연동",
+        "description": "자막 클릭 시 TOPIK 단어장과 연동된 의미, 예문, 발음 팝업"
+      },
+      "shadowing": {
+        "title": "쉐도잉 연습",
+        "description": "구간 반복 재생 + STT 기반 발음 연습으로 원어민처럼 말하기"
+      },
+      "aiQa": {
+        "title": "AI Q&A",
+        "description": "\"이 표현 언제 써요?\" RAG 기반 맞춤 답변으로 깊이 있는 학습"
+      },
+      "mistakes": {
+        "title": "오답노트",
+        "description": "모르는 단어 자동 저장, 영상별 복습으로 완벽한 암기"
+      },
+      "quiz": {
+        "title": "구간 퀴즈",
+        "description": "시청 후 자동 생성 퀴즈로 학습 효과 극대화"
+      }
+    },
+    "howTo": {
+      "sectionTitle": "사용 가이드",
+      "sectionSubtitle": "5단계로 완벽한 비디오 학습을 시작하세요",
+      "step1": { "title": "영상 선택", "description": "카테고리별로 원하는 한국어 영상을 선택하세요" },
+      "step2": { "title": "자막 언어 설정", "description": "7개 언어 중 원하는 자막을 선택하세요" },
+      "step3": { "title": "단어 클릭 학습", "description": "모르는 단어를 클릭하면 의미와 예문이 팝업됩니다" },
+      "step4": { "title": "쉐도잉 연습", "description": "구간을 선택해 반복 듣고, 녹음해 비교하세요" },
+      "step5": { "title": "오답노트 확인", "description": "저장된 단어들을 복습하고 마스터하세요" }
+    },
+    "videos": {
+      "sectionTitle": "학습 영상",
+      "sectionSubtitle": "인기 한국어 학습 영상을 만나보세요",
+      "viewAll": "전체 보기",
+      "noVideos": "아직 등록된 영상이 없습니다",
+      "comingSoon": "곧 다양한 학습 영상이 추가됩니다!"
+    },
+    "categories": {
+      "all": "전체",
+      "drama": "드라마",
+      "news": "뉴스",
+      "education": "교육",
+      "variety": "예능",
+      "music": "음악"
+    },
+    "difficulty": {
+      "beginner": "초급",
+      "intermediate": "중급",
+      "advanced": "고급"
+    },
+    "cta": {
+      "title": "지금 바로 시작하세요!",
+      "description": "영상을 보면서 자연스럽게 한국어 실력을 키워보세요. 7개국어 자막과 AI 기반 학습 도구가 함께합니다.",
+      "button": "무료로 시작하기"
+    }
+  },
+  "videoPlayer": {
+    "backToHub": "목록으로 돌아가기",
+    "error": "오류",
+    "videoNotFound": "영상을 찾을 수 없습니다",
+    "beginner": "초급",
+    "intermediate": "중급",
+    "advanced": "고급",
+    "unknownDuration": "시간 미정",
+    "views": "조회",
+    "subtitleLanguage": "자막 언어",
+    "hideSubtitle": "자막 숨기기",
+    "showSubtitle": "자막 보기",
+    "shadowing": "쉐도잉",
+    "shadowingDesc": "따라 말하기 연습",
+    "vocabulary": "단어장",
+    "vocabularyDesc": "TOPIK 어휘 저장",
+    "aiQa": "AI 질문",
+    "aiQaDesc": "표현 궁금증 해결",
+    "subtitleList": "자막 목록",
+    "clickToJump": "클릭하면 해당 구간으로 이동합니다",
+    "noSubtitles": "자막이 없습니다",
+    "subtitlesComingSoon": "자막이 곧 추가됩니다"
   }
 }

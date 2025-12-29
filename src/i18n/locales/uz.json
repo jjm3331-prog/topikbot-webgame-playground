@@ -2084,5 +2084,106 @@
     "goHome": "Bosh sahifaga",
     "goBack": "Orqaga",
     "path": "Yo'l"
+  },
+  "videoHub": {
+    "hero": {
+      "badge": "Ajoyib o'quv tizimi",
+      "title1": "Video o'rganish",
+      "title2": "7 tilda mukammal",
+      "subtitle": "YouTube bilan koreys tilini o'rganing • Haqiqiy vaqtda subtitr sinxronizatsiyasi • Bir marta bosib TOPIK so'zlarni o'rganing • AI asosidagi shaxsiy fikr-mulohaza",
+      "startButton": "O'rganishni boshlash",
+      "guideButton": "Qo'llanmani ko'rish"
+    },
+    "stats": {
+      "languages": "Tillar",
+      "pronunciation": "Talaffuz fikri",
+      "repeat": "Bo'lim takrori",
+      "vocabulary": "Lug'at aloqasi"
+    },
+    "features": {
+      "sectionTitle": "Farqli o'quv xususiyatlari",
+      "sectionSubtitle": "Oddiy video ko'rishdan tashqari, koreys tilini mukammal o'zlashtirish uchun yagona tizim",
+      "subtitle": {
+        "title": "7 tilda subtitrlar",
+        "description": "Haqiqiy vaqtda almashtirish: koreys, vetnam, ingliz, yapon, xitoy, rus, o'zbek"
+      },
+      "topik": {
+        "title": "TOPIK lug'at aloqasi",
+        "description": "Subtitrlarni bosib TOPIK lug'atidagi ma'no, misollar va talaffuzni ko'ring"
+      },
+      "shadowing": {
+        "title": "Shadowing mashqi",
+        "description": "Bo'lim takrori + STT asosidagi talaffuz mashqi bilan ona tilida gapiring"
+      },
+      "aiQa": {
+        "title": "AI savol-javob",
+        "description": "\"Bu iborani qachon ishlataman?\" RAG asosidagi maxsus javoblar bilan chuqur o'rganish"
+      },
+      "mistakes": {
+        "title": "Xato daftari",
+        "description": "Noma'lum so'zlarni avtomatik saqlash, video bo'yicha takrorlash bilan mukammal yodlash"
+      },
+      "quiz": {
+        "title": "Bo'lim testi",
+        "description": "Ko'rgandan keyin avtomatik yaratilgan testlar o'quv samaradorligini maksimal darajaga oshiradi"
+      }
+    },
+    "howTo": {
+      "sectionTitle": "Foydalanuvchi qo'llanmasi",
+      "sectionSubtitle": "5 qadamda mukammal video o'rganishni boshlang",
+      "step1": { "title": "Video tanlash", "description": "Turkum bo'yicha koreys videolarini tanlang" },
+      "step2": { "title": "Subtitr tilini o'rnatish", "description": "7 tildan subtitrlarni tanlang" },
+      "step3": { "title": "So'zlarni bosib o'rganish", "description": "Noma'lum so'zlarni bosib ma'no va misollarni ko'ring" },
+      "step4": { "title": "Shadowing mashqi", "description": "Takrorlash va yozib olish uchun bo'limlarni tanlang" },
+      "step5": { "title": "Xato daftarini ko'rish", "description": "Saqlangan so'zlarni takrorlang va o'zlashtiring" }
+    },
+    "videos": {
+      "sectionTitle": "O'quv videolari",
+      "sectionSubtitle": "Mashhur koreys o'rganish videolarini kashf eting",
+      "viewAll": "Hammasini ko'rish",
+      "noVideos": "Hali ro'yxatdan o'tgan videolar yo'q",
+      "comingSoon": "Turli o'quv videolari tez orada qo'shiladi!"
+    },
+    "categories": {
+      "all": "Hammasi",
+      "drama": "Drama",
+      "news": "Yangiliklar",
+      "education": "Ta'lim",
+      "variety": "Ko'ngilochar",
+      "music": "Musiqa"
+    },
+    "difficulty": {
+      "beginner": "Boshlang'ich",
+      "intermediate": "O'rta",
+      "advanced": "Yuqori"
+    },
+    "cta": {
+      "title": "Hozir boshlang!",
+      "description": "Video ko'rish orqali koreys tilini tabiiy ravishda yaxshilang. 7 tilda subtitrlar va AI o'quv vositalari bilan birga.",
+      "button": "Bepul boshlash"
+    }
+  },
+  "videoPlayer": {
+    "backToHub": "Ro'yxatga qaytish",
+    "error": "Xato",
+    "videoNotFound": "Video topilmadi",
+    "beginner": "Boshlang'ich",
+    "intermediate": "O'rta",
+    "advanced": "Yuqori",
+    "unknownDuration": "Noma'lum",
+    "views": "ko'rish",
+    "subtitleLanguage": "Subtitr tili",
+    "hideSubtitle": "Subtitrni yashirish",
+    "showSubtitle": "Subtitrni ko'rsatish",
+    "shadowing": "Shadowing",
+    "shadowingDesc": "Gapirish mashqi",
+    "vocabulary": "Lug'at",
+    "vocabularyDesc": "TOPIK so'zlarini saqlash",
+    "aiQa": "AI savol",
+    "aiQaDesc": "Savollarga javob",
+    "subtitleList": "Subtitrlar ro'yxati",
+    "clickToJump": "Ushbu bo'limga o'tish uchun bosing",
+    "noSubtitles": "Subtitrlar mavjud emas",
+    "subtitlesComingSoon": "Subtitrlar tez orada qo'shiladi"
   }
 }

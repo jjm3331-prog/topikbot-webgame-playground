@@ -2066,5 +2066,106 @@
     "goHome": "返回首页",
     "goBack": "返回上页",
     "path": "路径"
+  },
+  "videoHub": {
+    "hero": {
+      "badge": "压倒性学习系统",
+      "title1": "视频学习",
+      "title2": "7种语言完美掌握",
+      "subtitle": "用YouTube视频学韩语 • 实时字幕同步 • 一键学习TOPIK词汇 • AI定制反馈",
+      "startButton": "开始学习",
+      "guideButton": "查看指南"
+    },
+    "stats": {
+      "languages": "支持语言",
+      "pronunciation": "发音反馈",
+      "repeat": "区间循环",
+      "vocabulary": "词汇联动"
+    },
+    "features": {
+      "sectionTitle": "差异化学习功能",
+      "sectionSubtitle": "超越简单视频观看，完美掌握韩语的一体化系统",
+      "subtitle": {
+        "title": "7语言字幕",
+        "description": "实时切换：韩语、越南语、英语、日语、中文、俄语、乌兹别克语"
+      },
+      "topik": {
+        "title": "TOPIK词汇联动",
+        "description": "点击字幕查看与TOPIK词汇表联动的含义、例句和发音"
+      },
+      "shadowing": {
+        "title": "跟读练习",
+        "description": "区间循环播放 + STT发音练习，像母语者一样说话"
+      },
+      "aiQa": {
+        "title": "AI问答",
+        "description": "\"这个表达什么时候用？\"基于RAG的定制回答深度学习"
+      },
+      "mistakes": {
+        "title": "错题本",
+        "description": "自动保存不认识的单词，按视频复习完美记忆"
+      },
+      "quiz": {
+        "title": "区间测验",
+        "description": "观看后自动生成测验最大化学习效果"
+      }
+    },
+    "howTo": {
+      "sectionTitle": "使用指南",
+      "sectionSubtitle": "5步开始完美视频学习",
+      "step1": { "title": "选择视频", "description": "按类别选择韩语视频" },
+      "step2": { "title": "设置字幕语言", "description": "从7种语言中选择字幕" },
+      "step3": { "title": "点击单词学习", "description": "点击不认识的单词查看含义和例句" },
+      "step4": { "title": "跟读练习", "description": "选择区间循环收听并录音比较" },
+      "step5": { "title": "查看错题本", "description": "复习保存的单词并掌握" }
+    },
+    "videos": {
+      "sectionTitle": "学习视频",
+      "sectionSubtitle": "发现热门韩语学习视频",
+      "viewAll": "查看全部",
+      "noVideos": "还没有注册视频",
+      "comingSoon": "各种学习视频即将添加！"
+    },
+    "categories": {
+      "all": "全部",
+      "drama": "电视剧",
+      "news": "新闻",
+      "education": "教育",
+      "variety": "综艺",
+      "music": "音乐"
+    },
+    "difficulty": {
+      "beginner": "初级",
+      "intermediate": "中级",
+      "advanced": "高级"
+    },
+    "cta": {
+      "title": "立即开始！",
+      "description": "看视频自然提升韩语水平。7语言字幕和AI学习工具同行。",
+      "button": "免费开始"
+    }
+  },
+  "videoPlayer": {
+    "backToHub": "返回列表",
+    "error": "错误",
+    "videoNotFound": "找不到视频",
+    "beginner": "初级",
+    "intermediate": "中级",
+    "advanced": "高级",
+    "unknownDuration": "时长未定",
+    "views": "次观看",
+    "subtitleLanguage": "字幕语言",
+    "hideSubtitle": "隐藏字幕",
+    "showSubtitle": "显示字幕",
+    "shadowing": "跟读",
+    "shadowingDesc": "跟读练习",
+    "vocabulary": "词汇本",
+    "vocabularyDesc": "保存TOPIK词汇",
+    "aiQa": "AI提问",
+    "aiQaDesc": "解答疑问",
+    "subtitleList": "字幕列表",
+    "clickToJump": "点击跳转到该区间",
+    "noSubtitles": "没有字幕",
+    "subtitlesComingSoon": "字幕即将添加"
   }
 }
