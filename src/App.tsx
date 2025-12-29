@@ -60,6 +60,8 @@ import Battle from "./pages/Battle";
 import AdminVideoManager from "./pages/AdminVideoManager";
 import AdminVideoSubtitles from "./pages/AdminVideoSubtitles";
 import VideoLearningHub from "./pages/VideoLearningHub";
+import MockExamHub from "./pages/MockExamHub";
+import AdminMockExam from "./pages/AdminMockExam";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWAWelcome from "./components/PWAWelcome";
 import SplashScreen from "./components/SplashScreen";
@@ -216,6 +218,8 @@ const App = () => {
               <Route path="/admin/video-manager" element={<ProtectedRoute><AdminVideoManager /></ProtectedRoute>} />
               <Route path="/admin/video/:videoId/subtitles" element={<ProtectedRoute><AdminVideoSubtitles /></ProtectedRoute>} />
               <Route path="/video-hub" element={<ProtectedRoute><VideoLearningHub /></ProtectedRoute>} />
+              <Route path="/mock-exam" element={<ProtectedRoute><MockExamHub /></ProtectedRoute>} />
+              <Route path="/admin/mock-exam" element={<ProtectedRoute><AdminMockExam /></ProtectedRoute>} />
               <Route path="/board-hub" element={<ProtectedRoute><BoardHub /></ProtectedRoute>} />
               <Route path="/board/:boardType" element={<ProtectedRoute><Board /></ProtectedRoute>} />
               <Route path="/board/:boardType/:postId" element={<ProtectedRoute><BoardPost /></ProtectedRoute>} />

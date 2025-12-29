@@ -881,6 +881,341 @@ export type Database = {
         }
         Relationships: []
       }
+      mock_exam_answers: {
+        Row: {
+          answered_at: string | null
+          attempt_id: string
+          id: string
+          is_correct: boolean | null
+          question_id: string
+          time_spent_seconds: number | null
+          user_answer: number | null
+        }
+        Insert: {
+          answered_at?: string | null
+          attempt_id: string
+          id?: string
+          is_correct?: boolean | null
+          question_id: string
+          time_spent_seconds?: number | null
+          user_answer?: number | null
+        }
+        Update: {
+          answered_at?: string | null
+          attempt_id?: string
+          id?: string
+          is_correct?: boolean | null
+          question_id?: string
+          time_spent_seconds?: number | null
+          user_answer?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mock_exam_answers_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "mock_exam_attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mock_exam_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "mock_question_bank"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mock_exam_attempts: {
+        Row: {
+          correct_count: number
+          created_at: string
+          exam_mode: string
+          exam_type: string
+          finished_at: string | null
+          id: string
+          is_completed: boolean
+          listening_score: number | null
+          part_number: number | null
+          predicted_grade: number | null
+          reading_score: number | null
+          section: string | null
+          started_at: string
+          time_limit_seconds: number | null
+          time_taken_seconds: number | null
+          total_questions: number
+          total_score: number | null
+          user_id: string
+        }
+        Insert: {
+          correct_count?: number
+          created_at?: string
+          exam_mode: string
+          exam_type: string
+          finished_at?: string | null
+          id?: string
+          is_completed?: boolean
+          listening_score?: number | null
+          part_number?: number | null
+          predicted_grade?: number | null
+          reading_score?: number | null
+          section?: string | null
+          started_at?: string
+          time_limit_seconds?: number | null
+          time_taken_seconds?: number | null
+          total_questions: number
+          total_score?: number | null
+          user_id: string
+        }
+        Update: {
+          correct_count?: number
+          created_at?: string
+          exam_mode?: string
+          exam_type?: string
+          finished_at?: string | null
+          id?: string
+          is_completed?: boolean
+          listening_score?: number | null
+          part_number?: number | null
+          predicted_grade?: number | null
+          reading_score?: number | null
+          section?: string | null
+          started_at?: string
+          time_limit_seconds?: number | null
+          time_taken_seconds?: number | null
+          total_questions?: number
+          total_score?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mock_exam_mistakes: {
+        Row: {
+          ai_analysis: string | null
+          attempt_id: string | null
+          created_at: string
+          id: string
+          last_reviewed: string | null
+          mastered: boolean
+          mastered_at: string | null
+          mistake_category: string | null
+          next_review: string | null
+          question_id: string
+          review_count: number
+          updated_at: string
+          user_id: string
+          user_notes: string | null
+        }
+        Insert: {
+          ai_analysis?: string | null
+          attempt_id?: string | null
+          created_at?: string
+          id?: string
+          last_reviewed?: string | null
+          mastered?: boolean
+          mastered_at?: string | null
+          mistake_category?: string | null
+          next_review?: string | null
+          question_id: string
+          review_count?: number
+          updated_at?: string
+          user_id: string
+          user_notes?: string | null
+        }
+        Update: {
+          ai_analysis?: string | null
+          attempt_id?: string | null
+          created_at?: string
+          id?: string
+          last_reviewed?: string | null
+          mastered?: boolean
+          mastered_at?: string | null
+          mistake_category?: string | null
+          next_review?: string | null
+          question_id?: string
+          review_count?: number
+          updated_at?: string
+          user_id?: string
+          user_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mock_exam_mistakes_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "mock_exam_attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mock_exam_mistakes_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "mock_question_bank"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mock_question_bank: {
+        Row: {
+          correct_answer: number
+          created_at: string
+          created_by: string | null
+          difficulty: string | null
+          exam_type: string
+          explanation_en: string | null
+          explanation_ja: string | null
+          explanation_ko: string | null
+          explanation_ru: string | null
+          explanation_uz: string | null
+          explanation_vi: string | null
+          explanation_zh: string | null
+          grammar_points: Json | null
+          id: string
+          is_active: boolean
+          options: Json
+          part_number: number
+          question_audio_url: string | null
+          question_image_url: string | null
+          question_number: number | null
+          question_text: string
+          section: string
+          template_id: string | null
+          updated_at: string
+          usage_count: number
+          vocabulary: Json | null
+        }
+        Insert: {
+          correct_answer: number
+          created_at?: string
+          created_by?: string | null
+          difficulty?: string | null
+          exam_type: string
+          explanation_en?: string | null
+          explanation_ja?: string | null
+          explanation_ko?: string | null
+          explanation_ru?: string | null
+          explanation_uz?: string | null
+          explanation_vi?: string | null
+          explanation_zh?: string | null
+          grammar_points?: Json | null
+          id?: string
+          is_active?: boolean
+          options?: Json
+          part_number: number
+          question_audio_url?: string | null
+          question_image_url?: string | null
+          question_number?: number | null
+          question_text: string
+          section: string
+          template_id?: string | null
+          updated_at?: string
+          usage_count?: number
+          vocabulary?: Json | null
+        }
+        Update: {
+          correct_answer?: number
+          created_at?: string
+          created_by?: string | null
+          difficulty?: string | null
+          exam_type?: string
+          explanation_en?: string | null
+          explanation_ja?: string | null
+          explanation_ko?: string | null
+          explanation_ru?: string | null
+          explanation_uz?: string | null
+          explanation_vi?: string | null
+          explanation_zh?: string | null
+          grammar_points?: Json | null
+          id?: string
+          is_active?: boolean
+          options?: Json
+          part_number?: number
+          question_audio_url?: string | null
+          question_image_url?: string | null
+          question_number?: number | null
+          question_text?: string
+          section?: string
+          template_id?: string | null
+          updated_at?: string
+          usage_count?: number
+          vocabulary?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mock_question_bank_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "mock_question_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mock_question_templates: {
+        Row: {
+          created_at: string
+          description: string | null
+          description_ko: string | null
+          description_vi: string | null
+          difficulty: string | null
+          display_order: number
+          exam_type: string
+          examples: Json | null
+          generation_hints: Json | null
+          id: string
+          is_active: boolean
+          part_name: string
+          part_name_ko: string | null
+          part_name_vi: string | null
+          part_number: number
+          question_count: number
+          section: string
+          time_limit_minutes: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          description_ko?: string | null
+          description_vi?: string | null
+          difficulty?: string | null
+          display_order?: number
+          exam_type: string
+          examples?: Json | null
+          generation_hints?: Json | null
+          id?: string
+          is_active?: boolean
+          part_name: string
+          part_name_ko?: string | null
+          part_name_vi?: string | null
+          part_number: number
+          question_count?: number
+          section: string
+          time_limit_minutes?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          description_ko?: string | null
+          description_vi?: string | null
+          difficulty?: string | null
+          display_order?: number
+          exam_type?: string
+          examples?: Json | null
+          generation_hints?: Json | null
+          id?: string
+          is_active?: boolean
+          part_name?: string
+          part_name_ko?: string | null
+          part_name_vi?: string | null
+          part_number?: number
+          question_count?: number
+          section?: string
+          time_limit_minutes?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
