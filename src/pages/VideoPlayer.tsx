@@ -93,6 +93,8 @@ export default function VideoPlayer() {
   const subtitleListRef = useRef<HTMLDivElement>(null);
   const activeSubtitleRef = useRef<HTMLButtonElement>(null);
 
+  const hasHangul = (text?: string | null) => /[가-힣]/.test(text ?? '');
+
   useEffect(() => {
     if (videoId) {
       fetchVideo();
@@ -412,8 +414,8 @@ export default function VideoPlayer() {
                         </p>
                       )}
 
-                      {/* Korean (support line) - show under translation */}
-                      {dualSubtitle && selectedLanguage !== 'ko' && koreanSubtitleNow && (
+                      {/* Korean (support line) - only if we actually have Korean text in DB */}
+                      {dualSubtitle && selectedLanguage !== 'ko' && koreanSubtitleNow && hasHangul(koreanSubtitleNow.text) && (
                         <p className="text-base sm:text-lg font-medium text-white/90">
                           {koreanSubtitleNow.text}
                         </p>
