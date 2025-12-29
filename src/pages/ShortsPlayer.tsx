@@ -405,14 +405,13 @@ export default function ShortsPlayer() {
                     {availableLanguages.map((lang) => {
                       const isActive = selectedLanguage === lang.code;
                       return (
-                        <button
+                        <div
                           key={lang.code}
-                          onClick={() => setSelectedLanguage(lang.code)}
                           className={`
-                            relative px-3 py-2 rounded-xl text-xs font-medium transition-all duration-300
+                            relative px-3 py-2 rounded-xl text-xs font-medium
                             ${isActive 
                               ? 'text-white shadow-md' 
-                              : 'text-muted-foreground bg-muted/50 hover:bg-muted hover:text-foreground'
+                              : 'text-muted-foreground bg-muted/50'
                             }
                           `}
                         >
@@ -427,7 +426,7 @@ export default function ShortsPlayer() {
                             <span>{lang.flag}</span>
                             <span className="hidden sm:inline">{lang.name}</span>
                           </span>
-                        </button>
+                        </div>
                       );
                     })}
                   </div>
