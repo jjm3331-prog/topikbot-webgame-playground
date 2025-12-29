@@ -462,11 +462,16 @@ const MockExamManager = () => {
                 </p>
               </div>
 
-              {/* Explanation Text Input */}
-              <div className="space-y-2">
-                <Label>해설 텍스트 (선택)</Label>
+              {/* Explanation Text Input with Language Tabs */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label>해설 텍스트 (한국어 필수)</Label>
+                  <Badge variant="outline" className="text-xs">
+                    한국어 해설 입력 시 AI가 6개 언어로 자동 번역
+                  </Badge>
+                </div>
                 <Textarea
-                  placeholder={`해설을 붙여넣기 하세요. (선택사항)
+                  placeholder={`해설을 붙여넣기 하세요.
 
 예시:
 1. 정답: ①
@@ -479,6 +484,9 @@ const MockExamManager = () => {
                   onChange={(e) => setExplanationText(e.target.value)}
                   className="min-h-[200px] font-mono text-sm"
                 />
+                <p className="text-xs text-muted-foreground">
+                  💡 한국어 해설만 입력하면 저장 시 AI가 베트남어, 영어, 일본어, 중국어, 러시아어, 우즈베크어로 자동 번역합니다.
+                </p>
               </div>
 
               {/* Parse Button */}
