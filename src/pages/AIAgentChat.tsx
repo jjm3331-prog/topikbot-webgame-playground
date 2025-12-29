@@ -266,8 +266,8 @@ const AIAgentChat = () => {
     }
   };
 
-  // Parse Gemini SSE stream
-  const parseGeminiStream = async (
+  // Parse OpenAI SSE stream
+  const parseOpenAIStream = async (
     reader: ReadableStreamDefaultReader<Uint8Array>,
     onDelta: (text: string) => void,
     onDone: () => void
@@ -282,21 +282,30 @@ const AIAgentChat = () => {
 
         buffer += decoder.decode(value, { stream: true });
 
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || "";
+        // Process line-by-line as data arrives
+        let newlineIndex: number;
+        while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
+          let line = buffer.slice(0, newlineIndex);
+          buffer = buffer.slice(newlineIndex + 1);
 
-        for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            const jsonStr = line.slice(6).trim();
-            if (jsonStr === "[DONE]") continue;
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
 
-            try {
-              const parsed = JSON.parse(jsonStr);
-              const text = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
-              if (text) onDelta(text);
-            } catch {
-              // Ignore parse errors
-            }
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") {
+            onDone();
+            return;
+          }
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) onDelta(content);
+          } catch {
+            // Incomplete JSON split across chunks: put it back and wait for more data
+            buffer = line + "\n" + buffer;
+            break;
           }
         }
       }
@@ -470,7 +479,7 @@ const AIAgentChat = () => {
             },
           ]);
 
-          await parseGeminiStream(
+          await parseOpenAIStream(
             reader,
             (deltaText) => {
               fullText += deltaText;

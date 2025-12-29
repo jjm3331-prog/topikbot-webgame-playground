@@ -1,3 +1,4 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -93,7 +94,11 @@ Writing rules (VERY IMPORTANT):
 Formatting:
 - Use friendly tone and appropriate emojis.
 - Use markdown headings/lists.
-- Use markdown tables when comparing.
+- When using markdown tables, ensure they are properly formatted with header row, separator row, and data rows.
+- Example table format:
+| Column1 | Column2 |
+|---------|---------|
+| Data1   | Data2   |
 
 ${agentHint}`;
 
@@ -113,7 +118,7 @@ Use the reference context above if it is relevant.`;
 function generateCacheKey(question: string, language: Lang, agentId?: string): string {
   const normalized = question.toLowerCase().trim().replace(/\s+/g, " ");
   const a = (agentId || "topik").toLowerCase();
-  return `ai_tutor_v4_${language}_${a}_${normalized.substring(0, 200)}`;
+  return `ai_tutor_v5_${language}_${a}_${normalized.substring(0, 200)}`;
 }
 
 // Check and update daily usage
@@ -371,34 +376,24 @@ serve(async (req) => {
     // Build system prompt with RAG context + language
     const systemPrompt = buildSystemPrompt({ language, agentId, ragContext });
 
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) {
-      throw new Error("GEMINI_API_KEY is not configured");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    if (!OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY is not configured");
     }
 
-    // Convert messages to Gemini format
-    const geminiMessages = messages.map((msg: { role: string; content: string }) => ({
-      role: msg.role === "assistant" ? "model" : "user",
-      parts: [{ text: msg.content }],
-    }));
-
-    const contents = [
-      { role: "user", parts: [{ text: systemPrompt }] },
-      {
-        role: "model",
-        parts: [
-          {
-            text: "Understood. I will follow the language policy and formatting rules.",
-          },
-        ],
-      },
-      ...geminiMessages,
+    // Convert messages to OpenAI format
+    const openaiMessages = [
+      { role: "system", content: systemPrompt },
+      ...messages.map((msg: { role: string; content: string }) => ({
+        role: msg.role,
+        content: msg.content,
+      })),
     ];
 
-    // Streaming mode
+    // Streaming mode with GPT-4.1-mini
     if (stream) {
       console.log(
-        "Streaming with gemini-2.5-flash, language:",
+        "Streaming with gpt-4.1-mini, language:",
         language,
         "agent:",
         agentId,
@@ -406,33 +401,24 @@ serve(async (req) => {
         ragContext.length > 0
       );
 
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse&key=${GEMINI_API_KEY}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents,
-            generationConfig: {
-              temperature: 0.8,
-              maxOutputTokens: 8192,
-              thinkingConfig: {
-                thinkingBudget: 2048,
-              },
-            },
-            safetySettings: [
-              { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_ONLY_HIGH" },
-              { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_ONLY_HIGH" },
-              { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_ONLY_HIGH" },
-              { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" },
-            ],
-          }),
-        }
-      );
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "gpt-4.1-mini-2025-04-14",
+          messages: openaiMessages,
+          stream: true,
+          max_tokens: 16384, // Maximum output tokens for gpt-4.1-mini
+          temperature: 0.8,
+        }),
+      });
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("Gemini API error:", response.status, errorText);
+        console.error("OpenAI API error:", response.status, errorText);
 
         if (response.status === 429) {
           return new Response(
@@ -440,7 +426,7 @@ serve(async (req) => {
             { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
-        throw new Error(`Gemini API error: ${response.status}`);
+        throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
       }
 
       return new Response(response.body, {
@@ -455,35 +441,25 @@ serve(async (req) => {
     }
 
     // Non-streaming mode
-    console.log("Non-streaming with gemini-2.5-flash, language:", language, "agent:", agentId);
+    console.log("Non-streaming with gpt-4.1-mini, language:", language, "agent:", agentId);
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents,
-          generationConfig: {
-            temperature: 0.8,
-            maxOutputTokens: 8192,
-            thinkingConfig: {
-              thinkingBudget: 2048,
-            },
-          },
-          safetySettings: [
-            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_ONLY_HIGH" },
-            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_ONLY_HIGH" },
-            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_ONLY_HIGH" },
-            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" },
-          ],
-        }),
-      }
-    );
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4.1-mini-2025-04-14",
+        messages: openaiMessages,
+        max_tokens: 16384,
+        temperature: 0.8,
+      }),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Gemini API error:", response.status, errorText);
+      console.error("OpenAI API error:", response.status, errorText);
 
       if (response.status === 429) {
         return new Response(
@@ -491,12 +467,12 @@ serve(async (req) => {
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      throw new Error(`Gemini API error: ${response.status}`);
+      throw new Error(`OpenAI API error: ${response.status}`);
     }
 
     const data = await response.json();
     const aiResponse =
-      data.candidates?.[0]?.content?.parts?.[0]?.text ||
+      data.choices?.[0]?.message?.content ||
       (language === "ko" ? "죄송해요, 지금은 답변할 수 없어요. 다시 시도해주세요." : "Sorry, I can't answer that right now. Please try again.");
 
     // Save to cache
