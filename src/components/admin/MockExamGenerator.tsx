@@ -55,7 +55,10 @@ interface GeneratedQuestion {
   listening_script?: string;
   question_audio_url?: string;
   question_image_url?: string;
-  image_description?: string;
+  // [5-8] 그림 문제용 - 4개 이미지 URL
+  option_images?: string[];
+  // [5-8] 그림 문제용 - 4개 장면 설명
+  option_image_descriptions?: string[];
 }
 
 interface ValidationResult {
@@ -604,6 +607,7 @@ const MockExamGenerator = () => {
           vocabulary: q.vocabulary || [],
           question_audio_url: q.question_audio_url || null,
           question_image_url: q.question_image_url || null,
+          option_images: q.option_images || [],
           generation_source: referenceContent ? "ai_from_reference" : "ai_generated",
           status: "approved",
           approved_by: user?.id,
@@ -1210,10 +1214,10 @@ const MockExamGenerator = () => {
                                 <span className="text-sm truncate max-w-md">
                                   {question.question_text.slice(0, 60)}...
                                 </span>
-                                {question.question_image_url && (
+                                {(question.option_images?.some(img => img) || question.option_image_descriptions) && (
                                   <Badge variant="outline" className="text-purple-600 text-xs">
                                     <Image className="w-3 h-3 mr-1" />
-                                    그림
+                                    그림4개
                                   </Badge>
                                 )}
                                 {question.question_audio_url && (
@@ -1242,145 +1246,117 @@ const MockExamGenerator = () => {
                                 <p className="mt-1 whitespace-pre-wrap">{question.question_text}</p>
                               </div>
 
-                              {/* Question Image for Picture Dialogue [5-8] */}
-                              {(question.question_image_url || question.image_description) && (
+                              {/* [5-8] 그림 문제 - 4개 이미지 보기 */}
+                              {(question.option_images || question.option_image_descriptions) && (
                                 <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                                  <Label className="text-xs text-purple-600 flex items-center gap-1 mb-2">
+                                  <Label className="text-xs text-purple-600 flex items-center gap-1 mb-3">
                                     <Image className="w-3 h-3" />
-                                    그림 문제 이미지
+                                    그림 문제 - 보기 이미지 4개
                                   </Label>
                                   
-                                  {question.question_image_url ? (
-                                    <div className="space-y-2">
-                                      <div className="relative group">
-                                        <img 
-                                          src={question.question_image_url} 
-                                          alt="문제 이미지" 
-                                          className="max-h-48 rounded-lg border"
-                                        />
-                                        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                          <Button
-                                            size="sm"
-                                            variant="destructive"
-                                            className="h-7 w-7 p-0"
-                                            onClick={() => {
-                                              const updated = [...generatedQuestions];
-                                              updated[index].question_image_url = undefined;
-                                              setGeneratedQuestions(updated);
-                                            }}
-                                          >
-                                            <X className="w-3 h-3" />
-                                          </Button>
-                                        </div>
-                                      </div>
+                                  <div className="grid grid-cols-2 gap-3">
+                                    {[0, 1, 2, 3].map((optIdx) => {
+                                      const imageUrl = question.option_images?.[optIdx];
+                                      const imageDesc = question.option_image_descriptions?.[optIdx];
+                                      const isCorrect = question.correct_answer === optIdx + 1;
                                       
-                                      {/* Replace Image Button */}
-                                      <div className="flex items-center gap-2">
-                                        <Label 
-                                          htmlFor={`image-replace-${index}`}
-                                          className="cursor-pointer flex items-center gap-2 px-3 py-1.5 text-xs bg-purple-100 dark:bg-purple-800 hover:bg-purple-200 dark:hover:bg-purple-700 rounded-md transition-colors"
+                                      return (
+                                        <div 
+                                          key={optIdx} 
+                                          className={`relative border-2 rounded-lg p-2 ${
+                                            isCorrect ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'border-border'
+                                          }`}
                                         >
-                                          <Upload className="w-3 h-3" />
-                                          이미지 교체
-                                        </Label>
-                                        <input
-                                          id={`image-replace-${index}`}
-                                          type="file"
-                                          accept="image/*"
-                                          className="hidden"
-                                          onChange={async (e) => {
-                                            const file = e.target.files?.[0];
-                                            if (!file) return;
-                                            
-                                            try {
-                                              const fileName = `mock-exam/${examType}/${examRound}/picture_q${question.question_number || index + 1}_manual_${Date.now()}.${file.name.split('.').pop()}`;
-                                              const { error } = await supabase.storage
-                                                .from("podcast-audio")
-                                                .upload(fileName, file, { upsert: true });
-                                              
-                                              if (error) throw error;
-                                              
-                                              const { data: urlData } = supabase.storage
-                                                .from("podcast-audio")
-                                                .getPublicUrl(fileName);
-                                              
-                                              const updated = [...generatedQuestions];
-                                              updated[index].question_image_url = urlData.publicUrl;
-                                              setGeneratedQuestions(updated);
-                                              
-                                              toast({
-                                                title: "이미지 교체 완료",
-                                                description: "새 이미지가 업로드되었습니다.",
-                                              });
-                                            } catch (err: any) {
-                                              toast({
-                                                title: "업로드 실패",
-                                                description: err.message,
-                                                variant: "destructive",
-                                              });
-                                            }
-                                          }}
-                                        />
-                                        <span className="text-xs text-muted-foreground">
-                                          AI 생성 이미지가 마음에 안 들면 직접 업로드
-                                        </span>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <div className="space-y-2">
-                                      <p className="text-sm text-muted-foreground italic">
-                                        이미지 설명: {question.image_description}
-                                      </p>
-                                      <p className="text-xs text-yellow-600">
-                                        ⚠️ 이미지 생성에 실패했습니다. 직접 업로드해주세요.
-                                      </p>
-                                      <Label 
-                                        htmlFor={`image-upload-${index}`}
-                                        className="cursor-pointer inline-flex items-center gap-2 px-3 py-1.5 text-xs bg-purple-100 dark:bg-purple-800 hover:bg-purple-200 dark:hover:bg-purple-700 rounded-md transition-colors"
-                                      >
-                                        <Upload className="w-3 h-3" />
-                                        이미지 업로드
-                                      </Label>
-                                      <input
-                                        id={`image-upload-${index}`}
-                                        type="file"
-                                        accept="image/*"
-                                        className="hidden"
-                                        onChange={async (e) => {
-                                          const file = e.target.files?.[0];
-                                          if (!file) return;
+                                          <div className="flex items-center justify-between mb-1">
+                                            <span className="text-xs font-bold">
+                                              {optIdx + 1}번 {isCorrect && <Badge className="ml-1 bg-green-500 text-xs">정답</Badge>}
+                                            </span>
+                                          </div>
                                           
-                                          try {
-                                            const fileName = `mock-exam/${examType}/${examRound}/picture_q${question.question_number || index + 1}_manual_${Date.now()}.${file.name.split('.').pop()}`;
-                                            const { error } = await supabase.storage
-                                              .from("podcast-audio")
-                                              .upload(fileName, file, { upsert: true });
-                                            
-                                            if (error) throw error;
-                                            
-                                            const { data: urlData } = supabase.storage
-                                              .from("podcast-audio")
-                                              .getPublicUrl(fileName);
-                                            
-                                            const updated = [...generatedQuestions];
-                                            updated[index].question_image_url = urlData.publicUrl;
-                                            setGeneratedQuestions(updated);
-                                            
-                                            toast({
-                                              title: "이미지 업로드 완료",
-                                              description: "이미지가 추가되었습니다.",
-                                            });
-                                          } catch (err: any) {
-                                            toast({
-                                              title: "업로드 실패",
-                                              description: err.message,
-                                              variant: "destructive",
-                                            });
-                                          }
-                                        }}
-                                      />
-                                    </div>
-                                  )}
+                                          {imageUrl ? (
+                                            <div className="relative group">
+                                              <img 
+                                                src={imageUrl} 
+                                                alt={`보기 ${optIdx + 1}`}
+                                                className="w-full h-24 object-cover rounded"
+                                              />
+                                              <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Button
+                                                  size="sm"
+                                                  variant="destructive"
+                                                  className="h-5 w-5 p-0"
+                                                  onClick={() => {
+                                                    const updated = [...generatedQuestions];
+                                                    if (updated[index].option_images) {
+                                                      updated[index].option_images![optIdx] = '';
+                                                    }
+                                                    setGeneratedQuestions(updated);
+                                                  }}
+                                                >
+                                                  <X className="w-2 h-2" />
+                                                </Button>
+                                              </div>
+                                            </div>
+                                          ) : (
+                                            <div className="w-full h-24 bg-muted rounded flex items-center justify-center">
+                                              <span className="text-xs text-muted-foreground text-center px-2">
+                                                {imageDesc?.slice(0, 40)}...
+                                              </span>
+                                            </div>
+                                          )}
+                                          
+                                          {/* 이미지 교체 버튼 */}
+                                          <Label 
+                                            htmlFor={`opt-img-${index}-${optIdx}`}
+                                            className="cursor-pointer flex items-center justify-center gap-1 mt-1 py-1 text-xs bg-purple-100 dark:bg-purple-800 hover:bg-purple-200 dark:hover:bg-purple-700 rounded transition-colors"
+                                          >
+                                            <Upload className="w-2 h-2" />
+                                            {imageUrl ? '교체' : '업로드'}
+                                          </Label>
+                                          <input
+                                            id={`opt-img-${index}-${optIdx}`}
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={async (e) => {
+                                              const file = e.target.files?.[0];
+                                              if (!file) return;
+                                              
+                                              try {
+                                                const fileName = `mock-exam/${examType}/${examRound}/picture_q${question.question_number || index + 1}_opt${optIdx + 1}_${Date.now()}.${file.name.split('.').pop()}`;
+                                                const { error } = await supabase.storage
+                                                  .from("podcast-audio")
+                                                  .upload(fileName, file, { upsert: true });
+                                                
+                                                if (error) throw error;
+                                                
+                                                const { data: urlData } = supabase.storage
+                                                  .from("podcast-audio")
+                                                  .getPublicUrl(fileName);
+                                                
+                                                const updated = [...generatedQuestions];
+                                                if (!updated[index].option_images) {
+                                                  updated[index].option_images = ['', '', '', ''];
+                                                }
+                                                updated[index].option_images![optIdx] = urlData.publicUrl;
+                                                setGeneratedQuestions(updated);
+                                                
+                                                toast({
+                                                  title: `보기 ${optIdx + 1} 이미지 업로드 완료`,
+                                                });
+                                              } catch (err: any) {
+                                                toast({
+                                                  title: "업로드 실패",
+                                                  description: err.message,
+                                                  variant: "destructive",
+                                                });
+                                              }
+                                            }}
+                                          />
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
                                 </div>
                               )}
 
