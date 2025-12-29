@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -40,11 +40,14 @@ const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
   const [sessionComplete, setSessionComplete] = useState(false);
   const [autoPlay, setAutoPlay] = useState(true);
   const [countdown, setCountdown] = useState(3);
+  
+  // 세션 내 이미 본 단어 ID 추적 (중복 방지)
+  const sessionSeenWords = useRef<Set<string>>(new Set());
 
   const currentWord = words[currentIndex];
   const currentLang = getCurrentLanguage();
 
-  // Fetch vocabulary from DB
+  // Fetch vocabulary from DB with deduplication
   const fetchWords = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -53,14 +56,27 @@ const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
         .select('*')
         .eq('level', level)
         .order('seq_no')
-        .limit(100);
+        .limit(200); // 더 많이 가져와서 중복 제거 후 필터링
 
       if (error) throw error;
 
       if (data && data.length > 0) {
+        // 세션 내 이미 본 단어 제외
+        const unseenWords = data.filter(w => !sessionSeenWords.current.has(w.id));
+        
+        console.log(`[FlashLoop] Level ${level}: ${unseenWords.length}/${data.length} new words`);
+        
+        // 충분한 단어가 있으면 미본 단어만 사용
+        const wordsToUse = unseenWords.length >= 20 ? unseenWords : data;
+        
         // Shuffle words and take 20
-        const shuffled = [...data].sort(() => Math.random() - 0.5);
-        setWords(shuffled.slice(0, 20) as VocabWord[]);
+        const shuffled = [...wordsToUse].sort(() => Math.random() - 0.5);
+        const selected = shuffled.slice(0, 20) as VocabWord[];
+        
+        // 선택된 단어들을 세션 기록에 추가
+        selected.forEach(w => sessionSeenWords.current.add(w.id));
+        
+        setWords(selected);
       } else {
         setWords([]);
       }

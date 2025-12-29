@@ -250,13 +250,34 @@ const MockExamTest = () => {
 
   const startNewAttempt = async (userId: string) => {
     try {
-      // Fetch questions from database
       const dbExamType = mapExamTypeToDb(examType || 'topik1');
+      const difficulty = searchParams.get('difficulty') || 'intermediate';
+      
+      // ========== 중복 문제 방지: 사용자가 이미 푼 문제 ID 가져오기 ==========
+      const { data: answeredQuestions } = await supabase
+        .from('mock_exam_answers')
+        .select('question_id, mock_exam_attempts!inner(user_id)')
+        .eq('mock_exam_attempts.user_id', userId);
+      
+      const answeredQuestionIds = new Set(
+        (answeredQuestions || []).map(a => a.question_id)
+      );
+      console.log(`[MockExam] User ${userId} has answered ${answeredQuestionIds.size} questions before`);
+      
+      // Fetch questions from database
       let query = supabase
         .from('mock_question_bank')
         .select('*')
         .eq('exam_type', dbExamType)
         .eq('is_active', true);
+      
+      // 난이도 매핑: URL 파라미터 → DB 난이도값
+      const difficultyMap: Record<string, string[]> = {
+        'beginner': ['easy', '쉬움', 'beginner'],
+        'intermediate': ['medium', '보통', 'intermediate', 'normal'],
+        'advanced': ['hard', '어려움', 'advanced', 'difficult']
+      };
+      const difficultyValues = difficultyMap[difficulty] || difficultyMap['intermediate'];
       
       // Weakness mode: fetch specific questions
       if (mode === 'weakness' && weaknessQuestionIds.length > 0) {
@@ -272,17 +293,52 @@ const MockExamTest = () => {
         if (partNumber) {
           query = query.eq('part_number', partNumber);
         }
+        // 난이도 필터 적용 (full 모드에서는 적용하지 않음 - 다양한 난이도 섞기)
+        if (mode !== 'full' && difficulty !== 'all') {
+          query = query.in('difficulty', difficultyValues);
+        }
       }
       
-      const { data: questionData, error } = await query.order('section').order('part_number').order('question_number');
+      const { data: allQuestionData, error } = await query.order('section').order('part_number').order('question_number');
       
-      if (error || !questionData?.length) {
+      if (error) {
+        console.error('[MockExam] Query error:', error);
         toast({ title: "문제를 불러올 수 없습니다", description: "관리자에게 문의하세요", variant: "destructive" });
         navigate('/mock-exam');
         return;
       }
       
-      const formattedQuestions: Question[] = questionData.map(q => ({
+      // ========== 중복 문제 필터링 ==========
+      let questionData = (allQuestionData || []).filter(q => !answeredQuestionIds.has(q.id));
+      console.log(`[MockExam] After filtering: ${questionData.length} new questions (from ${allQuestionData?.length || 0} total)`);
+      
+      // 필터링 후 문제가 부족하면 이미 푼 문제도 포함 (fallback)
+      if (questionData.length < 10 && allQuestionData && allQuestionData.length > 0) {
+        console.log(`[MockExam] Not enough new questions, including some answered ones`);
+        // 가장 오래전에 푼 문제들을 우선 포함 (shuffle로 랜덤 선택)
+        const shuffledAll = [...allQuestionData].sort(() => Math.random() - 0.5);
+        questionData = shuffledAll;
+      }
+      
+      if (!questionData.length) {
+        toast({ title: "문제를 불러올 수 없습니다", description: "관리자에게 문의하세요", variant: "destructive" });
+        navigate('/mock-exam');
+        return;
+      }
+      
+      // ========== 랜덤 셔플 (중복 방지된 문제들) ==========
+      const shuffledQuestions = [...questionData].sort(() => Math.random() - 0.5);
+      
+      // 모드별 문제 수 제한
+      const questionLimits: Record<string, number> = {
+        'full': mode === 'full' ? shuffledQuestions.length : 50,
+        'section': 30,
+        'part': 15,
+        'weakness': weaknessQuestionIds.length
+      };
+      const limitedQuestions = shuffledQuestions.slice(0, questionLimits[mode] || 30);
+      
+      const formattedQuestions: Question[] = limitedQuestions.map(q => ({
         id: q.id,
         question_text: q.question_text,
         options: Array.isArray(q.options) ? q.options as string[] : [],
@@ -303,7 +359,6 @@ const MockExamTest = () => {
         instruction_text: (q as any).instruction_text || undefined,
         exam_round: (q as any).exam_round || undefined,
         exam_year: (q as any).exam_year || undefined,
-        // Writing section questions
         question_type: q.section === 'writing' ? 
           (q.part_number <= 2 ? 'short_answer' : 'essay') : 'multiple_choice',
         word_limit: q.section === 'writing' ? 
@@ -311,6 +366,7 @@ const MockExamTest = () => {
         sample_answer: undefined
       }));
       
+      console.log(`[MockExam] Final question count: ${formattedQuestions.length}`);
       setQuestions(formattedQuestions);
       
       const attemptTimeLimit = getTimeLimit();
