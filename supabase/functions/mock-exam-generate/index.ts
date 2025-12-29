@@ -145,34 +145,106 @@ async function rerankResults(
   }));
 }
 
-// RAG Search
-async function ragSearch(query: string, supabase: any): Promise<string> {
+// RAG Search - Enhanced for listening scripts
+async function ragSearch(
+  query: string, 
+  supabase: any, 
+  section?: string,
+  difficulty?: string
+): Promise<string> {
   try {
     console.log('🔍 RAG search for:', query);
     
-    const queryEmbedding = await generateEmbedding(query);
+    // For listening section, create specialized queries for script patterns
+    const queries: string[] = [query];
     
-    const { data: searchResults, error } = await supabase.rpc(
-      'search_knowledge',
-      {
-        query_embedding: `[${queryEmbedding.join(',')}]`,
-        match_threshold: RAG_CONFIG.MATCH_THRESHOLD,
-        match_count: RAG_CONFIG.MATCH_COUNT,
-      }
-    );
+    if (section === 'listening') {
+      // Add specialized listening script queries
+      queries.push(
+        'TOPIK 듣기 대본 스크립트 대화 패턴',
+        'TOPIK listening script 남자 여자 대화',
+        '듣기 시험 대화문 예시 스크립트',
+        `TOPIK 듣기 ${difficulty === 'beginner' ? '초급' : difficulty === 'advanced' ? '고급' : '중급'} 대화`
+      );
+    }
+    
+    // Collect all search results from multiple queries
+    const allResults: any[] = [];
+    const seenIds = new Set<string>();
+    
+    for (const q of queries) {
+      const queryEmbedding = await generateEmbedding(q);
+      
+      const { data: searchResults, error } = await supabase.rpc(
+        'search_knowledge',
+        {
+          query_embedding: `[${queryEmbedding.join(',')}]`,
+          match_threshold: RAG_CONFIG.MATCH_THRESHOLD,
+          match_count: section === 'listening' ? 30 : RAG_CONFIG.MATCH_COUNT, // More results for listening
+        }
+      );
 
-    if (error || !searchResults?.length) {
+      if (!error && searchResults?.length) {
+        for (const result of searchResults) {
+          if (!seenIds.has(result.id)) {
+            seenIds.add(result.id);
+            allResults.push(result);
+          }
+        }
+      }
+    }
+
+    if (allResults.length === 0) {
       console.log('No RAG results found');
       return '';
     }
 
-    const rerankedResults = await rerankResults(query, searchResults, RAG_CONFIG.TOP_N);
+    console.log(`📚 Found ${allResults.length} total RAG results`);
+
+    // For listening, prioritize script-related content
+    let filteredResults = allResults;
+    if (section === 'listening') {
+      const scriptPatterns = ['대본', '스크립트', 'script', '남자:', '여자:', '대화', '듣기'];
+      const scored = allResults.map(r => {
+        let score = r.similarity || 0;
+        const content = r.content.toLowerCase();
+        
+        // Boost score for script-related content
+        for (const pattern of scriptPatterns) {
+          if (content.includes(pattern.toLowerCase())) {
+            score += 0.1;
+          }
+        }
+        
+        // Extra boost for actual dialogue patterns
+        if (content.includes('남자:') && content.includes('여자:')) {
+          score += 0.3;
+        }
+        if (content.match(/[가-힣]+:\s*[가-힣]/)) {
+          score += 0.2;
+        }
+        
+        return { ...r, boosted_score: score };
+      });
+      
+      // Sort by boosted score
+      scored.sort((a, b) => b.boosted_score - a.boosted_score);
+      filteredResults = scored.slice(0, 40); // Take top 40 for reranking
+    }
+
+    // Rerank with listening-specific query
+    const rerankQuery = section === 'listening' 
+      ? `TOPIK 듣기 대본 스크립트 대화 남자 여자 ${query}`
+      : query;
+    
+    const topN = section === 'listening' ? 12 : RAG_CONFIG.TOP_N; // More context for listening
+    const rerankedResults = await rerankResults(rerankQuery, filteredResults, topN);
     
     const context = rerankedResults.map((r: any, i: number) => 
-      `[참고자료 ${i + 1}] (${r.document_title || 'TOPIK 자료'})\n${r.content}`
+      `[참고자료 ${i + 1}] (${r.document_title || 'TOPIK 자료'})${r.boosted_score ? ` [스코어: ${r.boosted_score.toFixed(2)}]` : ''}\n${r.content}`
     ).join('\n\n---\n\n');
 
-    console.log(`✅ RAG found ${rerankedResults.length} relevant documents`);
+    console.log(`✅ RAG found ${rerankedResults.length} relevant documents (listening enhanced: ${section === 'listening'})`);
     return context;
   } catch (error) {
     console.error('RAG search error:', error);
@@ -302,18 +374,45 @@ ${params.topic ? `- 주제/문법: ${params.topic}` : ''}
   } else if (params.section === 'listening') {
     prompt += `
 ### 듣기 영역 문제 유형
-- [1~4] 그림 고르기 (간단한 대화 듣고 적절한 그림 선택)
-- [5~8] 대화 후 행동/장소/이유 찾기
-- [9~12] 대화의 내용과 같은 것 고르기
-- [13~16] 대화의 주제 파악
-- [17~20] 대화 후 적절한 응답 고르기
+- [1~4] 적절한 대답 고르기 (간단한 질문-응답)
+- [5~8] 그림 보고 알맞은 대화 고르기
+- [9~12] 대화의 장소/화제/목적 파악
+- [13~16] 세부 내용 파악 (대화 내용과 같은 것)
+- [17~20] 화자의 의도/태도/후속 행동 파악
+- [21~30] 긴 대화/담화 듣고 종합적 이해
 
-### 🎵 듣기 스크립트 (listening_script) - 필수!
-듣기 문제는 반드시 listening_script 필드에 대화 스크립트를 포함해야 합니다.
-예시:
-"listening_script": "남자: 오늘 날씨가 어때요?\\n여자: 비가 올 것 같아요. 우산을 가져가세요.\\n남자: 고마워요."
+### 🎵 듣기 스크립트 (listening_script) - 매우 중요!
 
-question_text에는 질문만 넣으세요. 예: "남자는 왜 우산을 가져갑니까?"`;
+**반드시 참고자료(RAG)에 있는 실제 TOPIK 듣기 대본 패턴을 참고하여 자연스러운 스크립트를 생성하세요.**
+
+듣기 스크립트 작성 원칙:
+1. **화자 표시**: 반드시 "남자:" / "여자:" 또는 "남:" / "여:" 형식 사용
+2. **자연스러운 대화**: 실제 한국어 대화처럼 자연스럽게 (축약, 조사 생략 등)
+3. **문제 유형별 길이**:
+   - [1~4] 1-2턴의 짧은 대화 (질문-대답)
+   - [5~12] 3-4턴의 중간 대화
+   - [13~20] 5-8턴의 긴 대화
+   - [21~30] 담화/강의/뉴스 형식 포함 가능
+4. **맥락 명확성**: 스크립트만 보고도 정답을 논리적으로 도출할 수 있어야 함
+5. **오답 선지 타당성**: 오답도 그럴듯해야 하지만, 스크립트에 명확한 근거가 없어야 함
+
+스크립트 예시 (유형별):
+
+[1~4번 유형 - 적절한 대답]
+"여자: 오늘 저녁에 뭐 할 거예요?"
+
+[5~8번 유형 - 그림 대화]
+"남자: 이 책 어디에 놓을까요?\\n여자: 저 책상 위에 놓아 주세요."
+
+[9~12번 유형 - 장소/화제]
+"여자: 어서 오세요. 뭘 찾으세요?\\n남자: 감기약 좀 주세요.\\n여자: 어떤 증상이 있으세요?\\n남자: 기침이 많이 나고 열도 좀 있어요."
+
+[13~16번 유형 - 세부 내용]
+"남자: 이번 주말에 산에 갈 건데, 같이 갈래?\\n여자: 좋아. 그런데 날씨가 괜찮을까?\\n남자: 일기예보 봤는데 맑대. 아침 8시에 출발하자.\\n여자: 알았어. 도시락은 내가 준비할게."
+
+question_text에는 질문만 넣으세요.
+- 좋은 예: "남자는 왜 감기약을 사러 왔습니까?"
+- 나쁜 예: "(대화를 듣고) 남자는..." (스크립트는 listening_script에)`;
   }
 
   if (ragContext) {
@@ -323,6 +422,17 @@ question_text에는 질문만 넣으세요. 예: "남자는 왜 우산을 가져
 ${ragContext}
 
 위 참고 자료의 어휘, 문법, 문장 패턴을 활용하여 유사한 스타일의 문제를 생성하세요.`;
+
+    if (params.section === 'listening') {
+      prompt += `
+
+### ⚠️ 듣기 스크립트 생성 시 중요 지침
+1. **위 참고자료에서 실제 TOPIK 듣기 대본 패턴을 분석하세요**
+2. 대화의 흐름, 화자 교대 패턴, 표현 방식을 참고하세요
+3. 참고자료에 있는 대화 구조를 모방하되, 새로운 상황으로 변형하세요
+4. 정답이 스크립트에서 명확히 도출되도록 작성하세요
+5. 오답 선지는 그럴듯하지만 스크립트와 맞지 않아야 합니다`;
+    }
   }
 
   if (params.referenceDocContent) {
@@ -591,11 +701,11 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // RAG Search for context
+    // RAG Search for context - Enhanced for listening section
     let ragContext = '';
     if (params.useRag !== false && OPENAI_API_KEY) {
       const searchQuery = `TOPIK ${params.examType === 'topik1' ? 'I' : 'II'} ${params.section} ${params.difficulty} ${params.topic || ''}`.trim();
-      ragContext = await ragSearch(searchQuery, supabase);
+      ragContext = await ragSearch(searchQuery, supabase, params.section, params.difficulty);
     }
 
     // Handle streaming mode
