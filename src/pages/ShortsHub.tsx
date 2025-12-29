@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import CleanHeader from '@/components/CleanHeader';
 import AppFooter from '@/components/AppFooter';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Play, Eye, Globe, Tv, Mic, Newspaper, Music, Utensils, Plane, Sparkles, Zap, Users, Clock } from 'lucide-react';
+import { Play, Eye, Globe, Tv, Mic, Newspaper, Music, Landmark, Plane, Sparkles, Zap, Users, Clock } from 'lucide-react';
 
 interface ShortsVideo {
   id: string;
@@ -24,7 +24,7 @@ const CATEGORIES = [
   { id: 'variety', label: '예능', icon: Mic, gradient: 'from-amber-400 via-orange-500 to-red-500' },
   { id: 'news', label: '뉴스', icon: Newspaper, gradient: 'from-cyan-400 via-blue-500 to-indigo-600' },
   { id: 'kpop', label: 'K팝', icon: Music, gradient: 'from-violet-500 via-purple-500 to-pink-500' },
-  { id: 'food', label: '먹방/요리', icon: Utensils, gradient: 'from-emerald-400 via-green-500 to-teal-500' },
+  { id: 'culture', label: '한국 문화', icon: Landmark, gradient: 'from-emerald-400 via-green-500 to-teal-500' },
   { id: 'travel', label: '여행', icon: Plane, gradient: 'from-sky-400 via-blue-500 to-cyan-500' },
 ];
 
