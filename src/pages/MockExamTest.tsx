@@ -44,11 +44,20 @@ interface Question {
   correct_answer: number;
   section: string;
   part_number: number;
+  question_number?: number;
   question_audio_url?: string;
   question_image_url?: string;
   explanation_ko?: string;
   explanation_vi?: string;
   explanation_en?: string;
+  explanation_ja?: string;
+  explanation_zh?: string;
+  explanation_ru?: string;
+  explanation_uz?: string;
+  point_value?: number;
+  instruction_text?: string;
+  exam_round?: number;
+  exam_year?: number;
   // Writing section specific
   question_type?: 'multiple_choice' | 'short_answer' | 'essay';
   word_limit?: number;
@@ -218,11 +227,20 @@ const MockExamTest = () => {
         correct_answer: q.correct_answer,
         section: q.section,
         part_number: q.part_number,
+        question_number: q.question_number || undefined,
         question_audio_url: q.question_audio_url || undefined,
         question_image_url: q.question_image_url || undefined,
         explanation_ko: q.explanation_ko || undefined,
         explanation_vi: q.explanation_vi || undefined,
         explanation_en: q.explanation_en || undefined,
+        explanation_ja: q.explanation_ja || undefined,
+        explanation_zh: q.explanation_zh || undefined,
+        explanation_ru: q.explanation_ru || undefined,
+        explanation_uz: q.explanation_uz || undefined,
+        point_value: (q as any).point_value || 3,
+        instruction_text: (q as any).instruction_text || undefined,
+        exam_round: (q as any).exam_round || undefined,
+        exam_year: (q as any).exam_year || undefined,
         // Writing section questions
         question_type: q.section === 'writing' ? 
           (q.part_number <= 2 ? 'short_answer' : 'essay') : 'multiple_choice',
@@ -640,6 +658,10 @@ const MockExamTest = () => {
     const lang = i18n.language;
     if (lang === 'vi' && question.explanation_vi) return question.explanation_vi;
     if (lang === 'en' && question.explanation_en) return question.explanation_en;
+    if (lang === 'ja' && question.explanation_ja) return question.explanation_ja;
+    if (lang === 'zh' && question.explanation_zh) return question.explanation_zh;
+    if (lang === 'ru' && question.explanation_ru) return question.explanation_ru;
+    if (lang === 'uz' && question.explanation_uz) return question.explanation_uz;
     return question.explanation_ko || "해설이 없습니다.";
   };
 
@@ -797,12 +819,24 @@ const MockExamTest = () => {
               {sidebarOpen ? <ChevronLeft /> : <ChevronRight />}
             </Button>
             <div>
-              <span className="text-sm text-muted-foreground">
-                {currentQuestion?.section === 'listening' ? '듣기' : 
-                 currentQuestion?.section === 'reading' ? '읽기' : '쓰기'} - Part {currentQuestion?.part_number}
-              </span>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                {questions[0]?.exam_round && (
+                  <Badge variant="outline" className="text-xs">
+                    제{questions[0].exam_round}회
+                  </Badge>
+                )}
+                <span>
+                  {currentQuestion?.section === 'listening' ? '듣기' : 
+                   currentQuestion?.section === 'reading' ? '읽기' : '쓰기'} - Part {currentQuestion?.part_number}
+                </span>
+                {currentQuestion?.point_value && (
+                  <Badge className="bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs">
+                    {currentQuestion.point_value}점
+                  </Badge>
+                )}
+              </div>
               <h2 className="font-bold">
-                문제 {isWritingSection ? 50 + (questions.filter(q => q.section === 'writing').indexOf(currentQuestion!) + 1) : currentIndex + 1}
+                문제 {currentQuestion?.question_number || (isWritingSection ? 50 + (questions.filter(q => q.section === 'writing').indexOf(currentQuestion!) + 1) : currentIndex + 1)}
               </h2>
             </div>
           </div>
@@ -857,14 +891,25 @@ const MockExamTest = () => {
                 </div>
               )}
               
+              {/* Instruction Text (지시문) */}
+              {currentQuestion.instruction_text && (
+                <Card className="mb-4 border-primary/30 bg-primary/5">
+                  <CardContent className="pt-4">
+                    <p className="text-sm text-primary font-medium whitespace-pre-wrap">
+                      {currentQuestion.instruction_text}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+              
               {/* Question Text */}
               <Card className="mb-6">
                 <CardContent className="pt-6">
-                  <p className="text-lg whitespace-pre-wrap">{currentQuestion.question_text}</p>
+                  <p className="text-lg whitespace-pre-wrap leading-relaxed">{currentQuestion.question_text}</p>
                 </CardContent>
               </Card>
               
-              {/* Multiple Choice Options (Listening/Reading) */}
+              {/* Multiple Choice Options (Listening/Reading) - TOPIK Style ①②③④ */}
               {!isWritingSection && (
                 <div className="space-y-3">
                   {currentQuestion.options.map((option, idx) => {
@@ -872,6 +917,7 @@ const MockExamTest = () => {
                     const isSelected = answer?.user_answer === idx;
                     const isCorrect = idx === currentQuestion.correct_answer;
                     const showResult = isPracticeMode && answer !== undefined;
+                    const circledNumbers = ['①', '②', '③', '④'];
                     
                     return (
                       <button
@@ -879,25 +925,27 @@ const MockExamTest = () => {
                         onClick={() => handleAnswer(idx)}
                         disabled={isPracticeMode && answer !== undefined}
                         className={cn(
-                          "w-full p-4 rounded-lg border text-left transition-all flex items-start gap-3",
-                          !showResult && isSelected && "border-primary bg-primary/5",
+                          "w-full p-4 rounded-lg border text-left transition-all flex items-start gap-4 group",
+                          !showResult && isSelected && "border-primary bg-primary/10 ring-2 ring-primary/30",
                           !showResult && !isSelected && "hover:border-primary/50 hover:bg-muted/50",
                           showResult && isCorrect && "border-green-500 bg-green-50 dark:bg-green-950/30",
                           showResult && isSelected && !isCorrect && "border-destructive bg-destructive/10"
                         )}
                       >
                         <span className={cn(
-                          "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium shrink-0",
-                          isSelected ? "bg-primary text-primary-foreground" : "bg-muted"
+                          "text-2xl font-bold shrink-0 transition-colors",
+                          isSelected ? "text-primary" : "text-muted-foreground group-hover:text-foreground",
+                          showResult && isCorrect && "text-green-600 dark:text-green-400",
+                          showResult && isSelected && !isCorrect && "text-destructive"
                         )}>
-                          {idx + 1}
+                          {circledNumbers[idx]}
                         </span>
-                        <span className="flex-1 pt-1">{option}</span>
+                        <span className="flex-1 pt-1 text-base">{option}</span>
                         {showResult && isCorrect && (
-                          <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
+                          <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" />
                         )}
                         {showResult && isSelected && !isCorrect && (
-                          <X className="w-5 h-5 text-destructive shrink-0" />
+                          <X className="w-6 h-6 text-destructive shrink-0" />
                         )}
                       </button>
                     );

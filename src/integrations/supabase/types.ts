@@ -1073,9 +1073,11 @@ export type Database = {
           explanation_zh: string | null
           grammar_points: Json | null
           id: string
+          instruction_text: string | null
           is_active: boolean
           options: Json
           part_number: number
+          point_value: number | null
           question_audio_url: string | null
           question_image_url: string | null
           question_number: number | null
@@ -1103,9 +1105,11 @@ export type Database = {
           explanation_zh?: string | null
           grammar_points?: Json | null
           id?: string
+          instruction_text?: string | null
           is_active?: boolean
           options?: Json
           part_number: number
+          point_value?: number | null
           question_audio_url?: string | null
           question_image_url?: string | null
           question_number?: number | null
@@ -1133,9 +1137,11 @@ export type Database = {
           explanation_zh?: string | null
           grammar_points?: Json | null
           id?: string
+          instruction_text?: string | null
           is_active?: boolean
           options?: Json
           part_number?: number
+          point_value?: number | null
           question_audio_url?: string | null
           question_image_url?: string | null
           question_number?: number | null
