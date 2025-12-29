@@ -10,10 +10,9 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ChevronLeft, Globe, BookOpen, Sparkles, Volume2, Repeat, Mic } from 'lucide-react';
+import { ChevronLeft, Globe, BookOpen, Volume2, Mic } from 'lucide-react';
 import { toast } from 'sonner';
 import WordPopup from '@/components/shorts/WordPopup';
-import ABRepeatControls from '@/components/shorts/ABRepeatControls';
 import ShadowingMode from '@/components/shorts/ShadowingMode';
 
 interface ShortsVideo {
@@ -69,11 +68,6 @@ export default function ShortsPlayer() {
   const [ytReady, setYtReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // A-B Repeat state
-  const [pointA, setPointA] = useState<number | null>(null);
-  const [pointB, setPointB] = useState<number | null>(null);
-  const [isRepeating, setIsRepeating] = useState(false);
-
   // Word popup state
   const [wordPopup, setWordPopup] = useState<WordPopupState | null>(null);
 
@@ -123,15 +117,6 @@ export default function ShortsPlayer() {
       initPlayer();
     }
   }, [video, ytReady]);
-
-  // A-B Repeat logic
-  useEffect(() => {
-    if (isRepeating && pointA !== null && pointB !== null) {
-      if (currentTime >= pointB) {
-        playerRef.current?.seekTo?.(pointA, true);
-      }
-    }
-  }, [currentTime, isRepeating, pointA, pointB]);
 
   const initPlayer = () => {
     if (!video) return;
@@ -228,52 +213,6 @@ export default function ShortsPlayer() {
     const m = Math.floor(seconds / 60);
     const s = Math.floor(seconds % 60);
     return `${m}:${s.toString().padStart(2, '0')}`;
-  };
-
-  // A-B Repeat handlers
-  const handleSetA = () => {
-    setPointA(currentTime);
-    toast.success(`A 지점 설정: ${formatTime(currentTime)}`);
-  };
-
-  const handleSetB = () => {
-    if (pointA !== null && currentTime > pointA) {
-      setPointB(currentTime);
-      toast.success(`B 지점 설정: ${formatTime(currentTime)}`);
-    } else {
-      toast.error('B 지점은 A 지점 이후여야 합니다');
-    }
-  };
-
-  const handleClearAB = () => {
-    setPointA(null);
-    setPointB(null);
-    setIsRepeating(false);
-    toast.info('A-B 구간 초기화');
-  };
-
-  const handleToggleRepeat = () => {
-    if (pointA !== null && pointB !== null) {
-      setIsRepeating(!isRepeating);
-      if (!isRepeating) {
-        seekTo(pointA);
-        playVideo();
-      }
-    }
-  };
-
-  // Set A-B from subtitle click
-  const handleSubtitleABSet = (sub: Subtitle, isA: boolean) => {
-    if (isA) {
-      setPointA(sub.start);
-      setPointB(null);
-      toast.success(`A 지점: ${formatTime(sub.start)}`);
-    } else {
-      if (pointA !== null && sub.end > pointA) {
-        setPointB(sub.end);
-        toast.success(`B 지점: ${formatTime(sub.end)}`);
-      }
-    }
   };
 
   // Word click handler
@@ -385,28 +324,6 @@ export default function ShortsPlayer() {
                   조회수 {video.view_count.toLocaleString()}회
                 </p>
               </div>
-
-              {/* A-B Repeat Controls */}
-              <Card className="mt-4 w-full max-w-[400px]">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <Repeat className="w-4 h-4" />
-                    A-B 반복 구간
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ABRepeatControls
-                    pointA={pointA}
-                    pointB={pointB}
-                    isRepeating={isRepeating}
-                    onSetA={handleSetA}
-                    onSetB={handleSetB}
-                    onClear={handleClearAB}
-                    onToggleRepeat={handleToggleRepeat}
-                    formatTime={formatTime}
-                  />
-                </CardContent>
-              </Card>
             </div>
 
             {/* Right: Subtitle Panel + Shadowing */}
@@ -459,7 +376,7 @@ export default function ShortsPlayer() {
                         <BookOpen className="w-5 h-5" />
                         자막 타임라인
                         <span className="text-xs text-muted-foreground font-normal ml-2">
-                          💡 한글 단어 클릭 = 뜻 보기 | 더블클릭 = A/B 설정
+                          💡 한글 단어 클릭 시 뜻 보기
                         </span>
                       </CardTitle>
                     </CardHeader>
@@ -470,20 +387,15 @@ export default function ShortsPlayer() {
                             const isActive = idx === activeIndex;
                             const koreanText = koreanSubtitles[idx]?.text;
                             const showDual = selectedLanguage !== 'ko' && koreanText;
-                            const isPointA = pointA !== null && Math.abs(sub.start - pointA) < 0.5;
-                            const isPointB = pointB !== null && Math.abs(sub.end - pointB) < 0.5;
 
                             return (
                               <motion.button
                                 key={idx}
                                 ref={isActive ? activeSubRef : null}
                                 onClick={() => seekTo(sub.start)}
-                                onDoubleClick={() => handleSubtitleABSet(sub, pointA === null)}
                                 className={`w-full text-left p-3 rounded-xl transition-all ${
                                   isActive 
                                     ? 'bg-primary/10 border-2 border-primary shadow-lg' 
-                                    : isPointA || isPointB
-                                    ? 'bg-yellow-500/10 border-2 border-yellow-500/50'
                                     : 'bg-muted/50 hover:bg-muted border border-transparent'
                                 }`}
                                 animate={isActive ? { scale: 1.02 } : { scale: 1 }}
@@ -497,12 +409,6 @@ export default function ShortsPlayer() {
                                       <Volume2 className="w-3 h-3 mr-1" />
                                       재생 중
                                     </Badge>
-                                  )}
-                                  {isPointA && (
-                                    <Badge className="bg-yellow-500 text-xs">A</Badge>
-                                  )}
-                                  {isPointB && (
-                                    <Badge className="bg-yellow-500 text-xs">B</Badge>
                                   )}
                                 </div>
                                 
