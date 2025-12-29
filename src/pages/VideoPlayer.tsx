@@ -155,7 +155,10 @@ export default function VideoPlayer() {
         controls: 1,
         modestbranding: 1,
         rel: 0,
-        cc_load_policy: 0,
+        cc_load_policy: 0,  // Don't auto-show CC
+        iv_load_policy: 3,  // Hide annotations
+        disablekb: 0,
+        hl: 'ko',           // Interface language
       },
       events: {
         onReady: () => {
@@ -318,19 +321,18 @@ export default function VideoPlayer() {
     return koreanSubtitles.find(sub => currentTime >= sub.start && currentTime <= sub.end) || null;
   }, [dualSubtitle, selectedLanguage, koreanSubtitles, currentTime]);
 
-  // Debug log
+  // Debug log for subtitle sync
   useEffect(() => {
-    if (dualSubtitle && selectedLanguage !== 'ko') {
-      console.log('[Dual Subtitle Debug]', {
-        currentTime,
-        selectedLanguage,
-        koreanSubtitles: koreanSubtitles.length,
-        currentSubtitles: currentSubtitles.length,
-        koreanNow: koreanSubtitleNow?.text,
-        translatedNow: currentSubtitle?.text,
-      });
-    }
-  }, [currentTime, dualSubtitle, selectedLanguage]);
+    console.log('[Subtitle Debug]', {
+      currentTime: currentTime.toFixed(2),
+      selectedLanguage,
+      subtitlesAvailable: subtitles.map(s => s.language),
+      currentSubtitlesCount: currentSubtitles.length,
+      currentSubtitle: currentSubtitle?.text?.substring(0, 30),
+      koreanSubtitleNow: koreanSubtitleNow?.text?.substring(0, 30),
+      dualSubtitle,
+    });
+  }, [currentTime, selectedLanguage, currentSubtitle, koreanSubtitleNow]);
 
   if (loading) {
     return (
@@ -374,23 +376,24 @@ export default function VideoPlayer() {
                   <div id="youtube-player" className="w-full h-full" />
                 </div>
                 
-                {/* Subtitle Overlay */}
+                {/* Subtitle Overlay - Our custom subtitles */}
                 {showSubtitle && (currentSubtitle || koreanSubtitleNow) && (
                   <motion.div
+                    key={`${currentSubtitle?.start}-${koreanSubtitleNow?.start}`}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="absolute bottom-16 left-0 right-0 px-4"
+                    className="absolute bottom-4 left-0 right-0 px-4 z-10"
                   >
-                    <div className="bg-black/80 backdrop-blur-sm text-white text-center py-3 px-6 rounded-lg max-w-3xl mx-auto space-y-1">
+                    <div className="bg-gradient-to-r from-black/90 to-black/80 backdrop-blur-md text-white text-center py-4 px-8 rounded-xl max-w-3xl mx-auto space-y-2 border border-white/10 shadow-2xl">
                       {/* Korean (top) - only in dual mode and not already Korean */}
                       {dualSubtitle && selectedLanguage !== 'ko' && koreanSubtitleNow && (
-                        <p className="text-base sm:text-lg font-medium text-yellow-300">
+                        <p className="text-lg sm:text-xl font-bold text-yellow-400">
                           {koreanSubtitleNow.text}
                         </p>
                       )}
                       {/* Selected language (bottom or only) */}
                       {currentSubtitle && (
-                        <p className={`font-medium ${dualSubtitle && selectedLanguage !== 'ko' ? 'text-sm sm:text-base text-white/90' : 'text-lg sm:text-xl'}`}>
+                        <p className={`font-medium ${dualSubtitle && selectedLanguage !== 'ko' ? 'text-base sm:text-lg text-white' : 'text-xl sm:text-2xl text-white'}`}>
                           {currentSubtitle.text}
                         </p>
                       )}
