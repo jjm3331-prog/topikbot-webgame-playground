@@ -558,17 +558,23 @@ export default function AdminVideoManager() {
 
   const parseSRT = (content: string): Array<{ start: number; end: number; text: string }> => {
     const subtitles: Array<{ start: number; end: number; text: string }> = [];
-    const blocks = content.trim().split(/\n\n+/);
+
+    // Normalize line endings for Windows/macOS compatibility
+    const normalized = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+    const blocks = normalized.split(/\n\n+/);
 
     for (const block of blocks) {
-      const lines = block.split('\n').filter(l => l.trim());
+      const lines = block
+        .split(/\n/)
+        .map((l) => l.trim())
+        .filter(Boolean);
       if (lines.length < 2) continue;
 
       // Find timestamp line (format: 00:00:00,000 --> 00:00:03,240)
-      const timestampLine = lines.find(l => l.includes('-->'));
+      const timestampLine = lines.find((l) => l.includes('-->'));
       if (!timestampLine) continue;
 
-      const [startStr, endStr] = timestampLine.split('-->').map(s => s.trim());
+      const [startStr, endStr] = timestampLine.split('-->').map((s) => s.trim());
       if (!startStr || !endStr) continue;
 
       const parseTimestamp = (ts: string): number => {
@@ -583,12 +589,24 @@ export default function AdminVideoManager() {
 
       // Get text lines (everything after timestamp)
       const timestampIndex = lines.indexOf(timestampLine);
-      const textLines = lines.slice(timestampIndex + 1);
-      
-      // For bilingual SRT, take only the first line (Korean)
-      const text = textLines[0]?.trim() || '';
-      
-      if (text && !text.match(/^\d+$/)) {
+      const textLines = lines.slice(timestampIndex + 1).filter((l) => !/^[0-9]+$/.test(l));
+
+      // If the SRT contains bilingual lines per block, pick by selected upload language.
+      // - ko: prefer first line
+      // - others: prefer second line if present, else fallback to joined text
+      let text = '';
+      if (textLines.length === 1) {
+        text = textLines[0];
+      } else if (textLines.length >= 2) {
+        text = srtLanguage === 'ko' ? textLines[0] : textLines[1] ?? textLines.join(' ');
+      } else {
+        text = '';
+      }
+
+      // Fallback: join multi-line captions (some SRTs split sentences across lines)
+      if (!text) text = textLines.join(' ').trim();
+
+      if (text) {
         subtitles.push({ start, end, text });
       }
     }
