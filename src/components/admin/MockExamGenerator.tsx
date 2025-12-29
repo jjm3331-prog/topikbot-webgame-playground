@@ -1,13 +1,11 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -15,13 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   Accordion,
   AccordionContent,
@@ -32,10 +23,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { 
-  Loader2, Sparkles, Upload, FileText, CheckCircle, 
-  AlertTriangle, XCircle, Brain, Wand2, Eye, Save,
+  Loader2, Sparkles, FileText, CheckCircle, 
+  AlertTriangle, XCircle, Brain, Wand2, Save,
   RefreshCw, FileUp, BookOpen, Headphones, PenLine,
-  Target, Zap, ThumbsUp, ThumbsDown, Edit
+  Target, ThumbsUp, Volume2, Mic2, Radio
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -66,13 +57,35 @@ interface ValidationResult {
 }
 
 interface GenerationState {
-  step: "idle" | "generating" | "validating" | "ready" | "saving";
+  step: "idle" | "rag" | "generating" | "validating" | "audio" | "ready" | "saving";
   progress: number;
   message: string;
+  tokenCount?: number;
 }
+
+// TTS Presets
+const TTS_PRESETS = {
+  exam: {
+    label: "📝 시험용 (정확한 발음)",
+    description: "정확하고 또렷한 발음, 적당히 느린 속도",
+  },
+  learning: {
+    label: "📚 학습용 (천천히)",
+    description: "초보자를 위한 느린 속도",
+  },
+  natural: {
+    label: "💬 자연스러운",
+    description: "일상 대화처럼 자연스러운 속도",
+  },
+  formal: {
+    label: "🎙️ 공식/뉴스",
+    description: "뉴스 아나운서 스타일",
+  },
+};
 
 const MockExamGenerator = () => {
   const { toast } = useToast();
+  const abortControllerRef = useRef<AbortController | null>(null);
   
   // Generation settings
   const [examType, setExamType] = useState<string>("topik1");
@@ -83,6 +96,7 @@ const MockExamGenerator = () => {
   const [examRound, setExamRound] = useState<string>("");
   const [useRag, setUseRag] = useState<boolean>(true);
   const [generateAudio, setGenerateAudio] = useState<boolean>(true);
+  const [ttsPreset, setTtsPreset] = useState<keyof typeof TTS_PRESETS>("exam");
   
   // Reference document
   const [referenceFile, setReferenceFile] = useState<File | null>(null);
@@ -94,14 +108,13 @@ const MockExamGenerator = () => {
   const [validationResults, setValidationResults] = useState<ValidationResult[]>([]);
   const [selectedQuestions, setSelectedQuestions] = useState<Set<number>>(new Set());
   
-  // State
+  // Streaming state
+  const [streamingContent, setStreamingContent] = useState<string>("");
   const [genState, setGenState] = useState<GenerationState>({
     step: "idle",
     progress: 0,
     message: "",
   });
-  const [showPreview, setShowPreview] = useState(false);
-  const [previewQuestion, setPreviewQuestion] = useState<GeneratedQuestion | null>(null);
 
   // Handle reference file upload
   const handleReferenceUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -112,7 +125,6 @@ const MockExamGenerator = () => {
     setUploadingRef(true);
     
     try {
-      // For text files, read directly
       if (file.name.endsWith('.txt') || file.name.endsWith('.md')) {
         const text = await file.text();
         setReferenceContent(text);
@@ -121,16 +133,13 @@ const MockExamGenerator = () => {
           description: `${file.name} 파일이 로드되었습니다.`,
         });
       } else {
-        // Upload to storage for processing
         const fileName = `references/${Date.now()}_${file.name}`;
-        const { data, error } = await supabase.storage
+        const { error } = await supabase.storage
           .from("mock-exam-references")
           .upload(fileName, file);
         
         if (error) throw error;
         
-        // For now, we'll let Gemini process the file content
-        // In a full implementation, we'd use a document parser
         const text = await file.text();
         setReferenceContent(text);
         
@@ -151,7 +160,56 @@ const MockExamGenerator = () => {
     }
   };
 
-  // Generate questions using AI
+  // Process SSE stream
+  const processSSEStream = useCallback(async (
+    response: Response,
+    onProgress: (step: string, progress: number, message: string) => void,
+    onToken: (content: string) => void,
+    onComplete: (data: any) => void,
+    onError: (error: string) => void
+  ) => {
+    const reader = response.body?.getReader();
+    if (!reader) throw new Error("No response body");
+
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || "";
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            
+            switch (data.type) {
+              case "progress":
+                onProgress(data.step, data.progress, data.message);
+                break;
+              case "token":
+                onToken(data.content);
+                break;
+              case "complete":
+                onComplete(data);
+                break;
+              case "error":
+                onError(data.error);
+                break;
+            }
+          } catch (e) {
+            // Ignore parse errors
+          }
+        }
+      }
+    }
+  }, []);
+
+  // Generate questions using AI with streaming
   const handleGenerate = async () => {
     if (!examRound.trim()) {
       toast({
@@ -162,15 +220,19 @@ const MockExamGenerator = () => {
       return;
     }
 
-    setGenState({ step: "generating", progress: 20, message: "🤖 Gemini 2.5 Pro가 문제를 생성 중..." });
+    // Reset state
     setGeneratedQuestions([]);
     setValidationResults([]);
     setSelectedQuestions(new Set());
+    setStreamingContent("");
+    setGenState({ step: "generating", progress: 10, message: "🚀 AI 문제 생성 시작..." });
+
+    abortControllerRef.current = new AbortController();
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
-      // Step 1: Generate questions
+      // Step 1: Generate questions with streaming
       const generateResponse = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mock-exam-generate`,
         {
@@ -189,24 +251,47 @@ const MockExamGenerator = () => {
             generateAudio: section === 'listening' ? generateAudio : false,
             examRound: parseInt(examRound, 10),
             referenceDocContent: referenceContent || undefined,
+            ttsPreset: section === 'listening' ? ttsPreset : undefined,
+            stream: true,
           }),
+          signal: abortControllerRef.current.signal,
         }
       );
 
-      const generateResult = await generateResponse.json();
-      
       if (!generateResponse.ok) {
-        throw new Error(generateResult.error || "문제 생성 실패");
+        const errorData = await generateResponse.json();
+        throw new Error(errorData.error || "문제 생성 실패");
       }
 
-      if (!generateResult.questions || generateResult.questions.length === 0) {
+      let generatedData: any = null;
+
+      await processSSEStream(
+        generateResponse,
+        (step, progress, message) => {
+          setGenState({ step: step as any, progress, message, tokenCount: undefined });
+        },
+        (content) => {
+          setStreamingContent(prev => prev + content);
+        },
+        (data) => {
+          generatedData = data;
+          if (data.questions) {
+            setGeneratedQuestions(data.questions);
+          }
+        },
+        (error) => {
+          throw new Error(error);
+        }
+      );
+
+      if (!generatedData?.questions || generatedData.questions.length === 0) {
         throw new Error("생성된 문제가 없습니다.");
       }
 
-      setGeneratedQuestions(generateResult.questions);
-      setGenState({ step: "validating", progress: 60, message: "🔍 AI가 문제를 검증 중..." });
+      // Step 2: Validate questions with streaming
+      setGenState({ step: "validating", progress: 60, message: "🔍 AI 검증 시작..." });
+      setStreamingContent("");
 
-      // Step 2: Validate questions
       const validateResponse = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mock-exam-validate`,
         {
@@ -216,52 +301,70 @@ const MockExamGenerator = () => {
             "Authorization": `Bearer ${session?.access_token}`,
           },
           body: JSON.stringify({
-            questions: generateResult.questions,
+            questions: generatedData.questions,
             examType,
             section,
+            stream: true,
           }),
+          signal: abortControllerRef.current.signal,
         }
       );
 
-      const validateResult = await validateResponse.json();
-
       if (!validateResponse.ok) {
-        console.warn("Validation failed, using generated questions as-is");
-        // Set all questions as selected if validation fails
-        setSelectedQuestions(new Set(generateResult.questions.map((_: any, i: number) => i)));
+        console.warn("Validation request failed, using generated questions as-is");
+        setSelectedQuestions(new Set(generatedData.questions.map((_: any, i: number) => i)));
       } else {
-        setValidationResults(validateResult.validations || []);
-        
-        // Auto-select questions that passed validation (score >= 80)
-        const passedIndices = new Set<number>();
-        (validateResult.validations || []).forEach((v: ValidationResult, i: number) => {
-          if (v.score >= 80) {
-            passedIndices.add(i);
+        let validateData: any = null;
+
+        await processSSEStream(
+          validateResponse,
+          (step, progress, message) => {
+            setGenState({ step: "validating", progress: 60 + (progress * 0.4), message });
+          },
+          (content) => {
+            setStreamingContent(prev => prev + content);
+          },
+          (data) => {
+            validateData = data;
+          },
+          (error) => {
+            console.warn("Validation stream error:", error);
           }
-        });
-        setSelectedQuestions(passedIndices);
-        
-        // Apply corrections
-        if (validateResult.validations) {
-          const correctedQuestions = generateResult.questions.map((q: GeneratedQuestion, i: number) => {
-            const validation = validateResult.validations[i];
-            if (validation?.correctedQuestion) {
-              return { ...q, ...validation.correctedQuestion };
-            }
-            return q;
+        );
+
+        if (validateData?.validations) {
+          setValidationResults(validateData.validations);
+          
+          // Auto-select questions that passed validation
+          const passedIndices = new Set<number>();
+          validateData.validations.forEach((v: ValidationResult, i: number) => {
+            if (v.score >= 80) passedIndices.add(i);
+          });
+          setSelectedQuestions(passedIndices);
+          
+          // Apply corrections
+          const correctedQuestions = generatedData.questions.map((q: GeneratedQuestion, i: number) => {
+            const validation = validateData.validations[i];
+            return validation?.correctedQuestion ? { ...q, ...validation.correctedQuestion } : q;
           });
           setGeneratedQuestions(correctedQuestions);
-        }
 
-        toast({
-          title: "검증 완료",
-          description: `${validateResult.passedCount}개 통과, ${validateResult.failedCount}개 검토 필요`,
-        });
+          toast({
+            title: "검증 완료",
+            description: `${validateData.passedCount}개 통과, ${validateData.failedCount}개 검토 필요`,
+          });
+        }
       }
 
       setGenState({ step: "ready", progress: 100, message: "✅ 생성 및 검증 완료!" });
+      setStreamingContent("");
 
     } catch (error: any) {
+      if (error.name === 'AbortError') {
+        setGenState({ step: "idle", progress: 0, message: "취소됨" });
+        return;
+      }
+      
       console.error("Generation error:", error);
       setGenState({ step: "idle", progress: 0, message: "" });
       toast({
@@ -270,6 +373,12 @@ const MockExamGenerator = () => {
         variant: "destructive",
       });
     }
+  };
+
+  // Cancel generation
+  const handleCancel = () => {
+    abortControllerRef.current?.abort();
+    setGenState({ step: "idle", progress: 0, message: "취소됨" });
   };
 
   // Save approved questions to database
@@ -306,6 +415,7 @@ const MockExamGenerator = () => {
           topic: q.topic || topic || null,
           grammar_points: q.grammar_points || [],
           vocabulary: q.vocabulary || [],
+          question_audio_url: q.question_audio_url || null,
           generation_source: referenceContent ? "ai_from_reference" : "ai_generated",
           status: "approved",
           approved_by: user?.id,
@@ -331,6 +441,7 @@ const MockExamGenerator = () => {
       setSelectedQuestions(new Set());
       setReferenceContent("");
       setReferenceFile(null);
+      setStreamingContent("");
 
     } catch (error: any) {
       console.error("Save error:", error);
@@ -343,7 +454,6 @@ const MockExamGenerator = () => {
     }
   };
 
-  // Toggle question selection
   const toggleQuestionSelection = (index: number) => {
     const newSet = new Set(selectedQuestions);
     if (newSet.has(index)) {
@@ -354,16 +464,9 @@ const MockExamGenerator = () => {
     setSelectedQuestions(newSet);
   };
 
-  // Select all / deselect all
-  const selectAll = () => {
-    setSelectedQuestions(new Set(generatedQuestions.map((_, i) => i)));
-  };
+  const selectAll = () => setSelectedQuestions(new Set(generatedQuestions.map((_, i) => i)));
+  const deselectAll = () => setSelectedQuestions(new Set());
 
-  const deselectAll = () => {
-    setSelectedQuestions(new Set());
-  };
-
-  // Get validation status for a question
   const getValidationStatus = (index: number) => {
     const validation = validationResults[index];
     if (!validation) return { color: "gray", icon: null, score: null };
@@ -386,6 +489,8 @@ const MockExamGenerator = () => {
     }
   };
 
+  const isGenerating = ["generating", "validating", "rag", "audio"].includes(genState.step);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -396,7 +501,7 @@ const MockExamGenerator = () => {
             AI 문제 자동 생성 시스템
           </CardTitle>
           <CardDescription>
-            Gemini 2.5 Pro + RAG 기반 TOPIK 모의고사 문제 자동 생성 및 검증
+            Gemini 2.5 Pro + RAG 기반 TOPIK 모의고사 문제 자동 생성 및 검증 (스트리밍)
           </CardDescription>
         </CardHeader>
       </Card>
@@ -507,26 +612,54 @@ const MockExamGenerator = () => {
             </div>
           </div>
 
-          {/* Audio Generation Toggle (for listening section) */}
+          {/* Audio Generation & TTS Preset (for listening section) */}
           {section === 'listening' && (
-            <div className="flex items-center gap-3 p-3 bg-cyan-500/10 border border-cyan-500/20 rounded-lg">
-              <Checkbox
-                id="generateAudio"
-                checked={generateAudio}
-                onCheckedChange={(checked) => setGenerateAudio(checked === true)}
-              />
-              <div className="flex-1">
-                <Label htmlFor="generateAudio" className="cursor-pointer flex items-center gap-2">
-                  <Headphones className="w-4 h-4 text-cyan-500" />
-                  ElevenLabs TTS 음성 자동 생성
-                </Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  듣기 문제의 대화 스크립트를 자연스러운 한국어 음성으로 자동 생성합니다.
-                </p>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 p-3 bg-cyan-500/10 border border-cyan-500/20 rounded-lg">
+                <Checkbox
+                  id="generateAudio"
+                  checked={generateAudio}
+                  onCheckedChange={(checked) => setGenerateAudio(checked === true)}
+                />
+                <div className="flex-1">
+                  <Label htmlFor="generateAudio" className="cursor-pointer flex items-center gap-2">
+                    <Headphones className="w-4 h-4 text-cyan-500" />
+                    ElevenLabs TTS 음성 자동 생성
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    듣기 문제의 대화 스크립트를 자연스러운 한국어 음성으로 자동 생성합니다.
+                  </p>
+                </div>
               </div>
+
+              {generateAudio && (
+                <div className="space-y-3 p-4 bg-gradient-to-r from-cyan-500/5 to-blue-500/5 border border-cyan-500/20 rounded-lg">
+                  <Label className="flex items-center gap-2">
+                    <Volume2 className="w-4 h-4 text-cyan-500" />
+                    TTS 음성 프리셋
+                  </Label>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    {Object.entries(TTS_PRESETS).map(([key, preset]) => (
+                      <div
+                        key={key}
+                        onClick={() => setTtsPreset(key as keyof typeof TTS_PRESETS)}
+                        className={`p-3 rounded-lg border cursor-pointer transition-all ${
+                          ttsPreset === key 
+                            ? 'border-cyan-500 bg-cyan-500/10 ring-2 ring-cyan-500/30' 
+                            : 'border-border hover:border-cyan-500/50 hover:bg-muted/50'
+                        }`}
+                      >
+                        <div className="font-medium text-sm">{preset.label}</div>
+                        <div className="text-xs text-muted-foreground mt-1">{preset.description}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
+          {/* Reference Upload */}
           <div className="space-y-3">
             <Label className="flex items-center gap-2">
               <FileUp className="w-4 h-4" />
@@ -555,31 +688,61 @@ const MockExamGenerator = () => {
             )}
           </div>
 
-          {/* Generate Button */}
-          <Button
-            onClick={handleGenerate}
-            disabled={genState.step !== "idle" && genState.step !== "ready"}
-            className="w-full h-12 text-lg"
-            size="lg"
-          >
-            {genState.step === "generating" || genState.step === "validating" ? (
-              <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                {genState.message}
-              </>
-            ) : (
-              <>
-                <Wand2 className="w-5 h-5 mr-2" />
-                AI로 문제 생성하기
-              </>
+          {/* Generate / Cancel Button */}
+          <div className="flex gap-3">
+            <Button
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              className="flex-1 h-12 text-lg"
+              size="lg"
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  {genState.message}
+                </>
+              ) : (
+                <>
+                  <Wand2 className="w-5 h-5 mr-2" />
+                  AI로 문제 생성하기 (스트리밍)
+                </>
+              )}
+            </Button>
+            {isGenerating && (
+              <Button
+                onClick={handleCancel}
+                variant="destructive"
+                size="lg"
+                className="h-12"
+              >
+                취소
+              </Button>
             )}
-          </Button>
+          </div>
 
-          {/* Progress Bar */}
+          {/* Progress Bar & Streaming Content */}
           {genState.step !== "idle" && (
-            <div className="space-y-2">
-              <Progress value={genState.progress} className="h-2" />
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <Progress value={genState.progress} className="flex-1 h-3" />
+                <span className="text-sm font-medium text-muted-foreground">
+                  {genState.progress}%
+                </span>
+              </div>
               <p className="text-sm text-center text-muted-foreground">{genState.message}</p>
+              
+              {/* Live Streaming Output */}
+              {streamingContent && isGenerating && (
+                <div className="p-3 bg-muted/50 rounded-lg border max-h-32 overflow-auto">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Radio className="w-3 h-3 text-green-500 animate-pulse" />
+                    <span className="text-xs font-medium text-green-600">실시간 생성 중...</span>
+                  </div>
+                  <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-mono">
+                    {streamingContent.slice(-500)}
+                  </pre>
+                </div>
+              )}
             </div>
           )}
         </CardContent>
@@ -595,7 +758,7 @@ const MockExamGenerator = () => {
           >
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-wrap gap-3">
                   <CardTitle className="text-lg flex items-center gap-2">
                     <FileText className="w-5 h-5" />
                     생성된 문제 ({generatedQuestions.length}개)
@@ -635,7 +798,7 @@ const MockExamGenerator = () => {
                               className="mr-3"
                             />
                             <AccordionTrigger className="flex-1 hover:no-underline">
-                              <div className="flex items-center gap-3 text-left">
+                              <div className="flex items-center gap-3 text-left flex-wrap">
                                 <Badge variant="secondary">
                                   Q{question.question_number || index + 1}
                                 </Badge>
@@ -643,6 +806,12 @@ const MockExamGenerator = () => {
                                 <span className="text-sm truncate max-w-md">
                                   {question.question_text.slice(0, 60)}...
                                 </span>
+                                {question.question_audio_url && (
+                                  <Badge variant="outline" className="text-cyan-600 text-xs">
+                                    <Volume2 className="w-3 h-3 mr-1" />
+                                    음성
+                                  </Badge>
+                                )}
                                 {status.icon}
                                 {status.score !== null && (
                                   <Badge
@@ -662,6 +831,22 @@ const MockExamGenerator = () => {
                                 <Label className="text-xs text-muted-foreground">문제</Label>
                                 <p className="mt-1 whitespace-pre-wrap">{question.question_text}</p>
                               </div>
+
+                              {/* Listening Script & Audio */}
+                              {question.listening_script && (
+                                <div className="p-3 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg">
+                                  <Label className="text-xs text-cyan-600 flex items-center gap-1">
+                                    <Mic2 className="w-3 h-3" />
+                                    듣기 스크립트
+                                  </Label>
+                                  <p className="mt-1 text-sm whitespace-pre-wrap">{question.listening_script}</p>
+                                  {question.question_audio_url && (
+                                    <audio controls className="w-full mt-2">
+                                      <source src={question.question_audio_url} type="audio/mpeg" />
+                                    </audio>
+                                  )}
+                                </div>
+                              )}
 
                               {/* Options */}
                               <div className="space-y-2">
@@ -730,6 +915,7 @@ const MockExamGenerator = () => {
                       setValidationResults([]);
                       setSelectedQuestions(new Set());
                       setGenState({ step: "idle", progress: 0, message: "" });
+                      setStreamingContent("");
                     }}
                   >
                     <RefreshCw className="w-4 h-4 mr-2" />
