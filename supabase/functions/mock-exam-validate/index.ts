@@ -1,0 +1,176 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+
+interface Question {
+  question_text: string;
+  options: string[];
+  correct_answer: number;
+  explanation_ko: string;
+  explanation_en?: string;
+  explanation_vi?: string;
+  part_number: number;
+  question_number: number;
+  grammar_points?: string[];
+  vocabulary?: string[];
+  difficulty: string;
+  topic?: string;
+}
+
+interface ValidationResult {
+  isValid: boolean;
+  score: number; // 0-100
+  issues: string[];
+  suggestions: string[];
+  correctedQuestion?: Question;
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { questions, examType, section } = await req.json();
+
+    if (!questions || !Array.isArray(questions) || questions.length === 0) {
+      return new Response(
+        JSON.stringify({ error: "Questions array is required" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (!LOVABLE_API_KEY) {
+      throw new Error("LOVABLE_API_KEY not configured");
+    }
+
+    console.log(`🔍 Validating ${questions.length} questions for ${examType} ${section}`);
+
+    const systemPrompt = `당신은 TOPIK(한국어능력시험) 검수 전문가입니다.
+생성된 모의고사 문제의 품질을 검증하고 필요시 수정해야 합니다.
+
+## 검증 기준
+
+### 1. 한국어 정확성 (30점)
+- 맞춤법/띄어쓰기 오류
+- 문법적 오류
+- 자연스러운 표현
+
+### 2. 문제 형식 (20점)
+- TOPIK 공식 형식 준수
+- 지문과 질문의 명확성
+- 보기 형식의 일관성 (①②③④)
+
+### 3. 정답 정확성 (30점)
+- 정답이 유일하게 맞는 답인지
+- 오답 선지들이 합리적인지
+- 정답 번호와 실제 정답 일치 여부
+
+### 4. 해설 품질 (20점)
+- 해설이 정답을 잘 설명하는지
+- 다국어 해설 일관성
+- 학습에 도움이 되는 내용
+
+## 출력 형식
+각 문제에 대해 다음 JSON 형식으로 검증 결과를 반환하세요:
+{
+  "validations": [
+    {
+      "question_number": 문제 번호,
+      "isValid": true/false,
+      "score": 0-100 점수,
+      "issues": ["발견된 문제점 1", "문제점 2"],
+      "suggestions": ["개선 제안 1", "제안 2"],
+      "correctedQuestion": null 또는 수정된 문제 객체 (수정이 필요한 경우)
+    }
+  ],
+  "overallScore": 전체 평균 점수,
+  "passedCount": 통과 문제 수 (score >= 80),
+  "failedCount": 불통과 문제 수,
+  "summary": "전체 검증 요약"
+}
+
+점수가 80점 미만인 문제는 correctedQuestion에 수정된 버전을 제공하세요.`;
+
+    const userPrompt = `다음 ${examType.toUpperCase()} ${section} 문제들을 검증해주세요:
+
+${JSON.stringify(questions, null, 2)}
+
+각 문제를 철저히 검토하고 검증 결과를 반환하세요.`;
+
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-pro",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        response_format: { type: "json_object" },
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("AI API error:", response.status, errorText);
+      
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: "API credits exhausted. Please add credits." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      throw new Error(`AI API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content;
+
+    if (!content) {
+      throw new Error("No content in AI response");
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(content);
+    } catch (e) {
+      console.error("Failed to parse validation response:", content);
+      throw new Error("Failed to parse validation response");
+    }
+
+    console.log(`✅ Validation complete: ${parsed.passedCount} passed, ${parsed.failedCount} failed`);
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        ...parsed,
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+
+  } catch (error: unknown) {
+    console.error("Validation error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return new Response(
+      JSON.stringify({ error: errorMessage }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+});

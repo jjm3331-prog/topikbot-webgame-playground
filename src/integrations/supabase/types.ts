@@ -1057,6 +1057,9 @@ export type Database = {
       }
       mock_question_bank: {
         Row: {
+          ai_validation_notes: string | null
+          approved_at: string | null
+          approved_by: string | null
           correct_answer: number
           created_at: string
           created_by: string | null
@@ -1071,6 +1074,7 @@ export type Database = {
           explanation_uz: string | null
           explanation_vi: string | null
           explanation_zh: string | null
+          generation_source: string | null
           grammar_points: Json | null
           id: string
           instruction_text: string | null
@@ -1082,13 +1086,19 @@ export type Database = {
           question_image_url: string | null
           question_number: number | null
           question_text: string
+          reference_doc_url: string | null
           section: string
+          status: string | null
           template_id: string | null
+          topic: string | null
           updated_at: string
           usage_count: number
           vocabulary: Json | null
         }
         Insert: {
+          ai_validation_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           correct_answer: number
           created_at?: string
           created_by?: string | null
@@ -1103,6 +1113,7 @@ export type Database = {
           explanation_uz?: string | null
           explanation_vi?: string | null
           explanation_zh?: string | null
+          generation_source?: string | null
           grammar_points?: Json | null
           id?: string
           instruction_text?: string | null
@@ -1114,13 +1125,19 @@ export type Database = {
           question_image_url?: string | null
           question_number?: number | null
           question_text: string
+          reference_doc_url?: string | null
           section: string
+          status?: string | null
           template_id?: string | null
+          topic?: string | null
           updated_at?: string
           usage_count?: number
           vocabulary?: Json | null
         }
         Update: {
+          ai_validation_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           correct_answer?: number
           created_at?: string
           created_by?: string | null
@@ -1135,6 +1152,7 @@ export type Database = {
           explanation_uz?: string | null
           explanation_vi?: string | null
           explanation_zh?: string | null
+          generation_source?: string | null
           grammar_points?: Json | null
           id?: string
           instruction_text?: string | null
@@ -1146,8 +1164,11 @@ export type Database = {
           question_image_url?: string | null
           question_number?: number | null
           question_text?: string
+          reference_doc_url?: string | null
           section?: string
+          status?: string | null
           template_id?: string | null
+          topic?: string | null
           updated_at?: string
           usage_count?: number
           vocabulary?: Json | null

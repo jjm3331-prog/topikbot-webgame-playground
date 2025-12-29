@@ -134,3 +134,30 @@ verify_jwt = false
 
 [functions.retranslate-zh]
 verify_jwt = false
+
+[functions.mock-exam-parse]
+verify_jwt = true
+
+[functions.mock-exam-generate]
+verify_jwt = true
+
+[functions.mock-exam-validate]
+verify_jwt = true
+
+[functions.mock-exam-report]
+verify_jwt = true
+
+[functions.related-words]
+verify_jwt = false
+
+[functions.shorts-expressions]
+verify_jwt = false
+
+[functions.video-translate]
+verify_jwt = false
+
+[functions.video-whisper]
+verify_jwt = false
+
+[functions.youtube-captions]
+verify_jwt = false
