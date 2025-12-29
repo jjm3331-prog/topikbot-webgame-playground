@@ -143,6 +143,7 @@ verify_jwt = true
 
 [functions.mock-exam-validate]
 verify_jwt = true
+max_body_size = "10mb"
 
 [functions.mock-exam-report]
 verify_jwt = true
