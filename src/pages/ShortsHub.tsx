@@ -116,9 +116,9 @@ export default function ShortsHub() {
 
               {/* Subtitle */}
               <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-                드라마, K팝, 예능 속 생생한 표현을
+                AI가 정제한 드라마, K팝, 예능 속 핵심 표현을
                 <br className="hidden sm:block" />
-                <span className="text-foreground font-medium">1분 안에</span> 마스터하세요
+                <span className="text-foreground font-medium">1분 안에</span> 완벽하게 학습하세요
               </p>
 
               {/* Stats Row */}
@@ -134,16 +134,16 @@ export default function ShortsHub() {
                   </div>
                   <div className="text-left">
                     <p className="text-2xl font-bold text-foreground">{videos.length}</p>
-                    <p className="text-sm text-muted-foreground">콘텐츠</p>
+                    <p className="text-sm text-muted-foreground">학습 영상</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-secondary to-korean-cyan flex items-center justify-center shadow-lg shadow-secondary/25">
-                    <Globe className="w-6 h-6 text-white" />
+                    <Sparkles className="w-6 h-6 text-white" />
                   </div>
                   <div className="text-left">
-                    <p className="text-2xl font-bold text-foreground">7</p>
-                    <p className="text-sm text-muted-foreground">자막 언어</p>
+                    <p className="text-2xl font-bold text-foreground">AI</p>
+                    <p className="text-sm text-muted-foreground">맞춤 학습</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -362,21 +362,21 @@ export default function ShortsHub() {
               >
                 {/* Background */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary via-korean-orange to-korean-gold opacity-90" />
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNiIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utb3BhY2l0eT0iLjEiLz48L2c+PC9zdmc+')] opacity-30" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.2)_0%,transparent_60%)]" />
                 
                 <div className="relative z-10">
                   <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                    매일 새로운 숏츠로 한국어 실력 UP! 🚀
+                    AI가 분석한 핵심 표현으로 빠르게 성장하세요! 🚀
                   </h3>
                   <p className="text-white/80 mb-8 max-w-lg mx-auto">
-                    지금 바로 시작해서 한국어 표현을 마스터하세요
+                    영상 속 생생한 한국어를 AI가 학습 콘텐츠로 정제해 드려요
                   </p>
                   <div className="flex flex-wrap justify-center gap-4">
                     <button
                       onClick={() => navigate(`/shorts/${videos[0]?.id}`)}
                       className="px-8 py-4 bg-white text-primary font-bold rounded-2xl hover:bg-white/90 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1"
                     >
-                      첫 영상 보기
+                      지금 학습 시작하기
                     </button>
                   </div>
                 </div>
