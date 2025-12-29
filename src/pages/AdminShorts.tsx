@@ -6,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Trash2, Edit, Loader2, Upload, Globe, CheckCircle, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Edit, Loader2, Upload, Globe, CheckCircle, AlertCircle, Tv, Mic, Newspaper, Music, Film, Utensils, Plane, BookOpen } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface ShortsVideo {
@@ -19,6 +20,7 @@ interface ShortsVideo {
   is_published: boolean;
   view_count: number;
   created_at: string;
+  category: string;
 }
 
 interface SubtitleStatus {
@@ -31,6 +33,18 @@ const LANGUAGE_FLAGS: Record<string, string> = {
   ko: '🇰🇷', vi: '🇻🇳', en: '🇺🇸', ja: '🇯🇵', zh: '🇨🇳', ru: '🇷🇺', uz: '🇺🇿'
 };
 
+// 카테고리 정의
+const CATEGORIES = [
+  { id: 'kdrama', label: 'K드라마', icon: Tv },
+  { id: 'variety', label: '예능', icon: Mic },
+  { id: 'news', label: '뉴스', icon: Newspaper },
+  { id: 'kpop', label: 'K팝', icon: Music },
+  { id: 'movie', label: '영화', icon: Film },
+  { id: 'food', label: '먹방/요리', icon: Utensils },
+  { id: 'travel', label: '여행', icon: Plane },
+  { id: 'education', label: '교육', icon: BookOpen },
+];
+
 export default function AdminShorts() {
   const navigate = useNavigate();
   const [videos, setVideos] = useState<ShortsVideo[]>([]);
@@ -41,7 +55,7 @@ export default function AdminShorts() {
   const [translatingId, setTranslatingId] = useState<string | null>(null);
 
   // Form state
-  const [formData, setFormData] = useState({ youtube_url: '', title: '' });
+  const [formData, setFormData] = useState({ youtube_url: '', title: '', category: 'kdrama' });
   const [editingVideo, setEditingVideo] = useState<ShortsVideo | null>(null);
 
   // SRT Upload state
@@ -77,11 +91,10 @@ export default function AdminShorts() {
 
   const fetchVideos = async () => {
     try {
-      // 숏츠는 category='shorts'로 구분
+      // 모든 숏츠 카테고리 가져오기
       const { data, error } = await supabase
         .from('video_lessons')
-        .select('id, youtube_url, youtube_id, title, thumbnail_url, is_published, view_count, created_at')
-        .eq('category', 'shorts')
+        .select('id, youtube_url, youtube_id, title, thumbnail_url, is_published, view_count, created_at, category')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -139,7 +152,7 @@ export default function AdminShorts() {
         youtube_id: youtubeId,
         title: formData.title,
         thumbnail_url: `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`,
-        category: 'shorts',
+        category: formData.category,
         difficulty: 'intermediate',
         is_published: false,
       };
@@ -171,12 +184,12 @@ export default function AdminShorts() {
 
   const resetForm = () => {
     setEditingVideo(null);
-    setFormData({ youtube_url: '', title: '' });
+    setFormData({ youtube_url: '', title: '', category: 'kdrama' });
   };
 
   const handleEdit = (video: ShortsVideo) => {
     setEditingVideo(video);
-    setFormData({ youtube_url: video.youtube_url, title: video.title });
+    setFormData({ youtube_url: video.youtube_url, title: video.title, category: video.category || 'kdrama' });
   };
 
   const handleDelete = async (video: ShortsVideo) => {
@@ -396,6 +409,24 @@ export default function AdminShorts() {
                     required
                   />
                 </div>
+                <div>
+                  <Label>카테고리 *</Label>
+                  <Select
+                    value={formData.category}
+                    onValueChange={(value) => setFormData({ ...formData, category: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="카테고리 선택" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIES.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id}>
+                          {cat.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div className="flex gap-2">
                   <Button type="submit" disabled={saving} className="flex-1">
                     {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
@@ -441,9 +472,14 @@ export default function AdminShorts() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2 mb-2">
                           <h3 className="font-medium truncate">{video.title}</h3>
-                          <Badge variant={video.is_published ? 'default' : 'secondary'}>
-                            {video.is_published ? '공개' : '비공개'}
-                          </Badge>
+                          <div className="flex gap-1">
+                            <Badge variant="outline" className="text-xs">
+                              {CATEGORIES.find(c => c.id === video.category)?.label || video.category}
+                            </Badge>
+                            <Badge variant={video.is_published ? 'default' : 'secondary'}>
+                              {video.is_published ? '공개' : '비공개'}
+                            </Badge>
+                          </div>
                         </div>
 
                         <p className="text-sm text-muted-foreground mb-3">
