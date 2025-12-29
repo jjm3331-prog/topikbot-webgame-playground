@@ -1061,7 +1061,9 @@ export type Database = {
           created_at: string
           created_by: string | null
           difficulty: string | null
+          exam_round: number | null
           exam_type: string
+          exam_year: number | null
           explanation_en: string | null
           explanation_ja: string | null
           explanation_ko: string | null
@@ -1089,7 +1091,9 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           difficulty?: string | null
+          exam_round?: number | null
           exam_type: string
+          exam_year?: number | null
           explanation_en?: string | null
           explanation_ja?: string | null
           explanation_ko?: string | null
@@ -1117,7 +1121,9 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           difficulty?: string | null
+          exam_round?: number | null
           exam_type?: string
+          exam_year?: number | null
           explanation_en?: string | null
           explanation_ja?: string | null
           explanation_ko?: string | null
