@@ -684,32 +684,62 @@ const Admin = () => {
               ))}
             </div>
 
-            <div className="mt-8 grid md:grid-cols-2 gap-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-primary" />
-                    최근 활동
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground text-sm">
-                    활동 그래프는 추후 추가 예정입니다.
-                  </p>
+            {/* Quick Access Cards */}
+            <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card 
+                className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-cyan-500/50 bg-gradient-to-br from-cyan-500/10 to-blue-500/10"
+                onClick={() => navigate('/admin/video-manager')}
+              >
+                <CardContent className="p-6 flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polygon points="5 3 19 12 5 21 5 3" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-bold">비디오 관리</h3>
+                    <p className="text-sm text-muted-foreground">영상 등록 및 자막 관리</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-primary" />
-                    최근 등록 문서
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground text-sm">
-                    문서 관리는 "지식문서" 탭에서 확인하세요.
-                  </p>
+              <Card className="cursor-pointer hover:shadow-lg transition-all">
+                <CardContent className="p-6 flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <TrendingUp className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold">최근 활동</h3>
+                    <p className="text-sm text-muted-foreground">활동 통계 보기</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+                </CardContent>
+              </Card>
+
+              <Card className="cursor-pointer hover:shadow-lg transition-all">
+                <CardContent className="p-6 flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-korean-purple/10 flex items-center justify-center">
+                    <BookOpen className="w-6 h-6 text-korean-purple" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold">지식문서</h3>
+                    <p className="text-sm text-muted-foreground">RAG 문서 관리</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
+                </CardContent>
+              </Card>
+
+              <Card className="cursor-pointer hover:shadow-lg transition-all">
+                <CardContent className="p-6 flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-korean-orange/10 flex items-center justify-center">
+                    <Star className="w-6 h-6 text-korean-orange" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold">후기 관리</h3>
+                    <p className="text-sm text-muted-foreground">사용자 후기 관리</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 ml-auto text-muted-foreground" />
                 </CardContent>
               </Card>
             </div>
