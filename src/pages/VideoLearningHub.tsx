@@ -21,7 +21,8 @@ import {
   PenLine,
   CheckCircle,
   Zap,
-  Users
+  Users,
+  Smartphone
 } from 'lucide-react';
 
 interface VideoLesson {
@@ -33,11 +34,21 @@ interface VideoLesson {
   view_count: number;
 }
 
+interface ShortsVideo {
+  id: string;
+  title: string;
+  youtube_id: string;
+  thumbnail_url: string | null;
+  view_count: number;
+}
+
 export default function VideoLearningHub() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [videos, setVideos] = useState<VideoLesson[]>([]);
+  const [shorts, setShorts] = useState<ShortsVideo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [shortsLoading, setShortsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   const CATEGORIES = [
@@ -98,6 +109,7 @@ export default function VideoLearningHub() {
 
   useEffect(() => {
     fetchVideos();
+    fetchShorts();
   }, []);
 
   const fetchVideos = async () => {
@@ -106,6 +118,7 @@ export default function VideoLearningHub() {
         .from('video_lessons')
         .select('id, title, thumbnail_url, category, difficulty, view_count')
         .eq('is_published', true)
+        .neq('category', 'shorts')
         .order('view_count', { ascending: false })
         .limit(6);
 
@@ -115,6 +128,25 @@ export default function VideoLearningHub() {
       console.error('Error fetching videos:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchShorts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('video_lessons')
+        .select('id, title, youtube_id, thumbnail_url, view_count')
+        .eq('category', 'shorts')
+        .eq('is_published', true)
+        .order('view_count', { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+      setShorts((data as ShortsVideo[]) || []);
+    } catch (error) {
+      console.error('Error fetching shorts:', error);
+    } finally {
+      setShortsLoading(false);
     }
   };
 
@@ -185,9 +217,10 @@ export default function VideoLearningHub() {
                   size="lg" 
                   variant="outline"
                   className="text-lg px-8 h-14 rounded-2xl"
-                  onClick={() => document.getElementById('how-to-use')?.scrollIntoView({ behavior: 'smooth' })}
+                  onClick={() => navigate('/shorts')}
                 >
-                  {t('videoHub.hero.guideButton')}
+                  <Smartphone className="w-5 h-5 mr-2" />
+                  숏츠 보기
                 </Button>
               </div>
 
@@ -308,8 +341,79 @@ export default function VideoLearningHub() {
           </div>
         </section>
 
+        {/* Shorts Preview Section */}
+        <section className="py-16 sm:py-20 bg-muted/30">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8"
+            >
+              <div>
+                <h2 className="text-3xl font-bold mb-2">📱 숏츠 학습</h2>
+                <p className="text-muted-foreground">짧은 영상으로 빠르게 표현을 익혀보세요</p>
+              </div>
+              <Button variant="outline" className="rounded-full" onClick={() => navigate('/shorts')}>
+                전체 숏츠 보기
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            </motion.div>
+
+            {shortsLoading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                {Array.from({ length: 10 }).map((_, i) => (
+                  <div key={i} className="aspect-[9/16] rounded-2xl bg-muted animate-pulse" />
+                ))}
+              </div>
+            ) : shorts.length === 0 ? (
+              <Card className="p-10 text-center">
+                <p className="text-muted-foreground">아직 공개된 숏츠가 없습니다</p>
+                <Button className="mt-4" onClick={() => navigate('/shorts')}>숏츠 페이지로 이동</Button>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                {shorts.map((video, index) => (
+                  <motion.div
+                    key={video.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.04 }}
+                  >
+                    <Card
+                      className="group cursor-pointer overflow-hidden hover:shadow-xl transition-all hover:-translate-y-1"
+                      onClick={() => navigate(`/shorts/${video.id}`)}
+                    >
+                      <div className="aspect-[9/16] relative bg-muted">
+                        <img
+                          src={video.thumbnail_url || `https://img.youtube.com/vi/${video.youtube_id}/maxresdefault.jpg`}
+                          alt={`${video.title} 숏츠 썸네일`}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center">
+                            <Play className="w-7 h-7 text-primary ml-1" fill="currentColor" />
+                          </div>
+                        </div>
+                        <Badge className="absolute bottom-2 left-2 bg-black/60 backdrop-blur text-white">
+                          👁 {video.view_count.toLocaleString()}
+                        </Badge>
+                      </div>
+                      <CardContent className="p-3">
+                        <p className="text-sm font-medium line-clamp-2">{video.title}</p>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
         {/* Video Preview Section */}
-        <section id="videos" className="py-16 sm:py-20 bg-muted/30">
+        <section id="videos" className="py-16 sm:py-20 bg-background">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
