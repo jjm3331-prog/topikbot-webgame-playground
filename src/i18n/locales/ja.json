@@ -2250,5 +2250,142 @@
       "tip2": "再生ボタンでそのシーンに移動",
       "tip3": "文化タブで韓国文化も一緒に学習"
     }
+  },
+  "mockExam": {
+    "featureName": "TOPIK模擬試験",
+    "badge": "AI搭載模擬試験システム",
+    "title": "TOPIK模擬試験",
+    "subtitle": "実際のTOPIK試験と同じ形式で\nAIが生成する無限の問題で完璧に準備しましょう",
+    "selectExamType": "試験タイプを選択",
+    "selectMode": "学習モード",
+    "total": "合計",
+    "startButton": "開始",
+    "upgradeToPremium": "プレミアムにアップグレード",
+    "coreFeatures": "主要機能",
+    "units": {
+      "questions": "問",
+      "minutes": "分"
+    },
+    "examTypes": {
+      "topik1": {
+        "title": "TOPIK I",
+        "subtitle": "初級 (1-2級)",
+        "description": "韓国語基礎能力評価"
+      },
+      "topik2": {
+        "title": "TOPIK II",
+        "subtitle": "中上級 (3-6級)",
+        "description": "韓国語上級能力評価"
+      },
+      "eps": {
+        "title": "EPS-TOPIK",
+        "subtitle": "雇用許可制",
+        "description": "海外就労韓国語能力試験"
+      }
+    },
+    "sections": {
+      "listening": "聞き取り",
+      "reading": "読解",
+      "writing": "作文"
+    },
+    "modes": {
+      "full": {
+        "title": "本番模擬試験",
+        "description": "本番と同じ環境で全問題を解く",
+        "features": {
+          "timeLimit": "時間制限",
+          "allQuestions": "全問題",
+          "realExam": "本番環境"
+        }
+      },
+      "section": {
+        "title": "セクション練習",
+        "description": "聞き取り/読解を選んで集中練習",
+        "features": {
+          "selectSection": "セクション選択",
+          "noTimeLimit": "時間無制限",
+          "instantExplanation": "即時解説"
+        }
+      },
+      "part": {
+        "title": "パート練習",
+        "description": "特定の問題タイプに集中",
+        "features": {
+          "typePractice": "タイプ練習",
+          "repeatLearning": "繰り返し学習",
+          "weaknessImprovement": "弱点改善"
+        }
+      },
+      "weakness": {
+        "title": "弱点集中",
+        "description": "AI分析による弱点問題",
+        "features": {
+          "aiAnalysis": "AI分析",
+          "customRecommend": "カスタム推奨",
+          "efficientLearning": "効率的学習"
+        }
+      }
+    },
+    "features": {
+      "aiGeneration": {
+        "title": "AI問題生成",
+        "description": "RAG + Geminiで無限の新問題を生成"
+      },
+      "multiLanguage": {
+        "title": "7言語解説",
+        "description": "韓国語、ベトナム語、英語、日本語、中国語、ロシア語、ウズベク語"
+      },
+      "detailedAnalysis": {
+        "title": "詳細分析",
+        "description": "セクション弱点分析と予想等級"
+      },
+      "smartMistakeNote": {
+        "title": "スマート誤答ノート",
+        "description": "間違った問題を自動保存して復習"
+      }
+    },
+    "userGuide": {
+      "title": "使用ガイド",
+      "description": "TOPIK模擬試験システムの使い方を段階的に案内します"
+    },
+    "tutorial": {
+      "step1": {
+        "title": "試験タイプを選択",
+        "description": "TOPIK I、TOPIK II、EPS-TOPIKから選択してください。"
+      },
+      "step2": {
+        "title": "モードを選択",
+        "description": "本番、セクション、パート、弱点集中から選択してください。"
+      },
+      "step3": {
+        "title": "問題を解く",
+        "description": "時間内に問題を解き、不確かな問題にマークしてください。"
+      },
+      "step4": {
+        "title": "結果を確認",
+        "description": "スコア、予想等級、セクション分析を確認してください。"
+      },
+      "step5": {
+        "title": "復習する",
+        "description": "解説を確認し、誤答ノートに保存してください。"
+      }
+    },
+    "notice": {
+      "title": "重要なお知らせ",
+      "item1": "本番模擬試験モードは実際の試験と同じ時間制限があります。",
+      "item2": "聞き取りセクションは音声が自動再生され、1回のみ聞けます。",
+      "item3": "作文セクションは「作文添削」メニューと連動しています。",
+      "item4": "誤答ノートは自動保存され、いつでも復習できます。",
+      "item5": "AI問題生成はプレミアム会員に無制限で提供されます。"
+    },
+    "quickLinks": {
+      "writing": "作文添削",
+      "speaking": "会話練習",
+      "ranking": "ランキング"
+    },
+    "dialog": {
+      "title": "セクション選択",
+      "description": "練習するセクションを選んでください"
+    }
   }
 }

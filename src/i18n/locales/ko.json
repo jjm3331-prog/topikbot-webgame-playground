@@ -2639,5 +2639,142 @@
       "tip2": "재생 버튼으로 해당 장면으로 바로 이동",
       "tip3": "문화 탭에서 한국 문화도 함께 학습"
     }
+  },
+  "mockExam": {
+    "featureName": "TOPIK 모의고사",
+    "badge": "AI 기반 모의고사 시스템",
+    "title": "TOPIK 모의고사",
+    "subtitle": "실제 TOPIK 시험과 100% 동일한 유형으로\nAI가 생성하는 무한한 문제로 완벽하게 대비하세요",
+    "selectExamType": "시험 유형 선택",
+    "selectMode": "학습 모드",
+    "total": "총",
+    "startButton": "시작하기",
+    "upgradeToPremium": "Premium 업그레이드",
+    "coreFeatures": "핵심 기능",
+    "units": {
+      "questions": "문항",
+      "minutes": "분"
+    },
+    "examTypes": {
+      "topik1": {
+        "title": "TOPIK I",
+        "subtitle": "초급 (1-2급)",
+        "description": "한국어 기초 능력 평가"
+      },
+      "topik2": {
+        "title": "TOPIK II",
+        "subtitle": "중고급 (3-6급)",
+        "description": "한국어 심화 능력 평가"
+      },
+      "eps": {
+        "title": "EPS-TOPIK",
+        "subtitle": "고용허가제",
+        "description": "해외취업 한국어능력시험"
+      }
+    },
+    "sections": {
+      "listening": "듣기",
+      "reading": "읽기",
+      "writing": "쓰기"
+    },
+    "modes": {
+      "full": {
+        "title": "실전 모의고사",
+        "description": "실제 시험과 동일한 환경에서 전체 문항 풀기",
+        "features": {
+          "timeLimit": "시간 제한",
+          "allQuestions": "전체 문항",
+          "realExam": "실전 환경"
+        }
+      },
+      "section": {
+        "title": "영역별 연습",
+        "description": "듣기/읽기 영역을 선택해서 집중 훈련",
+        "features": {
+          "selectSection": "영역 선택",
+          "noTimeLimit": "시간 무제한",
+          "instantExplanation": "즉시 해설"
+        }
+      },
+      "part": {
+        "title": "Part별 연습",
+        "description": "특정 문제 유형만 집중적으로 훈련",
+        "features": {
+          "typePractice": "유형별 훈련",
+          "repeatLearning": "반복 학습",
+          "weaknessImprovement": "취약점 보완"
+        }
+      },
+      "weakness": {
+        "title": "약점 집중",
+        "description": "AI가 분석한 취약 유형 맞춤 문제",
+        "features": {
+          "aiAnalysis": "AI 분석",
+          "customRecommend": "맞춤 추천",
+          "efficientLearning": "효율적 학습"
+        }
+      }
+    },
+    "features": {
+      "aiGeneration": {
+        "title": "AI 문제 생성",
+        "description": "RAG + Gemini로 무한한 신규 문제 생성"
+      },
+      "multiLanguage": {
+        "title": "7개 언어 해설",
+        "description": "한국어, 베트남어, 영어, 일본어, 중국어, 러시아어, 우즈베크어"
+      },
+      "detailedAnalysis": {
+        "title": "상세 분석",
+        "description": "영역별 취약점 분석 및 예상 등급 산출"
+      },
+      "smartMistakeNote": {
+        "title": "스마트 오답노트",
+        "description": "틀린 문제 자동 저장 및 반복 학습 관리"
+      }
+    },
+    "userGuide": {
+      "title": "사용 가이드",
+      "description": "TOPIK 모의고사 시스템 사용법을 단계별로 안내합니다"
+    },
+    "tutorial": {
+      "step1": {
+        "title": "시험 유형 선택",
+        "description": "TOPIK I (초급), TOPIK II (중고급), EPS-TOPIK 중 선택하세요."
+      },
+      "step2": {
+        "title": "학습 모드 선택",
+        "description": "실전 모의고사, 영역별, Part별, 약점 집중 중 원하는 모드를 선택하세요."
+      },
+      "step3": {
+        "title": "문제 풀기",
+        "description": "시간 내에 문제를 풀고, 모르는 문제는 표시해두세요."
+      },
+      "step4": {
+        "title": "결과 확인",
+        "description": "점수, 예상 등급, 영역별 분석을 확인하세요."
+      },
+      "step5": {
+        "title": "오답 복습",
+        "description": "틀린 문제는 해설을 확인하고 오답노트에 저장하세요."
+      }
+    },
+    "notice": {
+      "title": "중요 안내",
+      "item1": "실전 모의고사 모드는 실제 시험과 동일한 시간 제한이 적용됩니다.",
+      "item2": "듣기 영역은 오디오가 자동 재생되며, 한 번만 들을 수 있습니다.",
+      "item3": "쓰기 영역은 기존 '쓰기 첨삭' 메뉴와 연동됩니다.",
+      "item4": "오답노트는 자동으로 저장되며, 언제든 복습할 수 있습니다.",
+      "item5": "AI 문제 생성 기능은 Premium 회원에게 무제한 제공됩니다."
+    },
+    "quickLinks": {
+      "writing": "쓰기 첨삭",
+      "speaking": "말하기 연습",
+      "ranking": "랭킹 보기"
+    },
+    "dialog": {
+      "title": "영역 선택",
+      "description": "연습할 영역을 선택하세요"
+    }
   }
 }

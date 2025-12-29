@@ -2501,5 +2501,142 @@
       "tip2": "Click play to jump to that scene",
       "tip3": "Learn Korean culture in the Culture tab"
     }
+  },
+  "mockExam": {
+    "featureName": "TOPIK Mock Exam",
+    "badge": "AI-Powered Mock Exam System",
+    "title": "TOPIK Mock Exam",
+    "subtitle": "Prepare perfectly with unlimited AI-generated questions\nin the same format as the real TOPIK exam",
+    "selectExamType": "Select Exam Type",
+    "selectMode": "Learning Mode",
+    "total": "Total",
+    "startButton": "Start",
+    "upgradeToPremium": "Upgrade to Premium",
+    "coreFeatures": "Core Features",
+    "units": {
+      "questions": " questions",
+      "minutes": " min"
+    },
+    "examTypes": {
+      "topik1": {
+        "title": "TOPIK I",
+        "subtitle": "Beginner (Level 1-2)",
+        "description": "Basic Korean proficiency assessment"
+      },
+      "topik2": {
+        "title": "TOPIK II",
+        "subtitle": "Intermediate-Advanced (Level 3-6)",
+        "description": "Advanced Korean proficiency assessment"
+      },
+      "eps": {
+        "title": "EPS-TOPIK",
+        "subtitle": "Employment Permit System",
+        "description": "Korean proficiency test for overseas employment"
+      }
+    },
+    "sections": {
+      "listening": "Listening",
+      "reading": "Reading",
+      "writing": "Writing"
+    },
+    "modes": {
+      "full": {
+        "title": "Full Mock Exam",
+        "description": "Complete all questions in a real exam environment",
+        "features": {
+          "timeLimit": "Time Limit",
+          "allQuestions": "All Questions",
+          "realExam": "Real Exam"
+        }
+      },
+      "section": {
+        "title": "Section Practice",
+        "description": "Focus on listening/reading sections",
+        "features": {
+          "selectSection": "Select Section",
+          "noTimeLimit": "No Time Limit",
+          "instantExplanation": "Instant Explanation"
+        }
+      },
+      "part": {
+        "title": "Part Practice",
+        "description": "Focus on specific question types",
+        "features": {
+          "typePractice": "Type Practice",
+          "repeatLearning": "Repeat Learning",
+          "weaknessImprovement": "Weakness Fix"
+        }
+      },
+      "weakness": {
+        "title": "Weakness Focus",
+        "description": "AI-analyzed weak area questions",
+        "features": {
+          "aiAnalysis": "AI Analysis",
+          "customRecommend": "Custom Recommend",
+          "efficientLearning": "Efficient Learning"
+        }
+      }
+    },
+    "features": {
+      "aiGeneration": {
+        "title": "AI Question Generation",
+        "description": "Generate unlimited new questions with RAG + Gemini"
+      },
+      "multiLanguage": {
+        "title": "7 Language Explanations",
+        "description": "Korean, Vietnamese, English, Japanese, Chinese, Russian, Uzbek"
+      },
+      "detailedAnalysis": {
+        "title": "Detailed Analysis",
+        "description": "Section weakness analysis and predicted grade"
+      },
+      "smartMistakeNote": {
+        "title": "Smart Mistake Note",
+        "description": "Auto-save wrong answers for repeat learning"
+      }
+    },
+    "userGuide": {
+      "title": "User Guide",
+      "description": "Step-by-step guide to using the TOPIK mock exam system"
+    },
+    "tutorial": {
+      "step1": {
+        "title": "Select Exam Type",
+        "description": "Choose from TOPIK I, TOPIK II, or EPS-TOPIK."
+      },
+      "step2": {
+        "title": "Select Mode",
+        "description": "Choose from Full Exam, Section, Part, or Weakness Focus."
+      },
+      "step3": {
+        "title": "Solve Questions",
+        "description": "Answer questions within the time limit and mark unsure ones."
+      },
+      "step4": {
+        "title": "Check Results",
+        "description": "View your score, predicted grade, and section analysis."
+      },
+      "step5": {
+        "title": "Review Mistakes",
+        "description": "Check explanations and save to mistake note."
+      }
+    },
+    "notice": {
+      "title": "Important Notice",
+      "item1": "Full mock exam mode has the same time limit as the real exam.",
+      "item2": "Listening section audio plays automatically and can only be played once.",
+      "item3": "Writing section is linked with the 'Writing Correction' menu.",
+      "item4": "Mistake notes are saved automatically for review anytime.",
+      "item5": "AI question generation is unlimited for Premium members."
+    },
+    "quickLinks": {
+      "writing": "Writing Correction",
+      "speaking": "Speaking Practice",
+      "ranking": "View Ranking"
+    },
+    "dialog": {
+      "title": "Select Section",
+      "description": "Choose the section to practice"
+    }
   }
 }

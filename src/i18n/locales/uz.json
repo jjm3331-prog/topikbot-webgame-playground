@@ -2255,5 +2255,142 @@
       "tip2": "O'sha sahnaga o'tish uchun ijro tugmasini bosing",
       "tip3": "Madaniyat bo'limida Koreya madaniyatini o'rganing"
     }
+  },
+  "mockExam": {
+    "featureName": "TOPIK Sinov Imtihoni",
+    "badge": "AI asosidagi sinov imtihon tizimi",
+    "title": "TOPIK Sinov Imtihoni",
+    "subtitle": "Haqiqiy TOPIK imtihoni bilan bir xil formatda\nAI yaratgan cheksiz savollar bilan mukammal tayyorlaning",
+    "selectExamType": "Imtihon turini tanlang",
+    "selectMode": "O'quv rejimi",
+    "total": "Jami",
+    "startButton": "Boshlash",
+    "upgradeToPremium": "Premium ga o'tish",
+    "coreFeatures": "Asosiy xususiyatlar",
+    "units": {
+      "questions": " ta savol",
+      "minutes": " daqiqa"
+    },
+    "examTypes": {
+      "topik1": {
+        "title": "TOPIK I",
+        "subtitle": "Boshlang'ich (1-2 daraja)",
+        "description": "Asosiy koreys tili ko'nikmalarini baholash"
+      },
+      "topik2": {
+        "title": "TOPIK II",
+        "subtitle": "O'rta-Yuqori (3-6 daraja)",
+        "description": "Yuqori darajadagi koreys tili ko'nikmalarini baholash"
+      },
+      "eps": {
+        "title": "EPS-TOPIK",
+        "subtitle": "Ish ruxsatnomasi tizimi",
+        "description": "Xorijda ishlash uchun koreys tili imtihoni"
+      }
+    },
+    "sections": {
+      "listening": "Tinglash",
+      "reading": "O'qish",
+      "writing": "Yozish"
+    },
+    "modes": {
+      "full": {
+        "title": "To'liq sinov imtihoni",
+        "description": "Haqiqiy imtihon sharoitida barcha savollarni yechish",
+        "features": {
+          "timeLimit": "Vaqt chegarasi",
+          "allQuestions": "Barcha savollar",
+          "realExam": "Haqiqiy imtihon"
+        }
+      },
+      "section": {
+        "title": "Bo'lim mashqi",
+        "description": "Tinglash/O'qish bo'limlariga e'tibor",
+        "features": {
+          "selectSection": "Bo'lim tanlash",
+          "noTimeLimit": "Vaqt chegarasiz",
+          "instantExplanation": "Darhol tushuntirish"
+        }
+      },
+      "part": {
+        "title": "Qism mashqi",
+        "description": "Muayyan savol turlariga e'tibor",
+        "features": {
+          "typePractice": "Tur mashqi",
+          "repeatLearning": "Takroriy o'rganish",
+          "weaknessImprovement": "Kamchilik tuzatish"
+        }
+      },
+      "weakness": {
+        "title": "Kamchilik e'tibori",
+        "description": "AI tahlil qilgan zaif joylarga oid savollar",
+        "features": {
+          "aiAnalysis": "AI tahlili",
+          "customRecommend": "Shaxsiy tavsiya",
+          "efficientLearning": "Samarali o'qish"
+        }
+      }
+    },
+    "features": {
+      "aiGeneration": {
+        "title": "AI savol yaratish",
+        "description": "RAG + Gemini bilan cheksiz yangi savollar yaratish"
+      },
+      "multiLanguage": {
+        "title": "7 tilda tushuntirish",
+        "description": "Koreys, vietnam, ingliz, yapon, xitoy, rus, o'zbek"
+      },
+      "detailedAnalysis": {
+        "title": "Batafsil tahlil",
+        "description": "Bo'lim kamchiliklari tahlili va taxminiy daraja"
+      },
+      "smartMistakeNote": {
+        "title": "Aqlli xato daftari",
+        "description": "Noto'g'ri javoblarni takrorlash uchun avtomatik saqlash"
+      }
+    },
+    "userGuide": {
+      "title": "Foydalanuvchi qo'llanmasi",
+      "description": "TOPIK sinov imtihon tizimidan foydalanish bo'yicha bosqichma-bosqich qo'llanma"
+    },
+    "tutorial": {
+      "step1": {
+        "title": "Imtihon turini tanlang",
+        "description": "TOPIK I, TOPIK II yoki EPS-TOPIK dan tanlang."
+      },
+      "step2": {
+        "title": "Rejimni tanlang",
+        "description": "To'liq, Bo'lim, Qism yoki Kamchilik dan tanlang."
+      },
+      "step3": {
+        "title": "Savollarni yeching",
+        "description": "Vaqt ichida javob bering va ishonchsiz savollarni belgilang."
+      },
+      "step4": {
+        "title": "Natijalarni tekshiring",
+        "description": "Ball, taxminiy daraja va tahlilni ko'ring."
+      },
+      "step5": {
+        "title": "Xatolarni takrorlang",
+        "description": "Tushuntirishlarni ko'ring va xato daftariga saqlang."
+      }
+    },
+    "notice": {
+      "title": "Muhim eslatma",
+      "item1": "To'liq sinov imtihoni haqiqiy imtihon bilan bir xil vaqt chegarasiga ega.",
+      "item2": "Tinglash bo'limi audiosi avtomatik ijro etiladi va faqat bir marta tinglanadi.",
+      "item3": "Yozish bo'limi 'Yozuv tuzatish' menyusi bilan bog'langan.",
+      "item4": "Xato daftari avtomatik saqlanadi va istalgan vaqtda takrorlanadi.",
+      "item5": "AI savol yaratish Premium a'zolarga cheksiz taqdim etiladi."
+    },
+    "quickLinks": {
+      "writing": "Yozuv tuzatish",
+      "speaking": "Gapirish mashqi",
+      "ranking": "Reyting"
+    },
+    "dialog": {
+      "title": "Bo'lim tanlang",
+      "description": "Mashq qilish uchun bo'limni tanlang"
+    }
   }
 }
