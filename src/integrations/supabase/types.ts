@@ -1282,6 +1282,204 @@ export type Database = {
         }
         Relationships: []
       }
+      video_learning_progress: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          id: string
+          last_position_seconds: number
+          quiz_score: number | null
+          shadowing_attempts: number
+          total_watches: number
+          updated_at: string
+          user_id: string
+          video_id: string
+          watched_seconds: number
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          last_position_seconds?: number
+          quiz_score?: number | null
+          shadowing_attempts?: number
+          total_watches?: number
+          updated_at?: string
+          user_id: string
+          video_id: string
+          watched_seconds?: number
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          last_position_seconds?: number
+          quiz_score?: number | null
+          shadowing_attempts?: number
+          total_watches?: number
+          updated_at?: string
+          user_id?: string
+          video_id?: string
+          watched_seconds?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_learning_progress_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "video_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_lessons: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          difficulty: string
+          duration_seconds: number | null
+          id: string
+          is_published: boolean
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          view_count: number
+          youtube_id: string
+          youtube_url: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          difficulty?: string
+          duration_seconds?: number | null
+          id?: string
+          is_published?: boolean
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          view_count?: number
+          youtube_id: string
+          youtube_url: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          difficulty?: string
+          duration_seconds?: number | null
+          id?: string
+          is_published?: boolean
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          view_count?: number
+          youtube_id?: string
+          youtube_url?: string
+        }
+        Relationships: []
+      }
+      video_mistakes: {
+        Row: {
+          context_sentence: string | null
+          created_at: string
+          id: string
+          mastered: boolean
+          mistake_count: number
+          notes: string | null
+          subtitle_index: number
+          timestamp_end: number
+          timestamp_start: number
+          updated_at: string
+          user_id: string
+          video_id: string
+          word: string
+          word_meaning: string | null
+        }
+        Insert: {
+          context_sentence?: string | null
+          created_at?: string
+          id?: string
+          mastered?: boolean
+          mistake_count?: number
+          notes?: string | null
+          subtitle_index: number
+          timestamp_end: number
+          timestamp_start: number
+          updated_at?: string
+          user_id: string
+          video_id: string
+          word: string
+          word_meaning?: string | null
+        }
+        Update: {
+          context_sentence?: string | null
+          created_at?: string
+          id?: string
+          mastered?: boolean
+          mistake_count?: number
+          notes?: string | null
+          subtitle_index?: number
+          timestamp_end?: number
+          timestamp_start?: number
+          updated_at?: string
+          user_id?: string
+          video_id?: string
+          word?: string
+          word_meaning?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_mistakes_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "video_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_subtitles: {
+        Row: {
+          created_at: string
+          id: string
+          is_reviewed: boolean
+          language: string
+          subtitles: Json
+          updated_at: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_reviewed?: boolean
+          language?: string
+          subtitles?: Json
+          updated_at?: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_reviewed?: boolean
+          language?: string
+          subtitles?: Json
+          updated_at?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_subtitles_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "video_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       writing_corrections: {
         Row: {
           answer_image_url: string | null
