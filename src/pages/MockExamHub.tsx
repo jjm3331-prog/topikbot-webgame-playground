@@ -38,13 +38,13 @@ const MockExamHub = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { isPremium, loading } = useSubscription();
-  const [selectedExam, setSelectedExam] = useState<string>("TOPIK_I");
+  const [selectedExam, setSelectedExam] = useState<string>("topik1");
   const [selectedMode, setSelectedMode] = useState<string>("full");
   const [showModeDialog, setShowModeDialog] = useState(false);
 
   const examTypes = [
     {
-      id: "TOPIK_I",
+      id: "topik1",
       titleKey: "mockExam.examTypes.topik1.title",
       subtitleKey: "mockExam.examTypes.topik1.subtitle",
       descriptionKey: "mockExam.examTypes.topik1.description",
@@ -58,7 +58,7 @@ const MockExamHub = () => {
       totalQuestions: 70
     },
     {
-      id: "TOPIK_II",
+      id: "topik2",
       titleKey: "mockExam.examTypes.topik2.title",
       subtitleKey: "mockExam.examTypes.topik2.subtitle",
       descriptionKey: "mockExam.examTypes.topik2.description",
@@ -73,7 +73,7 @@ const MockExamHub = () => {
       totalQuestions: 104
     },
     {
-      id: "TOPIK_EPS",
+      id: "eps",
       titleKey: "mockExam.examTypes.eps.title",
       subtitleKey: "mockExam.examTypes.eps.subtitle",
       descriptionKey: "mockExam.examTypes.eps.description",
@@ -442,7 +442,7 @@ const MockExamHub = () => {
             </DialogHeader>
             <div className={cn(
               "grid gap-4 py-4",
-              selectedExam === 'TOPIK_II' ? "grid-cols-3" : "grid-cols-2"
+              selectedExam === 'topik2' ? "grid-cols-3" : "grid-cols-2"
             )}>
               <Button 
                 variant="outline" 
@@ -460,7 +460,7 @@ const MockExamHub = () => {
                 <BookOpen className="w-8 h-8" />
                 <span>{t('mockExam.sections.reading')}</span>
               </Button>
-              {selectedExam === 'TOPIK_II' && (
+              {selectedExam === 'topik2' && (
                 <Button 
                   variant="outline" 
                   className="h-24 flex flex-col gap-2"
