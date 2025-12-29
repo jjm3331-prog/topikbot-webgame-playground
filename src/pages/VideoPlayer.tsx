@@ -84,6 +84,7 @@ export default function VideoPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [showSubtitle, setShowSubtitle] = useState(true);
+  const [ytReady, setYtReady] = useState(false);
   
   const playerRef = useRef<any>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -97,9 +98,22 @@ export default function VideoPlayer() {
   }, [videoId]);
 
   useEffect(() => {
-    // Load YouTube IFrame API
+    // Load YouTube IFrame API (once) and set readiness
+    if ((window as any).YT?.Player) {
+      setYtReady(true);
+      return;
+    }
+
+    if (document.getElementById('yt-iframe-api')) return;
+
+    (window as any).onYouTubeIframeAPIReady = () => {
+      setYtReady(true);
+    };
+
     const tag = document.createElement('script');
+    tag.id = 'yt-iframe-api';
     tag.src = 'https://www.youtube.com/iframe_api';
+    tag.async = true;
     const firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
 
@@ -107,20 +121,30 @@ export default function VideoPlayer() {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
+      try {
+        playerRef.current?.destroy?.();
+      } catch {
+        // ignore
+      }
     };
   }, []);
 
   useEffect(() => {
-    if (video && (window as any).YT && (window as any).YT.Player) {
+    if (video && ytReady && (window as any).YT?.Player) {
       initPlayer();
-    } else if (video) {
-      (window as any).onYouTubeIframeAPIReady = initPlayer;
     }
-  }, [video]);
+  }, [video, ytReady]);
 
   const initPlayer = () => {
     if (!video) return;
-    
+
+    // destroy previous instance (route changes / hot reload)
+    try {
+      playerRef.current?.destroy?.();
+    } catch {
+      // ignore
+    }
+
     playerRef.current = new (window as any).YT.Player('youtube-player', {
       videoId: video.youtube_id,
       playerVars: {
@@ -131,6 +155,10 @@ export default function VideoPlayer() {
         cc_load_policy: 0,
       },
       events: {
+        onReady: () => {
+          // Ensure subtitle syncing starts immediately when user hits play
+          updateCurrentSubtitle(playerRef.current?.getCurrentTime?.() ?? 0);
+        },
         onStateChange: onPlayerStateChange,
       },
     });
@@ -144,6 +172,10 @@ export default function VideoPlayer() {
       setIsPlaying(false);
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+      }
+      // Keep subtitle synced even when paused
+      if (playerRef.current?.getCurrentTime) {
+        updateCurrentSubtitle(playerRef.current.getCurrentTime());
       }
     }
   };
@@ -164,7 +196,10 @@ export default function VideoPlayer() {
 
   const updateCurrentSubtitle = (time: number) => {
     const currentSubs = subtitles.find(s => s.language === selectedLanguage);
-    if (!currentSubs) return;
+    if (!currentSubs || !Array.isArray(currentSubs.subtitles)) {
+      setCurrentSubtitle(null);
+      return;
+    }
 
     const subtitle = currentSubs.subtitles.find(
       sub => time >= sub.start && time <= sub.end
@@ -172,15 +207,29 @@ export default function VideoPlayer() {
     setCurrentSubtitle(subtitle || null);
   };
 
+  // Re-evaluate subtitle when language/subtitles change
+  useEffect(() => {
+    updateCurrentSubtitle(currentTime);
+  }, [selectedLanguage, subtitles]);
+
   const fetchVideo = async () => {
     try {
       const { data, error } = await supabase
         .from('video_lessons')
         .select('*')
         .eq('id', videoId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) {
+        toast({
+          title: t('videoPlayer.error'),
+          description: t('videoPlayer.videoNotFound'),
+          variant: 'destructive',
+        });
+        navigate('/video-hub');
+        return;
+      }
       setVideo(data);
     } catch (error) {
       console.error('Error fetching video:', error);
