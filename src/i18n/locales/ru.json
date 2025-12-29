@@ -2334,7 +2334,7 @@
     "features": {
       "aiGeneration": {
         "title": "AI-генерация вопросов",
-        "description": "Неограниченное создание новых вопросов с RAG + Gemini"
+        "description": "Неограниченное создание новых вопросов с LUKATO RAG AI"
       },
       "multiLanguage": {
         "title": "Объяснения на 7 языках",

@@ -2329,7 +2329,7 @@
     "features": {
       "aiGeneration": {
         "title": "AI問題生成",
-        "description": "RAG + Geminiで無限の新問題を生成"
+        "description": "LUKATO RAG AIで無限の新問題を生成"
       },
       "multiLanguage": {
         "title": "7言語解説",

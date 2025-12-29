@@ -449,7 +449,7 @@ const MockExamHub = () => {
 
                   {/* 바디 */}
                   <div className="p-6">
-                    <p className="text-muted-foreground text-sm mb-6">{t(exam.descriptionKey)}</p>
+                    <p className="text-foreground/70 text-sm mb-6">{t(exam.descriptionKey)}</p>
                     
                     <div className="space-y-3">
                       {exam.sections.map((section) => (
@@ -462,9 +462,9 @@ const MockExamHub = () => {
                             <div className="p-2 rounded-lg bg-primary/10">
                               <section.icon className="w-4 h-4 text-primary" />
                             </div>
-                            <span className="font-medium">{t(section.nameKey)}</span>
+                            <span className="font-medium text-foreground">{t(section.nameKey)}</span>
                           </div>
-                          <span className="text-sm text-muted-foreground">
+                          <span className="text-sm text-foreground/60">
                             {section.questions}문항 / {section.time}분
                           </span>
                         </motion.div>
@@ -473,12 +473,12 @@ const MockExamHub = () => {
 
                     <div className="mt-6 pt-4 border-t border-border/50 flex justify-between items-center">
                       <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-muted-foreground" />
-                        <span className="font-bold">{exam.totalQuestions}문항</span>
+                        <FileText className="w-4 h-4 text-foreground/60" />
+                        <span className="font-bold text-foreground">{exam.totalQuestions}문항</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-muted-foreground" />
-                        <span className="font-bold">{exam.totalTime}분</span>
+                        <Clock className="w-4 h-4 text-foreground/60" />
+                        <span className="font-bold text-foreground">{exam.totalTime}분</span>
                       </div>
                     </div>
                   </div>
@@ -531,15 +531,15 @@ const MockExamHub = () => {
                   <mode.icon className="w-7 h-7 text-white" />
                 </div>
 
-                <h3 className="font-bold text-lg mb-2">{t(mode.titleKey)}</h3>
-                <p className="text-sm text-muted-foreground mb-4">{t(mode.descriptionKey)}</p>
+                <h3 className="font-bold text-lg mb-2 text-foreground">{t(mode.titleKey)}</h3>
+                <p className="text-sm text-foreground/70 mb-4">{t(mode.descriptionKey)}</p>
 
                 <div className="flex flex-wrap gap-2">
                   {mode.featureKeys.map((featureKey) => (
                     <Badge 
                       key={featureKey} 
                       variant="secondary" 
-                      className="text-xs bg-muted/80 hover:bg-muted transition-colors"
+                      className="text-xs bg-primary/20 text-foreground hover:bg-primary/30 transition-colors border-0"
                     >
                       {t(featureKey)}
                     </Badge>
