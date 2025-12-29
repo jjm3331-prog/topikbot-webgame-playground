@@ -220,9 +220,11 @@ export default function ShortsPlayer() {
     return subtitles.find(s => s.language === 'ko')?.subtitles || [];
   }, [subtitles]);
 
+  // 현재 앱 언어만 표시 (영어는 제외하고 해당 언어 페이지의 언어만)
   const availableLanguages = useMemo(() => {
     const currentAppLang = normalizeLang(i18n.language);
-    return LANGUAGES.filter(l => l.code === currentAppLang || l.code === 'en');
+    // 현재 앱 언어만 반환 (해당 국가 페이지에서는 그 언어만)
+    return LANGUAGES.filter(l => l.code === currentAppLang);
   }, [i18n.language]);
 
   const fetchLearningContent = useCallback(async () => {
