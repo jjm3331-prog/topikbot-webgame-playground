@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Trash2, Edit, Play, Loader2, Languages, CheckCircle, AlertCircle, Zap, Youtube, Mic, Upload } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Edit, Play, Loader2, CheckCircle, AlertCircle, Upload } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
@@ -36,12 +36,6 @@ interface SubtitleStatus {
   is_reviewed: boolean;
 }
 
-interface CaptionCheckResult {
-  has_captions: boolean;
-  available_languages: string[];
-  has_korean: boolean;
-  caption_type: string | null;
-}
 
 const CATEGORIES = [
   { value: 'drama', label: '🎭 드라마' },
@@ -65,21 +59,10 @@ export default function AdminVideoManager() {
   const [videos, setVideos] = useState<VideoLesson[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [generating, setGenerating] = useState<string | null>(null);
-  const [translating, setTranslating] = useState<string | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<VideoLesson | null>(null);
   const [subtitleStatuses, setSubtitleStatuses] = useState<Record<string, SubtitleStatus[]>>({});
   const [isAdmin, setIsAdmin] = useState(false);
-  const [captionChecks, setCaptionChecks] = useState<Record<string, CaptionCheckResult | null>>({});
-  const [checkingCaptions, setCheckingCaptions] = useState<string | null>(null);
   
-  // Progress tracking for chain generation
-  const [chainProgress, setChainProgress] = useState<{
-    videoId: string;
-    step: 'checking' | 'extracting' | 'transcribing' | 'translating' | 'done';
-    progress: number;
-    message: string;
-  } | null>(null);
 
   // SRT Upload state
   const [srtUploadOpen, setSrtUploadOpen] = useState(false);
@@ -220,256 +203,6 @@ export default function AdminVideoManager() {
     }
   };
 
-  // Check if YouTube has auto-generated captions
-  const handleCheckCaptions = async (video: VideoLesson) => {
-    setCheckingCaptions(video.id);
-    try {
-      const { data, error } = await supabase.functions.invoke('youtube-captions', {
-        body: { video_id: video.id, youtube_id: video.youtube_id, check_only: true }
-      });
-
-      if (error) throw error;
-
-      setCaptionChecks(prev => ({
-        ...prev,
-        [video.id]: data as CaptionCheckResult
-      }));
-
-      if (data?.has_captions && data?.has_korean) {
-        toast.success('✅ 유튜브 자동 자막 발견! 무료로 가져올 수 있습니다.');
-      } else {
-        toast.info('자동 자막 없음 - Whisper로 생성해야 합니다.');
-      }
-    } catch (error: any) {
-      console.error('Error checking captions:', error);
-      toast.error('자막 체크 실패');
-    } finally {
-      setCheckingCaptions(null);
-    }
-  };
-
-  // Fetch captions from YouTube (free scraping)
-  const handleFetchYouTubeCaptions = async (video: VideoLesson) => {
-    setGenerating(video.id);
-    setChainProgress({
-      videoId: video.id,
-      step: 'extracting',
-      progress: 30,
-      message: '📥 유튜브에서 자막 가져오는 중...'
-    });
-
-    try {
-      const { data, error } = await supabase.functions.invoke('youtube-captions', {
-        body: { video_id: video.id, youtube_id: video.youtube_id }
-      });
-
-      if (error) throw error;
-
-      if (data?.use_whisper) {
-        // No captions available, need to use Whisper
-        toast.info(data.message);
-        setChainProgress(null);
-        setGenerating(null);
-        return;
-      }
-
-      setChainProgress({
-        videoId: video.id,
-        step: 'done',
-        progress: 100,
-        message: `✅ ${data.message}`
-      });
-
-      toast.success(`유튜브 자막 가져오기 완료! (${data.subtitles_count}개)`);
-      
-      setTimeout(() => setChainProgress(null), 1500);
-      fetchVideos();
-    } catch (error: any) {
-      console.error('Error fetching YouTube captions:', error);
-      toast.error(error?.message || '자막 가져오기 실패');
-      setChainProgress(null);
-    } finally {
-      setGenerating(null);
-    }
-  };
-
-  // Fully automatic: YouTube captions → translate OR Whisper → translate
-  const handleGenerateAndTranslate = async (video: VideoLesson) => {
-    setGenerating(video.id);
-    setChainProgress({
-      videoId: video.id,
-      step: 'checking',
-      progress: 10,
-      message: '🔍 유튜브 자막 확인 중...'
-    });
-
-    try {
-      // Step 1: Check if YouTube has captions
-      const { data: captionCheck } = await supabase.functions.invoke('youtube-captions', {
-        body: { video_id: video.id, youtube_id: video.youtube_id, check_only: true }
-      });
-
-      let subtitlesReady = false;
-
-      if (captionCheck?.has_captions && captionCheck?.has_korean) {
-        // Try to fetch YouTube captions (FREE!)
-        setChainProgress({
-          videoId: video.id,
-          step: 'extracting',
-          progress: 25,
-          message: '📥 유튜브 자막 무료로 가져오는 중...'
-        });
-
-        const { data: ytData, error: ytError } = await supabase.functions.invoke('youtube-captions', {
-          body: { video_id: video.id, youtube_id: video.youtube_id }
-        });
-
-        if (!ytError && ytData?.success) {
-          toast.success(`유튜브 자막 가져오기 완료! (무료, ${ytData.subtitles_count}개)`);
-          subtitlesReady = true;
-        }
-      }
-
-      // Step 2: If no YouTube captions, use Whisper
-      if (!subtitlesReady) {
-        setChainProgress({
-          videoId: video.id,
-          step: 'transcribing',
-          progress: 40,
-          message: '🎤 Whisper로 자막 생성 중... (유료)'
-        });
-
-        const { data: whisperData, error: whisperError } = await supabase.functions.invoke('video-whisper', {
-          body: { video_id: video.id, youtube_id: video.youtube_id }
-        });
-
-        if (whisperError) throw whisperError;
-        if (whisperData?.error) throw new Error(whisperData.error);
-
-        toast.success(`Whisper 자막 생성 완료! (${whisperData?.subtitles_count}개)`);
-      }
-
-      // Step 3: Auto-translate to all languages
-      setChainProgress({
-        videoId: video.id,
-        step: 'translating',
-        progress: 70,
-        message: '🌍 6개 언어 번역 중...'
-      });
-
-      const { error: translateError } = await supabase.functions.invoke('video-translate', {
-        body: { video_id: video.id }
-      });
-
-      if (translateError) throw translateError;
-
-      setChainProgress({
-        videoId: video.id,
-        step: 'done',
-        progress: 100,
-        message: '🎉 자막 생성 + 번역 완료!'
-      });
-
-      toast.success('모든 작업 완료!');
-      
-      setTimeout(() => setChainProgress(null), 2000);
-      fetchVideos();
-    } catch (error: any) {
-      console.error('Error in chain generation:', error);
-      toast.error(error?.message || '자막 생성에 실패했습니다');
-      setChainProgress(null);
-    } finally {
-      setGenerating(null);
-    }
-  };
-
-  // Just generate subtitles (no translation)
-  const handleGenerateSubtitlesOnly = async (video: VideoLesson) => {
-    setGenerating(video.id);
-    setChainProgress({
-      videoId: video.id,
-      step: 'extracting',
-      progress: 20,
-      message: '🎵 YouTube에서 오디오 추출 중...'
-    });
-
-    try {
-      setChainProgress({
-        videoId: video.id,
-        step: 'transcribing',
-        progress: 50,
-        message: '🎤 Whisper로 자막 생성 중...'
-      });
-      
-      const { data, error } = await supabase.functions.invoke('video-whisper', {
-        body: { video_id: video.id, youtube_id: video.youtube_id }
-      });
-
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-
-      setChainProgress({
-        videoId: video.id,
-        step: 'done',
-        progress: 100,
-        message: '✅ 자막 생성 완료!'
-      });
-
-      toast.success(data?.message || '자막이 생성되었습니다');
-      
-      setTimeout(() => {
-        setChainProgress(null);
-      }, 1500);
-      
-      fetchVideos();
-    } catch (error: any) {
-      console.error('Error generating subtitles:', error);
-      const msg = error?.message || '자막 생성에 실패했습니다';
-      toast.error(msg);
-      setChainProgress(null);
-    } finally {
-      setGenerating(null);
-    }
-  };
-
-  const handleTranslate = async (video: VideoLesson) => {
-    setTranslating(video.id);
-    setChainProgress({
-      videoId: video.id,
-      step: 'translating',
-      progress: 50,
-      message: '🌍 6개 언어 번역 중...'
-    });
-
-    try {
-      const { data, error } = await supabase.functions.invoke('video-translate', {
-        body: { video_id: video.id }
-      });
-
-      if (error) throw error;
-      
-      setChainProgress({
-        videoId: video.id,
-        step: 'done',
-        progress: 100,
-        message: '✅ 번역 완료!'
-      });
-
-      toast.success(data.message);
-      
-      setTimeout(() => {
-        setChainProgress(null);
-      }, 1500);
-      
-      fetchVideos();
-    } catch (error) {
-      console.error('Error translating:', error);
-      toast.error('번역에 실패했습니다');
-      setChainProgress(null);
-    } finally {
-      setTranslating(null);
-    }
-  };
 
   const handleTogglePublish = async (video: VideoLesson) => {
     try {
@@ -868,117 +601,15 @@ export default function AdminVideoManager() {
                               ))}
                             </div>
 
-                            {/* Caption Check Status */}
-                            {captionChecks[video.id] && (
-                              <div className="mb-3 p-2 rounded-lg bg-muted/50 text-sm">
-                                {captionChecks[video.id]?.has_korean ? (
-                                  <span className="text-green-600 dark:text-green-400 flex items-center gap-1">
-                                    <Youtube className="w-4 h-4" />
-                                    ✅ 유튜브 자막 있음 (무료 가져오기 가능!)
-                                  </span>
-                                ) : (
-                                  <span className="text-yellow-600 dark:text-yellow-400 flex items-center gap-1">
-                                    <Mic className="w-4 h-4" />
-                                    ⚠️ 유튜브 자막 없음 (Whisper 필요)
-                                  </span>
-                                )}
-                              </div>
-                            )}
-
-                            {/* Progress Bar */}
-                            {chainProgress?.videoId === video.id && (
-                              <div className="mb-3 space-y-2">
-                                <div className="flex items-center gap-2">
-                                  <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                                  <span className="text-sm font-medium">{chainProgress.message}</span>
-                                </div>
-                                <Progress value={chainProgress.progress} className="h-2" />
-                              </div>
-                            )}
-
-                            {/* Actions */}
+                            {/* Actions - Only working features */}
                             <div className="flex flex-wrap gap-2">
-                              {/* Check captions first */}
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleCheckCaptions(video)}
-                                disabled={checkingCaptions === video.id}
-                              >
-                                {checkingCaptions === video.id ? (
-                                  <Loader2 className="w-4 h-4 animate-spin mr-1" />
-                                ) : (
-                                  <Youtube className="w-4 h-4 mr-1" />
-                                )}
-                                자막 체크
-                              </Button>
-
-                              {/* If YouTube captions available, show free fetch button */}
-                              {captionChecks[video.id]?.has_korean && (
-                                <Button
-                                  size="sm"
-                                  variant="default"
-                                  onClick={() => handleFetchYouTubeCaptions(video)}
-                                  disabled={generating === video.id}
-                                  className="bg-green-600 hover:bg-green-700"
-                                >
-                                  {generating === video.id ? (
-                                    <Loader2 className="w-4 h-4 animate-spin mr-1" />
-                                  ) : (
-                                    <Youtube className="w-4 h-4 mr-1" />
-                                  )}
-                                  🆓 무료 자막
-                                </Button>
-                              )}
-
-                              <Button
-                                size="sm"
-                                variant="default"
-                                onClick={() => handleGenerateAndTranslate(video)}
-                                disabled={generating === video.id || translating === video.id}
-                                className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
-                              >
-                                {generating === video.id ? (
-                                  <Loader2 className="w-4 h-4 animate-spin mr-1" />
-                                ) : (
-                                  <Zap className="w-4 h-4 mr-1" />
-                                )}
-                                ⚡ 자막+번역
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleGenerateSubtitlesOnly(video)}
-                                disabled={generating === video.id}
-                                title="Whisper로 자막 생성 (유료)"
-                              >
-                                {generating === video.id && chainProgress?.step !== 'translating' ? (
-                                  <Loader2 className="w-4 h-4 animate-spin mr-1" />
-                                ) : (
-                                  <Mic className="w-4 h-4 mr-1" />
-                                )}
-                                Whisper
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleTranslate(video)}
-                                disabled={translating === video.id}
-                              >
-                                {translating === video.id ? (
-                                  <Loader2 className="w-4 h-4 animate-spin mr-1" />
-                                ) : (
-                                  <Languages className="w-4 h-4 mr-1" />
-                                )}
-                                번역
-                              </Button>
                               <Button
                                 size="sm"
                                 variant="outline"
                                 onClick={() => openSrtUpload(video)}
                               >
                                 <Upload className="w-4 h-4 mr-1" />
-                                SRT
+                                SRT 업로드
                               </Button>
                               <Button
                                 size="sm"
