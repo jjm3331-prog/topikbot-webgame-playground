@@ -9,6 +9,112 @@ const corsHeaders = {
 
 type Subtitle = { start: number; end: number; text: string };
 
+// Multiple YouTube audio extraction services for reliability
+const AUDIO_EXTRACTORS = [
+  {
+    name: "yt-download.org",
+    getAudioUrl: async (videoId: string) => {
+      const resp = await fetch(`https://api.yt-download.org/get-links?url=https://www.youtube.com/watch?v=${videoId}`, {
+        headers: { "User-Agent": "Mozilla/5.0" }
+      });
+      if (!resp.ok) return null;
+      const data = await resp.json();
+      // Find audio format
+      const audio = data?.formats?.find((f: any) => f.mimeType?.includes("audio"));
+      return audio?.url || null;
+    }
+  },
+  {
+    name: "y2mate-api",
+    getAudioUrl: async (videoId: string) => {
+      // Use rapidapi y2mate
+      const resp = await fetch(`https://youtube-mp36.p.rapidapi.com/dl?id=${videoId}`, {
+        headers: {
+          "X-RapidAPI-Key": Deno.env.get("RAPIDAPI_KEY") || "",
+          "X-RapidAPI-Host": "youtube-mp36.p.rapidapi.com",
+          "User-Agent": "Mozilla/5.0"
+        }
+      });
+      if (!resp.ok) return null;
+      const data = await resp.json();
+      return data?.link || null;
+    }
+  },
+  {
+    name: "ssyoutube",
+    getAudioUrl: async (videoId: string) => {
+      const resp = await fetch(`https://ssyoutube.com/api/convert?url=https://www.youtube.com/watch?v=${videoId}`, {
+        headers: { "User-Agent": "Mozilla/5.0" }
+      });
+      if (!resp.ok) return null;
+      const data = await resp.json();
+      const audio = data?.url?.find((u: any) => u.type === "mp3" || u.audio);
+      return audio?.url || null;
+    }
+  },
+  {
+    name: "loader.to",
+    getAudioUrl: async (videoId: string) => {
+      // Step 1: Request conversion
+      const initResp = await fetch(`https://loader.to/api/init`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": "Mozilla/5.0"
+        },
+        body: JSON.stringify({
+          url: `https://www.youtube.com/watch?v=${videoId}`,
+          format: "mp3"
+        })
+      });
+      if (!initResp.ok) return null;
+      const initData = await initResp.json();
+      if (!initData?.id) return null;
+      
+      // Step 2: Poll for result
+      for (let i = 0; i < 30; i++) {
+        await new Promise(r => setTimeout(r, 2000));
+        const statusResp = await fetch(`https://loader.to/api/status?id=${initData.id}`, {
+          headers: { "User-Agent": "Mozilla/5.0" }
+        });
+        if (!statusResp.ok) continue;
+        const statusData = await statusResp.json();
+        if (statusData?.download_url) return statusData.download_url;
+        if (statusData?.status === "error") break;
+      }
+      return null;
+    }
+  },
+  {
+    name: "ytdl-core-api",
+    getAudioUrl: async (videoId: string) => {
+      // Try public ytdl API instances
+      const apis = [
+        `https://ytdl-core-api.onrender.com/api/info?url=https://www.youtube.com/watch?v=${videoId}`,
+        `https://yt-dlp-api.onrender.com/api/info?url=https://www.youtube.com/watch?v=${videoId}`,
+      ];
+      
+      for (const api of apis) {
+        try {
+          const resp = await fetch(api, {
+            headers: { "User-Agent": "Mozilla/5.0" }
+          });
+          if (!resp.ok) continue;
+          const data = await resp.json();
+          const formats = data?.formats || data?.info?.formats || [];
+          const audio = formats.find((f: any) => 
+            f.mimeType?.includes("audio") || f.audioCodec || f.acodec
+          );
+          if (audio?.url) return audio.url;
+        } catch {
+          continue;
+        }
+      }
+      return null;
+    }
+  }
+];
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -17,7 +123,7 @@ serve(async (req) => {
   try {
     const body = await req.json();
     const video_id = body?.video_id as string | undefined;
-    const audio_url = body?.audio_url as string | undefined;
+    const youtube_id = body?.youtube_id as string | undefined;
     const manual_subtitles = body?.manual_subtitles as string | Subtitle[] | undefined;
 
     if (!video_id) throw new Error("video_id is required");
@@ -71,11 +177,11 @@ serve(async (req) => {
       );
     }
 
-    // 2) Automatic path: audio_url must be a direct downloadable audio file (mp3/m4a/wav)
-    if (!audio_url) {
+    // 2) Automatic path: Extract audio from YouTube and send to Whisper
+    if (!youtube_id) {
       return new Response(
         JSON.stringify({
-          error: "audio_url is required (직접 다운로드 가능한 오디오 파일 URL 필요: mp3/m4a/wav)",
+          error: "youtube_id is required for automatic subtitle generation",
         }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
@@ -84,46 +190,68 @@ serve(async (req) => {
     const openAiKey = Deno.env.get("OPENAI_API_KEY");
     if (!openAiKey) throw new Error("OPENAI_API_KEY is not configured");
 
-    console.log(`[Whisper] Fetching audio from audio_url for video: ${video_id}`);
+    console.log(`[Whisper] Starting automatic extraction for YouTube: ${youtube_id}`);
 
-    const audioResp = await fetch(audio_url, {
+    // Try each audio extractor until one succeeds
+    let audioUrl: string | null = null;
+    let successExtractor: string | null = null;
+
+    for (const extractor of AUDIO_EXTRACTORS) {
+      console.log(`[Whisper] Trying extractor: ${extractor.name}`);
+      try {
+        audioUrl = await extractor.getAudioUrl(youtube_id);
+        if (audioUrl) {
+          successExtractor = extractor.name;
+          console.log(`[Whisper] Success with ${extractor.name}: ${audioUrl.slice(0, 100)}...`);
+          break;
+        }
+      } catch (e) {
+        console.log(`[Whisper] ${extractor.name} failed:`, e);
+      }
+    }
+
+    if (!audioUrl) {
+      console.error("[Whisper] All audio extractors failed");
+      return new Response(
+        JSON.stringify({
+          error: "모든 오디오 추출 서비스가 실패했습니다. 잠시 후 다시 시도해주세요.",
+          tried: AUDIO_EXTRACTORS.map(e => e.name),
+        }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    // Download audio
+    console.log(`[Whisper] Downloading audio from ${successExtractor}...`);
+    const audioResp = await fetch(audioUrl, {
       method: "GET",
-      headers: {
-        // Some CDNs require UA
-        "User-Agent": "Mozilla/5.0",
-      },
+      headers: { "User-Agent": "Mozilla/5.0" },
     });
 
     if (!audioResp.ok) {
       const t = await safeText(audioResp);
-      console.error("[Whisper] Audio fetch failed:", audioResp.status, t);
+      console.error("[Whisper] Audio download failed:", audioResp.status, t);
       return new Response(
-        JSON.stringify({ error: `audio_url fetch failed (${audioResp.status})` }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        JSON.stringify({ error: `오디오 다운로드 실패 (${audioResp.status})` }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const contentType = audioResp.headers.get("content-type") || "application/octet-stream";
-    const contentLength = parseInt(audioResp.headers.get("content-length") || "0", 10);
-
-    // OpenAI Whisper file limit is ~25MB; keep a strict guard.
-    const MAX_BYTES = 25 * 1024 * 1024;
-    if (contentLength && contentLength > MAX_BYTES) {
-      return new Response(
-        JSON.stringify({ error: `audio file too large (${Math.round(contentLength / 1024 / 1024)}MB). 최대 25MB.` }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
-
+    const contentType = audioResp.headers.get("content-type") || "audio/mpeg";
     const audioBuf = await audioResp.arrayBuffer();
+    
+    // OpenAI Whisper file limit is ~25MB
+    const MAX_BYTES = 25 * 1024 * 1024;
     if (audioBuf.byteLength > MAX_BYTES) {
       return new Response(
-        JSON.stringify({ error: `audio file too large (${Math.round(audioBuf.byteLength / 1024 / 1024)}MB). 최대 25MB.` }),
+        JSON.stringify({ error: `오디오 파일이 너무 큽니다 (${Math.round(audioBuf.byteLength / 1024 / 1024)}MB). 최대 25MB.` }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const filename = guessFileName(audio_url, contentType);
+    console.log(`[Whisper] Audio downloaded: ${Math.round(audioBuf.byteLength / 1024)}KB`);
+
+    const filename = "audio.mp3";
     const file = new File([audioBuf], filename, { type: contentType });
 
     const form = new FormData();
@@ -131,9 +259,8 @@ serve(async (req) => {
     form.append("file", file);
     form.append("response_format", "verbose_json");
     form.append("language", "ko");
-    // word timestamps are included in verbose_json on many outputs; segment timestamps always exist.
 
-    console.log(`[Whisper] Sending to OpenAI Whisper: ${filename} (${Math.round(audioBuf.byteLength / 1024)}KB)`);
+    console.log(`[Whisper] Sending to OpenAI Whisper...`);
 
     const whisperResp = await fetch("https://api.openai.com/v1/audio/transcriptions", {
       method: "POST",
@@ -210,7 +337,7 @@ serve(async (req) => {
         success: true,
         message: `Whisper 자막 생성 완료: ${subtitles.length}개 세그먼트`,
         subtitles_count: subtitles.length,
-        source: "audio_url",
+        source: successExtractor,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
@@ -229,18 +356,6 @@ async function safeText(resp: Response) {
   } catch {
     return "";
   }
-}
-
-function guessFileName(url: string, contentType: string) {
-  try {
-    const u = new URL(url);
-    const last = u.pathname.split("/").pop() || "audio";
-    if (last.includes(".")) return last;
-  } catch {
-    // ignore
-  }
-  const ext = contentType.includes("mpeg") ? "mp3" : contentType.includes("mp4") ? "m4a" : contentType.includes("wav") ? "wav" : "bin";
-  return `audio.${ext}`;
 }
 
 // Parse SRT format to subtitle array
