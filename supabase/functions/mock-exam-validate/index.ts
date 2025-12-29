@@ -86,7 +86,7 @@ const systemPrompt = `당신은 TOPIK(한국어능력시험) 검수 전문가입
 
 점수가 80점 미만인 문제는 correctedQuestion에 수정된 버전을 제공하세요.`;
 
-// 단일 배치 검증 함수
+// 단일 배치 검증 함수 (Gemini 직접 호출 + 씽킹버젯 최대치)
 async function validateBatch(
   questions: Question[],
   examType: string,
@@ -98,6 +98,8 @@ async function validateBatch(
 ${JSON.stringify(questions, null, 2)}
 
 각 문제를 철저히 검토하고 검증 결과를 반환하세요.`;
+
+  console.log(`🤖 Calling Gemini ${geminiModel} with thinkingBudget: 24576, maxOutputTokens: 65536`);
 
   const geminiResponse = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${GEMINI_API_KEY}`,
@@ -111,9 +113,12 @@ ${JSON.stringify(questions, null, 2)}
         }],
         generationConfig: {
           temperature: 0.3,
-          topP: 0.9,
-          maxOutputTokens: 16384,
+          topP: 0.95,
+          maxOutputTokens: 65536, // 맥스토큰 최대치
           responseMimeType: "application/json",
+          thinkingConfig: {
+            thinkingBudget: 24576, // 씽킹버젯 최대치
+          },
         },
         safetySettings: [
           { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
