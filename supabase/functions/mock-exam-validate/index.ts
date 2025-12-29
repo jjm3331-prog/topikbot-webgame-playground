@@ -116,6 +116,9 @@ ${JSON.stringify(params.questions, null, 2)}
                 topP: 0.9,
                 maxOutputTokens: 32768,
                 responseMimeType: "application/json",
+                thinkingConfig: {
+                  thinkingBudget: 24576,  // 씽킹버젯 최대치 적용
+                },
               },
               safetySettings: [
                 { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
@@ -316,6 +319,9 @@ ${JSON.stringify(params.questions, null, 2)}
             topP: 0.9,
             maxOutputTokens: 32768,
             responseMimeType: "application/json",
+            thinkingConfig: {
+              thinkingBudget: 24576,  // 씽킹버젯 최대치 적용
+            },
           },
           safetySettings: [
             { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
