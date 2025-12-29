@@ -135,12 +135,13 @@ const MockExamTest = () => {
     if (isPracticeMode) return null; // No time limit in practice mode
     
     const timeLimits: Record<string, { listening: number; reading: number; writing?: number }> = {
-      TOPIK_I: { listening: 40 * 60, reading: 60 * 60 },
-      TOPIK_II: { listening: 60 * 60, reading: 70 * 60, writing: 50 * 60 },
-      TOPIK_EPS: { listening: 25 * 60, reading: 25 * 60 }
+      topik1: { listening: 40 * 60, reading: 60 * 60 },
+      topik2: { listening: 60 * 60, reading: 70 * 60, writing: 50 * 60 },
+      eps: { listening: 25 * 60, reading: 25 * 60 }
     };
     
-    const examLimits = timeLimits[examType || 'TOPIK_I'];
+    const examLimits = timeLimits[examType || 'topik1'];
+    if (!examLimits) return null;
     if (section) {
       return examLimits[section as keyof typeof examLimits] || null;
     }
@@ -388,15 +389,34 @@ const MockExamTest = () => {
       const answersArray = Array.from(answers.values());
       
       for (const answer of answersArray) {
-        await supabase
+        // Check if answer exists first
+        const { data: existing } = await supabase
           .from('mock_exam_answers')
-          .upsert({
-            attempt_id: attemptId,
-            question_id: answer.question_id,
-            user_answer: answer.user_answer,
-            is_correct: answer.is_correct,
-            time_spent_seconds: answer.time_spent_seconds
-          }, { onConflict: 'attempt_id,question_id' });
+          .select('id')
+          .eq('attempt_id', attemptId)
+          .eq('question_id', answer.question_id)
+          .maybeSingle();
+        
+        if (existing) {
+          await supabase
+            .from('mock_exam_answers')
+            .update({
+              user_answer: answer.user_answer,
+              is_correct: answer.is_correct,
+              time_spent_seconds: answer.time_spent_seconds
+            })
+            .eq('id', existing.id);
+        } else {
+          await supabase
+            .from('mock_exam_answers')
+            .insert({
+              attempt_id: attemptId,
+              question_id: answer.question_id,
+              user_answer: answer.user_answer,
+              is_correct: answer.is_correct,
+              time_spent_seconds: answer.time_spent_seconds
+            });
+        }
       }
     } catch (error) {
       console.error('Auto-save failed:', error);
@@ -431,15 +451,36 @@ const MockExamTest = () => {
     if (!user || !attempt) return;
     
     try {
-      await supabase
+      // Check if mistake already exists
+      const { data: existing } = await supabase
         .from('mock_exam_mistakes')
-        .upsert({
-          user_id: user.id,
-          question_id: question.id,
-          attempt_id: attempt.id,
-          mastered: false,
-          review_count: 0
-        }, { onConflict: 'user_id,question_id' });
+        .select('id, review_count')
+        .eq('user_id', user.id)
+        .eq('question_id', question.id)
+        .maybeSingle();
+      
+      if (existing) {
+        // Update existing mistake
+        await supabase
+          .from('mock_exam_mistakes')
+          .update({
+            attempt_id: attempt.id,
+            review_count: (existing.review_count || 0) + 1,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existing.id);
+      } else {
+        // Insert new mistake
+        await supabase
+          .from('mock_exam_mistakes')
+          .insert({
+            user_id: user.id,
+            question_id: question.id,
+            attempt_id: attempt.id,
+            mastered: false,
+            review_count: 0
+          });
+      }
     } catch (error) {
       console.error('Failed to save mistake:', error);
     }
@@ -500,16 +541,34 @@ const MockExamTest = () => {
       for (const answer of answersArray) {
         if (answer.is_correct) correctCount++;
         
-        // Save all answers
-        await supabase
+        // Check if answer exists first
+        const { data: existing } = await supabase
           .from('mock_exam_answers')
-          .upsert({
-            attempt_id: attempt.id,
-            question_id: answer.question_id,
-            user_answer: answer.user_answer,
-            is_correct: answer.is_correct,
-            answered_at: new Date().toISOString()
-          }, { onConflict: 'attempt_id,question_id' });
+          .select('id')
+          .eq('attempt_id', attempt.id)
+          .eq('question_id', answer.question_id)
+          .maybeSingle();
+        
+        if (existing) {
+          await supabase
+            .from('mock_exam_answers')
+            .update({
+              user_answer: answer.user_answer,
+              is_correct: answer.is_correct,
+              answered_at: new Date().toISOString()
+            })
+            .eq('id', existing.id);
+        } else {
+          await supabase
+            .from('mock_exam_answers')
+            .insert({
+              attempt_id: attempt.id,
+              question_id: answer.question_id,
+              user_answer: answer.user_answer,
+              is_correct: answer.is_correct,
+              answered_at: new Date().toISOString()
+            });
+        }
       }
       
       // Calculate time taken
@@ -536,15 +595,25 @@ const MockExamTest = () => {
         if (!answer.is_correct && user) {
           const question = questions.find(q => q.id === answer.question_id);
           if (question) {
-            await supabase
+            // Check if mistake already exists
+            const { data: existing } = await supabase
               .from('mock_exam_mistakes')
-              .upsert({
-                user_id: user.id,
-                question_id: answer.question_id,
-                attempt_id: attempt.id,
-                mastered: false,
-                review_count: 0
-              }, { onConflict: 'user_id,question_id' });
+              .select('id')
+              .eq('user_id', user.id)
+              .eq('question_id', answer.question_id)
+              .maybeSingle();
+            
+            if (!existing) {
+              await supabase
+                .from('mock_exam_mistakes')
+                .insert({
+                  user_id: user.id,
+                  question_id: answer.question_id,
+                  attempt_id: attempt.id,
+                  mastered: false,
+                  review_count: 0
+                });
+            }
           }
         }
       }
