@@ -91,7 +91,7 @@ export default function VideoPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [showSubtitle, setShowSubtitle] = useState(true);
-  const [dualSubtitle, setDualSubtitle] = useState(false); // Show KO + translated
+  const [dualSubtitle, setDualSubtitle] = useState(true); // Always show KO + translated
   const [hideBurnedInSubs, setHideBurnedInSubs] = useState(true); // Hide hardcoded/burned-in subs area
   const [ytReady, setYtReady] = useState(false);
   
@@ -353,11 +353,10 @@ export default function VideoPlayer() {
     }
   }, [currentSubtitleIndex]);
 
-  // Get Korean subtitle at current time for dual mode
+  // Get Korean subtitle at current time (used for dual subtitles and as a safety baseline)
   const koreanSubtitleNow = useMemo(() => {
-    if (!dualSubtitle || selectedLanguage === 'ko') return null;
     return koreanSubtitles.find(sub => currentTime >= sub.start && currentTime <= sub.end) || null;
-  }, [dualSubtitle, selectedLanguage, koreanSubtitles, currentTime]);
+  }, [koreanSubtitles, currentTime]);
 
   // Debug log for subtitle sync
   useEffect(() => {
@@ -434,17 +433,24 @@ export default function VideoPlayer() {
                     className={`absolute left-0 right-0 px-4 z-50 ${hideBurnedInSubs ? 'bottom-24' : 'bottom-4'}`}
                   >
                     <div className="bg-gradient-to-r from-black/90 to-black/80 backdrop-blur-md text-white text-center py-4 px-8 rounded-xl max-w-3xl mx-auto space-y-2 border border-white/10 shadow-2xl">
-                      {/* Selected language (main line) - ALWAYS the translation in dual mode */}
-                      {currentSubtitle && (
-                        <p className={`font-semibold ${dualSubtitle && selectedLanguage !== 'ko' ? 'text-xl sm:text-2xl text-yellow-400' : 'text-xl sm:text-2xl text-white'}`}>
+                      {/* Translation (top line) */}
+                      {dualSubtitle && selectedLanguage !== 'ko' && currentSubtitle && (
+                        <p className="font-semibold text-xl sm:text-2xl text-yellow-400">
                           {currentSubtitle.text}
                         </p>
                       )}
 
-                      {/* Korean (support line) - only if we actually have Korean text in DB */}
-                      {dualSubtitle && selectedLanguage !== 'ko' && koreanSubtitleNow && hasHangul(koreanSubtitleNow.text) && (
+                      {/* Korean (bottom line) */}
+                      {koreanSubtitleNow && hasHangul(koreanSubtitleNow.text) && (
                         <p className="text-base sm:text-lg font-medium text-white/90">
                           {koreanSubtitleNow.text}
+                        </p>
+                      )}
+
+                      {/* Fallback when user is viewing Korean only */}
+                      {!dualSubtitle && currentSubtitle && (
+                        <p className="font-semibold text-xl sm:text-2xl text-white">
+                          {currentSubtitle.text}
                         </p>
                       )}
                     </div>
