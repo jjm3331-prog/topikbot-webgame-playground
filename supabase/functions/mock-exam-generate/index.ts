@@ -13,35 +13,42 @@ const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 const COHERE_API_KEY = Deno.env.get("COHERE_API_KEY");
 const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
-// TTS Voice Presets
+// TTS Voice Presets - Korean Native Voices (High Quality)
+// 여성: Seoyeon - 한국어 네이티브, 자연스럽고 명확한 발음
+// 남성: Junwoo - 한국어 네이티브, 자연스럽고 명확한 발음
+const KOREAN_VOICES = {
+  female: "yoZ06aMxZJJ28mfd3POQ", // Seoyeon - Korean native female
+  male: "ODq5zmih8GrVes37Dizd",   // Junwoo - Korean native male
+} as const;
+
 const TTS_PRESETS = {
   exam: {
-    voiceId: "cgSgspJ2msm6clMCkdW9", // Jessica - clear Korean
-    stability: 0.8,
+    voiceId: KOREAN_VOICES.female, // Default to female Korean native
+    stability: 0.75,
     similarity_boost: 0.85,
-    style: 0.2,
-    speed: 0.82, // Slower for exam (avoid rushed delivery)
+    style: 0.15,
+    speed: 0.8, // Slower for exam (clear delivery)
   },
   learning: {
-    voiceId: "cgSgspJ2msm6clMCkdW9", // Jessica
+    voiceId: KOREAN_VOICES.female,
     stability: 0.7,
     similarity_boost: 0.8,
-    style: 0.3,
-    speed: 0.8, // Slower for learners
+    style: 0.2,
+    speed: 0.75, // Even slower for learners
   },
   natural: {
-    voiceId: "onwK4e9ZLuTAKqWW03F9", // Daniel - more natural
+    voiceId: KOREAN_VOICES.male,
     stability: 0.5,
     similarity_boost: 0.75,
-    style: 0.5,
-    speed: 0.95, // Slightly slower than 1.0 for clarity
+    style: 0.4,
+    speed: 0.9,
   },
   formal: {
-    voiceId: "JBFqnCBsd6RMkjVDRZzb", // George - formal
-    stability: 0.9,
+    voiceId: KOREAN_VOICES.female,
+    stability: 0.85,
     similarity_boost: 0.9,
     style: 0.1,
-    speed: 0.9,
+    speed: 0.85,
   },
 } as const;
 
@@ -330,8 +337,8 @@ async function generateListeningAudio(
     const isMultiSpeaker = uniqueSpeakers.size >= 2 && (uniqueSpeakers.has("male") || uniqueSpeakers.has("female"));
 
     const voiceBySpeaker: Record<"male" | "female" | "other", string> = {
-      female: "cgSgspJ2msm6clMCkdW9", // Jessica
-      male: "onwK4e9ZLuTAKqWW03F9", // Daniel
+      female: KOREAN_VOICES.female, // Seoyeon - Korean native female
+      male: KOREAN_VOICES.male,     // Junwoo - Korean native male
       other: baseSettings.voiceId,
     };
 

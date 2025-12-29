@@ -5,9 +5,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// ElevenLabs v3 (eleven_turbo_v2_5) - Korean-optimized native voice
-// Custom Korean voice ID provided by user
-const KOREAN_VOICE_ID = "ksaI0TCD9BstzEzlxj4q";
+// Korean Native Voices (High Quality)
+// Seoyeon - 한국어 네이티브 여성, 자연스럽고 명확한 발음
+const KOREAN_VOICE_FEMALE = "yoZ06aMxZJJ28mfd3POQ";
+// Junwoo - 한국어 네이티브 남성, 자연스럽고 명확한 발음  
+const KOREAN_VOICE_MALE = "ODq5zmih8GrVes37Dizd";
+// Default to female voice
+const DEFAULT_KOREAN_VOICE = KOREAN_VOICE_FEMALE;
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -26,7 +30,7 @@ serve(async (req) => {
       throw new Error("ELEVENLABS_API_KEY is not configured");
     }
 
-    const selectedVoice = voiceId || KOREAN_VOICE_ID;
+    const selectedVoice = voiceId || DEFAULT_KOREAN_VOICE;
 
     console.log(`[TTS] text="${text.substring(0, 50)}..." voice=${selectedVoice} speed=${speed}`);
 

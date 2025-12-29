@@ -5,8 +5,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Default voice: Sarah (natural and clear for Korean)
-const DEFAULT_VOICE_ID = "EXAVITQu4vr4xnSDxMaL";
+// Korean Native Voices (High Quality)
+// Seoyeon - 한국어 네이티브 여성, 자연스럽고 명확한 발음
+const KOREAN_VOICE_FEMALE = "yoZ06aMxZJJ28mfd3POQ";
+// Junwoo - 한국어 네이티브 남성, 자연스럽고 명확한 발음
+const KOREAN_VOICE_MALE = "ODq5zmih8GrVes37Dizd";
+const DEFAULT_VOICE_ID = KOREAN_VOICE_FEMALE;
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {

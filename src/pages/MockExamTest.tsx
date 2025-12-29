@@ -25,7 +25,8 @@ import {
   FileText,
   EyeOff,
   Lightbulb,
-  Target
+  Target,
+  Gauge
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,6 +35,8 @@ import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Slider } from "@/components/ui/slider";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { mapExamTypeToDb } from "@/lib/mockExamDb";
@@ -131,6 +134,7 @@ const MockExamTest = () => {
   // Audio state (for listening section)
   const [isPlaying, setIsPlaying] = useState(false);
   const [playCount, setPlayCount] = useState<Map<string, number>>(new Map());
+  const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
   // Practice mode state - based on preset settings
@@ -592,6 +596,7 @@ const MockExamTest = () => {
     }
     
     audioRef.current = new Audio(currentQuestion.question_audio_url);
+    audioRef.current.playbackRate = playbackSpeed;
     audioRef.current.onplay = () => setIsPlaying(true);
     audioRef.current.onended = () => {
       setIsPlaying(false);
@@ -604,6 +609,14 @@ const MockExamTest = () => {
       toast({ title: "오디오 재생 오류", variant: "destructive" });
     };
     audioRef.current.play();
+  };
+
+  const handleSpeedChange = (speed: number[]) => {
+    const newSpeed = speed[0];
+    setPlaybackSpeed(newSpeed);
+    if (audioRef.current) {
+      audioRef.current.playbackRate = newSpeed;
+    }
   };
 
   const handleSubmit = async () => {
@@ -902,7 +915,7 @@ const MockExamTest = () => {
           <div className="flex items-center gap-2">
             {/* Audio controls for listening */}
             {isListeningSection && currentQuestion?.question_audio_url && (
-              <div className="flex items-center gap-2 mr-4">
+              <div className="flex items-center gap-3 mr-4">
                 <Button
                   variant={isPlaying ? "secondary" : "default"}
                   size="sm"
@@ -912,6 +925,50 @@ const MockExamTest = () => {
                   {isPlaying ? <Pause className="w-4 h-4 mr-1" /> : <Play className="w-4 h-4 mr-1" />}
                   {isPlaying ? "재생 중" : "듣기"}
                 </Button>
+                
+                {/* Speed control popover */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-1.5">
+                      <Gauge className="w-4 h-4" />
+                      {playbackSpeed.toFixed(1)}x
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-64 p-4" align="end">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">재생 속도</span>
+                        <Badge variant="secondary">{playbackSpeed.toFixed(1)}x</Badge>
+                      </div>
+                      <Slider
+                        value={[playbackSpeed]}
+                        onValueChange={handleSpeedChange}
+                        min={0.5}
+                        max={1.5}
+                        step={0.1}
+                        className="w-full"
+                      />
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>0.5x (느리게)</span>
+                        <span>1.5x (빠르게)</span>
+                      </div>
+                      <div className="flex gap-1 pt-2">
+                        {[0.7, 0.85, 1.0, 1.2].map((speed) => (
+                          <Button
+                            key={speed}
+                            variant={playbackSpeed === speed ? "default" : "outline"}
+                            size="sm"
+                            className="flex-1 text-xs"
+                            onClick={() => handleSpeedChange([speed])}
+                          >
+                            {speed}x
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+                
                 {!isPracticeMode && (
                   <Badge variant="outline">
                     {2 - (playCount.get(currentQuestion.id) || 0)}회 남음
