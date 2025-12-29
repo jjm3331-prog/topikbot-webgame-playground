@@ -17,23 +17,25 @@ interface ShortsVideo {
   category: string;
 }
 
-// 카테고리 정의
+// Categories
 const CATEGORIES = [
-  { id: 'all', label: '전체', icon: Sparkles, gradient: 'from-primary via-korean-orange to-korean-gold' },
-  { id: 'kdrama', label: 'K드라마/영화', icon: Tv, gradient: 'from-rose-500 via-pink-500 to-fuchsia-500' },
-  { id: 'variety', label: '예능', icon: Mic, gradient: 'from-amber-400 via-orange-500 to-red-500' },
-  { id: 'news', label: '뉴스', icon: Newspaper, gradient: 'from-cyan-400 via-blue-500 to-indigo-600' },
-  { id: 'kpop', label: 'K팝', icon: Music, gradient: 'from-violet-500 via-purple-500 to-pink-500' },
-  { id: 'culture', label: '한국 문화', icon: Landmark, gradient: 'from-emerald-400 via-green-500 to-teal-500' },
-  { id: 'travel', label: '여행', icon: Plane, gradient: 'from-sky-400 via-blue-500 to-cyan-500' },
-];
+  { id: 'all', labelKey: 'videoHub.categories.all', icon: Sparkles, gradient: 'from-primary via-korean-orange to-korean-gold' },
+  { id: 'drama', labelKey: 'videoHub.categories.drama', icon: Tv, gradient: 'from-rose-500 via-pink-500 to-fuchsia-500' },
+  { id: 'variety', labelKey: 'videoHub.categories.variety', icon: Mic, gradient: 'from-amber-400 via-orange-500 to-red-500' },
+  { id: 'news', labelKey: 'videoHub.categories.news', icon: Newspaper, gradient: 'from-cyan-400 via-blue-500 to-indigo-600' },
+  { id: 'music', labelKey: 'videoHub.categories.music', icon: Music, gradient: 'from-violet-500 via-purple-500 to-pink-500' },
+  { id: 'culture', labelKey: 'videoHub.categories.culture', icon: Landmark, gradient: 'from-emerald-400 via-green-500 to-teal-500' },
+  { id: 'travel', labelKey: 'videoHub.categories.travel', icon: Plane, gradient: 'from-sky-400 via-blue-500 to-cyan-500' },
+] as const;
+
+type CategoryId = typeof CATEGORIES[number]['id'];
 
 export default function ShortsHub() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [videos, setVideos] = useState<ShortsVideo[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState<CategoryId>('all');
   const categoryRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -57,20 +59,25 @@ export default function ShortsHub() {
     }
   };
 
-  // 카테고리별 필터링
+  // Filter by category (DB categories: kdrama, movie, variety, news, kpop, culture, travel)
   const filteredVideos = selectedCategory === 'all'
     ? videos
-    : selectedCategory === 'kdrama'
+    : selectedCategory === 'drama'
       ? videos.filter(v => v.category === 'kdrama' || v.category === 'movie')
-      : videos.filter(v => v.category === selectedCategory);
+      : selectedCategory === 'music'
+        ? videos.filter(v => v.category === 'kpop' || v.category === 'music')
+        : videos.filter(v => v.category === selectedCategory);
 
-  // 카테고리별 개수 계산
-  const getCategoryCount = (categoryId: string) => {
+  const getCategoryCount = (categoryId: CategoryId) => {
     if (categoryId === 'all') return videos.length;
-    if (categoryId === 'kdrama') {
-      return videos.filter(v => v.category === 'kdrama' || v.category === 'movie').length;
-    }
+    if (categoryId === 'drama') return videos.filter(v => v.category === 'kdrama' || v.category === 'movie').length;
+    if (categoryId === 'music') return videos.filter(v => v.category === 'kpop' || v.category === 'music').length;
     return videos.filter(v => v.category === categoryId).length;
+  };
+
+  const getCategoryLabel = (categoryId: CategoryId) => {
+    const cat = CATEGORIES.find(c => c.id === categoryId);
+    return cat ? t(cat.labelKey) : t('videoHub.categories.all');
   };
 
   const totalViews = videos.reduce((acc, v) => acc + v.view_count, 0);
@@ -105,20 +112,18 @@ export default function ShortsHub() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
                 </span>
-                <span className="text-sm font-semibold text-primary tracking-wide">NEW SHORTS DAILY</span>
+                <span className="text-sm font-semibold text-primary tracking-wide">{t('videoHub.hero.badge')}</span>
               </motion.div>
 
               {/* Main Title */}
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6">
-                <span className="block text-foreground">숏츠로 배우는</span>
-                <span className="block text-gradient-primary mt-2">진짜 한국어</span>
+                <span className="block text-foreground">{t('videoHub.hero.title1')}</span>
+                <span className="block text-gradient-primary mt-2">{t('videoHub.hero.title2')}</span>
               </h1>
 
               {/* Subtitle */}
               <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-                AI가 정제한 드라마, K팝, 예능 속 핵심 표현을
-                <br className="hidden sm:block" />
-                <span className="text-foreground font-medium">1분 안에</span> 완벽하게 학습하세요
+                {t('videoHub.hero.subtitle')}
               </p>
 
               {/* Stats Row */}
@@ -134,16 +139,16 @@ export default function ShortsHub() {
                   </div>
                   <div className="text-left">
                     <p className="text-2xl font-bold text-foreground">{videos.length}</p>
-                    <p className="text-sm text-muted-foreground">학습 영상</p>
+                    <p className="text-sm text-muted-foreground">{t('videoHub.videos.sectionTitle')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-secondary to-korean-cyan flex items-center justify-center shadow-lg shadow-secondary/25">
-                    <Sparkles className="w-6 h-6 text-white" />
+                    <Globe className="w-6 h-6 text-white" />
                   </div>
                   <div className="text-left">
-                    <p className="text-2xl font-bold text-foreground">AI</p>
-                    <p className="text-sm text-muted-foreground">맞춤 학습</p>
+                    <p className="text-2xl font-bold text-foreground">7</p>
+                    <p className="text-sm text-muted-foreground">{t('videoHub.stats.languages')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -152,7 +157,7 @@ export default function ShortsHub() {
                   </div>
                   <div className="text-left">
                     <p className="text-2xl font-bold text-foreground">{(totalViews / 1000).toFixed(1)}K</p>
-                    <p className="text-sm text-muted-foreground">조회수</p>
+                    <p className="text-sm text-muted-foreground">{t('videoPlayer.views')}</p>
                   </div>
                 </div>
               </motion.div>
@@ -199,7 +204,7 @@ export default function ShortsHub() {
                     
                     <span className="relative z-10 flex items-center gap-2">
                       <Icon className={`w-4 h-4 ${isActive ? '' : 'group-hover:scale-110'} transition-transform`} />
-                      <span>{cat.label}</span>
+                      <span>{t(cat.labelKey)}</span>
                       <span className={`
                         px-2 py-0.5 rounded-full text-xs font-semibold
                         ${isActive ? 'bg-white/20' : 'bg-muted-foreground/10'}
@@ -226,11 +231,11 @@ export default function ShortsHub() {
             >
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
-                  {CATEGORIES.find(c => c.id === selectedCategory)?.label || '전체'} 
-                  <span className="text-muted-foreground font-normal ml-2">쇼츠</span>
+                  {getCategoryLabel(selectedCategory)}
+                  <span className="text-muted-foreground font-normal ml-2">{t('videoHub.videos.sectionTitle')}</span>
                 </h2>
                 <p className="text-muted-foreground mt-1">
-                  {filteredVideos.length}개의 학습 콘텐츠
+                  {t('videoHub.videos.count', { count: filteredVideos.length })}
                 </p>
               </div>
             </motion.div>
@@ -255,13 +260,10 @@ export default function ShortsHub() {
                   <Play className="w-10 h-10 text-muted-foreground" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-2">
-                  아직 콘텐츠가 없어요
+                  {t('videoHub.videos.noVideos')}
                 </h3>
                 <p className="text-muted-foreground max-w-sm">
-                  {selectedCategory === 'all' 
-                    ? '곧 새로운 숏츠가 업로드될 예정이에요!' 
-                    : `${CATEGORIES.find(c => c.id === selectedCategory)?.label} 카테고리에 곧 콘텐츠가 추가됩니다`
-                  }
+                  {t('videoHub.videos.comingSoon')}
                 </p>
               </motion.div>
             ) : (
@@ -275,8 +277,12 @@ export default function ShortsHub() {
                   className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6"
                 >
                   {filteredVideos.map((video, idx) => {
-                    const categoryInfo = CATEGORIES.find(c => c.id === video.category) || 
-                                        (video.category === 'movie' ? CATEGORIES.find(c => c.id === 'kdrama') : null);
+                    const categoryInfo =
+                      video.category === 'kdrama' || video.category === 'movie'
+                        ? CATEGORIES.find(c => c.id === 'drama')
+                        : video.category === 'kpop' || video.category === 'music'
+                          ? CATEGORIES.find(c => c.id === 'music')
+                          : CATEGORIES.find(c => c.id === (video.category as CategoryId));
                     
                     return (
                       <motion.div
@@ -307,7 +313,7 @@ export default function ShortsHub() {
                           {/* Category Badge */}
                           {categoryInfo && (
                             <div className={`absolute top-3 left-3 px-3 py-1.5 rounded-full text-xs font-bold text-white bg-gradient-to-r ${categoryInfo.gradient} shadow-lg`}>
-                              {categoryInfo.label}
+                              {t(categoryInfo.labelKey)}
                             </div>
                           )}
                           
@@ -366,17 +372,17 @@ export default function ShortsHub() {
                 
                 <div className="relative z-10">
                   <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                    AI가 분석한 핵심 표현으로 빠르게 성장하세요! 🚀
+                    {t('videoHub.cta.title')}
                   </h3>
                   <p className="text-white/80 mb-8 max-w-lg mx-auto">
-                    영상 속 생생한 한국어를 AI가 학습 콘텐츠로 정제해 드려요
+                    {t('videoHub.cta.description')}
                   </p>
                   <div className="flex flex-wrap justify-center gap-4">
                     <button
                       onClick={() => navigate(`/shorts/${videos[0]?.id}`)}
                       className="px-8 py-4 bg-white text-primary font-bold rounded-2xl hover:bg-white/90 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1"
                     >
-                      지금 학습 시작하기
+                      {t('videoHub.cta.button')}
                     </button>
                   </div>
                 </div>
