@@ -53,6 +53,7 @@ interface Question {
   question_number?: number;
   question_audio_url?: string;
   question_image_url?: string;
+  option_images?: string[]; // 그림 문제용 - 4개 이미지 보기
   explanation_ko?: string;
   explanation_vi?: string;
   explanation_en?: string;
@@ -1042,47 +1043,116 @@ const MockExamTest = () => {
               
               {/* Multiple Choice Options (Listening/Reading) - TOPIK Style ①②③④ */}
               {!isWritingSection && (
-                <div className="space-y-3">
-                  {currentQuestion.options.map((option, idx) => {
-                    const answer = answers.get(currentQuestion.id);
-                    const isSelected = answer?.user_answer === idx;
-                    // DB stores correct_answer as 1-based (1,2,3,4), idx is 0-based (0,1,2,3)
-                    const isCorrect = (idx + 1) === currentQuestion.correct_answer;
-                    const showResult = isPracticeMode && answer !== undefined;
-                    const circledNumbers = ['①', '②', '③', '④'];
-                    
-                    return (
-                      <button
-                        key={idx}
-                        onClick={() => handleAnswer(idx)}
-                        disabled={isPracticeMode && answer !== undefined}
-                        className={cn(
-                          "w-full p-4 rounded-lg border text-left transition-all flex items-start gap-4 group",
-                          !showResult && isSelected && "border-primary bg-primary/10 ring-2 ring-primary/30",
-                          !showResult && !isSelected && "hover:border-primary/50 hover:bg-muted/50",
-                          showResult && isCorrect && "border-green-500 bg-green-50 dark:bg-green-950/30",
-                          showResult && isSelected && !isCorrect && "border-destructive bg-destructive/10"
-                        )}
-                      >
-                        <span className={cn(
-                          "text-2xl font-bold shrink-0 transition-colors",
-                          isSelected ? "text-primary" : "text-muted-foreground group-hover:text-foreground",
-                          showResult && isCorrect && "text-green-600 dark:text-green-400",
-                          showResult && isSelected && !isCorrect && "text-destructive"
-                        )}>
-                          {circledNumbers[idx]}
-                        </span>
-                        <span className="flex-1 pt-1 text-base">{option}</span>
-                        {showResult && isCorrect && (
-                          <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" />
-                        )}
-                        {showResult && isSelected && !isCorrect && (
-                          <X className="w-6 h-6 text-destructive shrink-0" />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
+                <>
+                  {/* 그림 문제 - 이미지 4개 그리드 */}
+                  {currentQuestion.option_images && currentQuestion.option_images.length === 4 ? (
+                    <div className="grid grid-cols-2 gap-4">
+                      {currentQuestion.option_images.map((imageUrl, idx) => {
+                        const answer = answers.get(currentQuestion.id);
+                        const isSelected = answer?.user_answer === idx;
+                        const isCorrect = (idx + 1) === currentQuestion.correct_answer;
+                        const showResult = isPracticeMode && answer !== undefined;
+                        const circledNumbers = ['①', '②', '③', '④'];
+                        
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => handleAnswer(idx)}
+                            disabled={isPracticeMode && answer !== undefined}
+                            className={cn(
+                              "relative rounded-xl border-2 transition-all overflow-hidden group",
+                              !showResult && isSelected && "border-primary ring-2 ring-primary/30",
+                              !showResult && !isSelected && "border-muted hover:border-primary/50",
+                              showResult && isCorrect && "border-green-500 ring-2 ring-green-500/30",
+                              showResult && isSelected && !isCorrect && "border-destructive ring-2 ring-destructive/30"
+                            )}
+                          >
+                            {/* 번호 배지 */}
+                            <div className={cn(
+                              "absolute top-2 left-2 z-10 w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold transition-colors",
+                              !showResult && isSelected && "bg-primary text-primary-foreground",
+                              !showResult && !isSelected && "bg-background/90 text-foreground border",
+                              showResult && isCorrect && "bg-green-500 text-white",
+                              showResult && isSelected && !isCorrect && "bg-destructive text-destructive-foreground"
+                            )}>
+                              {circledNumbers[idx]}
+                            </div>
+                            
+                            {/* 결과 아이콘 */}
+                            {showResult && (
+                              <div className="absolute top-2 right-2 z-10">
+                                {isCorrect && (
+                                  <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                                    <CheckCircle2 className="w-5 h-5 text-white" />
+                                  </div>
+                                )}
+                                {isSelected && !isCorrect && (
+                                  <div className="w-8 h-8 rounded-full bg-destructive flex items-center justify-center">
+                                    <X className="w-5 h-5 text-white" />
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            
+                            {/* 이미지 */}
+                            <img 
+                              src={imageUrl} 
+                              alt={`보기 ${idx + 1}`}
+                              className="w-full aspect-square object-cover"
+                            />
+                            
+                            {/* 호버 오버레이 */}
+                            {!showResult && !isSelected && (
+                              <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    /* 일반 텍스트 보기 */
+                    <div className="space-y-3">
+                      {currentQuestion.options.map((option, idx) => {
+                        const answer = answers.get(currentQuestion.id);
+                        const isSelected = answer?.user_answer === idx;
+                        const isCorrect = (idx + 1) === currentQuestion.correct_answer;
+                        const showResult = isPracticeMode && answer !== undefined;
+                        const circledNumbers = ['①', '②', '③', '④'];
+                        
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => handleAnswer(idx)}
+                            disabled={isPracticeMode && answer !== undefined}
+                            className={cn(
+                              "w-full p-4 rounded-lg border text-left transition-all flex items-start gap-4 group",
+                              !showResult && isSelected && "border-primary bg-primary/10 ring-2 ring-primary/30",
+                              !showResult && !isSelected && "hover:border-primary/50 hover:bg-muted/50",
+                              showResult && isCorrect && "border-green-500 bg-green-50 dark:bg-green-950/30",
+                              showResult && isSelected && !isCorrect && "border-destructive bg-destructive/10"
+                            )}
+                          >
+                            <span className={cn(
+                              "text-2xl font-bold shrink-0 transition-colors",
+                              isSelected ? "text-primary" : "text-muted-foreground group-hover:text-foreground",
+                              showResult && isCorrect && "text-green-600 dark:text-green-400",
+                              showResult && isSelected && !isCorrect && "text-destructive"
+                            )}>
+                              {circledNumbers[idx]}
+                            </span>
+                            <span className="flex-1 pt-1 text-base">{option}</span>
+                            {showResult && isCorrect && (
+                              <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" />
+                            )}
+                            {showResult && isSelected && !isCorrect && (
+                              <X className="w-6 h-6 text-destructive shrink-0" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
               )}
               
               {/* Writing Section - Text Input */}
