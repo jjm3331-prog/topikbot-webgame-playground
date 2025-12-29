@@ -19,11 +19,12 @@ import {
   Sparkles,
   ChevronRight,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  Database
 } from "lucide-react";
 
 interface Question {
-  id: number;
+  id: string;
   passage: string;
   question: string;
   options: string[];
@@ -32,8 +33,21 @@ interface Question {
   explanationVi: string;
 }
 
+// Tab categories mapping to part_numbers
+// Reading B: 고급 읽기 (Part 6+)
+// arrangement: part 6-7 (순서 배열)
+// inference: part 8-9 (추론)
+// paired: part 10-11 (복합 문항)
+// long: part 12+ (장문 독해)
 type TabKey = "arrangement" | "inference" | "paired" | "long";
 type TopikLevel = "1-2" | "3-4" | "5-6";
+
+// Map TopikLevel to exam_type
+const levelToExamType: Record<TopikLevel, string> = {
+  "1-2": "TOPIK_I",
+  "3-4": "TOPIK_II",
+  "5-6": "TOPIK_II",
+};
 
 const ReadingB = () => {
   const navigate = useNavigate();
@@ -49,27 +63,32 @@ const ReadingB = () => {
   const [isQuizComplete, setIsQuizComplete] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [dbQuestionCount, setDbQuestionCount] = useState(0);
 
   const tabCategories = {
     arrangement: {
       label: t("readingB.tabs.arrangement"),
       sublabel: t("readingB.tabs.arrangementSub"),
       emoji: "🔢",
+      partNumbers: [6, 7],
     },
     inference: {
       label: t("readingB.tabs.inference"),
       sublabel: t("readingB.tabs.inferenceSub"),
       emoji: "🧠",
+      partNumbers: [8, 9],
     },
     paired: {
       label: t("readingB.tabs.paired"),
       sublabel: t("readingB.tabs.pairedSub"),
       emoji: "🔗",
+      partNumbers: [10, 11],
     },
     long: {
       label: t("readingB.tabs.long"),
       sublabel: t("readingB.tabs.longSub"),
       emoji: "📖",
+      partNumbers: [12, 13, 14, 15],
     },
   };
 
@@ -82,7 +101,7 @@ const ReadingB = () => {
   const fallbackQuestions: Record<string, Question[]> = {
     arrangement: [
       {
-        id: 1,
+        id: "fallback-1",
         passage: "(가) 그래서 우산을 가져갔습니다.\n(나) 아침에 일어났습니다.\n(다) 밖에 비가 오고 있었습니다.\n(라) 회사에 갈 준비를 했습니다.",
         question: t("readingB.arrangeInOrder"),
         options: ["(나)-(라)-(다)-(가)", "(나)-(다)-(가)-(라)", "(다)-(나)-(라)-(가)", "(라)-(나)-(다)-(가)"],
@@ -93,7 +112,7 @@ const ReadingB = () => {
     ],
     inference: [
       {
-        id: 1,
+        id: "fallback-2",
         passage: "한국에서는 설날에 떡국을 먹습니다. 떡국을 먹으면 한 살을 더 먹는다고 합니다. 그래서 아이들은 설날이 되면 ( ).",
         question: t("readingB.chooseCorrect"),
         options: ["떡국을 먹고 싶어합니다", "떡국을 싫어합니다", "학교에 갑니다", "친구를 만납니다"],
@@ -104,7 +123,7 @@ const ReadingB = () => {
     ],
     paired: [
       {
-        id: 1,
+        id: "fallback-3",
         passage: "📚 서울시립도서관\n• 운영시간: 평일 09:00-21:00\n• 휴관일: 매주 월요일",
         question: t("readingB.aboutLibrary"),
         options: ["월요일에는 이용할 수 없습니다", "주말에만 운영합니다", "24시간 운영합니다", "화요일에 쉽니다"],
@@ -115,7 +134,7 @@ const ReadingB = () => {
     ],
     long: [
       {
-        id: 1,
+        id: "fallback-4",
         passage: "최근 한국에서는 1인 가구가 빠르게 증가하고 있습니다. 특히 젊은 층에서 혼자 사는 것을 선호하는 경향이 나타나고 있습니다.",
         question: t("readingB.matchContent"),
         options: ["1인 가구가 늘어나고 있습니다", "가족과 함께 사는 것이 유행입니다", "노년층이 혼자 살기를 원합니다", "1인 가구가 줄어들고 있습니다"],
@@ -126,20 +145,59 @@ const ReadingB = () => {
     ],
   };
 
-  const fetchQuestions = useCallback(async (tabType: string, level: TopikLevel) => {
+  // DB에서 읽기 문제 가져오기
+  const fetchQuestions = useCallback(async (tabType: TabKey, level: TopikLevel) => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('reading-content', {
-        body: { type: 'readingB', tabType, topikLevel: level, count: 5 }
-      });
+      const examType = levelToExamType[level];
+      const partNumbers = tabCategories[tabType].partNumbers;
+
+      // Fetch questions from mock_question_bank
+      const { data, error } = await supabase
+        .from('mock_question_bank')
+        .select('id, question_text, options, correct_answer, explanation_ko, explanation_vi, instruction_text')
+        .eq('section', 'reading')
+        .eq('exam_type', examType)
+        .eq('is_active', true)
+        .in('part_number', partNumbers)
+        .limit(50);
+
       if (error) throw error;
-      if (data?.questions && data.questions.length > 0) {
-        setQuestions(data.questions);
+
+      if (data && data.length > 0) {
+        setDbQuestionCount(data.length);
+        
+        // Shuffle and pick 5 random questions
+        const shuffled = [...data].sort(() => Math.random() - 0.5);
+        const selected = shuffled.slice(0, 5);
+
+        const formattedQuestions: Question[] = selected.map((q, idx) => {
+          const opts = Array.isArray(q.options) ? q.options : [];
+          return {
+            id: q.id,
+            passage: q.instruction_text || q.question_text,
+            question: q.instruction_text ? q.question_text : "다음 질문에 답하세요.",
+            options: opts.map((o: any) => typeof o === 'string' ? o : o.text || String(o)),
+            answer: q.correct_answer - 1, // DB is 1-indexed, UI is 0-indexed
+            explanationKo: q.explanation_ko || "해설이 준비 중입니다.",
+            explanationVi: q.explanation_vi || "Giải thích đang được chuẩn bị.",
+          };
+        });
+
+        setQuestions(formattedQuestions);
+        console.log(`✅ DB에서 ${formattedQuestions.length}개 읽기B 문제 로드 (전체: ${data.length}개)`);
       } else {
+        // No DB questions, use fallback
+        setDbQuestionCount(0);
         setQuestions(fallbackQuestions[tabType] || fallbackQuestions.arrangement);
+        toast({
+          title: "DB 문제 없음",
+          description: "해당 조건의 문제가 없어 샘플 문제를 사용합니다.",
+        });
       }
     } catch (error) {
-      console.error('Error fetching questions:', error);
+      console.error('Error fetching questions from DB:', error);
+      setDbQuestionCount(0);
       setQuestions(fallbackQuestions[tabType] || fallbackQuestions.arrangement);
     } finally {
       setIsLoading(false);
@@ -156,7 +214,7 @@ const ReadingB = () => {
 
   useEffect(() => {
     fetchQuestions(activeTab, topikLevel);
-  }, [activeTab, topikLevel, fetchQuestions]);
+  }, [activeTab, topikLevel]);
 
   const currentCategory = tabCategories[activeTab];
   const currentQuestion = questions[currentQuestionIndex];
@@ -332,9 +390,9 @@ const ReadingB = () => {
                 exit={{ opacity: 0 }}
                 className="rounded-3xl bg-gradient-to-b from-card to-card/50 border border-border/50 shadow-2xl p-12 text-center"
               >
-                <Loader2 className="w-16 h-16 animate-spin text-primary mx-auto mb-6" />
-                <h3 className="text-xl font-bold text-foreground mb-2">{t("readingB.loading")}</h3>
-                <p className="text-muted-foreground">{t("readingB.aiGenerating")}</p>
+                <Database className="w-16 h-16 animate-pulse text-primary mx-auto mb-6" />
+                <h3 className="text-xl font-bold text-foreground mb-2">문제 불러오는 중...</h3>
+                <p className="text-muted-foreground">DB에서 읽기 문제를 불러오고 있습니다</p>
               </motion.div>
             ) : !currentQuestion ? (
               <motion.div
