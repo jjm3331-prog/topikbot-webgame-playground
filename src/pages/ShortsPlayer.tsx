@@ -75,14 +75,14 @@ const LANGUAGES = [
   { code: 'uz', name: "O'zbek", flag: '🇺🇿', gradient: 'from-cyan-500 to-green-500' },
 ] as const;
 
-const CATEGORY_LABELS: Record<string, string> = {
-  kdrama: 'K드라마',
-  movie: '영화',
-  variety: '예능',
-  news: '뉴스',
-  kpop: 'K팝',
-  culture: '한국문화',
-  travel: '여행',
+const CATEGORY_KEYS: Record<string, string> = {
+  kdrama: 'categories.kdrama',
+  movie: 'categories.movie',
+  variety: 'categories.variety',
+  news: 'categories.news',
+  kpop: 'categories.kpop',
+  culture: 'categories.culture',
+  travel: 'categories.travel',
 };
 
 export default function ShortsPlayer() {
@@ -253,11 +253,11 @@ export default function ShortsPlayer() {
       }
     } catch (error) {
       console.error('Error fetching learning content:', error);
-      toast.error('학습 콘텐츠를 불러오는데 실패했습니다');
+      toast.error(t('videoPlayer.aiLearning.loadFailed'));
     } finally {
       setLoadingContent(false);
     }
-  }, [videoId, koreanSubtitles, selectedLanguage]);
+  }, [videoId, koreanSubtitles, selectedLanguage, t]);
 
   useEffect(() => {
     if (koreanSubtitles.length > 0) {
@@ -276,7 +276,8 @@ export default function ShortsPlayer() {
   };
 
   const getCategoryLabel = (category: string) => {
-    return CATEGORY_LABELS[category] || category;
+    const key = CATEGORY_KEYS[category];
+    return key ? t(`videoPlayer.${key}`) : category;
   };
 
   if (loading) {
@@ -433,8 +434,8 @@ export default function ShortsPlayer() {
                       <Sparkles className="w-4 h-4 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-semibold text-foreground">AI 학습 콘텐츠</h3>
-                      <p className="text-xs text-muted-foreground">영상에서 추출한 핵심 학습 자료</p>
+                      <h3 className="text-sm font-semibold text-foreground">{t('videoPlayer.aiLearning.title')}</h3>
+                      <p className="text-xs text-muted-foreground">{t('videoPlayer.aiLearning.description')}</p>
                     </div>
                   </div>
                 </div>
@@ -447,7 +448,7 @@ export default function ShortsPlayer() {
                       </div>
                       <div className="absolute inset-0 rounded-full bg-primary/10 animate-ping" />
                     </div>
-                    <p className="text-sm text-muted-foreground mt-4">AI가 학습 콘텐츠를 분석 중...</p>
+                    <p className="text-sm text-muted-foreground mt-4">{t('videoPlayer.aiLearning.loading')}</p>
                   </div>
                 ) : learningContent ? (
                   <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -455,19 +456,20 @@ export default function ShortsPlayer() {
                       <TabsList className="w-full grid grid-cols-4 h-10">
                         <TabsTrigger value="sentences" className="text-xs gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                           <MessageCircle className="w-3.5 h-3.5" />
-                          <span className="hidden sm:inline">핵심</span>문장
+                          <span className="hidden sm:inline">{t('videoPlayer.tabs.sentences')}</span>
+                          <span className="sm:hidden">{t('videoPlayer.tabs.sentences').slice(0, 2)}</span>
                         </TabsTrigger>
                         <TabsTrigger value="vocabulary" className="text-xs gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                           <BookOpen className="w-3.5 h-3.5" />
-                          어휘
+                          {t('videoPlayer.tabs.vocabulary')}
                         </TabsTrigger>
                         <TabsTrigger value="idioms" className="text-xs gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                           <Globe2 className="w-3.5 h-3.5" />
-                          관용어
+                          {t('videoPlayer.tabs.idioms')}
                         </TabsTrigger>
                         <TabsTrigger value="culture" className="text-xs gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                           <Heart className="w-3.5 h-3.5" />
-                          문화
+                          {t('videoPlayer.tabs.culture')}
                         </TabsTrigger>
                       </TabsList>
                     </div>
@@ -491,14 +493,14 @@ export default function ShortsPlayer() {
                                 <button
                                   onClick={() => speakText(sentence.korean)}
                                   className="p-1.5 rounded-lg bg-muted hover:bg-primary hover:text-white transition-colors"
-                                  title="발음 듣기"
+                                  title={t('videoPlayer.tooltips.listenPronunciation')}
                                 >
                                   <Volume2 className="w-3.5 h-3.5" />
                                 </button>
                                 <button
                                   onClick={() => seekTo(sentence.timestamp)}
                                   className="p-1.5 rounded-lg bg-muted hover:bg-primary hover:text-white transition-colors"
-                                  title="영상에서 보기"
+                                  title={t('videoPlayer.tooltips.watchInVideo')}
                                 >
                                   <Play className="w-3.5 h-3.5" />
                                 </button>
@@ -510,7 +512,7 @@ export default function ShortsPlayer() {
                           </motion.div>
                         ))
                       ) : (
-                        <EmptyState message="핵심 문장이 없습니다" />
+                        <EmptyState message={t('videoPlayer.empty.sentences')} />
                       )}
                     </TabsContent>
 
@@ -545,7 +547,7 @@ export default function ShortsPlayer() {
                           </motion.div>
                         ))
                       ) : (
-                        <EmptyState message="어휘가 없습니다" />
+                        <EmptyState message={t('videoPlayer.empty.vocabulary')} />
                       )}
                     </TabsContent>
 
@@ -571,11 +573,11 @@ export default function ShortsPlayer() {
                             </div>
                             <div className="space-y-1.5 text-sm">
                               <div className="flex gap-2">
-                                <span className="text-xs font-medium text-muted-foreground w-10 shrink-0">직역</span>
+                                <span className="text-xs font-medium text-muted-foreground w-10 shrink-0">{t('videoPlayer.idiomLabels.literal')}</span>
                                 <span className="text-foreground/80">{idiom.literal}</span>
                               </div>
                               <div className="flex gap-2">
-                                <span className="text-xs font-medium text-primary w-10 shrink-0">의미</span>
+                                <span className="text-xs font-medium text-primary w-10 shrink-0">{t('videoPlayer.idiomLabels.meaning')}</span>
                                 <span className="text-foreground">{idiom.meaning}</span>
                               </div>
                             </div>
@@ -586,7 +588,7 @@ export default function ShortsPlayer() {
                           </motion.div>
                         ))
                       ) : (
-                        <EmptyState message="관용어가 없습니다" />
+                        <EmptyState message={t('videoPlayer.empty.idioms')} />
                       )}
                     </TabsContent>
 
@@ -615,7 +617,7 @@ export default function ShortsPlayer() {
                           </motion.div>
                         ))
                       ) : (
-                        <EmptyState message="문화 노트가 없습니다" />
+                        <EmptyState message={t('videoPlayer.empty.culture')} />
                       )}
                     </TabsContent>
                   </Tabs>
@@ -625,7 +627,7 @@ export default function ShortsPlayer() {
                       <GraduationCap className="w-7 h-7 text-muted-foreground" />
                     </div>
                     <p className="text-sm text-muted-foreground mb-4">
-                      학습 콘텐츠를 불러오지 못했습니다
+                      {t('videoPlayer.aiLearning.loadError')}
                     </p>
                     <Button
                       variant="outline"
@@ -634,7 +636,7 @@ export default function ShortsPlayer() {
                       className="gap-2"
                     >
                       <RotateCcw className="w-4 h-4" />
-                      다시 분석하기
+                      {t('videoPlayer.aiLearning.retry')}
                     </Button>
                   </div>
                 )}
@@ -647,19 +649,19 @@ export default function ShortsPlayer() {
                     <Lightbulb className="w-4 h-4 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-sm font-bold text-foreground mb-2">학습 Tip</h3>
+                    <h3 className="text-sm font-bold text-foreground mb-2">{t('videoPlayer.learningTips.title')}</h3>
                     <ul className="space-y-1.5 text-xs text-muted-foreground">
                       <li className="flex items-center gap-2">
                         <Volume2 className="w-3 h-3 text-primary shrink-0" />
-                        발음 버튼으로 한국어 발음을 들어보세요
+                        {t('videoPlayer.learningTips.tip1')}
                       </li>
                       <li className="flex items-center gap-2">
                         <Play className="w-3 h-3 text-primary shrink-0" />
-                        재생 버튼으로 해당 장면으로 바로 이동
+                        {t('videoPlayer.learningTips.tip2')}
                       </li>
                       <li className="flex items-center gap-2">
                         <Heart className="w-3 h-3 text-primary shrink-0" />
-                        문화 탭에서 한국 문화도 함께 학습
+                        {t('videoPlayer.learningTips.tip3')}
                       </li>
                     </ul>
                   </div>

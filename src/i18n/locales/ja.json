@@ -2164,6 +2164,49 @@
     "subtitleList": "字幕リスト",
     "clickToJump": "クリックで該当区間に移動",
     "noSubtitles": "字幕がありません",
-    "subtitlesComingSoon": "字幕がまもなく追加されます"
+    "subtitlesComingSoon": "字幕がまもなく追加されます",
+    "categories": {
+      "kdrama": "韓国ドラマ",
+      "movie": "映画",
+      "variety": "バラエティ",
+      "news": "ニュース",
+      "kpop": "K-POP",
+      "culture": "韓国文化",
+      "travel": "旅行"
+    },
+    "aiLearning": {
+      "title": "AI学習コンテンツ",
+      "description": "動画から抽出した重要学習資料",
+      "loading": "AIがコンテンツを分析中...",
+      "loadError": "学習コンテンツを読み込めませんでした",
+      "loadFailed": "学習コンテンツの読み込みに失敗しました",
+      "retry": "再分析"
+    },
+    "tabs": {
+      "sentences": "重要文",
+      "vocabulary": "語彙",
+      "idioms": "慣用句",
+      "culture": "文化"
+    },
+    "empty": {
+      "sentences": "重要文がありません",
+      "vocabulary": "語彙がありません",
+      "idioms": "慣用句がありません",
+      "culture": "文化ノートがありません"
+    },
+    "tooltips": {
+      "listenPronunciation": "発音を聞く",
+      "watchInVideo": "動画で見る"
+    },
+    "idiomLabels": {
+      "literal": "直訳",
+      "meaning": "意味"
+    },
+    "learningTips": {
+      "title": "学習ヒント",
+      "tip1": "発音ボタンで韓国語の発音を聞いてみましょう",
+      "tip2": "再生ボタンでそのシーンに移動",
+      "tip3": "文化タブで韓国文化も一緒に学習"
+    }
   }
 }

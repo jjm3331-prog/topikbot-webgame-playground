@@ -2414,6 +2414,49 @@
     "subtitleList": "Subtitle List",
     "clickToJump": "Click to jump to that section",
     "noSubtitles": "No subtitles available",
-    "subtitlesComingSoon": "Subtitles coming soon"
+    "subtitlesComingSoon": "Subtitles coming soon",
+    "categories": {
+      "kdrama": "K-Drama",
+      "movie": "Movie",
+      "variety": "Variety",
+      "news": "News",
+      "kpop": "K-Pop",
+      "culture": "Korean Culture",
+      "travel": "Travel"
+    },
+    "aiLearning": {
+      "title": "AI Learning Content",
+      "description": "Key learning materials extracted from video",
+      "loading": "AI is analyzing content...",
+      "loadError": "Failed to load learning content",
+      "loadFailed": "Failed to load learning content",
+      "retry": "Retry Analysis"
+    },
+    "tabs": {
+      "sentences": "Key Sentences",
+      "vocabulary": "Vocabulary",
+      "idioms": "Idioms",
+      "culture": "Culture"
+    },
+    "empty": {
+      "sentences": "No key sentences",
+      "vocabulary": "No vocabulary",
+      "idioms": "No idioms",
+      "culture": "No cultural notes"
+    },
+    "tooltips": {
+      "listenPronunciation": "Listen to pronunciation",
+      "watchInVideo": "Watch in video"
+    },
+    "idiomLabels": {
+      "literal": "Literal",
+      "meaning": "Meaning"
+    },
+    "learningTips": {
+      "title": "Learning Tips",
+      "tip1": "Click the sound button to hear Korean pronunciation",
+      "tip2": "Click play to jump to that scene",
+      "tip3": "Learn Korean culture in the Culture tab"
+    }
   }
 }

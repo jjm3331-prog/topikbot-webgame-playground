@@ -2433,6 +2433,49 @@
     "subtitleList": "Danh sách phụ đề",
     "clickToJump": "Nhấp để chuyển đến đoạn đó",
     "noSubtitles": "Chưa có phụ đề",
-    "subtitlesComingSoon": "Phụ đề sắp được thêm"
+    "subtitlesComingSoon": "Phụ đề sắp được thêm",
+    "categories": {
+      "kdrama": "Phim Hàn",
+      "movie": "Phim",
+      "variety": "Giải trí",
+      "news": "Tin tức",
+      "kpop": "K-pop",
+      "culture": "Văn hóa Hàn",
+      "travel": "Du lịch"
+    },
+    "aiLearning": {
+      "title": "Nội dung học AI",
+      "description": "Tài liệu học trích xuất từ video",
+      "loading": "AI đang phân tích nội dung...",
+      "loadError": "Không thể tải nội dung học",
+      "loadFailed": "Tải nội dung học thất bại",
+      "retry": "Phân tích lại"
+    },
+    "tabs": {
+      "sentences": "Câu chính",
+      "vocabulary": "Từ vựng",
+      "idioms": "Thành ngữ",
+      "culture": "Văn hóa"
+    },
+    "empty": {
+      "sentences": "Không có câu chính",
+      "vocabulary": "Không có từ vựng",
+      "idioms": "Không có thành ngữ",
+      "culture": "Không có ghi chú văn hóa"
+    },
+    "tooltips": {
+      "listenPronunciation": "Nghe phát âm",
+      "watchInVideo": "Xem trong video"
+    },
+    "idiomLabels": {
+      "literal": "Nghĩa đen",
+      "meaning": "Nghĩa"
+    },
+    "learningTips": {
+      "title": "Mẹo học",
+      "tip1": "Nhấn nút phát âm để nghe cách đọc tiếng Hàn",
+      "tip2": "Nhấn nút phát để chuyển đến cảnh đó",
+      "tip3": "Tìm hiểu văn hóa Hàn trong tab Văn hóa"
+    }
   }
 }
