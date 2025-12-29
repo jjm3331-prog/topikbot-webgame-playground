@@ -457,62 +457,98 @@ const MockExamGenerator = () => {
       }
     }
 
-    setGenState({ step: "saving", progress: 90, message: "💾 문제를 저장 중..." });
+    setGenState({ step: "saving", progress: 10, message: "🌐 7개국어 해설 AI 번역 중..." });
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
       
-      const questionsToSave = generatedQuestions
-        .filter((_, i) => selectedQuestions.has(i))
-        .map((q, idx) => {
-          // 해설 자동 보정
-          const validation = validations[generatedQuestions.indexOf(q)];
-          const filledExplanations = validation && !validation.isValid
-            ? autoFillMissingExplanations({
-                explanation_ko: q.explanation_ko,
-                explanation_en: q.explanation_en,
-                explanation_vi: q.explanation_vi,
-              }, validation)
-            : {};
-          
-          return {
-            exam_type: mapExamTypeToDb(examType),
-            section,
-            exam_round: parseInt(examRound, 10),
-            part_number: q.part_number,
-            question_number: q.question_number || idx + 1,
-            question_text: q.question_text,
-            options: q.options,
-            correct_answer: q.correct_answer,
-            explanation_ko: q.explanation_ko,
-            explanation_en: filledExplanations.explanation_en || q.explanation_en || null,
-            explanation_vi: filledExplanations.explanation_vi || q.explanation_vi || null,
-            explanation_ja: filledExplanations.explanation_ja || null,
-            explanation_zh: filledExplanations.explanation_zh || null,
-            explanation_ru: filledExplanations.explanation_ru || null,
-            explanation_uz: filledExplanations.explanation_uz || null,
-            difficulty: mapDifficultyToDb(q.difficulty),
-            topic: q.topic || topic || null,
-            grammar_points: q.grammar_points || [],
-            vocabulary: q.vocabulary || [],
-            question_audio_url: q.question_audio_url || null,
-            generation_source: referenceContent ? "ai_from_reference" : "ai_generated",
-            status: "approved",
-            approved_by: user?.id,
-            approved_at: new Date().toISOString(),
-            is_active: true,
-          };
+      // Filter selected questions
+      const selectedQuestionsArray = generatedQuestions.filter((_, i) => selectedQuestions.has(i));
+      const totalQuestions = selectedQuestionsArray.length;
+      
+      // Translate explanations for each question
+      const translatedQuestions = [];
+      for (let i = 0; i < selectedQuestionsArray.length; i++) {
+        const q = selectedQuestionsArray[i];
+        const progress = 10 + Math.floor((i / totalQuestions) * 70);
+        setGenState({ 
+          step: "saving", 
+          progress, 
+          message: `🌐 ${i + 1}/${totalQuestions} 번역 중... (${q.question_text.substring(0, 30)}...)` 
         });
+
+        let translations: Record<string, string> = {};
+        
+        // Only translate if we have Korean explanation
+        if (q.explanation_ko && q.explanation_ko.trim()) {
+          try {
+            const translateResponse = await fetch(
+              `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/translate-explanations`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${session?.access_token}`,
+                },
+                body: JSON.stringify({
+                  explanation_ko: q.explanation_ko,
+                  targetLanguages: ['vi', 'en', 'ja', 'zh', 'ru', 'uz']
+                }),
+              }
+            );
+
+            if (translateResponse.ok) {
+              translations = await translateResponse.json();
+              console.log(`✅ Question ${i + 1} translated successfully`);
+            } else {
+              console.warn(`⚠️ Translation failed for question ${i + 1}, using fallback`);
+            }
+          } catch (translateError) {
+            console.warn(`⚠️ Translation error for question ${i + 1}:`, translateError);
+          }
+        }
+
+        translatedQuestions.push({
+          exam_type: mapExamTypeToDb(examType),
+          section,
+          exam_round: parseInt(examRound, 10),
+          part_number: q.part_number,
+          question_number: q.question_number || i + 1,
+          question_text: q.question_text,
+          options: q.options,
+          correct_answer: q.correct_answer,
+          explanation_ko: q.explanation_ko,
+          explanation_en: translations.explanation_en || q.explanation_en || q.explanation_ko,
+          explanation_vi: translations.explanation_vi || q.explanation_vi || q.explanation_ko,
+          explanation_ja: translations.explanation_ja || q.explanation_ko,
+          explanation_zh: translations.explanation_zh || q.explanation_ko,
+          explanation_ru: translations.explanation_ru || q.explanation_ko,
+          explanation_uz: translations.explanation_uz || q.explanation_ko,
+          difficulty: mapDifficultyToDb(q.difficulty),
+          topic: q.topic || topic || null,
+          grammar_points: q.grammar_points || [],
+          vocabulary: q.vocabulary || [],
+          question_audio_url: q.question_audio_url || null,
+          generation_source: referenceContent ? "ai_from_reference" : "ai_generated",
+          status: "approved",
+          approved_by: user?.id,
+          approved_at: new Date().toISOString(),
+          is_active: true,
+        });
+      }
+
+      setGenState({ step: "saving", progress: 85, message: "💾 데이터베이스에 저장 중..." });
 
       const { error } = await supabase
         .from("mock_question_bank")
-        .insert(questionsToSave);
+        .insert(translatedQuestions);
 
       if (error) throw error;
 
       toast({
         title: "저장 완료! 🎉",
-        description: `${questionsToSave.length}개의 문제가 승인되어 저장되었습니다.`,
+        description: `${translatedQuestions.length}개의 문제가 7개국어 해설과 함께 저장되었습니다.`,
       });
 
       // Reset state
@@ -526,12 +562,13 @@ const MockExamGenerator = () => {
       setReferenceFile(null);
       setStreamingContent("");
 
-    } catch (error: any) {
-      console.error("Save error:", error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      console.error("Save error:", errorMessage);
       setGenState({ step: "ready", progress: 100, message: "저장 실패" });
       toast({
         title: "저장 실패",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     }
