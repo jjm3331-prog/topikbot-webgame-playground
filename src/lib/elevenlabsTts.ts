@@ -1,5 +1,3 @@
-import { supabase } from "@/integrations/supabase/client";
-
 let currentAudio: HTMLAudioElement | null = null;
 let currentObjectUrl: string | null = null;
 
@@ -33,29 +31,25 @@ export async function playElevenLabsTTS(
 
   cleanupAudio();
 
-  const { data, error } = await supabase.functions.invoke("elevenlabs-tts", {
-    body: { text: cleaned.slice(0, truncate), speed },
-  });
+  const response = await fetch(
+    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify({ text: cleaned.slice(0, truncate), speed }),
+    }
+  );
 
-  if (error) throw error;
-
-  // supabase-js returns different types depending on content-type.
-  let blob: Blob | null = null;
-  if (data instanceof Blob) {
-    blob = data;
-  } else if (data instanceof ArrayBuffer) {
-    blob = new Blob([data], { type: "audio/mpeg" });
-  } else if (data && typeof data === "object" && "audioContent" in data) {
-    // If the function ever switches to base64 JSON.
-    const base64 = (data as any).audioContent as string;
-    const res = await fetch(`data:audio/mpeg;base64,${base64}`);
-    blob = await res.blob();
+  if (!response.ok) {
+    const t = await response.text().catch(() => "");
+    throw new Error(`TTS request failed: ${response.status} ${t}`);
   }
 
-  if (!blob) {
-    throw new Error("Unsupported TTS response format");
-  }
-
+  const blob = await response.blob();
   const url = URL.createObjectURL(blob);
   currentObjectUrl = url;
 
@@ -64,12 +58,8 @@ export async function playElevenLabsTTS(
 
   await audio.play();
 
-  audio.onended = () => {
-    cleanupAudio();
-  };
-  audio.onerror = () => {
-    cleanupAudio();
-  };
+  audio.onended = () => cleanupAudio();
+  audio.onerror = () => cleanupAudio();
 }
 
 export function stopElevenLabsTTS() {
