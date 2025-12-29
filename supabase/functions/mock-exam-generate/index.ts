@@ -20,30 +20,30 @@ const TTS_PRESETS = {
     stability: 0.8,
     similarity_boost: 0.85,
     style: 0.2,
-    speed: 0.9, // Slightly slower for exam
+    speed: 0.82, // Slower for exam (avoid rushed delivery)
   },
   learning: {
     voiceId: "cgSgspJ2msm6clMCkdW9", // Jessica
     stability: 0.7,
     similarity_boost: 0.8,
     style: 0.3,
-    speed: 0.85, // Slower for learners
+    speed: 0.8, // Slower for learners
   },
   natural: {
     voiceId: "onwK4e9ZLuTAKqWW03F9", // Daniel - more natural
     stability: 0.5,
     similarity_boost: 0.75,
     style: 0.5,
-    speed: 1.0, // Normal speed
+    speed: 0.95, // Slightly slower than 1.0 for clarity
   },
   formal: {
     voiceId: "JBFqnCBsd6RMkjVDRZzb", // George - formal
     stability: 0.9,
     similarity_boost: 0.9,
     style: 0.1,
-    speed: 0.95,
+    speed: 0.9,
   },
-};
+} as const;
 
 // RAG Configuration
 const RAG_CONFIG = {
@@ -257,55 +257,134 @@ async function ragSearch(
 }
 
 // Generate TTS audio using ElevenLabs with preset
+// - Removes speaker labels like "남자:"/"여자:" from spoken audio
+// - If multiple speakers are detected, alternates voices per speaker and concatenates segments
 async function generateListeningAudio(
-  script: string, 
+  script: string,
   questionNumber: number,
   examType: string,
   examRound: number,
   supabase: any,
-  preset: keyof typeof TTS_PRESETS = 'exam'
+  preset: keyof typeof TTS_PRESETS = "exam",
 ): Promise<string | null> {
   if (!ELEVENLABS_API_KEY || !script) return null;
 
+  const detectSpeaker = (raw: string): { speakerKey: "male" | "female" | "other"; text: string } => {
+    const line = raw.trim();
+    // Examples: "남자:", "여자:", "남:", "여:", "A:", "B:" (Korean/ASCII colons)
+    const m = line.match(/^\s*(남자|여자|남성|여성|남|여|A|B|C|D)\s*[:：]\s*(.*)$/i);
+    if (!m) return { speakerKey: "other", text: line };
+
+    const label = String(m[1]).toLowerCase();
+    const text = String(m[2] ?? "").trim();
+
+    if (["여자", "여성", "여"].includes(label)) return { speakerKey: "female", text };
+    if (["남자", "남성", "남"].includes(label)) return { speakerKey: "male", text };
+
+    // A/B/C/D: treat as alternating speakers but default to other
+    return { speakerKey: "other", text };
+  };
+
+  const stripLeadingId3 = (buf: ArrayBuffer): Uint8Array => {
+    const bytes = new Uint8Array(buf);
+    // ID3 header: "ID3" + ver(2) + flags(1) + size(4, syncsafe)
+    if (bytes.length >= 10 && bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33) {
+      const size =
+        ((bytes[6] & 0x7f) << 21) |
+        ((bytes[7] & 0x7f) << 14) |
+        ((bytes[8] & 0x7f) << 7) |
+        (bytes[9] & 0x7f);
+      const start = Math.min(bytes.length, 10 + size);
+      return bytes.slice(start);
+    }
+    return bytes;
+  };
+
+  const concatBytes = (parts: Uint8Array[]): Uint8Array => {
+    const total = parts.reduce((acc, p) => acc + p.length, 0);
+    const out = new Uint8Array(total);
+    let offset = 0;
+    for (const p of parts) {
+      out.set(p, offset);
+      offset += p.length;
+    }
+    return out;
+  };
+
   try {
     console.log(`🎵 Generating audio for Q${questionNumber} with ${preset} preset...`);
-    
-    const settings = TTS_PRESETS[preset];
-    
-    const response = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${settings.voiceId}`,
-      {
+
+    const baseSettings = TTS_PRESETS[preset];
+
+    // Split into segments (multi-speaker) by line breaks; ignore empty lines
+    const rawLines = script
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter(Boolean);
+
+    const segments = rawLines.length
+      ? rawLines.map(detectSpeaker).filter((s) => s.text)
+      : [{ speakerKey: "other" as const, text: script.trim() }];
+
+    const uniqueSpeakers = new Set(segments.map((s) => s.speakerKey));
+    const isMultiSpeaker = uniqueSpeakers.size >= 2 && (uniqueSpeakers.has("male") || uniqueSpeakers.has("female"));
+
+    const voiceBySpeaker: Record<"male" | "female" | "other", string> = {
+      female: "cgSgspJ2msm6clMCkdW9", // Jessica
+      male: "onwK4e9ZLuTAKqWW03F9", // Daniel
+      other: baseSettings.voiceId,
+    };
+
+    // Build audio buffer(s)
+    const audioParts: Uint8Array[] = [];
+
+    for (let i = 0; i < segments.length; i++) {
+      const seg = segments[i];
+      const voiceId = isMultiSpeaker ? voiceBySpeaker[seg.speakerKey] : baseSettings.voiceId;
+
+      // Add a short pause between lines by punctuation (natural for TTS)
+      const text = seg.text.endsWith(".") || seg.text.endsWith("?") || seg.text.endsWith("!")
+        ? `${seg.text} ...`
+        : `${seg.text}. ...`;
+
+      const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
         method: "POST",
         headers: {
           "xi-api-key": ELEVENLABS_API_KEY,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          text: script,
+          text,
           model_id: "eleven_multilingual_v2",
           output_format: "mp3_44100_128",
           voice_settings: {
-            stability: settings.stability,
-            similarity_boost: settings.similarity_boost,
-            style: settings.style,
-            speed: settings.speed,
+            stability: baseSettings.stability,
+            similarity_boost: baseSettings.similarity_boost,
+            style: baseSettings.style,
+            speed: baseSettings.speed,
           },
         }),
-      }
-    );
+      });
 
-    if (!response.ok) {
-      console.error("ElevenLabs TTS error:", response.status);
-      return null;
+      if (!response.ok) {
+        const t = await response.text().catch(() => "");
+        console.error("ElevenLabs TTS error:", response.status, t);
+        return null;
+      }
+
+      const buf = await response.arrayBuffer();
+      // Strip ID3 on subsequent segments to avoid repeated headers when concatenating
+      const bytes = i === 0 ? new Uint8Array(buf) : stripLeadingId3(buf);
+      audioParts.push(bytes);
     }
 
-    const audioBuffer = await response.arrayBuffer();
+    const finalBytes = audioParts.length === 1 ? audioParts[0] : concatBytes(audioParts);
+
     const fileName = `mock-exam/${examType}/${examRound}/listening_q${questionNumber}_${Date.now()}.mp3`;
-    
-    // Upload to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
+
+    const { error: uploadError } = await supabase.storage
       .from("podcast-audio")
-      .upload(fileName, audioBuffer, {
+      .upload(fileName, finalBytes.buffer, {
         contentType: "audio/mpeg",
         upsert: true,
       });
@@ -315,11 +394,9 @@ async function generateListeningAudio(
       return null;
     }
 
-    const { data: urlData } = supabase.storage
-      .from("podcast-audio")
-      .getPublicUrl(fileName);
+    const { data: urlData } = supabase.storage.from("podcast-audio").getPublicUrl(fileName);
 
-    console.log(`✅ Audio generated for Q${questionNumber}`);
+    console.log(`✅ Audio generated for Q${questionNumber} (multiSpeaker: ${isMultiSpeaker})`);
     return urlData.publicUrl;
   } catch (error) {
     console.error("TTS generation error:", error);
