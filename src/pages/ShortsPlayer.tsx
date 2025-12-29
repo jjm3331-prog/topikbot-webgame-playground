@@ -225,11 +225,19 @@ export default function ShortsPlayer() {
     }
   }, [activeIndex]);
 
-  // Available languages for this video
+  // Available languages for this video - only show Korean (fixed) + current app language
   const availableLanguages = useMemo(() => {
     const available = new Set(subtitles.map(s => s.language));
-    return LANGUAGES.filter(l => available.has(l.code));
-  }, [subtitles]);
+    const currentAppLang = normalizeLang(i18n.language);
+    
+    // Always include Korean + only the current app language
+    return LANGUAGES.filter(l => {
+      if (!available.has(l.code)) return false; // Must have subtitles for this language
+      if (l.code === 'ko') return true; // Korean is always shown
+      if (l.code === currentAppLang) return true; // Current app language is shown
+      return false; // Other languages are hidden
+    });
+  }, [subtitles, i18n.language]);
 
   // Fetch key expressions from LLM
   const fetchKeyExpressions = useCallback(async () => {
