@@ -2135,6 +2135,7 @@
       "sectionTitle": "学习视频",
       "sectionSubtitle": "发现热门韩语学习视频",
       "viewAll": "查看全部",
+      "count": "{{count}} 个",
       "noVideos": "还没有注册视频",
       "comingSoon": "各种学习视频即将添加！"
     },
@@ -2144,7 +2145,9 @@
       "news": "新闻",
       "education": "教育",
       "variety": "综艺",
-      "music": "音乐"
+      "music": "音乐",
+      "culture": "文化",
+      "travel": "旅行"
     },
     "difficulty": {
       "beginner": "初级",

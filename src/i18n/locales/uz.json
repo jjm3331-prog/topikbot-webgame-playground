@@ -2153,6 +2153,7 @@
       "sectionTitle": "O'quv videolari",
       "sectionSubtitle": "Mashhur koreys o'rganish videolarini kashf eting",
       "viewAll": "Hammasini ko'rish",
+      "count": "{{count}} ta",
       "noVideos": "Hali ro'yxatdan o'tgan videolar yo'q",
       "comingSoon": "Turli o'quv videolari tez orada qo'shiladi!"
     },
@@ -2162,7 +2163,9 @@
       "news": "Yangiliklar",
       "education": "Ta'lim",
       "variety": "Ko'ngilochar",
-      "music": "Musiqa"
+      "music": "Musiqa",
+      "culture": "Madaniyat",
+      "travel": "Sayohat"
     },
     "difficulty": {
       "beginner": "Boshlang'ich",

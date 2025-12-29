@@ -2371,6 +2371,7 @@
       "sectionTitle": "Learning Videos",
       "sectionSubtitle": "Discover popular Korean learning videos",
       "viewAll": "View All",
+      "count": "{{count}} videos",
       "noVideos": "No videos registered yet",
       "comingSoon": "Various learning videos coming soon!"
     },
@@ -2380,7 +2381,9 @@
       "news": "News",
       "education": "Education",
       "variety": "Variety",
-      "music": "Music"
+      "music": "Music",
+      "culture": "Culture",
+      "travel": "Travel"
     },
     "difficulty": {
       "beginner": "Beginner",

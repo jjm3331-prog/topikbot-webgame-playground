@@ -80,12 +80,10 @@ const InterviewSimulation = () => {
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [interviewStarted, setInterviewStarted] = useState(false);
   const [interviewEnded, setInterviewEnded] = useState(false);
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
   const [questionCount, setQuestionCount] = useState(0);
-  const [ttsEnabled, setTtsEnabled] = useState(true);
   const [isEvaluating, setIsEvaluating] = useState(false);
 
   const companies = [
@@ -160,18 +158,6 @@ const InterviewSimulation = () => {
     return selectedCompany || "기업";
   };
 
-  const speakText = async (text: string) => {
-    if (!ttsEnabled) return;
-
-    setIsSpeaking(true);
-    try {
-      await playElevenLabsTTS(text, { speed: 0.85, truncate: 800 });
-    } catch (error) {
-      console.error("TTS error:", error);
-    } finally {
-      setIsSpeaking(false);
-    }
-  };
 
   const startRecording = async () => {
     try {
@@ -621,56 +607,7 @@ const InterviewSimulation = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {/* Interactive Speaker Button - 수동 클릭으로 최신 AI 응답 재생 */}
-                    <motion.div
-                      animate={!isSpeaking && messages.length > 0 && messages[messages.length - 1]?.role === "assistant" ? {
-                        scale: [1, 1.1, 1],
-                        boxShadow: [
-                          "0 0 0 0 rgba(249, 115, 22, 0)",
-                          "0 0 0 8px rgba(249, 115, 22, 0.3)",
-                          "0 0 0 0 rgba(249, 115, 22, 0)"
-                        ]
-                      } : {}}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                      className="rounded-full"
-                    >
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          const lastAssistantMsg = [...messages].reverse().find(m => m.role === "assistant");
-                          if (lastAssistantMsg) {
-                            speakText(lastAssistantMsg.content);
-                          }
-                        }}
-                        disabled={isSpeaking || messages.length === 0}
-                        className={`gap-1.5 rounded-full transition-all duration-300 ${
-                          isSpeaking 
-                            ? "bg-orange-500/20 text-orange-500" 
-                            : messages.length > 0 && messages[messages.length - 1]?.role === "assistant"
-                              ? "bg-orange-500/10 text-orange-500 hover:bg-orange-500/20 hover:scale-110"
-                              : "text-muted-foreground"
-                        }`}
-                      >
-                        {isSpeaking ? (
-                          <Volume2 className="w-5 h-5 animate-pulse" />
-                        ) : (
-                          <Volume2 className="w-5 h-5" />
-                        )}
-                      </Button>
-                    </motion.div>
-                    {/* TTS 토글 버튼 */}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setTtsEnabled(!ttsEnabled)}
-                      className={`h-8 w-8 ${ttsEnabled ? 'text-foreground' : 'text-muted-foreground'}`}
-                      title={ttsEnabled ? t('interview.ttsEnabled') : t('interview.ttsDisabled')}
-                    >
-                      {ttsEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-                    </Button>
-                  </div>
+                  <div />
                 </div>
                 <div className="mt-4">
                   <div className="flex items-center justify-between text-card-caption text-muted-foreground mb-2">

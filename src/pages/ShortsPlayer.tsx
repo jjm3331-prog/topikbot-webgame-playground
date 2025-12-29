@@ -8,9 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ChevronLeft, Volume2, Play, Eye, Lightbulb, GraduationCap, Languages, Sparkles, Loader2, BookOpen, MessageCircle, Globe2, Heart, RotateCcw } from 'lucide-react';
+import { ChevronLeft, Play, Eye, Lightbulb, GraduationCap, Languages, Sparkles, Loader2, BookOpen, MessageCircle, Globe2, Heart, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
-import { playElevenLabsTTS } from '@/lib/elevenlabsTts';
 
 interface KeySentence {
   korean: string;
@@ -274,14 +273,6 @@ export default function ShortsPlayer() {
     }
   }, [koreanSubtitles.length, selectedLanguage]);
 
-  const speakText = async (text: string) => {
-    try {
-      await playElevenLabsTTS(text, { speed: 0.8, truncate: 260 });
-    } catch (e) {
-      console.error('TTS error:', e);
-      toast.error(t('videoPlayer.error'));
-    }
-  };
 
   const getCategoryLabel = (category: string) => {
     const key = CATEGORY_KEYS[category];
@@ -496,22 +487,13 @@ export default function ShortsPlayer() {
                               <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary text-xs font-mono">
                                 {formatTime(sentence.timestamp)}
                               </span>
-                              <div className="flex gap-1.5">
-                                <button
-                                  onClick={() => speakText(sentence.korean)}
-                                  className="p-1.5 rounded-lg bg-muted hover:bg-primary hover:text-white transition-colors"
-                                  title={t('videoPlayer.tooltips.listenPronunciation')}
-                                >
-                                  <Volume2 className="w-3.5 h-3.5" />
-                                </button>
-                                <button
-                                  onClick={() => seekTo(sentence.timestamp)}
-                                  className="p-1.5 rounded-lg bg-muted hover:bg-primary hover:text-white transition-colors"
-                                  title={t('videoPlayer.tooltips.watchInVideo')}
-                                >
-                                  <Play className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
+                              <button
+                                onClick={() => seekTo(sentence.timestamp)}
+                                className="p-1.5 rounded-lg bg-muted hover:bg-primary hover:text-white transition-colors"
+                                title={t('videoPlayer.tooltips.watchInVideo')}
+                              >
+                                <Play className="w-3.5 h-3.5" />
+                              </button>
                             </div>
                             <p className="text-base font-bold text-foreground mb-1.5">{sentence.korean}</p>
                             <p className="text-sm text-primary/80 mb-1.5">{sentence.translation}</p>
@@ -539,12 +521,6 @@ export default function ShortsPlayer() {
                                 <span className="text-base font-bold text-foreground">{vocab.word}</span>
                                 <Badge variant="outline" className="text-[10px] px-1.5 py-0">{vocab.partOfSpeech}</Badge>
                               </div>
-                              <button
-                                onClick={() => speakText(vocab.word)}
-                                className="p-1.5 rounded-lg bg-muted hover:bg-primary hover:text-white transition-colors"
-                              >
-                                <Volume2 className="w-3.5 h-3.5" />
-                              </button>
                             </div>
                             <p className="text-sm text-primary/80 mb-2">{vocab.meaning}</p>
                             <div className="p-2.5 rounded-lg bg-background/50 border border-border/30">
@@ -571,12 +547,6 @@ export default function ShortsPlayer() {
                           >
                             <div className="flex items-start justify-between mb-2">
                               <p className="text-base font-bold text-foreground">{idiom.korean}</p>
-                              <button
-                                onClick={() => speakText(idiom.korean)}
-                                className="p-1.5 rounded-lg bg-muted hover:bg-primary hover:text-white transition-colors"
-                              >
-                                <Volume2 className="w-3.5 h-3.5" />
-                              </button>
                             </div>
                             <div className="space-y-1.5 text-sm">
                               <div className="flex gap-2">
@@ -659,7 +629,7 @@ export default function ShortsPlayer() {
                     <h3 className="text-sm font-bold text-foreground mb-2">{t('videoPlayer.learningTips.title')}</h3>
                     <ul className="space-y-1.5 text-xs text-muted-foreground">
                       <li className="flex items-center gap-2">
-                        <Volume2 className="w-3 h-3 text-primary shrink-0" />
+                        <BookOpen className="w-3 h-3 text-primary shrink-0" />
                         {t('videoPlayer.learningTips.tip1')}
                       </li>
                       <li className="flex items-center gap-2">

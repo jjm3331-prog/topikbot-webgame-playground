@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
-import { X, BookmarkPlus, Volume2, Loader2 } from 'lucide-react';
+import { X, BookmarkPlus, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { playElevenLabsTTS } from '@/lib/elevenlabsTts';
 
 interface WordPopupProps {
   word: string;
@@ -98,13 +97,6 @@ export default function WordPopup({ word, position, onClose, videoId }: WordPopu
     }
   };
 
-  const speakWord = async () => {
-    try {
-      await playElevenLabsTTS(word, { speed: 0.8, truncate: 80 });
-    } catch (e) {
-      console.error('TTS error:', e);
-    }
-  };
 
   // 클릭 위치 기준 팝업 위치 조정
   const popupStyle = {
@@ -125,9 +117,6 @@ export default function WordPopup({ word, position, onClose, videoId }: WordPopu
         <div className="bg-primary/10 px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xl font-bold text-primary">{word}</span>
-            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={speakWord}>
-              <Volume2 className="w-4 h-4" />
-            </Button>
           </div>
           <Button size="icon" variant="ghost" className="h-7 w-7" onClick={onClose}>
             <X className="w-4 h-4" />

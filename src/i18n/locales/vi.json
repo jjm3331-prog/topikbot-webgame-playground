@@ -2390,6 +2390,7 @@
       "sectionTitle": "Video học tập",
       "sectionSubtitle": "Khám phá video học tiếng Hàn phổ biến",
       "viewAll": "Xem tất cả",
+      "count": "{{count}} video",
       "noVideos": "Chưa có video nào",
       "comingSoon": "Video học tập đa dạng sắp được thêm!"
     },
@@ -2399,7 +2400,9 @@
       "news": "Tin tức",
       "education": "Giáo dục",
       "variety": "Giải trí",
-      "music": "Âm nhạc"
+      "music": "Âm nhạc",
+      "culture": "Văn hoá",
+      "travel": "Du lịch"
     },
     "difficulty": {
       "beginner": "Sơ cấp",
