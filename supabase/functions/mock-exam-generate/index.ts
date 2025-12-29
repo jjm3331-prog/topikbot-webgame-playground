@@ -1100,13 +1100,23 @@ async function handleStreamingGeneration(
         let geminiResponse: Response | null = null;
         let lastError = "";
         
+        // 최대 5분 (300초) 타임아웃 - Gemini API가 허용하는 최대치
+        const GEMINI_TIMEOUT_MS = 300000; // 5 minutes
+        
         for (let attempt = 0; attempt < 3; attempt++) {
           try {
+            // AbortController로 타임아웃 설정
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
+            
+            sendProgress("generating", 30 + attempt * 2, `🤖 Gemini 2.5 Pro 호출 중... (시도 ${attempt + 1}/3, 최대 5분)`);
+            
             geminiResponse = await fetch(
               `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:streamGenerateContent?key=${GEMINI_API_KEY}&alt=sse`,
               {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
+                signal: controller.signal,
                 body: JSON.stringify({
                   contents: [{
                     role: "user",
@@ -1136,6 +1146,8 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
                 }),
               }
             );
+            
+            clearTimeout(timeoutId);
 
             if (geminiResponse.ok) break;
             
@@ -1146,15 +1158,20 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
             // Retry on 503 (overloaded) or 429 (rate limit)
             if (geminiResponse.status === 503 || geminiResponse.status === 429) {
               sendProgress("generating", 32, `⏳ 재시도 중... (${attempt + 1}/3)`);
-              await new Promise(r => setTimeout(r, 2000 * (attempt + 1))); // Exponential backoff
+              await new Promise(r => setTimeout(r, 3000 * (attempt + 1))); // Exponential backoff
             } else {
               break; // Don't retry other errors
             }
           } catch (fetchError: any) {
-            lastError = fetchError.message || "Network error";
-            console.error(`Gemini fetch error attempt ${attempt + 1}:`, lastError);
+            if (fetchError.name === 'AbortError') {
+              lastError = `타임아웃 (5분 초과) - 문제 수를 줄여서 다시 시도해주세요.`;
+              console.error(`Gemini timeout after ${GEMINI_TIMEOUT_MS}ms on attempt ${attempt + 1}`);
+            } else {
+              lastError = fetchError.message || "Network error";
+              console.error(`Gemini fetch error attempt ${attempt + 1}:`, lastError);
+            }
             if (attempt < 2) {
-              await new Promise(r => setTimeout(r, 2000 * (attempt + 1)));
+              await new Promise(r => setTimeout(r, 3000 * (attempt + 1)));
             }
           }
         }
