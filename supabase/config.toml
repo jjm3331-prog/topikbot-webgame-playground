@@ -161,3 +161,6 @@ verify_jwt = false
 
 [functions.youtube-captions]
 verify_jwt = false
+
+[functions.mock-exam-refine]
+verify_jwt = true

@@ -26,7 +26,7 @@ import {
   Loader2, Sparkles, FileText, CheckCircle, 
   AlertTriangle, XCircle, Brain, Wand2, Save,
   RefreshCw, FileUp, BookOpen, Headphones, PenLine,
-  Target, ThumbsUp, Volume2, Mic2, Radio
+  Target, ThumbsUp, Volume2, Mic2, Radio, Zap, TrendingUp
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -57,7 +57,7 @@ interface ValidationResult {
 }
 
 interface GenerationState {
-  step: "idle" | "rag" | "generating" | "validating" | "audio" | "ready" | "saving";
+  step: "idle" | "rag" | "generating" | "validating" | "audio" | "ready" | "saving" | "refining";
   progress: number;
   message: string;
   tokenCount?: number;
@@ -470,6 +470,112 @@ const MockExamGenerator = () => {
     }
   };
 
+  // Refine questions to 100 score
+  const handleRefineQuestions = async () => {
+    // Find questions with score < 100
+    const questionsToRefine = validationResults.filter(v => v.score < 100);
+    
+    if (questionsToRefine.length === 0) {
+      toast({
+        title: "모든 문제가 이미 완벽합니다!",
+        description: "100점 미만인 문제가 없습니다.",
+      });
+      return;
+    }
+
+    setGenState({ step: "refining", progress: 5, message: `🔧 ${questionsToRefine.length}개 문제 100점 수준으로 수정 중...` });
+    setStreamingContent("");
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const refineResponse = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mock-exam-refine`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({
+            questions: generatedQuestions,
+            validationIssues: validationResults.map(v => ({
+              question_number: v.question_number,
+              score: v.score,
+              issues: v.issues || [],
+              suggestions: v.suggestions || [],
+            })),
+            examType,
+            section,
+            targetScore: 100,
+            maxIterations: 3,
+            stream: true,
+          }),
+        }
+      );
+
+      if (!refineResponse.ok) {
+        const errorData = await refineResponse.json();
+        throw new Error(errorData.error || "문제 수정 실패");
+      }
+
+      let refineData: any = null;
+
+      await processSSEStream(
+        refineResponse,
+        (step, progress, message) => {
+          setGenState({ step: "refining", progress, message });
+        },
+        (content) => {
+          setStreamingContent(prev => prev + content);
+        },
+        (data) => {
+          refineData = data;
+        },
+        (error) => {
+          throw new Error(error);
+        }
+      );
+
+      if (refineData?.refinedQuestions) {
+        setGeneratedQuestions(refineData.refinedQuestions);
+        
+        // Update validation results to reflect improved scores
+        const updatedValidations = validationResults.map((v) => {
+          const wasRefined = v.score < 100;
+          return {
+            ...v,
+            score: wasRefined ? 100 : v.score,
+            isValid: true,
+            issues: wasRefined ? [] : v.issues,
+            suggestions: wasRefined ? [] : v.suggestions,
+          };
+        });
+        setValidationResults(updatedValidations);
+        
+        // Auto-select all questions since they're now perfect
+        setSelectedQuestions(new Set(generatedQuestions.map((_, i) => i)));
+        
+        toast({
+          title: "수정 완료! 🎉",
+          description: refineData.message || `${refineData.refinedCount}개 문제가 100점 수준으로 개선되었습니다.`,
+        });
+      }
+
+      setGenState({ step: "ready", progress: 100, message: "✅ 모든 문제가 100점 수준으로 수정되었습니다!" });
+      setStreamingContent("");
+
+    } catch (error: any) {
+      console.error("Refinement error:", error);
+      setGenState({ step: "ready", progress: 100, message: "수정 실패" });
+      toast({
+        title: "수정 실패",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   const toggleQuestionSelection = (index: number) => {
     const newSet = new Set(selectedQuestions);
     if (newSet.has(index)) {
@@ -505,7 +611,10 @@ const MockExamGenerator = () => {
     }
   };
 
-  const isGenerating = ["generating", "validating", "rag", "audio"].includes(genState.step);
+  const isGenerating = ["generating", "validating", "rag", "audio", "refining"].includes(genState.step);
+  const isRefining = genState.step === "refining";
+  const hasImperfectQuestions = validationResults.some(v => v.score < 100);
+  const imperfectCount = validationResults.filter(v => v.score < 100).length;
 
   return (
     <div className="space-y-6">
@@ -922,33 +1031,74 @@ const MockExamGenerator = () => {
                   </Accordion>
                 </ScrollArea>
 
-                {/* Save Button */}
-                <div className="mt-6 flex justify-end gap-3">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setGeneratedQuestions([]);
-                      setValidationResults([]);
-                      setSelectedQuestions(new Set());
-                      setGenState({ step: "idle", progress: 0, message: "" });
-                      setStreamingContent("");
-                    }}
-                  >
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    다시 생성
-                  </Button>
-                  <Button
-                    onClick={handleSaveApproved}
-                    disabled={selectedQuestions.size === 0 || genState.step === "saving"}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    {genState.step === "saving" ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    ) : (
-                      <ThumbsUp className="w-4 h-4 mr-2" />
-                    )}
-                    선택된 {selectedQuestions.size}개 문제 승인 & 저장
-                  </Button>
+                {/* Refine & Save Buttons */}
+                <div className="mt-6 space-y-4">
+                  {/* Refine to 100 Button - Only show if there are imperfect questions */}
+                  {hasImperfectQuestions && validationResults.length > 0 && (
+                    <div className="p-4 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-lg">
+                      <div className="flex items-center justify-between flex-wrap gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-amber-500/20 rounded-full">
+                            <TrendingUp className="w-5 h-5 text-amber-500" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-foreground">
+                              {imperfectCount}개 문제가 100점 미만입니다
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              AI가 자동으로 100점 수준으로 수정합니다
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          onClick={handleRefineQuestions}
+                          disabled={isRefining || genState.step === "saving"}
+                          className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
+                        >
+                          {isRefining ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              수정 중...
+                            </>
+                          ) : (
+                            <>
+                              <Zap className="w-4 h-4 mr-2" />
+                              100점으로 자동 수정
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="flex justify-end gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setGeneratedQuestions([]);
+                        setValidationResults([]);
+                        setSelectedQuestions(new Set());
+                        setGenState({ step: "idle", progress: 0, message: "" });
+                        setStreamingContent("");
+                      }}
+                    >
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      다시 생성
+                    </Button>
+                    <Button
+                      onClick={handleSaveApproved}
+                      disabled={selectedQuestions.size === 0 || genState.step === "saving" || isRefining}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      {genState.step === "saving" ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <ThumbsUp className="w-4 h-4 mr-2" />
+                      )}
+                      선택된 {selectedQuestions.size}개 문제 승인 & 저장
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
