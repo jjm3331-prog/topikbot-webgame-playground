@@ -990,7 +990,11 @@ const MockExamHub = () => {
                   onClick={() => {
                     setShowWeaknessDialog(false);
                     const questionIds = weaknessAnalysis.questions.map(q => q.questionId).join(',');
-                    navigate(`/mock-exam/${selectedExam}?mode=weakness&questions=${questionIds}`);
+                    // 추천 이유도 함께 전달
+                    const reasons = weaknessAnalysis.questions.map(q => 
+                      encodeURIComponent(getWeaknessReasonText(q.reasons, 'ko'))
+                    ).join(',');
+                    navigate(`/mock-exam/${selectedExam}?mode=weakness&questions=${questionIds}&reasons=${reasons}`);
                   }}
                   className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
                 >

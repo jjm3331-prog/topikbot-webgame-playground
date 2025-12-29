@@ -24,7 +24,8 @@ import {
   Eye,
   FileText,
   EyeOff,
-  Lightbulb
+  Lightbulb,
+  Target
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,6 +37,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { mapExamTypeToDb } from "@/lib/mockExamDb";
+import { getPreset, getPresetTotalTime, type ExamPreset } from "@/lib/examPresets";
 import { cn } from "@/lib/utils";
 
 interface Question {
@@ -101,7 +103,12 @@ const MockExamTest = () => {
   const mode = searchParams.get('mode') || 'full'; // full, section, part, weakness
   const section = searchParams.get('section'); // listening, reading
   const partNumber = searchParams.get('part') ? parseInt(searchParams.get('part')!) : null;
-  const weaknessQuestionIds = searchParams.get('questions')?.split(',') || []; // for weakness mode
+  const weaknessQuestionIds = searchParams.get('questions')?.split(',').filter(Boolean) || []; // for weakness mode
+  const weaknessReasons = searchParams.get('reasons')?.split(',') || []; // 추천 이유
+  
+  // Get preset settings
+  const dbExamTypeForPreset = mapExamTypeToDb(examType || 'topik1');
+  const examPreset = getPreset(dbExamTypeForPreset, mode);
   
   // State
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -126,9 +133,17 @@ const MockExamTest = () => {
   const [playCount, setPlayCount] = useState<Map<string, number>>(new Map());
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
-  // Practice mode state
-  const isPracticeMode = mode === 'section' || mode === 'part' || mode === 'weakness';
+  // Practice mode state - based on preset settings
+  const isPracticeMode = examPreset ? 
+    examPreset.settings.explanationTiming === 'immediate' : 
+    (mode === 'section' || mode === 'part' || mode === 'weakness');
   const [showExplanation, setShowExplanation] = useState<Map<string, boolean>>(new Map());
+  
+  // 프리셋 설정 적용
+  const allowPause = examPreset?.settings.allowPause ?? isPracticeMode;
+  const allowSkip = examPreset?.settings.allowSkip ?? true;
+  const explanationTiming = examPreset?.settings.explanationTiming ?? (isPracticeMode ? 'immediate' : 'after_exam');
+  const scoringMethod = examPreset?.settings.scoringMethod ?? (isPracticeMode ? 'immediate' : 'after_submit');
   
   // Auto-save interval
   const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -141,9 +156,28 @@ const MockExamTest = () => {
   // Writing state
   const [writingAnswers, setWritingAnswers] = useState<Map<string, string>>(new Map());
   
-  // Time limits based on exam type and mode
+  // Time limits based on preset or exam type
   const getTimeLimit = useCallback(() => {
-    if (isPracticeMode) return null; // No time limit in practice mode
+    // 프리셋에서 시간제한 설정 가져오기
+    if (examPreset) {
+      if (!examPreset.settings.timeLimit) return null;
+      
+      // 프리셋에 고정 시간이 있으면 사용
+      if (examPreset.settings.timeLimitSeconds) {
+        return examPreset.settings.timeLimitSeconds;
+      }
+      
+      // 섹션별 시간 계산
+      if (examPreset.sections) {
+        if (section && examPreset.sections[section as keyof typeof examPreset.sections]) {
+          return examPreset.sections[section as keyof typeof examPreset.sections]?.timeSeconds || null;
+        }
+        return getPresetTotalTime(examPreset);
+      }
+    }
+    
+    // 프리셋이 없으면 기존 로직 사용
+    if (isPracticeMode) return null;
     
     const timeLimits: Record<string, { listening: number; reading: number; writing?: number }> = {
       topik1: { listening: 40 * 60, reading: 60 * 60 },
@@ -157,7 +191,17 @@ const MockExamTest = () => {
       return examLimits[section as keyof typeof examLimits] || null;
     }
     return examLimits.listening + examLimits.reading + (examLimits.writing || 0);
-  }, [examType, section, isPracticeMode]);
+  }, [examType, section, isPracticeMode, examPreset]);
+  
+  // 약점 모드에서 문제별 추천 이유 가져오기
+  const getWeaknessReason = (questionId: string): string | null => {
+    if (mode !== 'weakness' || weaknessQuestionIds.length === 0) return null;
+    const idx = weaknessQuestionIds.indexOf(questionId);
+    if (idx >= 0 && weaknessReasons[idx]) {
+      return decodeURIComponent(weaknessReasons[idx]);
+    }
+    return null;
+  };
 
   // Initialize exam
   useEffect(() => {
@@ -893,6 +937,22 @@ const MockExamTest = () => {
         <ScrollArea className="flex-1 p-6">
           {currentQuestion && (
             <div className="max-w-3xl mx-auto">
+              {/* 약점 집중 모드 - 추천 이유 배지 */}
+              {mode === 'weakness' && getWeaknessReason(currentQuestion.id) && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-4"
+                >
+                  <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30">
+                    <Target className="w-4 h-4 text-amber-600" />
+                    <span className="text-sm font-medium text-amber-700 dark:text-amber-400">
+                      💡 추천 이유: {getWeaknessReason(currentQuestion.id)}
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+              
               {/* Question Image */}
               {currentQuestion.question_image_url && (
                 <div className="mb-6">

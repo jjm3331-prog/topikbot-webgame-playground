@@ -24,11 +24,19 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { mapExamTypeToDb } from "@/lib/mockExamDb";
 import { 
+  validateExplanations, 
+  autoFillMissingExplanations, 
+  summarizeBatchValidation,
+  SUPPORTED_LANGUAGES,
+  type ValidationResult as ExplanationValidation
+} from "@/lib/explanationValidator";
+import { 
   Loader2, Sparkles, FileText, CheckCircle, 
   AlertTriangle, XCircle, Brain, Wand2, Save,
   RefreshCw, FileUp, BookOpen, Headphones, PenLine,
-  Target, ThumbsUp, Volume2, Mic2, Radio, Zap, TrendingUp
+  Target, ThumbsUp, Volume2, Mic2, Radio, Zap, TrendingUp, Globe
 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface GeneratedQuestion {
@@ -108,6 +116,10 @@ const MockExamGenerator = () => {
   const [generatedQuestions, setGeneratedQuestions] = useState<GeneratedQuestion[]>([]);
   const [validationResults, setValidationResults] = useState<ValidationResult[]>([]);
   const [selectedQuestions, setSelectedQuestions] = useState<Set<number>>(new Set());
+  
+  // 7개국어 해설 검증 상태
+  const [explanationValidations, setExplanationValidations] = useState<ExplanationValidation[]>([]);
+  const [showExplanationWarning, setShowExplanationWarning] = useState(false);
   
   // Streaming state
   const [streamingContent, setStreamingContent] = useState<string>("");
@@ -398,6 +410,24 @@ const MockExamGenerator = () => {
     return mapping[difficulty.toLowerCase()] || 'medium';
   };
 
+  // 7개국어 해설 검증 실행
+  const validateAllExplanations = () => {
+    const validations: ExplanationValidation[] = generatedQuestions.map(q => 
+      validateExplanations({
+        explanation_ko: q.explanation_ko,
+        explanation_en: q.explanation_en,
+        explanation_vi: q.explanation_vi,
+      })
+    );
+    setExplanationValidations(validations);
+    
+    // 누락된 해설이 있는지 확인
+    const hasIssues = validations.some(v => !v.isValid);
+    setShowExplanationWarning(hasIssues);
+    
+    return { validations, hasIssues };
+  };
+
   // Save approved questions to database
   const handleSaveApproved = async () => {
     if (selectedQuestions.size === 0) {
@@ -409,6 +439,24 @@ const MockExamGenerator = () => {
       return;
     }
 
+    // 7개국어 해설 검증
+    const { validations, hasIssues } = validateAllExplanations();
+    
+    if (hasIssues) {
+      const issueCount = validations.filter(v => !v.isValid).length;
+      const selectedWithIssues = Array.from(selectedQuestions).filter(i => 
+        validations[i] && !validations[i].isValid
+      ).length;
+      
+      if (selectedWithIssues > 0) {
+        toast({
+          title: "⚠️ 해설 누락 경고",
+          description: `선택된 문제 중 ${selectedWithIssues}개에 7개국어 해설이 누락되어 있습니다. 자동 보정 후 저장합니다.`,
+          variant: "destructive",
+        });
+      }
+    }
+
     setGenState({ step: "saving", progress: 90, message: "💾 문제를 저장 중..." });
 
     try {
@@ -416,29 +464,45 @@ const MockExamGenerator = () => {
       
       const questionsToSave = generatedQuestions
         .filter((_, i) => selectedQuestions.has(i))
-        .map((q, idx) => ({
-          exam_type: mapExamTypeToDb(examType),
-          section,
-          exam_round: parseInt(examRound, 10),
-          part_number: q.part_number,
-          question_number: q.question_number || idx + 1,
-          question_text: q.question_text,
-          options: q.options,
-          correct_answer: q.correct_answer,
-          explanation_ko: q.explanation_ko,
-          explanation_en: q.explanation_en || null,
-          explanation_vi: q.explanation_vi || null,
-          difficulty: mapDifficultyToDb(q.difficulty),
-          topic: q.topic || topic || null,
-          grammar_points: q.grammar_points || [],
-          vocabulary: q.vocabulary || [],
-          question_audio_url: q.question_audio_url || null,
-          generation_source: referenceContent ? "ai_from_reference" : "ai_generated",
-          status: "approved",
-          approved_by: user?.id,
-          approved_at: new Date().toISOString(),
-          is_active: true,
-        }));
+        .map((q, idx) => {
+          // 해설 자동 보정
+          const validation = validations[generatedQuestions.indexOf(q)];
+          const filledExplanations = validation && !validation.isValid
+            ? autoFillMissingExplanations({
+                explanation_ko: q.explanation_ko,
+                explanation_en: q.explanation_en,
+                explanation_vi: q.explanation_vi,
+              }, validation)
+            : {};
+          
+          return {
+            exam_type: mapExamTypeToDb(examType),
+            section,
+            exam_round: parseInt(examRound, 10),
+            part_number: q.part_number,
+            question_number: q.question_number || idx + 1,
+            question_text: q.question_text,
+            options: q.options,
+            correct_answer: q.correct_answer,
+            explanation_ko: q.explanation_ko,
+            explanation_en: filledExplanations.explanation_en || q.explanation_en || null,
+            explanation_vi: filledExplanations.explanation_vi || q.explanation_vi || null,
+            explanation_ja: filledExplanations.explanation_ja || null,
+            explanation_zh: filledExplanations.explanation_zh || null,
+            explanation_ru: filledExplanations.explanation_ru || null,
+            explanation_uz: filledExplanations.explanation_uz || null,
+            difficulty: mapDifficultyToDb(q.difficulty),
+            topic: q.topic || topic || null,
+            grammar_points: q.grammar_points || [],
+            vocabulary: q.vocabulary || [],
+            question_audio_url: q.question_audio_url || null,
+            generation_source: referenceContent ? "ai_from_reference" : "ai_generated",
+            status: "approved",
+            approved_by: user?.id,
+            approved_at: new Date().toISOString(),
+            is_active: true,
+          };
+        });
 
       const { error } = await supabase
         .from("mock_question_bank")
@@ -456,6 +520,8 @@ const MockExamGenerator = () => {
       setGeneratedQuestions([]);
       setValidationResults([]);
       setSelectedQuestions(new Set());
+      setExplanationValidations([]);
+      setShowExplanationWarning(false);
       setReferenceContent("");
       setReferenceFile(null);
       setStreamingContent("");
@@ -468,6 +534,23 @@ const MockExamGenerator = () => {
         description: error.message,
         variant: "destructive",
       });
+    }
+  };
+  
+  // 해설 검증 상태 가져오기
+  const getExplanationStatus = (index: number) => {
+    const validation = explanationValidations[index];
+    if (!validation) return null;
+    
+    if (validation.isValid) {
+      return { color: "green", icon: <Globe className="w-4 h-4 text-green-500" />, label: "7개국어 완료" };
+    } else {
+      const missingCount = validation.missingLanguages.length + validation.emptyLanguages.length;
+      return { 
+        color: "yellow", 
+        icon: <Globe className="w-4 h-4 text-yellow-500" />, 
+        label: `${7 - missingCount}/7 언어` 
+      };
     }
   };
 
