@@ -206,14 +206,16 @@ export default function AdminVideoManager() {
     setGenerating(video.id);
     try {
       const { data, error } = await supabase.functions.invoke('video-whisper', {
-        body: { youtube_url: video.youtube_url, video_id: video.id }
+        body: { video_id: video.id }
       });
 
       if (error) throw error;
       
-      toast.success('자막 생성이 시작되었습니다');
-      if (data.note) {
-        toast.info(data.note);
+      if (data.needs_manual_input) {
+        toast.success('자막 템플릿이 생성되었습니다');
+        toast.info('자막 검수에서 직접 입력해주세요');
+      } else {
+        toast.success(data.message || '자막이 저장되었습니다');
       }
       fetchVideos();
     } catch (error) {
