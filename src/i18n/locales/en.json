@@ -2320,7 +2320,7 @@
       "badge": "Overwhelming Learning System",
       "title1": "Video Learning",
       "title2": "Perfect in 7 Languages",
-      "subtitle": "Learn Korean with YouTube videos • Real-time subtitle sync • TOPIK vocabulary in one click • AI-powered personalized feedback",
+      "subtitle": "Learn Korean with YouTube videos • 7-language subtitles • TOPIK vocabulary in one click • AI-powered personalized feedback",
       "startButton": "Start Learning",
       "guideButton": "View Guide"
     },
@@ -2335,7 +2335,7 @@
       "sectionSubtitle": "Beyond simple video watching, an all-in-one system for perfect Korean mastery",
       "subtitle": {
         "title": "7-Language Subtitles",
-        "description": "Real-time switching: Korean, Vietnamese, English, Japanese, Chinese, Russian, Uzbek"
+        "description": "Switch subtitles: Korean, Vietnamese, English, Japanese, Chinese, Russian, Uzbek"
       },
       "topik": {
         "title": "TOPIK Vocabulary Link",

@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChevronLeft, Volume2, Play, Eye, Lightbulb, GraduationCap, Languages, Sparkles, Loader2, BookOpen, MessageCircle, Globe2, Heart, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
+import { playElevenLabsTTS } from '@/lib/elevenlabsTts';
 
 interface KeySentence {
   korean: string;
@@ -101,25 +102,15 @@ export default function ShortsPlayer() {
   const [video, setVideo] = useState<ShortsVideo | null>(null);
   const [loading, setLoading] = useState(true);
   const [subtitles, setSubtitles] = useState<SubtitleData[]>([]);
-  const [selectedLanguage, setSelectedLanguage] = useState(() => normalizeLang(i18n.language));
+
+  // Per-language page: only expose the current page language (no cross-language switching).
+  const selectedLanguage = useMemo(() => normalizeLang(i18n.language), [i18n.language]);
+
   const [ytReady, setYtReady] = useState(false);
   const [learningContent, setLearningContent] = useState<LearningContent | null>(null);
   const [loadingContent, setLoadingContent] = useState(false);
   const [activeTab, setActiveTab] = useState('sentences');
 
-  const playerRef = useRef<any>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    if (videoId) {
-      fetchVideo();
-      fetchSubtitles();
-    }
-  }, [videoId]);
-
-  useEffect(() => {
-    setSelectedLanguage(normalizeLang(i18n.language));
-  }, [i18n.language]);
 
   useEffect(() => {
     if ((window as any).YT?.Player) {
@@ -225,8 +216,11 @@ export default function ShortsPlayer() {
     return subtitles.find(s => s.language === 'ko')?.subtitles || [];
   }, [subtitles]);
 
-  // Show all supported learning languages (7+Korean)
-  const availableLanguages = useMemo(() => LANGUAGES, []);
+  // Per-language page: only expose the current locale language.
+  const availableLanguages = useMemo(
+    () => LANGUAGES.filter((l) => l.code === selectedLanguage),
+    [selectedLanguage]
+  );
 
   const fetchLearningContent = useCallback(async () => {
     if (!videoId || koreanSubtitles.length === 0) return;
@@ -265,13 +259,12 @@ export default function ShortsPlayer() {
     }
   }, [koreanSubtitles.length, selectedLanguage]);
 
-  const speakText = (text: string) => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'ko-KR';
-      utterance.rate = 0.85;
-      window.speechSynthesis.speak(utterance);
+  const speakText = async (text: string) => {
+    try {
+      await playElevenLabsTTS(text, { speed: 0.8, truncate: 260 });
+    } catch (e) {
+      console.error('TTS error:', e);
+      toast.error(t('videoPlayer.error'));
     }
   };
 
