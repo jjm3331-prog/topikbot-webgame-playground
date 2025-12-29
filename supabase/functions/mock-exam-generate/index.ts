@@ -68,6 +68,10 @@ interface GenerateRequest {
   examRound?: number;
   ttsPreset?: keyof typeof TTS_PRESETS;
   stream?: boolean;
+  // 듣기 세부 설정
+  listeningQuestionType?: string;
+  dialogueLength?: string;
+  speakerCount?: string;
 }
 
 interface GeneratedQuestion {
@@ -372,8 +376,40 @@ ${params.topic ? `- 주제/문법: ${params.topic}` : ''}
 
 각 문제에는 반드시 지문(읽기 텍스트)이 포함되어야 합니다.`;
   } else if (params.section === 'listening') {
+    // 듣기 세부 설정 파싱
+    const questionType = params.listeningQuestionType || 'mixed';
+    const dialogueLen = params.dialogueLength || 'auto';
+    const speakers = params.speakerCount || 'auto';
+
+    // 문제 유형별 설정
+    const questionTypeGuide: Record<string, { partRange: string; turns: string; description: string }> = {
+      "1-4": { partRange: "1~4", turns: "1-2턴", description: "적절한 대답 고르기 (간단한 질문-응답)" },
+      "5-8": { partRange: "5~8", turns: "2-3턴", description: "그림 보고 알맞은 대화 고르기" },
+      "9-12": { partRange: "9~12", turns: "3-4턴", description: "대화의 장소/화제/목적 파악" },
+      "13-16": { partRange: "13~16", turns: "4-6턴", description: "세부 내용 파악" },
+      "17-20": { partRange: "17~20", turns: "5-8턴", description: "화자의 의도/태도/후속 행동 파악" },
+      "21-30": { partRange: "21~30", turns: "6-10턴", description: "긴 대화/담화 종합 이해" },
+    };
+
+    // 대화 길이 설정
+    const dialogueLengthGuide: Record<string, string> = {
+      short: "짧은 대화 (1-3턴)",
+      medium: "중간 대화 (4-6턴)",
+      long: "긴 대화 (7-10턴)",
+      auto: "문제 유형에 맞는 길이",
+    };
+
+    // 화자 수 설정
+    const speakerGuide: Record<string, string> = {
+      "2": "남자-여자 2인 대화",
+      "3": "3인 대화 (남1-여1-남2 또는 남1-여2)",
+      "monologue": "1인 담화 (강의, 뉴스, 안내방송 등)",
+      "auto": "문제 유형에 맞는 화자 구성",
+    };
+
     prompt += `
 ### 듣기 영역 문제 유형
+${questionType === 'mixed' ? `
 - [1~4] 적절한 대답 고르기 (간단한 질문-응답)
 - [5~8] 그림 보고 알맞은 대화 고르기
 - [9~12] 대화의 장소/화제/목적 파악
@@ -381,18 +417,25 @@ ${params.topic ? `- 주제/문법: ${params.topic}` : ''}
 - [17~20] 화자의 의도/태도/후속 행동 파악
 - [21~30] 긴 대화/담화 듣고 종합적 이해
 
+다양한 유형을 골고루 생성하세요.` : `
+⚠️ **지정된 문제 유형**: [${questionTypeGuide[questionType]?.partRange}번 유형]
+- 유형: ${questionTypeGuide[questionType]?.description}
+- 권장 대화 길이: ${questionTypeGuide[questionType]?.turns}
+
+모든 문제를 이 유형으로 생성하세요.`}
+
+### 🎧 대화 설정
+- **대화 길이**: ${dialogueLengthGuide[dialogueLen] || dialogueLengthGuide.auto}
+- **화자 구성**: ${speakerGuide[speakers] || speakerGuide.auto}
+
 ### 🎵 듣기 스크립트 (listening_script) - 매우 중요!
 
 **반드시 참고자료(RAG)에 있는 실제 TOPIK 듣기 대본 패턴을 참고하여 자연스러운 스크립트를 생성하세요.**
 
 듣기 스크립트 작성 원칙:
-1. **화자 표시**: 반드시 "남자:" / "여자:" 또는 "남:" / "여:" 형식 사용
+1. **화자 표시**: 반드시 "남자:" / "여자:" 또는 "남:" / "여:" 형식 사용${speakers === '3' ? ' (3인: 남1, 여1, 남2 등)' : ''}${speakers === 'monologue' ? ' (1인 담화: "화자:" 또는 내용만)' : ''}
 2. **자연스러운 대화**: 실제 한국어 대화처럼 자연스럽게 (축약, 조사 생략 등)
-3. **문제 유형별 길이**:
-   - [1~4] 1-2턴의 짧은 대화 (질문-대답)
-   - [5~12] 3-4턴의 중간 대화
-   - [13~20] 5-8턴의 긴 대화
-   - [21~30] 담화/강의/뉴스 형식 포함 가능
+3. **대화 길이**: ${dialogueLen === 'short' ? '1-3턴의 짧은 대화' : dialogueLen === 'medium' ? '4-6턴의 중간 대화' : dialogueLen === 'long' ? '7-10턴의 긴 대화' : '문제 유형에 맞는 적절한 길이'}
 4. **맥락 명확성**: 스크립트만 보고도 정답을 논리적으로 도출할 수 있어야 함
 5. **오답 선지 타당성**: 오답도 그럴듯해야 하지만, 스크립트에 명확한 근거가 없어야 함
 
@@ -409,6 +452,9 @@ ${params.topic ? `- 주제/문법: ${params.topic}` : ''}
 
 [13~16번 유형 - 세부 내용]
 "남자: 이번 주말에 산에 갈 건데, 같이 갈래?\\n여자: 좋아. 그런데 날씨가 괜찮을까?\\n남자: 일기예보 봤는데 맑대. 아침 8시에 출발하자.\\n여자: 알았어. 도시락은 내가 준비할게."
+
+[21~30번 유형 - 담화]
+"안녕하세요. 오늘 강의에서는 한국의 전통 음식에 대해 알아보겠습니다. 한국 음식은 발효 식품이 많은 것이 특징입니다..."
 
 question_text에는 질문만 넣으세요.
 - 좋은 예: "남자는 왜 감기약을 사러 왔습니까?"
