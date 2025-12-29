@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Trash2, Edit, Loader2, Upload, Globe, CheckCircle, AlertCircle, Tv, Mic, Newspaper, Music, Utensils, Plane } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Edit, Loader2, Upload, Globe, CheckCircle, AlertCircle, Tv, Mic, Newspaper, Music, Landmark, Plane } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface ShortsVideo {
@@ -39,7 +39,7 @@ const CATEGORIES = [
   { id: 'variety', label: '예능', icon: Mic },
   { id: 'news', label: '뉴스', icon: Newspaper },
   { id: 'kpop', label: 'K팝', icon: Music },
-  { id: 'food', label: '먹방/요리', icon: Utensils },
+  { id: 'culture', label: '한국 문화', icon: Landmark },
   { id: 'travel', label: '여행', icon: Plane },
 ];
 
