@@ -70,6 +70,14 @@ const getAgentPlaceholder = (t: TFunction, agentId: string) => {
   }
 };
 
+const normalizeAssistantMarkdown = (content: string) => {
+  // Some models output HTML tags like <br> inside markdown (especially tables).
+  // We convert a small safe subset to plain markdown-friendly text.
+  return (content || "")
+    .replace(/<br\s*\/?\s*>/gi, "\n")
+    .replace(/&nbsp;/gi, " ");
+};
+
 const AIAgentChat = () => {
   const { agentId } = useParams<{ agentId: string }>();
   const navigate = useNavigate();
@@ -757,11 +765,11 @@ const AIAgentChat = () => {
                                     <th className="px-4 py-2.5 text-left font-semibold text-foreground whitespace-nowrap border-b border-border/50">{children}</th>
                                   ),
                                   td: ({ children }) => (
-                                    <td className="px-4 py-2.5 text-foreground">{children}</td>
+                                    <td className="px-4 py-2.5 text-foreground whitespace-pre-line">{children}</td>
                                   ),
                                 }}
                               >
-                                {message.content}
+                                {normalizeAssistantMarkdown(message.content)}
                               </ReactMarkdown>
                             </div>
                           ) : (
