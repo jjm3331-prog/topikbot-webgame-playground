@@ -160,14 +160,17 @@ const MiniCloze = ({ level, onMistake }: MiniClozeProps) => {
     fetchQuestions();
   };
 
-  // Render sentence with blank
+  // Render sentence with blank - 정답은 showResult 후에만 표시
   const renderSentence = () => {
     if (!currentQuestion) return null;
     
     if (useVocabMode) {
       const vocab = currentQuestion as VocabWord;
       const phrase = vocab.example_phrase || `_____ 을/를 사용합니다.`;
-      const parts = phrase.replace(vocab.word, '_____').split('_____');
+      // 문장에서 정답 단어를 찾아서 빈칸으로 대체
+      const parts = phrase.includes(vocab.word) 
+        ? phrase.split(vocab.word) 
+        : phrase.split('_____');
       
       return (
         <p className="text-xl md:text-2xl font-medium leading-relaxed">
@@ -186,7 +189,16 @@ const MiniCloze = ({ level, onMistake }: MiniClozeProps) => {
       );
     } else {
       const q = currentQuestion as ClozeQuestion;
-      const parts = q.sentence.split('_____');
+      // sentence에 _____ 가 포함되어 있으면 그대로 사용, 아니면 blank_word를 빈칸으로 대체
+      let parts: string[];
+      if (q.sentence.includes('_____')) {
+        parts = q.sentence.split('_____');
+      } else if (q.sentence.includes(q.blank_word)) {
+        parts = q.sentence.split(q.blank_word);
+      } else {
+        parts = [q.sentence, ''];
+      }
+      
       return (
         <p className="text-xl md:text-2xl font-medium leading-relaxed">
           {parts[0]}
