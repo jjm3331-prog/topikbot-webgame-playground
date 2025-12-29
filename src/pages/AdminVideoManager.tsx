@@ -10,6 +10,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { ArrowLeft, Plus, Trash2, Edit, Play, Loader2, Languages, CheckCircle, AlertCircle } from 'lucide-react';
 
@@ -71,6 +79,10 @@ export default function AdminVideoManager() {
   const [selectedVideo, setSelectedVideo] = useState<VideoLesson | null>(null);
   const [subtitleStatuses, setSubtitleStatuses] = useState<Record<string, SubtitleStatus[]>>({});
   const [isAdmin, setIsAdmin] = useState(false);
+
+  const [audioDialogOpen, setAudioDialogOpen] = useState(false);
+  const [audioDialogVideo, setAudioDialogVideo] = useState<VideoLesson | null>(null);
+  const [audioUrl, setAudioUrl] = useState('');
 
   // Form state
   const [formData, setFormData] = useState({
@@ -202,25 +214,35 @@ export default function AdminVideoManager() {
     }
   };
 
-  const handleGenerateSubtitles = async (video: VideoLesson) => {
-    setGenerating(video.id);
+  const openAudioDialog = (video: VideoLesson) => {
+    setAudioDialogVideo(video);
+    setAudioUrl('');
+    setAudioDialogOpen(true);
+  };
+
+  const handleGenerateSubtitles = async () => {
+    if (!audioDialogVideo) return;
+    if (!audioUrl.trim()) {
+      toast.error('오디오 파일 URL을 입력해주세요');
+      return;
+    }
+
+    setGenerating(audioDialogVideo.id);
     try {
       const { data, error } = await supabase.functions.invoke('video-whisper', {
-        body: { video_id: video.id }
+        body: { video_id: audioDialogVideo.id, audio_url: audioUrl.trim() }
       });
 
       if (error) throw error;
-      
-      if (data.needs_manual_input) {
-        toast.success('자막 템플릿이 생성되었습니다');
-        toast.info('자막 검수에서 직접 입력해주세요');
-      } else {
-        toast.success(data.message || '자막이 저장되었습니다');
-      }
+
+      toast.success(data?.message || '자막이 생성되었습니다');
+      setAudioDialogOpen(false);
+      setAudioDialogVideo(null);
       fetchVideos();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating subtitles:', error);
-      toast.error('자막 생성에 실패했습니다');
+      const msg = error?.message || '자막 생성에 실패했습니다';
+      toast.error(msg);
     } finally {
       setGenerating(null);
     }
@@ -313,7 +335,9 @@ export default function AdminVideoManager() {
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/admin')}>
+          <Button variant="ghost" size="icon" onClick={() => navigate('/admin')}
+            aria-label="관리자 홈으로 이동"
+          >
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <h1 className="text-2xl font-bold">🎬 비디오 학습 관리</h1>
@@ -440,6 +464,7 @@ export default function AdminVideoManager() {
                                 src={video.thumbnail_url}
                                 alt={video.title}
                                 className="w-full h-full object-cover"
+                                loading="lazy"
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center">
@@ -500,7 +525,7 @@ export default function AdminVideoManager() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => handleGenerateSubtitles(video)}
+                                onClick={() => openAudioDialog(video)}
                                 disabled={generating === video.id}
                               >
                                 {generating === video.id ? (
@@ -555,6 +580,44 @@ export default function AdminVideoManager() {
           </div>
         </div>
       </div>
+
+      <Dialog open={audioDialogOpen} onOpenChange={setAudioDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>오디오 URL로 자동 자막 생성</DialogTitle>
+            <DialogDescription>
+              직접 다운로드 가능한 오디오 파일 URL(mp3/m4a/wav)을 넣으면, Whisper가 타임스탬프 자막(KO)을 자동 생성해 저장합니다.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <Label>오디오 파일 URL</Label>
+            <Input
+              value={audioUrl}
+              onChange={(e) => setAudioUrl(e.target.value)}
+              placeholder="https://.../audio.m4a"
+            />
+            <p className="text-xs text-muted-foreground">
+              * YouTube 링크 자체가 아니라 “오디오 파일(직접 다운로드)” 링크여야 합니다. (최대 25MB)
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAudioDialogOpen(false)}>
+              취소
+            </Button>
+            <Button
+              onClick={handleGenerateSubtitles}
+              disabled={!audioDialogVideo || generating === audioDialogVideo?.id}
+            >
+              {audioDialogVideo && generating === audioDialogVideo.id ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              ) : null}
+              생성
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
