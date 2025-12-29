@@ -1096,42 +1096,68 @@ async function handleStreamingGeneration(
         
         sendProgress("generating", 30, "🤖 Gemini 2.5 Pro 문제 생성 시작...");
 
-        // Call Gemini with streaming
-        const geminiResponse = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:streamGenerateContent?key=${GEMINI_API_KEY}&alt=sse`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{
-                role: "user",
-                parts: [{
-                  text: `${systemPrompt}\n\n---\n\n${params.questionCount}개의 ${params.section} 문제를 생성해주세요.
+        // Call Gemini with streaming - with retry logic
+        let geminiResponse: Response | null = null;
+        let lastError = "";
+        
+        for (let attempt = 0; attempt < 3; attempt++) {
+          try {
+            geminiResponse = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:streamGenerateContent?key=${GEMINI_API_KEY}&alt=sse`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  contents: [{
+                    role: "user",
+                    parts: [{
+                      text: `${systemPrompt}\n\n---\n\n${params.questionCount}개의 ${params.section} 문제를 생성해주세요.
 ${params.topic ? `주제/문법: ${params.topic}` : ''}
 난이도: ${params.difficulty}
 모든 문제는 실제 TOPIK 시험과 동일한 형식이어야 합니다.`
-                }]
-              }],
-              generationConfig: {
-                temperature: 0.7,
-                topP: 0.95,
-                topK: 40,
-                maxOutputTokens: 65536,
-                responseMimeType: "application/json",
-              },
-              safetySettings: [
-                { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-                { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-                { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
-                { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
-              ],
-            }),
-          }
-        );
+                    }]
+                  }],
+                  generationConfig: {
+                    temperature: 0.7,
+                    topP: 0.95,
+                    topK: 40,
+                    maxOutputTokens: 65536,
+                    responseMimeType: "application/json",
+                  },
+                  safetySettings: [
+                    { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                    { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                    { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                    { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+                  ],
+                }),
+              }
+            );
 
-        if (!geminiResponse.ok) {
-          const errorText = await geminiResponse.text();
-          throw new Error(`Gemini API error: ${geminiResponse.status} - ${errorText}`);
+            if (geminiResponse.ok) break;
+            
+            const errorText = await geminiResponse.text();
+            lastError = `Gemini API error: ${geminiResponse.status}`;
+            console.error(`Gemini attempt ${attempt + 1} failed:`, geminiResponse.status, errorText.slice(0, 200));
+            
+            // Retry on 503 (overloaded) or 429 (rate limit)
+            if (geminiResponse.status === 503 || geminiResponse.status === 429) {
+              sendProgress("generating", 32, `⏳ 재시도 중... (${attempt + 1}/3)`);
+              await new Promise(r => setTimeout(r, 2000 * (attempt + 1))); // Exponential backoff
+            } else {
+              break; // Don't retry other errors
+            }
+          } catch (fetchError: any) {
+            lastError = fetchError.message || "Network error";
+            console.error(`Gemini fetch error attempt ${attempt + 1}:`, lastError);
+            if (attempt < 2) {
+              await new Promise(r => setTimeout(r, 2000 * (attempt + 1)));
+            }
+          }
+        }
+
+        if (!geminiResponse || !geminiResponse.ok) {
+          throw new Error(lastError || "Gemini API 호출 실패. 잠시 후 다시 시도해주세요.");
         }
 
         // Stream the response
