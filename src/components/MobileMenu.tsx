@@ -82,7 +82,7 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
 
   const topikItems = [
     { path: "/learning-hub", icon: Sparkles, labelKey: "mobileMenu.items.learningHub", isHighlight: true },
-    { path: "/shorts", icon: Smartphone, labelKey: "숏츠", isHighlight: true },
+    { path: "/shorts", icon: Smartphone, labelKey: "menu.items.shorts", isHighlight: true },
     { path: "/board-hub", icon: MessageSquare, labelKey: "mobileMenu.items.community", isHighlight: true },
   ];
 
