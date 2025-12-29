@@ -22,6 +22,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { mapExamTypeToDb } from "@/lib/mockExamDb";
 import { 
   Loader2, Sparkles, FileText, CheckCircle, 
   AlertTriangle, XCircle, Brain, Wand2, Save,
@@ -416,7 +417,7 @@ const MockExamGenerator = () => {
       const questionsToSave = generatedQuestions
         .filter((_, i) => selectedQuestions.has(i))
         .map((q, idx) => ({
-          exam_type: examType,
+          exam_type: mapExamTypeToDb(examType),
           section,
           exam_round: parseInt(examRound, 10),
           part_number: q.part_number,
