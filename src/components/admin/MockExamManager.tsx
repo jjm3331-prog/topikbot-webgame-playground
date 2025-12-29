@@ -36,7 +36,7 @@ import { useToast } from "@/hooks/use-toast";
 import { 
   Loader2, Plus, Search, Trash2, Edit, Eye, Upload, 
   FileText, CheckCircle, AlertTriangle, RefreshCw,
-  BookOpen, Headphones, PenLine
+  BookOpen, Headphones, PenLine, ImagePlus, X
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -76,6 +76,8 @@ interface ParsedQuestion {
   part_number: number;
   question_number: number;
   listening_script?: string;
+  imageFile?: File;
+  imagePreview?: string;
 }
 
 const MockExamManager = () => {
@@ -270,6 +272,33 @@ const MockExamManager = () => {
         setGeneratingAudio(false);
       }
 
+      // Upload images for each question that has one
+      const imageUrls: Record<number, string> = {};
+      for (const q of parsedQuestions) {
+        if (q.imageFile) {
+          try {
+            const fileName = `mock-exam/${examType}/${examRound}/q${q.question_number}_${Date.now()}.${q.imageFile.name.split('.').pop()}`;
+            
+            const { data: uploadData, error: uploadError } = await supabase.storage
+              .from("podcast-audio")
+              .upload(fileName, q.imageFile, {
+                contentType: q.imageFile.type,
+                upsert: true,
+              });
+
+            if (!uploadError && uploadData) {
+              const { data: urlData } = supabase.storage
+                .from("podcast-audio")
+                .getPublicUrl(fileName);
+              imageUrls[q.question_number] = urlData.publicUrl;
+              console.log(`Image uploaded for Q${q.question_number}:`, urlData.publicUrl);
+            }
+          } catch (err) {
+            console.error(`Failed to upload image for Q${q.question_number}:`, err);
+          }
+        }
+      }
+
       const questionsToInsert = parsedQuestions.map((q) => ({
         exam_type: examType,
         section,
@@ -281,6 +310,7 @@ const MockExamManager = () => {
         correct_answer: q.correct_answer,
         explanation_ko: q.explanation,
         question_audio_url: audioUrls[q.question_number] || null,
+        question_image_url: imageUrls[q.question_number] || null,
         is_active: true,
       }));
 
@@ -743,6 +773,65 @@ const MockExamManager = () => {
                     <Badge variant="secondary">정답: {q.correct_answer}번</Badge>
                   </div>
                   <p className="font-medium mb-3 whitespace-pre-line">{q.question_text}</p>
+                  
+                  {/* Image Upload Section */}
+                  <div className="mb-3 p-3 border border-dashed rounded-lg bg-muted/30">
+                    <Label className="text-sm flex items-center gap-2 mb-2">
+                      <ImagePlus className="w-4 h-4 text-primary" />
+                      문제 이미지 (선택)
+                    </Label>
+                    {q.imagePreview ? (
+                      <div className="relative inline-block">
+                        <img 
+                          src={q.imagePreview} 
+                          alt={`문제 ${q.question_number} 이미지`}
+                          className="max-h-32 rounded border"
+                        />
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          className="absolute -top-2 -right-2 h-6 w-6"
+                          onClick={() => {
+                            const updated = [...parsedQuestions];
+                            updated[index] = {
+                              ...updated[index],
+                              imageFile: undefined,
+                              imagePreview: undefined,
+                            };
+                            setParsedQuestions(updated);
+                          }}
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        className="text-sm"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (ev) => {
+                              const updated = [...parsedQuestions];
+                              updated[index] = {
+                                ...updated[index],
+                                imageFile: file,
+                                imagePreview: ev.target?.result as string,
+                              };
+                              setParsedQuestions(updated);
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    )}
+                    <p className="text-xs text-muted-foreground mt-1">
+                      PNG, JPG, GIF 등 이미지 파일 업로드
+                    </p>
+                  </div>
+
                   <div className="space-y-1 mb-3">
                     {q.options.map((opt, optIndex) => (
                       <div
