@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Mic, MicOff, RotateCcw, ChevronRight, Volume2, RefreshCw, Loader2, Trophy, Youtube, Timer, Zap } from "lucide-react";
+import { ArrowLeft, Mic, MicOff, RotateCcw, ChevronRight, RefreshCw, Loader2, Trophy, Youtube, Timer, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import CleanHeader from "@/components/CleanHeader";
@@ -54,8 +54,7 @@ const KDrama = () => {
   const [timerMode, setTimerMode] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
   const [videoKey, setVideoKey] = useState(0);
-  const [isPlayingTTS, setIsPlayingTTS] = useState(false);
-  const [selectedVoice, setSelectedVoice] = useState('nova');
+  
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -64,12 +63,6 @@ const KDrama = () => {
 
   const currentScene = scenes[currentIndex];
 
-  const voiceOptions = [
-    { id: 'nova', label: t('kdrama.voices.minhee', '👩 민희'), gender: 'female' },
-    { id: 'shimmer', label: t('kdrama.voices.sua', '👩 수아'), gender: 'female' },
-    { id: 'echo', label: t('kdrama.voices.hyunjun', '👨 현준'), gender: 'male' },
-    { id: 'fable', label: t('kdrama.voices.jihun', '👨 지훈'), gender: 'male' },
-  ];
 
   // Save score to profile
   const saveScoreToProfile = async (finalScore: number) => {
@@ -173,50 +166,6 @@ const KDrama = () => {
     handleNext();
   }, [currentIndex, scenes.length]);
 
-  // Play TTS
-  const playTTS = async () => {
-    if (isPlayingTTS) {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-      setIsPlayingTTS(false);
-      return;
-    }
-
-    setIsPlayingTTS(true);
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/drama-tts`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({
-            text: currentScene.korean,
-            voice: selectedVoice
-          }),
-        }
-      );
-
-      if (!response.ok) throw new Error('TTS failed');
-      const data = await response.json();
-      
-      if (data.audioContent) {
-        const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
-        audioRef.current = audio;
-        audio.onended = () => { setIsPlayingTTS(false); audioRef.current = null; };
-        audio.onerror = () => { setIsPlayingTTS(false); audioRef.current = null; };
-        await audio.play();
-      }
-    } catch (error) {
-      console.error('TTS error:', error);
-      setIsPlayingTTS(false);
-      toast.error(t('kdrama.ttsError', 'TTS 오류'));
-    }
-  };
 
   // Recording functions
   const startRecording = async () => {
@@ -510,15 +459,6 @@ const KDrama = () => {
                 <p className="text-purple-400 text-sm">🎭 {currentScene.audioTip}</p>
               </div>
 
-              {/* Voice Selection */}
-              <div className="flex gap-1.5 mb-4">
-                {voiceOptions.map((v) => (
-                  <button key={v.id} onClick={() => setSelectedVoice(v.id)}
-                    className={`flex-1 py-2 rounded-lg text-xs font-medium ${selectedVoice === v.id ? 'bg-purple-500 text-white' : 'bg-white/10 text-gray-300'}`}>
-                    {v.label}
-                  </button>
-                ))}
-              </div>
 
               {/* Result */}
               <AnimatePresence>
@@ -547,12 +487,6 @@ const KDrama = () => {
               <div className="space-y-3">
                 {!result ? (
                   <>
-                    <div className="flex gap-2">
-                      <Button onClick={playTTS} variant="outline" className={`flex-1 border-purple-500/50 ${isPlayingTTS ? 'text-purple-400 bg-purple-500/20' : 'text-purple-400'}`}>
-                        <Volume2 className={`w-4 h-4 mr-2 ${isPlayingTTS ? 'animate-pulse' : ''}`} />
-                        {isPlayingTTS ? t('kdrama.playing', '재생중...') : t('kdrama.playOriginal', '원어민 듣기')}
-                      </Button>
-                    </div>
                     <Button
                       onClick={isRecording ? stopRecording : startRecording}
                       disabled={isProcessing}
