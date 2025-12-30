@@ -268,6 +268,8 @@ const MockExamGenerator = () => {
 
     const decoder = new TextDecoder();
     let buffer = "";
+    let hasReceivedData = false;
+    let lastEventType = "";
 
     while (true) {
       const { done, value } = await reader.read();
@@ -279,8 +281,13 @@ const MockExamGenerator = () => {
 
       for (const line of lines) {
         if (line.startsWith('data: ')) {
+          const jsonStr = line.slice(6).trim();
+          if (!jsonStr || jsonStr === '[DONE]') continue;
+          
           try {
-            const data = JSON.parse(line.slice(6));
+            const data = JSON.parse(jsonStr);
+            hasReceivedData = true;
+            lastEventType = data.type;
             
             switch (data.type) {
               case "progress":
@@ -293,14 +300,22 @@ const MockExamGenerator = () => {
                 onComplete(data);
                 break;
               case "error":
-                onError(data.error);
+                console.error("[SSE] Error event received:", data.error);
+                onError(data.error || "Unknown error from server");
                 break;
             }
           } catch (e) {
-            // Ignore parse errors
+            console.warn("[SSE] JSON parse error:", jsonStr.slice(0, 100));
           }
         }
       }
+    }
+    
+    // 스트림이 끝났는데 complete 이벤트가 없었다면 경고
+    if (!hasReceivedData) {
+      console.error("[SSE] Stream ended with no data received");
+    } else if (lastEventType !== "complete" && lastEventType !== "error") {
+      console.warn("[SSE] Stream ended without complete event, last event:", lastEventType);
     }
   }, []);
 
@@ -373,6 +388,7 @@ const MockExamGenerator = () => {
 
       let generatedData: any = null;
       let lastProgress = 10;
+      let streamError: string | null = null;
 
       await processSSEStream(
         generateResponse,
@@ -391,12 +407,19 @@ const MockExamGenerator = () => {
           }
         },
         (error) => {
-          throw new Error(error);
+          console.error("Generation stream error:", error);
+          streamError = error;
         }
       );
 
+      // 스트림 에러가 발생했으면 먼저 처리
+      if (streamError) {
+        throw new Error(streamError);
+      }
+
       if (!generatedData?.questions || generatedData.questions.length === 0) {
-        throw new Error("생성된 문제가 없습니다. 다시 시도해주세요.");
+        const errorMsg = generatedData?.error || "생성된 문제가 없습니다. 다시 시도해주세요.";
+        throw new Error(errorMsg);
       }
 
       // Step 2: Validate questions with streaming (optional, can fail gracefully)
