@@ -278,23 +278,40 @@ const MockExamHub = () => {
   // 파트별 문제 개수 로드
   const loadAvailableParts = async (examId: string) => {
     const dbExamType = mapExamTypeToDb(examId);
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('mock_question_bank')
       .select('part_number, section')
       .eq('exam_type', dbExamType)
       .eq('is_active', true);
-    
+
+    if (error) {
+      console.error('[MockExamHub] loadAvailableParts error', error);
+      setAvailableParts([]);
+      return;
+    }
+
+    const allowedSections = new Set(['listening', 'reading', 'writing']);
+
     if (data) {
       const partCounts = new Map<string, { partNumber: number; section: string; count: number }>();
-      data.forEach(q => {
-        const key = `${q.section}-${q.part_number}`;
-        const existing = partCounts.get(key);
-        if (existing) {
-          existing.count++;
-        } else {
-          partCounts.set(key, { partNumber: q.part_number, section: q.section, count: 1 });
-        }
-      });
+      data
+        .filter((q: any) => {
+          const sec = String(q.section ?? '').toLowerCase();
+          const pn = Number(q.part_number);
+          return allowedSections.has(sec) && Number.isFinite(pn) && pn > 0;
+        })
+        .forEach((q: any) => {
+          const sec = String(q.section).toLowerCase();
+          const pn = Number(q.part_number);
+          const key = `${sec}-${pn}`;
+          const existing = partCounts.get(key);
+          if (existing) {
+            existing.count++;
+          } else {
+            partCounts.set(key, { partNumber: pn, section: sec, count: 1 });
+          }
+        });
+
       setAvailableParts(
         Array.from(partCounts.values()).sort((a, b) => {
           if (a.section !== b.section) return a.section.localeCompare(b.section);
