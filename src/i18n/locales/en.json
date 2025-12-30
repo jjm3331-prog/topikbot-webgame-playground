@@ -1477,13 +1477,22 @@
     "statsTitle": "Part-time",
     "turn": "Turn",
     "selectJob": "Where do you want to work?",
+    "selectJobDesc": "Choose a workplace to start",
     "selectDifficulty": "Select Difficulty",
+    "selectDifficultyDesc": "Choose customer difficulty level",
     "jobs": {
       "convenience_store": "Convenience Store",
       "cafe": "Café",
       "restaurant": "Restaurant",
       "pc_bang": "PC Bang",
       "bookstore": "Bookstore"
+    },
+    "jobsDesc": {
+      "convenience_store": "Cashier, product guidance, inventory",
+      "cafe": "Barista, order taking, serving",
+      "restaurant": "Order taking, serving, payment",
+      "pc_bang": "Seat registration, technical support",
+      "bookstore": "Book search, consulting, checkout"
     },
     "difficulty": {
       "easy": "Easy",

@@ -1492,13 +1492,22 @@
     "statsTitle": "Làm thêm",
     "turn": "Lượt",
     "selectJob": "Bạn muốn làm việc ở đâu?",
+    "selectJobDesc": "Chọn nơi làm việc để bắt đầu",
     "selectDifficulty": "Chọn độ khó",
+    "selectDifficultyDesc": "Chọn mức độ khó của khách hàng",
     "jobs": {
       "convenience_store": "Cửa hàng tiện lợi",
       "cafe": "Quán cà phê",
       "restaurant": "Nhà hàng",
       "pc_bang": "Quán net",
       "bookstore": "Hiệu sách"
+    },
+    "jobsDesc": {
+      "convenience_store": "Bán hàng, thanh toán, hướng dẫn khách",
+      "cafe": "Pha chế, gọi món, phục vụ",
+      "restaurant": "Gọi món, phục vụ, thanh toán",
+      "pc_bang": "Đăng ký máy, hỗ trợ kỹ thuật",
+      "bookstore": "Tìm sách, tư vấn, thanh toán"
     },
     "difficulty": {
       "easy": "Dễ",
