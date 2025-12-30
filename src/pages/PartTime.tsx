@@ -426,7 +426,7 @@ const PartTime = () => {
             </motion.div>
           )}
 
-          {/* Playing State - Premium Design */}
+          {/* Playing State - Immersive Chat UI */}
           {(gameState === 'playing' || gameState === 'evaluating') && scenario && (
             <motion.div
               key="playing"
@@ -434,112 +434,210 @@ const PartTime = () => {
               initial="hidden"
               animate="visible"
               exit={{ opacity: 0, y: -20 }}
-              className="space-y-4 lg:space-y-6"
+              className="flex flex-col h-[calc(100vh-200px)] max-h-[700px]"
             >
-              {/* Current Job Badge */}
-              <motion.div variants={itemVariants} className="flex items-center justify-between flex-wrap gap-4">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl ${JOBS.find(j => j.id === selectedJob)?.iconBg || 'bg-violet-500'} flex items-center justify-center`}>
-                    {(() => {
-                      const job = JOBS.find(j => j.id === selectedJob);
-                      return job ? <job.icon className="w-5 h-5 text-white" /> : null;
-                    })()}
-                  </div>
-                  <div>
-                    <span className="text-white font-bold">{t(`parttime.jobs.${selectedJob}`)}</span>
-                    <span className="text-white/50 text-sm block">{scenario.customer_type}</span>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Situation Card */}
+              {/* Chat Header - Job & Customer Info */}
               <motion.div 
                 variants={itemVariants}
-                className="rounded-2xl p-5 lg:p-6 bg-gradient-to-br from-blue-500/10 to-cyan-500/5 border border-blue-500/20 backdrop-blur-sm"
+                className="flex-shrink-0 rounded-t-3xl p-4 lg:p-5 bg-gradient-to-r from-slate-800/90 to-slate-700/90 border border-white/10 border-b-0 backdrop-blur-xl"
               >
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                    <Target className="w-5 h-5 text-blue-400" />
-                  </div>
-                  <div>
-                    <p className="text-blue-400 text-sm font-medium mb-1">📍 {t('parttime.situation')}</p>
-                    <p className="text-white text-base lg:text-lg">{scenario.situation_hint_ko}</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Customer Speech Bubble */}
-              <motion.div 
-                variants={itemVariants}
-                className="rounded-2xl p-6 lg:p-8 bg-gradient-to-br from-violet-500/15 to-purple-500/10 border border-violet-500/20 backdrop-blur-sm"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-violet-500/25">
-                    <MessageCircle className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-violet-300 text-sm font-medium mb-2">{t('parttime.customer')}</p>
-                    <p className="text-xl lg:text-2xl text-white font-medium leading-relaxed">
-                      "{scenario.customer_line_ko}"
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Hint Toggle */}
-              <motion.div variants={itemVariants}>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowHint(!showHint)}
-                  className="w-full h-12 rounded-xl border-amber-500/30 bg-amber-500/5 text-amber-400 hover:bg-amber-500/10 hover:border-amber-500/50"
-                >
-                  <Lightbulb className="w-5 h-5 mr-2" />
-                  {showHint ? t('parttime.hideHint') : t('parttime.showHint')}
-                </Button>
-              </motion.div>
-
-              {/* Hint Display */}
-              <AnimatePresence>
-                {showHint && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="rounded-2xl p-5 bg-amber-500/10 border border-amber-500/30 backdrop-blur-sm"
-                  >
-                    <div className="flex items-start gap-3">
-                      <Lightbulb className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-amber-400 text-sm font-medium mb-1">💡 {t('parttime.hint')}</p>
-                        <p className="text-white">{scenario.expected_response_hint_ko}</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    {/* Customer Avatar */}
+                    <div className="relative">
+                      <div className="w-14 h-14 lg:w-16 lg:h-16 rounded-2xl bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 flex items-center justify-center shadow-xl shadow-violet-500/30 ring-2 ring-violet-400/30">
+                        <span className="text-2xl lg:text-3xl">
+                          {scenario.customer_type.includes('여성') || scenario.customer_type.includes('할머니') || scenario.customer_type.includes('아줌마') 
+                            ? '👩' 
+                            : scenario.customer_type.includes('어린') || scenario.customer_type.includes('학생')
+                            ? '🧒'
+                            : scenario.customer_type.includes('할아버지')
+                            ? '👴'
+                            : '🧑'}
+                        </span>
                       </div>
+                      {/* Online Indicator */}
+                      <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-3 border-slate-800 flex items-center justify-center">
+                        <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-white font-bold text-lg lg:text-xl">{scenario.customer_type}</h3>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-xl">{JOBS.find(j => j.id === selectedJob)?.emoji}</span>
+                        <span className="text-white/50 text-sm">{t(`parttime.jobs.${selectedJob}`)}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Hint Button */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowHint(!showHint)}
+                    className={`w-12 h-12 rounded-xl transition-all duration-300 ${showHint ? 'bg-amber-500/20 text-amber-400' : 'bg-white/5 text-white/50 hover:text-amber-400 hover:bg-amber-500/10'}`}
+                  >
+                    <Lightbulb className="w-5 h-5" />
+                  </Button>
+                </div>
+              </motion.div>
+
+              {/* Chat Messages Area */}
+              <motion.div 
+                variants={itemVariants}
+                className="flex-1 overflow-y-auto px-4 lg:px-6 py-6 bg-gradient-to-b from-slate-800/50 via-slate-900/80 to-slate-900/90 border-x border-white/10 space-y-5"
+                style={{ 
+                  backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.08) 0%, transparent 50%)',
+                }}
+              >
+                {/* Situation Context - System Message */}
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex justify-center"
+                >
+                  <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-blue-500/15 border border-blue-500/25 backdrop-blur-sm max-w-[90%] lg:max-w-[70%]">
+                    <Target className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                    <span className="text-blue-300 text-sm text-center">{scenario.situation_hint_ko}</span>
+                  </div>
+                </motion.div>
+
+                {/* Customer Message Bubble */}
+                <motion.div 
+                  initial={{ opacity: 0, x: -30, scale: 0.9 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.2 }}
+                  className="flex items-end gap-3"
+                >
+                  {/* Customer Avatar (Small) */}
+                  <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/25">
+                    <span className="text-lg">
+                      {scenario.customer_type.includes('여성') || scenario.customer_type.includes('할머니') || scenario.customer_type.includes('아줌마') 
+                        ? '👩' 
+                        : scenario.customer_type.includes('어린') || scenario.customer_type.includes('학생')
+                        ? '🧒'
+                        : scenario.customer_type.includes('할아버지')
+                        ? '👴'
+                        : '🧑'}
+                    </span>
+                  </div>
+                  
+                  {/* Message Bubble */}
+                  <div className="max-w-[85%] lg:max-w-[75%]">
+                    <div className="relative">
+                      {/* Bubble Tail */}
+                      <div className="absolute bottom-3 -left-2 w-4 h-4 bg-gradient-to-br from-violet-500/30 to-purple-500/20 rotate-45 rounded-sm" />
+                      
+                      <div className="relative rounded-2xl rounded-bl-md p-5 lg:p-6 bg-gradient-to-br from-violet-500/25 to-purple-500/15 border border-violet-400/30 backdrop-blur-sm shadow-xl shadow-violet-500/10">
+                        <p className="text-white text-lg lg:text-xl font-medium leading-relaxed">
+                          {scenario.customer_line_ko}
+                        </p>
+                        
+                        {/* Typing indicator style timestamp */}
+                        <div className="flex items-center gap-1.5 mt-3">
+                          <div className="w-1.5 h-1.5 rounded-full bg-violet-400/60" />
+                          <span className="text-violet-300/60 text-xs">{t('parttime.customer')}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Hint Display - System Message Style */}
+                <AnimatePresence>
+                  {showHint && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      className="flex justify-center"
+                    >
+                      <div className="inline-flex items-start gap-3 px-5 py-4 rounded-2xl bg-gradient-to-r from-amber-500/15 to-yellow-500/10 border border-amber-500/30 backdrop-blur-sm max-w-[90%] lg:max-w-[75%]">
+                        <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                          <Lightbulb className="w-4 h-4 text-amber-400" />
+                        </div>
+                        <div>
+                          <p className="text-amber-400 text-xs font-semibold mb-1">{t('parttime.hint')}</p>
+                          <p className="text-amber-100 text-sm leading-relaxed">{scenario.expected_response_hint_ko}</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Player Response Preview (if typing) */}
+                {playerInput && (
+                  <motion.div 
+                    initial={{ opacity: 0, x: 30 }}
+                    animate={{ opacity: 0.6, x: 0 }}
+                    className="flex items-end gap-3 justify-end"
+                  >
+                    <div className="max-w-[85%] lg:max-w-[75%]">
+                      <div className="relative">
+                        <div className="absolute bottom-3 -right-2 w-4 h-4 bg-gradient-to-bl from-emerald-500/30 to-teal-500/20 rotate-45 rounded-sm" />
+                        <div className="relative rounded-2xl rounded-br-md p-4 lg:p-5 bg-gradient-to-bl from-emerald-500/20 to-teal-500/15 border border-emerald-400/20 border-dashed">
+                          <p className="text-white/60 text-base lg:text-lg">{playerInput}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
+                      <span className="text-lg">🧑‍💼</span>
                     </div>
                   </motion.div>
                 )}
-              </AnimatePresence>
+              </motion.div>
 
-              {/* Input Area */}
+              {/* Input Area - Fixed at Bottom */}
               <motion.div 
                 variants={itemVariants}
-                className="rounded-2xl p-5 lg:p-6 bg-white/5 border border-white/10 backdrop-blur-sm"
+                className="flex-shrink-0 rounded-b-3xl p-4 lg:p-5 bg-gradient-to-t from-slate-900 via-slate-800/95 to-slate-800/90 border border-white/10 border-t-0 backdrop-blur-xl"
               >
-                <p className="text-white/60 text-sm mb-3">✍️ {t('parttime.respond')}</p>
-                <div className="flex gap-3">
-                  <Input
-                    value={playerInput}
-                    onChange={(e) => setPlayerInput(e.target.value)}
-                    placeholder={t('parttime.placeholder')}
-                    className="flex-1 h-12 rounded-xl bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-violet-500/50 focus:ring-violet-500/20"
-                    disabled={loading}
-                    onKeyDown={(e) => e.key === 'Enter' && !loading && handleSubmitResponse()}
-                  />
+                <div className="flex items-center gap-3">
+                  {/* Player Avatar */}
+                  <div className="hidden sm:flex flex-shrink-0 w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 items-center justify-center shadow-lg shadow-emerald-500/25">
+                    <span className="text-xl">🧑‍💼</span>
+                  </div>
+                  
+                  {/* Input Field */}
+                  <div className="flex-1 relative">
+                    <Input
+                      value={playerInput}
+                      onChange={(e) => setPlayerInput(e.target.value)}
+                      placeholder={t('parttime.placeholder')}
+                      className="w-full h-13 lg:h-14 pl-5 pr-14 rounded-2xl bg-white/5 border-white/15 text-white text-base lg:text-lg placeholder:text-white/30 focus:border-emerald-500/50 focus:ring-emerald-500/20 focus:bg-white/10 transition-all"
+                      disabled={loading}
+                      onKeyDown={(e) => e.key === 'Enter' && !loading && handleSubmitResponse()}
+                    />
+                    
+                    {/* Character Count */}
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <span className={`text-xs ${playerInput.length > 0 ? 'text-emerald-400' : 'text-white/30'}`}>
+                        {playerInput.length > 0 && `${playerInput.length}자`}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Send Button */}
                   <Button
                     onClick={handleSubmitResponse}
                     disabled={loading || !playerInput.trim()}
-                    className="h-12 px-6 rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 shadow-lg shadow-violet-500/25"
+                    className="h-13 lg:h-14 w-13 lg:w-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 shadow-xl shadow-emerald-500/30 disabled:opacity-40 disabled:shadow-none transition-all duration-300"
                   >
-                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                    {loading ? (
+                      <Loader2 className="w-5 h-5 lg:w-6 lg:h-6 animate-spin" />
+                    ) : (
+                      <Send className="w-5 h-5 lg:w-6 lg:h-6" />
+                    )}
                   </Button>
+                </div>
+                
+                {/* Quick Tips */}
+                <div className="flex items-center justify-center gap-4 mt-3 text-white/40 text-xs">
+                  <span className="flex items-center gap-1">
+                    <kbd className="px-1.5 py-0.5 rounded bg-white/10">Enter</kbd>
+                    {t('parttime.respond')}
+                  </span>
                 </div>
               </motion.div>
             </motion.div>
