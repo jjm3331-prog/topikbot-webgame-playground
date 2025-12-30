@@ -329,14 +329,24 @@ const MockExamTest = () => {
       // ========== 랜덤 셔플 (중복 방지된 문제들) ==========
       const shuffledQuestions = [...questionData].sort(() => Math.random() - 0.5);
       
+      // 실전모드 문제수: TOPIK I = 70문제(듣기30+읽기40), TOPIK II = 104문제(듣기50+읽기50+쓰기4), EPS = 50문제
+      const getFullModeQuestionLimit = (): number => {
+        const dbType = dbExamType;
+        if (dbType === 'TOPIK_I') return 70;
+        if (dbType === 'TOPIK_II') return 104;
+        if (dbType === 'TOPIK_EPS') return 50;
+        return 70; // default
+      };
+      
       // 모드별 문제 수 제한
       const questionLimits: Record<string, number> = {
-        'full': mode === 'full' ? shuffledQuestions.length : 50,
-        'section': 30,
+        'full': getFullModeQuestionLimit(),
+        'section': section === 'listening' ? (dbExamType === 'TOPIK_II' ? 50 : dbExamType === 'TOPIK_I' ? 30 : 25) : 
+                   section === 'reading' ? (dbExamType === 'TOPIK_II' ? 50 : dbExamType === 'TOPIK_I' ? 40 : 25) : 30,
         'part': 15,
         'weakness': weaknessQuestionIds.length
       };
-      const limitedQuestions = shuffledQuestions.slice(0, questionLimits[mode] || 30);
+      const limitedQuestions = shuffledQuestions.slice(0, Math.min(questionLimits[mode] || 30, shuffledQuestions.length));
       
       const formattedQuestions: Question[] = limitedQuestions.map(q => ({
         id: q.id,
@@ -817,7 +827,32 @@ const MockExamTest = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex flex-col lg:flex-row">
+      {/* Mobile Header - Timer & Progress */}
+      <div className="lg:hidden sticky top-0 z-20 bg-card border-b p-3 flex items-center justify-between gap-3">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="shrink-0"
+        >
+          {sidebarOpen ? <X className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+        </Button>
+        <div className="flex-1 flex items-center gap-2">
+          <Progress value={progress} className="h-2 flex-1" />
+          <span className="text-xs text-muted-foreground shrink-0">{answeredCount}/{questions.length}</span>
+        </div>
+        {timeRemaining !== null && (
+          <div className={cn(
+            "flex items-center gap-1 px-2 py-1 rounded text-sm font-mono font-bold shrink-0",
+            timeRemaining < 300 ? "bg-destructive/10 text-destructive" : "bg-muted"
+          )}>
+            <Clock className="w-4 h-4" />
+            {formatTime(timeRemaining)}
+          </div>
+        )}
+      </div>
+
       {/* Sidebar - Question Navigation */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -825,25 +860,43 @@ const MockExamTest = () => {
             initial={{ x: -300, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -300, opacity: 0 }}
-            className="w-72 border-r bg-card flex flex-col h-screen sticky top-0"
+            className={cn(
+              "bg-card border-r flex flex-col",
+              // 모바일: 오버레이로 전체 화면
+              "fixed inset-0 z-30 lg:relative lg:z-auto",
+              "w-full lg:w-72 lg:h-screen lg:sticky lg:top-0"
+            )}
           >
-            <div className="p-4 border-b">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="font-bold">{examType?.replace('_', ' ')}</h2>
-                <Badge variant={isPracticeMode ? "secondary" : "default"}>
-                  {isPracticeMode ? "연습 모드" : "실전 모드"}
-                </Badge>
+            <div className="p-4 border-b flex items-center justify-between">
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="font-bold text-sm lg:text-base">{examType?.replace('_', ' ')}</h2>
+                  <Badge variant={isPracticeMode ? "secondary" : "default"} className="text-xs">
+                    {isPracticeMode ? "연습" : "실전"}
+                  </Badge>
+                </div>
+                <div className="hidden lg:block">
+                  <Progress value={progress} className="h-2" />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {answeredCount} / {questions.length} 완료
+                  </p>
+                </div>
               </div>
-              <Progress value={progress} className="h-2" />
-              <p className="text-sm text-muted-foreground mt-1">
-                {answeredCount} / {questions.length} 완료
-              </p>
+              {/* 모바일 닫기 버튼 */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSidebarOpen(false)}
+                className="lg:hidden ml-2"
+              >
+                <X className="w-5 h-5" />
+              </Button>
             </div>
             
-            {/* Timer (real mode only) */}
+            {/* Timer (real mode only) - desktop */}
             {timeRemaining !== null && (
               <div className={cn(
-                "p-4 border-b flex items-center gap-2",
+                "p-4 border-b items-center gap-2 hidden lg:flex",
                 timeRemaining < 300 && "bg-destructive/10"
               )}>
                 <Clock className={cn(
@@ -878,20 +931,23 @@ const MockExamTest = () => {
                         )}
                         <span>{sec === 'listening' ? '듣기' : sec === 'reading' ? '읽기' : '쓰기'}</span>
                       </div>
-                      <div className="grid grid-cols-5 gap-1.5">
+                      {/* 모바일: 6열, 데스크톱: 5열 */}
+                      <div className="grid grid-cols-6 lg:grid-cols-5 gap-1.5">
                         {sectionQuestions.map((q, idx) => {
                           const globalIndex = questions.indexOf(q);
                           const status = getAnswerStatus(q.id);
                           const isFlagged = flagged.has(q.id);
-                          // For writing questions, check if text answer exists
                           const hasWritingAnswer = sec === 'writing' && writingAnswers.has(q.id) && (writingAnswers.get(q.id)?.length || 0) > 0;
                           
                           return (
                             <button
                               key={q.id}
-                              onClick={() => setCurrentIndex(globalIndex)}
+                              onClick={() => {
+                                setCurrentIndex(globalIndex);
+                                setSidebarOpen(false); // 모바일에서 선택 후 닫기
+                              }}
                               className={cn(
-                                "w-10 h-10 rounded-lg text-sm font-medium transition-all relative",
+                                "w-9 h-9 lg:w-10 lg:h-10 rounded-lg text-xs lg:text-sm font-medium transition-all relative",
                                 globalIndex === currentIndex && "ring-2 ring-primary",
                                 !hasWritingAnswer && status === 'unanswered' && "bg-muted hover:bg-muted/80",
                                 (status === 'answered' || hasWritingAnswer) && "bg-primary text-primary-foreground",
@@ -901,7 +957,7 @@ const MockExamTest = () => {
                             >
                               {sec === 'writing' ? `${51 + idx}` : globalIndex + 1}
                               {isFlagged && (
-                                <Flag className="w-3 h-3 absolute -top-1 -right-1 text-amber-500 fill-amber-500" />
+                                <Flag className="w-2.5 h-2.5 lg:w-3 lg:h-3 absolute -top-1 -right-1 text-amber-500 fill-amber-500" />
                               )}
                             </button>
                           );
@@ -935,9 +991,9 @@ const MockExamTest = () => {
       </AnimatePresence>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col h-screen">
-        {/* Top Bar */}
-        <div className="border-b p-4 flex items-center justify-between bg-card">
+      <div className="flex-1 flex flex-col min-h-0 lg:h-screen">
+        {/* Top Bar - 데스크톱용 */}
+        <div className="hidden lg:flex border-b p-4 items-center justify-between bg-card">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
@@ -1048,8 +1104,44 @@ const MockExamTest = () => {
           </div>
         </div>
 
+        {/* Mobile Question Info Bar */}
+        <div className="lg:hidden bg-card border-b px-4 py-2 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="font-bold">
+              문제 {currentQuestion?.question_number || currentIndex + 1}
+            </span>
+            <span className="text-muted-foreground">
+              {currentQuestion?.section === 'listening' ? '듣기' : 
+               currentQuestion?.section === 'reading' ? '읽기' : '쓰기'}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            {/* Audio for mobile */}
+            {isListeningSection && currentQuestion?.question_audio_url && (
+              <Button
+                variant={isPlaying ? "secondary" : "default"}
+                size="sm"
+                onClick={handlePlayAudio}
+                disabled={!isPracticeMode && (playCount.get(currentQuestion?.id || '') || 0) >= 2}
+              >
+                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleFlag}
+            >
+              <Flag className={cn(
+                "w-4 h-4",
+                flagged.has(currentQuestion?.id || '') && "fill-amber-500 text-amber-500"
+              )} />
+            </Button>
+          </div>
+        </div>
+
         {/* Question Content */}
-        <ScrollArea className="flex-1 p-6">
+        <ScrollArea className="flex-1 p-4 lg:p-6">
           {currentQuestion && (
             <div className="max-w-3xl mx-auto">
               {/* 약점 집중 모드 - 추천 이유 배지 */}
@@ -1061,7 +1153,7 @@ const MockExamTest = () => {
                 >
                   <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30">
                     <Target className="w-4 h-4 text-amber-600" />
-                    <span className="text-sm font-medium text-amber-700 dark:text-amber-400">
+                    <span className="text-xs lg:text-sm font-medium text-amber-700 dark:text-amber-400">
                       💡 추천 이유: {getWeaknessReason(currentQuestion.id)}
                     </span>
                   </div>
@@ -1070,7 +1162,7 @@ const MockExamTest = () => {
               
               {/* Question Image */}
               {currentQuestion.question_image_url && (
-                <div className="mb-6">
+                <div className="mb-4 lg:mb-6">
                   <img 
                     src={currentQuestion.question_image_url} 
                     alt="문제 이미지" 
@@ -1081,9 +1173,9 @@ const MockExamTest = () => {
               
               {/* Instruction Text (지시문) */}
               {currentQuestion.instruction_text && (
-                <Card className="mb-4 border-primary/30 bg-primary/5">
-                  <CardContent className="pt-4">
-                    <p className="text-sm text-primary font-medium whitespace-pre-wrap">
+                <Card className="mb-3 lg:mb-4 border-primary/30 bg-primary/5">
+                  <CardContent className="pt-3 lg:pt-4">
+                    <p className="text-xs lg:text-sm text-primary font-medium whitespace-pre-wrap">
                       {currentQuestion.instruction_text}
                     </p>
                   </CardContent>
@@ -1091,9 +1183,9 @@ const MockExamTest = () => {
               )}
               
               {/* Question Text */}
-              <Card className="mb-6">
-                <CardContent className="pt-6">
-                  <p className="text-lg whitespace-pre-wrap leading-relaxed">{currentQuestion.question_text}</p>
+              <Card className="mb-4 lg:mb-6">
+                <CardContent className="pt-4 lg:pt-6">
+                  <p className="text-base lg:text-lg whitespace-pre-wrap leading-relaxed">{currentQuestion.question_text}</p>
                 </CardContent>
               </Card>
               

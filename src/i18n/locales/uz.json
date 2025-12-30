@@ -2390,7 +2390,10 @@
     },
     "dialog": {
       "title": "Bo'lim tanlang",
-      "description": "Mashq qilish uchun bo'limni tanlang"
+      "description": "Mashq qilish uchun bo'limni tanlang",
+      "listening": "Tinglash",
+      "reading": "O'qish",
+      "writing": "Yozish"
     }
   }
 }

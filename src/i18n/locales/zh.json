@@ -2399,7 +2399,10 @@
     },
     "dialog": {
       "title": "选择部分",
-      "description": "选择要练习的部分"
+      "description": "选择要练习的部分",
+      "listening": "听力",
+      "reading": "阅读",
+      "writing": "写作"
     }
   }
 }

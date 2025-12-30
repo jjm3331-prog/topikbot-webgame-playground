@@ -2636,7 +2636,10 @@
     },
     "dialog": {
       "title": "Select Section",
-      "description": "Choose the section to practice"
+      "description": "Choose the section to practice",
+      "listening": "Listening",
+      "reading": "Reading",
+      "writing": "Writing"
     }
   }
 }

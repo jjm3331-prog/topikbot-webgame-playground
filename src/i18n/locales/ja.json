@@ -2385,7 +2385,10 @@
     },
     "dialog": {
       "title": "セクション選択",
-      "description": "練習するセクションを選んでください"
+      "description": "練習するセクションを選んでください",
+      "listening": "聞き取り",
+      "reading": "読解",
+      "writing": "作文"
     }
   }
 }

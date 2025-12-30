@@ -2655,7 +2655,10 @@
     },
     "dialog": {
       "title": "Chọn phần",
-      "description": "Chọn phần để luyện tập"
+      "description": "Chọn phần để luyện tập",
+      "listening": "Nghe",
+      "reading": "Đọc",
+      "writing": "Viết"
     }
   }
 }
