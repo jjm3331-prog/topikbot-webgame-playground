@@ -370,7 +370,7 @@ async function generateListeningAudio(
         },
         body: JSON.stringify({
           text,
-          model_id: "eleven_multilingual_v2",
+          model_id: "eleven_v3", // 최신 V3 모델
           output_format: "mp3_44100_128",
           voice_settings: {
             stability: baseSettings.stability,
