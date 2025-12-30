@@ -8,19 +8,15 @@ const corsHeaders = {
 // ============================================
 // 한국어 네이티브 보이스 (ElevenLabs Voice Library)
 // ============================================
-// 최고 품질 한국어 네이티브 발음을 위해 선별된 보이스
+// 사용자 지정 최고 품질 한국어 네이티브 보이스
 
-// Seoyeon (서연) - 한국어 네이티브 여성, 또렷하고 따뜻한 목소리
-const VOICE_SEOYEON = "yoZ06aMxZJJ28mfd3POQ";
-// Junwoo (준우) - 한국어 네이티브 남성, 차분하고 명확한 발음
-const VOICE_JUNWOO = "ODq5zmih8GrVes37Dizd";
-// Yuna (유나) - 한국어 네이티브 여성, 젊고 밝은 톤
-const VOICE_YUNA = "XB0fDUnXU5powFXDhCwa";
-// Jinho (진호) - 한국어 네이티브 남성, 깊고 안정적인 목소리
-const VOICE_JINHO = "AZnzlk1XvdvUeBnXmlld";
+// 여성 목소리 - 사용자 지정
+const VOICE_FEMALE = "ksaI0TCD9BstzEzlxj4q";
+// 남성 목소리 - 사용자 지정
+const VOICE_MALE = "WqVy7827vjE2r3jWvbnP";
 
-// 기본 보이스: Seoyeon (가장 자연스러운 한국어 발음)
-const DEFAULT_KOREAN_VOICE = VOICE_SEOYEON;
+// 기본 보이스: 여성 (사용자 지정)
+const DEFAULT_KOREAN_VOICE = VOICE_FEMALE;
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -42,7 +38,7 @@ serve(async (req) => {
     // 성별에 따른 보이스 선택 또는 지정된 voiceId 사용
     let selectedVoice = voiceId || DEFAULT_KOREAN_VOICE;
     if (!voiceId && gender) {
-      selectedVoice = gender === 'male' ? VOICE_JUNWOO : VOICE_SEOYEON;
+      selectedVoice = gender === 'male' ? VOICE_MALE : VOICE_FEMALE;
     }
 
     console.log(`[TTS] Korean Native: text="${text.substring(0, 30)}..." voice=${selectedVoice} speed=${speed}`);
