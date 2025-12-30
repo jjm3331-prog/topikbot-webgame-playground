@@ -1543,13 +1543,22 @@
     "statsTitle": "아르바이트",
     "turn": "턴",
     "selectJob": "어디서 일할까요?",
+    "selectJobDesc": "일할 장소를 선택해주세요",
     "selectDifficulty": "난이도 선택",
+    "selectDifficultyDesc": "손님 난이도를 선택해주세요",
     "jobs": {
       "convenience_store": "편의점",
       "cafe": "카페",
       "restaurant": "식당",
       "pc_bang": "PC방",
       "bookstore": "서점"
+    },
+    "jobsDesc": {
+      "convenience_store": "계산, 상품 안내, 재고 정리",
+      "cafe": "음료 제조, 주문 접수, 서빙",
+      "restaurant": "주문 접수, 서빙, 계산",
+      "pc_bang": "좌석 안내, 기술 지원",
+      "bookstore": "도서 찾기, 상담, 계산"
     },
     "difficulty": {
       "easy": "쉬움",

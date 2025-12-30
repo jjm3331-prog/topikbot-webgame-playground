@@ -248,7 +248,7 @@ const PartTime = () => {
             >
               <div className="text-center mb-8">
                 <h1 className="text-2xl font-bold text-white mb-2">{t('parttime.selectJob')}</h1>
-                <p className="text-white/60">{t('parttime.selectJob')}</p>
+                <p className="text-white/60">{t('parttime.selectJobDesc')}</p>
               </div>
 
               <div className="grid grid-cols-1 gap-4">
@@ -265,7 +265,7 @@ const PartTime = () => {
                     </div>
                     <div className="text-left">
                       <h3 className="text-xl font-bold text-white">{t(`parttime.jobs.${job.id}`)}</h3>
-                      <p className="text-white/70">{t(`parttime.jobs.${job.id}`)}</p>
+                      <p className="text-white/70">{t(`parttime.jobsDesc.${job.id}`)}</p>
                     </div>
                   </motion.button>
                 ))}
@@ -284,7 +284,7 @@ const PartTime = () => {
             >
               <div className="text-center mb-8">
                 <h1 className="text-2xl font-bold text-white mb-2">{t('parttime.selectDifficulty')}</h1>
-                <p className="text-white/60">{t('parttime.selectDifficulty')}</p>
+                <p className="text-white/60">{t('parttime.selectDifficultyDesc')}</p>
               </div>
 
               <div className="grid grid-cols-1 gap-4">
