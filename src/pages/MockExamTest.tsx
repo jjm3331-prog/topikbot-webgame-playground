@@ -98,11 +98,29 @@ const MockExamTest = () => {
   const { toast } = useToast();
   
   const mode = searchParams.get('mode') || 'full';
-  const section = searchParams.get('section');
-  const partNumber = searchParams.get('part') ? parseInt(searchParams.get('part')!) : null;
+  const sectionRaw = searchParams.get('section');
+  const partRaw = searchParams.get('part');
+  const partNumber = partRaw ? Number(partRaw) : null;
   const weaknessQuestionIds = searchParams.get('questions')?.split(',').filter(Boolean) || [];
   const weaknessReasons = searchParams.get('reasons')?.split(',') || [];
-  
+
+  const allowedSections = new Set(['listening', 'reading', 'writing']);
+  const section = sectionRaw ? String(sectionRaw).toLowerCase() : null;
+  const safePartNumber = partNumber !== null && Number.isFinite(partNumber) ? partNumber : null;
+
+  // 잘못된 경로/파라미터 방어 (경로 전수 검사 핵심 가드)
+  if (mode === 'section' && section && !allowedSections.has(section)) {
+    toast({ title: '잘못된 접근', description: '영역 선택 값이 올바르지 않습니다.', variant: 'destructive' });
+    navigate('/mock-exam');
+    return null;
+  }
+  if (mode === 'part') {
+    if (!section || !allowedSections.has(section) || safePartNumber === null || safePartNumber <= 0) {
+      toast({ title: '잘못된 접근', description: '파트 선택 값이 올바르지 않습니다.', variant: 'destructive' });
+      navigate('/mock-exam');
+      return null;
+    }
+  }
   const dbExamTypeForPreset = mapExamTypeToDb(examType || 'topik1');
   const examPreset = getPreset(dbExamTypeForPreset, mode);
   
@@ -209,7 +227,7 @@ const MockExamTest = () => {
         if (mode === 'section') {
           attemptQuery = attemptQuery.eq('section', section || null).is('part_number', null);
         } else if (mode === 'part') {
-          attemptQuery = attemptQuery.eq('section', section || null).eq('part_number', partNumber);
+          attemptQuery = attemptQuery.eq('section', section || null).eq('part_number', safePartNumber);
         } else {
           attemptQuery = attemptQuery.is('section', null).is('part_number', null);
         }
@@ -235,7 +253,7 @@ const MockExamTest = () => {
       if (timerRef.current) clearInterval(timerRef.current);
       if (saveIntervalRef.current) clearInterval(saveIntervalRef.current);
     };
-  }, [examType, mode, section, partNumber]);
+  }, [examType, mode, section, safePartNumber]);
 
   const startNewAttempt = async (userId: string) => {
     try {
@@ -274,8 +292,8 @@ const MockExamTest = () => {
         if (section) {
           query = query.eq('section', section);
         }
-        if (partNumber) {
-          query = query.eq('part_number', partNumber);
+        if (safePartNumber) {
+          query = query.eq('part_number', safePartNumber);
         }
         if (mode !== 'full' && difficulty !== 'all') {
           query = query.in('difficulty', difficultyValues);
@@ -285,6 +303,7 @@ const MockExamTest = () => {
       const { data: allQuestionData, error } = await query.order('section').order('part_number').order('question_number');
       
       if (error) {
+        console.error('[MockExamTest] question load error', { examType, mode, section, safePartNumber, error });
         toast({ title: "문제를 불러올 수 없습니다", description: "관리자에게 문의하세요", variant: "destructive" });
         navigate('/mock-exam');
         return;
@@ -298,6 +317,7 @@ const MockExamTest = () => {
       }
       
       if (!questionData.length) {
+        console.warn('[MockExamTest] no questions found', { examType, mode, section, safePartNumber });
         toast({ title: "문제를 불러올 수 없습니다", description: "관리자에게 문의하세요", variant: "destructive" });
         navigate('/mock-exam');
         return;
@@ -361,7 +381,7 @@ const MockExamTest = () => {
           exam_type: dbExamType,
           exam_mode: mode,
           section: section || null,
-          part_number: partNumber,
+          part_number: safePartNumber,
           total_questions: formattedQuestions.length,
           correct_count: 0,
           time_limit_seconds: attemptTimeLimit,
