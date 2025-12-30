@@ -43,8 +43,7 @@ serve(async (req) => {
 
     console.log(`[TTS] Korean Native: text="${text.substring(0, 30)}..." voice=${selectedVoice} speed=${speed}`);
 
-    // eleven_multilingual_v2: 최고 품질 다국어 모델 (한국어 발음 최적화)
-    // turbo_v2_5는 빠르지만 한국어 발음 품질이 떨어짐
+    // eleven_v3: 최신 최고 품질 모델 (2025년 8월 출시)
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${selectedVoice}`,
       {
@@ -55,13 +54,13 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           text,
-          model_id: "eleven_multilingual_v2", // 한국어 최적화 모델
+          model_id: "eleven_v3", // 최신 V3 모델
           output_format: "mp3_44100_128",
           voice_settings: {
-            stability: 0.7,         // 안정성 (높을수록 일관된 발음)
-            similarity_boost: 0.9,  // 원본 보이스 유사도
-            style: 0.2,             // 스타일 강도 (낮을수록 자연스러움)
-            use_speaker_boost: true, // 선명도 향상
+            stability: 0.7,
+            similarity_boost: 0.9,
+            style: 0.2,
+            use_speaker_boost: true,
           },
         }),
       }
