@@ -207,11 +207,11 @@ const Landing = () => {
       {/* ========== HERO SECTION ========== */}
       <motion.section
         style={{ opacity: heroOpacity, scale: heroScale }}
-        className="min-h-[90dvh] md:min-h-[100dvh] flex flex-col items-center justify-center px-4 sm:px-6 pt-20 pb-12 relative overflow-hidden"
+        className="min-h-[85dvh] sm:min-h-[90dvh] md:min-h-[100dvh] flex flex-col items-center justify-center px-4 sm:px-6 pt-16 sm:pt-20 pb-8 sm:pb-12 relative overflow-hidden"
       >
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="blob-primary w-[600px] h-[600px] -top-40 -right-32" />
-          <div className="blob-secondary w-[400px] h-[400px] -bottom-32 -left-32" />
+          <div className="blob-primary w-[400px] sm:w-[600px] h-[400px] sm:h-[600px] -top-40 -right-32" />
+          <div className="blob-secondary w-[300px] sm:w-[400px] h-[300px] sm:h-[400px] -bottom-32 -left-32" />
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto text-center">
@@ -258,12 +258,12 @@ const Landing = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
             transition={{ duration: 0.5, delay: 0.6 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8"
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6 sm:mb-8"
           >
             <Button
               onClick={() => navigate("/auth")}
               size="lg"
-              className="group w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-10 btn-primary text-primary-foreground text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl"
+              className="group w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-10 btn-primary text-primary-foreground text-sm sm:text-base md:text-lg font-bold rounded-xl sm:rounded-2xl min-h-[48px]"
             >
               <Rocket className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               {t("landing.hero.cta")}
@@ -336,15 +336,15 @@ const Landing = () => {
       </section>
 
       {/* ========== STATS SECTION WITH ANIMATED COUNTERS ========== */}
-      <section className="py-16 sm:py-20 px-4 sm:px-6">
+      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0 }}
-              className="floating-card p-3 sm:p-6 text-center group"
+              className="floating-card p-3 sm:p-4 md:p-6 text-center group"
             >
               <motion.div
                 initial={{ scale: 0 }}
@@ -352,12 +352,12 @@ const Landing = () => {
                 viewport={{ once: true }}
                 transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
               >
-                <Users className="w-5 h-5 sm:w-8 sm:h-8 mx-auto mb-1.5 sm:mb-3 text-primary group-hover:scale-110 transition-transform" />
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 mx-auto mb-1.5 sm:mb-2 md:mb-3 text-primary group-hover:scale-110 transition-transform" />
               </motion.div>
-              <div className="font-black text-lg sm:text-2xl md:text-3xl text-gradient-primary mb-0.5 sm:mb-1">
+              <div className="font-black text-base sm:text-lg md:text-2xl lg:text-3xl text-gradient-primary mb-0.5">
                 <AnimatedCounter target={50000} suffix="+" duration={2.5} />
               </div>
-              <div className="text-muted-foreground text-[10px] sm:text-xs">{t("landing.stats.students")}</div>
+              <div className="text-muted-foreground text-[9px] sm:text-[10px] md:text-xs leading-tight">{t("landing.stats.students")}</div>
             </motion.div>
             
             <motion.div
@@ -678,64 +678,64 @@ const Landing = () => {
 
 
       {/* ========== HEADHUNTING PROMO BANNER ========== */}
-      <section className="py-16 sm:py-20 px-4 sm:px-6">
+      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-korean-teal via-korean-blue to-korean-purple p-6 sm:p-8 lg:p-10"
+            className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-korean-teal via-korean-blue to-korean-purple p-5 sm:p-6 lg:p-10"
           >
             {/* Subtle overlay for depth */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1),transparent_50%)]" />
             
-            <div className="relative z-10 flex flex-col lg:flex-row items-center gap-6 lg:gap-8">
+            <div className="relative z-10 flex flex-col lg:flex-row items-center gap-4 sm:gap-6 lg:gap-8">
               {/* Icon */}
               <div className="flex-shrink-0">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
-                  <Briefcase className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-lg sm:rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                  <Briefcase className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white" />
                 </div>
               </div>
               
               {/* Content */}
               <div className="flex-1 text-center lg:text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-semibold mb-3">
-                  <Crown className="w-3.5 h-3.5" />
+                <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-white/20 text-white text-[10px] sm:text-xs font-semibold mb-2 sm:mb-3">
+                  <Crown className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                   <span>{t("landing.headhunting.badge")}</span>
                 </div>
-                <h3 className="font-heading font-bold text-xl sm:text-2xl lg:text-3xl text-white mb-2">
+                <h3 className="font-heading font-bold text-lg sm:text-xl lg:text-2xl xl:text-3xl text-white mb-1.5 sm:mb-2 leading-tight">
                   {t("landing.headhunting.title1")} <span className="text-korean-yellow">{t("landing.headhunting.title2")}</span>
                 </h3>
-                <p className="text-white/80 text-sm sm:text-base mb-4">
+                <p className="text-white/80 text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed">
                   {t("landing.headhunting.desc1")} <strong className="text-white">{t("landing.headhunting.free")}</strong>. {t("landing.headhunting.desc2")}
                 </p>
-                <div className="flex flex-wrap justify-center lg:justify-start gap-2 text-xs text-white/90">
-                  <span className="flex items-center gap-1.5 bg-white/15 px-2.5 py-1 rounded-full">
-                    <Check className="w-3 h-3 text-korean-green" /> 
+                <div className="flex flex-wrap justify-center lg:justify-start gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-white/90">
+                  <span className="flex items-center gap-1 sm:gap-1.5 bg-white/15 px-2 sm:px-2.5 py-1 rounded-full">
+                    <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-korean-green" /> 
                     {t("landing.headhunting.tag1")}
                   </span>
-                  <span className="flex items-center gap-1.5 bg-white/15 px-2.5 py-1 rounded-full">
-                    <Check className="w-3 h-3 text-korean-green" /> 
+                  <span className="flex items-center gap-1 sm:gap-1.5 bg-white/15 px-2 sm:px-2.5 py-1 rounded-full">
+                    <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-korean-green" /> 
                     {t("landing.headhunting.tag2")}
                   </span>
-                  <span className="flex items-center gap-1.5 bg-white/15 px-2.5 py-1 rounded-full">
-                    <Check className="w-3 h-3 text-korean-green" /> 
+                  <span className="flex items-center gap-1 sm:gap-1.5 bg-white/15 px-2 sm:px-2.5 py-1 rounded-full">
+                    <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-korean-green" /> 
                     {t("landing.headhunting.tag3")}
                   </span>
                 </div>
               </div>
               
               {/* CTA */}
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 w-full lg:w-auto">
                 <Button
                   onClick={() => navigate("/headhunting")}
                   size="lg"
-                  className="h-12 px-6 bg-white hover:bg-white/95 text-korean-blue font-bold text-sm rounded-xl group shadow-lg"
+                  className="w-full lg:w-auto h-11 sm:h-12 px-5 sm:px-6 bg-white hover:bg-white/95 text-korean-blue font-bold text-xs sm:text-sm rounded-lg sm:rounded-xl group shadow-lg min-h-[44px]"
                 >
                   {t("landing.headhunting.cta")}
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="ml-2 w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
-                <p className="text-white/70 text-[10px] text-center mt-1.5">
+                <p className="text-white/70 text-[9px] sm:text-[10px] text-center mt-1 sm:mt-1.5">
                   {t("landing.headhunting.ctaSub")}
                 </p>
               </div>
@@ -890,23 +890,23 @@ const Landing = () => {
       </section>
 
       {/* ========== FINAL CTA ========== */}
-      <section className="py-16 sm:py-20 px-4 sm:px-6 bg-muted/30">
+      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 bg-muted/30">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="max-w-xl mx-auto text-center"
         >
-          <h2 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl text-foreground mb-4">
+          <h2 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl text-foreground mb-3 sm:mb-4 leading-tight">
             <span className="text-gradient-primary">{t("landing.finalCta.title1")}</span> {t("landing.finalCta.title2")}!
           </h2>
-          <p className="text-muted-foreground text-sm sm:text-base mb-6">
+          <p className="text-muted-foreground text-xs sm:text-sm md:text-base mb-5 sm:mb-6 px-2">
             {t("landing.finalCta.desc")} <span className="text-foreground font-semibold">{t("landing.finalCta.noRival")}</span>
           </p>
           <Button
             onClick={() => navigate("/auth")}
             size="lg"
-            className="group h-12 sm:h-14 px-8 sm:px-10 btn-primary text-primary-foreground text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl"
+            className="group w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-10 btn-primary text-primary-foreground text-sm sm:text-base md:text-lg font-bold rounded-xl sm:rounded-2xl min-h-[48px]"
           >
             <Rocket className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
             {t("landing.finalCta.cta")}

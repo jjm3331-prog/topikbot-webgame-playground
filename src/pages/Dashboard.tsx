@@ -190,22 +190,22 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
       <CleanHeader />
-      <main className="flex-1 pt-8 pb-8 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto w-full space-y-6">
+      <main className="flex-1 pt-6 sm:pt-8 pb-8 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto w-full space-y-5 sm:space-y-6">
           {/* Welcome Message */}
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <div className="flex items-start gap-4">
-              <span className="text-4xl sm:text-5xl">👋</span>
-              <div>
-                <h1 className="text-title font-bold text-foreground">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <span className="text-3xl sm:text-4xl md:text-5xl flex-shrink-0">👋</span>
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground leading-tight">
                   {t('dashboard.welcome', { name: profile?.username || 'User' })}
                 </h1>
-                <p className="text-body text-muted-foreground mt-1">{t('dashboard.whatToLearn')}</p>
+                <p className="text-sm sm:text-base text-muted-foreground mt-0.5 sm:mt-1">{t('dashboard.whatToLearn')}</p>
               </div>
             </div>
           </motion.div>
@@ -215,28 +215,28 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="grid gap-4 sm:grid-cols-2"
+            className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2"
           >
             {/* Points & Level Card */}
             <div 
               onClick={() => navigate("/points-system")}
-              className="glass-card rounded-2xl p-5 cursor-pointer hover:shadow-lg transition-all group"
+              className="glass-card rounded-xl sm:rounded-2xl p-4 sm:p-5 cursor-pointer hover:shadow-lg transition-all group active:scale-[0.98]"
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-korean-orange to-korean-pink flex items-center justify-center">
-                    <Star className="w-6 h-6 text-white" />
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <div className="flex items-center gap-2.5 sm:gap-3">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-korean-orange to-korean-pink flex items-center justify-center flex-shrink-0">
+                    <Star className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
-                  <div>
-                    <p className="text-card-caption text-muted-foreground">{t('dashboard.totalPoints')}</p>
-                    <p className="text-2xl font-bold text-foreground">{profile?.points?.toLocaleString() || 0}</p>
+                  <div className="min-w-0">
+                    <p className="text-xs sm:text-sm text-muted-foreground">{t('dashboard.totalPoints')}</p>
+                    <p className="text-xl sm:text-2xl font-bold text-foreground">{profile?.points?.toLocaleString() || 0}</p>
                   </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground group-hover:translate-x-1 transition-transform flex-shrink-0" />
               </div>
               
               {levelInfo && (
-                <div className="space-y-2">
+                <div className="space-y-1.5 sm:space-y-2">
                   <div className="flex items-center justify-between">
                     <span className={`text-card-body font-semibold ${levelInfo.color}`}>
                       {levelInfo.name}
@@ -367,15 +367,14 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.11 }}
-            className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"
+            className="grid grid-cols-1 sm:grid-cols-2 gap-3"
           >
             {/* Video Learning Banner */}
             <motion.div 
               onClick={() => navigate("/video-hub")}
-              whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
-              className="relative overflow-hidden rounded-2xl cursor-pointer group h-[110px] sm:h-[140px] shadow-lg hover:shadow-xl hover:shadow-cyan-500/20"
+              className="relative overflow-hidden rounded-xl sm:rounded-2xl cursor-pointer group h-[100px] sm:h-[120px] md:h-[140px] shadow-lg hover:shadow-xl hover:shadow-cyan-500/20 active:scale-[0.98]"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 via-blue-500 to-violet-600 group-hover:from-cyan-400 group-hover:via-blue-400 group-hover:to-violet-500 transition-all duration-500" />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
