@@ -56,8 +56,9 @@ serve(async (req) => {
           text,
           model_id: "eleven_v3", // 최신 V3 모델
           output_format: "mp3_44100_128",
+          // eleven_v3 stability 값: 0.0 (Creative), 0.5 (Natural), 1.0 (Robust) 중 하나만 허용
           voice_settings: {
-            stability: 0.7,
+            stability: 1.0, // Robust - 명확한 발음
             similarity_boost: 0.9,
             style: 0.2,
             use_speaker_boost: true,

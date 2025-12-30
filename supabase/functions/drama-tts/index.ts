@@ -46,8 +46,9 @@ serve(async (req) => {
           // eleven_v3: 최신 최고 품질 모델 (2025년 8월 출시)
           model_id: "eleven_v3",
           output_format: "mp3_44100_128",
+          // eleven_v3 stability 값: 0.0 (Creative), 0.5 (Natural), 1.0 (Robust) 중 하나만 허용
           voice_settings: {
-            stability: 0.4, // More expressive for drama
+            stability: 0.0, // Creative - 드라마용 표현력 극대화
             similarity_boost: 0.8,
             style: 0.5, // More stylized for drama
             use_speaker_boost: true,
