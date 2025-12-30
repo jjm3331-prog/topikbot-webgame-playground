@@ -108,19 +108,10 @@ const MockExamTest = () => {
   const section = sectionRaw ? String(sectionRaw).toLowerCase() : null;
   const safePartNumber = partNumber !== null && Number.isFinite(partNumber) ? partNumber : null;
 
-  // 잘못된 경로/파라미터 방어 (경로 전수 검사 핵심 가드)
-  if (mode === 'section' && section && !allowedSections.has(section)) {
-    toast({ title: '잘못된 접근', description: '영역 선택 값이 올바르지 않습니다.', variant: 'destructive' });
-    navigate('/mock-exam');
-    return null;
-  }
-  if (mode === 'part') {
-    if (!section || !allowedSections.has(section) || safePartNumber === null || safePartNumber <= 0) {
-      toast({ title: '잘못된 접근', description: '파트 선택 값이 올바르지 않습니다.', variant: 'destructive' });
-      navigate('/mock-exam');
-      return null;
-    }
-  }
+  // 잘못된 경로/파라미터 방어 (훅 순서 깨지지 않도록 "리다이렉트 플래그"만 계산)
+  const invalidRoute =
+    (mode === 'section' && section !== null && !allowedSections.has(section)) ||
+    (mode === 'part' && (!section || !allowedSections.has(section) || safePartNumber === null || safePartNumber <= 0));
   const dbExamTypeForPreset = mapExamTypeToDb(examType || 'topik1');
   const examPreset = getPreset(dbExamTypeForPreset, mode);
   
@@ -204,6 +195,12 @@ const MockExamTest = () => {
 
   useEffect(() => {
     const initExam = async () => {
+      if (invalidRoute) {
+        toast({ title: '잘못된 접근', description: '선택한 영역/파트 경로가 올바르지 않습니다.', variant: 'destructive' });
+        navigate('/mock-exam');
+        return;
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({ title: "로그인이 필요합니다", variant: "destructive" });
@@ -253,7 +250,7 @@ const MockExamTest = () => {
       if (timerRef.current) clearInterval(timerRef.current);
       if (saveIntervalRef.current) clearInterval(saveIntervalRef.current);
     };
-  }, [examType, mode, section, safePartNumber]);
+  }, [examType, mode, section, safePartNumber, invalidRoute]);
 
   const startNewAttempt = async (userId: string) => {
     try {
