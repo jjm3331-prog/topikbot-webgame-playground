@@ -243,10 +243,10 @@ const Pricing = () => {
             transition={{ delay: 0.1 }}
             className="flex justify-center mb-8"
           >
-            <div className="inline-flex items-center p-1.5 rounded-full bg-muted border border-border">
+            <div className="inline-flex items-center p-1 sm:p-1.5 rounded-full bg-muted border border-border overflow-x-auto max-w-full">
               <button
                 onClick={() => setBillingPeriod("1-month")}
-                className={`px-4 sm:px-5 py-2.5 rounded-full text-card-caption sm:text-card-body font-medium transition-all ${
+                className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all whitespace-nowrap min-h-[40px] ${
                   billingPeriod === "1-month"
                     ? "bg-background text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
@@ -256,27 +256,27 @@ const Pricing = () => {
               </button>
               <button
                 onClick={() => setBillingPeriod("6-months")}
-                className={`px-4 sm:px-5 py-2.5 rounded-full text-card-caption sm:text-card-body font-medium transition-all relative ${
+                className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all relative whitespace-nowrap min-h-[40px] ${
                   billingPeriod === "6-months"
                     ? "bg-background text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {t("pricing.period.6months")}
-                <span className="absolute -top-2.5 -right-2.5 px-2 py-0.5 rounded text-badge font-bold bg-korean-orange text-white">
+                <span className="absolute -top-2 -right-1 sm:-top-2.5 sm:-right-2.5 px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold bg-korean-orange text-white">
                   -20%
                 </span>
               </button>
               <button
                 onClick={() => setBillingPeriod("12-months")}
-                className={`px-4 sm:px-5 py-2.5 rounded-full text-card-caption sm:text-card-body font-medium transition-all relative ${
+                className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all relative whitespace-nowrap min-h-[40px] ${
                   billingPeriod === "12-months"
                     ? "bg-background text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {t("pricing.period.12months")}
-                <span className="absolute -top-2.5 -right-2.5 px-2 py-0.5 rounded text-badge font-bold bg-korean-green text-white">
+                <span className="absolute -top-2 -right-1 sm:-top-2.5 sm:-right-2.5 px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold bg-korean-green text-white">
                   BEST
                 </span>
               </button>
@@ -288,10 +288,10 @@ const Pricing = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto mb-12"
+            className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-3xl mx-auto mb-10 sm:mb-12"
           >
             {/* Free Plan */}
-            <div className="relative rounded-2xl p-7 border bg-card border-border hover:border-primary/30 transition-all">
+            <div className="relative rounded-xl sm:rounded-2xl p-5 sm:p-7 border bg-card border-border hover:border-primary/30 transition-all">
               <span className="absolute -top-3.5 left-6 px-4 py-1.5 rounded-full bg-muted text-foreground text-badge font-bold border border-border">
                 {t("pricing.free.badge")}
               </span>

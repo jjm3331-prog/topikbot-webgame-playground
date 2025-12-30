@@ -115,48 +115,48 @@ export default function GameHub() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
       <CleanHeader />
 
-      <main className="flex-1 pt-6 pb-12 px-4 sm:px-6">
+      <main className="flex-1 pt-4 sm:pt-6 pb-8 sm:pb-12 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto w-full">
           <header>
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-8"
+              className="mb-6 sm:mb-8"
             >
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate("/dashboard")}
-                className="mb-4 -ml-2"
+                className="mb-3 sm:mb-4 -ml-2 h-10 touch-target"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 {t("common.back")}
               </Button>
 
-              <div className="flex items-center gap-5 mb-5">
-                <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-korean-orange via-korean-pink to-korean-purple flex items-center justify-center shadow-lg">
-                  <Gamepad2 className="w-9 h-9 sm:w-10 sm:h-10 text-white" />
+              <div className="flex items-center gap-3 sm:gap-5 mb-4 sm:mb-5">
+                <div className="w-14 h-14 sm:w-18 md:w-20 sm:h-18 md:h-20 rounded-xl sm:rounded-2xl bg-gradient-to-br from-korean-orange via-korean-pink to-korean-purple flex items-center justify-center shadow-lg flex-shrink-0">
+                  <Gamepad2 className="w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 text-white" />
                 </div>
-                <div>
-                  <h1 className="text-title font-bold text-foreground">{t("gameHub.title")}</h1>
-                  <p className="text-body text-muted-foreground mt-1">{t("gameHub.description")}</p>
+                <div className="min-w-0">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground leading-tight">{t("gameHub.title")}</h1>
+                  <p className="text-sm sm:text-base text-muted-foreground mt-0.5 sm:mt-1">{t("gameHub.description")}</p>
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-3 mt-5">
-                <Badge variant="outline" className="gap-2 py-2 px-4 text-card-caption">
-                  <Gamepad2 className="w-4 h-4 text-korean-orange" />
+              <div className="flex flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-5">
+                <Badge variant="outline" className="gap-1.5 sm:gap-2 py-1.5 sm:py-2 px-2.5 sm:px-4 text-xs sm:text-sm">
+                  <Gamepad2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-korean-orange" />
                   <span>{t("gameHub.games")}</span>
                 </Badge>
-                <Badge variant="outline" className="gap-2 py-2 px-4 text-card-caption">
-                  <Sparkles className="w-4 h-4 text-korean-pink" />
+                <Badge variant="outline" className="gap-1.5 sm:gap-2 py-1.5 sm:py-2 px-2.5 sm:px-4 text-xs sm:text-sm">
+                  <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-korean-pink" />
                   <span>{t("gameHub.aiInteractive")}</span>
                 </Badge>
-                <Badge variant="outline" className="gap-2 py-2 px-4 text-card-caption">
-                  <Zap className="w-4 h-4 text-korean-green" />
+                <Badge variant="outline" className="gap-1.5 sm:gap-2 py-1.5 sm:py-2 px-2.5 sm:px-4 text-xs sm:text-sm">
+                  <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-korean-green" />
                   <span>{t("gameHub.learnPlay")}</span>
                 </Badge>
               </div>
@@ -165,7 +165,7 @@ export default function GameHub() {
 
           <section>
             <motion.section variants={containerVariants} initial="hidden" animate="visible">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
                 {gameMenus.map((menu, index) => {
                   const title = t(menu.titleKey);
                   const subtitle = t(menu.subtitleKey);
@@ -178,23 +178,23 @@ export default function GameHub() {
                     >
                       <Card
                         onClick={() => navigate(menu.path)}
-                        className={`relative overflow-hidden cursor-pointer group h-full border-2 ${menu.borderColor} hover:shadow-2xl hover:scale-[1.02] transition-all duration-300`}
+                        className={`relative overflow-hidden cursor-pointer group h-full border ${menu.borderColor} hover:shadow-xl active:scale-[0.98] transition-all duration-200`}
                       >
                         <div
                           className={`absolute inset-0 bg-gradient-to-br ${menu.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
                         />
 
                         {menu.isHot && (
-                          <div className="absolute top-4 right-4 z-20">
-                            <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white text-badge px-3 py-1.5 font-semibold">
+                          <div className="absolute top-2 sm:top-3 right-2 sm:right-3 z-20">
+                            <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 font-semibold">
                               🔥 {t("gameHub.hot")}
                             </Badge>
                           </div>
                         )}
 
-                        <div className="relative z-10 p-6 sm:p-8 flex flex-col items-center text-center h-full">
-                          <div className="relative mb-4">
-                            <span className="text-5xl sm:text-6xl group-hover:scale-125 transition-transform duration-300 block">
+                        <div className="relative z-10 p-4 sm:p-6 flex flex-col items-center text-center h-full">
+                          <div className="relative mb-2 sm:mb-3">
+                            <span className="text-3xl sm:text-4xl md:text-5xl group-hover:scale-110 transition-transform duration-300 block">
                               {menu.emoji}
                             </span>
                             <div
@@ -202,21 +202,21 @@ export default function GameHub() {
                             />
                           </div>
 
-                          <h3 className="font-bold text-foreground text-card-title-lg sm:text-2xl mb-1.5">
+                          <h3 className="font-bold text-foreground text-sm sm:text-base md:text-lg mb-0.5 sm:mb-1 leading-snug">
                             {title}
                           </h3>
-                          <p className="text-card-caption sm:text-base text-muted-foreground mb-3">{subtitle}</p>
+                          <p className="text-[11px] sm:text-xs md:text-sm text-muted-foreground mb-1.5 sm:mb-2">{subtitle}</p>
 
-                          <p className="text-card-body sm:text-lg text-muted-foreground/90 leading-relaxed flex-1">
+                          <p className="text-xs sm:text-sm text-muted-foreground/90 leading-relaxed flex-1 line-clamp-2 sm:line-clamp-none">
                             {description}
                           </p>
 
-                          <div className="mt-6 w-full">
+                          <div className="mt-3 sm:mt-4 w-full">
                             <div
-                              className={`flex items-center justify-center gap-2 py-3 sm:py-3.5 rounded-xl bg-gradient-to-r ${menu.color} opacity-0 group-hover:opacity-100 transition-all duration-300`}
+                              className={`flex items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 rounded-lg sm:rounded-xl bg-gradient-to-r ${menu.color} sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300`}
                             >
-                              <span className="text-white text-button-lg font-bold">{t("common.playNow")}</span>
-                              <ChevronRight className="w-5 h-5 text-white" />
+                              <span className="text-white text-xs sm:text-sm font-bold">{t("common.playNow")}</span>
+                              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                             </div>
                           </div>
                         </div>
@@ -233,17 +233,17 @@ export default function GameHub() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="mt-12 text-center"
+              className="mt-8 sm:mt-12 text-center"
             >
-              <Card className="p-8 sm:p-10 bg-gradient-to-br from-korean-orange/10 via-korean-pink/10 to-korean-purple/10 border-korean-orange/20">
-                <Trophy className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-5 text-korean-orange" />
-                <h2 className="text-headline sm:text-2xl font-bold text-foreground mb-3">{t("gameHub.funLearning")}</h2>
-                <p className="text-body text-muted-foreground mb-6">{t("gameHub.dailyPlay")}</p>
+              <Card className="p-5 sm:p-8 md:p-10 bg-gradient-to-br from-korean-orange/10 via-korean-pink/10 to-korean-purple/10 border-korean-orange/20">
+                <Trophy className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto mb-3 sm:mb-5 text-korean-orange" />
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground mb-2 sm:mb-3">{t("gameHub.funLearning")}</h2>
+                <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">{t("gameHub.dailyPlay")}</p>
                 <Button
                   onClick={() => navigate("/dashboard")}
-                  className="bg-gradient-to-r from-korean-orange to-korean-pink hover:opacity-90 text-button-lg py-3 px-6"
+                  className="bg-gradient-to-r from-korean-orange to-korean-pink hover:opacity-90 text-sm sm:text-base py-2.5 sm:py-3 px-4 sm:px-6 h-auto min-h-[44px]"
                 >
-                  <Star className="w-5 h-5 mr-2" />
+                  <Star className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   {t("common.backToDashboard")}
                 </Button>
               </Card>
