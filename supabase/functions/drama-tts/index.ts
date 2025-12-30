@@ -5,11 +5,11 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Korean Native Voices (High Quality)
-// Seoyeon - 한국어 네이티브 여성, 자연스럽고 명확한 발음
-const KOREAN_VOICE_FEMALE = "yoZ06aMxZJJ28mfd3POQ";
-// Junwoo - 한국어 네이티브 남성, 자연스럽고 명확한 발음
-const KOREAN_VOICE_MALE = "ODq5zmih8GrVes37Dizd";
+// 사용자 지정 최고 품질 한국어 네이티브 보이스
+// 여성 목소리 - 사용자 지정
+const KOREAN_VOICE_FEMALE = "ksaI0TCD9BstzEzlxj4q";
+// 남성 목소리 - 사용자 지정
+const KOREAN_VOICE_MALE = "WqVy7827vjE2r3jWvbnP";
 const DEFAULT_VOICE_ID = KOREAN_VOICE_FEMALE;
 
 serve(async (req) => {
@@ -43,8 +43,8 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           text,
-          // eleven_multilingual_v2: Native Korean pronunciation for drama dubbing
-          model_id: "eleven_multilingual_v2",
+          // eleven_v3: 최신 최고 품질 모델 (2025년 8월 출시)
+          model_id: "eleven_v3",
           output_format: "mp3_44100_128",
           voice_settings: {
             stability: 0.4, // More expressive for drama
