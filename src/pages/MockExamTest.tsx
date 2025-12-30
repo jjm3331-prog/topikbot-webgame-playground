@@ -6,8 +6,6 @@ import {
   Clock, 
   ChevronLeft, 
   ChevronRight, 
-  Volume2, 
-  VolumeX,
   Play,
   Pause,
   BookOpen,
@@ -15,21 +13,18 @@ import {
   PenTool,
   Flag,
   CheckCircle2,
-  AlertCircle,
   X,
-  Save,
-  RotateCcw,
   Send,
   Home,
-  Eye,
   FileText,
-  EyeOff,
   Lightbulb,
   Target,
-  Gauge
+  Gauge,
+  Grid3X3,
+  ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -37,6 +32,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Slider } from "@/components/ui/slider";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { mapExamTypeToDb } from "@/lib/mockExamDb";
@@ -53,7 +49,7 @@ interface Question {
   question_number?: number;
   question_audio_url?: string;
   question_image_url?: string;
-  option_images?: string[]; // 그림 문제용 - 4개 이미지 보기
+  option_images?: string[];
   explanation_ko?: string;
   explanation_vi?: string;
   explanation_en?: string;
@@ -65,7 +61,6 @@ interface Question {
   instruction_text?: string;
   exam_round?: number;
   exam_year?: number;
-  // Writing section specific
   question_type?: 'multiple_choice' | 'short_answer' | 'essay';
   word_limit?: number;
   sample_answer?: string;
@@ -92,7 +87,6 @@ interface AnswerData {
   user_answer: number | null;
   is_correct?: boolean;
   time_spent_seconds?: number;
-  // Writing answer
   text_answer?: string;
 }
 
@@ -103,54 +97,46 @@ const MockExamTest = () => {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
   
-  // Mode from URL params
-  const mode = searchParams.get('mode') || 'full'; // full, section, part, weakness
-  const section = searchParams.get('section'); // listening, reading
+  const mode = searchParams.get('mode') || 'full';
+  const section = searchParams.get('section');
   const partNumber = searchParams.get('part') ? parseInt(searchParams.get('part')!) : null;
-  const weaknessQuestionIds = searchParams.get('questions')?.split(',').filter(Boolean) || []; // for weakness mode
-  const weaknessReasons = searchParams.get('reasons')?.split(',') || []; // 추천 이유
+  const weaknessQuestionIds = searchParams.get('questions')?.split(',').filter(Boolean) || [];
+  const weaknessReasons = searchParams.get('reasons')?.split(',') || [];
   
-  // Get preset settings
   const dbExamTypeForPreset = mapExamTypeToDb(examType || 'topik1');
   const examPreset = getPreset(dbExamTypeForPreset, mode);
   
-  // State
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Map<string, AnswerData>>(new Map());
   const [flagged, setFlagged] = useState<Set<string>>(new Set());
   const [attempt, setAttempt] = useState<AttemptData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   const [showResultDialog, setShowResultDialog] = useState(false);
+  const [showQuestionGrid, setShowQuestionGrid] = useState(false);
   const [user, setUser] = useState<any>(null);
   
-  // Timer state
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Audio state (for listening section)
   const [isPlaying, setIsPlaying] = useState(false);
   const [playCount, setPlayCount] = useState<Map<string, number>>(new Map());
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
-  // Practice mode state - based on preset settings
   const isPracticeMode = examPreset ? 
     examPreset.settings.explanationTiming === 'immediate' : 
     (mode === 'section' || mode === 'part' || mode === 'weakness');
   const [showExplanation, setShowExplanation] = useState<Map<string, boolean>>(new Map());
   
-  // 프리셋 설정 적용
   const allowPause = examPreset?.settings.allowPause ?? isPracticeMode;
   const allowSkip = examPreset?.settings.allowSkip ?? true;
   const explanationTiming = examPreset?.settings.explanationTiming ?? (isPracticeMode ? 'immediate' : 'after_exam');
   const scoringMethod = examPreset?.settings.scoringMethod ?? (isPracticeMode ? 'immediate' : 'after_submit');
   
-  // Auto-save interval
   const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const currentQuestion = questions[currentIndex];
@@ -158,21 +144,14 @@ const MockExamTest = () => {
   const isWritingSection = currentQuestion?.section === 'writing';
   const isReadingSection = currentQuestion?.section === 'reading';
   
-  // Writing state
   const [writingAnswers, setWritingAnswers] = useState<Map<string, string>>(new Map());
   
-  // Time limits based on preset or exam type
   const getTimeLimit = useCallback(() => {
-    // 프리셋에서 시간제한 설정 가져오기
     if (examPreset) {
       if (!examPreset.settings.timeLimit) return null;
-      
-      // 프리셋에 고정 시간이 있으면 사용
       if (examPreset.settings.timeLimitSeconds) {
         return examPreset.settings.timeLimitSeconds;
       }
-      
-      // 섹션별 시간 계산
       if (examPreset.sections) {
         if (section && examPreset.sections[section as keyof typeof examPreset.sections]) {
           return examPreset.sections[section as keyof typeof examPreset.sections]?.timeSeconds || null;
@@ -180,8 +159,6 @@ const MockExamTest = () => {
         return getPresetTotalTime(examPreset);
       }
     }
-    
-    // 프리셋이 없으면 기존 로직 사용
     if (isPracticeMode) return null;
     
     const timeLimits: Record<string, { listening: number; reading: number; writing?: number }> = {
@@ -198,7 +175,6 @@ const MockExamTest = () => {
     return examLimits.listening + examLimits.reading + (examLimits.writing || 0);
   }, [examType, section, isPracticeMode, examPreset]);
   
-  // 약점 모드에서 문제별 추천 이유 가져오기
   const getWeaknessReason = (questionId: string): string | null => {
     if (mode !== 'weakness' || weaknessQuestionIds.length === 0) return null;
     const idx = weaknessQuestionIds.indexOf(questionId);
@@ -208,7 +184,6 @@ const MockExamTest = () => {
     return null;
   };
 
-  // Initialize exam
   useEffect(() => {
     const initExam = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -219,43 +194,37 @@ const MockExamTest = () => {
       }
       setUser(user);
       
-       // Check for existing incomplete attempt (same mode/section/part only)
-       const dbExamType = mapExamTypeToDb(examType || 'topik1');
+      const dbExamType = mapExamTypeToDb(examType || 'topik1');
 
-       // Weakness 모드는 항상 새 시도(문항 세트가 매번 달라질 수 있음)
-       let existingAttempt: any = null;
-       if (mode !== 'weakness') {
-         let attemptQuery = supabase
-           .from('mock_exam_attempts')
-           .select('*')
-           .eq('user_id', user.id)
-           .eq('exam_type', dbExamType)
-           .eq('exam_mode', mode)
-           .eq('is_completed', false);
+      let existingAttempt: any = null;
+      if (mode !== 'weakness') {
+        let attemptQuery = supabase
+          .from('mock_exam_attempts')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('exam_type', dbExamType)
+          .eq('exam_mode', mode)
+          .eq('is_completed', false);
 
-         // 섹션/파트가 지정된 모드에서는 동일한 값만 재개
-         if (mode === 'section') {
-           attemptQuery = attemptQuery.eq('section', section || null).is('part_number', null);
-         } else if (mode === 'part') {
-           attemptQuery = attemptQuery.eq('section', section || null).eq('part_number', partNumber);
-         } else {
-           // full 모드: section/part 없는 시도만
-           attemptQuery = attemptQuery.is('section', null).is('part_number', null);
-         }
+        if (mode === 'section') {
+          attemptQuery = attemptQuery.eq('section', section || null).is('part_number', null);
+        } else if (mode === 'part') {
+          attemptQuery = attemptQuery.eq('section', section || null).eq('part_number', partNumber);
+        } else {
+          attemptQuery = attemptQuery.is('section', null).is('part_number', null);
+        }
 
-         const { data } = await attemptQuery
-           .order('created_at', { ascending: false })
-           .limit(1)
-           .single();
+        const { data } = await attemptQuery
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
 
-         existingAttempt = data;
-       }
+        existingAttempt = data;
+      }
       
       if (existingAttempt) {
-        // Resume existing attempt
         await resumeAttempt(existingAttempt, user.id);
       } else {
-        // Start new attempt
         await startNewAttempt(user.id);
       }
     };
@@ -273,7 +242,6 @@ const MockExamTest = () => {
       const dbExamType = mapExamTypeToDb(examType || 'topik1');
       const difficulty = searchParams.get('difficulty') || 'intermediate';
       
-      // ========== 중복 문제 방지: 사용자가 이미 푼 문제 ID 가져오기 ==========
       const { data: answeredQuestions } = await supabase
         .from('mock_exam_answers')
         .select('question_id, mock_exam_attempts!inner(user_id)')
@@ -282,16 +250,13 @@ const MockExamTest = () => {
       const answeredQuestionIds = new Set(
         (answeredQuestions || []).map(a => a.question_id)
       );
-      console.log(`[MockExam] User ${userId} has answered ${answeredQuestionIds.size} questions before`);
       
-      // Fetch questions from database
       let query = supabase
         .from('mock_question_bank')
         .select('*')
         .eq('exam_type', dbExamType)
         .eq('is_active', true);
       
-      // 난이도 매핑: URL 파라미터 → DB 난이도값
       const difficultyMap: Record<string, string[]> = {
         'beginner': ['easy', '쉬움', 'beginner'],
         'intermediate': ['medium', '보통', 'intermediate', 'normal'],
@@ -299,7 +264,6 @@ const MockExamTest = () => {
       };
       const difficultyValues = difficultyMap[difficulty] || difficultyMap['intermediate'];
       
-      // Weakness mode: fetch specific questions
       if (mode === 'weakness' && weaknessQuestionIds.length > 0) {
         query = supabase
           .from('mock_question_bank')
@@ -313,7 +277,6 @@ const MockExamTest = () => {
         if (partNumber) {
           query = query.eq('part_number', partNumber);
         }
-        // 난이도 필터 적용 (full 모드에서는 적용하지 않음 - 다양한 난이도 섞기)
         if (mode !== 'full' && difficulty !== 'all') {
           query = query.in('difficulty', difficultyValues);
         }
@@ -322,20 +285,14 @@ const MockExamTest = () => {
       const { data: allQuestionData, error } = await query.order('section').order('part_number').order('question_number');
       
       if (error) {
-        console.error('[MockExam] Query error:', error);
         toast({ title: "문제를 불러올 수 없습니다", description: "관리자에게 문의하세요", variant: "destructive" });
         navigate('/mock-exam');
         return;
       }
       
-      // ========== 중복 문제 필터링 ==========
       let questionData = (allQuestionData || []).filter(q => !answeredQuestionIds.has(q.id));
-      console.log(`[MockExam] After filtering: ${questionData.length} new questions (from ${allQuestionData?.length || 0} total)`);
       
-      // 필터링 후 문제가 부족하면 이미 푼 문제도 포함 (fallback)
       if (questionData.length < 10 && allQuestionData && allQuestionData.length > 0) {
-        console.log(`[MockExam] Not enough new questions, including some answered ones`);
-        // 가장 오래전에 푼 문제들을 우선 포함 (shuffle로 랜덤 선택)
         const shuffledAll = [...allQuestionData].sort(() => Math.random() - 0.5);
         questionData = shuffledAll;
       }
@@ -346,19 +303,16 @@ const MockExamTest = () => {
         return;
       }
       
-      // ========== 랜덤 셔플 (중복 방지된 문제들) ==========
       const shuffledQuestions = [...questionData].sort(() => Math.random() - 0.5);
       
-      // 실전모드 문제수: TOPIK I = 70문제(듣기30+읽기40), TOPIK II = 104문제(듣기50+읽기50+쓰기4), EPS = 50문제
       const getFullModeQuestionLimit = (): number => {
         const dbType = dbExamType;
         if (dbType === 'TOPIK_I') return 70;
         if (dbType === 'TOPIK_II') return 104;
         if (dbType === 'TOPIK_EPS') return 50;
-        return 70; // default
+        return 70;
       };
       
-      // 모드별 문제 수 제한
       const questionLimits: Record<string, number> = {
         'full': getFullModeQuestionLimit(),
         'section': section === 'listening' ? (dbExamType === 'TOPIK_II' ? 50 : dbExamType === 'TOPIK_I' ? 30 : 25) : 
@@ -396,12 +350,10 @@ const MockExamTest = () => {
         sample_answer: undefined
       }));
       
-      console.log(`[MockExam] Final question count: ${formattedQuestions.length}`);
       setQuestions(formattedQuestions);
       
       const attemptTimeLimit = getTimeLimit();
       
-      // Create attempt record
       const { data: newAttempt, error: attemptError } = await supabase
         .from('mock_exam_attempts')
         .insert({
@@ -424,12 +376,10 @@ const MockExamTest = () => {
       setTimeRemaining(attemptTimeLimit);
       setLoading(false);
       
-      // Start timer if not practice mode
       if (attemptTimeLimit) {
         startTimer();
       }
       
-      // Start auto-save
       startAutoSave(newAttempt.id);
       
     } catch (error) {
@@ -440,7 +390,6 @@ const MockExamTest = () => {
 
   const resumeAttempt = async (existingAttempt: any, userId: string) => {
     try {
-      // Fetch questions
       let query = supabase
         .from('mock_question_bank')
         .select('*')
@@ -477,57 +426,45 @@ const MockExamTest = () => {
       
       setQuestions(formattedQuestions);
       
-      // Fetch existing answers
       const { data: existingAnswers } = await supabase
         .from('mock_exam_answers')
         .select('*')
         .eq('attempt_id', existingAttempt.id);
       
       if (existingAnswers) {
-        const answersMap = new Map<string, AnswerData>();
+        const answerMap = new Map<string, AnswerData>();
         existingAnswers.forEach(a => {
-          answersMap.set(a.question_id, {
+          answerMap.set(a.question_id, {
             question_id: a.question_id,
             user_answer: a.user_answer,
-            is_correct: a.is_correct || undefined,
-            time_spent_seconds: a.time_spent_seconds || undefined
+            is_correct: a.is_correct ?? undefined
           });
         });
-        setAnswers(answersMap);
+        setAnswers(answerMap);
       }
       
-      // Calculate remaining time
-      const startedAt = new Date(existingAttempt.started_at).getTime();
-      const elapsed = Math.floor((Date.now() - startedAt) / 1000);
-      const remaining = existingAttempt.time_limit_seconds ? Math.max(0, existingAttempt.time_limit_seconds - elapsed) : null;
-      
       setAttempt(existingAttempt);
-      setTimeRemaining(remaining);
-      setLoading(false);
       
-      if (remaining && remaining > 0) {
+      const elapsed = existingAttempt.time_taken_seconds || 0;
+      if (existingAttempt.time_limit_seconds) {
+        setTimeRemaining(Math.max(0, existingAttempt.time_limit_seconds - elapsed));
         startTimer();
       }
       
+      setLoading(false);
       startAutoSave(existingAttempt.id);
-      
-      toast({ title: "이어서 풀기", description: "이전 진행 상황을 불러왔습니다" });
       
     } catch (error) {
       console.error('Failed to resume:', error);
-      await startNewAttempt(userId);
+      navigate('/mock-exam');
     }
   };
 
   const startTimer = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    
     timerRef.current = setInterval(() => {
       setTimeRemaining(prev => {
-        if (prev === null) return null;
-        if (prev <= 1) {
-          clearInterval(timerRef.current!);
-          handleTimeUp();
+        if (prev === null || prev <= 0) {
+          if (timerRef.current) clearInterval(timerRef.current);
           return 0;
         }
         return prev - 1;
@@ -535,55 +472,35 @@ const MockExamTest = () => {
     }, 1000);
   };
 
-  const handleTimeUp = () => {
-    toast({ title: "시간 종료", description: "자동으로 제출됩니다", variant: "destructive" });
-    handleSubmit();
-  };
-
   const startAutoSave = (attemptId: string) => {
-    if (saveIntervalRef.current) clearInterval(saveIntervalRef.current);
-    
     saveIntervalRef.current = setInterval(() => {
       saveProgress(attemptId);
-    }, 30000); // Save every 30 seconds
+    }, 30000);
   };
 
   const saveProgress = async (attemptId: string) => {
-    if (!attemptId) return;
+    if (!attemptId || answers.size === 0) return;
     
     try {
-      const answersArray = Array.from(answers.values());
+      const answerData = Array.from(answers.values()).map(a => ({
+        attempt_id: attemptId,
+        question_id: a.question_id,
+        user_answer: a.user_answer,
+        is_correct: a.is_correct,
+        time_spent_seconds: a.time_spent_seconds
+      }));
       
-      for (const answer of answersArray) {
-        // Check if answer exists first
-        const { data: existing } = await supabase
-          .from('mock_exam_answers')
-          .select('id')
-          .eq('attempt_id', attemptId)
-          .eq('question_id', answer.question_id)
-          .maybeSingle();
+      await supabase.from('mock_exam_answers').upsert(answerData, { onConflict: 'attempt_id,question_id' });
+      
+      const correctCount = Array.from(answers.values()).filter(a => a.is_correct).length;
+      await supabase
+        .from('mock_exam_attempts')
+        .update({
+          correct_count: correctCount,
+          time_taken_seconds: timeRemaining !== null ? (getTimeLimit() || 0) - timeRemaining : undefined
+        })
+        .eq('id', attemptId);
         
-        if (existing) {
-          await supabase
-            .from('mock_exam_answers')
-            .update({
-              user_answer: answer.user_answer,
-              is_correct: answer.is_correct,
-              time_spent_seconds: answer.time_spent_seconds
-            })
-            .eq('id', existing.id);
-        } else {
-          await supabase
-            .from('mock_exam_answers')
-            .insert({
-              attempt_id: attemptId,
-              question_id: answer.question_id,
-              user_answer: answer.user_answer,
-              is_correct: answer.is_correct,
-              time_spent_seconds: answer.time_spent_seconds
-            });
-        }
-      }
     } catch (error) {
       console.error('Auto-save failed:', error);
     }
@@ -592,117 +509,61 @@ const MockExamTest = () => {
   const handleAnswer = (optionIndex: number) => {
     if (!currentQuestion) return;
     
-    // DB stores correct_answer as 1-based (1,2,3,4), optionIndex is 0-based (0,1,2,3)
     const isCorrect = (optionIndex + 1) === currentQuestion.correct_answer;
     
-    const newAnswer: AnswerData = {
+    setAnswers(prev => new Map(prev).set(currentQuestion.id, {
       question_id: currentQuestion.id,
       user_answer: optionIndex,
-      is_correct: isCorrect
-    };
+      is_correct: isPracticeMode ? isCorrect : undefined
+    }));
     
-    setAnswers(prev => new Map(prev).set(currentQuestion.id, newAnswer));
-    
-    // In practice mode, show explanation immediately
     if (isPracticeMode) {
       setShowExplanation(prev => new Map(prev).set(currentQuestion.id, true));
-      
-      // Save to mistakes if wrong
-      if (!isCorrect && user) {
-        saveMistake(currentQuestion, optionIndex);
-      }
-    }
-  };
-
-  const saveMistake = async (question: Question, userAnswer: number) => {
-    if (!user || !attempt) return;
-    
-    try {
-      // Check if mistake already exists
-      const { data: existing } = await supabase
-        .from('mock_exam_mistakes')
-        .select('id, review_count')
-        .eq('user_id', user.id)
-        .eq('question_id', question.id)
-        .maybeSingle();
-      
-      if (existing) {
-        // Update existing mistake
-        await supabase
-          .from('mock_exam_mistakes')
-          .update({
-            attempt_id: attempt.id,
-            review_count: (existing.review_count || 0) + 1,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', existing.id);
-      } else {
-        // Insert new mistake
-        await supabase
-          .from('mock_exam_mistakes')
-          .insert({
-            user_id: user.id,
-            question_id: question.id,
-            attempt_id: attempt.id,
-            mastered: false,
-            review_count: 0
-          });
-      }
-    } catch (error) {
-      console.error('Failed to save mistake:', error);
     }
   };
 
   const handleFlag = () => {
     if (!currentQuestion) return;
-    
     setFlagged(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(currentQuestion.id)) {
-        newSet.delete(currentQuestion.id);
+      const next = new Set(prev);
+      if (next.has(currentQuestion.id)) {
+        next.delete(currentQuestion.id);
       } else {
-        newSet.add(currentQuestion.id);
+        next.add(currentQuestion.id);
       }
-      return newSet;
+      return next;
     });
   };
 
   const handlePlayAudio = () => {
     if (!currentQuestion?.question_audio_url) return;
     
-    const currentPlayCount = playCount.get(currentQuestion.id) || 0;
-    
-    // In practice mode, unlimited plays. In real mode, max 2 plays
-    if (!isPracticeMode && currentPlayCount >= 2) {
-      toast({ title: "재생 제한", description: "이 문제는 2회까지만 재생할 수 있습니다" });
-      return;
+    if (!audioRef.current) {
+      audioRef.current = new Audio(currentQuestion.question_audio_url);
+      audioRef.current.playbackRate = playbackSpeed;
+      audioRef.current.onended = () => setIsPlaying(false);
     }
     
-    if (audioRef.current) {
+    if (isPlaying) {
       audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.src = currentQuestion.question_audio_url;
+      audioRef.current.playbackRate = playbackSpeed;
+      audioRef.current.play();
+      setIsPlaying(true);
+      
+      setPlayCount(prev => {
+        const count = prev.get(currentQuestion.id) || 0;
+        return new Map(prev).set(currentQuestion.id, count + 1);
+      });
     }
-    
-    audioRef.current = new Audio(currentQuestion.question_audio_url);
-    audioRef.current.playbackRate = playbackSpeed;
-    audioRef.current.onplay = () => setIsPlaying(true);
-    audioRef.current.onended = () => {
-      setIsPlaying(false);
-      if (!isPracticeMode) {
-        setPlayCount(prev => new Map(prev).set(currentQuestion.id, (prev.get(currentQuestion.id) || 0) + 1));
-      }
-    };
-    audioRef.current.onerror = () => {
-      setIsPlaying(false);
-      toast({ title: "오디오 재생 오류", variant: "destructive" });
-    };
-    audioRef.current.play();
   };
 
-  const handleSpeedChange = (speed: number[]) => {
-    const newSpeed = speed[0];
-    setPlaybackSpeed(newSpeed);
+  const handleSpeedChange = (value: number[]) => {
+    setPlaybackSpeed(value[0]);
     if (audioRef.current) {
-      audioRef.current.playbackRate = newSpeed;
+      audioRef.current.playbackRate = value[0];
     }
   };
 
@@ -710,88 +571,39 @@ const MockExamTest = () => {
     if (!attempt) return;
     
     try {
-      // Calculate score
-      let correctCount = 0;
-      const answersArray = Array.from(answers.values());
+      await saveProgress(attempt.id);
       
-      for (const answer of answersArray) {
-        if (answer.is_correct) correctCount++;
-        
-        // Check if answer exists first
-        const { data: existing } = await supabase
-          .from('mock_exam_answers')
-          .select('id')
-          .eq('attempt_id', attempt.id)
-          .eq('question_id', answer.question_id)
-          .maybeSingle();
-        
-        if (existing) {
-          await supabase
-            .from('mock_exam_answers')
-            .update({
-              user_answer: answer.user_answer,
-              is_correct: answer.is_correct,
-              answered_at: new Date().toISOString()
-            })
-            .eq('id', existing.id);
-        } else {
-          await supabase
-            .from('mock_exam_answers')
-            .insert({
-              attempt_id: attempt.id,
-              question_id: answer.question_id,
-              user_answer: answer.user_answer,
-              is_correct: answer.is_correct,
-              answered_at: new Date().toISOString()
-            });
-        }
-      }
+      const correctCount = isPracticeMode 
+        ? Array.from(answers.values()).filter(a => a.is_correct).length
+        : 0;
       
-      // Calculate time taken
-      const startedAt = new Date(attempt.started_at).getTime();
-      const timeTaken = Math.floor((Date.now() - startedAt) / 1000);
-      
-      // Calculate scores
-      const totalScore = Math.round((correctCount / questions.length) * 100);
-      
-      // Update attempt
       await supabase
         .from('mock_exam_attempts')
         .update({
           is_completed: true,
           finished_at: new Date().toISOString(),
           correct_count: correctCount,
-          time_taken_seconds: timeTaken,
-          total_score: totalScore
+          time_taken_seconds: timeRemaining !== null ? (getTimeLimit() || 0) - timeRemaining : undefined
         })
         .eq('id', attempt.id);
       
-      // Save mistakes for wrong answers
-      for (const answer of answersArray) {
-        if (!answer.is_correct && user) {
-          const question = questions.find(q => q.id === answer.question_id);
-          if (question) {
-            // Check if mistake already exists
-            const { data: existing } = await supabase
-              .from('mock_exam_mistakes')
-              .select('id')
-              .eq('user_id', user.id)
-              .eq('question_id', answer.question_id)
-              .maybeSingle();
-            
-            if (!existing) {
-              await supabase
-                .from('mock_exam_mistakes')
-                .insert({
-                  user_id: user.id,
-                  question_id: answer.question_id,
-                  attempt_id: attempt.id,
-                  mastered: false,
-                  review_count: 0
-                });
-            }
-          }
-        }
+      if (!isPracticeMode) {
+        const evaluatedAnswers = Array.from(answers.entries()).map(([qId, ans]) => {
+          const q = questions.find(q => q.id === qId);
+          const isCorrect = q && (ans.user_answer !== null) && ((ans.user_answer + 1) === q.correct_answer);
+          return { ...ans, is_correct: isCorrect };
+        });
+        
+        evaluatedAnswers.forEach(ans => {
+          answers.set(ans.question_id, ans);
+        });
+        setAnswers(new Map(answers));
+        
+        const finalCorrect = evaluatedAnswers.filter(a => a.is_correct).length;
+        await supabase
+          .from('mock_exam_attempts')
+          .update({ correct_count: finalCorrect })
+          .eq('id', attempt.id);
       }
       
       if (timerRef.current) clearInterval(timerRef.current);
@@ -835,6 +647,18 @@ const MockExamTest = () => {
   const answeredCount = answers.size;
   const progress = (answeredCount / questions.length) * 100;
 
+  const getSectionIcon = (sec: string) => {
+    if (sec === 'listening') return Headphones;
+    if (sec === 'reading') return BookOpen;
+    return PenTool;
+  };
+
+  const getSectionLabel = (sec: string) => {
+    if (sec === 'listening') return '듣기';
+    if (sec === 'reading') return '읽기';
+    return '쓰기';
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -846,356 +670,138 @@ const MockExamTest = () => {
     );
   }
 
+  const SectionIcon = currentQuestion ? getSectionIcon(currentQuestion.section) : BookOpen;
+
   return (
-    <div className="min-h-screen bg-background flex flex-col lg:flex-row">
-      {/* Mobile Header - Timer & Progress */}
-      <div className="lg:hidden sticky top-0 z-20 bg-card border-b p-3 flex items-center justify-between gap-3">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="shrink-0"
-        >
-          {sidebarOpen ? <X className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
-        </Button>
-        <div className="flex-1 flex items-center gap-2">
-          <Progress value={progress} className="h-2 flex-1" />
-          <span className="text-xs text-muted-foreground shrink-0">{answeredCount}/{questions.length}</span>
-        </div>
-        {timeRemaining !== null && (
-          <div className={cn(
-            "flex items-center gap-1 px-2 py-1 rounded text-sm font-mono font-bold shrink-0",
-            timeRemaining < 300 ? "bg-destructive/10 text-destructive" : "bg-muted"
-          )}>
-            <Clock className="w-4 h-4" />
-            {formatTime(timeRemaining)}
-          </div>
-        )}
-      </div>
-
-      {/* Sidebar - Question Navigation */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <motion.div
-            initial={{ x: -300, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -300, opacity: 0 }}
-            className={cn(
-              "bg-card border-r flex flex-col",
-              // 모바일: 오버레이로 전체 화면
-              "fixed inset-0 z-30 lg:relative lg:z-auto",
-              "w-full lg:w-72 lg:h-screen lg:sticky lg:top-0"
-            )}
-          >
-            <div className="p-4 border-b flex items-center justify-between">
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
-                  <h2 className="font-bold text-sm lg:text-base">{examType?.replace('_', ' ')}</h2>
-                  <Badge variant={isPracticeMode ? "secondary" : "default"} className="text-xs">
-                    {isPracticeMode ? "연습" : "실전"}
-                  </Badge>
-                </div>
-                <div className="hidden lg:block">
-                  <Progress value={progress} className="h-2" />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {answeredCount} / {questions.length} 완료
-                  </p>
-                </div>
-              </div>
-              {/* 모바일 닫기 버튼 */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSidebarOpen(false)}
-                className="lg:hidden ml-2"
-              >
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
-            
-            {/* Timer (real mode only) - desktop */}
-            {timeRemaining !== null && (
-              <div className={cn(
-                "p-4 border-b items-center gap-2 hidden lg:flex",
-                timeRemaining < 300 && "bg-destructive/10"
-              )}>
-                <Clock className={cn(
-                  "w-5 h-5",
-                  timeRemaining < 300 ? "text-destructive" : "text-muted-foreground"
-                )} />
-                <span className={cn(
-                  "text-xl font-mono font-bold",
-                  timeRemaining < 300 && "text-destructive"
-                )}>
-                  {formatTime(timeRemaining)}
-                </span>
-              </div>
-            )}
-            
-            <ScrollArea className="flex-1 p-4">
-              <div className="space-y-4">
-                {/* Group by section */}
-                {['listening', 'reading', 'writing'].map(sec => {
-                  const sectionQuestions = questions.filter(q => q.section === sec);
-                  if (sectionQuestions.length === 0) return null;
-                  
-                  return (
-                    <div key={sec}>
-                      <div className="flex items-center gap-2 mb-2 text-sm font-medium text-muted-foreground">
-                        {sec === 'listening' ? (
-                          <Headphones className="w-4 h-4" />
-                        ) : sec === 'reading' ? (
-                          <BookOpen className="w-4 h-4" />
-                        ) : (
-                          <PenTool className="w-4 h-4" />
-                        )}
-                        <span>{sec === 'listening' ? '듣기' : sec === 'reading' ? '읽기' : '쓰기'}</span>
-                      </div>
-                      {/* 모바일: 6열, 데스크톱: 5열 */}
-                      <div className="grid grid-cols-6 lg:grid-cols-5 gap-1.5">
-                        {sectionQuestions.map((q, idx) => {
-                          const globalIndex = questions.indexOf(q);
-                          const status = getAnswerStatus(q.id);
-                          const isFlagged = flagged.has(q.id);
-                          const hasWritingAnswer = sec === 'writing' && writingAnswers.has(q.id) && (writingAnswers.get(q.id)?.length || 0) > 0;
-                          
-                          return (
-                            <button
-                              key={q.id}
-                              onClick={() => {
-                                setCurrentIndex(globalIndex);
-                                setSidebarOpen(false); // 모바일에서 선택 후 닫기
-                              }}
-                              className={cn(
-                                "w-9 h-9 lg:w-10 lg:h-10 rounded-lg text-xs lg:text-sm font-medium transition-all relative",
-                                globalIndex === currentIndex && "ring-2 ring-primary",
-                                !hasWritingAnswer && status === 'unanswered' && "bg-muted hover:bg-muted/80",
-                                (status === 'answered' || hasWritingAnswer) && "bg-primary text-primary-foreground",
-                                status === 'correct' && "bg-green-500 text-white",
-                                status === 'incorrect' && "bg-destructive text-white"
-                              )}
-                            >
-                              {sec === 'writing' ? `${51 + idx}` : globalIndex + 1}
-                              {isFlagged && (
-                                <Flag className="w-2.5 h-2.5 lg:w-3 lg:h-3 absolute -top-1 -right-1 text-amber-500 fill-amber-500" />
-                              )}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </ScrollArea>
-            
-            <div className="p-4 border-t space-y-2">
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => setShowExitDialog(true)}
-              >
-                <Home className="w-4 h-4 mr-2" />
-                나가기
-              </Button>
-              <Button 
-                className="w-full"
-                onClick={() => setShowSubmitDialog(true)}
-              >
-                <Send className="w-4 h-4 mr-2" />
-                제출하기
-              </Button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-0 lg:h-screen">
-        {/* Top Bar - 데스크톱용 */}
-        <div className="hidden lg:flex border-b p-4 items-center justify-between bg-card">
-          <div className="flex items-center gap-4">
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* ========== TOP HEADER (심플) ========== */}
+      <header className="sticky top-0 z-20 bg-card/95 backdrop-blur-sm border-b">
+        <div className="flex items-center justify-between px-4 py-3 max-w-4xl mx-auto">
+          {/* Left: Back + Title */}
+          <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
+              onClick={() => setShowExitDialog(true)}
+              className="shrink-0"
             >
-              {sidebarOpen ? <ChevronLeft /> : <ChevronRight />}
+              <ArrowLeft className="w-5 h-5" />
             </Button>
             <div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                {questions[0]?.exam_round && (
-                  <Badge variant="outline" className="text-xs">
-                    제{questions[0].exam_round}회
-                  </Badge>
-                )}
-                <span>
-                  {currentQuestion?.section === 'listening' ? '듣기' : 
-                   currentQuestion?.section === 'reading' ? '읽기' : '쓰기'} - Part {currentQuestion?.part_number}
+              <div className="flex items-center gap-2">
+                <Badge variant={isPracticeMode ? "secondary" : "default"} className="text-xs">
+                  {isPracticeMode ? "연습" : "실전"}
+                </Badge>
+                <span className="text-sm font-medium text-muted-foreground">
+                  {examType?.toUpperCase().replace('_', ' ')}
                 </span>
-                {currentQuestion?.point_value && (
-                  <Badge className="bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs">
-                    {currentQuestion.point_value}점
-                  </Badge>
-                )}
               </div>
-              <h2 className="font-bold">
-                문제 {currentQuestion?.question_number || (isWritingSection ? 50 + (questions.filter(q => q.section === 'writing').indexOf(currentQuestion!) + 1) : currentIndex + 1)}
-              </h2>
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
-            {/* Audio controls for listening */}
-            {isListeningSection && currentQuestion?.question_audio_url && (
-              <div className="flex items-center gap-3 mr-4">
-                <Button
-                  variant={isPlaying ? "secondary" : "default"}
-                  size="sm"
-                  onClick={handlePlayAudio}
-                  disabled={!isPracticeMode && (playCount.get(currentQuestion.id) || 0) >= 2}
-                >
-                  {isPlaying ? <Pause className="w-4 h-4 mr-1" /> : <Play className="w-4 h-4 mr-1" />}
-                  {isPlaying ? "재생 중" : "듣기"}
-                </Button>
-                
-                {/* Speed control popover */}
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm" className="gap-1.5">
-                      <Gauge className="w-4 h-4" />
-                      {playbackSpeed.toFixed(1)}x
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-64 p-4" align="end">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">재생 속도</span>
-                        <Badge variant="secondary">{playbackSpeed.toFixed(1)}x</Badge>
-                      </div>
-                      <Slider
-                        value={[playbackSpeed]}
-                        onValueChange={handleSpeedChange}
-                        min={0.5}
-                        max={1.5}
-                        step={0.1}
-                        className="w-full"
-                      />
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>0.5x (느리게)</span>
-                        <span>1.5x (빠르게)</span>
-                      </div>
-                      <div className="flex gap-1 pt-2">
-                        {[0.7, 0.85, 1.0, 1.2].map((speed) => (
-                          <Button
-                            key={speed}
-                            variant={playbackSpeed === speed ? "default" : "outline"}
-                            size="sm"
-                            className="flex-1 text-xs"
-                            onClick={() => handleSpeedChange([speed])}
-                          >
-                            {speed}x
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-                
-                {!isPracticeMode && (
-                  <Badge variant="outline">
-                    {2 - (playCount.get(currentQuestion.id) || 0)}회 남음
-                  </Badge>
-                )}
-              </div>
-            )}
-            
-            <Button
-              variant={flagged.has(currentQuestion?.id || '') ? "secondary" : "outline"}
-              size="sm"
-              onClick={handleFlag}
-            >
-              <Flag className={cn(
-                "w-4 h-4 mr-1",
-                flagged.has(currentQuestion?.id || '') && "fill-amber-500 text-amber-500"
-              )} />
-              표시
-            </Button>
-          </div>
+          {/* Right: Timer */}
+          {timeRemaining !== null && (
+            <div className={cn(
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-mono font-bold",
+              timeRemaining < 300 ? "bg-destructive/10 text-destructive" : "bg-muted"
+            )}>
+              <Clock className="w-4 h-4" />
+              {formatTime(timeRemaining)}
+            </div>
+          )}
         </div>
-
-        {/* Mobile Question Info Bar */}
-        <div className="lg:hidden bg-card border-b px-4 py-2 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="font-bold">
-              문제 {currentQuestion?.question_number || currentIndex + 1}
-            </span>
-            <span className="text-muted-foreground">
-              {currentQuestion?.section === 'listening' ? '듣기' : 
-               currentQuestion?.section === 'reading' ? '읽기' : '쓰기'}
+        
+        {/* Progress Bar */}
+        <div className="px-4 pb-3 max-w-4xl mx-auto">
+          <div className="flex items-center gap-3">
+            <Progress value={progress} className="h-2 flex-1" />
+            <span className="text-xs text-muted-foreground font-medium shrink-0">
+              {answeredCount}/{questions.length}
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            {/* Audio for mobile */}
-            {isListeningSection && currentQuestion?.question_audio_url && (
-              <Button
-                variant={isPlaying ? "secondary" : "default"}
-                size="sm"
-                onClick={handlePlayAudio}
-                disabled={!isPracticeMode && (playCount.get(currentQuestion?.id || '') || 0) >= 2}
-              >
-                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleFlag}
-            >
-              <Flag className={cn(
-                "w-4 h-4",
-                flagged.has(currentQuestion?.id || '') && "fill-amber-500 text-amber-500"
-              )} />
-            </Button>
-          </div>
         </div>
+      </header>
 
-        {/* Question Content */}
-        <ScrollArea className="flex-1 p-4 lg:p-6">
+      {/* ========== MAIN CONTENT ========== */}
+      <ScrollArea className="flex-1">
+        <main className="max-w-3xl mx-auto px-4 py-6">
           {currentQuestion && (
-            <div className="max-w-3xl mx-auto">
-              {/* 약점 집중 모드 - 추천 이유 배지 */}
-              {mode === 'weakness' && getWeaknessReason(currentQuestion.id) && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mb-4"
-                >
-                  <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30">
-                    <Target className="w-4 h-4 text-amber-600" />
-                    <span className="text-xs lg:text-sm font-medium text-amber-700 dark:text-amber-400">
-                      💡 추천 이유: {getWeaknessReason(currentQuestion.id)}
-                    </span>
+            <div className="space-y-6">
+              {/* Question Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={cn(
+                    "w-10 h-10 rounded-xl flex items-center justify-center",
+                    isListeningSection ? "bg-blue-500/10" : isReadingSection ? "bg-emerald-500/10" : "bg-purple-500/10"
+                  )}>
+                    <SectionIcon className={cn(
+                      "w-5 h-5",
+                      isListeningSection ? "text-blue-500" : isReadingSection ? "text-emerald-500" : "text-purple-500"
+                    )} />
                   </div>
-                </motion.div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">
+                      {getSectionLabel(currentQuestion.section)} · Part {currentQuestion.part_number}
+                    </p>
+                    <h1 className="text-xl font-bold">문제 {currentIndex + 1}</h1>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  {/* Audio Controls */}
+                  {isListeningSection && currentQuestion.question_audio_url && (
+                    <Button
+                      variant={isPlaying ? "secondary" : "default"}
+                      size="sm"
+                      onClick={handlePlayAudio}
+                      className="gap-1.5"
+                    >
+                      {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                      {isPlaying ? "재생중" : "듣기"}
+                    </Button>
+                  )}
+                  
+                  {/* Flag */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleFlag}
+                    className={cn(
+                      flagged.has(currentQuestion.id) && "text-amber-500"
+                    )}
+                  >
+                    <Flag className={cn(
+                      "w-5 h-5",
+                      flagged.has(currentQuestion.id) && "fill-amber-500"
+                    )} />
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Weakness Reason Badge */}
+              {mode === 'weakness' && getWeaknessReason(currentQuestion.id) && (
+                <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30">
+                  <Target className="w-4 h-4 text-amber-600" />
+                  <span className="text-sm font-medium text-amber-700 dark:text-amber-400">
+                    💡 {getWeaknessReason(currentQuestion.id)}
+                  </span>
+                </div>
               )}
               
               {/* Question Image */}
               {currentQuestion.question_image_url && (
-                <div className="mb-4 lg:mb-6">
-                  <img 
-                    src={currentQuestion.question_image_url} 
-                    alt="문제 이미지" 
-                    className="max-w-full rounded-lg border"
-                  />
-                </div>
+                <img 
+                  src={currentQuestion.question_image_url} 
+                  alt="문제 이미지" 
+                  className="w-full max-w-lg rounded-xl border mx-auto"
+                />
               )}
               
-              {/* Instruction Text (지시문) */}
+              {/* Instruction Text */}
               {currentQuestion.instruction_text && (
-                <Card className="mb-3 lg:mb-4 border-primary/30 bg-primary/5">
-                  <CardContent className="pt-3 lg:pt-4">
-                    <p className="text-xs lg:text-sm text-primary font-medium whitespace-pre-wrap">
+                <Card className="border-primary/30 bg-primary/5">
+                  <CardContent className="py-3 px-4">
+                    <p className="text-sm text-primary font-medium whitespace-pre-wrap">
                       {currentQuestion.instruction_text}
                     </p>
                   </CardContent>
@@ -1203,127 +809,57 @@ const MockExamTest = () => {
               )}
               
               {/* Question Text */}
-              <Card className="mb-4 lg:mb-6">
-                <CardContent className="pt-4 lg:pt-6">
-                  <p className="text-base lg:text-lg whitespace-pre-wrap leading-relaxed">{currentQuestion.question_text}</p>
+              <Card>
+                <CardContent className="py-5 px-5">
+                  <p className="text-lg leading-relaxed whitespace-pre-wrap">{currentQuestion.question_text}</p>
                 </CardContent>
               </Card>
               
-              {/* Multiple Choice Options (Listening/Reading) - TOPIK Style ①②③④ */}
+              {/* Multiple Choice Options */}
               {!isWritingSection && (
-                <>
-                  {/* 그림 문제 - 이미지 4개 그리드 */}
-                  {currentQuestion.option_images && currentQuestion.option_images.length === 4 ? (
-                    <div className="grid grid-cols-2 gap-4">
-                      {currentQuestion.option_images.map((imageUrl, idx) => {
-                        const answer = answers.get(currentQuestion.id);
-                        const isSelected = answer?.user_answer === idx;
-                        const isCorrect = (idx + 1) === currentQuestion.correct_answer;
-                        const showResult = isPracticeMode && answer !== undefined;
-                        const circledNumbers = ['①', '②', '③', '④'];
-                        
-                        return (
-                          <button
-                            key={idx}
-                            onClick={() => handleAnswer(idx)}
-                            disabled={isPracticeMode && answer !== undefined}
-                            className={cn(
-                              "relative rounded-xl border-2 transition-all overflow-hidden group",
-                              !showResult && isSelected && "border-primary ring-2 ring-primary/30",
-                              !showResult && !isSelected && "border-muted hover:border-primary/50",
-                              showResult && isCorrect && "border-green-500 ring-2 ring-green-500/30",
-                              showResult && isSelected && !isCorrect && "border-destructive ring-2 ring-destructive/30"
-                            )}
-                          >
-                            {/* 번호 배지 */}
-                            <div className={cn(
-                              "absolute top-2 left-2 z-10 w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold transition-colors",
-                              !showResult && isSelected && "bg-primary text-primary-foreground",
-                              !showResult && !isSelected && "bg-background/90 text-foreground border",
-                              showResult && isCorrect && "bg-green-500 text-white",
-                              showResult && isSelected && !isCorrect && "bg-destructive text-destructive-foreground"
-                            )}>
-                              {circledNumbers[idx]}
-                            </div>
-                            
-                            {/* 결과 아이콘 */}
-                            {showResult && (
-                              <div className="absolute top-2 right-2 z-10">
-                                {isCorrect && (
-                                  <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
-                                    <CheckCircle2 className="w-5 h-5 text-white" />
-                                  </div>
-                                )}
-                                {isSelected && !isCorrect && (
-                                  <div className="w-8 h-8 rounded-full bg-destructive flex items-center justify-center">
-                                    <X className="w-5 h-5 text-white" />
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                            
-                            {/* 이미지 */}
-                            <img 
-                              src={imageUrl} 
-                              alt={`보기 ${idx + 1}`}
-                              className="w-full aspect-square object-cover"
-                            />
-                            
-                            {/* 호버 오버레이 */}
-                            {!showResult && !isSelected && (
-                              <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors" />
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    /* 일반 텍스트 보기 */
-                    <div className="space-y-3">
-                      {currentQuestion.options.map((option, idx) => {
-                        const answer = answers.get(currentQuestion.id);
-                        const isSelected = answer?.user_answer === idx;
-                        const isCorrect = (idx + 1) === currentQuestion.correct_answer;
-                        const showResult = isPracticeMode && answer !== undefined;
-                        const circledNumbers = ['①', '②', '③', '④'];
-                        
-                        return (
-                          <button
-                            key={idx}
-                            onClick={() => handleAnswer(idx)}
-                            disabled={isPracticeMode && answer !== undefined}
-                            className={cn(
-                              "w-full p-4 rounded-lg border text-left transition-all flex items-start gap-4 group",
-                              !showResult && isSelected && "border-primary bg-primary/10 ring-2 ring-primary/30",
-                              !showResult && !isSelected && "hover:border-primary/50 hover:bg-muted/50",
-                              showResult && isCorrect && "border-green-500 bg-green-50 dark:bg-green-950/30",
-                              showResult && isSelected && !isCorrect && "border-destructive bg-destructive/10"
-                            )}
-                          >
-                            <span className={cn(
-                              "text-2xl font-bold shrink-0 transition-colors",
-                              isSelected ? "text-primary" : "text-muted-foreground group-hover:text-foreground",
-                              showResult && isCorrect && "text-green-600 dark:text-green-400",
-                              showResult && isSelected && !isCorrect && "text-destructive"
-                            )}>
-                              {circledNumbers[idx]}
-                            </span>
-                            <span className="flex-1 pt-1 text-base">{option}</span>
-                            {showResult && isCorrect && (
-                              <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" />
-                            )}
-                            {showResult && isSelected && !isCorrect && (
-                              <X className="w-6 h-6 text-destructive shrink-0" />
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </>
+                <div className="space-y-3">
+                  {currentQuestion.options.map((option, idx) => {
+                    const answer = answers.get(currentQuestion.id);
+                    const isSelected = answer?.user_answer === idx;
+                    const isCorrect = (idx + 1) === currentQuestion.correct_answer;
+                    const showResult = isPracticeMode && answer !== undefined;
+                    const circledNumbers = ['①', '②', '③', '④'];
+                    
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => handleAnswer(idx)}
+                        disabled={isPracticeMode && answer !== undefined}
+                        className={cn(
+                          "w-full p-4 rounded-xl border-2 text-left transition-all flex items-start gap-4 group",
+                          !showResult && isSelected && "border-primary bg-primary/5",
+                          !showResult && !isSelected && "border-border hover:border-primary/50 hover:bg-muted/30",
+                          showResult && isCorrect && "border-green-500 bg-green-50 dark:bg-green-950/30",
+                          showResult && isSelected && !isCorrect && "border-destructive bg-destructive/5"
+                        )}
+                      >
+                        <span className={cn(
+                          "text-2xl font-bold shrink-0 transition-colors",
+                          isSelected ? "text-primary" : "text-muted-foreground group-hover:text-foreground",
+                          showResult && isCorrect && "text-green-600 dark:text-green-400",
+                          showResult && isSelected && !isCorrect && "text-destructive"
+                        )}>
+                          {circledNumbers[idx]}
+                        </span>
+                        <span className="flex-1 pt-1 text-base">{option}</span>
+                        {showResult && isCorrect && (
+                          <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" />
+                        )}
+                        {showResult && isSelected && !isCorrect && (
+                          <X className="w-6 h-6 text-destructive shrink-0" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               )}
               
-              {/* Writing Section - Text Input */}
+              {/* Writing Section */}
               {isWritingSection && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -1346,59 +882,30 @@ const MockExamTest = () => {
                       onChange={(e) => {
                         const newText = e.target.value;
                         setWritingAnswers(prev => new Map(prev).set(currentQuestion.id, newText));
-                        // Also update answers map for tracking
                         setAnswers(prev => new Map(prev).set(currentQuestion.id, {
                           question_id: currentQuestion.id,
                           user_answer: null,
                           text_answer: newText
                         }));
                       }}
-                      placeholder={currentQuestion.question_type === 'short_answer' 
-                        ? "빈칸에 알맞은 내용을 쓰세요..." 
-                        : "주어진 주제에 대해 글을 작성하세요..."}
+                      placeholder="여기에 답을 작성하세요..."
                       className={cn(
-                        "w-full rounded-lg border bg-background p-4 text-base resize-none focus:outline-none focus:ring-2 focus:ring-primary/50",
-                        currentQuestion.question_type === 'short_answer' ? "h-32" : "h-64 md:h-96"
+                        "w-full rounded-xl border-2 bg-background p-4 text-base resize-none focus:outline-none focus:border-primary",
+                        currentQuestion.question_type === 'short_answer' ? "h-32" : "h-64"
                       )}
                     />
                     <div className="absolute bottom-3 right-3 text-sm text-muted-foreground">
                       {(writingAnswers.get(currentQuestion.id) || '').length}자
-                      {currentQuestion.word_limit && ` / ${currentQuestion.word_limit}자`}
                     </div>
                   </div>
-                  
-                  {/* Writing Tips */}
-                  <Card className="border-primary/20 bg-primary/5">
-                    <CardContent className="pt-4">
-                      <div className="flex items-start gap-3">
-                        <FileText className="w-5 h-5 text-primary mt-0.5" />
-                        <div className="text-sm">
-                          <p className="font-medium mb-1">작성 안내</p>
-                          {currentQuestion.question_type === 'short_answer' ? (
-                            <ul className="text-muted-foreground space-y-1">
-                              <li>• 빈칸에 적절한 표현을 완성하세요.</li>
-                              <li>• 문맥에 맞는 문법과 어휘를 사용하세요.</li>
-                            </ul>
-                          ) : (
-                            <ul className="text-muted-foreground space-y-1">
-                              <li>• 주제에 맞게 서론-본론-결론 구조로 작성하세요.</li>
-                              <li>• 다양한 문법과 어휘를 사용하세요.</li>
-                              <li>• 제출 후 AI 첨삭을 받을 수 있습니다.</li>
-                            </ul>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
                 </div>
               )}
               
-              {/* Explanation (Practice Mode) - Only for multiple choice */}
+              {/* Explanation (Practice Mode) */}
               {isPracticeMode && !isWritingSection && answers.has(currentQuestion.id) && (
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-6"
                 >
                   <Collapsible defaultOpen>
                     <CollapsibleTrigger asChild>
@@ -1407,13 +914,13 @@ const MockExamTest = () => {
                           <Lightbulb className="w-4 h-4 text-amber-500" />
                           해설 보기
                         </span>
-                        <ChevronRight className="w-4 h-4 transition-transform ui-open:rotate-90" />
+                        <ChevronRight className="w-4 h-4" />
                       </Button>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <Card className="mt-2 border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/20">
-                        <CardContent className="pt-4">
-                          <p className="text-sm whitespace-pre-wrap">{getExplanation(currentQuestion)}</p>
+                        <CardContent className="py-4 px-4">
+                          <p className="text-sm whitespace-pre-wrap leading-relaxed">{getExplanation(currentQuestion)}</p>
                         </CardContent>
                       </Card>
                     </CollapsibleContent>
@@ -1422,34 +929,121 @@ const MockExamTest = () => {
               )}
             </div>
           )}
-        </ScrollArea>
+        </main>
+      </ScrollArea>
 
-        {/* Bottom Navigation */}
-        <div className="border-t p-4 flex items-center justify-between bg-card">
+      {/* ========== BOTTOM NAVIGATION ========== */}
+      <footer className="sticky bottom-0 bg-card/95 backdrop-blur-sm border-t">
+        <div className="flex items-center justify-between px-4 py-3 max-w-4xl mx-auto gap-3">
           <Button
             variant="outline"
             onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))}
             disabled={currentIndex === 0}
+            className="flex-1 max-w-[120px]"
           >
             <ChevronLeft className="w-4 h-4 mr-1" />
             이전
           </Button>
           
-          <span className="text-sm text-muted-foreground">
-            {currentIndex + 1} / {questions.length}
-          </span>
+          {/* Question Grid Trigger */}
+          <Drawer open={showQuestionGrid} onOpenChange={setShowQuestionGrid}>
+            <DrawerTrigger asChild>
+              <Button variant="ghost" className="gap-2">
+                <Grid3X3 className="w-4 h-4" />
+                <span className="font-bold">{currentIndex + 1}</span>
+                <span className="text-muted-foreground">/ {questions.length}</span>
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader className="text-left">
+                <DrawerTitle>문제 목록</DrawerTitle>
+              </DrawerHeader>
+              <div className="px-4 pb-6 max-h-[60vh] overflow-y-auto">
+                <div className="grid grid-cols-6 sm:grid-cols-8 gap-2">
+                  {questions.map((q, idx) => {
+                    const status = getAnswerStatus(q.id);
+                    const isFlagged = flagged.has(q.id);
+                    
+                    return (
+                      <button
+                        key={q.id}
+                        onClick={() => {
+                          setCurrentIndex(idx);
+                          setShowQuestionGrid(false);
+                        }}
+                        className={cn(
+                          "w-10 h-10 rounded-lg text-sm font-medium transition-all relative",
+                          idx === currentIndex && "ring-2 ring-primary",
+                          status === 'unanswered' && "bg-muted hover:bg-muted/80",
+                          status === 'answered' && "bg-primary text-primary-foreground",
+                          status === 'correct' && "bg-green-500 text-white",
+                          status === 'incorrect' && "bg-destructive text-white"
+                        )}
+                      >
+                        {idx + 1}
+                        {isFlagged && (
+                          <Flag className="w-2.5 h-2.5 absolute -top-0.5 -right-0.5 text-amber-500 fill-amber-500" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                
+                <div className="flex gap-2 mt-6 pt-4 border-t">
+                  <Button 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => {
+                      setShowQuestionGrid(false);
+                      setShowExitDialog(true);
+                    }}
+                  >
+                    <Home className="w-4 h-4 mr-2" />
+                    나가기
+                  </Button>
+                  <Button 
+                    className="flex-1"
+                    onClick={() => {
+                      setShowQuestionGrid(false);
+                      setShowSubmitDialog(true);
+                    }}
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    제출하기
+                  </Button>
+                </div>
+              </div>
+            </DrawerContent>
+          </Drawer>
           
           <Button
-            variant="outline"
-            onClick={() => setCurrentIndex(Math.min(questions.length - 1, currentIndex + 1))}
-            disabled={currentIndex === questions.length - 1}
+            variant={currentIndex === questions.length - 1 ? "default" : "outline"}
+            onClick={() => {
+              if (currentIndex === questions.length - 1) {
+                setShowSubmitDialog(true);
+              } else {
+                setCurrentIndex(currentIndex + 1);
+              }
+            }}
+            className="flex-1 max-w-[120px]"
           >
-            다음
-            <ChevronRight className="w-4 h-4 ml-1" />
+            {currentIndex === questions.length - 1 ? (
+              <>
+                제출
+                <Send className="w-4 h-4 ml-1" />
+              </>
+            ) : (
+              <>
+                다음
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </>
+            )}
           </Button>
         </div>
-      </div>
+      </footer>
 
+      {/* ========== DIALOGS ========== */}
+      
       {/* Exit Dialog */}
       <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
         <DialogContent>
