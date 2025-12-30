@@ -7,7 +7,6 @@ import {
   XCircle,
   RotateCcw,
   Loader2,
-  Volume2,
   Globe,
   ArrowRight,
   Sparkles,
@@ -304,29 +303,6 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
     setHintsUsed(prev => prev + 1);
   };
 
-  // Play TTS
-  const playTTS = async (text: string) => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
-        {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({ text, speed: 0.85 }),
-        }
-      );
-      if (!response.ok) return;
-      const blob = await response.blob();
-      const audio = new Audio(URL.createObjectURL(blob));
-      await audio.play();
-    } catch (error) {
-      console.error("TTS error:", error);
-    }
-  };
 
   // 타이머 색상 계산
   const getTimerColor = () => {
@@ -442,13 +418,6 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
               {currentPuzzle.word.pos}
             </span>
           )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => playTTS(currentPuzzle.word.word)}
-          >
-            <Volume2 className="w-4 h-4" />
-          </Button>
         </div>
         <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
           <Globe className="w-4 h-4" />
@@ -638,21 +607,6 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
           </Button>
         )}
       </div>
-
-      {/* Listen to correct answer */}
-      {showResult && (
-        <div className="flex justify-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => playTTS(currentPuzzle.sentence)}
-            className="text-muted-foreground"
-          >
-            <Volume2 className="w-4 h-4 mr-2" />
-            정답 문장 듣기
-          </Button>
-        </div>
-      )}
     </div>
   );
 };

@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   Play, 
-  Volume2, 
   ChevronRight, 
   CheckCircle2,
   RotateCcw,
@@ -107,32 +106,6 @@ const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
     }
   }, [phase, currentWord, autoPlay, sessionComplete, countdown]);
 
-  // Play TTS - ElevenLabs 고품질 한국어 TTS
-  const playTTS = async (text: string) => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
-        {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({ text, speed: 0.85 }),
-        }
-      );
-      if (!response.ok) {
-        console.error("ElevenLabs TTS error:", response.status);
-        return;
-      }
-      const blob = await response.blob();
-      const audio = new Audio(URL.createObjectURL(blob));
-      await audio.play();
-    } catch (error) {
-      console.error("TTS error:", error);
-    }
-  };
 
   const handleKnow = () => {
     if (!currentWord) return;
@@ -310,16 +283,6 @@ const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
               {currentWord.pos || ''}
             </motion.p>
             
-            {/* TTS Button */}
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => playTTS(currentWord.word)}
-              className="mb-6"
-            >
-              <Volume2 className="w-5 h-5 mr-2" />
-              발음 듣기
-            </Button>
 
             {/* Meaning (shown when revealed) */}
             <AnimatePresence>
