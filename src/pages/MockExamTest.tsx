@@ -229,12 +229,32 @@ const MockExamTest = () => {
           attemptQuery = attemptQuery.is('section', null).is('part_number', null);
         }
 
-        const { data } = await attemptQuery
+        const { data, error } = await attemptQuery
           .order('created_at', { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
 
-        existingAttempt = data;
+        if (error) {
+          console.warn('[MockExamTest] existing attempt lookup error (ignored)', {
+            examType,
+            mode,
+            section,
+            safePartNumber,
+            error,
+          });
+        }
+
+        // 안전장치: 현재 라우트 파라미터와 불일치하는 attempt는 절대 재개하지 않음
+        if (data) {
+          const sameSection = (data.section ?? null) === (section ?? null);
+          const samePart = (data.part_number ?? null) === (safePartNumber ?? null);
+          const shouldResume =
+            (mode === 'full' && data.section === null && data.part_number === null) ||
+            (mode === 'section' && sameSection && data.part_number === null) ||
+            (mode === 'part' && sameSection && samePart);
+
+          existingAttempt = shouldResume ? data : null;
+        }
       }
       
       if (existingAttempt) {
@@ -271,14 +291,52 @@ const MockExamTest = () => {
         .select('*')
         .eq('exam_type', dbExamType)
         .eq('is_active', true);
-      
+
       const difficultyMap: Record<string, string[]> = {
-        'beginner': ['easy', '쉬움', 'beginner'],
-        'intermediate': ['medium', '보통', 'intermediate', 'normal'],
-        'advanced': ['hard', '어려움', 'advanced', 'difficult']
+        beginner: ['easy', '쉬움', 'beginner'],
+        intermediate: ['medium', '보통', 'intermediate', 'normal'],
+        advanced: ['hard', '어려움', 'advanced', 'difficult'],
       };
-      const difficultyValues = difficultyMap[difficulty] || difficultyMap['intermediate'];
-      
+      const difficultyValues = difficultyMap[difficulty] || difficultyMap.intermediate;
+
+      // ========== 데이터 기반 "경로 전수 검증" (해당 examType/section/part에 실제 문제가 존재하는지) ==========
+      // 섹션/파트가 DB에 없으면, 사용자는 "경로 꼬임"으로 느끼기 때문에 여기서 명확히 차단한다.
+      if (mode !== 'weakness') {
+        let countQuery = supabase
+          .from('mock_question_bank')
+          .select('id', { count: 'exact', head: true })
+          .eq('exam_type', dbExamType)
+          .eq('is_active', true);
+
+        if (section) countQuery = countQuery.eq('section', section);
+        if (safePartNumber) countQuery = countQuery.eq('part_number', safePartNumber);
+
+        const { count, error: countError } = await countQuery;
+
+        if (countError) {
+          console.error('[MockExamTest] question count check error', {
+            examType,
+            mode,
+            section,
+            safePartNumber,
+            countError,
+          });
+          toast({ title: '문제를 불러올 수 없습니다', description: '잠시 후 다시 시도해주세요.', variant: 'destructive' });
+          navigate('/mock-exam');
+          return;
+        }
+
+        if (!count || count <= 0) {
+          console.warn('[MockExamTest] no questions for this route', { examType, mode, section, safePartNumber });
+          toast({
+            title: '문제 준비중',
+            description: '선택한 영역/파트에 아직 문제가 없습니다. 다른 항목을 선택해주세요.',
+          });
+          navigate('/mock-exam');
+          return;
+        }
+      }
+
       if (mode === 'weakness' && weaknessQuestionIds.length > 0) {
         query = supabase
           .from('mock_question_bank')
@@ -296,26 +354,29 @@ const MockExamTest = () => {
           query = query.in('difficulty', difficultyValues);
         }
       }
-      
+
       const { data: allQuestionData, error } = await query.order('section').order('part_number').order('question_number');
-      
+
       if (error) {
         console.error('[MockExamTest] question load error', { examType, mode, section, safePartNumber, error });
-        toast({ title: "문제를 불러올 수 없습니다", description: "관리자에게 문의하세요", variant: "destructive" });
+        toast({ title: '문제를 불러올 수 없습니다', description: '잠시 후 다시 시도해주세요.', variant: 'destructive' });
         navigate('/mock-exam');
         return;
       }
-      
-      let questionData = (allQuestionData || []).filter(q => !answeredQuestionIds.has(q.id));
-      
+
+      let questionData = (allQuestionData || []).filter((q) => !answeredQuestionIds.has(q.id));
+
       if (questionData.length < 10 && allQuestionData && allQuestionData.length > 0) {
         const shuffledAll = [...allQuestionData].sort(() => Math.random() - 0.5);
         questionData = shuffledAll;
       }
-      
+
       if (!questionData.length) {
-        console.warn('[MockExamTest] no questions found', { examType, mode, section, safePartNumber });
-        toast({ title: "문제를 불러올 수 없습니다", description: "관리자에게 문의하세요", variant: "destructive" });
+        console.warn('[MockExamTest] no questions found after filtering', { examType, mode, section, safePartNumber });
+        toast({
+          title: '문제 준비중',
+          description: '현재 조건으로 출제할 문제가 없습니다. 다른 난이도/항목을 선택해주세요.',
+        });
         navigate('/mock-exam');
         return;
       }

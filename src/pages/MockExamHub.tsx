@@ -2,9 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { 
-  BookOpen, 
-  Headphones, 
+import {
+  BookOpen,
+  Headphones,
   PenTool,
   Mic,
   Clock,
@@ -28,7 +28,7 @@ import {
   Crown,
   Flame,
   Loader2,
-  X
+  X,
 } from "lucide-react";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
@@ -42,6 +42,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { mapExamTypeToDb } from "@/lib/mockExamDb";
 import { analyzeUserWeakness, type WeaknessAnalysis, getWeaknessReasonText } from "@/lib/weaknessAnalyzer";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from "@/hooks/use-toast";
 
 // 파티클 배경 (경량화)
 const FloatingParticles = () => {
@@ -86,23 +87,27 @@ const GlowOrb = ({ className, color }: { className?: string; color: string }) =>
 const MockExamHub = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { toast } = useToast();
   const { isPremium, loading } = useSubscription();
-  
+
   // 모달 관련 상태
   const [showStartDialog, setShowStartDialog] = useState(false);
   const [selectedExamForStart, setSelectedExamForStart] = useState<string | null>(null);
   const [selectedMode, setSelectedMode] = useState<string>("full");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("intermediate");
-  
+
   // 기존 다이얼로그 상태
   const [showModeDialog, setShowModeDialog] = useState(false);
   const [showPartDialog, setShowPartDialog] = useState(false);
   const [showWeaknessDialog, setShowWeaknessDialog] = useState(false);
-  
+
   // 약점 분석 상태
   const [weaknessAnalysis, setWeaknessAnalysis] = useState<WeaknessAnalysis | null>(null);
   const [loadingWeakness, setLoadingWeakness] = useState(false);
-  
+
+  // 섹션/파트 가용성 (DB 기반)
+  const [availableSectionCounts, setAvailableSectionCounts] = useState<Record<string, number>>({});
+
   // 파트 목록
   const [availableParts, setAvailableParts] = useState<{ partNumber: number; section: string; count: number }[]>([]);
 
@@ -275,6 +280,31 @@ const MockExamHub = () => {
     setShowStartDialog(true);
   };
 
+  // 섹션별 문제 개수 로드 (DB에 없으면 버튼 비활성화)
+  const loadAvailableSections = async (examId: string) => {
+    const dbExamType = mapExamTypeToDb(examId);
+    const { data, error } = await supabase
+      .from('mock_question_bank')
+      .select('section')
+      .eq('exam_type', dbExamType)
+      .eq('is_active', true);
+
+    if (error) {
+      console.error('[MockExamHub] loadAvailableSections error', error);
+      setAvailableSectionCounts({});
+      return;
+    }
+
+    const counts: Record<string, number> = {};
+    (data || []).forEach((row: any) => {
+      const sec = String(row.section ?? '').toLowerCase();
+      if (!sec) return;
+      counts[sec] = (counts[sec] || 0) + 1;
+    });
+
+    setAvailableSectionCounts(counts);
+  };
+
   // 파트별 문제 개수 로드
   const loadAvailableParts = async (examId: string) => {
     const dbExamType = mapExamTypeToDb(examId);
@@ -343,10 +373,11 @@ const MockExamHub = () => {
   // 시험 시작
   const handleStartExam = () => {
     if (!selectedExamForStart) return;
-    
+
     setShowStartDialog(false);
-    
+
     if (selectedMode === 'section') {
+      loadAvailableSections(selectedExamForStart);
       setShowModeDialog(true);
     } else if (selectedMode === 'part') {
       loadAvailableParts(selectedExamForStart);
@@ -759,48 +790,99 @@ const MockExamHub = () => {
               <DialogTitle className="text-xl">{t('mockExam.dialog.title')}</DialogTitle>
               <DialogDescription>{t('mockExam.dialog.description')}</DialogDescription>
             </DialogHeader>
-            <div className={cn(
-              "grid gap-4 py-4",
-              selectedExamForStart === 'topik2' ? "grid-cols-3" : "grid-cols-2"
-            )}>
-              <motion.button 
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => {
-                  setShowModeDialog(false);
-                  navigate(`/mock-exam/${selectedExamForStart}?mode=section&section=listening&difficulty=${selectedDifficulty}`);
-                }}
-                className="h-28 flex flex-col items-center justify-center gap-3 rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 hover:border-blue-500/40 transition-all"
-              >
-                <Headphones className="w-8 h-8 text-blue-500" />
-                <span className="font-medium">{t('mockExam.dialog.listening')}</span>
-              </motion.button>
-              <motion.button 
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => {
-                  setShowModeDialog(false);
-                  navigate(`/mock-exam/${selectedExamForStart}?mode=section&section=reading&difficulty=${selectedDifficulty}`);
-                }}
-                className="h-28 flex flex-col items-center justify-center gap-3 rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 hover:border-emerald-500/40 transition-all"
-              >
-                <BookOpen className="w-8 h-8 text-emerald-500" />
-                <span className="font-medium">{t('mockExam.dialog.reading')}</span>
-              </motion.button>
-              {selectedExamForStart === 'topik2' && (
-                <motion.button 
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => {
-                    setShowModeDialog(false);
-                    navigate('/writing-correction');
-                  }}
-                  className="h-28 flex flex-col items-center justify-center gap-3 rounded-xl bg-gradient-to-br from-purple-500/10 to-violet-500/10 border border-purple-500/20 hover:border-purple-500/40 transition-all"
-                >
-                  <PenTool className="w-8 h-8 text-purple-500" />
-                  <span className="font-medium">{t('mockExam.dialog.writing')}</span>
-                </motion.button>
+            <div
+              className={cn(
+                "grid gap-4 py-4",
+                selectedExamForStart === 'topik2' ? 'grid-cols-3' : 'grid-cols-2'
               )}
+            >
+              {(() => {
+                const listeningCount = availableSectionCounts['listening'] || 0;
+                const readingCount = availableSectionCounts['reading'] || 0;
+                const listeningDisabled = listeningCount <= 0;
+                const readingDisabled = readingCount <= 0;
+
+                return (
+                  <>
+                    <motion.button
+                      whileHover={listeningDisabled ? undefined : { scale: 1.02 }}
+                      whileTap={listeningDisabled ? undefined : { scale: 0.98 }}
+                      disabled={listeningDisabled}
+                      onClick={() => {
+                        if (listeningDisabled) {
+                          toast({
+                            title: '문제 준비중',
+                            description: '듣기 영역 문제 데이터가 아직 없습니다. 다른 영역을 선택해주세요.',
+                          });
+                          return;
+                        }
+                        setShowModeDialog(false);
+                        navigate(
+                          `/mock-exam/${selectedExamForStart}?mode=section&section=listening&difficulty=${selectedDifficulty}`
+                        );
+                      }}
+                      className={cn(
+                        'h-28 flex flex-col items-center justify-center gap-3 rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border transition-all',
+                        listeningDisabled
+                          ? 'border-white/10 opacity-40 cursor-not-allowed'
+                          : 'border-blue-500/20 hover:border-blue-500/40'
+                      )}
+                    >
+                      <Headphones className="w-8 h-8 text-blue-500" />
+                      <span className="font-medium">{t('mockExam.dialog.listening')}</span>
+                      {listeningDisabled && (
+                        <span className="text-[11px] text-muted-foreground">준비중</span>
+                      )}
+                    </motion.button>
+
+                    <motion.button
+                      whileHover={readingDisabled ? undefined : { scale: 1.02 }}
+                      whileTap={readingDisabled ? undefined : { scale: 0.98 }}
+                      disabled={readingDisabled}
+                      onClick={() => {
+                        if (readingDisabled) {
+                          toast({
+                            title: '문제 준비중',
+                            description: '읽기 영역 문제 데이터가 아직 없습니다. 다른 영역을 선택해주세요.',
+                          });
+                          return;
+                        }
+                        setShowModeDialog(false);
+                        navigate(
+                          `/mock-exam/${selectedExamForStart}?mode=section&section=reading&difficulty=${selectedDifficulty}`
+                        );
+                      }}
+                      className={cn(
+                        'h-28 flex flex-col items-center justify-center gap-3 rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border transition-all',
+                        readingDisabled
+                          ? 'border-white/10 opacity-40 cursor-not-allowed'
+                          : 'border-emerald-500/20 hover:border-emerald-500/40'
+                      )}
+                    >
+                      <BookOpen className="w-8 h-8 text-emerald-500" />
+                      <span className="font-medium">{t('mockExam.dialog.reading')}</span>
+                      {readingDisabled && (
+                        <span className="text-[11px] text-muted-foreground">준비중</span>
+                      )}
+                    </motion.button>
+
+                    {selectedExamForStart === 'topik2' && (
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => {
+                          setShowModeDialog(false);
+                          navigate('/writing-correction');
+                        }}
+                        className="h-28 flex flex-col items-center justify-center gap-3 rounded-xl bg-gradient-to-br from-purple-500/10 to-violet-500/10 border border-purple-500/20 hover:border-purple-500/40 transition-all"
+                      >
+                        <PenTool className="w-8 h-8 text-purple-500" />
+                        <span className="font-medium">{t('mockExam.dialog.writing')}</span>
+                      </motion.button>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           </DialogContent>
         </Dialog>
