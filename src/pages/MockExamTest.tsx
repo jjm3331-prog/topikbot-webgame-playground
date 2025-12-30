@@ -219,17 +219,37 @@ const MockExamTest = () => {
       }
       setUser(user);
       
-       // Check for existing incomplete attempt
+       // Check for existing incomplete attempt (same mode/section/part only)
        const dbExamType = mapExamTypeToDb(examType || 'topik1');
-       const { data: existingAttempt } = await supabase
-         .from('mock_exam_attempts')
-         .select('*')
-         .eq('user_id', user.id)
-         .eq('exam_type', dbExamType)
-         .eq('is_completed', false)
-         .order('created_at', { ascending: false })
-         .limit(1)
-         .single();
+
+       // Weakness 모드는 항상 새 시도(문항 세트가 매번 달라질 수 있음)
+       let existingAttempt: any = null;
+       if (mode !== 'weakness') {
+         let attemptQuery = supabase
+           .from('mock_exam_attempts')
+           .select('*')
+           .eq('user_id', user.id)
+           .eq('exam_type', dbExamType)
+           .eq('exam_mode', mode)
+           .eq('is_completed', false);
+
+         // 섹션/파트가 지정된 모드에서는 동일한 값만 재개
+         if (mode === 'section') {
+           attemptQuery = attemptQuery.eq('section', section || null).is('part_number', null);
+         } else if (mode === 'part') {
+           attemptQuery = attemptQuery.eq('section', section || null).eq('part_number', partNumber);
+         } else {
+           // full 모드: section/part 없는 시도만
+           attemptQuery = attemptQuery.is('section', null).is('part_number', null);
+         }
+
+         const { data } = await attemptQuery
+           .order('created_at', { ascending: false })
+           .limit(1)
+           .single();
+
+         existingAttempt = data;
+       }
       
       if (existingAttempt) {
         // Resume existing attempt
