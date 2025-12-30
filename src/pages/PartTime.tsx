@@ -19,7 +19,15 @@ import {
   MessageCircle,
   Lightbulb,
   Trophy,
-  Heart
+  Heart,
+  Briefcase,
+  Sparkles,
+  ArrowRight,
+  Zap,
+  Target,
+  TrendingUp,
+  CheckCircle2,
+  XCircle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import CleanHeader from "@/components/CleanHeader";
@@ -60,17 +68,17 @@ interface Evaluation {
 }
 
 const JOBS = [
-  { id: 'convenience_store' as JobType, icon: Store, name_ko: '편의점', name_vi: 'Cửa hàng tiện lợi', color: 'from-orange-500 to-red-500' },
-  { id: 'cafe' as JobType, icon: Coffee, name_ko: '카페', name_vi: 'Quán cà phê', color: 'from-amber-500 to-yellow-500' },
-  { id: 'restaurant' as JobType, icon: UtensilsCrossed, name_ko: '식당', name_vi: 'Nhà hàng', color: 'from-green-500 to-emerald-500' },
-  { id: 'pc_bang' as JobType, icon: Monitor, name_ko: 'PC방', name_vi: 'Quán net', color: 'from-blue-500 to-cyan-500' },
-  { id: 'bookstore' as JobType, icon: BookOpen, name_ko: '서점', name_vi: 'Hiệu sách', color: 'from-purple-500 to-pink-500' },
+  { id: 'convenience_store' as JobType, icon: Store, emoji: '🏪', color: 'from-orange-500 to-amber-400', bgColor: 'bg-orange-500/10', borderColor: 'border-orange-500/30', iconBg: 'bg-gradient-to-br from-orange-400 to-red-500' },
+  { id: 'cafe' as JobType, icon: Coffee, emoji: '☕', color: 'from-amber-500 to-yellow-400', bgColor: 'bg-amber-500/10', borderColor: 'border-amber-500/30', iconBg: 'bg-gradient-to-br from-amber-400 to-yellow-500' },
+  { id: 'restaurant' as JobType, icon: UtensilsCrossed, emoji: '🍽️', color: 'from-emerald-500 to-green-400', bgColor: 'bg-emerald-500/10', borderColor: 'border-emerald-500/30', iconBg: 'bg-gradient-to-br from-emerald-400 to-green-500' },
+  { id: 'pc_bang' as JobType, icon: Monitor, emoji: '🖥️', color: 'from-blue-500 to-cyan-400', bgColor: 'bg-blue-500/10', borderColor: 'border-blue-500/30', iconBg: 'bg-gradient-to-br from-blue-400 to-cyan-500' },
+  { id: 'bookstore' as JobType, icon: BookOpen, emoji: '📚', color: 'from-violet-500 to-purple-400', bgColor: 'bg-violet-500/10', borderColor: 'border-violet-500/30', iconBg: 'bg-gradient-to-br from-violet-400 to-purple-500' },
 ];
 
 const DIFFICULTIES = [
-  { id: 'easy' as Difficulty, name_ko: '쉬움', name_vi: 'Dễ', description: '천천히, 기본 상황', color: 'from-green-500 to-emerald-500' },
-  { id: 'medium' as Difficulty, name_ko: '보통', name_vi: 'Trung bình', description: '일반 속도, 다양한 요청', color: 'from-yellow-500 to-orange-500' },
-  { id: 'hard' as Difficulty, name_ko: '어려움', name_vi: 'Khó', description: '까다로운 손님, 클레임', color: 'from-red-500 to-pink-500' },
+  { id: 'easy' as Difficulty, icon: Target, emoji: '😊', color: 'from-emerald-500 to-green-400', stars: 1 },
+  { id: 'medium' as Difficulty, icon: Zap, emoji: '😅', color: 'from-amber-500 to-yellow-400', stars: 2 },
+  { id: 'hard' as Difficulty, icon: TrendingUp, emoji: '😤', color: 'from-rose-500 to-pink-400', stars: 3 },
 ];
 
 const MAX_TURNS = 5;
@@ -155,7 +163,6 @@ const PartTime = () => {
   const handleNextTurn = () => {
     if (turn >= MAX_TURNS) {
       setGameState('game_over');
-      // Update money in profile
       updateProfile();
     } else {
       setTurn(prev => prev + 1);
@@ -207,160 +214,289 @@ const PartTime = () => {
 
   const getGradeColor = (grade: string) => {
     switch (grade) {
+      case 'S': return 'from-yellow-400 via-amber-300 to-yellow-500';
+      case 'A': return 'from-emerald-400 via-green-300 to-emerald-500';
+      case 'B': return 'from-blue-400 via-cyan-300 to-blue-500';
+      case 'C': return 'from-orange-400 via-amber-300 to-orange-500';
+      default: return 'from-rose-400 via-pink-300 to-rose-500';
+    }
+  };
+
+  const getGradeTextColor = (grade: string) => {
+    switch (grade) {
       case 'S': return 'text-yellow-400';
-      case 'A': return 'text-green-400';
+      case 'A': return 'text-emerald-400';
       case 'B': return 'text-blue-400';
       case 'C': return 'text-orange-400';
-      default: return 'text-red-400';
+      default: return 'text-rose-400';
+    }
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.08 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      transition: { type: "spring" as const, stiffness: 300, damping: 24 }
     }
   };
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-b from-purple-900 via-purple-800 to-[#0f0f23] flex flex-col overflow-hidden">
+    <div className="min-h-[100dvh] bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex flex-col overflow-x-hidden">
       <CleanHeader />
       
-      {/* Stats Bar */}
-      <div className="flex items-center justify-between p-4 border-b border-white/10">
-        <span className="text-white font-medium">{t('parttime.statsTitle')}</span>
-        {gameState !== 'select_job' && gameState !== 'select_difficulty' && (
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-yellow-400">
-              <Coins className="w-5 h-5" />
-              <span className="font-bold">₩{totalEarned.toLocaleString()}</span>
+      {/* Premium Stats Bar */}
+      <div className="sticky top-0 z-40 backdrop-blur-xl bg-slate-900/80 border-b border-white/5">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/25">
+              <Briefcase className="w-5 h-5 text-white" />
             </div>
-            <div className="text-white/70">
-              {t('parttime.turn')} {turn}/{MAX_TURNS}
+            <div>
+              <h1 className="text-white font-bold text-lg">{t('parttime.statsTitle')}</h1>
+              <p className="text-white/50 text-xs">Part-time Job Simulator</p>
             </div>
           </div>
-        )}
+          
+          {gameState !== 'select_job' && gameState !== 'select_difficulty' && (
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30">
+                <Coins className="w-5 h-5 text-amber-400" />
+                <span className="font-bold text-amber-400">₩{totalEarned.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10">
+                <span className="text-white/60 text-sm">{t('parttime.turn')}</span>
+                <span className="font-bold text-white">{turn}/{MAX_TURNS}</span>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="p-4 max-w-2xl mx-auto">
+      <div className="flex-1 p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto w-full">
         <AnimatePresence mode="wait">
-          {/* Job Selection */}
+          {/* Job Selection - Premium 2-Column Grid */}
           {gameState === 'select_job' && (
             <motion.div
               key="select_job"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
               exit={{ opacity: 0, y: -20 }}
-              className="space-y-6"
+              className="space-y-8"
             >
-              <div className="text-center mb-8">
-                <h1 className="text-2xl font-bold text-white mb-2">{t('parttime.selectJob')}</h1>
-                <p className="text-white/60">{t('parttime.selectJobDesc')}</p>
-              </div>
+              {/* Hero Section */}
+              <motion.div variants={itemVariants} className="text-center space-y-4">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-violet-500/20 to-purple-500/20 border border-violet-500/30">
+                  <Sparkles className="w-4 h-4 text-violet-400" />
+                  <span className="text-violet-300 text-sm font-medium">AI Role-play Simulation</span>
+                </div>
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/60">
+                  {t('parttime.selectJob')}
+                </h1>
+                <p className="text-white/50 text-base sm:text-lg max-w-md mx-auto">
+                  {t('parttime.selectJobDesc')}
+                </p>
+              </motion.div>
 
-              <div className="grid grid-cols-1 gap-4">
-                {JOBS.map((job) => (
+              {/* 2-Column Job Grid */}
+              <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
+                {JOBS.map((job, index) => (
                   <motion.button
                     key={job.id}
-                    whileHover={{ scale: 1.02 }}
+                    variants={itemVariants}
+                    whileHover={{ scale: 1.02, y: -4 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handleSelectJob(job.id)}
-                    className={`glass-card p-6 rounded-xl flex items-center gap-4 bg-gradient-to-r ${job.color} bg-opacity-20 hover:bg-opacity-30 transition-all`}
+                    className={`group relative overflow-hidden rounded-2xl p-6 lg:p-8 border ${job.borderColor} ${job.bgColor} backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:shadow-${job.color.split('-')[1]}-500/20`}
                   >
-                    <div className={`p-3 rounded-full bg-gradient-to-r ${job.color}`}>
-                      <job.icon className="w-8 h-8 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <h3 className="text-xl font-bold text-white">{t(`parttime.jobs.${job.id}`)}</h3>
-                      <p className="text-white/70">{t(`parttime.jobsDesc.${job.id}`)}</p>
+                    {/* Background Gradient Glow */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${job.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+                    
+                    {/* Floating Particles */}
+                    <div className="absolute top-4 right-4 w-20 h-20 rounded-full bg-gradient-to-br from-white/5 to-transparent blur-2xl group-hover:scale-150 transition-transform duration-700" />
+                    
+                    <div className="relative flex items-center gap-4 lg:gap-5">
+                      {/* Icon */}
+                      <div className={`flex-shrink-0 w-14 h-14 lg:w-16 lg:h-16 rounded-2xl ${job.iconBg} flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                        <job.icon className="w-7 h-7 lg:w-8 lg:h-8 text-white" />
+                      </div>
+                      
+                      {/* Content */}
+                      <div className="flex-1 text-left min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-2xl">{job.emoji}</span>
+                          <h3 className="text-lg lg:text-xl font-bold text-white truncate">
+                            {t(`parttime.jobs.${job.id}`)}
+                          </h3>
+                        </div>
+                        <p className="text-white/60 text-sm lg:text-base line-clamp-2">
+                          {t(`parttime.jobsDesc.${job.id}`)}
+                        </p>
+                      </div>
+                      
+                      {/* Arrow */}
+                      <ArrowRight className="w-5 h-5 text-white/30 group-hover:text-white group-hover:translate-x-1 transition-all duration-300" />
                     </div>
                   </motion.button>
                 ))}
-              </div>
+              </motion.div>
             </motion.div>
           )}
 
-          {/* Difficulty Selection */}
+          {/* Difficulty Selection - Premium Design */}
           {gameState === 'select_difficulty' && (
             <motion.div
               key="select_difficulty"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
               exit={{ opacity: 0, y: -20 }}
-              className="space-y-6"
+              className="space-y-8"
             >
-              <div className="text-center mb-8">
-                <h1 className="text-2xl font-bold text-white mb-2">{t('parttime.selectDifficulty')}</h1>
-                <p className="text-white/60">{t('parttime.selectDifficultyDesc')}</p>
-              </div>
+              {/* Hero */}
+              <motion.div variants={itemVariants} className="text-center space-y-4">
+                <button
+                  onClick={() => setGameState('select_job')}
+                  className="inline-flex items-center gap-2 text-white/60 hover:text-white transition-colors mb-4"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                  <span>{t('parttime.back')}</span>
+                </button>
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/60">
+                  {t('parttime.selectDifficulty')}
+                </h1>
+                <p className="text-white/50 text-base sm:text-lg max-w-md mx-auto">
+                  {t('parttime.selectDifficultyDesc')}
+                </p>
+              </motion.div>
 
-              <div className="grid grid-cols-1 gap-4">
-                {DIFFICULTIES.map((diff) => (
+              {/* Difficulty Cards - Horizontal on Desktop */}
+              <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
+                {DIFFICULTIES.map((diff, index) => (
                   <motion.button
                     key={diff.id}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    variants={itemVariants}
+                    whileHover={{ scale: 1.03, y: -4 }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={() => handleSelectDifficulty(diff.id)}
-                    className={`glass-card p-6 rounded-xl bg-gradient-to-r ${diff.color} bg-opacity-20 hover:bg-opacity-30 transition-all`}
+                    className={`group relative overflow-hidden rounded-2xl p-6 lg:p-8 border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm transition-all duration-300 hover:border-white/20`}
                   >
-                    <h3 className="text-xl font-bold text-white">{t(`parttime.difficulty.${diff.id}`)}</h3>
-                    <p className="text-white/70 mt-1">{t(`parttime.difficulty.${diff.id}Desc`)}</p>
+                    {/* Gradient Overlay on Hover */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${diff.color} opacity-0 group-hover:opacity-15 transition-opacity duration-500`} />
+                    
+                    <div className="relative space-y-4 text-center">
+                      {/* Emoji */}
+                      <div className="text-5xl lg:text-6xl transform group-hover:scale-110 transition-transform duration-300">
+                        {diff.emoji}
+                      </div>
+                      
+                      {/* Title */}
+                      <h3 className="text-xl lg:text-2xl font-bold text-white">
+                        {t(`parttime.difficulty.${diff.id}`)}
+                      </h3>
+                      
+                      {/* Stars */}
+                      <div className="flex items-center justify-center gap-1">
+                        {[...Array(3)].map((_, i) => (
+                          <Star 
+                            key={i} 
+                            className={`w-5 h-5 ${i < diff.stars ? 'text-amber-400 fill-amber-400' : 'text-white/20'}`} 
+                          />
+                        ))}
+                      </div>
+                      
+                      {/* Description */}
+                      <p className="text-white/50 text-sm">
+                        {t(`parttime.difficulty.${diff.id}Desc`)}
+                      </p>
+                    </div>
                   </motion.button>
                 ))}
-              </div>
-
-              <Button
-                variant="outline"
-                onClick={() => setGameState('select_job')}
-                className="w-full border-white/20 text-white hover:bg-white/10"
-              >
-                {t('parttime.back')}
-              </Button>
+              </motion.div>
             </motion.div>
           )}
 
-          {/* Playing State */}
+          {/* Playing State - Premium Design */}
           {(gameState === 'playing' || gameState === 'evaluating') && scenario && (
             <motion.div
               key="playing"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
               exit={{ opacity: 0, y: -20 }}
-              className="space-y-4"
+              className="space-y-4 lg:space-y-6"
             >
-              {/* Job & Turn Info */}
-              <div className="glass-card p-4 rounded-xl">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-neon-cyan font-bold">{t(`parttime.jobs.${selectedJob}`)}</span>
-                  </div>
-                  <div className="text-white/70">
-                    {t('parttime.customerType')}: <span className="text-white">{scenario.customer_type}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Situation */}
-              <div className="glass-card p-4 rounded-xl bg-blue-500/10">
-                <p className="text-white/60 text-sm mb-1">📍 {t('parttime.situation')}</p>
-                <p className="text-white">{scenario.situation_hint_ko}</p>
-              </div>
-
-              {/* Customer Line */}
-              <div className="glass-card p-6 rounded-xl bg-gradient-to-r from-pink-500/20 to-purple-500/20">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-full bg-pink-500/30">
-                    <MessageCircle className="w-6 h-6 text-pink-400" />
+              {/* Current Job Badge */}
+              <motion.div variants={itemVariants} className="flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl ${JOBS.find(j => j.id === selectedJob)?.iconBg || 'bg-violet-500'} flex items-center justify-center`}>
+                    {(() => {
+                      const job = JOBS.find(j => j.id === selectedJob);
+                      return job ? <job.icon className="w-5 h-5 text-white" /> : null;
+                    })()}
                   </div>
                   <div>
-                    <p className="text-white/60 text-sm mb-2">{t('parttime.customer')}:</p>
-                    <p className="text-xl text-white font-medium">"{scenario.customer_line_ko}"</p>
+                    <span className="text-white font-bold">{t(`parttime.jobs.${selectedJob}`)}</span>
+                    <span className="text-white/50 text-sm block">{scenario.customer_type}</span>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
-              {/* Hint Button */}
-              <Button
-                variant="outline"
-                onClick={() => setShowHint(!showHint)}
-                className="w-full border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/20"
+              {/* Situation Card */}
+              <motion.div 
+                variants={itemVariants}
+                className="rounded-2xl p-5 lg:p-6 bg-gradient-to-br from-blue-500/10 to-cyan-500/5 border border-blue-500/20 backdrop-blur-sm"
               >
-                <Lightbulb className="w-4 h-4 mr-2" />
-                {showHint ? t('parttime.hideHint') : t('parttime.showHint')}
-              </Button>
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                    <Target className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <div>
+                    <p className="text-blue-400 text-sm font-medium mb-1">📍 {t('parttime.situation')}</p>
+                    <p className="text-white text-base lg:text-lg">{scenario.situation_hint_ko}</p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Customer Speech Bubble */}
+              <motion.div 
+                variants={itemVariants}
+                className="rounded-2xl p-6 lg:p-8 bg-gradient-to-br from-violet-500/15 to-purple-500/10 border border-violet-500/20 backdrop-blur-sm"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-violet-500/25">
+                    <MessageCircle className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-violet-300 text-sm font-medium mb-2">{t('parttime.customer')}</p>
+                    <p className="text-xl lg:text-2xl text-white font-medium leading-relaxed">
+                      "{scenario.customer_line_ko}"
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Hint Toggle */}
+              <motion.div variants={itemVariants}>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowHint(!showHint)}
+                  className="w-full h-12 rounded-xl border-amber-500/30 bg-amber-500/5 text-amber-400 hover:bg-amber-500/10 hover:border-amber-500/50"
+                >
+                  <Lightbulb className="w-5 h-5 mr-2" />
+                  {showHint ? t('parttime.hideHint') : t('parttime.showHint')}
+                </Button>
+              </motion.div>
 
               {/* Hint Display */}
               <AnimatePresence>
@@ -369,153 +505,207 @@ const PartTime = () => {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="glass-card p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30"
+                    className="rounded-2xl p-5 bg-amber-500/10 border border-amber-500/30 backdrop-blur-sm"
                   >
-                    <p className="text-yellow-400 text-sm mb-1">💡 {t('parttime.hint')}</p>
-                    <p className="text-white">{scenario.expected_response_hint_ko}</p>
+                    <div className="flex items-start gap-3">
+                      <Lightbulb className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-amber-400 text-sm font-medium mb-1">💡 {t('parttime.hint')}</p>
+                        <p className="text-white">{scenario.expected_response_hint_ko}</p>
+                      </div>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
 
               {/* Input Area */}
-              <div className="glass-card p-4 rounded-xl">
-                <p className="text-white/60 text-sm mb-2">✍️ {t('parttime.respond')}:</p>
-                <div className="flex gap-2">
+              <motion.div 
+                variants={itemVariants}
+                className="rounded-2xl p-5 lg:p-6 bg-white/5 border border-white/10 backdrop-blur-sm"
+              >
+                <p className="text-white/60 text-sm mb-3">✍️ {t('parttime.respond')}</p>
+                <div className="flex gap-3">
                   <Input
                     value={playerInput}
                     onChange={(e) => setPlayerInput(e.target.value)}
                     placeholder={t('parttime.placeholder')}
-                    className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/40"
+                    className="flex-1 h-12 rounded-xl bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-violet-500/50 focus:ring-violet-500/20"
                     disabled={loading}
                     onKeyDown={(e) => e.key === 'Enter' && !loading && handleSubmitResponse()}
                   />
                   <Button
                     onClick={handleSubmitResponse}
                     disabled={loading || !playerInput.trim()}
-                    className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+                    className="h-12 px-6 rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 shadow-lg shadow-violet-500/25"
                   >
                     {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                   </Button>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           )}
 
-          {/* Result State */}
+          {/* Result State - Premium Design */}
           {gameState === 'result' && evaluation && (
             <motion.div
               key="result"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="space-y-4"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="space-y-4 lg:space-y-6"
             >
               {/* Grade Display */}
-              <div className="glass-card p-8 rounded-xl text-center">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", delay: 0.2 }}
-                  className={`text-8xl font-bold ${getGradeColor(evaluation.grade)} mb-4`}
-                >
-                  {evaluation.grade}
-                </motion.div>
-                <p className="text-white text-2xl">{evaluation.score}{t('parttime.score')}</p>
-                <div className="flex items-center justify-center gap-2 mt-4 text-yellow-400">
-                  <Coins className="w-6 h-6" />
-                  <span className="text-xl font-bold">+₩{evaluation.earned_money.toLocaleString()}</span>
+              <motion.div 
+                variants={itemVariants}
+                className="rounded-3xl p-8 lg:p-12 text-center bg-gradient-to-br from-white/10 to-white/5 border border-white/10 backdrop-blur-xl relative overflow-hidden"
+              >
+                {/* Decorative Elements */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${getGradeColor(evaluation.grade)} opacity-10`} />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-gradient-to-b from-white/10 to-transparent rounded-full blur-3xl" />
+                
+                <div className="relative">
+                  <motion.div
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
+                    className={`text-8xl lg:text-9xl font-black bg-gradient-to-br ${getGradeColor(evaluation.grade)} bg-clip-text text-transparent mb-4`}
+                  >
+                    {evaluation.grade}
+                  </motion.div>
+                  <p className="text-2xl lg:text-3xl text-white font-bold">{evaluation.score}{t('parttime.score')}</p>
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="flex items-center justify-center gap-3 mt-6 px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 inline-flex mx-auto"
+                  >
+                    <Coins className="w-7 h-7 text-amber-400" />
+                    <span className="text-2xl font-bold text-amber-400">+₩{evaluation.earned_money.toLocaleString()}</span>
+                  </motion.div>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Customer Reaction */}
-              <div className="glass-card p-4 rounded-xl bg-purple-500/10">
-                <p className="text-white/60 text-sm mb-1">😊 {t('parttime.customerReaction')}</p>
-                <p className="text-white">{evaluation.customer_reaction_ko}</p>
-              </div>
+              <motion.div 
+                variants={itemVariants}
+                className="rounded-2xl p-5 bg-violet-500/10 border border-violet-500/20"
+              >
+                <p className="text-violet-400 text-sm font-medium mb-2">😊 {t('parttime.customerReaction')}</p>
+                <p className="text-white text-base lg:text-lg">{evaluation.customer_reaction_ko}</p>
+              </motion.div>
 
               {/* Feedback */}
-              <div className="glass-card p-4 rounded-xl">
-                <p className="text-white/60 text-sm mb-2">📝 {t('parttime.feedback')}</p>
+              <motion.div 
+                variants={itemVariants}
+                className="rounded-2xl p-5 bg-white/5 border border-white/10"
+              >
+                <p className="text-white/60 text-sm font-medium mb-2">📝 {t('parttime.feedback')}</p>
                 <p className="text-white">{evaluation.feedback_ko}</p>
-              </div>
+              </motion.div>
 
               {/* Better Response */}
-              <div className="glass-card p-4 rounded-xl bg-green-500/10">
-                <p className="text-white/60 text-sm mb-2">✨ {t('parttime.betterResponse')}</p>
-                <p className="text-white">"{evaluation.better_response_ko}"</p>
-              </div>
+              <motion.div 
+                variants={itemVariants}
+                className="rounded-2xl p-5 bg-emerald-500/10 border border-emerald-500/20"
+              >
+                <p className="text-emerald-400 text-sm font-medium mb-2">✨ {t('parttime.betterResponse')}</p>
+                <p className="text-white text-base lg:text-lg">"{evaluation.better_response_ko}"</p>
+              </motion.div>
 
               {/* Language Tips */}
               {evaluation.language_tips && evaluation.language_tips.length > 0 && (
-                <div className="glass-card p-4 rounded-xl bg-red-500/10">
-                  <p className="text-white/60 text-sm mb-2">🔤 {t('parttime.languageCorrection')}</p>
-                  {evaluation.language_tips.map((tip, idx) => (
-                    <div key={idx} className="mb-3 last:mb-0">
-                      <div className="flex gap-2 items-center mb-1">
-                        <span className="text-red-400 line-through">{tip.wrong}</span>
-                        <span className="text-white/50">→</span>
-                        <span className="text-green-400">{tip.correct}</span>
+                <motion.div 
+                  variants={itemVariants}
+                  className="rounded-2xl p-5 bg-rose-500/10 border border-rose-500/20"
+                >
+                  <p className="text-rose-400 text-sm font-medium mb-3">🔤 {t('parttime.languageCorrection')}</p>
+                  <div className="space-y-4">
+                    {evaluation.language_tips.map((tip, idx) => (
+                      <div key={idx} className="flex items-start gap-3">
+                        <XCircle className="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <span className="text-rose-400 line-through">{tip.wrong}</span>
+                            <ArrowRight className="w-4 h-4 text-white/30" />
+                            <span className="text-emerald-400 font-medium">{tip.correct}</span>
+                          </div>
+                          <p className="text-white/70 text-sm">{tip.explanation_ko}</p>
+                        </div>
                       </div>
-                      <p className="text-white/70 text-sm">{tip.explanation_ko}</p>
-                      <p className="text-white/50 text-xs">{tip.explanation_vi}</p>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </motion.div>
               )}
 
               {/* Next Button */}
-              <Button
-                onClick={handleNextTurn}
-                className="w-full h-14 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-lg font-bold"
-              >
-                {turn >= MAX_TURNS ? t('parttime.viewResult') : t('parttime.nextCustomer')}
-              </Button>
+              <motion.div variants={itemVariants}>
+                <Button
+                  onClick={handleNextTurn}
+                  className="w-full h-14 rounded-2xl bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-lg font-bold shadow-xl shadow-violet-500/25"
+                >
+                  {turn >= MAX_TURNS ? t('parttime.viewResult') : t('parttime.nextCustomer')}
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </motion.div>
             </motion.div>
           )}
 
-          {/* Game Over State */}
+          {/* Game Over State - Premium Design */}
           {gameState === 'game_over' && (
             <motion.div
               key="game_over"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="space-y-6"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="space-y-6 lg:space-y-8"
             >
-              <div className="glass-card p-8 rounded-xl text-center">
-                <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ type: "spring", delay: 0.2 }}
-                >
-                  <Trophy className="w-20 h-20 text-yellow-400 mx-auto mb-4" />
-                </motion.div>
-                <h1 className="text-3xl font-bold text-white mb-2">{t('parttime.workDone')}</h1>
+              {/* Trophy Card */}
+              <motion.div 
+                variants={itemVariants}
+                className="rounded-3xl p-8 lg:p-12 text-center bg-gradient-to-br from-amber-500/20 via-yellow-500/10 to-orange-500/20 border border-amber-500/30 backdrop-blur-xl relative overflow-hidden"
+              >
+                {/* Decorative Elements */}
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-500/20 via-transparent to-transparent" />
                 
-                <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-xl p-6">
-                  <p className="text-white/70 mb-2">{t('parttime.todayIncome')}</p>
-                  <div className="flex items-center justify-center gap-2 text-yellow-400">
-                    <Coins className="w-8 h-8" />
-                    <span className="text-4xl font-bold">₩{totalEarned.toLocaleString()}</span>
+                <div className="relative">
+                  <motion.div
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
+                  >
+                    <Trophy className="w-24 h-24 lg:w-32 lg:h-32 text-amber-400 mx-auto mb-6 drop-shadow-[0_0_30px_rgba(251,191,36,0.5)]" />
+                  </motion.div>
+                  
+                  <h1 className="text-3xl lg:text-4xl font-black text-white mb-6">{t('parttime.workDone')}</h1>
+                  
+                  <div className="inline-block rounded-2xl p-6 lg:p-8 bg-gradient-to-br from-amber-500/20 to-yellow-500/20 border border-amber-500/40">
+                    <p className="text-amber-300/70 text-sm mb-2">{t('parttime.todayIncome')}</p>
+                    <div className="flex items-center justify-center gap-3 text-amber-400">
+                      <Coins className="w-10 h-10" />
+                      <span className="text-4xl lg:text-5xl font-black">₩{totalEarned.toLocaleString()}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
-              <div className="grid grid-cols-2 gap-4">
+              {/* Action Buttons */}
+              <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4">
                 <Button
                   onClick={handleRestart}
-                  className="h-14 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                  className="h-14 rounded-2xl bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-lg font-bold shadow-lg shadow-violet-500/25"
                 >
                   {t('parttime.restart')}
                 </Button>
                 <Button
                   onClick={() => navigate('/dashboard')}
                   variant="outline"
-                  className="h-14 border-white/20 text-white hover:bg-white/10"
+                  className="h-14 rounded-2xl border-white/20 text-white hover:bg-white/10"
                 >
                   {t('parttime.backToDashboard')}
                 </Button>
-              </div>
+              </motion.div>
             </motion.div>
           )}
 
@@ -524,12 +714,16 @@ const PartTime = () => {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+              className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50"
             >
-              <div className="glass-card p-8 rounded-xl text-center">
-                <Loader2 className="w-12 h-12 text-neon-cyan animate-spin mx-auto mb-4" />
-                <p className="text-white">{t('parttime.loading')}</p>
-              </div>
+              <motion.div 
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="rounded-3xl p-8 lg:p-12 text-center bg-gradient-to-br from-white/10 to-white/5 border border-white/10 backdrop-blur-xl"
+              >
+                <Loader2 className="w-16 h-16 text-violet-400 animate-spin mx-auto mb-4" />
+                <p className="text-white text-lg font-medium">{t('parttime.loading')}</p>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
