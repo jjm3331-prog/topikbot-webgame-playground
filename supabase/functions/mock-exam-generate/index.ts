@@ -20,31 +20,33 @@ const KOREAN_VOICES = {
   male: "WqVy7827vjE2r3jWvbnP",   // 사용자 지정 남성 목소리
 } as const;
 
+// eleven_v3 모델의 stability 값은 반드시 [0.0, 0.5, 1.0] 중 하나여야 함
+// 0.0 = Creative, 0.5 = Natural, 1.0 = Robust
 const TTS_PRESETS = {
   exam: {
     voiceId: KOREAN_VOICES.female, // Default to female Korean native
-    stability: 0.75,
+    stability: 1.0, // Robust - 시험용 명확한 발음
     similarity_boost: 0.85,
     style: 0.15,
     speed: 0.8, // Slower for exam (clear delivery)
   },
   learning: {
     voiceId: KOREAN_VOICES.female,
-    stability: 0.7,
+    stability: 1.0, // Robust - 학습용 명확한 발음
     similarity_boost: 0.8,
     style: 0.2,
     speed: 0.75, // Even slower for learners
   },
   natural: {
     voiceId: KOREAN_VOICES.male,
-    stability: 0.5,
+    stability: 0.5, // Natural - 자연스러운 발화
     similarity_boost: 0.75,
     style: 0.4,
     speed: 0.9,
   },
   formal: {
     voiceId: KOREAN_VOICES.female,
-    stability: 0.85,
+    stability: 1.0, // Robust - 격식체 명확한 발음
     similarity_boost: 0.9,
     style: 0.1,
     speed: 0.85,
