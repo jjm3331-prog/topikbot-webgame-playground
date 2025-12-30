@@ -14,11 +14,10 @@ const COHERE_API_KEY = Deno.env.get("COHERE_API_KEY");
 const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
 // TTS Voice Presets - Korean Native Voices (High Quality)
-// 여성: Seoyeon - 한국어 네이티브, 자연스럽고 명확한 발음
-// 남성: Junwoo - 한국어 네이티브, 자연스럽고 명확한 발음
+// 사용자 지정 최고 품질 한국어 네이티브 보이스
 const KOREAN_VOICES = {
-  female: "yoZ06aMxZJJ28mfd3POQ", // Seoyeon - Korean native female
-  male: "ODq5zmih8GrVes37Dizd",   // Junwoo - Korean native male
+  female: "ksaI0TCD9BstzEzlxj4q", // 사용자 지정 여성 목소리
+  male: "WqVy7827vjE2r3jWvbnP",   // 사용자 지정 남성 목소리
 } as const;
 
 const TTS_PRESETS = {
