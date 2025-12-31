@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -86,8 +86,8 @@ const MAX_WARNINGS = 1; // 1 warning allowed, 2nd violation = lose
 
 export default function ChainReactionMultiplayer({ words, onBack, initialRoomCode }: ChainReactionMultiplayerProps) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [gamePhase, setGamePhase] = useState<GamePhase>("menu");
-  const gamePhaseRef = useRef<GamePhase>("menu");
   const [room, setRoom] = useState<Room | null>(null);
   const [playerId] = useState(() => crypto.randomUUID());
   const [playerName, setPlayerName] = useState("");
@@ -1034,10 +1034,10 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                 <Link2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Nối từ 1:1
+                {t("battle.wordChain")}
               </span>
             </h1>
-            <p className="text-muted-foreground mt-1">끝말잇기 대결</p>
+            <p className="text-muted-foreground mt-1">{t("battle.wordChainKo")}</p>
           </div>
         </div>
 
@@ -1045,18 +1045,16 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
         <Card className="p-6 sm:p-8 bg-gradient-to-br from-yellow-500/5 to-orange-500/5 border-yellow-500/20">
           <h2 className="text-xl sm:text-2xl font-bold mb-6 flex items-center gap-3">
             <span className="text-2xl sm:text-3xl">📋</span>
-            <span>Cách chơi</span>
+            <span>{t("battle.howToPlay")}</span>
             <span className="text-muted-foreground font-normal">/ 게임 방법</span>
           </h2>
 
           {/* Game Overview */}
           <div className="mb-6 p-5 rounded-xl bg-background/80 border border-yellow-500/20">
             <p className="text-base sm:text-lg leading-relaxed">
-              Nối từ theo <span className="text-yellow-500 font-bold">âm tiết cuối</span> của từ trước đó.
+              {t("battle.wordChainGame.overview")}
               <br />
-              <span className="text-muted-foreground">
-                Ví dụ: <span className="text-foreground">"사랑"</span> → <span className="text-foreground">"랑데부"</span> → <span className="text-foreground">"부자"</span>
-              </span>
+              <span className="text-muted-foreground">{t("battle.wordChainGame.overviewExample")}</span>
             </p>
           </div>
 
@@ -1065,41 +1063,33 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/30">
               <div className="flex items-center gap-3 mb-2">
                 <Timer className="w-6 h-6 text-blue-400" />
-                <span className="font-bold text-lg text-blue-400">12 giây mỗi lượt</span>
+                <span className="font-bold text-lg text-blue-400">{t("battle.secondsPerTurn")}</span>
               </div>
-              <p className="text-muted-foreground">
-                Hết giờ mà chưa nhập = cảnh báo!
-              </p>
+              <p className="text-muted-foreground">{t("battle.wordChainGame.timeoutWarnDesc")}</p>
             </div>
 
             <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30">
               <div className="flex items-center gap-3 mb-2">
                 <AlertTriangle className="w-6 h-6 text-red-400" />
-                <span className="font-bold text-lg text-red-400">2 cảnh báo = Thua</span>
+                <span className="font-bold text-lg text-red-400">{t("battle.warnings")}</span>
               </div>
-              <p className="text-muted-foreground">
-                Từ sai hoặc hết giờ đều tính cảnh báo.
-              </p>
+              <p className="text-muted-foreground">{t("battle.wordChainGame.warningDesc")}</p>
             </div>
 
             <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/30">
               <div className="flex items-center gap-3 mb-2">
                 <Zap className="w-6 h-6 text-green-400" />
-                <span className="font-bold text-lg text-green-400">Luật đueum 두음법칙</span>
+                <span className="font-bold text-lg text-green-400">{t("battle.wordChainGame.dueumTitle")}</span>
               </div>
-              <p className="text-muted-foreground">
-                녀→여, 뇨→요, 뉴→유, 니→이, 랴→야...
-              </p>
+              <p className="text-muted-foreground">녀→여, 뇨→요, 뉴→유, 니→이, 랴→야...</p>
             </div>
 
             <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30">
               <div className="flex items-center gap-3 mb-2">
                 <Trophy className="w-6 h-6 text-yellow-400" />
-                <span className="font-bold text-lg text-yellow-400">+1,000 điểm</span>
+                <span className="font-bold text-lg text-yellow-400">{t("battle.wordChainGame.rewardTitle")}</span>
               </div>
-              <p className="text-muted-foreground">
-                Chiến thắng để nhận điểm thưởng!
-              </p>
+              <p className="text-muted-foreground">{t("battle.wordChainGame.rewardDesc")}</p>
             </div>
           </div>
         </Card>
@@ -1109,12 +1099,12 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
           <div className="space-y-5">
             <div>
               <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                Tên của bạn / 닉네임
+                {t("battle.semanticGame.yourNameLabel")}
               </label>
               <Input
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
-                placeholder="Nhập tên..."
+                placeholder={t("battle.semanticGame.yourNamePlaceholder")}
                 className="text-lg h-12"
                 maxLength={20}
               />
@@ -1128,7 +1118,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                   disabled={!playerName.trim()}
                 >
                   <Crown className="w-6 h-6" />
-                  Tạo phòng
+                  {t("battle.semanticGame.createRoom")}
                 </Button>
               </motion.div>
 
@@ -1140,7 +1130,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                   disabled={!playerName.trim()}
                 >
                   <Users className="w-6 h-6" />
-                  Tham gia
+                  {t("battle.semanticGame.join")}
                 </Button>
               </motion.div>
             </div>
@@ -1160,21 +1150,22 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       >
         <Card className="p-6 sm:p-8">
           <div className="flex items-center gap-3 mb-6">
-            <Button variant="ghost" size="icon" onClick={() => setGamePhase("menu")}>
+            <Button variant="ghost" size="icon" onClick={() => setGamePhase("menu")}
+            >
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h2 className="text-xl font-bold">Tham gia phòng</h2>
+            <h2 className="text-xl font-bold">{t("battle.semanticGame.joinRoomTitle")}</h2>
           </div>
 
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                Mã phòng / 방 코드
+                {t("battle.semanticGame.roomCodeLabel")}
               </label>
               <Input
                 value={roomCodeInput}
                 onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
-                placeholder="6 ký tự..."
+                placeholder={t("battle.semanticGame.roomCodePlaceholder")}
                 className="text-center text-2xl tracking-widest h-14 font-mono"
                 maxLength={6}
               />
@@ -1186,7 +1177,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                 onClick={() => setGamePhase("menu")}
                 className="flex-1 h-12"
               >
-                Hủy
+                {t("battle.semanticGame.cancel")}
               </Button>
               <Button
                 onClick={joinRoom}
@@ -1194,7 +1185,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                 className="flex-1 h-12 bg-gradient-to-r from-yellow-400 to-orange-500"
               >
                 <Users className="w-5 h-5 mr-2" />
-                Tham gia
+                {t("battle.semanticGame.join")}
               </Button>
             </div>
           </div>
@@ -1212,7 +1203,10 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
           transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
           className="w-16 h-16 rounded-full border-4 border-muted border-t-yellow-500 mb-4"
         />
-        <p className="text-muted-foreground text-lg">Đang tạo phòng...</p>
+        <p className="text-muted-foreground text-lg">{t("battle.semanticGame.creatingRoom")}</p>
+      </div>
+    );
+  }
       </div>
     );
   }
@@ -1459,7 +1453,9 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
               : "bg-muted/50 text-muted-foreground"
           }`}
         >
-          {isMyTurn ? "🎯 Lượt của bạn! Hãy nhập từ!" : `⏳ Lượt của ${opponentName}...`}
+          {isMyTurn
+            ? t("battle.wordChainGame.yourTurn")
+            : t("battle.wordChainGame.opponentTurn", { name: opponentName })}
         </motion.div>
 
         {/* Players Warnings */}
@@ -1477,9 +1473,10 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
               ))}
             </div>
             {myWarnings > 0 && (
-              <p className="text-xs text-red-400 mt-1.5 font-medium">Cảnh báo {myWarnings}</p>
+              <p className="text-xs text-red-400 mt-1.5 font-medium">
+                {t("battle.wordChainGame.warningCount", { count: myWarnings })}
+              </p>
             )}
-          </div>
 
           <div className="text-center">
             <p className="text-xs text-muted-foreground">VS</p>
@@ -1498,9 +1495,10 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
               ))}
             </div>
             {opponentWarnings > 0 && (
-              <p className="text-xs text-red-400 mt-1.5 font-medium">Cảnh báo {opponentWarnings}</p>
+              <p className="text-xs text-red-400 mt-1.5 font-medium">
+                {t("battle.wordChainGame.warningCount", { count: opponentWarnings })}
+              </p>
             )}
-          </div>
         </div>
 
         {/* Word Chain Display */}

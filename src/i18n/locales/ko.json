@@ -668,6 +668,18 @@
       "roomCodeLabel": "방 코드",
       "roomCodeHint": "링크로 자동 참가가 안 되면 이 코드를 입력해 참가할 수 있어요"
     },
+    "wordChainGame": {
+      "overview": "이전 단어의 마지막 음절로 단어를 이어가세요.",
+      "overviewExample": "예: \"사랑\" → \"랑데부\" → \"부자\"",
+      "timeoutWarnDesc": "시간 내에 입력하지 못하면 경고!",
+      "warningDesc": "오답 또는 시간 초과는 경고로 처리돼요.",
+      "dueumTitle": "두음법칙",
+      "rewardTitle": "+1,000점",
+      "rewardDesc": "승리하면 보너스 점수를 받아요!",
+      "yourTurn": "🎯 내 차례! 단어를 입력하세요!",
+      "opponentTurn": "⏳ {{name}} 님 차례...",
+      "warningCount": "경고 {{count}}"
+    },
     "semanticGame": {
       "overview": "이전 단어와 의미가 이어지는 단어를 말하세요. (끝 음절 규칙이 아닙니다.)",
       "overviewExample": "예: \"바다\" → \"파도\" (바다→파도), \"학교\" → \"선생님\" (학교→선생님)",

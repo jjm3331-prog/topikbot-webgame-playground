@@ -607,7 +607,8 @@
       "roomCodeLabel": "房间代码",
       "roomCodeHint": "如果自动加入链接失败，朋友可以输入此代码"
     },
-    "semanticGame": {
+    "wordChainGame": {
+      "overview": "用上一个词的最后一个音节来接龙。",
       "overview": "说一个与前一个词意义相关的词（不是最后一个音节）。",
       "overviewExample": "例如：「바다」→「파도」（海→浪）、「학교」→「선생님」（学校→老师）",
       "aiScoringTitle": "AI评分",

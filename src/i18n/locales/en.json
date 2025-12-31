@@ -668,6 +668,18 @@
       "roomCodeLabel": "Room code",
       "roomCodeHint": "If the auto-join link doesn't work, your friend can enter this code"
     },
+    "wordChainGame": {
+      "overview": "Connect words by the last syllable of the previous word.",
+      "overviewExample": "Example: \"사랑\" → \"랑데부\" → \"부자\"",
+      "timeoutWarnDesc": "Time's up = warning!",
+      "warningDesc": "Wrong word or timeout counts as a warning.",
+      "dueumTitle": "Dueum rule (두음법칙)",
+      "rewardTitle": "+1,000 pts",
+      "rewardDesc": "Win to earn bonus points!",
+      "yourTurn": "🎯 Your turn! Enter a word!",
+      "opponentTurn": "⏳ {{name}}'s turn...",
+      "warningCount": "Warning {{count}}"
+    },
     "semanticGame": {
       "overview": "Say a word that is connected by meaning to the previous word (not by last syllable).",
       "overviewExample": "Example: \"바다\" → \"파도\" (sea → wave), \"학교\" → \"선생님\" (school → teacher)",
