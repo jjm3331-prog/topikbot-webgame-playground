@@ -570,27 +570,10 @@ export default function Battle() {
 
                   {/* Content */}
                   <div className="p-6 sm:p-8">
-                    {/* Coming Soon Badge */}
-                    {game.comingSoon && (
-                      <div className="absolute top-4 right-4">
-                        <span className="px-3 py-1.5 text-xs font-bold bg-muted text-muted-foreground rounded-full border border-border">
-                          {t('battle.comingSoon')}
-                        </span>
-                      </div>
-                    )}
-
                     {/* Icon & Title */}
                     <div className="flex items-start gap-5 mb-6">
-                      <div className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center ${
-                        game.available
-                          ? `bg-gradient-to-br ${game.gradient || "from-yellow-400 to-orange-500"} shadow-lg shadow-orange-500/20`
-                          : "bg-muted"
-                      }`}>
-                        {game.available ? (
-                          <game.icon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
-                        ) : (
-                          <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-muted-foreground" />
-                        )}
+                      <div className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center bg-gradient-to-br ${game.gradient || "from-yellow-400 to-orange-500"} shadow-lg shadow-orange-500/20`}>
+                        <game.icon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
                       </div>
 
                       <div className="flex-1 pt-1">
