@@ -101,6 +101,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
   const [streakBonus, setStreakBonus] = useState<StreakBonus | null>(null);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
   const channelRef = useRef<any>(null);
   const questionsChannelRef = useRef<any>(null);
   const answersChannelRef = useRef<any>(null);
@@ -391,7 +392,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
             setGamePhase("ready");
           }
           if (newRoom.status === "playing" && phase !== "playing" && phase !== "countdown") {
-            startCountdown(roomId);
+            startCountdown(roomId, newRoom.started_at);
           }
           if (newRoom.status === "finished" && phase !== "finished") {
             if (timerRef.current) clearInterval(timerRef.current);
@@ -469,9 +470,17 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
     if (!r || r.host_id !== me) return;
 
     try {
+      // Schedule a synchronized start time (3s countdown) so host/guest start together.
+      const scheduledStartAt = new Date(Date.now() + 3200).toISOString();
+
       const { error } = await supabase
         .from("chain_reaction_rooms")
-        .update({ status: "playing", started_at: new Date().toISOString(), host_score: 0, guest_score: 0 })
+        .update({
+          status: "playing",
+          started_at: scheduledStartAt,
+          host_score: 0,
+          guest_score: 0,
+        })
         .eq("id", r.id);
       if (error) throw error;
       clearHostedRoom();
@@ -481,18 +490,30 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
     }
   };
 
-  const startCountdown = (roomId: string) => {
+  const startCountdown = (roomId: string, startedAt?: string | null) => {
     setGamePhase("countdown");
-    let count = 3;
-    setCountdown(count);
-    playCountdownBeep(count);
-    const interval = setInterval(() => {
-      count--;
-      setCountdown(count);
-      playCountdownBeep(count);
-      if (count <= 0) {
-        clearInterval(interval);
+
+    const targetMs = startedAt ? new Date(startedAt).getTime() : Date.now() + 3000;
+    let lastShown: number | null = null;
+
+    if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
+
+    const tick = () => {
+      const remainingMs = targetMs - Date.now();
+      const remainingSec = Math.max(0, Math.ceil(remainingMs / 1000));
+
+      if (lastShown !== remainingSec) {
+        lastShown = remainingSec;
+        setCountdown(remainingSec);
+        playCountdownBeep(remainingSec);
+      }
+
+      if (remainingSec <= 0) {
+        if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
+        countdownTimerRef.current = null;
+
         setGamePhase("playing");
+
         // Host publishes first question
         if (isHostRef.current) {
           publishNextQuestion(roomId, 1);
@@ -500,7 +521,10 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
           setIsLoading(true);
         }
       }
-    }, 1000);
+    };
+
+    tick();
+    countdownTimerRef.current = setInterval(tick, 150);
   };
 
   // Host generates & publishes question to DB
@@ -681,6 +705,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
     if (questionsChannelRef.current) supabase.removeChannel(questionsChannelRef.current);
     if (answersChannelRef.current) supabase.removeChannel(answersChannelRef.current);
     if (timerRef.current) clearInterval(timerRef.current);
+    if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
   };
 
   useEffect(() => {
@@ -689,6 +714,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
       if (questionsChannelRef.current) supabase.removeChannel(questionsChannelRef.current);
       if (answersChannelRef.current) supabase.removeChannel(answersChannelRef.current);
       if (timerRef.current) clearInterval(timerRef.current);
+      if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
     };
   }, []);
 
