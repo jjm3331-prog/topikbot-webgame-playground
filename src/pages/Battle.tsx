@@ -77,6 +77,7 @@ export default function Battle() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); // null = loading
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
   const [initialRoomCode, setInitialRoomCode] = useState<string | undefined>();
+  const [initialGuestName, setInitialGuestName] = useState<string | undefined>();
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteGame, setInviteGame] = useState<string | null>(null);
   const [joiningRoom, setJoiningRoom] = useState(false);
@@ -230,8 +231,10 @@ export default function Battle() {
             onBack={() => {
               setSelectedGame(null);
               setInitialRoomCode(undefined);
+              setInitialGuestName(undefined);
             }}
             initialRoomCode={initialRoomCode}
+            initialGuestName={initialGuestName}
           />
         </main>
       </div>
@@ -529,8 +532,9 @@ export default function Battle() {
             >
               <WaitingRoomsList 
                 isLoggedIn={!!isLoggedIn}
-                onJoinRoom={(roomCode, gameType) => {
+                onJoinRoom={(roomCode, gameType, guestName) => {
                   setInitialRoomCode(roomCode);
+                  setInitialGuestName(guestName);
                   setSelectedGame(gameType);
                 }}
               />

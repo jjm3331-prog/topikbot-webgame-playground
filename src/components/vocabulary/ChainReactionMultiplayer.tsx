@@ -14,27 +14,25 @@ import {
   Send,
   Loader2,
   Users,
-  Copy,
   Check,
   ArrowLeft,
   Crown,
   Swords,
   Timer,
   RefreshCw,
-  Share2,
   AlertTriangle,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import RoomCodeCollapsible from "@/components/battle/RoomCodeCollapsible";
-import { saveHostedRoom, clearHostedRoom } from "@/components/battle/GuestJoinedNotification";
+import { clearHostedRoom, saveHostedRoom } from "@/components/battle/GuestJoinedNotification";
 import { saveGameRecord } from "@/lib/gameRecords";
 
 interface ChainReactionMultiplayerProps {
   words: { id: number; korean: string; meaning: string }[];
   onBack: () => void;
   initialRoomCode?: string;
+  initialGuestName?: string;
 }
 
 interface Room {
@@ -82,10 +80,10 @@ interface MoveRow {
 
 type GamePhase = "menu" | "creating" | "joining" | "waiting" | "ready" | "countdown" | "playing" | "finished";
 
-const TURN_TIME_LIMIT = 12; // seconds per turn
+const TURN_TIME_LIMIT = 20; // seconds per turn
 const MAX_WARNINGS = 1; // 1 warning allowed, 2nd violation = lose
 
-export default function ChainReactionMultiplayer({ words, onBack, initialRoomCode }: ChainReactionMultiplayerProps) {
+export default function ChainReactionMultiplayer({ words, onBack, initialRoomCode, initialGuestName }: ChainReactionMultiplayerProps) {
   const { toast } = useToast();
   const { t } = useTranslation();
   const [gamePhase, setGamePhase] = useState<GamePhase>("menu");
@@ -93,7 +91,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   const [playerId] = useState(() => crypto.randomUUID());
   const [playerName, setPlayerName] = useState("");
   const [roomCodeInput, setRoomCodeInput] = useState(initialRoomCode || "");
-  const [copied, setCopied] = useState(false);
+  const [guestNickname, setGuestNickname] = useState("");
   const [connectionMode, setConnectionMode] = useState<"semantic" | "phonetic">("phonetic");
   const guestJoinNotifiedRef = useRef(false);
   const autoStartTriggeredRef = useRef(false);
@@ -291,66 +289,67 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     }
   };
 
-  // URL auto-join
+  // Auto-join when initialRoomCode and initialGuestName are provided (from WaitingRoomsList)
   useEffect(() => {
-    if (initialRoomCode && initialRoomCode.length === 6 && gamePhase === "menu") {
-      const autoNickname = generateRandomNickname();
-      setPlayerName(autoNickname);
-      setRoomCodeInput(initialRoomCode.toUpperCase());
+    if (!initialRoomCode || initialRoomCode.length !== 6 || gamePhase !== "menu") return;
+    
+    // Use initialGuestName if provided, otherwise generate a random one
+    const guestName = initialGuestName || generateRandomNickname();
+    setPlayerName(guestName);
+    setRoomCodeInput(initialRoomCode.toUpperCase());
 
-      const autoJoin = async () => {
-        try {
-          const code = initialRoomCode.toUpperCase();
-          
-          // Find room with phonetic connection mode only
-          const { data: roomData, error: findError } = await supabase
-            .from("chain_reaction_rooms")
-            .select()
-            .eq("room_code", code)
-            .eq("connection_mode", "phonetic")
-            .maybeSingle();
+    const autoJoin = async () => {
+      try {
+        const code = initialRoomCode.toUpperCase();
+        
+        // Find room with phonetic connection mode only
+        const { data: roomData, error: findError } = await supabase
+          .from("chain_reaction_rooms")
+          .select()
+          .eq("room_code", code)
+          .eq("connection_mode", "phonetic")
+          .maybeSingle();
 
-          if (findError) throw findError;
-          if (!roomData) {
-            toast({ title: "방을 찾을 수 없습니다", variant: "destructive" });
-            setGamePhase("menu");
-            return;
-          }
-          if (roomData.status === "playing" || roomData.status === "finished") {
-            toast({ title: "이미 진행 중이거나 종료된 방입니다", variant: "destructive" });
-            setGamePhase("menu");
-            return;
-          }
-          if (roomData.guest_id) {
-            toast({ title: "이미 다른 사람이 참가했습니다", variant: "destructive" });
-            setGamePhase("menu");
-            return;
-          }
-
-          const { data, error } = await supabase
-            .from("chain_reaction_rooms")
-            .update({ guest_id: playerId, guest_name: autoNickname, guest_ready: true })
-            .eq("id", roomData.id)
-            .select()
-            .single();
-
-          if (error) throw error;
-          setRoom(data as Room);
-          setConnectionMode((data.connection_mode as "semantic" | "phonetic") || "phonetic");
-          setGamePhase("ready");
-          subscribeToRoom(data.id);
-          toast({ title: `${autoNickname}(으)로 참가 완료!` });
-        } catch (err) {
-          console.error("Auto join failed:", err);
-          toast({ title: "자동 참가 실패", variant: "destructive" });
+        if (findError) throw findError;
+        if (!roomData) {
+          toast({ title: "방을 찾을 수 없습니다", variant: "destructive" });
           setGamePhase("menu");
+          return;
         }
-      };
+        if (roomData.status === "playing" || roomData.status === "finished") {
+          toast({ title: "이미 진행 중이거나 종료된 방입니다", variant: "destructive" });
+          setGamePhase("menu");
+          return;
+        }
+        if (roomData.guest_id) {
+          toast({ title: "이미 다른 사람이 참가했습니다", variant: "destructive" });
+          setGamePhase("menu");
+          return;
+        }
 
-      setGamePhase("joining");
-      void autoJoin();
-    }
-  }, [initialRoomCode]);
+        const { data, error } = await supabase
+          .from("chain_reaction_rooms")
+          .update({ guest_id: playerId, guest_name: guestName, guest_ready: true })
+          .eq("id", roomData.id)
+          .select()
+          .single();
+
+        if (error) throw error;
+        setRoom(data as Room);
+        setConnectionMode((data.connection_mode as "semantic" | "phonetic") || "phonetic");
+        setGamePhase("ready");
+        subscribeToRoom(data.id);
+        toast({ title: `${guestName}(으)로 참가 완료!` });
+      } catch (err) {
+        console.error("Auto join failed:", err);
+        toast({ title: "자동 참가 실패", variant: "destructive" });
+        setGamePhase("menu");
+      }
+    };
+
+    setGamePhase("joining");
+    void autoJoin();
+  }, [initialRoomCode, initialGuestName]);
 
   // Host/Guest가 실제로 "페이지를 떠날 때"만 처리 (state 변경 cleanup에서 방 삭제되는 버그 방지)
   const roomRef = useRef<Room | null>(null);
@@ -981,40 +980,6 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     }
   }, [gamePhase, isMyTurn]);
 
-  // Copy URL
-  const copyRoomUrl = () => {
-    if (!room?.room_code) return;
-
-    // Use hardcoded custom domain for production
-    const url = `https://game.topikbot.kr/#/battle?game=word-chain&room=${room.room_code}`;
-
-    navigator.clipboard.writeText(url);
-    setCopied(true);
-    toast({ title: "🔗 Đã sao chép link!" });
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const shareRoom = async () => {
-    if (!room?.room_code) return;
-
-    const url = `https://game.topikbot.kr/#/battle?game=word-chain&room=${room.room_code}`;
-    const shareData = {
-      title: "Nối từ 1:1",
-      text: `🎮 Chơi nối từ với mình nhé! Mã phòng: ${room.room_code}`,
-      url,
-    };
-
-    if (navigator.share && navigator.canShare?.(shareData)) {
-      try {
-        await navigator.share(shareData);
-      } catch {
-        copyRoomUrl();
-      }
-    } else {
-      copyRoomUrl();
-    }
-  };
-
   // ==================== RENDER ====================
 
   // Menu
@@ -1226,17 +1191,20 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
           <h2 className="text-xl font-bold">{t("battle.semanticGame.waitingRoom")}</h2>
         </div>
 
-        {/* Room Code Card - Collapsible for manual entry fallback */}
-        <RoomCodeCollapsible 
-          roomCode={room.room_code}
-          copied={copied}
-          onCopy={copyRoomUrl}
-          onShare={shareRoom}
-          gradientFrom="from-yellow-400"
-          gradientTo="to-orange-500"
-          bgGlow1="bg-yellow-500/10"
-          bgGlow2="bg-orange-500/10"
-        />
+        {/* Info Card - 호스트 대기 안내 */}
+        {!room.guest_id && (
+          <Card className="p-5 bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-yellow-500/30">
+            <div className="text-center space-y-3">
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
+                <Users className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <p className="font-bold text-lg">{t("battle.waitingForOpponent")}</p>
+                <p className="text-sm text-muted-foreground mt-1">{t("battle.waitingDesc")}</p>
+              </div>
+            </div>
+          </Card>
+        )}
 
         {/* Players Status */}
         <Card className="p-5 bg-gradient-to-br from-card to-muted/30 border-border/50">
