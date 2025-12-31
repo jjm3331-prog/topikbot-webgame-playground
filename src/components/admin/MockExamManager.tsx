@@ -1,13 +1,9 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { mapExamTypeToDb } from "@/lib/mockExamDb";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -15,14 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,13 +21,35 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Loader2, Plus, Search, Trash2, Edit, Eye, Upload, 
-  FileText, CheckCircle, AlertTriangle, RefreshCw,
-  BookOpen, Headphones, PenLine, ImagePlus, X
+import {
+  Loader2,
+  Search,
+  Trash2,
+  RefreshCw,
+  BookOpen,
+  Headphones,
+  PenLine,
+  CheckCircle,
+  XCircle,
+  Database,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Volume2,
+  Image as ImageIcon,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface MockQuestion {
   id: string;
@@ -50,7 +60,7 @@ interface MockQuestion {
   question_text: string;
   question_audio_url: string | null;
   question_image_url: string | null;
-  options: unknown; // JSON type from Supabase
+  options: unknown;
   correct_answer: number;
   explanation_ko: string | null;
   explanation_vi: string | null;
@@ -61,35 +71,13 @@ interface MockQuestion {
   exam_round: number | null;
 }
 
-// Helper to safely get options as string array
-const getOptionsArray = (options: unknown): string[] => {
-  if (Array.isArray(options)) {
-    return options.map(String);
-  }
-  return [];
-};
-
-interface ParsedQuestion {
-  question_text: string;
-  options: string[];
-  correct_answer: number;
-  explanation: string;
-  part_number: number;
-  question_number: number;
-  listening_script?: string;
-  imageFile?: File;
-  imagePreview?: string;
-}
-
 const MockExamManager = () => {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("input");
   const [loading, setLoading] = useState(false);
-  const [parsing, setParsing] = useState(false);
   const [questions, setQuestions] = useState<MockQuestion[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Accurate counts (not affected by list pagination)
+  // Accurate counts
   const [questionCounts, setQuestionCounts] = useState({
     all: 0,
     listening: 0,
@@ -98,37 +86,22 @@ const MockExamManager = () => {
   });
   const [filteredTotalCount, setFilteredTotalCount] = useState(0);
 
-  // List section filter and pagination
-  const [listSectionFilter, setListSectionFilter] = useState<string>("all");
+  // Filters & Pagination
+  const [sectionFilter, setSectionFilter] = useState<string>("all");
+  const [examTypeFilter, setExamTypeFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 20;
+  const ITEMS_PER_PAGE = 30;
 
-  // Input form state
-  const [examType, setExamType] = useState<string>("topik1");
-  const [section, setSection] = useState<string>("reading");
-  const [examRound, setExamRound] = useState<string>("");
-  const [questionText, setQuestionText] = useState("");
-  const [explanationText, setExplanationText] = useState("");
-  const [listeningScript, setListeningScript] = useState("");
-  const [generatingAudio, setGeneratingAudio] = useState(false);
-
-  // Preview state
-  const [parsedQuestions, setParsedQuestions] = useState<ParsedQuestion[]>([]);
-  const [showPreview, setShowPreview] = useState(false);
-  const [savingQuestions, setSavingQuestions] = useState(false);
-
-  // Edit state
-  const [editingQuestion, setEditingQuestion] = useState<MockQuestion | null>(null);
+  // Delete state
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
-  // Reset page when filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [listSectionFilter, searchQuery]);
+  }, [sectionFilter, examTypeFilter, searchQuery]);
 
   useEffect(() => {
     loadQuestions();
-  }, [currentPage, listSectionFilter, searchQuery]);
+  }, [currentPage, sectionFilter, examTypeFilter, searchQuery]);
 
   const loadQuestions = async () => {
     setLoading(true);
@@ -137,7 +110,7 @@ const MockExamManager = () => {
       const from = (currentPage - 1) * ITEMS_PER_PAGE;
       const to = from + ITEMS_PER_PAGE - 1;
 
-      // 1) Accurate global counts (all sections)
+      // Global counts
       const [total, listening, reading, writing] = await Promise.all([
         supabase.from("mock_question_bank").select("id", { count: "exact", head: true }),
         supabase.from("mock_question_bank").select("id", { count: "exact", head: true }).eq("section", "listening"),
@@ -155,20 +128,25 @@ const MockExamManager = () => {
         writing: writing.count ?? 0,
       });
 
-      // 2) List query (paged + filter + search)
-      let listCountQuery = supabase
-        .from("mock_question_bank")
-        .select("id", { count: "exact", head: true });
-
+      // List query with filters
+      let listCountQuery = supabase.from("mock_question_bank").select("id", { count: "exact", head: true });
       let listQuery = supabase
         .from("mock_question_bank")
         .select("*")
-        .order("created_at", { ascending: false })
+        .order("exam_type", { ascending: true })
+        .order("section", { ascending: true })
+        .order("part_number", { ascending: true })
+        .order("question_number", { ascending: true })
         .range(from, to);
 
-      if (listSectionFilter !== "all") {
-        listCountQuery = listCountQuery.eq("section", listSectionFilter);
-        listQuery = listQuery.eq("section", listSectionFilter);
+      if (sectionFilter !== "all") {
+        listCountQuery = listCountQuery.eq("section", sectionFilter);
+        listQuery = listQuery.eq("section", sectionFilter);
+      }
+
+      if (examTypeFilter !== "all") {
+        listCountQuery = listCountQuery.eq("exam_type", examTypeFilter);
+        listQuery = listQuery.eq("exam_type", examTypeFilter);
       }
 
       if (q) {
@@ -197,847 +175,411 @@ const MockExamManager = () => {
     }
   };
 
-  const handleParseQuestions = async () => {
-    if (!examRound.trim()) {
-      toast({
-        title: "입력 오류",
-        description: "회차를 입력해주세요. (예: 1, 2, 3...)",
-        variant: "destructive",
-      });
-      return;
-    }
-    if (!questionText.trim()) {
-      toast({
-        title: "입력 오류",
-        description: "문제 텍스트를 입력해주세요.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setParsing(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mock-exam-parse`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${session?.access_token}`,
-          },
-          body: JSON.stringify({
-            examType,
-            section,
-            questionText: questionText.trim(),
-            explanationText: explanationText.trim(),
-          }),
-        }
-      );
-
-      const result = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(result.error || "파싱 실패");
-      }
-
-      if (result.questions && result.questions.length > 0) {
-        setParsedQuestions(result.questions);
-        setShowPreview(true);
-        toast({
-          title: "파싱 완료",
-          description: `${result.questions.length}개의 문제가 파싱되었습니다.`,
-        });
-      } else {
-        toast({
-          title: "파싱 결과 없음",
-          description: "문제를 파싱하지 못했습니다. 텍스트 형식을 확인해주세요.",
-          variant: "destructive",
-        });
-      }
-    } catch (error: any) {
-      console.error("Parse error:", error);
-      toast({
-        title: "파싱 실패",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setParsing(false);
-    }
-  };
-
-  const handleSaveQuestions = async () => {
-    if (parsedQuestions.length === 0) return;
-
-    setSavingQuestions(true);
-    try {
-      // If listening section and script provided, generate audio for each question
-      let audioUrls: Record<number, string> = {};
-      
-      if (section === "listening" && listeningScript.trim()) {
-        setGeneratingAudio(true);
-        toast({
-          title: "🎵 음성 생성 중...",
-          description: "ElevenLabs TTS로 듣기 음원을 생성하고 있습니다.",
-        });
-
-        // Parse listening scripts for each question
-        const scriptLines = listeningScript.split(/\n(?=\d+\.)/);
-        
-        for (const line of scriptLines) {
-          const match = line.match(/^(\d+)\.\s*([\s\S]+)/);
-          if (match) {
-            const qNum = parseInt(match[1], 10);
-            const script = match[2].trim();
-            
-            if (script) {
-              try {
-                // Generate TTS audio
-                const response = await fetch(
-                  `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
-                  {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-                    },
-                    body: JSON.stringify({ text: script, speed: 0.85 }),
-                  }
-                );
-
-                if (response.ok) {
-                  const audioBlob = await response.blob();
-                  const fileName = `mock-exam/${examType}/${examRound}/${section}_q${qNum}_${Date.now()}.mp3`;
-                  
-                  // Upload to Supabase Storage
-                  const { data: uploadData, error: uploadError } = await supabase.storage
-                    .from("podcast-audio")
-                    .upload(fileName, audioBlob, {
-                      contentType: "audio/mpeg",
-                      upsert: true,
-                    });
-
-                  if (!uploadError && uploadData) {
-                    const { data: urlData } = supabase.storage
-                      .from("podcast-audio")
-                      .getPublicUrl(fileName);
-                    audioUrls[qNum] = urlData.publicUrl;
-                    console.log(`Audio generated for Q${qNum}:`, urlData.publicUrl);
-                  }
-                }
-              } catch (err) {
-                console.error(`Failed to generate audio for Q${qNum}:`, err);
-              }
-            }
-          }
-        }
-        setGeneratingAudio(false);
-      }
-
-      // Upload images for each question that has one
-      const imageUrls: Record<number, string> = {};
-      for (const q of parsedQuestions) {
-        if (q.imageFile) {
-          try {
-            const fileName = `mock-exam/${examType}/${examRound}/q${q.question_number}_${Date.now()}.${q.imageFile.name.split('.').pop()}`;
-            
-            const { data: uploadData, error: uploadError } = await supabase.storage
-              .from("podcast-audio")
-              .upload(fileName, q.imageFile, {
-                contentType: q.imageFile.type,
-                upsert: true,
-              });
-
-            if (!uploadError && uploadData) {
-              const { data: urlData } = supabase.storage
-                .from("podcast-audio")
-                .getPublicUrl(fileName);
-              imageUrls[q.question_number] = urlData.publicUrl;
-              console.log(`Image uploaded for Q${q.question_number}:`, urlData.publicUrl);
-            }
-          } catch (err) {
-            console.error(`Failed to upload image for Q${q.question_number}:`, err);
-          }
-        }
-      }
-
-      const questionsToInsert = parsedQuestions.map((q) => ({
-        exam_type: mapExamTypeToDb(examType),
-        section,
-        exam_round: parseInt(examRound, 10),
-        part_number: q.part_number,
-        question_number: q.question_number,
-        question_text: q.question_text,
-        options: q.options,
-        correct_answer: q.correct_answer,
-        explanation_ko: q.explanation,
-        question_audio_url: audioUrls[q.question_number] || null,
-        question_image_url: imageUrls[q.question_number] || null,
-        is_active: true,
-      }));
-
-      const { error } = await supabase
-        .from("mock_question_bank")
-        .insert(questionsToInsert);
-
-      if (error) throw error;
-
-      const audioCount = Object.keys(audioUrls).length;
-      toast({
-        title: "저장 완료",
-        description: `${parsedQuestions.length}개의 문제가 저장되었습니다.${audioCount > 0 ? ` (음성 ${audioCount}개 생성)` : ""}`,
-      });
-
-      // Reset form
-      setQuestionText("");
-      setExplanationText("");
-      setListeningScript("");
-      setExamRound("");
-      setParsedQuestions([]);
-      setShowPreview(false);
-      
-      // Reload questions
-      await loadQuestions();
-      setActiveTab("list");
-    } catch (error: any) {
-      console.error("Save error:", error);
-      toast({
-        title: "저장 실패",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setSavingQuestions(false);
-      setGeneratingAudio(false);
-    }
-  };
-
   const handleDeleteQuestion = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from("mock_question_bank")
-        .delete()
-        .eq("id", id);
-
+      const { error } = await supabase.from("mock_question_bank").delete().eq("id", id);
       if (error) throw error;
 
-      toast({
-        title: "삭제 완료",
-        description: "문제가 삭제되었습니다.",
-      });
-
+      toast({ title: "삭제 완료", description: "문제가 삭제되었습니다." });
       setQuestions((prev) => prev.filter((q) => q.id !== id));
       setDeleteConfirmId(null);
+      // Refresh counts
+      loadQuestions();
     } catch (error: any) {
       console.error("Delete error:", error);
-      toast({
-        title: "삭제 실패",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast({ title: "삭제 실패", description: error.message, variant: "destructive" });
     }
   };
 
   const handleToggleActive = async (id: string, currentActive: boolean) => {
     try {
-      const { error } = await supabase
-        .from("mock_question_bank")
-        .update({ is_active: !currentActive })
-        .eq("id", id);
-
+      const { error } = await supabase.from("mock_question_bank").update({ is_active: !currentActive }).eq("id", id);
       if (error) throw error;
 
-      setQuestions((prev) =>
-        prev.map((q) =>
-          q.id === id ? { ...q, is_active: !currentActive } : q
-        )
-      );
-
+      setQuestions((prev) => prev.map((q) => (q.id === id ? { ...q, is_active: !currentActive } : q)));
       toast({
         title: currentActive ? "비활성화됨" : "활성화됨",
         description: `문제가 ${currentActive ? "비활성화" : "활성화"}되었습니다.`,
       });
     } catch (error: any) {
       console.error("Toggle error:", error);
-      toast({
-        title: "상태 변경 실패",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast({ title: "상태 변경 실패", description: error.message, variant: "destructive" });
     }
   };
 
-  // Server-side pagination uses filteredTotalCount
   const totalPages = Math.ceil(filteredTotalCount / ITEMS_PER_PAGE);
 
-  // Section counts for filter buttons
-  const sectionCounts = questionCounts;
-
-  const getExamTypeBadge = (type: string) => {
-    const normalized = (type || '').toUpperCase().replace(/[_\s]/g, '');
-    if (normalized.includes('TOPIKI') || normalized.includes('TOPIK1')) {
-      return <Badge className="bg-indigo-600 text-white">TOPIK I</Badge>;
+  const getSectionIcon = (section: string) => {
+    switch (section) {
+      case "listening":
+        return <Headphones className="w-4 h-4" />;
+      case "reading":
+        return <BookOpen className="w-4 h-4" />;
+      case "writing":
+        return <PenLine className="w-4 h-4" />;
+      default:
+        return null;
     }
-    return <Badge className="bg-purple-600 text-white">TOPIK II</Badge>;
   };
 
-  const getSectionBadge = (sectionValue: string) => {
-    switch (sectionValue) {
+  const getSectionColor = (section: string) => {
+    switch (section) {
       case "listening":
-        return <Badge variant="outline" className="border-cyan-500 text-cyan-600"><Headphones className="w-3 h-3 mr-1" />듣기</Badge>;
+        return "text-cyan-400";
       case "reading":
-        return <Badge variant="outline" className="border-green-500 text-green-600"><BookOpen className="w-3 h-3 mr-1" />읽기</Badge>;
+        return "text-emerald-400";
       case "writing":
-        return <Badge variant="outline" className="border-orange-500 text-orange-600"><PenLine className="w-3 h-3 mr-1" />쓰기</Badge>;
+        return "text-amber-400";
       default:
-        return <Badge variant="outline">{sectionValue}</Badge>;
+        return "text-muted-foreground";
     }
   };
 
   return (
     <div className="space-y-6">
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="input" className="flex items-center gap-2">
-            <Upload className="w-4 h-4" />
-            문제 입력
-          </TabsTrigger>
-          <TabsTrigger value="list" className="flex items-center gap-2">
-            <FileText className="w-4 h-4" />
-            문제 목록 ({questionCounts.all})
-          </TabsTrigger>
-        </TabsList>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card className="bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700">
+          <CardContent className="pt-5 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-blue-500/20">
+                <Database className="w-5 h-5 text-blue-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{questionCounts.all.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">전체 문제</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Input Tab */}
-        <TabsContent value="input" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Plus className="w-5 h-5 text-primary" />
-                TOPIK 문제 입력
+        <Card className="bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700">
+          <CardContent className="pt-5 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-cyan-500/20">
+                <Headphones className="w-5 h-5 text-cyan-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{questionCounts.listening.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">듣기</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700">
+          <CardContent className="pt-5 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-emerald-500/20">
+                <BookOpen className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{questionCounts.reading.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">읽기</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700">
+          <CardContent className="pt-5 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-amber-500/20">
+                <PenLine className="w-5 h-5 text-amber-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{questionCounts.writing.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">쓰기</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filter & Search Bar */}
+      <Card className="border-border/60">
+        <CardHeader className="pb-4">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <CardTitle className="text-lg flex items-center gap-2">
+                문제 목록
+                <Badge variant="secondary" className="ml-2 font-mono">
+                  {filteredTotalCount.toLocaleString()}
+                </Badge>
               </CardTitle>
-              <CardDescription>
-                텍스트로 문제를 입력하면 AI가 자동으로 파싱하여 DB에 저장합니다.
+              <CardDescription className="mt-1">
+                TOPIK 모의고사 문제 데이터베이스
               </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Exam Round Selection */}
-              <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                <h4 className="font-semibold text-primary mb-3 flex items-center gap-2">
-                  📋 시험 정보 (필수)
-                </h4>
-                <div className="grid sm:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-foreground">LUKATO 회차 *</Label>
-                    <Input
-                      type="number"
-                      placeholder="예: 1, 2, 3..."
-                      value={examRound}
-                      onChange={(e) => setExamRound(e.target.value)}
-                      className="font-bold text-lg"
-                      min={1}
-                    />
-                    <p className="text-xs text-muted-foreground">LUKATO 제1회 → 1 입력</p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-foreground">시험 유형</Label>
-                    <Select value={examType} onValueChange={setExamType}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="topik1">TOPIK I (1-2급)</SelectItem>
-                        <SelectItem value="topik2">TOPIK II (3-6급)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-foreground">영역</Label>
-                    <Select value={section} onValueChange={setSection}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="listening">듣기</SelectItem>
-                        <SelectItem value="reading">읽기</SelectItem>
-                        {examType === "topik2" && (
-                          <SelectItem value="writing">쓰기</SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                {examRound && (
-                  <div className="mt-3 p-2 bg-background rounded border">
-                    <span className="text-sm text-muted-foreground">저장될 시험: </span>
-                    <span className="font-semibold text-primary">
-                      LUKATO 제{examRound}회 {examType === 'topik1' ? 'TOPIK I' : 'TOPIK II'} {section === 'listening' ? '듣기' : section === 'reading' ? '읽기' : '쓰기'}
-                    </span>
-                  </div>
-                )}
-              </div>
+            </div>
 
-              {/* Question Text Input */}
-              <div className="space-y-2">
-                <Label>문제 텍스트</Label>
-                <Textarea
-                  placeholder={`문제를 그대로 붙여넣기 하세요.
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Section Filter */}
+              <Select value={sectionFilter} onValueChange={setSectionFilter}>
+                <SelectTrigger className="w-[130px] h-9">
+                  <SelectValue placeholder="영역" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체 영역</SelectItem>
+                  <SelectItem value="listening">듣기</SelectItem>
+                  <SelectItem value="reading">읽기</SelectItem>
+                  <SelectItem value="writing">쓰기</SelectItem>
+                </SelectContent>
+              </Select>
 
-예시:
-[1~2] 다음을 듣고 알맞은 것을 고르십시오.
+              {/* Exam Type Filter */}
+              <Select value={examTypeFilter} onValueChange={setExamTypeFilter}>
+                <SelectTrigger className="w-[130px] h-9">
+                  <SelectValue placeholder="시험유형" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체 유형</SelectItem>
+                  <SelectItem value="TOPIK_I">TOPIK I</SelectItem>
+                  <SelectItem value="TOPIK_II">TOPIK II</SelectItem>
+                </SelectContent>
+              </Select>
 
-1. 
-① 네, 만나서 반갑습니다.
-② 네, 다음에 또 만나요.
-③ 네, 처음 뵙겠습니다.
-④ 네, 다시 만나서 반갑습니다.
-
-2.
-① 가족이 네 명입니다.
-② 가족이 한국에 삽니다.
-③ 가족을 만나고 싶습니다.
-④ 가족과 함께 살고 있습니다.
-...`}
-                  value={questionText}
-                  onChange={(e) => setQuestionText(e.target.value)}
-                  className="min-h-[300px] font-mono text-sm"
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="문제 검색..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 w-[200px] h-9"
                 />
-                <p className="text-xs text-muted-foreground">
-                  여러 문제를 한 번에 입력할 수 있습니다. 문제 번호와 선택지를 포함해주세요.
-                </p>
               </div>
 
-              {/* Listening Script Input (only for listening section) */}
-              {section === "listening" && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label className="flex items-center gap-2">
-                      <Headphones className="w-4 h-4 text-cyan-500" />
-                      듣기 스크립트 (TTS 자동 생성)
-                    </Label>
-                    <Badge className="bg-cyan-500/20 text-cyan-600 border-cyan-500/30">
-                      🎵 ElevenLabs 한국어 TTS
-                    </Badge>
-                  </div>
-                  <Textarea
-                    placeholder={`각 문제별 듣기 스크립트를 입력하세요.
-
-예시:
-1. 여자: 처음 뵙겠습니다.
-   남자: _____________
-
-2. 남자: 가족이 몇 명이에요?
-   여자: _____________
-
-3. 여자: 오늘 날씨가 좋네요.
-   남자: 네, 정말 좋아요.
-
-...`}
-                    value={listeningScript}
-                    onChange={(e) => setListeningScript(e.target.value)}
-                    className="min-h-[200px] font-mono text-sm border-cyan-500/30"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    💡 저장 시 각 문제의 스크립트가 ElevenLabs TTS로 자동 음성 변환되어 Storage에 저장됩니다.
-                  </p>
-                </div>
-              )}
-
-              {/* Explanation Text Input with Language Tabs */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label>해설 텍스트 (한국어 필수)</Label>
-                  <Badge variant="outline" className="text-xs">
-                    한국어 해설 입력 시 AI가 6개 언어로 자동 번역
-                  </Badge>
-                </div>
-                <Textarea
-                  placeholder={`해설을 붙여넣기 하세요.
-
-예시:
-1. 정답: ①
-해설: "처음 뵙겠습니다"에 대한 응답으로 "네, 만나서 반갑습니다"가 적절합니다.
-
-2. 정답: ①
-해설: "가족이 몇 명이에요?"라는 질문에 대한 응답으로 "가족이 네 명입니다"가 적절합니다.
-...`}
-                  value={explanationText}
-                  onChange={(e) => setExplanationText(e.target.value)}
-                  className="min-h-[200px] font-mono text-sm"
-                />
-                <p className="text-xs text-muted-foreground">
-                  💡 한국어 해설만 입력하면 저장 시 AI가 베트남어, 영어, 일본어, 중국어, 러시아어, 우즈베크어로 자동 번역합니다.
-                </p>
-              </div>
-
-              {/* Parse Button */}
-              <Button 
-                onClick={handleParseQuestions}
-                disabled={parsing || !questionText.trim()}
-                className="w-full"
-                size="lg"
-              >
-                {parsing ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    AI가 문제를 분석 중...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                    문제 파싱 및 미리보기
-                  </>
-                )}
+              {/* Refresh */}
+              <Button variant="outline" size="icon" className="h-9 w-9" onClick={loadQuestions} disabled={loading}>
+                <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
               </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </div>
+          </div>
+        </CardHeader>
 
-        {/* List Tab */}
-        <TabsContent value="list" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-primary" />
-                    문제 목록
-                  </CardTitle>
-                  <div className="flex items-center gap-2">
-                    <div className="relative flex-1">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input
-                        placeholder="검색..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10 w-full sm:w-[200px]"
-                      />
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={loadQuestions}
-                      disabled={loading}
-                    >
-                      <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                    </Button>
-                  </div>
-                </div>
-                
-                {/* Section Filter Tabs */}
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    variant={listSectionFilter === "all" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setListSectionFilter("all")}
-                    className="gap-1"
-                  >
-                    전체 ({sectionCounts.all})
-                  </Button>
-                  <Button
-                    variant={listSectionFilter === "listening" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setListSectionFilter("listening")}
-                    className="gap-1"
-                  >
-                    <Headphones className="w-3 h-3" />
-                    듣기 ({sectionCounts.listening})
-                  </Button>
-                  <Button
-                    variant={listSectionFilter === "reading" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setListSectionFilter("reading")}
-                    className="gap-1"
-                  >
-                    <BookOpen className="w-3 h-3" />
-                    읽기 ({sectionCounts.reading})
-                  </Button>
-                  <Button
-                    variant={listSectionFilter === "writing" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setListSectionFilter("writing")}
-                    className="gap-1"
-                  >
-                    <PenLine className="w-3 h-3" />
-                    쓰기 ({sectionCounts.writing})
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                </div>
-              ) : filteredTotalCount === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>등록된 문제가 없습니다.</p>
-                  <Button
-                    variant="link"
-                    onClick={() => setActiveTab("input")}
-                    className="mt-2"
-                  >
-                    문제 입력하기 →
-                  </Button>
-                </div>
-              ) : (
-                <>
-                  <div className="space-y-3 max-h-[500px] overflow-y-auto mb-4">
-                    {questions.map((q, index) => (
-                      <motion.div
-                        key={q.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.02 }}
-                        className={`p-4 rounded-lg border transition-all ${
-                          q.is_active
-                            ? "border-border hover:border-primary/50"
-                            : "border-border/50 bg-muted/30 opacity-60"
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-2 flex-wrap">
-                              {q.exam_round && (
-                                <Badge className="bg-primary text-primary-foreground">
-                                  LUKATO 제{q.exam_round}회
-                                </Badge>
+        <CardContent className="p-0">
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          ) : filteredTotalCount === 0 ? (
+            <div className="text-center py-16 text-muted-foreground">
+              <Database className="w-12 h-12 mx-auto mb-4 opacity-40" />
+              <p className="text-sm">등록된 문제가 없습니다.</p>
+            </div>
+          ) : (
+            <>
+              {/* Table */}
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/40 hover:bg-muted/40">
+                      <TableHead className="w-[100px]">시험</TableHead>
+                      <TableHead className="w-[80px]">영역</TableHead>
+                      <TableHead className="w-[70px]">Part</TableHead>
+                      <TableHead className="w-[50px]">#</TableHead>
+                      <TableHead>문제</TableHead>
+                      <TableHead className="w-[60px] text-center">정답</TableHead>
+                      <TableHead className="w-[70px] text-center">미디어</TableHead>
+                      <TableHead className="w-[70px] text-center">상태</TableHead>
+                      <TableHead className="w-[90px] text-center">액션</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <AnimatePresence mode="popLayout">
+                      {questions.map((q, idx) => (
+                        <motion.tr
+                          key={q.id}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          transition={{ delay: idx * 0.015 }}
+                          className={`border-b border-border/40 hover:bg-muted/20 transition-colors ${
+                            !q.is_active ? "opacity-50" : ""
+                          }`}
+                        >
+                          <TableCell>
+                            <Badge
+                              className={`${
+                                q.exam_type?.includes("I") && !q.exam_type?.includes("II")
+                                  ? "bg-indigo-600 hover:bg-indigo-700"
+                                  : "bg-purple-600 hover:bg-purple-700"
+                              } text-white text-xs`}
+                            >
+                              {q.exam_type?.replace("_", " ") || "N/A"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className={`flex items-center gap-1.5 ${getSectionColor(q.section)}`}>
+                              {getSectionIcon(q.section)}
+                              <span className="text-xs font-medium">
+                                {q.section === "listening" ? "듣기" : q.section === "reading" ? "읽기" : "쓰기"}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-xs text-muted-foreground">Part {q.part_number}</span>
+                          </TableCell>
+                          <TableCell>
+                            <span className="font-mono text-xs">{q.question_number ?? "-"}</span>
+                          </TableCell>
+                          <TableCell>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <p className="text-sm line-clamp-1 max-w-[300px] cursor-help">
+                                    {q.question_text}
+                                  </p>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" className="max-w-md">
+                                  <p className="text-sm whitespace-pre-wrap">{q.question_text}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Badge variant="outline" className="font-mono text-xs">
+                              {q.correct_answer}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center justify-center gap-1">
+                              {q.question_audio_url && (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger>
+                                      <Volume2 className="w-4 h-4 text-cyan-400" />
+                                    </TooltipTrigger>
+                                    <TooltipContent>음원 있음</TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
                               )}
-                              {getExamTypeBadge(q.exam_type)}
-                              {getSectionBadge(q.section)}
-                              <Badge variant="secondary">Part {q.part_number}</Badge>
-                              {q.question_number && (
-                                <Badge variant="outline">#{q.question_number}</Badge>
+                              {q.question_image_url && (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger>
+                                      <ImageIcon className="w-4 h-4 text-amber-400" />
+                                    </TooltipTrigger>
+                                    <TooltipContent>이미지 있음</TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
                               )}
-                              {!q.is_active && (
-                                <Badge variant="destructive">비활성</Badge>
+                              {!q.question_audio_url && !q.question_image_url && (
+                                <span className="text-muted-foreground/40">—</span>
                               )}
                             </div>
-                            <p className="text-sm line-clamp-2">{q.question_text}</p>
-                            <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                              <span>정답: {q.correct_answer}번</span>
-                              <span>{new Date(q.created_at).toLocaleDateString("ko-KR")}</span>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-1">
+                          </TableCell>
+                          <TableCell className="text-center">
                             <Button
                               variant="ghost"
                               size="icon"
+                              className="h-7 w-7"
                               onClick={() => handleToggleActive(q.id, q.is_active)}
-                              title={q.is_active ? "비활성화" : "활성화"}
                             >
                               {q.is_active ? (
                                 <CheckCircle className="w-4 h-4 text-green-500" />
                               ) : (
-                                <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                                <XCircle className="w-4 h-4 text-red-400" />
                               )}
                             </Button>
+                          </TableCell>
+                          <TableCell className="text-center">
                             <Button
                               variant="ghost"
                               size="icon"
+                              className="h-7 w-7 text-destructive hover:text-destructive"
                               onClick={() => setDeleteConfirmId(q.id)}
                             >
-                              <Trash2 className="w-4 h-4 text-destructive" />
+                              <Trash2 className="w-4 h-4" />
                             </Button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                  
-                  {/* Pagination */}
-                  {totalPages > 1 && (
-                    <div className="flex items-center justify-between pt-4 border-t">
-                      <p className="text-sm text-muted-foreground">
-                        전체 {filteredTotalCount}개 중 {(currentPage - 1) * ITEMS_PER_PAGE + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredTotalCount)}개
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                          disabled={currentPage === 1}
-                        >
-                          이전
-                        </Button>
-                        <div className="flex items-center gap-1">
-                          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                            let pageNum: number;
-                            if (totalPages <= 5) {
-                              pageNum = i + 1;
-                            } else if (currentPage <= 3) {
-                              pageNum = i + 1;
-                            } else if (currentPage >= totalPages - 2) {
-                              pageNum = totalPages - 4 + i;
-                            } else {
-                              pageNum = currentPage - 2 + i;
-                            }
-                            return (
-                              <Button
-                                key={pageNum}
-                                variant={currentPage === pageNum ? "default" : "outline"}
-                                size="sm"
-                                className="w-8 h-8 p-0"
-                                onClick={() => setCurrentPage(pageNum)}
-                              >
-                                {pageNum}
-                              </Button>
-                            );
-                          })}
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                          disabled={currentPage === totalPages}
-                        >
-                          다음
-                        </Button>
-                      </div>
+                          </TableCell>
+                        </motion.tr>
+                      ))}
+                    </AnimatePresence>
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between px-6 py-4 border-t border-border/40">
+                  <p className="text-sm text-muted-foreground">
+                    {filteredTotalCount.toLocaleString()}개 중{" "}
+                    {((currentPage - 1) * ITEMS_PER_PAGE + 1).toLocaleString()}–
+                    {Math.min(currentPage * ITEMS_PER_PAGE, filteredTotalCount).toLocaleString()}개
+                  </p>
+
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => setCurrentPage(1)}
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronsLeft className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </Button>
+
+                    <div className="flex items-center gap-1 mx-2">
+                      {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
+                        let pageNum: number;
+                        if (totalPages <= 7) {
+                          pageNum = i + 1;
+                        } else if (currentPage <= 4) {
+                          pageNum = i + 1;
+                        } else if (currentPage >= totalPages - 3) {
+                          pageNum = totalPages - 6 + i;
+                        } else {
+                          pageNum = currentPage - 3 + i;
+                        }
+                        return (
+                          <Button
+                            key={pageNum}
+                            variant={currentPage === pageNum ? "default" : "ghost"}
+                            size="sm"
+                            className="h-8 w-8 p-0 text-xs"
+                            onClick={() => setCurrentPage(pageNum)}
+                          >
+                            {pageNum}
+                          </Button>
+                        );
+                      })}
                     </div>
-                  )}
-                </>
+
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => setCurrentPage(totalPages)}
+                      disabled={currentPage === totalPages}
+                    >
+                      <ChevronsRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
               )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      {/* Preview Dialog */}
-      <Dialog open={showPreview} onOpenChange={setShowPreview}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Eye className="w-5 h-5" />
-              파싱 결과 미리보기
-            </DialogTitle>
-            <DialogDescription>
-              {parsedQuestions.length}개의 문제가 파싱되었습니다. 확인 후 저장해주세요.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            {parsedQuestions.map((q, index) => (
-              <Card key={index} className="border-primary/20">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge>Part {q.part_number}</Badge>
-                    <Badge variant="outline">문제 {q.question_number}</Badge>
-                    <Badge variant="secondary">정답: {q.correct_answer}번</Badge>
-                  </div>
-                  <p className="font-medium mb-3 whitespace-pre-line">{q.question_text}</p>
-                  
-                  {/* Image Upload Section */}
-                  <div className="mb-3 p-3 border border-dashed rounded-lg bg-muted/30">
-                    <Label className="text-sm flex items-center gap-2 mb-2">
-                      <ImagePlus className="w-4 h-4 text-primary" />
-                      문제 이미지 (선택)
-                    </Label>
-                    {q.imagePreview ? (
-                      <div className="relative inline-block">
-                        <img 
-                          src={q.imagePreview} 
-                          alt={`문제 ${q.question_number} 이미지`}
-                          className="max-h-32 rounded border"
-                        />
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          className="absolute -top-2 -right-2 h-6 w-6"
-                          onClick={() => {
-                            const updated = [...parsedQuestions];
-                            updated[index] = {
-                              ...updated[index],
-                              imageFile: undefined,
-                              imagePreview: undefined,
-                            };
-                            setParsedQuestions(updated);
-                          }}
-                        >
-                          <X className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        className="text-sm"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            const reader = new FileReader();
-                            reader.onload = (ev) => {
-                              const updated = [...parsedQuestions];
-                              updated[index] = {
-                                ...updated[index],
-                                imageFile: file,
-                                imagePreview: ev.target?.result as string,
-                              };
-                              setParsedQuestions(updated);
-                            };
-                            reader.readAsDataURL(file);
-                          }
-                        }}
-                      />
-                    )}
-                    <p className="text-xs text-muted-foreground mt-1">
-                      PNG, JPG, GIF 등 이미지 파일 업로드
-                    </p>
-                  </div>
-
-                  <div className="space-y-1 mb-3">
-                    {q.options.map((opt, optIndex) => (
-                      <div
-                        key={optIndex}
-                        className={`p-2 rounded text-sm ${
-                          optIndex + 1 === q.correct_answer
-                            ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
-                            : "bg-muted"
-                        }`}
-                      >
-                        {optIndex + 1}. {opt}
-                      </div>
-                    ))}
-                  </div>
-                  {q.explanation && (
-                    <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded">
-                      <strong>해설:</strong> {q.explanation}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowPreview(false)}>
-              취소
-            </Button>
-            <Button onClick={handleSaveQuestions} disabled={savingQuestions || generatingAudio}>
-              {generatingAudio ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  🎵 음성 생성 중...
-                </>
-              ) : savingQuestions ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  저장 중...
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  {parsedQuestions.length}개 문제 저장
-                  {section === "listening" && listeningScript.trim() && " (+ TTS 생성)"}
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteConfirmId} onOpenChange={() => setDeleteConfirmId(null)}>
