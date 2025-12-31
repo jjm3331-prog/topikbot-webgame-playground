@@ -644,6 +644,11 @@
     "startNow": "Start now",
     "startGame": "Start Game",
     "challenger": "Challenger",
+    "guestKicked": "Guest has been kicked",
+    "kickGuest": "Kick",
+    "kickConfirm": "Are you sure you want to kick the guest?",
+    "playerLeftTitle": "Opponent left",
+    "playerLeftDesc": "Opponent left the game, you win!",
     "invite": {
       "copied": "Copied!",
       "copyInvite": "Copy invite link",

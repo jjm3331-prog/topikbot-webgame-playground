@@ -583,6 +583,11 @@
     "startNow": "今すぐ開始",
     "startGame": "ゲーム開始",
     "challenger": "挑戦者",
+    "guestKicked": "ゲストを追い出しました",
+    "kickGuest": "追い出す",
+    "kickConfirm": "本当にゲストを追い出しますか？",
+    "playerLeftTitle": "相手が退出しました",
+    "playerLeftDesc": "相手がゲームを離れたため、あなたの勝ちです！",
     "invite": {
       "copied": "コピー完了！",
       "copyInvite": "招待リンクをコピー",

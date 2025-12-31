@@ -644,6 +644,11 @@
     "startNow": "지금 시작",
     "startGame": "게임 시작",
     "challenger": "도전자",
+    "guestKicked": "게스트를 강퇴했습니다",
+    "kickGuest": "강퇴",
+    "kickConfirm": "정말 강퇴하시겠습니까?",
+    "playerLeftTitle": "상대방이 나갔습니다",
+    "playerLeftDesc": "상대방이 게임을 떠나서 자동으로 승리했습니다!",
     "invite": {
       "copied": "복사 완료!",
       "copyInvite": "초대 링크 복사",

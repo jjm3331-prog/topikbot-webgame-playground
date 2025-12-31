@@ -583,6 +583,11 @@
     "startNow": "立即开始",
     "startGame": "开始游戏",
     "challenger": "挑战者",
+    "guestKicked": "已踢出客人",
+    "kickGuest": "踢出",
+    "kickConfirm": "确定要踢出客人吗？",
+    "playerLeftTitle": "对手已离开",
+    "playerLeftDesc": "对手离开了游戏，你赢了！",
     "invite": {
       "copied": "已复制！",
       "copyInvite": "复制邀请链接",

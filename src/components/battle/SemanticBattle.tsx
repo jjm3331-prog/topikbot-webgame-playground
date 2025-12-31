@@ -225,28 +225,49 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
     }
   }, [initialRoomCode]);
 
-  // Host가 나갈 때 방 삭제
+  // Host/Guest가 나갈 때 처리
   useEffect(() => {
-    const handleHostLeave = async () => {
-      if (room && isHost && (gamePhase === "waiting" || gamePhase === "ready")) {
+    const handlePlayerLeave = async () => {
+      if (!room) return;
+      
+      // 대기실: 호스트가 나가면 방 삭제
+      if (isHost && (gamePhase === "waiting" || gamePhase === "ready")) {
         try {
           await supabase.from("chain_reaction_rooms").delete().eq("id", room.id);
           clearHostedRoom();
-          console.log("[SemanticBattle] Host left - room deleted:", room.id);
+          console.log("[SemanticBattle] Host left waiting room - room deleted:", room.id);
         } catch (err) {
           console.error("Failed to delete room on leave:", err);
+        }
+      }
+      // 게임 중: 나간 사람은 패배, 상대방 승리
+      else if (gamePhase === "playing") {
+        try {
+          const winnerId = isHost ? room.guest_id : room.host_id;
+          await supabase.from("chain_reaction_rooms").update({
+            status: "finished",
+            winner_id: winnerId,
+            finished_at: new Date().toISOString(),
+          }).eq("id", room.id);
+          console.log("[SemanticBattle] Player left during game - opponent wins:", winnerId);
+        } catch (err) {
+          console.error("Failed to set winner on leave:", err);
         }
       }
     };
 
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (room && isHost && (gamePhase === "waiting" || gamePhase === "ready")) {
-        // Sync delete attempt using sendBeacon
-        navigator.sendBeacon && navigator.sendBeacon(
-          `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/chain_reaction_rooms?id=eq.${room.id}`,
-          ''
-        );
+      if (!room) return;
+      
+      if (isHost && (gamePhase === "waiting" || gamePhase === "ready")) {
         supabase.from("chain_reaction_rooms").delete().eq("id", room.id);
+      } else if (gamePhase === "playing") {
+        const winnerId = isHost ? room.guest_id : room.host_id;
+        supabase.from("chain_reaction_rooms").update({
+          status: "finished",
+          winner_id: winnerId,
+          finished_at: new Date().toISOString(),
+        }).eq("id", room.id);
       }
     };
 
@@ -254,9 +275,25 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
 
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
-      handleHostLeave();
+      handlePlayerLeave();
     };
   }, [room, isHost, gamePhase]);
+
+  // 호스트가 게스트 강퇴
+  const kickGuest = async () => {
+    if (!room || !isHost || !room.guest_id) return;
+    try {
+      await supabase.from("chain_reaction_rooms").update({
+        guest_id: null,
+        guest_name: null,
+        guest_ready: false,
+        host_ready: false,
+      }).eq("id", room.id);
+      toast({ title: t("battle.guestKicked") });
+    } catch (err) {
+      console.error("Failed to kick guest:", err);
+    }
+  };
 
   const createRoom = async () => {
     if (!playerName.trim()) { toast({ title: t("battle.semanticGame.enterName"), variant: "destructive" }); return; }
@@ -920,6 +957,17 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
                 )}
               </Button>
             </motion.div>
+            
+            {isHost && room.guest_id && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={kickGuest}
+                className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
+              >
+                {t("battle.kickGuest")}
+              </Button>
+            )}
             
             {isHost && (
               <motion.div whileHover={{ scale: bothReady ? 1.02 : 1 }} whileTap={{ scale: 0.98 }}>
