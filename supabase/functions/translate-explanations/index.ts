@@ -90,36 +90,76 @@ function validateTranslation(lang: string, translation: string | undefined, orig
   return { valid: true };
 }
 
+async function sleep(ms: number) {
+  await new Promise((r) => setTimeout(r, ms));
+}
+
+function stripCodeFences(raw: string) {
+  return raw
+    .replace(/```json\s*/gi, "")
+    .replace(/```\s*/g, "")
+    .trim();
+}
+
+function extractJsonObject(raw: string): string | null {
+  const cleaned = stripCodeFences(raw);
+  const start = cleaned.indexOf("{");
+  const end = cleaned.lastIndexOf("}");
+  if (start === -1 || end === -1 || end <= start) return null;
+  return cleaned.slice(start, end + 1);
+}
+
+function safeJsonParse(raw: string): any {
+  const jsonStr = extractJsonObject(raw);
+  if (!jsonStr) throw new Error("NO_JSON_OBJECT_IN_RESPONSE");
+
+  try {
+    return JSON.parse(jsonStr);
+  } catch {
+    // Retry once with minimal normalization (remove trailing commas)
+    const normalized = jsonStr
+      .replace(/,\s*}/g, "}")
+      .replace(/,\s*]/g, "]");
+    return JSON.parse(normalized);
+  }
+}
+
+class HttpError extends Error {
+  status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+  }
+}
+
 async function translateWithGemini(koreanText: string, targetLanguages: string[]): Promise<TranslationResult> {
-  const languageList = targetLanguages.map(lang => `- ${lang}: ${LANGUAGE_NAMES[lang]}`).join('\n');
-  
-  // 긴 해설 (200자 이상)에 대한 최적화된 프롬프트
+  const languageList = targetLanguages.map((lang) => `- ${lang}: ${LANGUAGE_NAMES[lang]}`).join("\n");
   const isLongExplanation = koreanText.length >= 200;
-  
-  const prompt = `You are an expert translator specializing in Korean language education (TOPIK exam).
+
+  let lastError = "";
+  let lastValidationErrors: Record<string, string> = {};
+
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const feedback = Object.keys(lastValidationErrors).length
+        ? `\n\nPrevious attempt failed validation for: ${JSON.stringify(lastValidationErrors)}.\nFix ONLY those languages and return ALL languages again.`
+        : "";
+
+      const prompt = `You are an expert translator specializing in Korean language education (TOPIK exam).
 Translate the following Korean explanation into ${targetLanguages.length} languages.
 
-${isLongExplanation ? `⚠️ This is a DETAILED explanation (${koreanText.length} characters). 
-Preserve ALL content including:
-- Problem analysis (문제 분석)
-- Correct answer explanation (정답 해설)
-- Wrong answer analysis (오답 분석)
-- Grammar/vocabulary notes (문법/어휘)
-- Example sentences (예문)
-- Study tips (학습 팁)
+${isLongExplanation ? `⚠️ This is a DETAILED explanation (${koreanText.length} characters).
+Preserve ALL content. Do NOT summarize or shorten. Translate COMPLETELY.` : ""}
 
-Do NOT summarize or shorten. Translate COMPLETELY.` : ''}
+HARD RULES (MUST FOLLOW):
+1) Output ONLY a single JSON object. No markdown, no commentary.
+2) The JSON MUST include ALL keys exactly: ${targetLanguages.map((l) => `"${l}"`).join(", ")}
+3) Each value MUST be a complete translation string (do not truncate).
+4) Keep any Korean grammar terms / Korean example sentences in Hangul as-is.
+5) Maintain formatting (line breaks, bullets) as closely as possible.
+${feedback}
 
-IMPORTANT RULES:
-1. Keep Korean grammar terms and example sentences in Korean characters (한글)
-2. Translate ONLY the explanatory text, NOT the Korean examples
-3. Maintain the EXACT same formatting, structure, and bullet points
-4. Be accurate and natural in each target language
-5. Output ONLY valid JSON, no markdown code blocks or extra text
-6. Each translation should be COMPLETE - do not truncate
-7. CRITICAL: You MUST provide translations for ALL ${targetLanguages.length} languages. Do not skip any language.
-
-Korean explanation to translate:
+Korean explanation:
 """
 ${koreanText}
 """
@@ -127,122 +167,92 @@ ${koreanText}
 Target languages (ALL REQUIRED):
 ${languageList}
 
-Output format (JSON only, no markdown, ALL languages required):
+Return JSON like:
 {
-${targetLanguages.map(lang => `  "${lang}": "Complete ${LANGUAGE_NAMES[lang]} translation here"`).join(',\n')}
+${targetLanguages.map((lang) => `  "${lang}": "..."`).join(",\n")}
 }`;
 
-  // 재시도 로직 - 최대 3회 (검증 실패시 재시도 포함)
-  let lastError = '';
-  let lastValidationErrors: Record<string, string> = {};
-  
-  for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      console.log(`🔄 Attempt ${attempt + 1}/3 for translation...`);
-      
+      console.log(`🔄 translate-explanations attempt ${attempt + 1}/5 (len=${koreanText.length})`);
+
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
         {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
-              temperature: 0.3,
-              // 긴 해설에 대해 더 많은 토큰 허용
-              maxOutputTokens: isLongExplanation ? 8192 : 4096,
-            }
-          })
-        }
+              temperature: 0.2,
+              maxOutputTokens: isLongExplanation ? 12288 : 6144,
+              responseMimeType: "application/json",
+            },
+          }),
+        },
       );
 
       if (!response.ok) {
         const errorText = await response.text();
-        lastError = `Gemini API error: ${response.status} - ${errorText}`;
-        console.error(`Attempt ${attempt + 1} failed:`, lastError);
-        
-        // 503/429 에러시 재시도
-        if (response.status === 503 || response.status === 429) {
-          await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
+        lastError = `GEMINI_HTTP_${response.status}: ${errorText}`;
+        console.error("Gemini API error:", lastError);
+
+        // Backoff on transient errors
+        if (response.status === 429 || response.status === 503) {
+          const backoff = 1200 * Math.pow(2, attempt) + Math.floor(Math.random() * 250);
+          await sleep(backoff);
           continue;
         }
-        throw new Error(lastError);
+
+        throw new HttpError(response.status, lastError);
       }
 
       const data = await response.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      
-      // JSON 파싱 시도
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        lastError = `Failed to parse JSON from response: ${text.substring(0, 200)}`;
-        console.error(`Attempt ${attempt + 1}:`, lastError);
-        if (attempt < 2) {
-          await new Promise(r => setTimeout(r, 800));
-          continue;
-        }
-        throw new Error('Failed to parse translation response');
-      }
-      
-      const translations = JSON.parse(jsonMatch[0]);
-      
-      // 🔍 각 언어별 번역 결과 검증
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+      const translations = safeJsonParse(text) as Record<string, string>;
+
       const validationResults: Record<string, { valid: boolean; reason?: string }> = {};
       let allValid = true;
-      
+      lastValidationErrors = {};
+
       for (const lang of targetLanguages) {
-        const validation = validateTranslation(lang, translations[lang], koreanText);
+        const value = translations?.[lang];
+        const validation = validateTranslation(lang, value, koreanText);
         validationResults[lang] = validation;
         if (!validation.valid) {
           allValid = false;
-          lastValidationErrors[lang] = validation.reason || 'unknown';
-          console.warn(`⚠️ Validation failed for ${lang}: ${validation.reason}`);
+          lastValidationErrors[lang] = validation.reason || "unknown";
         }
       }
-      
-      // 모든 언어가 검증 통과하지 않으면 재시도
-      if (!allValid && attempt < 2) {
-        console.log(`🔄 Retrying due to validation failures: ${JSON.stringify(lastValidationErrors)}`);
-        await new Promise(r => setTimeout(r, 1000));
+
+      if (!allValid) {
+        console.warn("⚠️ Validation failed:", lastValidationErrors);
+        lastError = `VALIDATION_FAILED: ${JSON.stringify(lastValidationErrors)}`;
+        const backoff = 800 * Math.pow(1.6, attempt) + Math.floor(Math.random() * 200);
+        await sleep(backoff);
         continue;
       }
-      
-      // 번역 결과 구성 - 검증 실패한 언어는 원본 대신 빈 문자열 (fallback 방지)
+
       const result: TranslationResult = {
         explanation_ko: koreanText,
-        explanation_vi: validationResults['vi']?.valid ? translations.vi : koreanText,
-        explanation_en: validationResults['en']?.valid ? translations.en : koreanText,
-        explanation_ja: validationResults['ja']?.valid ? translations.ja : koreanText,
-        explanation_zh: validationResults['zh']?.valid ? translations.zh : koreanText,
-        explanation_ru: validationResults['ru']?.valid ? translations.ru : koreanText,
-        explanation_uz: validationResults['uz']?.valid ? translations.uz : koreanText,
+        explanation_vi: translations.vi,
+        explanation_en: translations.en,
+        explanation_ja: translations.ja,
+        explanation_zh: translations.zh,
+        explanation_ru: translations.ru,
+        explanation_uz: translations.uz,
       };
-      
-      // 로깅: 각 언어별 번역 길이 및 검증 결과
-      const validCount = Object.values(validationResults).filter(v => v.valid).length;
-      console.log(`✅ Translation success - ${validCount}/${targetLanguages.length} languages validated`);
-      console.log(`   Lengths: ko=${koreanText.length}, ` +
-        `vi=${result.explanation_vi.length}, en=${result.explanation_en.length}, ` +
-        `ja=${result.explanation_ja.length}, zh=${result.explanation_zh.length}, ` +
-        `ru=${result.explanation_ru.length}, uz=${result.explanation_uz.length}`);
-      
-      if (!allValid) {
-        console.warn(`⚠️ Some translations failed validation: ${JSON.stringify(lastValidationErrors)}`);
-      }
-      
+
+      console.log(`✅ Translation success - ${targetLanguages.length}/${targetLanguages.length} validated`);
       return result;
-      
-    } catch (parseError) {
-      lastError = parseError instanceof Error ? parseError.message : 'Parse error';
-      console.error(`Attempt ${attempt + 1} parse error:`, lastError);
-      if (attempt < 2) {
-        await new Promise(r => setTimeout(r, 800));
-        continue;
-      }
+    } catch (e) {
+      lastError = e instanceof Error ? e.message : "Unknown error";
+      console.error(`Attempt ${attempt + 1} failed:`, lastError);
+      const backoff = 700 * Math.pow(2, attempt) + Math.floor(Math.random() * 200);
+      await sleep(backoff);
+      continue;
     }
   }
-  
-  throw new Error(`Translation failed after 3 attempts: ${lastError}. Validation errors: ${JSON.stringify(lastValidationErrors)}`);
+
+  throw new Error(`Translation failed after retries: ${lastError}. Validation errors: ${JSON.stringify(lastValidationErrors)}`);
 }
 
 serve(async (req) => {
@@ -273,13 +283,13 @@ serve(async (req) => {
 
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const status = error instanceof HttpError ? error.status : (errorMessage.includes('GEMINI_HTTP_429') ? 429 : 500);
+
     console.error('Translation error:', errorMessage);
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    );
+
+    return new Response(JSON.stringify({ error: errorMessage }), {
+      status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });

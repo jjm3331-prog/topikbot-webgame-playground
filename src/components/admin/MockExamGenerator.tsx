@@ -614,20 +614,25 @@ const MockExamGenerator = () => {
       let translationSuccessCount = 0;
       let translationFailCount = 0;
 
+      // Rate-limit protection: spacing between translation requests
+      const REQUEST_SPACING_MS = 250;
+
       for (let i = 0; i < selectedQuestionsArray.length; i++) {
         const q = selectedQuestionsArray[i];
         const progress = 10 + Math.floor((i / totalQuestions) * 65);
-        setGenState({ 
-          step: "saving", 
-          progress, 
-          message: `🌐 ${i + 1}/${totalQuestions} 번역 중...` 
+        setGenState({
+          step: "saving",
+          progress,
+          message: `🌐 ${i + 1}/${totalQuestions} 번역 중...`,
         });
 
         let translations: Record<string, string> = {};
-        
-        // Translate with retry (max 2 attempts)
+
         if (q.explanation_ko && q.explanation_ko.trim()) {
-          for (let attempt = 0; attempt < 2; attempt++) {
+          let lastTranslateError: string | null = null;
+
+          // Up to 5 attempts with exponential backoff (handles 429/503 + parse/validation errors)
+          for (let attempt = 0; attempt < 5; attempt++) {
             try {
               const translateResponse = await fetch(
                 `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/translate-explanations`,
@@ -635,32 +640,69 @@ const MockExamGenerator = () => {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${session.access_token}`,
+                    Authorization: `Bearer ${session.access_token}`,
                   },
                   body: JSON.stringify({
                     explanation_ko: q.explanation_ko,
-                    targetLanguages: ['vi', 'en', 'ja', 'zh', 'ru', 'uz']
+                    targetLanguages: ["vi", "en", "ja", "zh", "ru", "uz"],
                   }),
-                }
+                },
               );
 
-              if (translateResponse.ok) {
-                translations = await translateResponse.json();
-                translationSuccessCount++;
-                break;
-              } else if (attempt === 1) {
-                translationFailCount++;
+              if (translateResponse.status === 429 || translateResponse.status === 503) {
+                lastTranslateError = `HTTP_${translateResponse.status}`;
+                const backoff = 1200 * Math.pow(2, attempt) + Math.floor(Math.random() * 250);
+                await new Promise((r) => setTimeout(r, backoff));
+                continue;
               }
+
+              if (!translateResponse.ok) {
+                const t = await translateResponse.text();
+                lastTranslateError = `HTTP_${translateResponse.status}: ${t?.slice(0, 200)}`;
+                const backoff = 700 * Math.pow(1.8, attempt) + Math.floor(Math.random() * 200);
+                await new Promise((r) => setTimeout(r, backoff));
+                continue;
+              }
+
+              translations = await translateResponse.json();
+
+              // Hard requirement: all 6 translations must exist & be non-empty
+              const requiredKeys = [
+                "explanation_vi",
+                "explanation_en",
+                "explanation_ja",
+                "explanation_zh",
+                "explanation_ru",
+                "explanation_uz",
+              ] as const;
+
+              const missing = requiredKeys.filter((k) => !translations?.[k] || !String(translations[k]).trim());
+              if (missing.length) {
+                lastTranslateError = `MISSING_KEYS: ${missing.join(",")}`;
+                const backoff = 800 * Math.pow(1.7, attempt) + Math.floor(Math.random() * 200);
+                await new Promise((r) => setTimeout(r, backoff));
+                continue;
+              }
+
+              translationSuccessCount++;
+              lastTranslateError = null;
+              break;
             } catch (translateError) {
-              if (attempt === 1) {
-                console.warn(`⚠️ Translation failed for Q${i + 1}:`, translateError);
-                translationFailCount++;
-              }
+              lastTranslateError = translateError instanceof Error ? translateError.message : "UNKNOWN_TRANSLATE_ERROR";
+              const backoff = 700 * Math.pow(2, attempt) + Math.floor(Math.random() * 200);
+              await new Promise((r) => setTimeout(r, backoff));
+              continue;
             }
-            
-            // Short delay before retry
-            if (attempt === 0) await new Promise(r => setTimeout(r, 500));
           }
+
+          if (lastTranslateError) {
+            translationFailCount++;
+            // 100% 정책: 번역 하나라도 실패하면 저장을 중단
+            throw new Error(`번역 실패: ${i + 1}번 문제 (${lastTranslateError})`);
+          }
+
+          // spacing to reduce bursty traffic
+          await new Promise((r) => setTimeout(r, REQUEST_SPACING_MS));
         }
 
         translatedQuestions.push({
@@ -672,12 +714,12 @@ const MockExamGenerator = () => {
           options: q.options,
           correct_answer: q.correct_answer,
           explanation_ko: q.explanation_ko || "",
-          explanation_en: translations.explanation_en || q.explanation_en || q.explanation_ko || "",
-          explanation_vi: translations.explanation_vi || q.explanation_vi || q.explanation_ko || "",
-          explanation_ja: translations.explanation_ja || q.explanation_ko || "",
-          explanation_zh: translations.explanation_zh || q.explanation_ko || "",
-          explanation_ru: translations.explanation_ru || q.explanation_ko || "",
-          explanation_uz: translations.explanation_uz || q.explanation_ko || "",
+          explanation_en: translations.explanation_en || q.explanation_en || "",
+          explanation_vi: translations.explanation_vi || q.explanation_vi || "",
+          explanation_ja: translations.explanation_ja || "",
+          explanation_zh: translations.explanation_zh || "",
+          explanation_ru: translations.explanation_ru || "",
+          explanation_uz: translations.explanation_uz || "",
           difficulty: mapDifficultyToDb(q.difficulty || difficulty),
           topic: q.topic || topic || null,
           grammar_points: q.grammar_points || [],
@@ -693,7 +735,6 @@ const MockExamGenerator = () => {
           is_active: true,
         });
       }
-
       // Save in chunks of 10 to avoid timeout
       const CHUNK_SIZE = 10;
       const chunks = [];
