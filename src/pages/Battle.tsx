@@ -250,8 +250,10 @@ export default function Battle() {
             onBack={() => {
               setSelectedGame(null);
               setInitialRoomCode(undefined);
+              setInitialGuestName(undefined);
             }}
             initialRoomCode={initialRoomCode}
+            initialGuestName={initialGuestName}
           />
         </main>
       </div>

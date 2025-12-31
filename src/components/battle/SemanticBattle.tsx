@@ -30,6 +30,7 @@ import { saveGameRecord, type StreakBonus } from "@/lib/gameRecords";
 interface SemanticBattleProps {
   onBack: () => void;
   initialRoomCode?: string;
+  initialGuestName?: string;
 }
 
 interface Room {
@@ -74,7 +75,7 @@ const TURN_TIME_LIMIT = 20;
 const MAX_WARNINGS = 1;
 const PASS_SCORE = 70;
 
-export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBattleProps) {
+export default function SemanticBattle({ onBack, initialRoomCode, initialGuestName }: SemanticBattleProps) {
   const { toast } = useToast();
   const { t, i18n } = useTranslation();
   const [gamePhase, setGamePhase] = useState<GamePhase>("menu");
@@ -209,64 +210,20 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
     return Array.from({ length: 6 }, () => chars.charAt(Math.floor(Math.random() * chars.length))).join("");
   };
 
-  // URL auto-join
+  // Prefill invite room code and allow user to set nickname before joining
   useEffect(() => {
-    if (!playerId || !authReady) return;
+    if (!authReady) return;
+    if (!initialRoomCode || initialRoomCode.length !== 6) return;
 
-    if (initialRoomCode && initialRoomCode.length === 6 && gamePhase === "menu") {
-      const autoNickname = generateRandomNickname();
-      setPlayerName(autoNickname);
+    // If user came from waiting room list/invite, prefill name and code but DON'T auto-join.
+    if (gamePhase === "menu") {
+      if (initialGuestName && initialGuestName.trim()) {
+        setPlayerName(initialGuestName.trim().slice(0, 20));
+      }
       setRoomCodeInput(initialRoomCode.toUpperCase());
       setGamePhase("joining");
-
-      const autoJoin = async () => {
-        try {
-          const code = initialRoomCode.toUpperCase();
-          const { data: roomData, error: findError } = await supabase
-            .from("chain_reaction_rooms")
-            .select()
-            .eq("room_code", code)
-            .eq("connection_mode", "semantic")
-            .maybeSingle();
-
-          if (findError) throw findError;
-          if (!roomData) {
-            toast({ title: t("battle.roomNotExists"), variant: "destructive" });
-            setGamePhase("menu");
-            return;
-          }
-          if (roomData.status === "playing" || roomData.status === "finished") {
-            toast({ title: t("battle.roomStartedOrFinished"), variant: "destructive" });
-            setGamePhase("menu");
-            return;
-          }
-          if (roomData.guest_id) {
-            toast({ title: t("battle.roomFull"), variant: "destructive" });
-            setGamePhase("menu");
-            return;
-          }
-
-          const { data, error } = await supabase
-            .from("chain_reaction_rooms")
-            .update({ guest_id: playerIdRef.current, guest_name: autoNickname, guest_ready: true })
-            .eq("id", roomData.id)
-            .select()
-            .single();
-
-          if (error) throw error;
-          setRoom(data as Room);
-          setGamePhase("ready");
-          subscribeToRoom(data.id);
-          toast({ title: t("battle.semanticGame.joinSuccess", { name: autoNickname }) });
-        } catch (err) {
-          toast({ title: t("battle.semanticGame.joinFailed"), variant: "destructive" });
-          setGamePhase("menu");
-        }
-      };
-
-      void autoJoin();
     }
-  }, [initialRoomCode, authReady, playerId, gamePhase, toast, t]);
+  }, [authReady, initialRoomCode, initialGuestName, gamePhase]);
 
   // Host/Guest가 실제로 "페이지를 떠날 때"만 처리 (state 변경 cleanup에서 방 삭제되는 버그 방지)
   const roomRef = useRef<Room | null>(null);
@@ -946,6 +903,17 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
 
             <div className="space-y-4">
               <div>
+                <label className="text-sm font-medium text-muted-foreground mb-2 block">{t("battle.semanticGame.yourNameLabel")}</label>
+                <Input
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value)}
+                  placeholder={t("battle.semanticGame.yourNamePlaceholder")}
+                  className="text-lg h-12"
+                  maxLength={20}
+                />
+              </div>
+
+              <div>
                 <label className="text-sm font-medium text-muted-foreground mb-2 block">{t("battle.semanticGame.roomCodeLabel")}</label>
                 <Input
                   value={roomCodeInput}
@@ -956,20 +924,20 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
                 />
               </div>
 
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={() => setGamePhase("menu")} className="flex-1 h-12">
-                {t("battle.semanticGame.cancel")}
-              </Button>
-              <Button
-                onClick={joinRoom}
-                disabled={roomCodeInput.length !== 6 || !playerName.trim()}
-                className="flex-1 h-12 bg-gradient-to-r from-purple-500 to-pink-500"
-              >
-                <Users className="w-5 h-5 mr-2" />
-                {t("battle.semanticGame.join")}
-              </Button>
+              <div className="flex gap-3">
+                <Button variant="outline" onClick={() => setGamePhase("menu")} className="flex-1 h-12">
+                  {t("battle.semanticGame.cancel")}
+                </Button>
+                <Button
+                  onClick={joinRoom}
+                  disabled={roomCodeInput.length !== 6 || !playerName.trim()}
+                  className="flex-1 h-12 bg-gradient-to-r from-purple-500 to-pink-500"
+                >
+                  <Users className="w-5 h-5 mr-2" />
+                  {t("battle.semanticGame.join")}
+                </Button>
+              </div>
             </div>
-          </div>
         </Card>
       </motion.div>
     );
