@@ -1,12 +1,11 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
-
-const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
 interface QuizQuestion {
   id: string;
@@ -25,117 +24,130 @@ serve(async (req) => {
   }
 
   try {
-    const { action, answer, questionId, usedQuestionIds = [] } = await req.json();
+    const { action, usedQuestionIds = [] } = await req.json();
 
     if (action === "generate") {
-      // Generate a new quiz question using AI
-      const systemPrompt = `당신은 한국어 학습 퀴즈를 생성하는 AI입니다.
-TOPIK I~II 초중급 수준의 문제를 생성해주세요.
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-문제 유형을 랜덤하게 선택하세요:
-1. vocabulary: 단어의 뜻 맞추기
-2. grammar: 문법 패턴 완성하기  
-3. expression: 상황에 맞는 표현 고르기
+      // 랜덤 유형 선택 (vocabulary: 어휘, grammar: 문법, expression: 표현)
+      const questionTypes = ["vocabulary", "grammar"] as const;
+      const randomType = questionTypes[Math.floor(Math.random() * questionTypes.length)];
 
-반드시 JSON 형식으로 응답하세요:
-{
-  "type": "vocabulary" | "grammar" | "expression",
-  "question": "문제 내용 (한국어)",
-  "options": ["선택지1", "선택지2", "선택지3", "선택지4"],
-  "correctIndex": 0-3 중 정답 인덱스,
-  "explanation_ko": "정답 설명 (한국어, 2줄 이내)",
-  "explanation_vi": "Giải thích đáp án (tiếng Việt, 2 dòng)",
-  "difficulty": "easy" | "medium" | "hard"
-}
+      let question: QuizQuestion | null = null;
 
-예시 문제 유형:
-- "다음 단어의 뜻은? '행복하다'" → ① 슬프다 ② 기쁘다 ③ 화나다 ④ 무섭다
-- "빈칸에 알맞은 말은? '저는 학교___ 갑니다.'" → ① 에 ② 을 ③ 이 ④ 와
-- "식당에서 주문할 때 사용하는 표현은?" → ① 잘 먹겠습니다 ② 안녕하세요 ③ 이거 주세요 ④ 감사합니다
+      if (randomType === "vocabulary") {
+        // 어휘 문제: topik_vocabulary에서 랜덤 선택
+        const { data: vocab, error } = await supabase
+          .from("topik_vocabulary")
+          .select("id, word, meaning_vi, example_sentence, example_sentence_vi, level")
+          .not("meaning_vi", "is", null)
+          .not("example_sentence", "is", null)
+          .limit(20);
 
-다양한 주제와 난이도로 생성해주세요.`;
+        if (!error && vocab && vocab.length > 0) {
+          const randomVocab = vocab[Math.floor(Math.random() * vocab.length)];
+          
+          // 오답 보기 생성 (같은 레벨의 다른 단어들)
+          const { data: distractors } = await supabase
+            .from("topik_vocabulary")
+            .select("meaning_vi")
+            .eq("level", randomVocab.level)
+            .neq("id", randomVocab.id)
+            .not("meaning_vi", "is", null)
+            .limit(10);
 
-      const userPrompt = `새로운 한국어 퀴즈 문제를 1개 생성해주세요.
-이미 사용된 문제 ID들: ${JSON.stringify(usedQuestionIds)}
-위 ID들과 다른 새로운 문제를 만들어주세요.`;
+          const wrongAnswers = distractors
+            ?.map(d => d.meaning_vi!)
+            .filter(m => m !== randomVocab.meaning_vi)
+            .slice(0, 3) || ["nghĩa 1", "nghĩa 2", "nghĩa 3"];
 
-      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash-lite",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-          temperature: 0.8,
-        }),
-      });
+          const correctAnswer = randomVocab.meaning_vi!;
+          const allOptions = [correctAnswer, ...wrongAnswers];
+          
+          // 섞기
+          for (let i = allOptions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [allOptions[i], allOptions[j]] = [allOptions[j], allOptions[i]];
+          }
 
-      if (!response.ok) {
-        console.error("AI gateway error:", response.status);
-        // Fallback question
-        return new Response(
-          JSON.stringify({
-            id: `fallback-${Date.now()}`,
+          const correctIndex = allOptions.indexOf(correctAnswer);
+
+          question = {
+            id: `vocab-${randomVocab.id}`,
             type: "vocabulary",
-            question: "'감사합니다'의 뜻은 무엇인가요?",
-            options: ["고맙습니다", "미안합니다", "안녕하세요", "잘 가세요"],
-            correctIndex: 0,
-            explanation_ko: "'감사합니다'는 '고맙습니다'와 같은 뜻으로, 감사를 표현할 때 사용합니다.",
-            explanation_vi: "'감사합니다' có nghĩa là 'cảm ơn', dùng để bày tỏ lòng biết ơn.",
-            difficulty: "easy",
-          }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+            question: `'${randomVocab.word}'의 뜻은 무엇인가요?`,
+            options: allOptions,
+            correctIndex,
+            explanation_ko: `'${randomVocab.word}'는 '${correctAnswer}'를 의미합니다.\n예: ${randomVocab.example_sentence || ""}`,
+            explanation_vi: `'${randomVocab.word}' có nghĩa là '${correctAnswer}'.\nVí dụ: ${randomVocab.example_sentence_vi || randomVocab.example_sentence || ""}`,
+            difficulty: randomVocab.level <= 2 ? "easy" : randomVocab.level <= 4 ? "medium" : "hard",
+          };
+        }
+      } else if (randomType === "grammar") {
+        // 문법 문제: grammar_ox_questions에서 선택
+        const { data: grammarQuestions, error } = await supabase
+          .from("grammar_ox_questions")
+          .select("id, statement, is_correct, explanation, explanation_vi, level")
+          .not("explanation_vi", "is", null)
+          .limit(20);
+
+        if (!error && grammarQuestions && grammarQuestions.length > 0) {
+          const randomGrammar = grammarQuestions[Math.floor(Math.random() * grammarQuestions.length)];
+          
+          // OX 문제를 4지선다로 변환
+          const correctOption = randomGrammar.is_correct ? "올바른 문장입니다" : "틀린 문장입니다";
+          const wrongOption = randomGrammar.is_correct ? "틀린 문장입니다" : "올바른 문장입니다";
+          
+          const allOptions = [
+            correctOption,
+            wrongOption,
+            "문법적으로 애매합니다",
+            "상황에 따라 다릅니다"
+          ];
+
+          // 섞기
+          for (let i = allOptions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [allOptions[i], allOptions[j]] = [allOptions[j], allOptions[i]];
+          }
+
+          const correctIndex = allOptions.indexOf(correctOption);
+
+          question = {
+            id: `grammar-${randomGrammar.id}`,
+            type: "grammar",
+            question: `다음 문장을 평가하세요: "${randomGrammar.statement}"`,
+            options: allOptions,
+            correctIndex,
+            explanation_ko: randomGrammar.explanation,
+            explanation_vi: randomGrammar.explanation_vi || randomGrammar.explanation,
+            difficulty: randomGrammar.level <= 2 ? "easy" : randomGrammar.level <= 4 ? "medium" : "hard",
+          };
+        }
       }
 
-      const data = await response.json();
-      const content = data.choices?.[0]?.message?.content || "";
-
-      let question: Partial<QuizQuestion>;
-      try {
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          question = JSON.parse(jsonMatch[0]);
-        } else {
-          throw new Error("No JSON found");
-        }
-      } catch (parseError) {
-        console.error("JSON parse error:", parseError, "Content:", content);
+      // 문제 생성 실패 시 fallback
+      if (!question) {
         question = {
+          id: `fallback-${Date.now()}`,
           type: "vocabulary",
-          question: "'학교'의 뜻은 무엇인가요?",
-          options: ["공부하는 곳", "먹는 곳", "자는 곳", "운동하는 곳"],
+          question: "'감사합니다'의 뜻은 무엇인가요?",
+          options: ["고맙습니다", "미안합니다", "안녕하세요", "잘 가세요"],
           correctIndex: 0,
-          explanation_ko: "'학교'는 학생들이 공부하는 교육 기관입니다.",
-          explanation_vi: "'학교' là trường học, nơi học sinh đến để học tập.",
+          explanation_ko: "'감사합니다'는 '고맙습니다'와 같은 뜻으로, 감사를 표현할 때 사용합니다.",
+          explanation_vi: "'감사합니다' có nghĩa là 'cảm ơn', dùng để bày tỏ lòng biết ơn.",
           difficulty: "easy",
         };
       }
 
-      // Add unique ID
-      const quizQuestion: QuizQuestion = {
-        id: `q-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        type: question.type || "vocabulary",
-        question: question.question || "",
-        options: question.options || [],
-        correctIndex: question.correctIndex ?? 0,
-        explanation_ko: question.explanation_ko || "",
-        explanation_vi: question.explanation_vi || "",
-        difficulty: question.difficulty || "medium",
-      };
-
-      return new Response(JSON.stringify(quizQuestion), {
+      return new Response(JSON.stringify(question), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     if (action === "check") {
-      // Check answer (simple validation - answer checking is done client-side for speed)
       return new Response(
         JSON.stringify({ success: true }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
