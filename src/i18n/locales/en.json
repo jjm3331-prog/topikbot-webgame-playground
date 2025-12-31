@@ -797,6 +797,17 @@
       "aiScoringDesc": "AI evaluates word relevance from 0-100 points",
       "passDesc": "Pass! Next turn",
       "failDesc": "Low relevance, 1 warning",
+      "speedQuiz": {
+        "scoring": "Scoring System",
+        "scoringDesc": "Points determined by correctness and speed",
+        "correctPoint": "Base points for correct answer",
+        "fastBonus": "Bonus for answers within 5 seconds",
+        "totalQuestions": "10 Questions",
+        "questionsDesc": "Total number of questions",
+        "timeLimit": "Time limit per question",
+        "quizTypes": "3 Types",
+        "quizTypesDesc": "Vocabulary, Grammar, Expressions"
+      },
       "quickRules": "Quick Rules Summary",
       "players": "1:1 Battle",
       "playersDesc": "Real-time match after login",
@@ -823,6 +834,12 @@
         "step2": "AI Wizard judges the connection (70+ = pass)",
         "step3": "Timeout, low score, or duplicate = warning!",
         "exampleDesc": "Sea → Wave (strong link! 95pts), School → Teacher (magical association! 88pts)"
+      },
+      "speedQuiz": {
+        "step1": "TOPIK vocabulary, grammar, and expression questions appear",
+        "step2": "Select the answer within 10 seconds! Faster = bonus!",
+        "step3": "Whoever answers more correctly out of 10 wins!",
+        "exampleDesc": "+10pts for correct answer, +5pts speed bonus if answered within 5 seconds"
       }
     },
     "currentStreak": "🔥 {{count}} win streak",
