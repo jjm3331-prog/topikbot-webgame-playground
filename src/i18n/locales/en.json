@@ -678,7 +678,21 @@
       "rewardDesc": "Win to earn bonus points!",
       "yourTurn": "🎯 Your turn! Enter a word!",
       "opponentTurn": "⏳ {{name}}'s turn...",
-      "warningCount": "Warning {{count}}"
+      "warningCount": "Warning {{count}}",
+      "nextPrompt": "Next: start with '{{char}}'",
+      "startWith": "Start with '{{char}}'...",
+      "enterWord": "Enter a word...",
+      "waitOpponent": "It's your opponent's turn...",
+      "waitHostStart": "Waiting for the host to start...",
+      "victory": "🎉 Victory!",
+      "defeat": "😢 Defeat",
+      "victoryDesc": "You beat {{name}}!",
+      "defeatDesc": "You lost to {{name}}...",
+      "winBonus": "+1,000 pts",
+      "totalWordsLabel": "Total linked words",
+      "totalWordsValue": "{{count}}",
+      "exit": "Exit",
+      "playAgain": "Play Again"
     },
     "semanticGame": {
       "overview": "Say a word that is connected by meaning to the previous word (not by last syllable).",

@@ -617,7 +617,21 @@
       "rewardDesc": "勝利してボーナスポイントを獲得！",
       "yourTurn": "🎯 あなたの番！単語を入力して！",
       "opponentTurn": "⏳ {{name}}の番...",
-      "warningCount": "警告 {{count}}"
+      "warningCount": "警告 {{count}}",
+      "nextPrompt": "次：'{{char}}' から始める",
+      "startWith": "'{{char}}' から始める...",
+      "enterWord": "単語を入力...",
+      "waitOpponent": "相手の番です...",
+      "waitHostStart": "ホストの開始を待っています...",
+      "victory": "🎉 勝利！",
+      "defeat": "😢 敗北",
+      "victoryDesc": "{{name}}に勝ちました！",
+      "defeatDesc": "{{name}}に負けました...",
+      "winBonus": "+1,000ポイント",
+      "totalWordsLabel": "つないだ単語数",
+      "totalWordsValue": "{{count}}",
+      "exit": "退出",
+      "playAgain": "もう一度"
     },
     "semanticGame": {
       "overview": "前の単語と意味的に関連する単語を言います（最後の音節ではありません）。",

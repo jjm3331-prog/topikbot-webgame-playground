@@ -615,7 +615,21 @@
       "rewardDesc": "G'alaba qozonib bonus ball oling!",
       "yourTurn": "🎯 Navbatingiz! So'z kiriting!",
       "opponentTurn": "⏳ {{name}} navbati...",
-      "warningCount": "Ogohlantirish {{count}}"
+      "warningCount": "Ogohlantirish {{count}}",
+      "nextPrompt": "Keyingi: '{{char}}' bilan boshlang",
+      "startWith": "'{{char}}' bilan boshlang...",
+      "enterWord": "So'z kiriting...",
+      "waitOpponent": "Raqib navbati...",
+      "waitHostStart": "Boshlash uchun xost kutilmoqda...",
+      "victory": "🎉 G'alaba!",
+      "defeat": "😢 Mag'lubiyat",
+      "victoryDesc": "Siz {{name}}ni yutdingiz!",
+      "defeatDesc": "Siz {{name}}ga yutqazdingiz...",
+      "winBonus": "+1,000 ball",
+      "totalWordsLabel": "Ulangan so'zlar soni",
+      "totalWordsValue": "{{count}}",
+      "exit": "Chiqish",
+      "playAgain": "Qayta o'ynash"
     },
     "semanticGame": {
       "overview": "Oldingi so'z bilan ma'no jihatidan bog'liq so'z ayting (oxirgi bo'g'in emas).",

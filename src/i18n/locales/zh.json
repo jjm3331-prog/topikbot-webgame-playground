@@ -657,7 +657,17 @@
       "victory": "🎉 胜利！",
       "defeat": "😢 失败",
       "victoryDesc": "你赢得了+1,000分！",
-      "defeatDesc": "{{name}} 获胜了！"
+      "defeatDesc": "{{name}} 获胜了！",
+      "nextPrompt": "下一步：以 '{{char}}' 开始",
+      "startWith": "以 '{{char}}' 开始...",
+      "enterWord": "输入单词...",
+      "waitOpponent": "轮到对手...",
+      "waitHostStart": "等待房主开始...",
+      "winBonus": "+1,000分",
+      "totalWordsLabel": "已接龙单词数",
+      "totalWordsValue": "{{count}}",
+      "exit": "退出",
+      "playAgain": "再玩一次"
     }
   },
   "vocabulary": {
