@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Check, Globe, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { languages, type LanguageCode } from '@/i18n/config';
-import { toast } from '@/hooks/use-toast';
+import { ChevronDown, Check, Globe, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { languages, type LanguageCode, getUiLangStorageKey } from "@/i18n/config";
+import { toast } from "@/hooks/use-toast";
 
 // Normalize language code (e.g., "ko-KR" → "ko", "en-US" → "en")
 const normalizeLanguageCode = (code: string): LanguageCode => {
@@ -50,7 +50,8 @@ export const LanguageSelector = () => {
     // Small delay for visual effect
     await new Promise(resolve => setTimeout(resolve, 150));
     
-    // Change language
+    // Change language + persist ONLY explicit user choice (scoped by domain)
+    window.localStorage.setItem(getUiLangStorageKey(), code);
     await i18n.changeLanguage(code);
     
     // Show toast notification
