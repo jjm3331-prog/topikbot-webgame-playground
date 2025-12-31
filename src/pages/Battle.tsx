@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Swords, Link2, Brain, Users, Trophy, Zap, Crown, Lock, X, Loader2, Play, Timer, AlertTriangle } from "lucide-react";
+import { Swords, Link2, Users, Trophy, Zap, Crown, Lock, Timer, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import CleanHeader from "@/components/CleanHeader";
@@ -55,11 +55,6 @@ const battleGames: BattleGame[] = [
   },
 ];
 
-interface RoomInfo {
-  host_name: string;
-  status: string;
-  guest_id: string | null;
-}
 
 export default function Battle() {
   const navigate = useNavigate();
@@ -156,177 +151,6 @@ export default function Battle() {
         }}
       />
 
-      {/* Premium Invite Modal Popup */}
-      <AnimatePresence>
-        {showInviteModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            onClick={handleCloseInviteModal}
-          >
-            {/* Backdrop with blur */}
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-md" />
-            
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.8, opacity: 0, y: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-md"
-            >
-              {/* Card with glass morphism */}
-              <div className="relative bg-card/95 backdrop-blur-xl border border-border/50 rounded-3xl shadow-2xl overflow-hidden">
-                {/* Background Effects */}
-                <div className="absolute inset-0 -z-10">
-                  <div className={`absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl opacity-30 ${inviteGame === "semantic" ? "bg-purple-500" : "bg-orange-500"}`} />
-                  <div className={`absolute bottom-0 left-0 w-48 h-48 rounded-full blur-3xl opacity-20 ${inviteGame === "semantic" ? "bg-pink-500" : "bg-yellow-500"}`} />
-                </div>
-                
-                {/* Close button */}
-                <button
-                  onClick={handleCloseInviteModal}
-                  className="absolute top-4 right-4 p-2 rounded-full bg-muted/50 hover:bg-muted transition-colors z-10"
-                >
-                  <X className="w-5 h-5 text-muted-foreground" />
-                </button>
-
-                {/* Header */}
-                <div className="pt-8 pb-6 px-6 text-center">
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", delay: 0.1 }}
-                    className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${inviteGame === "semantic" ? "from-purple-500 to-pink-500" : "from-yellow-400 to-orange-500"} flex items-center justify-center mx-auto mb-5 shadow-xl ${inviteGame === "semantic" ? "shadow-purple-500/30" : "shadow-orange-500/30"}`}
-                  >
-                    {inviteGame === "semantic" ? (
-                      <Brain className="w-10 h-10 text-white" />
-                    ) : (
-                      <Link2 className="w-10 h-10 text-white" />
-                    )}
-                  </motion.div>
-                  
-                  <h2 className={`text-2xl sm:text-3xl font-black mb-1 bg-gradient-to-r ${inviteGame === "semantic" ? "from-purple-400 to-pink-400" : "from-yellow-400 to-orange-400"} bg-clip-text text-transparent`}>
-                    {t(inviteGame === "semantic" ? 'battle.semantic' : 'battle.wordChain')}
-                  </h2>
-                  <p className="text-muted-foreground text-sm">
-                    {t(inviteGame === "semantic" ? 'battle.semanticKo' : 'battle.wordChainKo')}
-                  </p>
-                </div>
-
-                {/* Content */}
-                <div className="px-6 pb-8">
-                  {loadingRoom ? (
-                    <div className="py-8 text-center">
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                        className={`w-16 h-16 rounded-full border-4 border-muted ${inviteGame === "semantic" ? "border-t-purple-500" : "border-t-orange-500"} mx-auto mb-4`}
-                      />
-                      <p className="text-muted-foreground">{t('battle.loadingRoom')}</p>
-                    </div>
-                  ) : roomError ? (
-                    <div className="py-6 text-center">
-                      <div className="w-16 h-16 bg-destructive/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <X className="w-8 h-8 text-destructive" />
-                      </div>
-                      <p className="text-destructive font-bold text-lg mb-2">{roomError}</p>
-                      <p className="text-sm text-muted-foreground mb-6">
-                        {t('battle.roomNotAvailable')}
-                      </p>
-                      <Button
-                        onClick={handleCloseInviteModal}
-                        variant="outline"
-                        className="w-full h-12"
-                      >
-                        {t('battle.close')}
-                      </Button>
-                    </div>
-                  ) : (
-                    <>
-                      {/* Host info card */}
-                      {roomInfo && (
-                        <motion.div 
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.2 }}
-                          className="mb-6 p-5 bg-gradient-to-br from-muted/50 to-muted/30 rounded-2xl border border-border/50"
-                        >
-                          <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">{t('battle.hostWaiting')}</p>
-                          <div className="flex items-center justify-center gap-3">
-                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
-                              <Crown className="w-6 h-6 text-white" />
-                            </div>
-                            <span className="font-black text-2xl">{roomInfo.host_name}</span>
-                          </div>
-                        </motion.div>
-                      )}
-
-                      {/* Room code display */}
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="mb-6 text-center"
-                      >
-                        <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">{t('battle.roomCode')}</p>
-                        <p className={`text-4xl sm:text-5xl font-mono font-black tracking-[0.3em] bg-gradient-to-r ${inviteGame === "semantic" ? "from-purple-400 to-pink-400" : "from-yellow-400 to-orange-400"} bg-clip-text text-transparent`}>
-                          {initialRoomCode}
-                        </p>
-                      </motion.div>
-
-                      {/* Join button */}
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <Button
-                          onClick={handleJoinFromInvite}
-                          disabled={joiningRoom || !roomInfo}
-                          className={`w-full h-16 text-xl font-black rounded-2xl bg-gradient-to-r ${inviteGame === "semantic" ? "from-purple-500 to-pink-500 shadow-purple-500/30" : "from-yellow-400 to-orange-500 shadow-orange-500/30"} hover:opacity-90 text-white shadow-xl`}
-                        >
-                          {joiningRoom ? (
-                            <Loader2 className="w-7 h-7 animate-spin" />
-                          ) : (
-                            <>
-                              <Play className="w-7 h-7 mr-3" />
-                              {t('battle.joinNow')}
-                            </>
-                          )}
-                        </Button>
-                      </motion.div>
-
-                      {/* Rules reminder */}
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.5 }}
-                        className="mt-6 flex items-center justify-center gap-4 text-sm text-muted-foreground"
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <Timer className="w-4 h-4" />
-                          <span>{t('battle.secondsPerTurn')}</span>
-                        </div>
-                        <div className="w-1 h-1 rounded-full bg-muted-foreground" />
-                        <div className="flex items-center gap-1.5">
-                          <AlertTriangle className="w-4 h-4" />
-                          <span>{t('battle.warnings')}</span>
-                        </div>
-                      </motion.div>
-                    </>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
       <main className="pt-20 pb-24">
         {/* Hero Section - Full Width Premium Gradient */}
         <section className="relative overflow-hidden">
