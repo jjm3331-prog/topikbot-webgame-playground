@@ -632,6 +632,8 @@
     "secondsPerTurn": "턴당 20초 제한",
     "warnings": "경고 2회 시 패배",
     "waitingForOpponent": "상대방을 기다리는 중...",
+    "shareCodeDesc": "아래 방 코드를 친구에게 공유해서 참가하게 하세요.",
+    "cancel": "취소",
     "waitingDesc": "대기 목록에 방이 등록되었습니다. 다른 사람이 참가하면 자동으로 시작됩니다.",
     "enterGuestNickname": "닉네임 입력",
     "enterNicknamePlaceholder": "닉네임을 입력하세요...",

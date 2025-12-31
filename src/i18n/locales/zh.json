@@ -571,6 +571,8 @@
     "secondsPerTurn": "每回合20秒",
     "warnings": "2次警告即失败",
     "waitingForOpponent": "等待对手中...",
+    "shareCodeDesc": "请把下方房间代码分享给朋友以便加入。",
+    "cancel": "取消",
     "waitingDesc": "房间已加入等待列表。其他人加入后将自动开始。",
     "enterGuestNickname": "输入昵称",
     "enterNicknamePlaceholder": "请输入昵称...",

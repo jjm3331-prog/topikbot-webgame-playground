@@ -571,6 +571,8 @@
     "secondsPerTurn": "1ターン20秒",
     "warnings": "警告2回で敗北",
     "waitingForOpponent": "対戦相手を待っています...",
+    "shareCodeDesc": "下のルームコードを友達に共有して参加してもらいましょう。",
+    "cancel": "キャンセル",
     "waitingDesc": "ルームが待機リストに登録されました。他の人が参加すると自動的に開始します。",
     "enterGuestNickname": "ニックネームを入力",
     "enterNicknamePlaceholder": "ニックネームを入力してください...",
