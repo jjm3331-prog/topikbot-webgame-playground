@@ -28,6 +28,29 @@ interface TranslationResult {
   uz?: string;
 }
 
+// 번역 결과 검증 함수
+function validateTranslation(lang: string, translation: string | undefined, originalKorean: string): boolean {
+  if (!translation || translation.trim() === '') return false;
+  if (translation.trim() === originalKorean.trim()) return false;
+  if (translation.length < originalKorean.length * 0.2) return false;
+  
+  switch (lang) {
+    case 'ja':
+      return /[\u3040-\u30FF\u4E00-\u9FAF]/.test(translation);
+    case 'zh':
+      return /[\u4E00-\u9FAF]/.test(translation);
+    case 'ru':
+      return /[\u0400-\u04FF]/.test(translation);
+    case 'vi':
+      return /[àáảãạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđ]/i.test(translation);
+    case 'uz':
+    case 'en':
+      return /[a-zA-Z]/.test(translation);
+    default:
+      return true;
+  }
+}
+
 async function translateWithGemini(koreanText: string, targetLanguages: string[]): Promise<TranslationResult> {
   const languageList = targetLanguages.map(lang => `- ${lang}: ${LANGUAGE_NAMES[lang]}`).join('\n');
   
@@ -41,22 +64,25 @@ IMPORTANT RULES:
 4. Be accurate and natural in each target language
 5. Output ONLY valid JSON, no markdown code blocks or extra text
 6. Each translation should be COMPLETE - do not truncate
+7. CRITICAL: You MUST provide translations for ALL ${targetLanguages.length} languages. Do not skip any language.
 
 Korean explanation to translate:
 """
 ${koreanText}
 """
 
-Target languages:
+Target languages (ALL REQUIRED):
 ${languageList}
 
-Output format (JSON only, no markdown):
+Output format (JSON only, no markdown, ALL languages required):
 {
-${targetLanguages.map(lang => `  "${lang}": "${LANGUAGE_NAMES[lang]} translation here"`).join(',\n')}
+${targetLanguages.map(lang => `  "${lang}": "Complete ${LANGUAGE_NAMES[lang]} translation here"`).join(',\n')}
 }`;
 
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
+      console.log(`🔄 Attempt ${attempt + 1}/3...`);
+      
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
         {
@@ -96,12 +122,34 @@ ${targetLanguages.map(lang => `  "${lang}": "${LANGUAGE_NAMES[lang]} translation
       }
       
       const translations = JSON.parse(jsonMatch[0]);
-      return translations;
+      
+      // 검증: 모든 언어가 올바르게 번역됐는지 확인
+      const validatedTranslations: TranslationResult = {};
+      let validCount = 0;
+      
+      for (const lang of targetLanguages) {
+        if (validateTranslation(lang, translations[lang], koreanText)) {
+          validatedTranslations[lang as keyof TranslationResult] = translations[lang];
+          validCount++;
+        } else {
+          console.warn(`⚠️ Validation failed for ${lang}`);
+        }
+      }
+      
+      // 최소 절반 이상 성공해야 함, 아니면 재시도
+      if (validCount < targetLanguages.length / 2 && attempt < 2) {
+        console.log(`🔄 Only ${validCount}/${targetLanguages.length} valid, retrying...`);
+        await new Promise(r => setTimeout(r, 1500));
+        continue;
+      }
+      
+      console.log(`✅ ${validCount}/${targetLanguages.length} translations validated`);
+      return validatedTranslations;
       
     } catch (error) {
       console.error(`Attempt ${attempt + 1} error:`, error);
       if (attempt < 2) {
-        await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+        await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
         continue;
       }
       throw error;
@@ -182,7 +230,7 @@ serve(async (req) => {
 
     let successCount = 0;
     let failCount = 0;
-    const results: { id: string; success: boolean; error?: string }[] = [];
+    const results: { id: string; success: boolean; translatedLangs?: string[]; error?: string }[] = [];
 
     // 번역 실행 (순차적으로 - rate limit 방지)
     for (const item of needsTranslation) {
@@ -191,12 +239,15 @@ serve(async (req) => {
         
         const translations = await translateWithGemini(item.explanation_ko, item.missingLangs);
         
-        // DB 업데이트 객체 생성
+        // DB 업데이트 객체 생성 - 검증된 번역만 저장
         const updateObj: Record<string, string> = {};
+        const translatedLangs: string[] = [];
+        
         for (const lang of item.missingLangs) {
           const translation = translations[lang as keyof TranslationResult];
           if (translation && translation.length > 0) {
             updateObj[`explanation_${lang}`] = translation;
+            translatedLangs.push(lang);
           }
         }
         
@@ -210,13 +261,17 @@ serve(async (req) => {
             throw new Error(`DB update failed: ${updateError.message}`);
           }
           
-          console.log(`✅ Updated ${item.id} with ${Object.keys(updateObj).length} translations`);
+          console.log(`✅ Updated ${item.id} with ${translatedLangs.length} translations: ${translatedLangs.join(', ')}`);
           successCount++;
-          results.push({ id: item.id, success: true });
+          results.push({ id: item.id, success: true, translatedLangs });
+        } else {
+          console.warn(`⚠️ No valid translations for ${item.id}`);
+          failCount++;
+          results.push({ id: item.id, success: false, error: 'No valid translations' });
         }
         
         // Rate limit 방지를 위한 딜레이
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise(r => setTimeout(r, 800));
         
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : 'Unknown error';
