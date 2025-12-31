@@ -57,7 +57,6 @@ interface QuizQuestion {
   options: string[];
   correctIndex: number;
   explanation_ko: string;
-  explanation_vi: string;
   difficulty: "easy" | "medium" | "hard";
 }
 
@@ -920,11 +919,27 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
 
   // Playing screen
   if (gamePhase === "playing") {
+    const handleForfeit = async () => {
+      if (!room) return;
+      try {
+        const winnerId = isHost ? room.guest_id : room.host_id;
+        await supabase
+          .from("chain_reaction_rooms")
+          .update({ status: "finished", winner_id: winnerId, finished_at: new Date().toISOString() })
+          .eq("id", room.id);
+      } catch (err) {
+        console.error("[SpeedQuiz] Forfeit failed:", err);
+      }
+    };
+
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-2xl mx-auto space-y-4">
         {/* Header with scores */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={handleForfeit} className="text-red-400 hover:text-red-500 hover:bg-red-500/10" title="게임 포기">
+              <X className="w-5 h-5" />
+            </Button>
             <div className="text-center">
               <p className="text-sm text-muted-foreground">{isHost ? "나" : room?.host_name}</p>
               <p className="text-2xl font-bold text-emerald-400">{isHost ? myScore : opponentScore}</p>
@@ -1035,7 +1050,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
                   >
                     <p className="font-bold mb-1">{lastAnswerCorrect ? "✅ 정답!" : "❌ 오답"}</p>
                     <p className="text-sm text-muted-foreground">
-                      {i18n.language === "vi" ? currentQuestion.explanation_vi : currentQuestion.explanation_ko}
+                      {currentQuestion.explanation_ko}
                     </p>
                   </motion.div>
                 )}
