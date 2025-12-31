@@ -11,21 +11,19 @@ import {
   Send,
   Loader2,
   Users,
-  Copy,
   Check,
   ArrowLeft,
   Crown,
-  Swords,
   Timer,
-  Share2,
   AlertTriangle,
   Brain,
+  Swords,
   Zap,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import RoomCodeCollapsible from "@/components/battle/RoomCodeCollapsible";
+// RoomCodeCollapsible removed - using waiting list only
 import { saveHostedRoom, clearHostedRoom } from "@/components/battle/GuestJoinedNotification";
 import { saveGameRecord } from "@/lib/gameRecords";
 
@@ -72,7 +70,7 @@ interface MoveRow {
 
 type GamePhase = "menu" | "creating" | "joining" | "waiting" | "ready" | "countdown" | "playing" | "finished";
 
-const TURN_TIME_LIMIT = 12;
+const TURN_TIME_LIMIT = 20;
 const MAX_WARNINGS = 1;
 const PASS_SCORE = 70;
 
@@ -768,31 +766,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
     }
   };
 
-  const copyRoomLink = () => {
-    if (!room) return;
-    const link = `https://game.topikbot.kr/#/battle?game=semantic&room=${room.room_code}`;
-    navigator.clipboard.writeText(link);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-    toast({ title: t("battle.semanticGame.copiedLinkToast") });
-  };
-
-  const shareRoom = async () => {
-    if (!room) return;
-    const link = `https://game.topikbot.kr/#/battle?game=semantic&room=${room.room_code}`;
-    const shareData = {
-      title: `🧠 ${t("battle.semantic")}`,
-      text: t("battle.semanticGame.shareText", { code: room.room_code }),
-      url: link,
-    };
-    if (navigator.share && navigator.canShare?.(shareData)) {
-      try {
-        await navigator.share(shareData);
-      } catch (err) {}
-    } else {
-      copyRoomLink();
-    }
-  };
+  // Invite link functions removed - using waiting list only
 
   // Cleanup
   useEffect(() => {
@@ -1015,17 +989,20 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
           <h2 className="text-xl font-bold">{t("battle.semanticGame.waitingRoom")}</h2>
         </div>
 
-        {/* Room Code Card - Collapsible for manual entry fallback */}
-        <RoomCodeCollapsible 
-          roomCode={room.room_code}
-          copied={copied}
-          onCopy={copyRoomLink}
-          onShare={shareRoom}
-          gradientFrom="from-purple-400"
-          gradientTo="to-pink-400"
-          bgGlow1="bg-purple-500/10"
-          bgGlow2="bg-pink-500/10"
-        />
+        {/* Waiting for opponent - simplified UI */}
+        {!room.guest_id && (
+          <Card className="p-6 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20">
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                className="w-8 h-8 rounded-full border-2 border-muted border-t-purple-500"
+              />
+              <p className="text-lg font-semibold">{t("battle.waitingForOpponent")}</p>
+            </div>
+            <p className="text-sm text-muted-foreground text-center">{t("battle.waitingDesc")}</p>
+          </Card>
+        )}
 
         {/* Players Status */}
           <Card className="p-5 bg-gradient-to-br from-card to-muted/30 border-border/50">
