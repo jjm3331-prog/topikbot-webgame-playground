@@ -760,6 +760,25 @@
       "victoryDesc": "명탐정 보너스 +1,000점!",
       "defeatDesc": "{{name}} 탐정이 먼저 해결!"
     },
+    "speedQuizGame": {
+      "overview": "TOPIK 어휘, 문법, 표현 문제를 빠르게 풀어 승부를 겨뤄요! 10문제 중 더 많이 맞추면 승리!",
+      "quizTypesTitle": "📚 3가지 유형",
+      "quizTypesDesc": "어휘, 문법, 표현 문제가 랜덤으로 출제됩니다.",
+      "timeLimit": "⏱️ 10초 제한",
+      "timeLimitDesc": "문제당 10초! 빠른 판단력이 필요해요.",
+      "scoringTitle": "🎯 점수 시스템",
+      "scoringDesc": "정답 +10점, 5초 이내 답변 시 +5점 스피드 보너스!",
+      "rewardTitle": "🏆 +1,000점",
+      "rewardDesc": "승리하면 보너스 포인트를 받아요!",
+      "yourNameLabel": "닉네임",
+      "yourNamePlaceholder": "닉네임 입력...",
+      "createRoom": "방 만들기",
+      "join": "참가",
+      "joinTitle": "방 참가하기",
+      "joinButton": "입장하기",
+      "backToMenu": "돌아가기",
+      "playAgain": "다시 하기"
+    },
     "guide": {
       "title": "완벽 가이드",
       "subtitle": "게임 방식과 연승 혜택을 상세히 알아보세요!",
