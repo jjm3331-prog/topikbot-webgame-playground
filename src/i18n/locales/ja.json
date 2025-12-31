@@ -475,7 +475,9 @@
     "selectImage": "画像ファイルを選択してください。",
     "fileTooLarge": "ファイルが大きすぎます。5MB以下のファイルを選択してください。",
     "avatarUpdated": "プロフィール画像を更新しました！",
-    "avatarUploadFailed": "画像をアップロードできません。もう一度お試しください。"
+    "avatarUploadFailed": "画像をアップロードできません。もう一度お試しください。",
+    "currentStreak": "現在の連勝",
+    "maxStreak": "最高連勝"
   },
   "ranking": {
     "title": "TOPIKランキング",
@@ -732,7 +734,9 @@
       "streakNote": "連勝記録は敗北でリセット。最高連勝はプロフィールに保存！",
       "wordChain": { "step1": "相手の最後の音節で始まる単語を入力", "step2": "20秒以内に入力しないと警告1回！", "step3": "警告2回で敗北、相手の勝利" },
       "semantic": { "step1": "前の単語と意味的に関連する単語を入力", "step2": "AIが関連性をスコアで評価（70点以上でパス）", "step3": "タイムアウト、低スコア、重複は警告", "exampleDesc": "海と波は密接な関係（95点）、学校と先生も高い関連性（88点）" }
-    }
+    },
+    "currentStreak": "🔥 {{count}}連勝中",
+    "maxStreak": "最高連勝"
   },
   "vocabulary": {
     "title": "語彙学習",

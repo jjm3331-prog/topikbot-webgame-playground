@@ -528,6 +528,30 @@ const Profile = () => {
                 </div>
               </div>
 
+              {/* Streak Stats */}
+              {(gameStats.currentStreak > 0 || gameStats.maxStreak > 0) && (
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  {gameStats.currentStreak > 0 && (
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20">
+                      <span className="text-2xl">🔥</span>
+                      <div>
+                        <p className="text-lg font-bold text-orange-500">{gameStats.currentStreak}{t('battle.guide.consecutiveWins')}</p>
+                        <p className="text-xs text-muted-foreground">{t('profile.currentStreak')}</p>
+                      </div>
+                    </div>
+                  )}
+                  {gameStats.maxStreak > 0 && (
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20">
+                      <Trophy className="w-6 h-6 text-purple-500" />
+                      <div>
+                        <p className="text-lg font-bold text-purple-500">{gameStats.maxStreak}{t('battle.guide.consecutiveWins')}</p>
+                        <p className="text-xs text-muted-foreground">{t('profile.maxStreak')}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Recent Games */}
               {recentGames.length > 0 && (
                 <div>

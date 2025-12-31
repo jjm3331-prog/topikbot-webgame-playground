@@ -475,7 +475,9 @@
     "selectImage": "请选择图片文件。",
     "fileTooLarge": "文件太大，请选择5MB以下的文件。",
     "avatarUpdated": "头像已更新！",
-    "avatarUploadFailed": "无法上传图片，请重试。"
+    "avatarUploadFailed": "无法上传图片，请重试。",
+    "currentStreak": "当前连胜",
+    "maxStreak": "最高连胜"
   },
   "ranking": {
     "title": "TOPIK排行榜",
@@ -732,7 +734,9 @@
       "streakNote": "连胜记录在失败时重置。最高连胜保存到个人资料！",
       "wordChain": { "step1": "输入以对手最后音节开头的词", "step2": "20秒内未回答=1次警告！", "step3": "2次警告=失败，对手获胜" },
       "semantic": { "step1": "输入与前词语义相关的词", "step2": "AI评分相关性（70+分=通过）", "step3": "超时、低分、重复=警告", "exampleDesc": "海和浪密切相关（95分），学校和老师也高度相关（88分）" }
-    }
+    },
+    "currentStreak": "🔥 {{count}}连胜中",
+    "maxStreak": "最高连胜"
   },
   "vocabulary": {
     "title": "词汇学习",

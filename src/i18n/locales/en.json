@@ -511,7 +511,9 @@
     "selectImage": "Please select an image file.",
     "fileTooLarge": "File too large. Please select file under 5MB.",
     "avatarUpdated": "Profile picture updated!",
-    "avatarUploadFailed": "Failed to upload image. Please try again."
+    "avatarUploadFailed": "Failed to upload image. Please try again.",
+    "currentStreak": "Current Streak",
+    "maxStreak": "Best Streak"
   },
   "ranking": {
     "title": "TOPIK Ranking",
@@ -803,7 +805,9 @@
         "step3": "Timeout, low score, or duplicate = warning",
         "exampleDesc": "Sea & wave are closely related (95pts), school & teacher also highly relevant (88pts)"
       }
-    }
+    },
+    "currentStreak": "🔥 {{count}} win streak",
+    "maxStreak": "Best streak"
   },
   "vocabulary": {
     "title": "Vocabulary Learning",
