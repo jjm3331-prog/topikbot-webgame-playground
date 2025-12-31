@@ -678,7 +678,21 @@
       "rewardDesc": "Chiến thắng để nhận điểm thưởng!",
       "yourTurn": "🎯 Tới lượt bạn! Hãy nhập từ!",
       "opponentTurn": "⏳ Lượt của {{name}}...",
-      "warningCount": "Cảnh báo {{count}}"
+      "warningCount": "Cảnh báo {{count}}",
+      "nextPrompt": "Tiếp theo: bắt đầu bằng '{{char}}'",
+      "startWith": "Bắt đầu bằng '{{char}}'...",
+      "enterWord": "Nhập từ...",
+      "waitOpponent": "Lượt của đối thủ...",
+      "waitHostStart": "Đang chờ chủ phòng bắt đầu...",
+      "victory": "🎉 Chiến thắng!",
+      "defeat": "😢 Thua cuộc",
+      "victoryDesc": "Bạn đã thắng {{name}}!",
+      "defeatDesc": "Bạn đã thua {{name}}...",
+      "winBonus": "+1,000 điểm",
+      "totalWordsLabel": "Tổng số từ đã nối",
+      "totalWordsValue": "{{count}} từ",
+      "exit": "Thoát",
+      "playAgain": "Chơi lại"
     },
     "semanticGame": {
       "overview": "Nói từ theo ý nghĩa liên quan, không phải âm tiết cuối.",

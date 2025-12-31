@@ -226,8 +226,8 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       }
 
       toast({
-        title: "🎉 +1,000 điểm!",
-        description: "Bạn đã nhận được 1,000 điểm thưởng chiến thắng!",
+        title: t("battle.semanticGame.winToastTitle"),
+        description: t("battle.semanticGame.winToastDesc"),
       });
     } catch (err) {
       console.error("Error awarding points:", err);
@@ -1207,9 +1207,6 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       </div>
     );
   }
-      </div>
-    );
-  }
 
   // Premium Waiting/Ready Screen (통합 디자인 - 의미연결과 동일)
   if ((gamePhase === "waiting" || gamePhase === "ready") && room) {
@@ -1224,7 +1221,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
         {/* Header */}
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={onBack}><ArrowLeft className="w-5 h-5" /></Button>
-          <h2 className="text-xl font-bold">Phòng chờ</h2>
+          <h2 className="text-xl font-bold">{t("battle.semanticGame.waitingRoom")}</h2>
         </div>
 
         {/* Room Code Card - Collapsible for manual entry fallback */}
@@ -1348,7 +1345,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                   }`}
                 >
                   <Play className="w-5 h-5" />
-                  {bothReady ? "Bắt đầu!" : "Cả hai cần sẵn sàng"}
+                  {bothReady ? t("battle.semanticGame.start") : t("battle.semanticGame.bothReadyNeeded")}
                 </Button>
               </motion.div>
             )}
@@ -1356,7 +1353,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             {!isHost && bothReady && (
               <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm py-2">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Đang chờ chủ phòng bắt đầu...
+                {t("battle.wordChainGame.waitHostStart")}
               </div>
             )}
           </div>
@@ -1400,7 +1397,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             ) : (
               <motion.div initial={{ scale: 0, rotate: -10 }} animate={{ scale: 1, rotate: 0 }} className="relative">
                 <div className="text-6xl sm:text-8xl font-black bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500 bg-clip-text text-transparent">
-                  BẮT ĐẦU! 🎮
+                  {t("battle.semanticGame.countdownStart")}
                 </div>
               </motion.div>
             )}
@@ -1423,8 +1420,8 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
               <Link2 className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="font-bold">Nối từ 1:1</p>
-              <p className="text-xs text-muted-foreground">끝말잇기</p>
+              <p className="font-bold">{t("battle.wordChain")}</p>
+              <p className="text-xs text-muted-foreground">{t("battle.wordChainKo")}</p>
             </div>
           </div>
           
@@ -1477,6 +1474,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                 {t("battle.wordChainGame.warningCount", { count: myWarnings })}
               </p>
             )}
+          </div>
 
           <div className="text-center">
             <p className="text-xs text-muted-foreground">VS</p>
@@ -1499,6 +1497,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                 {t("battle.wordChainGame.warningCount", { count: opponentWarnings })}
               </p>
             )}
+          </div>
         </div>
 
         {/* Word Chain Display */}
@@ -1535,7 +1534,8 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
           {chain.length > 0 && (
             <div className="mt-4 text-center">
               <p className="text-sm text-muted-foreground">
-                Tiếp theo: bắt đầu bằng '<span className="text-primary font-bold text-lg">{chain[chain.length - 1].word.slice(-1)}</span>'
+                {t("battle.wordChainGame.nextPrompt", { char: chain[chain.length - 1].word.slice(-1) })}{" "}
+                <span className="text-primary font-bold text-lg">{chain[chain.length - 1].word.slice(-1)}</span>
               </p>
             </div>
           )}
@@ -1567,10 +1567,10 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             placeholder={
               !isMyTurn
-                ? "Lượt của đối thủ..."
+                ? t("battle.wordChainGame.waitOpponent")
                 : chain.length > 0
-                  ? `Bắt đầu bằng '${chain[chain.length - 1].word.slice(-1)}'...`
-                  : "Nhập từ..."
+                  ? t("battle.wordChainGame.startWith", { char: chain[chain.length - 1].word.slice(-1) })
+                  : t("battle.wordChainGame.enterWord")
             }
             className={`text-xl h-14 rounded-xl ${!isMyTurn ? "opacity-50" : ""}`}
             disabled={isValidating || !isMyTurn}
@@ -1629,11 +1629,13 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
             </motion.div>
 
             <h2 className={`text-4xl font-black mb-3 ${isWinner ? "text-yellow-500" : "text-muted-foreground"}`}>
-              {isWinner ? "🎉 Chiến thắng!" : "😢 Thua cuộc"}
+              {isWinner ? t("battle.wordChainGame.victory") : t("battle.wordChainGame.defeat")}
             </h2>
 
             <p className="text-lg text-muted-foreground mb-6">
-              {isWinner ? `Bạn đã thắng ${opponentName}!` : `Bạn đã thua ${opponentName}...`}
+              {isWinner
+                ? t("battle.wordChainGame.victoryDesc", { name: opponentName })
+                : t("battle.wordChainGame.defeatDesc", { name: opponentName })}
             </p>
 
             {isWinner && (
@@ -1644,19 +1646,19 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                 className="mb-6 inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/50 rounded-2xl"
               >
                 <Trophy className="w-6 h-6 text-yellow-500" />
-                <span className="text-2xl font-black text-yellow-500">+1,000 điểm!</span>
+                <span className="text-2xl font-black text-yellow-500">{t("battle.wordChainGame.winBonus")}</span>
               </motion.div>
             )}
 
             <div className="bg-muted/30 rounded-2xl p-5 mb-8 border border-border/50">
-              <p className="text-sm text-muted-foreground mb-2">Tổng số từ đã nối</p>
-              <p className="text-5xl font-black text-primary">{chain.length} từ</p>
+              <p className="text-sm text-muted-foreground mb-2">{t("battle.wordChainGame.totalWordsLabel")}</p>
+              <p className="text-5xl font-black text-primary">{t("battle.wordChainGame.totalWordsValue", { count: chain.length })}</p>
             </div>
 
             <div className="flex gap-4 justify-center">
               <Button onClick={onBack} variant="outline" size="lg" className="h-14 px-6 gap-2 text-lg">
                 <ArrowLeft className="w-5 h-5" />
-                Thoát
+                {t("battle.wordChainGame.exit")}
               </Button>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
@@ -1671,7 +1673,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                   className="h-14 px-6 gap-2 text-lg bg-gradient-to-r from-yellow-400 to-orange-500"
                 >
                   <RefreshCw className="w-5 h-5" />
-                  Chơi lại
+                  {t("battle.wordChainGame.playAgain")}
                 </Button>
               </motion.div>
             </div>
