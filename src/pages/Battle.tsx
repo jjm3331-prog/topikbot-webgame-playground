@@ -99,7 +99,13 @@ export default function Battle() {
     sessionStorage.setItem("battle_invite", JSON.stringify({ room: roomCode.toUpperCase(), game: game || "word-chain" }));
 
     setInitialRoomCode(roomCode.toUpperCase());
-    setInviteGame(game === "semantic" ? "semantic" : "word-chain");
+    if (game === "semantic") {
+      setInviteGame("semantic");
+    } else if (game === "speed-quiz") {
+      setInviteGame("speed-quiz");
+    } else {
+      setInviteGame("word-chain");
+    }
   }, [searchParams]);
 
   // Check auth
@@ -126,7 +132,10 @@ export default function Battle() {
       setRoomError(null);
 
       try {
-        const connectionMode = inviteGame === "semantic" ? "semantic" : "phonetic";
+        let connectionMode = "phonetic";
+        if (inviteGame === "semantic") connectionMode = "semantic";
+        else if (inviteGame === "speed-quiz") connectionMode = "speed_quiz";
+
         const { data, error } = await supabase
           .from("chain_reaction_rooms")
           .select("host_name, status, guest_id")
@@ -174,9 +183,12 @@ export default function Battle() {
   const handleJoinFromInvite = () => {
     setJoiningRoom(true);
     setShowInviteModal(false);
-    // Clear the stored invite after joining
     sessionStorage.removeItem("battle_invite");
-    setSelectedGame(inviteGame || "word-chain");
+    if (inviteGame === "speed-quiz") {
+      setSelectedGame("speed-quiz");
+    } else {
+      setSelectedGame(inviteGame || "word-chain");
+    }
   };
 
   const handleCloseInviteModal = () => {

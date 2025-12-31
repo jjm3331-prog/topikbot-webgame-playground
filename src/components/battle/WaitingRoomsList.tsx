@@ -172,7 +172,12 @@ export default function WaitingRoomsList({ onJoinRoom, isLoggedIn }: WaitingRoom
       return;
     }
     setJoining(selectedRoom.id);
-    const gameType = selectedRoom.connection_mode === "semantic" ? "semantic" : "word-chain";
+    let gameType = "word-chain";
+    if (selectedRoom.connection_mode === "semantic") {
+      gameType = "semantic";
+    } else if (selectedRoom.connection_mode === "speed_quiz") {
+      gameType = "speed-quiz";
+    }
     onJoinRoom(selectedRoom.room_code, gameType, guestNickname.trim());
     setSelectedRoom(null);
     setGuestNickname("");
@@ -184,13 +189,21 @@ export default function WaitingRoomsList({ onJoinRoom, isLoggedIn }: WaitingRoom
   };
 
   const getGameIcon = (mode: string) => {
-    return mode === "semantic" ? Brain : Link2;
+    if (mode === "semantic") return Brain;
+    if (mode === "speed_quiz") return Zap;
+    return Link2;
   };
 
   const getGameGradient = (mode: string) => {
-    return mode === "semantic" 
-      ? "from-purple-500 to-pink-500" 
-      : "from-yellow-400 to-orange-500";
+    if (mode === "semantic") return "from-purple-500 to-pink-500";
+    if (mode === "speed_quiz") return "from-emerald-500 to-cyan-500";
+    return "from-yellow-400 to-orange-500";
+  };
+
+  const getGameKey = (mode: string) => {
+    if (mode === "semantic") return "battle.semantic";
+    if (mode === "speed_quiz") return "battle.speedQuiz";
+    return "battle.wordChain";
   };
 
   const getTimeSince = (createdAt: string) => {
@@ -364,9 +377,7 @@ export default function WaitingRoomsList({ onJoinRoom, isLoggedIn }: WaitingRoom
               {rooms.map((room, index) => {
                 const GameIcon = getGameIcon(room.connection_mode);
                 const gradient = getGameGradient(room.connection_mode);
-                const gameKey = room.connection_mode === "semantic" 
-                  ? "battle.semantic" 
-                  : "battle.wordChain";
+                const gameKey = getGameKey(room.connection_mode);
 
                 return (
                   <motion.div
