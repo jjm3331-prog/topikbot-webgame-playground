@@ -1339,12 +1339,14 @@ export type Database = {
           id: string
           last_daily_bonus: string | null
           longest_streak: number
+          max_win_streak: number
           missions_completed: number
           money: number
           points: number
           total_missions: number
           updated_at: string
           username: string
+          win_streak: number
         }
         Insert: {
           avatar_url?: string | null
@@ -1357,12 +1359,14 @@ export type Database = {
           id: string
           last_daily_bonus?: string | null
           longest_streak?: number
+          max_win_streak?: number
           missions_completed?: number
           money?: number
           points?: number
           total_missions?: number
           updated_at?: string
           username: string
+          win_streak?: number
         }
         Update: {
           avatar_url?: string | null
@@ -1375,12 +1379,14 @@ export type Database = {
           id?: string
           last_daily_bonus?: string | null
           longest_streak?: number
+          max_win_streak?: number
           missions_completed?: number
           money?: number
           points?: number
           total_missions?: number
           updated_at?: string
           username?: string
+          win_streak?: number
         }
         Relationships: []
       }

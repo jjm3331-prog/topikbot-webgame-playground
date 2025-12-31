@@ -25,7 +25,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 // RoomCodeCollapsible removed - using waiting list only
 import { saveHostedRoom, clearHostedRoom } from "@/components/battle/GuestJoinedNotification";
-import { saveGameRecord } from "@/lib/gameRecords";
+import { saveGameRecord, type StreakBonus } from "@/lib/gameRecords";
 
 interface SemanticBattleProps {
   onBack: () => void;
@@ -104,6 +104,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
   const [lastValidation, setLastValidation] = useState<{score: number; reason_ko: string; reason_vi: string} | null>(null);
   const [countdown, setCountdown] = useState(3);
   const [usedWords, setUsedWords] = useState<string[]>([]);
+  const [streakBonus, setStreakBonus] = useState<StreakBonus | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const channelRef = useRef<any>(null);
@@ -444,7 +445,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "chain_reaction_rooms", filter: `id=eq.${roomId}` },
-        (payload) => {
+        async (payload) => {
           const newRoom = payload.new as Room;
           setRoom(newRoom);
           const phase = gamePhaseRef.current;
@@ -498,7 +499,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
             const opponentScore = amHost ? (newRoom.guest_score || 0) : (newRoom.host_score || 0);
 
             // Save game record
-            saveGameRecord({
+            const recordResult = await saveGameRecord({
               gameType: "semantic_battle",
               result: isWinner ? "win" : "lose",
               myScore,
@@ -511,6 +512,11 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
               playWinSound();
               confetti({ particleCount: 150, spread: 100 });
               awardWinnerPoints();
+              
+              // Show streak bonus if applicable
+              if (recordResult.streakBonus) {
+                setStreakBonus(recordResult.streakBonus);
+              }
             } else {
               playLoseSound();
             }
@@ -1359,6 +1365,26 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
             <p className="text-lg text-muted-foreground mb-6">
               {isWinner ? t("battle.semanticGame.victoryDesc") : t("battle.semanticGame.defeatDesc", { name: winnerName })}
             </p>
+
+            {/* Streak Bonus */}
+            {isWinner && streakBonus && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="mb-6 inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/50 rounded-2xl"
+              >
+                <Zap className="w-6 h-6 text-red-500" />
+                <span className="text-xl font-black text-red-500">
+                  🔥 {streakBonus.streakCount}{t("battle.streakWins")} +{streakBonus.bonusPoints.toLocaleString()}{t("battle.points")}
+                </span>
+                {streakBonus.isNewRecord && (
+                  <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full animate-pulse">
+                    {t("battle.newRecord")}
+                  </span>
+                )}
+              </motion.div>
+            )}
 
             <Card className="p-5 max-w-sm mx-auto mb-8 bg-muted/30 border-border/50">
               <div className="grid grid-cols-2 gap-4 text-center">
