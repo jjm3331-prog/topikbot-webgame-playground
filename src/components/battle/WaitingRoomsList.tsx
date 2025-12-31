@@ -11,13 +11,16 @@ import {
   Swords,
   Clock,
   Zap,
-  X
+  X,
+  Trophy,
+  TrendingUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { getGameStats, type GameStats } from "@/lib/gameRecords";
 
 interface WaitingRoom {
   id: string;
@@ -33,8 +36,8 @@ interface WaitingRoomsListProps {
   isLoggedIn: boolean;
 }
 
-// 24시간 = 86,400,000ms (하루 종일 대기 가능)
-const MAX_ROOM_AGE_MS = 24 * 60 * 60 * 1000;
+// 1시간 = 3,600,000ms (오래된 방 빠르게 정리)
+const MAX_ROOM_AGE_MS = 1 * 60 * 60 * 1000;
 
 export default function WaitingRoomsList({ onJoinRoom, isLoggedIn }: WaitingRoomsListProps) {
   const { t } = useTranslation();
@@ -43,6 +46,24 @@ export default function WaitingRoomsList({ onJoinRoom, isLoggedIn }: WaitingRoom
   const [joining, setJoining] = useState<string | null>(null);
   const [selectedRoom, setSelectedRoom] = useState<WaitingRoom | null>(null);
   const [guestNickname, setGuestNickname] = useState("");
+  const [myStats, setMyStats] = useState<GameStats | null>(null);
+
+  // Fetch user's battle stats
+  useEffect(() => {
+    const fetchMyStats = async () => {
+      if (!isLoggedIn) return;
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user?.id) {
+          const stats = await getGameStats(session.user.id);
+          setMyStats(stats);
+        }
+      } catch (err) {
+        console.error("Failed to fetch stats:", err);
+      }
+    };
+    fetchMyStats();
+  }, [isLoggedIn]);
 
   // Clean up old rooms (24시간 이상 된 waiting 방 삭제)
   const cleanupOldRooms = async () => {
@@ -256,6 +277,34 @@ export default function WaitingRoomsList({ onJoinRoom, isLoggedIn }: WaitingRoom
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* My Stats Card */}
+      {isLoggedIn && myStats && myStats.totalGames > 0 && (
+        <Card className="p-4 mb-4 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+                <Trophy className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-sm">{t('battle.myBattleStats')}</h4>
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <span className="text-green-500 font-medium">{myStats.wins}{t('battle.winsShort')}</span>
+                  <span className="text-red-500 font-medium">{myStats.losses}{t('battle.lossesShort')}</span>
+                  <span className="text-yellow-500 font-medium">{myStats.draws}{t('battle.drawsShort')}</span>
+                </div>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="flex items-center gap-1">
+                <TrendingUp className="w-4 h-4 text-primary" />
+                <span className="text-lg font-bold text-primary">{myStats.winRate}%</span>
+              </div>
+              <p className="text-[10px] text-muted-foreground">{t('battle.winRateLabel')}</p>
+            </div>
+          </div>
+        </Card>
+      )}
 
       <Card className="overflow-hidden">
       {/* Header */}
