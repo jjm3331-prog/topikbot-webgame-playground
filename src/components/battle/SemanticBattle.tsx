@@ -26,6 +26,7 @@ import confetti from "canvas-confetti";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import RoomCodeCollapsible from "@/components/battle/RoomCodeCollapsible";
+import { saveHostedRoom, clearHostedRoom } from "@/components/battle/GuestJoinedNotification";
 
 interface SemanticBattleProps {
   onBack: () => void;
@@ -246,6 +247,8 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
       setRoom(data as Room);
       setGamePhase("waiting");
       subscribeToRoom(data.id);
+      // Save to localStorage for guest-joined notification
+      saveHostedRoom(data.id, playerId);
     } catch (err) {
       toast({ title: t("battle.semanticGame.createFailed"), variant: "destructive" });
       setGamePhase("menu");
@@ -376,6 +379,9 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
         host_warnings: 0,
         guest_warnings: 0,
       }).eq("id", room.id);
+      
+      // Clear hosted room from localStorage since game is starting
+      clearHostedRoom();
     } catch (err) {}
   };
 

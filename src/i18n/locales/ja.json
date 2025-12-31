@@ -577,6 +577,12 @@
     "justNow": "たった今",
     "minutesAgo": "分前",
     "hoursAgo": "時間前",
+    "guestJoinedTitle": "対戦相手が入室しました！",
+    "guestJoinedDesc": "{{name}}さんがバトルに参加しました",
+    "opponentReady": "バトル準備完了！",
+    "startNow": "今すぐ開始",
+    "startGame": "ゲーム開始",
+    "challenger": "挑戦者",
     "invite": {
       "copied": "コピー完了！",
       "copyInvite": "招待リンクをコピー",
