@@ -82,7 +82,12 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
   const [gamePhase, setGamePhase] = useState<GamePhase>("menu");
   const gamePhaseRef = useRef<GamePhase>("menu");
   const [room, setRoom] = useState<Room | null>(null);
-  const [playerId] = useState(() => crypto.randomUUID());
+
+  // Use authenticated user id for stable multiplayer identity (prevents turn/host mismatch on refresh)
+  const [playerId, setPlayerId] = useState<string>("");
+  const playerIdRef = useRef<string>("");
+  const [authReady, setAuthReady] = useState(false);
+
   const [playerName, setPlayerName] = useState("");
   const [roomCodeInput, setRoomCodeInput] = useState(initialRoomCode || "");
   const [copied, setCopied] = useState(false);
@@ -109,6 +114,27 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
   useEffect(() => {
     gamePhaseRef.current = gamePhase;
   }, [gamePhase]);
+
+  useEffect(() => {
+    playerIdRef.current = playerId;
+  }, [playerId]);
+
+  useEffect(() => {
+    const initAuthIdentity = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const uid = session?.user?.id;
+        if (uid) {
+          setPlayerId(uid);
+          playerIdRef.current = uid;
+        }
+      } finally {
+        setAuthReady(true);
+      }
+    };
+
+    void initAuthIdentity();
+  }, []);
 
   const isHost = room?.host_id === playerId;
   const isMyTurn = room?.current_turn_player_id === playerId;
@@ -186,6 +212,8 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
 
   // URL auto-join
   useEffect(() => {
+    if (!playerId || !authReady) return;
+
     if (initialRoomCode && initialRoomCode.length === 6 && gamePhase === "menu") {
       const autoNickname = generateRandomNickname();
       setPlayerName(autoNickname);
@@ -203,13 +231,25 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
             .maybeSingle();
 
           if (findError) throw findError;
-          if (!roomData) { toast({ title: t("battle.roomNotExists"), variant: "destructive" }); setGamePhase("menu"); return; }
-          if (roomData.status === "playing" || roomData.status === "finished") { toast({ title: t("battle.roomStartedOrFinished"), variant: "destructive" }); setGamePhase("menu"); return; }
-          if (roomData.guest_id) { toast({ title: t("battle.roomFull"), variant: "destructive" }); setGamePhase("menu"); return; }
+          if (!roomData) {
+            toast({ title: t("battle.roomNotExists"), variant: "destructive" });
+            setGamePhase("menu");
+            return;
+          }
+          if (roomData.status === "playing" || roomData.status === "finished") {
+            toast({ title: t("battle.roomStartedOrFinished"), variant: "destructive" });
+            setGamePhase("menu");
+            return;
+          }
+          if (roomData.guest_id) {
+            toast({ title: t("battle.roomFull"), variant: "destructive" });
+            setGamePhase("menu");
+            return;
+          }
 
           const { data, error } = await supabase
             .from("chain_reaction_rooms")
-            .update({ guest_id: playerId, guest_name: autoNickname, guest_ready: true })
+            .update({ guest_id: playerIdRef.current, guest_name: autoNickname, guest_ready: true })
             .eq("id", roomData.id)
             .select()
             .single();
@@ -224,9 +264,10 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
           setGamePhase("menu");
         }
       };
+
       void autoJoin();
     }
-  }, [initialRoomCode]);
+  }, [initialRoomCode, authReady, playerId, gamePhase, toast, t]);
 
   // Host/Guest가 실제로 "페이지를 떠날 때"만 처리 (state 변경 cleanup에서 방 삭제되는 버그 방지)
   const roomRef = useRef<Room | null>(null);
@@ -299,7 +340,15 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
   };
 
   const createRoom = async () => {
-    if (!playerName.trim()) { toast({ title: t("battle.semanticGame.enterName"), variant: "destructive" }); return; }
+    if (!authReady || !playerIdRef.current) {
+      toast({ title: t("battle.loginRequired"), variant: "destructive" });
+      return;
+    }
+    if (!playerName.trim()) {
+      toast({ title: t("battle.semanticGame.enterName"), variant: "destructive" });
+      return;
+    }
+
     setGamePhase("creating");
     const roomCode = generateRoomCode();
 
@@ -308,7 +357,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
         .from("chain_reaction_rooms")
         .insert({
           room_code: roomCode,
-          host_id: playerId,
+          host_id: playerIdRef.current,
           host_name: playerName.trim(),
           connection_mode: "semantic",
           status: "waiting",
@@ -327,7 +376,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
       setGamePhase("waiting");
       subscribeToRoom(data.id);
       // Save to localStorage for guest-joined notification
-      saveHostedRoom(data.id, playerId);
+      saveHostedRoom(data.id, playerIdRef.current);
     } catch (err) {
       toast({ title: t("battle.semanticGame.createFailed"), variant: "destructive" });
       setGamePhase("menu");
@@ -335,7 +384,15 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
   };
 
   const joinRoom = async () => {
-    if (!playerName.trim() || !roomCodeInput.trim()) { toast({ title: t("battle.semanticGame.enterNameAndCode"), variant: "destructive" }); return; }
+    if (!authReady || !playerIdRef.current) {
+      toast({ title: t("battle.loginRequired"), variant: "destructive" });
+      return;
+    }
+    if (!playerName.trim() || !roomCodeInput.trim()) {
+      toast({ title: t("battle.semanticGame.enterNameAndCode"), variant: "destructive" });
+      return;
+    }
+
     setGamePhase("joining");
 
     try {
@@ -348,13 +405,25 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
         .maybeSingle();
 
       if (findError) throw findError;
-      if (!roomData) { toast({ title: t("battle.roomNotExists"), variant: "destructive" }); setGamePhase("menu"); return; }
-      if (roomData.status === "playing" || roomData.status === "finished") { toast({ title: t("battle.roomStartedOrFinished"), variant: "destructive" }); setGamePhase("menu"); return; }
-      if (roomData.guest_id) { toast({ title: t("battle.roomFull"), variant: "destructive" }); setGamePhase("menu"); return; }
+      if (!roomData) {
+        toast({ title: t("battle.roomNotExists"), variant: "destructive" });
+        setGamePhase("menu");
+        return;
+      }
+      if (roomData.status === "playing" || roomData.status === "finished") {
+        toast({ title: t("battle.roomStartedOrFinished"), variant: "destructive" });
+        setGamePhase("menu");
+        return;
+      }
+      if (roomData.guest_id) {
+        toast({ title: t("battle.roomFull"), variant: "destructive" });
+        setGamePhase("menu");
+        return;
+      }
 
       const { data, error } = await supabase
         .from("chain_reaction_rooms")
-        .update({ guest_id: playerId, guest_name: playerName.trim(), guest_ready: true })
+        .update({ guest_id: playerIdRef.current, guest_name: playerName.trim(), guest_ready: true })
         .eq("id", roomData.id)
         .select()
         .single();
@@ -374,12 +443,15 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
 
     const channel = supabase
       .channel(`semantic-room-${roomId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "chain_reaction_rooms", filter: `id=eq.${roomId}` },
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "chain_reaction_rooms", filter: `id=eq.${roomId}` },
         (payload) => {
           const newRoom = payload.new as Room;
           setRoom(newRoom);
           const phase = gamePhaseRef.current;
-          const amHost = newRoom.host_id === playerId;
+          const me = playerIdRef.current;
+          const amHost = newRoom.host_id === me;
 
           // Host: guest joined → notify + auto-ready + auto-start
           if (amHost && newRoom.guest_id) {
@@ -404,7 +476,12 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
                 .eq("id", newRoom.id);
             }
 
-            if (newRoom.status === "waiting" && newRoom.host_ready && newRoom.guest_ready && !autoStartTriggeredRef.current) {
+            if (
+              newRoom.status === "waiting" &&
+              newRoom.host_ready &&
+              newRoom.guest_ready &&
+              !autoStartTriggeredRef.current
+            ) {
               autoStartTriggeredRef.current = true;
               setTimeout(() => void startGame(), 150);
             }
@@ -418,8 +495,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
           }
           if (newRoom.status === "finished" && phase !== "finished") {
             setGamePhase("finished");
-            const amHost = newRoom.host_id === playerId;
-            const isWinner = newRoom.winner_id === playerId;
+            const isWinner = newRoom.winner_id === me;
             const myScore = amHost ? (newRoom.host_score || 0) : (newRoom.guest_score || 0);
             const opponentScore = amHost ? (newRoom.guest_score || 0) : (newRoom.host_score || 0);
 
@@ -432,7 +508,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
               opponentName: amHost ? newRoom.guest_name || undefined : newRoom.host_name,
               roomId: newRoom.id,
             });
-            
+
             if (isWinner) {
               playWinSound();
               confetti({ particleCount: 150, spread: 100 });
@@ -480,7 +556,8 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
   };
 
   const startGame = async () => {
-    if (!room || room.host_id !== playerId || !room.host_ready || !room.guest_ready) return;
+    const me = playerIdRef.current;
+    if (!room || room.host_id !== me || !room.host_ready || !room.guest_ready) return;
 
     const startWords = ["행복", "사랑", "음악", "여행", "학교", "친구", "음식", "영화"];
     const startWord = startWords[Math.floor(Math.random() * startWords.length)];
@@ -496,15 +573,18 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
         score_delta: 0,
       });
 
-      await supabase.from("chain_reaction_rooms").update({
-        status: "playing",
-        started_at: new Date().toISOString(),
-        current_turn_player_id: room.host_id,
-        turn_start_at: new Date().toISOString(),
-        host_warnings: 0,
-        guest_warnings: 0,
-      }).eq("id", room.id);
-      
+      await supabase
+        .from("chain_reaction_rooms")
+        .update({
+          status: "playing",
+          started_at: new Date().toISOString(),
+          current_turn_player_id: room.host_id,
+          turn_start_at: new Date().toISOString(),
+          host_warnings: 0,
+          guest_warnings: 0,
+        })
+        .eq("id", room.id);
+
       // Clear hosted room from localStorage since game is starting
       clearHostedRoom();
     } catch (err) {}
@@ -541,25 +621,41 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
     }, 1000);
   };
 
-  // Turn timer
+  // Turn timer (sync using turn_start_at so both clients see the same countdown)
+  const timeoutHandledForTurnRef = useRef<string | null>(null);
+
   useEffect(() => {
     if (gamePhase !== "playing" || !room) return;
 
     if (turnTimerRef.current) clearInterval(turnTimerRef.current);
 
-    setTurnTimeLeft(TURN_TIME_LIMIT);
-    turnTimerRef.current = setInterval(() => {
-      setTurnTimeLeft((prev) => {
-        if (prev <= 1) {
-          if (isMyTurn) handleTimeOut();
-          return TURN_TIME_LIMIT;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    // Reset per-turn guard when a new turn starts
+    timeoutHandledForTurnRef.current = room.turn_start_at || null;
 
-    return () => { if (turnTimerRef.current) clearInterval(turnTimerRef.current); };
-  }, [gamePhase, room?.current_turn_player_id]);
+    const tick = () => {
+      const turnStart = room.turn_start_at ? new Date(room.turn_start_at).getTime() : Date.now();
+      const elapsedSec = Math.floor((Date.now() - turnStart) / 1000);
+      const remaining = Math.max(0, TURN_TIME_LIMIT - elapsedSec);
+
+      setTurnTimeLeft(remaining);
+
+      const me = playerIdRef.current;
+      const myTurn = room.current_turn_player_id === me;
+
+      if (remaining <= 0 && myTurn && timeoutHandledForTurnRef.current === room.turn_start_at) {
+        // Ensure we only process timeout once per turn
+        timeoutHandledForTurnRef.current = `handled:${room.turn_start_at}`;
+        void handleTimeOut();
+      }
+    };
+
+    tick();
+    turnTimerRef.current = setInterval(tick, 500);
+
+    return () => {
+      if (turnTimerRef.current) clearInterval(turnTimerRef.current);
+    };
+  }, [gamePhase, room?.current_turn_player_id, room?.turn_start_at, room?.id]);
 
   const handleTimeOut = async () => {
     if (!room || !isMyTurn) return;
@@ -615,7 +711,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
         // Success - insert move and switch turn
         await supabase.from("chain_reaction_moves").insert({
           room_id: room.id,
-          player_id: playerId,
+          player_id: playerIdRef.current,
           player_name: playerName,
           word: word,
           connection_mode: "semantic",
@@ -1309,166 +1405,6 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
           </div>
         </Card>
       </motion.div>
-    );
-  }
-
-  if (gamePhase === "playing" && room) {
-    return (
-      <div className="space-y-4">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Brain className="w-5 h-5 text-purple-500" />
-            <span className="font-bold">{t("battle.semantic")}</span>
-          </div>
-          <div className={`px-3 py-1 rounded-full font-mono font-bold ${turnTimeLeft <= 3 ? "bg-red-500 text-white animate-pulse" : "bg-muted"}`}>
-            <Timer className="w-4 h-4 inline mr-1" />
-            {turnTimeLeft}s
-          </div>
-        </div>
-
-        {/* Scores */}
-        <div className="grid grid-cols-2 gap-3">
-          <Card className={`p-3 ${isHost ? "ring-2 ring-purple-500" : ""} ${room.current_turn_player_id === room.host_id ? "bg-purple-500/10" : ""}`}>
-            <div className="flex items-center gap-2 mb-1">
-              <Crown className="w-4 h-4 text-yellow-500" />
-              <span className="font-bold text-sm truncate">{room.host_name}</span>
-            </div>
-            <p className="text-2xl font-bold">{room.host_score}</p>
-            {room.host_warnings > 0 && (
-              <div className="flex gap-1 mt-1">
-                {Array.from({ length: room.host_warnings }).map((_, i) => (
-                  <AlertTriangle key={i} className="w-3 h-3 text-yellow-500" />
-                ))}
-              </div>
-            )}
-          </Card>
-          <Card className={`p-3 ${!isHost ? "ring-2 ring-purple-500" : ""} ${room.current_turn_player_id === room.guest_id ? "bg-purple-500/10" : ""}`}>
-            <div className="flex items-center gap-2 mb-1">
-              <Users className="w-4 h-4 text-blue-500" />
-              <span className="font-bold text-sm truncate">{room.guest_name}</span>
-            </div>
-            <p className="text-2xl font-bold">{room.guest_score}</p>
-            {room.guest_warnings > 0 && (
-              <div className="flex gap-1 mt-1">
-                {Array.from({ length: room.guest_warnings }).map((_, i) => (
-                  <AlertTriangle key={i} className="w-3 h-3 text-yellow-500" />
-                ))}
-              </div>
-            )}
-          </Card>
-        </div>
-
-        {/* Word chain */}
-        <Card className="p-4 max-h-40 overflow-y-auto">
-          <div className="flex flex-wrap gap-2">
-            {moves.map((move, idx) => (
-              <motion.span
-                key={move.id}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  move.player_id === "system" ? "bg-purple-500/20 text-purple-400" :
-                  move.player_id === playerId ? "bg-green-500/20 text-green-400" : "bg-blue-500/20 text-blue-400"
-                }`}
-              >
-                {move.word}
-                {move.score_delta > 0 && <span className="text-xs ml-1 opacity-70">({move.score_delta})</span>}
-              </motion.span>
-            ))}
-          </div>
-        </Card>
-
-        {/* Current word */}
-        {lastWord && (
-          <div className="text-center py-4">
-            <p className="text-sm text-muted-foreground mb-1">{t("battle.semanticGame.currentWord")}</p>
-            <p className="text-4xl font-bold text-purple-500">{lastWord}</p>
-          </div>
-        )}
-
-        {/* Validation feedback */}
-        {lastValidation && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`p-3 rounded-lg text-sm ${lastValidation.score >= PASS_SCORE ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}
-          >
-            <p className="font-bold">{t("battle.semanticGame.scoreLabel")}: {lastValidation.score}/100 {lastValidation.score >= PASS_SCORE ? "✅" : "❌"}</p>
-            <p>{i18n.language === "ko" ? lastValidation.reason_ko : lastValidation.reason_vi}</p>
-          </motion.div>
-        )}
-
-        {/* Input */}
-        <div className="flex gap-2">
-          <Input
-            ref={inputRef}
-            value={currentInput}
-            onChange={(e) => setCurrentInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSubmitWord()}
-            placeholder={isMyTurn ? t("battle.semanticGame.inputPlaceholder") : t("battle.semanticGame.waitTurn")}
-            disabled={!isMyTurn || isValidating}
-            className="flex-1"
-          />
-          <Button onClick={handleSubmitWord} disabled={!isMyTurn || !currentInput.trim() || isValidating} className="gap-2">
-            {isValidating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-          </Button>
-        </div>
-
-        {!isMyTurn && (
-          <p className="text-center text-sm text-muted-foreground animate-pulse">
-            {t("battle.semanticGame.waitOpponent")}
-          </p>
-        )}
-      </div>
-    );
-  }
-
-  if (gamePhase === "finished" && room) {
-    const isWinner = room.winner_id === playerId;
-    const winnerName = room.winner_id === room.host_id ? room.host_name : room.guest_name;
-
-    return (
-      <div className="text-center py-12 space-y-6">
-        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring" }}>
-          {isWinner ? (
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center mx-auto">
-              <Trophy className="w-12 h-12 text-white" />
-            </div>
-          ) : (
-            <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mx-auto">
-              <Swords className="w-12 h-12 text-muted-foreground" />
-            </div>
-          )}
-        </motion.div>
-
-        <div>
-          <h2 className="text-3xl font-bold mb-2">
-            {isWinner ? t("battle.semanticGame.victory") : t("battle.semanticGame.defeat")}
-          </h2>
-          <p className="text-muted-foreground">
-            {isWinner ? t("battle.semanticGame.victoryDesc") : t("battle.semanticGame.defeatDesc", { name: winnerName })}
-          </p>
-        </div>
-
-        <Card className="p-4 max-w-sm mx-auto">
-          <div className="grid grid-cols-2 gap-4 text-center">
-            <div>
-              <p className="text-sm text-muted-foreground">{room.host_name}</p>
-              <p className="text-2xl font-bold">{room.host_score}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">{room.guest_name}</p>
-              <p className="text-2xl font-bold">{room.guest_score}</p>
-            </div>
-          </div>
-        </Card>
-
-        <Button onClick={onBack} className="gap-2">
-          <ArrowLeft className="w-4 h-4" />
-          {t("common.back")}
-        </Button>
-      </div>
     );
   }
 
