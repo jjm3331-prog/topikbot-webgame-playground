@@ -537,9 +537,10 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
           setRoom(newRoom);
 
           const phase = gamePhaseRef.current;
+          const amHost = newRoom.host_id === playerId;
 
           // Host: guest joined → notify + auto-ready + auto-start
-          if (isHost && newRoom.guest_id) {
+          if (amHost && newRoom.guest_id) {
             if (!guestJoinNotifiedRef.current) {
               guestJoinNotifiedRef.current = true;
               playBeep(784, 120, "sine");
@@ -557,18 +558,13 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                 .from("chain_reaction_rooms")
                 .update({
                   host_ready: true,
-                  guest_ready: newRoom.guest_id ? true : false,
+                  guest_ready: !!newRoom.guest_id,
                 })
                 .eq("id", newRoom.id);
             }
 
             // Auto-start once when conditions are met
-            if (
-              newRoom.status === "waiting" &&
-              newRoom.host_ready &&
-              newRoom.guest_ready &&
-              !autoStartTriggeredRef.current
-            ) {
+            if (newRoom.status === "waiting" && newRoom.host_ready && newRoom.guest_ready && !autoStartTriggeredRef.current) {
               autoStartTriggeredRef.current = true;
               setTimeout(() => void startGame(), 150);
             }
@@ -584,17 +580,18 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
           if (newRoom.status === "finished" && phase !== "finished") {
             setGamePhase("finished");
+            const amHost = newRoom.host_id === playerId;
             const isWinner = newRoom.winner_id === playerId;
-            const myScore = isHost ? (newRoom.host_score || 0) : (newRoom.guest_score || 0);
-            const opponentScore = isHost ? (newRoom.guest_score || 0) : (newRoom.host_score || 0);
-            
+            const myScore = amHost ? (newRoom.host_score || 0) : (newRoom.guest_score || 0);
+            const opponentScore = amHost ? (newRoom.guest_score || 0) : (newRoom.host_score || 0);
+
             // Save game record
             saveGameRecord({
               gameType: "chain_reaction",
               result: isWinner ? "win" : "lose",
               myScore,
               opponentScore,
-              opponentName: isHost ? newRoom.guest_name || undefined : newRoom.host_name,
+              opponentName: amHost ? newRoom.guest_name || undefined : newRoom.host_name,
               roomId: newRoom.id,
             });
             
@@ -632,7 +629,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
   // Start game (host only)
   const startGame = async () => {
-    if (!room || !isHost) return;
+    if (!room || room.host_id !== playerId) return;
     if (!room.host_ready || !room.guest_ready) {
       toast({ title: "양쪽 모두 준비해야 시작할 수 있습니다", variant: "destructive" });
       return;

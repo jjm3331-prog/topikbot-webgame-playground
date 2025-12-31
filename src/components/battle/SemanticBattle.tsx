@@ -379,9 +379,10 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
           const newRoom = payload.new as Room;
           setRoom(newRoom);
           const phase = gamePhaseRef.current;
+          const amHost = newRoom.host_id === playerId;
 
           // Host: guest joined → notify + auto-ready + auto-start
-          if (isHost && newRoom.guest_id) {
+          if (amHost && newRoom.guest_id) {
             if (!guestJoinNotifiedRef.current) {
               guestJoinNotifiedRef.current = true;
               playBeep(784, 120, "sine");
@@ -398,17 +399,12 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
                 .from("chain_reaction_rooms")
                 .update({
                   host_ready: true,
-                  guest_ready: newRoom.guest_id ? true : false,
+                  guest_ready: !!newRoom.guest_id,
                 })
                 .eq("id", newRoom.id);
             }
 
-            if (
-              newRoom.status === "waiting" &&
-              newRoom.host_ready &&
-              newRoom.guest_ready &&
-              !autoStartTriggeredRef.current
-            ) {
+            if (newRoom.status === "waiting" && newRoom.host_ready && newRoom.guest_ready && !autoStartTriggeredRef.current) {
               autoStartTriggeredRef.current = true;
               setTimeout(() => void startGame(), 150);
             }
@@ -422,17 +418,18 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
           }
           if (newRoom.status === "finished" && phase !== "finished") {
             setGamePhase("finished");
+            const amHost = newRoom.host_id === playerId;
             const isWinner = newRoom.winner_id === playerId;
-            const myScore = isHost ? (newRoom.host_score || 0) : (newRoom.guest_score || 0);
-            const opponentScore = isHost ? (newRoom.guest_score || 0) : (newRoom.host_score || 0);
-            
+            const myScore = amHost ? (newRoom.host_score || 0) : (newRoom.guest_score || 0);
+            const opponentScore = amHost ? (newRoom.guest_score || 0) : (newRoom.host_score || 0);
+
             // Save game record
             saveGameRecord({
               gameType: "semantic_battle",
               result: isWinner ? "win" : "lose",
               myScore,
               opponentScore,
-              opponentName: isHost ? newRoom.guest_name || undefined : newRoom.host_name,
+              opponentName: amHost ? newRoom.guest_name || undefined : newRoom.host_name,
               roomId: newRoom.id,
             });
             
@@ -473,8 +470,9 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
 
   const toggleReady = async () => {
     if (!room) return;
-    const field = isHost ? "host_ready" : "guest_ready";
-    const currentValue = isHost ? room.host_ready : room.guest_ready;
+    const amHost = room.host_id === playerId;
+    const field = amHost ? "host_ready" : "guest_ready";
+    const currentValue = amHost ? room.host_ready : room.guest_ready;
     try {
       await supabase.from("chain_reaction_rooms").update({ [field]: !currentValue }).eq("id", room.id);
       if (!currentValue) playReadyFeedback();
@@ -482,7 +480,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
   };
 
   const startGame = async () => {
-    if (!room || !isHost || !room.host_ready || !room.guest_ready) return;
+    if (!room || room.host_id !== playerId || !room.host_ready || !room.guest_ready) return;
 
     const startWords = ["행복", "사랑", "음악", "여행", "학교", "친구", "음식", "영화"];
     const startWord = startWords[Math.floor(Math.random() * startWords.length)];
