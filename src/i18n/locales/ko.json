@@ -666,6 +666,8 @@
     "points": "점",
     "newRecord": "신기록!",
     "opponentReady": "대결 준비 완료!",
+    "opponentJoined": "상대방이 참가했습니다",
+    "gameStartingSoon": "잠시 후 게임이 시작됩니다",
     "startNow": "지금 시작",
     "startGame": "게임 시작",
     "challenger": "도전자",

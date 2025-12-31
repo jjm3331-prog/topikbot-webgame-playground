@@ -605,6 +605,8 @@
     "points": "点",
     "newRecord": "新記録!",
     "opponentReady": "バトル準備完了！",
+    "opponentJoined": "対戦相手が参加しました",
+    "gameStartingSoon": "まもなくゲーム開始",
     "startNow": "今すぐ開始",
     "startGame": "ゲーム開始",
     "challenger": "挑戦者",

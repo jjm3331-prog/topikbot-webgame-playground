@@ -605,6 +605,8 @@
     "points": "分",
     "newRecord": "新纪录!",
     "opponentReady": "准备开战！",
+    "opponentJoined": "对手已加入",
+    "gameStartingSoon": "游戏即将开始",
     "startNow": "立即开始",
     "startGame": "开始游戏",
     "challenger": "挑战者",
