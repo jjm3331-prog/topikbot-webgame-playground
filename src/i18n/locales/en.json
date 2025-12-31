@@ -634,6 +634,8 @@
     "waitingForOpponent": "Waiting for opponent...",
     "shareCodeDesc": "Share the room code below so your friend can join.",
     "cancel": "Cancel",
+    "backToMenu": "Back to Menu",
+    "playAgain": "Play Again",
     "waitingDesc": "Your room is now in the waiting list. Game starts when someone joins.",
     "enterGuestNickname": "Enter Nickname",
     "enterNicknamePlaceholder": "Enter your nickname...",

@@ -634,6 +634,8 @@
     "waitingForOpponent": "Đang chờ đối thủ...",
     "shareCodeDesc": "Hãy chia sẻ mã phòng bên dưới để bạn bè có thể tham gia.",
     "cancel": "Hủy",
+    "backToMenu": "Về menu",
+    "playAgain": "Chơi lại",
     "waitingDesc": "Phòng của bạn đã nằm trong danh sách chờ. Game bắt đầu khi có người tham gia.",
     "enterGuestNickname": "Nhập tên",
     "enterNicknamePlaceholder": "Nhập biệt danh của bạn...",
