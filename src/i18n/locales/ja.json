@@ -2265,6 +2265,8 @@
     "startButton": "開始",
     "upgradeToPremium": "プレミアムにアップグレード",
     "coreFeatures": "主要機能",
+    "comingSoon": "準備中",
+    "startExam": "試験開始",
     "units": {
       "questions": "問",
       "minutes": "分"

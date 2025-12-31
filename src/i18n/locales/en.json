@@ -2522,6 +2522,8 @@
     "startButton": "Start",
     "upgradeToPremium": "Upgrade to Premium",
     "coreFeatures": "Core Features",
+    "comingSoon": "Coming Soon",
+    "startExam": "Start Exam",
     "units": {
       "questions": " questions",
       "minutes": " min"
