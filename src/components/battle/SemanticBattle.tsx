@@ -225,6 +225,39 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
     }
   }, [initialRoomCode]);
 
+  // Host가 나갈 때 방 삭제
+  useEffect(() => {
+    const handleHostLeave = async () => {
+      if (room && isHost && (gamePhase === "waiting" || gamePhase === "ready")) {
+        try {
+          await supabase.from("chain_reaction_rooms").delete().eq("id", room.id);
+          clearHostedRoom();
+          console.log("[SemanticBattle] Host left - room deleted:", room.id);
+        } catch (err) {
+          console.error("Failed to delete room on leave:", err);
+        }
+      }
+    };
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (room && isHost && (gamePhase === "waiting" || gamePhase === "ready")) {
+        // Sync delete attempt using sendBeacon
+        navigator.sendBeacon && navigator.sendBeacon(
+          `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/chain_reaction_rooms?id=eq.${room.id}`,
+          ''
+        );
+        supabase.from("chain_reaction_rooms").delete().eq("id", room.id);
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      handleHostLeave();
+    };
+  }, [room, isHost, gamePhase]);
+
   const createRoom = async () => {
     if (!playerName.trim()) { toast({ title: t("battle.semanticGame.enterName"), variant: "destructive" }); return; }
     setGamePhase("creating");
