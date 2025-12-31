@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Swords, Link2, Brain, Users, Trophy, Zap, Crown, Lock, X, Loader2, Play, Timer, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -64,49 +64,10 @@ interface RoomInfo {
 export default function Battle() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [searchParams] = useSearchParams();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); // null = loading
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
   const [initialRoomCode, setInitialRoomCode] = useState<string | undefined>();
   const [initialGuestName, setInitialGuestName] = useState<string | undefined>();
-  const [showInviteModal, setShowInviteModal] = useState(false);
-  const [inviteGame, setInviteGame] = useState<string | null>(null);
-  const [joiningRoom, setJoiningRoom] = useState(false);
-  const [roomInfo, setRoomInfo] = useState<RoomInfo | null>(null);
-  const [loadingRoom, setLoadingRoom] = useState(false);
-  const [roomError, setRoomError] = useState<string | null>(null);
-
-  // Check URL params for room code + sessionStorage fallback for OAuth callbacks
-  useEffect(() => {
-    let roomCode = searchParams.get("room");
-    let game = searchParams.get("game");
-
-    // If no URL params, try sessionStorage (OAuth callback may lose query string)
-    if (!roomCode) {
-      const storedInvite = sessionStorage.getItem("battle_invite");
-      if (storedInvite) {
-        try {
-          const parsed = JSON.parse(storedInvite);
-          roomCode = parsed.room;
-          game = parsed.game;
-        } catch {}
-      }
-    }
-
-    if (!roomCode) return;
-
-    // Store invite info for potential OAuth callback
-    sessionStorage.setItem("battle_invite", JSON.stringify({ room: roomCode.toUpperCase(), game: game || "word-chain" }));
-
-    setInitialRoomCode(roomCode.toUpperCase());
-    if (game === "semantic") {
-      setInviteGame("semantic");
-    } else if (game === "speed-quiz") {
-      setInviteGame("speed-quiz");
-    } else {
-      setInviteGame("word-chain");
-    }
-  }, [searchParams]);
 
   // Check auth
   useEffect(() => {
@@ -123,97 +84,17 @@ export default function Battle() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Fetch room info when we have a room code
-  useEffect(() => {
-    if (!initialRoomCode) return;
-
-    const fetchRoomInfo = async () => {
-      setLoadingRoom(true);
-      setRoomError(null);
-
-      try {
-        let connectionMode = "phonetic";
-        if (inviteGame === "semantic") connectionMode = "semantic";
-        else if (inviteGame === "speed-quiz") connectionMode = "speed_quiz";
-
-        const { data, error } = await supabase
-          .from("chain_reaction_rooms")
-          .select("host_name, status, guest_id")
-          .eq("room_code", initialRoomCode)
-          .eq("connection_mode", connectionMode)
-          .maybeSingle();
-
-        if (error) throw error;
-
-        if (!data) {
-          setRoomError(t('battle.roomNotExists'));
-        } else if (data.status === "playing" || data.status === "finished") {
-          setRoomError(t('battle.roomStartedOrFinished'));
-        } else if (data.guest_id) {
-          setRoomError(t('battle.roomFull'));
-        } else {
-          setRoomInfo(data);
-        }
-      } catch (err) {
-        setRoomError(t('battle.roomNotAvailable'));
-      } finally {
-        setLoadingRoom(false);
-      }
-    };
-
-    fetchRoomInfo();
-  }, [initialRoomCode, inviteGame, t]);
-
-  // Handle invite flow: redirect to auth if not logged in, show modal if logged in
-  useEffect(() => {
-    if (isLoggedIn === null) return; // Still loading auth state
-    if (!initialRoomCode) return; // No invite
-
-    if (!isLoggedIn) {
-      // Redirect to auth with return URL
-      const currentPath = `/battle?game=${inviteGame || "word-chain"}&room=${initialRoomCode}`;
-      navigate(`/auth?redirect=${encodeURIComponent(currentPath)}`);
-      return;
-    }
-
-    // Logged in with invite → show modal
-    setShowInviteModal(true);
-  }, [isLoggedIn, initialRoomCode, inviteGame, navigate]);
-
-  const handleJoinFromInvite = () => {
-    setJoiningRoom(true);
-    setShowInviteModal(false);
-    sessionStorage.removeItem("battle_invite");
-    if (inviteGame === "speed-quiz") {
-      setSelectedGame("speed-quiz");
-    } else {
-      setSelectedGame(inviteGame || "word-chain");
-    }
-  };
-
-  const handleCloseInviteModal = () => {
-    setShowInviteModal(false);
-    setInitialRoomCode(undefined);
-    setInviteGame(null);
-    setRoomInfo(null);
-    setRoomError(null);
-    // Clear stored invite
-    sessionStorage.removeItem("battle_invite");
-    // Clear URL params
-    navigate("/battle", { replace: true });
-  };
-
   const handleSelectGame = (game: BattleGame) => {
     if (!game.available) {
-      toast.info(t('battle.comingSoon'), { description: t('battle.developing') });
+      toast.info(t("battle.comingSoon"), { description: t("battle.developing") });
       return;
     }
 
     if (!isLoggedIn) {
-      toast.error(t('battle.loginRequired'), {
-        description: t('battle.loginDesc'),
+      toast.error(t("battle.loginRequired"), {
+        description: t("battle.loginDesc"),
         action: {
-          label: t('common.login'),
+          label: t("common.login"),
           onClick: () => navigate("/auth"),
         },
       });

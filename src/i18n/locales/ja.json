@@ -573,6 +573,8 @@
     "waitingForOpponent": "対戦相手を待っています...",
     "shareCodeDesc": "下のルームコードを友達に共有して参加してもらいましょう。",
     "cancel": "キャンセル",
+    "backToMenu": "メニューへ",
+    "playAgain": "もう一度",
     "waitingDesc": "ルームが待機リストに登録されました。他の人が参加すると自動的に開始します。",
     "enterGuestNickname": "ニックネームを入力",
     "enterNicknamePlaceholder": "ニックネームを入力してください...",

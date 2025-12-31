@@ -194,12 +194,14 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
   useEffect(() => {
     if (!authReady) return;
     if (!initialRoomCode || initialRoomCode.length !== 6) return;
+    if (!initialGuestName || !initialGuestName.trim()) return;
+
+    // Guest flow (waiting list join): auto-join without showing room code UI
     if (gamePhase === "menu") {
-      if (initialGuestName && initialGuestName.trim()) {
-        setPlayerName(initialGuestName.trim().slice(0, 20));
-      }
+      setPlayerName(initialGuestName.trim().slice(0, 20));
       setRoomCodeInput(initialRoomCode.toUpperCase());
       setGamePhase("joining");
+      setTimeout(() => void joinRoom(initialRoomCode.toUpperCase(), initialGuestName.trim().slice(0, 20)), 0);
     }
   }, [authReady, initialRoomCode, initialGuestName, gamePhase]);
 
@@ -282,20 +284,24 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
     }
   };
 
-  const joinRoom = async () => {
+  const joinRoom = async (roomCode?: string, guestName?: string) => {
     if (!authReady || !playerIdRef.current) {
       toast({ title: t("battle.loginRequired"), variant: "destructive" });
       return;
     }
-    if (!playerName.trim() || !roomCodeInput.trim()) {
-      toast({ title: "닉네임과 방 코드를 입력해주세요", variant: "destructive" });
+
+    const name = (guestName ?? playerName).trim();
+    const code = (roomCode ?? roomCodeInput).trim().toUpperCase();
+
+    if (!name || code.length !== 6) {
+      toast({ title: t("battle.roomNotAvailable"), variant: "destructive" });
+      setGamePhase("menu");
       return;
     }
 
     setGamePhase("joining");
 
     try {
-      const code = roomCodeInput.toUpperCase();
       const { data: roomData, error: findError } = await supabase
         .from("chain_reaction_rooms")
         .select()
@@ -322,7 +328,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
 
       const { data, error } = await supabase
         .from("chain_reaction_rooms")
-        .update({ guest_id: playerIdRef.current, guest_name: playerName.trim(), guest_ready: true })
+        .update({ guest_id: playerIdRef.current, guest_name: name, guest_ready: true })
         .eq("id", roomData.id)
         .select()
         .single();
@@ -767,80 +773,41 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  onClick={createRoom}
-                  className="w-full h-16 text-lg font-bold gap-3 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:opacity-90 text-primary-foreground shadow-lg shadow-teal-500/30"
-                  disabled={!playerName.trim()}
-                >
-                  <Zap className="w-6 h-6" />
-                  {t("battle.speedQuizGame.createRoom")}
-                </Button>
-              </motion.div>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                onClick={createRoom}
+                className="w-full h-16 text-lg font-bold gap-3 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:opacity-90 text-primary-foreground shadow-lg shadow-teal-500/30"
+                disabled={!playerName.trim()}
+              >
+                <Zap className="w-6 h-6" />
+                {t("battle.speedQuizGame.createRoom")}
+              </Button>
+            </motion.div>
 
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant="outline"
-                  onClick={() => setGamePhase("joining")}
-                  className="w-full h-16 text-lg font-bold gap-3 border-2"
-                  disabled={!playerName.trim()}
-                >
-                  <Users className="w-6 h-6" />
-                  {t("battle.speedQuizGame.join")}
-                </Button>
-              </motion.div>
-            </div>
+            <p className="text-sm text-muted-foreground text-center">
+              {t("battle.waitingDesc")}
+            </p>
           </div>
         </Card>
       </motion.div>
     );
   }
 
-  // Joining screen
+  // Joining screen (auto-join from waiting list)
   if (gamePhase === "joining") {
     return (
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-md mx-auto">
-        <Card className="p-6 sm:p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <Button variant="ghost" size="icon" onClick={() => setGamePhase("menu")}>
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <h2 className="text-xl font-bold">{t("battle.speedQuizGame.joinTitle")}</h2>
+        <Card className="p-6 sm:p-8 text-center">
+          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 flex items-center justify-center">
+            <Loader2 className="w-8 h-8 text-primary-foreground animate-spin" />
           </div>
+          <h2 className="text-2xl font-bold mb-2">{t("battle.loadingRoom")}</h2>
+          <p className="text-muted-foreground mb-6">{t("battle.gameStartingSoon")}</p>
 
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-muted-foreground mb-2 block">{t("battle.speedQuizGame.yourNameLabel")}</label>
-              <Input
-                value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
-                placeholder={t("battle.speedQuizGame.yourNamePlaceholder")}
-                className="text-lg h-12"
-                maxLength={20}
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-muted-foreground mb-2 block">{t("battle.roomCode")}</label>
-              <Input
-                value={roomCodeInput}
-                onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
-                placeholder="ABCD12"
-                className="text-2xl h-14 text-center font-mono tracking-widest"
-                maxLength={6}
-              />
-            </div>
-
-            <Button
-              onClick={joinRoom}
-              className="w-full h-14 text-lg font-bold bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500"
-              disabled={!playerName.trim() || roomCodeInput.length !== 6}
-            >
-              <Play className="w-5 h-5 mr-2" />
-              {t("battle.speedQuizGame.joinButton")}
-            </Button>
-          </div>
+          <Button variant="outline" onClick={resetGame}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            {t("battle.cancel")}
+          </Button>
         </Card>
       </motion.div>
     );
@@ -855,14 +822,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
             <Loader2 className="w-8 h-8 text-primary-foreground animate-spin" />
           </div>
           <h2 className="text-2xl font-bold mb-2">{t("battle.waitingForOpponent")}</h2>
-          <p className="text-muted-foreground mb-6">{t("battle.shareCodeDesc")}</p>
-
-          {room && (
-            <div className="p-4 rounded-xl bg-muted mb-6">
-              <p className="text-sm text-muted-foreground mb-2">{t("battle.roomCode")}</p>
-              <p className="text-4xl font-mono font-bold tracking-widest">{room.room_code}</p>
-            </div>
-          )}
+          <p className="text-muted-foreground mb-6">{t("battle.waitingDesc")}</p>
 
           <Button variant="outline" onClick={resetGame}>
             <ArrowLeft className="w-4 h-4 mr-2" />
