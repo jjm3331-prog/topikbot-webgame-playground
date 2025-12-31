@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import {
   Play,
   Trophy,
-  Lightbulb,
+  Sparkles,
   Send,
   Loader2,
   Users,
@@ -17,9 +17,10 @@ import {
   Crown,
   Timer,
   AlertTriangle,
-  Brain,
+  Search,
   Swords,
   Zap,
+  Wand2,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { supabase } from "@/integrations/supabase/client";
@@ -828,10 +829,10 @@ export default function SemanticBattle({ onBack, initialRoomCode, initialGuestNa
           </Button>
           <div>
             <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500 flex items-center justify-center shadow-lg shadow-orange-500/30">
+                <Search className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
               </div>
-              <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 bg-clip-text text-transparent">
                 {t("battle.semantic")}
               </span>
             </h1>
@@ -840,15 +841,15 @@ export default function SemanticBattle({ onBack, initialRoomCode, initialGuestNa
         </div>
 
         {/* Game Rules Card */}
-        <Card className="p-6 sm:p-8 bg-gradient-to-br from-purple-500/5 to-pink-500/5 border-purple-500/20">
+        <Card className="p-6 sm:p-8 bg-gradient-to-br from-amber-500/5 via-orange-500/5 to-rose-500/5 border-amber-500/20">
           <h2 className="text-xl sm:text-2xl font-bold mb-6 flex items-center gap-3">
-            <span className="text-2xl sm:text-3xl">📋</span>
+            <span className="text-2xl sm:text-3xl">🔮</span>
             <span>{t("battle.howToPlay")}</span>
             <span className="text-muted-foreground font-normal">/ {t("battle.rules")}</span>
           </h2>
 
           {/* Game Overview */}
-          <div className="mb-6 p-5 rounded-xl bg-background/80 border border-purple-500/20">
+          <div className="mb-6 p-5 rounded-xl bg-background/80 border border-amber-500/20">
             <p className="text-base sm:text-lg leading-relaxed">
               {t("battle.semanticGame.overview")}
               <br />
@@ -858,10 +859,10 @@ export default function SemanticBattle({ onBack, initialRoomCode, initialGuestNa
 
           {/* Rules Grid */}
             <div className="grid sm:grid-cols-2 gap-4">
-              <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/30">
+              <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30">
                 <div className="flex items-center gap-3 mb-2">
-                  <Lightbulb className="w-6 h-6 text-green-400" />
-                  <span className="font-bold text-lg text-green-400">{t("battle.semanticGame.aiScoringTitle")}</span>
+                  <Wand2 className="w-6 h-6 text-amber-400" />
+                  <span className="font-bold text-lg text-amber-400">{t("battle.semanticGame.aiScoringTitle")}</span>
                 </div>
                 <p className="text-muted-foreground">{t("battle.semanticGame.aiScoringDesc")}</p>
               </div>
@@ -882,10 +883,10 @@ export default function SemanticBattle({ onBack, initialRoomCode, initialGuestNa
                 <p className="text-muted-foreground">{t("battle.semanticGame.warningsDesc")}</p>
               </div>
 
-              <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30">
+              <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30">
                 <div className="flex items-center gap-3 mb-2">
-                  <Trophy className="w-6 h-6 text-yellow-400" />
-                  <span className="font-bold text-lg text-yellow-400">{t("battle.semanticGame.rewardTitle")}</span>
+                  <Sparkles className="w-6 h-6 text-rose-400" />
+                  <span className="font-bold text-lg text-rose-400">{t("battle.semanticGame.rewardTitle")}</span>
                 </div>
                 <p className="text-muted-foreground">{t("battle.semanticGame.rewardDesc")}</p>
               </div>
@@ -894,14 +895,14 @@ export default function SemanticBattle({ onBack, initialRoomCode, initialGuestNa
           {/* Examples */}
           <div className="mt-6 p-4 rounded-xl bg-background/50 border border-muted">
             <p className="font-semibold mb-3 flex items-center gap-2">
-              <span className="text-xl">💡</span>
+              <span className="text-xl">🔍</span>
               {t("battle.semanticGame.relatedExamplesTitle")}
             </p>
             <div className="flex flex-wrap gap-3">
-              <span className="px-4 py-2 bg-purple-500/20 rounded-lg text-purple-300 font-medium">커피 → 카페</span>
-              <span className="px-4 py-2 bg-pink-500/20 rounded-lg text-pink-300 font-medium">겨울 → 눈</span>
-              <span className="px-4 py-2 bg-blue-500/20 rounded-lg text-blue-300 font-medium">음악 → 노래</span>
-              <span className="px-4 py-2 bg-green-500/20 rounded-lg text-green-300 font-medium">병원 → 의사</span>
+              <span className="px-4 py-2 bg-amber-500/20 rounded-lg text-amber-300 font-medium">커피 → 카페 ✨</span>
+              <span className="px-4 py-2 bg-orange-500/20 rounded-lg text-orange-300 font-medium">겨울 → 눈 ❄️</span>
+              <span className="px-4 py-2 bg-rose-500/20 rounded-lg text-rose-300 font-medium">음악 → 노래 🎵</span>
+              <span className="px-4 py-2 bg-violet-500/20 rounded-lg text-violet-300 font-medium">병원 → 의사 🏥</span>
             </div>
           </div>
         </Card>
@@ -924,10 +925,10 @@ export default function SemanticBattle({ onBack, initialRoomCode, initialGuestNa
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button
                     onClick={createRoom}
-                    className="w-full h-16 text-lg font-bold gap-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-primary-foreground"
+                    className="w-full h-16 text-lg font-bold gap-3 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:opacity-90 text-primary-foreground shadow-lg shadow-orange-500/30"
                     disabled={!playerName.trim()}
                   >
-                    <Crown className="w-6 h-6" />
+                    <Search className="w-6 h-6" />
                     {t("battle.semanticGame.createRoom")}
                   </Button>
                 </motion.div>
@@ -995,7 +996,7 @@ export default function SemanticBattle({ onBack, initialRoomCode, initialGuestNa
                 <Button
                   onClick={joinRoom}
                   disabled={roomCodeInput.length !== 6 || !playerName.trim()}
-                  className="flex-1 h-12 bg-gradient-to-r from-purple-500 to-pink-500"
+                  className="flex-1 h-12 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500"
                 >
                   <Users className="w-5 h-5 mr-2" />
                   {t("battle.semanticGame.join")}
@@ -1038,12 +1039,12 @@ export default function SemanticBattle({ onBack, initialRoomCode, initialGuestNa
 
         {/* Waiting for opponent - simplified UI */}
         {!room.guest_id && (
-          <Card className="p-6 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20">
+          <Card className="p-6 bg-gradient-to-br from-amber-500/10 to-rose-500/10 border-amber-500/20">
             <div className="flex items-center justify-center gap-3 mb-3">
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="w-8 h-8 rounded-full border-2 border-muted border-t-purple-500"
+                className="w-8 h-8 rounded-full border-2 border-muted border-t-amber-500"
               />
               <p className="text-lg font-semibold">{t("battle.waitingForOpponent")}</p>
             </div>
@@ -1215,8 +1216,8 @@ export default function SemanticBattle({ onBack, initialRoomCode, initialGuestNa
         {/* Header with Timer */}
         <div className="flex items-center justify-between p-4 bg-card rounded-2xl border border-border/50">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-              <Brain className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500 flex items-center justify-center shadow-lg shadow-orange-500/30">
+              <Search className="w-5 h-5 text-white" />
             </div>
             <div>
               <p className="font-bold">{t("battle.semantic")}</p>
