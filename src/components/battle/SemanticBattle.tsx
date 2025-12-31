@@ -247,15 +247,10 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
 
       if (!currentRoom) return;
 
-      // 대기실: 호스트가 떠나면 방 삭제
+      // 대기/준비 화면에서 다른 페이지로 이동해도 방은 유지 (유저 요구사항)
+      // 방 정리는 WaitingRoomsList의 시간 기반 정리(예: 24시간)로 처리
       if (amHost && (phase === "waiting" || phase === "ready")) {
-        try {
-          await supabase.from("chain_reaction_rooms").delete().eq("id", currentRoom.id);
-          clearHostedRoom();
-          console.log(`[SemanticBattle] Host left waiting room (${reason}) - room deleted:`, currentRoom.id);
-        } catch (err) {
-          console.error("Failed to delete room on leave:", err);
-        }
+        console.log(`[SemanticBattle] Host left waiting/ready (${reason}) - keep room:`, currentRoom.id);
       }
       // 게임 중: 떠난 사람 패배 처리
       else if (phase === "playing") {
@@ -318,6 +313,11 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
           connection_mode: "semantic",
           status: "waiting",
           host_ready: true,
+          guest_ready: false,
+          host_score: 0,
+          guest_score: 0,
+          host_warnings: 0,
+          guest_warnings: 0,
         })
         .select()
         .single();
@@ -567,7 +567,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
     if (!room || !isMyTurn) return;
 
     const warningField = isHost ? "host_warnings" : "guest_warnings";
-    const currentWarnings = isHost ? room.host_warnings : room.guest_warnings;
+    const currentWarnings = (isHost ? room.host_warnings : room.guest_warnings) || 0;
     const newWarnings = currentWarnings + 1;
 
     playWarnBeep();
@@ -626,7 +626,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
         });
 
         const scoreField = isHost ? "host_score" : "guest_score";
-        const currentScore = isHost ? room.host_score : room.guest_score;
+        const currentScore = (isHost ? room.host_score : room.guest_score) || 0;
         const nextTurn = isHost ? room.guest_id : room.host_id;
 
         await supabase.from("chain_reaction_rooms").update({
@@ -640,7 +640,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
       } else {
         // Failed - give warning
         const warningField = isHost ? "host_warnings" : "guest_warnings";
-        const currentWarnings = isHost ? room.host_warnings : room.guest_warnings;
+        const currentWarnings = (isHost ? room.host_warnings : room.guest_warnings) || 0;
         const newWarnings = currentWarnings + 1;
 
         playWarnBeep();

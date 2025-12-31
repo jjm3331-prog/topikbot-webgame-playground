@@ -31,8 +31,8 @@ interface WaitingRoomsListProps {
   isLoggedIn: boolean;
 }
 
-// 10분 = 600000ms
-const MAX_ROOM_AGE_MS = 10 * 60 * 1000;
+// 24시간 = 86,400,000ms (하루 종일 대기 가능)
+const MAX_ROOM_AGE_MS = 24 * 60 * 60 * 1000;
 
 export default function WaitingRoomsList({ onJoinRoom, isLoggedIn }: WaitingRoomsListProps) {
   const { t } = useTranslation();
@@ -40,52 +40,46 @@ export default function WaitingRoomsList({ onJoinRoom, isLoggedIn }: WaitingRoom
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState<string | null>(null);
 
-  // Clean up old rooms (10분 이상 된 waiting 방 삭제)
+  // Clean up old rooms (24시간 이상 된 waiting 방 삭제)
   const cleanupOldRooms = async () => {
     try {
-      const tenMinutesAgo = new Date(Date.now() - MAX_ROOM_AGE_MS).toISOString();
-      
+      const maxAgeAgo = new Date(Date.now() - MAX_ROOM_AGE_MS).toISOString();
+
       // Delete old waiting rooms that have no guest
       await supabase
         .from("chain_reaction_rooms")
         .delete()
         .eq("status", "waiting")
         .is("guest_id", null)
-        .lt("created_at", tenMinutesAgo);
-      
+        .lt("created_at", maxAgeAgo);
+
       console.log("[WaitingRooms] Cleaned up old rooms");
     } catch (err) {
       console.error("Failed to cleanup old rooms:", err);
     }
   };
 
-  // Fetch waiting rooms (최근 10분 이내만)
+  // Fetch waiting rooms (최근 24시간 이내만)
   const fetchRooms = async () => {
     setLoading(true);
     try {
       // First cleanup old rooms
       await cleanupOldRooms();
-      
-      const tenMinutesAgo = new Date(Date.now() - MAX_ROOM_AGE_MS).toISOString();
-      
+
+      const maxAgeAgo = new Date(Date.now() - MAX_ROOM_AGE_MS).toISOString();
+
       const { data, error } = await supabase
         .from("chain_reaction_rooms")
         .select("id, room_code, host_id, host_name, connection_mode, created_at")
         .eq("status", "waiting")
         .is("guest_id", null)
-        .gte("created_at", tenMinutesAgo) // 10분 이내의 방만
+        .gte("created_at", maxAgeAgo)
         .order("created_at", { ascending: false })
-        .limit(20);
+        .limit(50);
 
       if (error) throw error;
-      
-      // Double-check: filter out any rooms older than 10 minutes on client side too
-      const validRooms = (data || []).filter(room => {
-        const age = Date.now() - new Date(room.created_at).getTime();
-        return age < MAX_ROOM_AGE_MS;
-      });
-      
-      setRooms(validRooms);
+
+      setRooms(data || []);
     } catch (err) {
       console.error("Failed to fetch rooms:", err);
     } finally {
