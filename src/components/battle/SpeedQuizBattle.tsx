@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
@@ -43,17 +43,11 @@ interface Room {
   status: string;
   host_score: number;
   guest_score: number;
-  host_chain_length: number;
-  guest_chain_length: number;
   host_ready: boolean;
   guest_ready: boolean;
   winner_id: string | null;
   started_at: string | null;
   finished_at: string | null;
-  current_turn_player_id: string | null;
-  turn_start_at: string | null;
-  host_warnings: number;
-  guest_warnings: number;
 }
 
 interface QuizQuestion {
@@ -72,7 +66,7 @@ type GamePhase = "menu" | "creating" | "joining" | "waiting" | "ready" | "countd
 const QUESTION_TIME_LIMIT = 10;
 const TOTAL_QUESTIONS = 10;
 const POINTS_PER_CORRECT = 10;
-const SPEED_BONUS_THRESHOLD = 5; // seconds remaining for speed bonus
+const SPEED_BONUS_THRESHOLD = 5;
 
 export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestName }: SpeedQuizBattleProps) {
   const { toast } = useToast();
@@ -90,7 +84,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
   const guestJoinNotifiedRef = useRef(false);
   const autoStartTriggeredRef = useRef(false);
 
-  // Quiz state (synced via DB)
+  // Quiz state (synced via DB realtime)
   const [currentQuestion, setCurrentQuestion] = useState<QuizQuestion | null>(null);
   const [questionNumber, setQuestionNumber] = useState(0);
   const [timeLeft, setTimeLeft] = useState(QUESTION_TIME_LIMIT);
@@ -101,6 +95,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
   const [opponentScore, setOpponentScore] = useState(0);
   const [usedQuestionIds, setUsedQuestionIds] = useState<string[]>([]);
   const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
+  const [opponentAnswered, setOpponentAnswered] = useState(false);
 
   const [countdown, setCountdown] = useState(3);
   const [streakBonus, setStreakBonus] = useState<StreakBonus | null>(null);
@@ -111,9 +106,8 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
   const answersChannelRef = useRef<any>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
 
-  const currentQuestionStartRef = useRef<string | null>(null);
-  const lastPublishedQuestionRef = useRef<number>(0);
   const advanceTriggeredForQuestionRef = useRef<number>(0);
+  const myAnswerSubmittedRef = useRef(false);
 
   useEffect(() => {
     gamePhaseRef.current = gamePhase;
@@ -126,9 +120,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
   useEffect(() => {
     const initAuthIdentity = async () => {
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         const uid = session?.user?.id;
         if (uid) {
           setPlayerId(uid);
@@ -167,22 +159,11 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
     if (navigator.vibrate) navigator.vibrate(pattern);
   };
 
-  const playCorrectSound = () => {
-    playBeep(880, 100, "sine");
-    vibrate(50);
-  };
-  const playWrongSound = () => {
-    playBeep(300, 200, "sawtooth");
-    vibrate([50, 50]);
-  };
+  const playCorrectSound = () => { playBeep(880, 100, "sine"); vibrate(50); };
+  const playWrongSound = () => { playBeep(300, 200, "sawtooth"); vibrate([50, 50]); };
   const playCountdownBeep = (num: number) => {
-    if (num > 0) {
-      playBeep(600, 100, "square");
-      vibrate(30);
-    } else {
-      playBeep(880, 200, "sawtooth");
-      vibrate([50, 50, 100]);
-    }
+    if (num > 0) { playBeep(600, 100, "square"); vibrate(30); }
+    else { playBeep(880, 200, "sawtooth"); vibrate([50, 50, 100]); }
   };
   const playWinSound = () => {
     playBeep(523, 150, "sine");
@@ -196,17 +177,12 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
 
   const awardWinnerPoints = async () => {
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) return;
       const { data: profile } = await supabase.from("profiles").select("points").eq("id", session.user.id).maybeSingle();
       const currentPoints = profile?.points || 0;
       await supabase.from("profiles").update({ points: currentPoints + 1000 }).eq("id", session.user.id);
-      toast({
-        title: "🎉 승리 보너스!",
-        description: "+1000 포인트 획득!",
-      });
+      toast({ title: "🎉 승리 보너스!", description: "+1000 포인트 획득!" });
     } catch (err) {}
   };
 
@@ -238,7 +214,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
   }, [room, isHost, gamePhase]);
 
   useEffect(() => {
-    const handleLeave = async (reason: "beforeunload" | "unmount") => {
+    const handleLeave = async () => {
       const currentRoom = roomRef.current;
       const amHost = isHostRef.current;
       const phase = gamePhaseOnLeaveRef.current;
@@ -249,21 +225,17 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
           const winnerId = amHost ? currentRoom.guest_id : currentRoom.host_id;
           await supabase
             .from("chain_reaction_rooms")
-            .update({
-              status: "finished",
-              winner_id: winnerId,
-              finished_at: new Date().toISOString(),
-            })
+            .update({ status: "finished", winner_id: winnerId, finished_at: new Date().toISOString() })
             .eq("id", currentRoom.id);
         } catch (err) {}
       }
     };
 
-    const handleBeforeUnload = () => void handleLeave("beforeunload");
+    const handleBeforeUnload = () => void handleLeave();
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
-      void handleLeave("unmount");
+      void handleLeave();
     };
   }, []);
 
@@ -365,14 +337,16 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
     }
   };
 
+  // Subscribe to room, questions, and answers
   const subscribeToRoom = (roomId: string) => {
     if (channelRef.current) supabase.removeChannel(channelRef.current);
+    if (questionsChannelRef.current) supabase.removeChannel(questionsChannelRef.current);
+    if (answersChannelRef.current) supabase.removeChannel(answersChannelRef.current);
 
+    // Room subscription
     const channel = supabase
       .channel(`speed-quiz-room-${roomId}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "chain_reaction_rooms", filter: `id=eq.${roomId}` },
+      .on("postgres_changes", { event: "*", schema: "public", table: "chain_reaction_rooms", filter: `id=eq.${roomId}` },
         async (payload) => {
           const newRoom = payload.new as Room;
           setRoom(newRoom);
@@ -380,10 +354,12 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
           const me = playerIdRef.current;
           const amHost = newRoom.host_id === me;
 
-          // Update opponent score from room
+          // Update scores
           if (amHost) {
+            setMyScore(newRoom.host_score || 0);
             setOpponentScore(newRoom.guest_score || 0);
           } else {
+            setMyScore(newRoom.guest_score || 0);
             setOpponentScore(newRoom.host_score || 0);
           }
 
@@ -399,24 +375,9 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
               });
             }
 
-            if (newRoom.status === "waiting" && (!newRoom.host_ready || !newRoom.guest_ready)) {
-              void supabase
-                .from("chain_reaction_rooms")
-                .update({
-                  host_ready: true,
-                  guest_ready: !!newRoom.guest_id,
-                })
-                .eq("id", newRoom.id);
-            }
-
-            if (
-              newRoom.status === "waiting" &&
-              newRoom.host_ready &&
-              newRoom.guest_ready &&
-              !autoStartTriggeredRef.current
-            ) {
+            if (newRoom.status === "waiting" && newRoom.host_ready && newRoom.guest_ready && !autoStartTriggeredRef.current) {
               autoStartTriggeredRef.current = true;
-              setTimeout(() => void startGame(), 150);
+              setTimeout(() => void startGame(), 200);
             }
           }
 
@@ -424,9 +385,10 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
             setGamePhase("ready");
           }
           if (newRoom.status === "playing" && phase !== "playing" && phase !== "countdown") {
-            startCountdown();
+            startCountdown(roomId);
           }
           if (newRoom.status === "finished" && phase !== "finished") {
+            if (timerRef.current) clearInterval(timerRef.current);
             setGamePhase("finished");
             const isWinner = newRoom.winner_id === me;
             const myFinalScore = amHost ? (newRoom.host_score || 0) : (newRoom.guest_score || 0);
@@ -445,9 +407,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
               playWinSound();
               confetti({ particleCount: 150, spread: 100 });
               awardWinnerPoints();
-              if (recordResult.streakBonus) {
-                setStreakBonus(recordResult.streakBonus);
-              }
+              if (recordResult.streakBonus) setStreakBonus(recordResult.streakBonus);
             } else if (newRoom.winner_id) {
               playLoseSound();
             }
@@ -455,29 +415,62 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
         }
       )
       .subscribe();
-
     channelRef.current = channel;
+
+    // Questions subscription (both players receive same questions)
+    const qChannel = supabase
+      .channel(`speed-quiz-questions-${roomId}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "speed_quiz_room_questions", filter: `room_id=eq.${roomId}` },
+        (payload) => {
+          const row = payload.new as any;
+          console.log("[SpeedQuiz] New question received:", row.question_number);
+          const q = row.question as QuizQuestion;
+          setCurrentQuestion(q);
+          setQuestionNumber(row.question_number);
+          setUsedQuestionIds(prev => [...prev, q.id]);
+          setSelectedAnswer(null);
+          setShowResult(false);
+          setLastAnswerCorrect(null);
+          setOpponentAnswered(false);
+          myAnswerSubmittedRef.current = false;
+          setTimeLeft(QUESTION_TIME_LIMIT);
+          setIsLoading(false);
+          startQuestionTimer(roomId, row.question_number);
+        }
+      )
+      .subscribe();
+    questionsChannelRef.current = qChannel;
+
+    // Answers subscription (track opponent's answer)
+    const aChannel = supabase
+      .channel(`speed-quiz-answers-${roomId}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "speed_quiz_room_answers", filter: `room_id=eq.${roomId}` },
+        (payload) => {
+          const ans = payload.new as any;
+          const me = playerIdRef.current;
+          if (ans.user_id !== me) {
+            setOpponentAnswered(true);
+          }
+        }
+      )
+      .subscribe();
+    answersChannelRef.current = aChannel;
   };
 
   const startGame = async () => {
     const me = playerIdRef.current;
-    if (!room || room.host_id !== me || !room.host_ready || !room.guest_ready) return;
+    if (!room || room.host_id !== me) return;
 
     try {
       await supabase
         .from("chain_reaction_rooms")
-        .update({
-          status: "playing",
-          started_at: new Date().toISOString(),
-          host_score: 0,
-          guest_score: 0,
-        })
+        .update({ status: "playing", started_at: new Date().toISOString(), host_score: 0, guest_score: 0 })
         .eq("id", room.id);
       clearHostedRoom();
     } catch (err) {}
   };
 
-  const startCountdown = () => {
+  const startCountdown = (roomId: string) => {
     setGamePhase("countdown");
     let count = 3;
     setCountdown(count);
@@ -489,136 +482,172 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
       if (count <= 0) {
         clearInterval(interval);
         setGamePhase("playing");
-        setQuestionNumber(1);
-        loadNextQuestion();
+        // Host publishes first question
+        if (isHostRef.current) {
+          publishNextQuestion(roomId, 1);
+        } else {
+          setIsLoading(true);
+        }
       }
     }, 1000);
   };
 
-  const loadNextQuestion = async () => {
+  // Host generates & publishes question to DB
+  const publishNextQuestion = async (roomId: string, qNum: number) => {
+    console.log("[SpeedQuiz] Host publishing question:", qNum);
     setIsLoading(true);
-    setSelectedAnswer(null);
-    setShowResult(false);
-    setLastAnswerCorrect(null);
-    setTimeLeft(QUESTION_TIME_LIMIT);
 
     try {
       const { data, error } = await supabase.functions.invoke("speed-quiz", {
         body: { action: "generate", usedQuestionIds },
       });
-
       if (error) throw error;
 
       const question = data as QuizQuestion;
-      setCurrentQuestion(question);
-      setUsedQuestionIds((prev) => [...prev, question.id]);
 
-      // Start timer
-      if (timerRef.current) clearInterval(timerRef.current);
-      timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(timerRef.current!);
-            handleTimeOut();
-            return 0;
-          }
-          return prev - 1;
+      // Insert into speed_quiz_room_questions
+      const { error: insertError } = await supabase
+        .from("speed_quiz_room_questions")
+        .insert({
+          room_id: roomId,
+          question_number: qNum,
+          question: question as any,
+          started_at: new Date().toISOString(),
         });
-      }, 1000);
+
+      if (insertError) {
+        console.error("[SpeedQuiz] Failed to publish question:", insertError);
+        throw insertError;
+      }
     } catch (err) {
       toast({ title: "문제 로딩 실패", variant: "destructive" });
-      setIsLoading(false);
-    } finally {
       setIsLoading(false);
     }
   };
 
-  const handleTimeOut = () => {
+  const startQuestionTimer = (roomId: string, qNum: number) => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    let t = QUESTION_TIME_LIMIT;
+    setTimeLeft(t);
+
+    timerRef.current = setInterval(() => {
+      t--;
+      setTimeLeft(t);
+      if (t <= 0) {
+        clearInterval(timerRef.current!);
+        handleTimeOut(roomId, qNum);
+      }
+    }, 1000);
+  };
+
+  const handleTimeOut = async (roomId: string, qNum: number) => {
     if (showResult) return;
+    if (!myAnswerSubmittedRef.current) {
+      // Submit empty answer
+      await submitAnswer(roomId, qNum, null, 0, false);
+    }
     setShowResult(true);
     setLastAnswerCorrect(false);
     playWrongSound();
-    
-    setTimeout(() => {
-      if (questionNumber >= TOTAL_QUESTIONS) {
-        finishGame();
-      } else {
-        setQuestionNumber((prev) => prev + 1);
-        loadNextQuestion();
-      }
-    }, 1500);
+
+    setTimeout(() => advanceToNextQuestion(roomId, qNum), 2000);
   };
 
   const handleSelectAnswer = async (index: number) => {
-    if (selectedAnswer !== null || showResult || !currentQuestion) return;
+    if (selectedAnswer !== null || showResult || !currentQuestion || !room) return;
 
     if (timerRef.current) clearInterval(timerRef.current);
     setSelectedAnswer(index);
-    setShowResult(true);
 
     const isCorrect = index === currentQuestion.correctIndex;
     setLastAnswerCorrect(isCorrect);
 
     if (isCorrect) {
       playCorrectSound();
-      const speedBonus = timeLeft >= SPEED_BONUS_THRESHOLD ? 5 : 0;
-      const points = POINTS_PER_CORRECT + speedBonus;
-      const newScore = myScore + points;
-      setMyScore(newScore);
-
-      // Update score in room
-      const scoreField = isHost ? "host_score" : "guest_score";
-      await supabase
-        .from("chain_reaction_rooms")
-        .update({ [scoreField]: newScore })
-        .eq("id", room?.id || "");
     } else {
       playWrongSound();
     }
 
-    setTimeout(() => {
-      if (questionNumber >= TOTAL_QUESTIONS) {
-        finishGame();
-      } else {
-        setQuestionNumber((prev) => prev + 1);
-        loadNextQuestion();
-      }
-    }, 1500);
+    const speedBonus = timeLeft >= SPEED_BONUS_THRESHOLD ? 5 : 0;
+    const points = isCorrect ? POINTS_PER_CORRECT + speedBonus : 0;
+
+    await submitAnswer(room.id, questionNumber, index, points, isCorrect);
+    setShowResult(true);
+
+    // Wait before advancing
+    setTimeout(() => advanceToNextQuestion(room.id, questionNumber), 2000);
   };
 
-  const finishGame = async () => {
-    if (!room) return;
+  const submitAnswer = async (roomId: string, qNum: number, selectedIndex: number | null, scoreDelta: number, isCorrect: boolean) => {
+    if (myAnswerSubmittedRef.current) return;
+    myAnswerSubmittedRef.current = true;
 
-    // Wait a moment for final scores to sync
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    const me = playerIdRef.current;
+    try {
+      await supabase.from("speed_quiz_room_answers").insert({
+        room_id: roomId,
+        question_number: qNum,
+        user_id: me,
+        selected_index: selectedIndex,
+        time_left_seconds: timeLeft,
+        is_correct: isCorrect,
+        score_delta: scoreDelta,
+      });
 
-    // Fetch latest room state
-    const { data: latestRoom } = await supabase
-      .from("chain_reaction_rooms")
-      .select()
-      .eq("id", room.id)
-      .single();
-
-    if (!latestRoom) return;
-
-    const hostScore = latestRoom.host_score || 0;
-    const guestScore = latestRoom.guest_score || 0;
-
-    let winnerId: string | null = null;
-    if (hostScore > guestScore) {
-      winnerId = latestRoom.host_id;
-    } else if (guestScore > hostScore) {
-      winnerId = latestRoom.guest_id;
+      // Update room score
+      const newScore = myScore + scoreDelta;
+      setMyScore(newScore);
+      const scoreField = isHostRef.current ? "host_score" : "guest_score";
+      await supabase.from("chain_reaction_rooms").update({ [scoreField]: newScore }).eq("id", roomId);
+    } catch (err) {
+      console.error("[SpeedQuiz] Failed to submit answer:", err);
     }
+  };
 
-    await supabase
-      .from("chain_reaction_rooms")
-      .update({
-        status: "finished",
-        winner_id: winnerId,
-        finished_at: new Date().toISOString(),
-      })
-      .eq("id", room.id);
+  const advanceToNextQuestion = async (roomId: string, currentQNum: number) => {
+    if (advanceTriggeredForQuestionRef.current >= currentQNum) return;
+    advanceTriggeredForQuestionRef.current = currentQNum;
+
+    if (currentQNum >= TOTAL_QUESTIONS) {
+      // Game over
+      await finishGame(roomId);
+    } else if (isHostRef.current) {
+      // Host publishes next question
+      publishNextQuestion(roomId, currentQNum + 1);
+    } else {
+      // Guest waits for next question
+      setIsLoading(true);
+    }
+  };
+
+  const finishGame = async (roomId: string) => {
+    if (!isHostRef.current) return;
+
+    try {
+      // Fetch latest scores
+      const { data: latestRoom } = await supabase
+        .from("chain_reaction_rooms")
+        .select()
+        .eq("id", roomId)
+        .single();
+
+      if (!latestRoom) return;
+
+      const hostScore = latestRoom.host_score || 0;
+      const guestScore = latestRoom.guest_score || 0;
+
+      let winnerId: string | null = null;
+      if (hostScore > guestScore) {
+        winnerId = latestRoom.host_id;
+      } else if (guestScore > hostScore) {
+        winnerId = latestRoom.guest_id;
+      }
+
+      await supabase
+        .from("chain_reaction_rooms")
+        .update({ status: "finished", winner_id: winnerId, finished_at: new Date().toISOString() })
+        .eq("id", roomId);
+    } catch (err) {}
   };
 
   const resetGame = () => {
@@ -632,27 +661,32 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
     setSelectedAnswer(null);
     setShowResult(false);
     setStreakBonus(null);
+    setOpponentAnswered(false);
     guestJoinNotifiedRef.current = false;
     autoStartTriggeredRef.current = false;
+    advanceTriggeredForQuestionRef.current = 0;
+    myAnswerSubmittedRef.current = false;
     if (channelRef.current) supabase.removeChannel(channelRef.current);
+    if (questionsChannelRef.current) supabase.removeChannel(questionsChannelRef.current);
+    if (answersChannelRef.current) supabase.removeChannel(answersChannelRef.current);
     if (timerRef.current) clearInterval(timerRef.current);
   };
 
   useEffect(() => {
     return () => {
       if (channelRef.current) supabase.removeChannel(channelRef.current);
+      if (questionsChannelRef.current) supabase.removeChannel(questionsChannelRef.current);
+      if (answersChannelRef.current) supabase.removeChannel(answersChannelRef.current);
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
 
+  // ================== RENDER ==================
+
   // Menu screen
   if (gamePhase === "menu") {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-2xl mx-auto space-y-6"
-      >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto space-y-6">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0">
             <ArrowLeft className="w-5 h-5" />
@@ -677,9 +711,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
           </h2>
 
           <div className="mb-6 p-5 rounded-xl bg-background/80 border border-teal-500/20">
-            <p className="text-base sm:text-lg leading-relaxed">
-              {t("battle.speedQuizGame.overview")}
-            </p>
+            <p className="text-base sm:text-lg leading-relaxed">{t("battle.speedQuizGame.overview")}</p>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
@@ -763,11 +795,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
   // Joining screen
   if (gamePhase === "joining") {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-md mx-auto"
-      >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-md mx-auto">
         <Card className="p-6 sm:p-8">
           <div className="flex items-center gap-3 mb-6">
             <Button variant="ghost" size="icon" onClick={() => setGamePhase("menu")}>
@@ -816,11 +844,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
   // Waiting/Creating screen
   if (gamePhase === "creating" || gamePhase === "waiting") {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-md mx-auto"
-      >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-md mx-auto">
         <Card className="p-6 sm:p-8 text-center">
           <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 flex items-center justify-center">
             <Loader2 className="w-8 h-8 text-primary-foreground animate-spin" />
@@ -847,17 +871,13 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
   // Ready screen
   if (gamePhase === "ready") {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-md mx-auto"
-      >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-md mx-auto">
         <Card className="p-6 sm:p-8 text-center">
           <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
             <Check className="w-8 h-8 text-primary-foreground" />
           </div>
           <h2 className="text-2xl font-bold mb-4">{t("battle.opponentJoined")}</h2>
-          
+
           <div className="flex justify-center items-center gap-4 mb-6">
             <div className="text-center">
               <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-2">
@@ -885,11 +905,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
   // Countdown screen
   if (gamePhase === "countdown") {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="fixed inset-0 bg-background/95 flex items-center justify-center z-50"
-      >
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-background/95 flex items-center justify-center z-50">
         <motion.div
           key={countdown}
           initial={{ scale: 0.5, opacity: 0 }}
@@ -914,17 +930,14 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
   // Playing screen
   if (gamePhase === "playing") {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="max-w-2xl mx-auto space-y-4"
-      >
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-2xl mx-auto space-y-4">
         {/* Header with scores */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="text-center">
               <p className="text-sm text-muted-foreground">{isHost ? "나" : room?.host_name}</p>
               <p className="text-2xl font-bold text-emerald-400">{isHost ? myScore : opponentScore}</p>
+              {isHost && opponentAnswered && <span className="text-xs text-cyan-400">✓</span>}
             </div>
           </div>
 
@@ -942,6 +955,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
             <div className="text-center">
               <p className="text-sm text-muted-foreground">{isHost ? room?.guest_name : "나"}</p>
               <p className="text-2xl font-bold text-cyan-400">{isHost ? opponentScore : myScore}</p>
+              {!isHost && opponentAnswered && <span className="text-xs text-emerald-400">✓</span>}
             </div>
           </div>
         </div>
@@ -964,32 +978,28 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
                   currentQuestion.type === "grammar" ? "bg-blue-500/20 text-blue-400" :
                   "bg-purple-500/20 text-purple-400"
                 }`}>
-                  {currentQuestion.type === "vocabulary" ? "어휘" :
-                   currentQuestion.type === "grammar" ? "문법" : "표현"}
+                  {currentQuestion.type === "vocabulary" ? "어휘" : currentQuestion.type === "grammar" ? "문법" : "표현"}
                 </span>
                 <span className={`px-2 py-0.5 rounded text-xs ${
                   currentQuestion.difficulty === "easy" ? "bg-green-500/20 text-green-400" :
                   currentQuestion.difficulty === "medium" ? "bg-amber-500/20 text-amber-400" :
                   "bg-red-500/20 text-red-400"
                 }`}>
-                  {currentQuestion.difficulty === "easy" ? "쉬움" :
-                   currentQuestion.difficulty === "medium" ? "보통" : "어려움"}
+                  {currentQuestion.difficulty === "easy" ? "쉬움" : currentQuestion.difficulty === "medium" ? "보통" : "어려움"}
                 </span>
               </div>
 
               {/* Question text */}
-              <p className="text-xl sm:text-2xl font-bold leading-relaxed">
-                {currentQuestion.question}
-              </p>
+              <p className="text-xl sm:text-2xl font-bold leading-relaxed">{currentQuestion.question}</p>
 
               {/* Options */}
               <div className="grid gap-3">
                 {currentQuestion.options.map((option, index) => {
                   const isCorrect = index === currentQuestion.correctIndex;
                   const isSelected = selectedAnswer === index;
-                  
+
                   let optionClass = "p-4 rounded-xl border-2 text-left transition-all cursor-pointer ";
-                  
+
                   if (showResult) {
                     if (isCorrect) {
                       optionClass += "bg-emerald-500/20 border-emerald-500 text-emerald-300";
@@ -1032,9 +1042,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
                     animate={{ opacity: 1, y: 0 }}
                     className={`p-4 rounded-xl ${lastAnswerCorrect ? "bg-emerald-500/20 border border-emerald-500/30" : "bg-red-500/20 border border-red-500/30"}`}
                   >
-                    <p className="font-bold mb-1">
-                      {lastAnswerCorrect ? "✅ 정답!" : "❌ 오답"}
-                    </p>
+                    <p className="font-bold mb-1">{lastAnswerCorrect ? "✅ 정답!" : "❌ 오답"}</p>
                     <p className="text-sm text-muted-foreground">
                       {i18n.language === "vi" ? currentQuestion.explanation_vi : currentQuestion.explanation_ko}
                     </p>
@@ -1056,11 +1064,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
     const oppFinalScore = isHost ? (room?.guest_score || 0) : (room?.host_score || 0);
 
     return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="max-w-md mx-auto"
-      >
+      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="max-w-md mx-auto">
         <Card className="p-6 sm:p-8 text-center">
           <div className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center ${
             isDraw ? "bg-gray-500/20" : isWinner ? "bg-gradient-to-br from-amber-400 to-yellow-500" : "bg-gray-500/20"
@@ -1081,12 +1085,12 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
           <div className="flex justify-center items-center gap-6 my-6">
             <div className="text-center">
               <p className="text-sm text-muted-foreground">{isHost ? "나" : room?.host_name}</p>
-              <p className="text-4xl font-black text-emerald-400">{myFinalScore}</p>
+              <p className="text-4xl font-black text-emerald-400">{isHost ? myFinalScore : oppFinalScore}</p>
             </div>
             <div className="text-2xl">vs</div>
             <div className="text-center">
               <p className="text-sm text-muted-foreground">{isHost ? room?.guest_name : "나"}</p>
-              <p className="text-4xl font-black text-cyan-400">{oppFinalScore}</p>
+              <p className="text-4xl font-black text-cyan-400">{isHost ? oppFinalScore : myFinalScore}</p>
             </div>
           </div>
 
@@ -1102,11 +1106,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
           )}
 
           <div className="flex gap-3">
-            <Button
-              onClick={resetGame}
-              variant="outline"
-              className="flex-1"
-            >
+            <Button onClick={resetGame} variant="outline" className="flex-1">
               <ArrowLeft className="w-4 h-4 mr-2" />
               {t("battle.backToMenu")}
             </Button>
