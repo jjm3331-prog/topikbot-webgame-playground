@@ -666,6 +666,8 @@
     "points": " pts",
     "newRecord": "NEW RECORD!",
     "opponentReady": "Ready to battle!",
+    "opponentJoined": "Opponent joined",
+    "gameStartingSoon": "Game starting soon",
     "startNow": "Start now",
     "startGame": "Start Game",
     "challenger": "Challenger",

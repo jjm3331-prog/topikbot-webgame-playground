@@ -600,6 +600,8 @@
     "guestJoinedTitle": "Соперник присоединился!",
     "guestJoinedDesc": "{{name}} присоединился к битве",
     "opponentReady": "Готов к битве!",
+    "opponentJoined": "Соперник присоединился",
+    "gameStartingSoon": "Игра скоро начнётся",
     "startNow": "Начать сейчас",
     "startGame": "Начать игру",
     "challenger": "Соперник",

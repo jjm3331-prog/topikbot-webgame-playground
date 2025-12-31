@@ -603,6 +603,8 @@
     "points": " ball",
     "newRecord": "YANGI REKORD!",
     "opponentReady": "Jangga tayyor!",
+    "opponentJoined": "Raqib qo'shildi",
+    "gameStartingSoon": "O'yin tez orada boshlanadi",
     "startNow": "Hozir boshlash",
     "startGame": "O'yinni boshlash",
     "challenger": "Raqib",
