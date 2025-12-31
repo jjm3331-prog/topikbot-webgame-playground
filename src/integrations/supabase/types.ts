@@ -1444,6 +1444,72 @@ export type Database = {
         }
         Relationships: []
       }
+      speed_quiz_room_answers: {
+        Row: {
+          answered_at: string
+          created_at: string
+          id: string
+          is_correct: boolean | null
+          question_number: number
+          room_id: string
+          score_delta: number
+          selected_index: number | null
+          time_left_seconds: number | null
+          user_id: string
+        }
+        Insert: {
+          answered_at?: string
+          created_at?: string
+          id?: string
+          is_correct?: boolean | null
+          question_number: number
+          room_id: string
+          score_delta?: number
+          selected_index?: number | null
+          time_left_seconds?: number | null
+          user_id: string
+        }
+        Update: {
+          answered_at?: string
+          created_at?: string
+          id?: string
+          is_correct?: boolean | null
+          question_number?: number
+          room_id?: string
+          score_delta?: number
+          selected_index?: number | null
+          time_left_seconds?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      speed_quiz_room_questions: {
+        Row: {
+          created_at: string
+          id: string
+          question: Json
+          question_number: number
+          room_id: string
+          started_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          question: Json
+          question_number: number
+          room_id: string
+          started_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          question?: Json
+          question_number?: number
+          room_id?: string
+          started_at?: string | null
+        }
+        Relationships: []
+      }
       testimonials: {
         Row: {
           avatar_url: string | null
