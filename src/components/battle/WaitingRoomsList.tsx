@@ -31,26 +31,61 @@ interface WaitingRoomsListProps {
   isLoggedIn: boolean;
 }
 
+// 10분 = 600000ms
+const MAX_ROOM_AGE_MS = 10 * 60 * 1000;
+
 export default function WaitingRoomsList({ onJoinRoom, isLoggedIn }: WaitingRoomsListProps) {
   const { t } = useTranslation();
   const [rooms, setRooms] = useState<WaitingRoom[]>([]);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState<string | null>(null);
 
-  // Fetch waiting rooms
+  // Clean up old rooms (10분 이상 된 waiting 방 삭제)
+  const cleanupOldRooms = async () => {
+    try {
+      const tenMinutesAgo = new Date(Date.now() - MAX_ROOM_AGE_MS).toISOString();
+      
+      // Delete old waiting rooms that have no guest
+      await supabase
+        .from("chain_reaction_rooms")
+        .delete()
+        .eq("status", "waiting")
+        .is("guest_id", null)
+        .lt("created_at", tenMinutesAgo);
+      
+      console.log("[WaitingRooms] Cleaned up old rooms");
+    } catch (err) {
+      console.error("Failed to cleanup old rooms:", err);
+    }
+  };
+
+  // Fetch waiting rooms (최근 10분 이내만)
   const fetchRooms = async () => {
     setLoading(true);
     try {
+      // First cleanup old rooms
+      await cleanupOldRooms();
+      
+      const tenMinutesAgo = new Date(Date.now() - MAX_ROOM_AGE_MS).toISOString();
+      
       const { data, error } = await supabase
         .from("chain_reaction_rooms")
         .select("id, room_code, host_id, host_name, connection_mode, created_at")
         .eq("status", "waiting")
         .is("guest_id", null)
+        .gte("created_at", tenMinutesAgo) // 10분 이내의 방만
         .order("created_at", { ascending: false })
         .limit(20);
 
       if (error) throw error;
-      setRooms(data || []);
+      
+      // Double-check: filter out any rooms older than 10 minutes on client side too
+      const validRooms = (data || []).filter(room => {
+        const age = Date.now() - new Date(room.created_at).getTime();
+        return age < MAX_ROOM_AGE_MS;
+      });
+      
+      setRooms(validRooms);
     } catch (err) {
       console.error("Failed to fetch rooms:", err);
     } finally {
@@ -61,6 +96,10 @@ export default function WaitingRoomsList({ onJoinRoom, isLoggedIn }: WaitingRoom
   // Initial fetch
   useEffect(() => {
     fetchRooms();
+    
+    // Refresh every 30 seconds to keep list fresh
+    const interval = setInterval(fetchRooms, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   // Real-time subscription
