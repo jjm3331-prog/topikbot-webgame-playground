@@ -757,6 +757,51 @@
       "defeat": "😢 Thua cuộc",
       "victoryDesc": "Bạn đã thắng +1,000 điểm!",
       "defeatDesc": "{{name}} đã thắng!"
+    },
+    "guide": {
+      "title": "Hướng dẫn đầy đủ",
+      "subtitle": "Tìm hiểu chi tiết về cách chơi và phần thưởng chuỗi thắng!",
+      "howToPlay": "Cách chơi",
+      "example": "Ví dụ",
+      "seconds": "s",
+      "perTurn": "mỗi lượt",
+      "warnings": " cảnh báo",
+      "warningLose": "= thua",
+      "dueumRule": "Quy tắc Dueum",
+      "dueumDesc": "ㄴ→ㅇ, ㄹ→ㄴ tự động áp dụng",
+      "winReward": "Thưởng thắng",
+      "noDupe": "Không trùng lặp",
+      "noDupeDesc": "Không dùng từ đã nói",
+      "aiScoring": "Hệ thống chấm điểm AI",
+      "aiScoringDesc": "AI đánh giá mức độ liên quan từ 0-100 điểm",
+      "passDesc": "Đạt! Lượt tiếp theo",
+      "failDesc": "Liên quan thấp, 1 cảnh báo",
+      "quickRules": "Tóm tắt quy tắc",
+      "players": "Đấu 1:1",
+      "playersDesc": "Ghép trận sau khi đăng nhập",
+      "timeLimit": "Giới hạn 20 giây",
+      "timeLimitDesc": "Cần suy nghĩ nhanh",
+      "warningSystem": "Hệ thống cảnh báo",
+      "warningSystemDesc": "Sai/hết giờ = cảnh báo",
+      "rewards": "Phần thưởng",
+      "rewardsDesc": "1,000P + thưởng chuỗi",
+      "streakTitle": "🔥 Hệ thống thưởng chuỗi thắng",
+      "streakDesc": "Thắng liên tiếp để nhận điểm thưởng!",
+      "consecutiveWins": " thắng liên tiếp",
+      "bonusPoints": "Điểm thưởng",
+      "maxBonus": "Thưởng tối đa",
+      "streakNote": "Chuỗi reset khi thua. Chuỗi cao nhất lưu vào hồ sơ!",
+      "wordChain": {
+        "step1": "Nhập từ bắt đầu bằng âm tiết cuối của đối thủ",
+        "step2": "Không trả lời trong 20 giây = 1 cảnh báo!",
+        "step3": "2 cảnh báo = thua, đối thủ thắng"
+      },
+      "semantic": {
+        "step1": "Nhập từ liên quan về nghĩa với từ trước",
+        "step2": "AI chấm điểm liên quan (70+ = đạt)",
+        "step3": "Hết giờ, điểm thấp, trùng = cảnh báo",
+        "exampleDesc": "Biển & sóng liên quan chặt (95đ), trường & giáo viên cũng liên quan (88đ)"
+      }
     }
   },
   "vocabulary": {

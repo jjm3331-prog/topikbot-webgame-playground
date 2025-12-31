@@ -757,6 +757,52 @@
       "defeat": "😢 패배",
       "victoryDesc": "승리 보너스 +1,000점 획득!",
       "defeatDesc": "{{name}}님이 승리했습니다!"
+    },
+    "guide": {
+      "title": "완벽 가이드",
+      "subtitle": "게임 방식과 연승 혜택을 상세히 알아보세요!",
+      "howToPlay": "플레이 방법",
+      "example": "예시",
+      "seconds": "초",
+      "perTurn": "턴당 제한시간",
+      "warnings": "회 경고",
+      "warningLose": "시 패배",
+      "dueumRule": "두음법칙",
+      "dueumDesc": "ㄴ→ㅇ, ㄹ→ㄴ 자동 적용",
+      "winReward": "승리 보상",
+      "noDupe": "중복 금지",
+      "noDupeDesc": "이미 나온 단어 사용 불가",
+      "aiScoring": "AI 의미 점수 시스템",
+      "aiScoringDesc": "AI가 두 단어의 연관성을 0~100점으로 평가합니다",
+      "passDesc": "통과! 다음 턴으로",
+      "failDesc": "관련성 부족, 경고 1회",
+      "quickRules": "핵심 규칙 요약",
+      "players": "1:1 대결",
+      "playersDesc": "로그인 후 실시간 매칭",
+      "timeLimit": "20초 제한",
+      "timeLimitDesc": "빠른 판단력 필요",
+      "warningSystem": "경고 시스템",
+      "warningSystemDesc": "오답/시간초과 시 경고",
+      "rewards": "승리 보상",
+      "rewardsDesc": "1,000P + 연승 보너스",
+      "streakTitle": "🔥 연승 보너스 시스템",
+      "streakDesc": "연속으로 이기면 추가 보너스 포인트를 받습니다!",
+      "consecutiveWins": "연승",
+      "bonusPoints": "추가 보너스",
+      "maxBonus": "최대 보너스",
+      "streakNote": "연승 기록은 패배하면 리셋됩니다. 최고 연승 기록은 프로필에 저장됩니다!",
+      "wordChain": {
+        "step1": "상대방의 마지막 음절로 시작하는 단어를 입력하세요",
+        "step2": "20초 안에 입력하지 못하면 경고 1회!",
+        "step3": "경고 2회가 되면 패배, 상대방이 승리합니다",
+        "exampleDesc": "마지막 글자 '랑'으로 시작해서 '랑데부', 다시 '부'로 시작하는 '부자'"
+      },
+      "semantic": {
+        "step1": "이전 단어와 의미적으로 관련된 단어를 입력하세요",
+        "step2": "AI가 두 단어의 연관성을 점수로 평가합니다 (70점 이상 통과)",
+        "step3": "시간 초과, 낮은 점수, 중복 단어는 경고로 처리됩니다",
+        "exampleDesc": "바다와 파도는 밀접한 관계 (95점), 학교와 선생님도 연관성 높음 (88점)"
+      }
     }
   },
   "vocabulary": {

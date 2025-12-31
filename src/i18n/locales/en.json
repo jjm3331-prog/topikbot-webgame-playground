@@ -757,6 +757,52 @@
       "defeat": "😢 Defeat",
       "victoryDesc": "You won +1,000 points!",
       "defeatDesc": "{{name}} won!"
+    },
+    "guide": {
+      "title": "Complete Guide",
+      "subtitle": "Learn game rules and win streak benefits in detail!",
+      "howToPlay": "How to Play",
+      "example": "Example",
+      "seconds": "s",
+      "perTurn": "per turn",
+      "warnings": " warnings",
+      "warningLose": "= defeat",
+      "dueumRule": "Dueum Rule",
+      "dueumDesc": "ㄴ→ㅇ, ㄹ→ㄴ auto applied",
+      "winReward": "Win reward",
+      "noDupe": "No duplicates",
+      "noDupeDesc": "Can't use words already said",
+      "aiScoring": "AI Semantic Scoring System",
+      "aiScoringDesc": "AI evaluates word relevance from 0-100 points",
+      "passDesc": "Pass! Next turn",
+      "failDesc": "Low relevance, 1 warning",
+      "quickRules": "Quick Rules Summary",
+      "players": "1:1 Battle",
+      "playersDesc": "Real-time match after login",
+      "timeLimit": "20 second limit",
+      "timeLimitDesc": "Quick thinking required",
+      "warningSystem": "Warning System",
+      "warningSystemDesc": "Wrong/timeout = warning",
+      "rewards": "Win Rewards",
+      "rewardsDesc": "1,000P + streak bonus",
+      "streakTitle": "🔥 Win Streak Bonus System",
+      "streakDesc": "Win consecutively to earn bonus points!",
+      "consecutiveWins": " wins",
+      "bonusPoints": "Bonus points",
+      "maxBonus": "Max bonus",
+      "streakNote": "Streak resets on loss. Your best streak is saved to your profile!",
+      "wordChain": {
+        "step1": "Enter a word starting with opponent's last syllable",
+        "step2": "Fail to answer in 20 seconds = 1 warning!",
+        "step3": "2 warnings = defeat, opponent wins"
+      },
+      "exampleDesc": "Last letter '랑' → start with '랑데부', then '부' → '부자'",
+      "semantic": {
+        "step1": "Enter a word semantically related to the previous word",
+        "step2": "AI scores word relevance (70+ points = pass)",
+        "step3": "Timeout, low score, or duplicate = warning",
+        "exampleDesc": "Sea & wave are closely related (95pts), school & teacher also highly relevant (88pts)"
+      }
     }
   },
   "vocabulary": {
