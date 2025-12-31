@@ -2279,6 +2279,8 @@
     "startButton": "开始",
     "upgradeToPremium": "升级高级版",
     "coreFeatures": "核心功能",
+    "comingSoon": "准备中",
+    "startExam": "开始考试",
     "units": {
       "questions": "道题",
       "minutes": "分钟"

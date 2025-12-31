@@ -2660,6 +2660,8 @@
     "startButton": "시작하기",
     "upgradeToPremium": "Premium 업그레이드",
     "coreFeatures": "핵심 기능",
+    "comingSoon": "준비중",
+    "startExam": "시험 시작",
     "units": {
       "questions": "문항",
       "minutes": "분"

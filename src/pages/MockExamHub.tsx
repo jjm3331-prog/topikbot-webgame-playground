@@ -168,7 +168,8 @@ const MockExamHub = () => {
       totalTime: 50,
       totalQuestions: 50,
       level: "고용허가제",
-      popular: false
+      popular: false,
+      comingSoon: true
     }
   ];
 
@@ -563,23 +564,30 @@ const MockExamHub = () => {
                     </div>
 
                     {/* CTA 버튼 */}
-                    <motion.button
-                      onClick={() => handleExamCardClick(exam.id)}
-                      className={cn(
-                        "w-full py-3 rounded-xl font-bold text-white text-sm",
-                        "bg-gradient-to-r shadow-lg transition-all duration-300",
-                        exam.gradient,
-                        "hover:shadow-xl hover:brightness-110"
-                      )}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <span className="flex items-center justify-center gap-2">
-                        <Play className="w-4 h-4" />
-                        시험 시작
-                        <ArrowRight className="w-4 h-4" />
-                      </span>
-                    </motion.button>
+                    {exam.comingSoon ? (
+                      <div className="w-full py-3 rounded-xl font-bold text-white/60 text-sm bg-gradient-to-r from-gray-500 to-gray-600 cursor-not-allowed text-center flex items-center justify-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        {t('mockExam.comingSoon')}
+                      </div>
+                    ) : (
+                      <motion.button
+                        onClick={() => handleExamCardClick(exam.id)}
+                        className={cn(
+                          "w-full py-3 rounded-xl font-bold text-white text-sm",
+                          "bg-gradient-to-r shadow-lg transition-all duration-300",
+                          exam.gradient,
+                          "hover:shadow-xl hover:brightness-110"
+                        )}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <span className="flex items-center justify-center gap-2">
+                          <Play className="w-4 h-4" />
+                          {t('mockExam.startExam')}
+                          <ArrowRight className="w-4 h-4" />
+                        </span>
+                      </motion.button>
+                    )}
                   </div>
                 </div>
               </motion.div>
