@@ -638,6 +638,12 @@
     "justNow": "Vừa xong",
     "minutesAgo": " phút trước",
     "hoursAgo": " giờ trước",
+    "guestJoinedTitle": "Đối thủ đã vào phòng!",
+    "guestJoinedDesc": "{{name}} đã tham gia trận đấu",
+    "opponentReady": "Sẵn sàng đấu!",
+    "startNow": "Bắt đầu ngay",
+    "startGame": "Bắt đầu",
+    "challenger": "Đối thủ",
     "invite": {
       "copied": "Đã copy!",
       "copyInvite": "Copy link mời",

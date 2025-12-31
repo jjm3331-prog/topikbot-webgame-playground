@@ -10,6 +10,7 @@ import CommonFooter from "@/components/CommonFooter";
 import ChainReactionMultiplayer from "@/components/vocabulary/ChainReactionMultiplayer";
 import SemanticBattle from "@/components/battle/SemanticBattle";
 import WaitingRoomsList from "@/components/battle/WaitingRoomsList";
+import GuestJoinedNotification from "@/components/battle/GuestJoinedNotification";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -257,6 +258,14 @@ export default function Battle() {
   return (
     <div className="min-h-screen bg-background">
       <CleanHeader />
+
+      {/* Guest Joined Notification for Hosts */}
+      <GuestJoinedNotification 
+        onStartGame={(roomCode, gameType) => {
+          setInitialRoomCode(roomCode);
+          setSelectedGame(gameType);
+        }}
+      />
 
       {/* Premium Invite Modal Popup */}
       <AnimatePresence>

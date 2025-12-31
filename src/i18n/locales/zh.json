@@ -577,6 +577,12 @@
     "justNow": "刚刚",
     "minutesAgo": "分钟前",
     "hoursAgo": "小时前",
+    "guestJoinedTitle": "对手已加入！",
+    "guestJoinedDesc": "{{name}} 已加入对战",
+    "opponentReady": "准备开战！",
+    "startNow": "立即开始",
+    "startGame": "开始游戏",
+    "challenger": "挑战者",
     "invite": {
       "copied": "已复制！",
       "copyInvite": "复制邀请链接",

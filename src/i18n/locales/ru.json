@@ -575,6 +575,12 @@
     "justNow": "Только что",
     "minutesAgo": " мин. назад",
     "hoursAgo": " ч. назад",
+    "guestJoinedTitle": "Соперник присоединился!",
+    "guestJoinedDesc": "{{name}} присоединился к битве",
+    "opponentReady": "Готов к битве!",
+    "startNow": "Начать сейчас",
+    "startGame": "Начать игру",
+    "challenger": "Соперник",
     "invite": {
       "copied": "Скопировано!",
       "copyInvite": "Скопировать ссылку",

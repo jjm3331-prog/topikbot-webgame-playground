@@ -27,6 +27,7 @@ import confetti from "canvas-confetti";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import RoomCodeCollapsible from "@/components/battle/RoomCodeCollapsible";
+import { saveHostedRoom, clearHostedRoom } from "@/components/battle/GuestJoinedNotification";
 
 interface ChainReactionMultiplayerProps {
   words: { id: number; korean: string; meaning: string }[];
@@ -370,6 +371,8 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       setConnectionMode("phonetic");
       setGamePhase("waiting");
       subscribeToRoom(data.id);
+      // Save to localStorage for guest-joined notification
+      saveHostedRoom(data.id, playerId);
     } catch (err) {
       console.error("Failed to create room:", err);
       toast({ title: "방 생성 실패", variant: "destructive" });
@@ -531,6 +534,8 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
         })
         .eq("id", room.id);
 
+      // Clear hosted room from localStorage since game is starting
+      clearHostedRoom();
       startCountdown(room);
     } catch (err) {
       console.error("Failed to start game:", err);

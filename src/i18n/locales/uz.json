@@ -575,6 +575,12 @@
     "justNow": "Hozirgina",
     "minutesAgo": " daqiqa oldin",
     "hoursAgo": " soat oldin",
+    "guestJoinedTitle": "Raqib qo'shildi!",
+    "guestJoinedDesc": "{{name}} jangga qo'shildi",
+    "opponentReady": "Jangga tayyor!",
+    "startNow": "Hozir boshlash",
+    "startGame": "O'yinni boshlash",
+    "challenger": "Raqib",
     "invite": {
       "copied": "Nusxalandi!",
       "copyInvite": "Taklif havolasini nusxalash",
