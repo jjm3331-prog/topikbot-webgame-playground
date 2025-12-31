@@ -45,15 +45,6 @@ const battleGames: BattleGame[] = [
     gradient: "from-emerald-500 to-cyan-500",
   },
   {
-    id: "speed-quiz",
-    nameKey: "battle.speedQuiz",
-    nameKoKey: "battle.speedQuizKo",
-    descriptionKey: "battle.speedQuizDesc",
-    icon: Zap,
-    available: false,
-    comingSoon: true,
-  },
-  {
     id: "dictation",
     nameKey: "battle.dictation",
     nameKoKey: "battle.dictationKo",

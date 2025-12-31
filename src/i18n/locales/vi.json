@@ -760,6 +760,25 @@
       "victoryDesc": "Thưởng thám tử +1,000 điểm!",
       "defeatDesc": "Thám tử {{name}} giải trước!"
     },
+    "speedQuizGame": {
+      "overview": "Thi đua trả lời câu hỏi từ vựng, ngữ pháp và biểu thức TOPIK! Ai đúng nhiều hơn trong 10 câu sẽ thắng!",
+      "quizTypesTitle": "📚 3 loại câu hỏi",
+      "quizTypesDesc": "Câu hỏi từ vựng, ngữ pháp và biểu thức xuất hiện ngẫu nhiên.",
+      "timeLimit": "⏱️ 10 giây",
+      "timeLimitDesc": "Mỗi câu 10 giây! Cần suy nghĩ nhanh.",
+      "scoringTitle": "🎯 Tính điểm",
+      "scoringDesc": "Đúng +10 điểm, trả lời trong 5 giây = +5 điểm thưởng tốc độ!",
+      "rewardTitle": "🏆 +1,000 điểm",
+      "rewardDesc": "Thắng để nhận điểm thưởng!",
+      "yourNameLabel": "Biệt danh",
+      "yourNamePlaceholder": "Nhập biệt danh...",
+      "createRoom": "Tạo phòng",
+      "join": "Tham gia",
+      "joinTitle": "Tham gia phòng",
+      "joinButton": "Vào phòng",
+      "backToMenu": "Quay lại",
+      "playAgain": "Chơi lại"
+    },
     "guide": {
       "title": "Hướng dẫn đầy đủ",
       "subtitle": "Tìm hiểu chi tiết về cách chơi và phần thưởng chuỗi thắng!",

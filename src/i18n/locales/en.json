@@ -760,6 +760,25 @@
       "victoryDesc": "Detective bonus +1,000 pts!",
       "defeatDesc": "Detective {{name}} solved it first!"
     },
+    "speedQuizGame": {
+      "overview": "Race to answer TOPIK vocabulary, grammar, and expression questions! Whoever gets more correct out of 10 wins!",
+      "quizTypesTitle": "📚 3 Quiz Types",
+      "quizTypesDesc": "Vocabulary, grammar, and expression questions appear randomly.",
+      "timeLimit": "⏱️ 10 Seconds",
+      "timeLimitDesc": "10 seconds per question! Quick thinking required.",
+      "scoringTitle": "🎯 Scoring",
+      "scoringDesc": "Correct +10pts, answer within 5s = +5pts speed bonus!",
+      "rewardTitle": "🏆 +1,000 pts",
+      "rewardDesc": "Win to earn bonus points!",
+      "yourNameLabel": "Nickname",
+      "yourNamePlaceholder": "Enter nickname...",
+      "createRoom": "Create Room",
+      "join": "Join",
+      "joinTitle": "Join Room",
+      "joinButton": "Enter Room",
+      "backToMenu": "Back",
+      "playAgain": "Play Again"
+    },
     "guide": {
       "title": "Complete Guide",
       "subtitle": "Learn game rules and win streak benefits in detail!",
