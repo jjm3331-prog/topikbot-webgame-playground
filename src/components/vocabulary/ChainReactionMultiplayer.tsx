@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -121,6 +122,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   const inputRef = useRef<HTMLInputElement>(null);
   const channelRef = useRef<any>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const gamePhaseRef = useRef<GamePhase>("menu");
 
   useEffect(() => {
     gamePhaseRef.current = gamePhase;
