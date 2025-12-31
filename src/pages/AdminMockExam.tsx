@@ -60,6 +60,9 @@ const AdminMockExam = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadType, setUploadType] = useState<'templates' | 'questions'>('templates');
   const [selectedExamType, setSelectedExamType] = useState<string>('all');
+  const [sectionFilter, setSectionFilter] = useState<'all' | 'reading' | 'listening' | 'writing'>('all');
+  const [page, setPage] = useState(0);
+  const PAGE_SIZE = 100;
   const [jsonPreview, setJsonPreview] = useState<any>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -78,22 +81,72 @@ const AdminMockExam = () => {
     }
   });
 
-  // Fetch questions
+  // Fetch question counts (accurate, not affected by pagination)
+  const { data: questionCounts, isLoading: countsLoading } = useQuery({
+    queryKey: ['mock-question-counts', selectedExamType],
+    queryFn: async () => {
+      const applyExamType = (q: any) =>
+        selectedExamType === 'all' ? q : q.eq('exam_type', selectedExamType);
+
+      const [total, reading, listening, writing] = await Promise.all([
+        applyExamType(
+          supabase
+            .from('mock_question_bank')
+            .select('id', { count: 'exact', head: true })
+        ),
+        applyExamType(
+          supabase
+            .from('mock_question_bank')
+            .select('id', { count: 'exact', head: true })
+            .eq('section', 'reading')
+        ),
+        applyExamType(
+          supabase
+            .from('mock_question_bank')
+            .select('id', { count: 'exact', head: true })
+            .eq('section', 'listening')
+        ),
+        applyExamType(
+          supabase
+            .from('mock_question_bank')
+            .select('id', { count: 'exact', head: true })
+            .eq('section', 'writing')
+        ),
+      ]);
+
+      const anyError = total.error || reading.error || listening.error || writing.error;
+      if (anyError) throw anyError;
+
+      return {
+        total: total.count ?? 0,
+        reading: reading.count ?? 0,
+        listening: listening.count ?? 0,
+        writing: writing.count ?? 0,
+      };
+    }
+  });
+
+  // Fetch questions (paged)
   const { data: questions, isLoading: questionsLoading } = useQuery({
-    queryKey: ['mock-questions', selectedExamType],
+    queryKey: ['mock-questions', selectedExamType, sectionFilter, page],
     queryFn: async () => {
       let query = supabase
         .from('mock_question_bank')
         .select('*')
         .order('exam_type')
+        .order('section')
         .order('part_number')
         .order('question_number')
-        .limit(100);
-      
+        .range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
+
       if (selectedExamType !== 'all') {
         query = query.eq('exam_type', selectedExamType);
       }
-      
+
+      if (sectionFilter !== 'all') {
+        query = query.eq('section', sectionFilter);
+      }
+
       const { data, error } = await query;
       if (error) throw error;
       return data as QuestionBankItem[];
@@ -299,6 +352,7 @@ const AdminMockExam = () => {
               </div>
             </CardContent>
           </Card>
+
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
@@ -306,12 +360,13 @@ const AdminMockExam = () => {
                   <Database className="w-6 h-6 text-blue-500" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{questions?.length || 0}</p>
-                  <p className="text-sm text-muted-foreground">문제</p>
+                  <p className="text-2xl font-bold">{countsLoading ? '—' : (questionCounts?.total ?? 0)}</p>
+                  <p className="text-sm text-muted-foreground">문제 ({selectedExamType === 'all' ? '전체' : selectedExamType.replace('_', ' ')})</p>
                 </div>
               </div>
             </CardContent>
           </Card>
+
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
@@ -319,14 +374,13 @@ const AdminMockExam = () => {
                   <BookOpen className="w-6 h-6 text-purple-500" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">
-                    {questions?.filter(q => q.section === 'reading').length || 0}
-                  </p>
+                  <p className="text-2xl font-bold">{countsLoading ? '—' : (questionCounts?.reading ?? 0)}</p>
                   <p className="text-sm text-muted-foreground">읽기 문제</p>
                 </div>
               </div>
             </CardContent>
           </Card>
+
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
@@ -334,9 +388,7 @@ const AdminMockExam = () => {
                   <Headphones className="w-6 h-6 text-amber-500" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">
-                    {questions?.filter(q => q.section === 'listening').length || 0}
-                  </p>
+                  <p className="text-2xl font-bold">{countsLoading ? '—' : (questionCounts?.listening ?? 0)}</p>
                   <p className="text-sm text-muted-foreground">듣기 문제</p>
                 </div>
               </div>
@@ -532,24 +584,73 @@ const AdminMockExam = () => {
           <TabsContent value="questions">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <div>
                     <CardTitle>문제 은행</CardTitle>
                     <CardDescription>
-                      등록된 모의고사 문제 목록
+                      등록된 모의고사 문제 목록 (페이지당 {PAGE_SIZE}개)
                     </CardDescription>
                   </div>
-                  <Select value={selectedExamType} onValueChange={setSelectedExamType}>
-                    <SelectTrigger className="w-40">
-                      <SelectValue placeholder="시험 유형" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">전체</SelectItem>
-                      <SelectItem value="TOPIK_I">TOPIK I</SelectItem>
-                      <SelectItem value="TOPIK_II">TOPIK II</SelectItem>
-                      <SelectItem value="TOPIK_EPS">EPS-TOPIK</SelectItem>
-                    </SelectContent>
-                  </Select>
+
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <Select
+                      value={selectedExamType}
+                      onValueChange={(v) => {
+                        setSelectedExamType(v);
+                        setPage(0);
+                      }}
+                    >
+                      <SelectTrigger className="w-40">
+                        <SelectValue placeholder="시험 유형" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">전체</SelectItem>
+                        <SelectItem value="TOPIK_I">TOPIK I</SelectItem>
+                        <SelectItem value="TOPIK_II">TOPIK II</SelectItem>
+                        <SelectItem value="TOPIK_EPS">EPS-TOPIK</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <Select
+                      value={sectionFilter}
+                      onValueChange={(v) => {
+                        setSectionFilter(v as any);
+                        setPage(0);
+                      }}
+                    >
+                      <SelectTrigger className="w-40">
+                        <SelectValue placeholder="영역" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">전체</SelectItem>
+                        <SelectItem value="listening">듣기</SelectItem>
+                        <SelectItem value="reading">읽기</SelectItem>
+                        <SelectItem value="writing">쓰기</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage((p) => Math.max(0, p - 1))}
+                        disabled={page === 0}
+                      >
+                        이전
+                      </Button>
+                      <div className="text-sm text-muted-foreground min-w-16 text-center">
+                        {page + 1}p
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage((p) => p + 1)}
+                        disabled={questionsLoading || (questions?.length ?? 0) < PAGE_SIZE}
+                      >
+                        다음
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
@@ -578,7 +679,7 @@ const AdminMockExam = () => {
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            {question.section === 'listening' ? '듣기' : '읽기'}
+                            {question.section === 'listening' ? '듣기' : question.section === 'writing' ? '쓰기' : '읽기'}
                           </TableCell>
                           <TableCell>Part {question.part_number}</TableCell>
                           <TableCell className="max-w-md truncate">
