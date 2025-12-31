@@ -806,36 +806,7 @@
         "questionsDesc": "Total number of questions",
         "timeLimit": "Time limit per question",
         "quizTypes": "3 Types",
-        "quizTypesDesc": "Vocabulary, Grammar, Expressions"
-      },
-      "quickRules": "Quick Rules Summary",
-      "players": "1:1 Battle",
-      "playersDesc": "Real-time match after login",
-      "timeLimit": "20 second limit",
-      "timeLimitDesc": "Quick thinking required",
-      "warningSystem": "Warning System",
-      "warningSystemDesc": "Wrong/timeout = warning",
-      "rewards": "Win Rewards",
-      "rewardsDesc": "1,000P + streak bonus",
-      "streakTitle": "🔥 Win Streak Bonus System",
-      "streakDesc": "Win consecutively to earn bonus points!",
-      "consecutiveWins": " wins",
-      "bonusPoints": "Bonus points",
-      "maxBonus": "Max bonus",
-      "streakNote": "Streak resets on loss. Your best streak is saved to your profile!",
-      "wordChain": {
-        "step1": "Enter a word starting with opponent's last syllable",
-        "step2": "Fail to answer in 20 seconds = 1 warning!",
-        "step3": "2 warnings = defeat, opponent wins"
-      },
-      "exampleDesc": "Last letter '랑' → start with '랑데부', then '부' → '부자'",
-      "semantic": {
-        "step1": "Deduce a word magically connected to the previous clue",
-        "step2": "AI Wizard judges the connection (70+ = pass)",
-        "step3": "Timeout, low score, or duplicate = warning!",
-        "exampleDesc": "Sea → Wave (strong link! 95pts), School → Teacher (magical association! 88pts)"
-      },
-      "speedQuiz": {
+        "quizTypesDesc": "Vocabulary, Grammar, Expressions",
         "step1": "TOPIK vocabulary, grammar, and expression questions appear",
         "step2": "Select the answer within 10 seconds! Faster = bonus!",
         "step3": "Whoever answers more correctly out of 10 wins!",

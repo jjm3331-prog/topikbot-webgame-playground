@@ -741,6 +741,21 @@
         "step2": "AI ikki so'z bog'liqligini ball bilan baholaydi (70+ ball o'tadi)",
         "step3": "Vaqt tugashi, past ball, takror so'z ogohlantirish hisoblanadi",
         "exampleDesc": "바다 va 파도 yaqin bog'liq (95 ball), 학교 va 선생님 ham bog'liq (88 ball)"
+      },
+      "speedQuiz": {
+        "scoring": "Ball tizimi",
+        "scoringDesc": "Ball to'g'ri javob va tezlikka qarab beriladi",
+        "correctPoint": "To'g'ri javob uchun asosiy ball",
+        "fastBonus": "5 soniya ichida javob bersangiz qo'shimcha bonus",
+        "totalQuestions": "10 ta savol",
+        "questionsDesc": "Jami savollar soni",
+        "timeLimit": "Har savol uchun vaqt",
+        "quizTypes": "3 tur",
+        "quizTypesDesc": "Lug'at, grammatika, iboralar",
+        "step1": "TOPIK lug'at, grammatika va iboralar savollari chiqadi",
+        "step2": "10 soniyada javobni tanlang! Tezroq = ko'proq bonus!",
+        "step3": "10 savoldan ko'proq to'g'ri javob bergan yutadi!",
+        "exampleDesc": "To'g'ri javob +10 ball, 5 soniya ichida javob bersangiz qo'shimcha +5 tezlik bonusi"
       }
     },
     "currentStreak": "🔥 {{count}} ketma-ket g'alaba",
