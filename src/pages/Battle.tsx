@@ -2,13 +2,12 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Swords, Link2, Users, Trophy, Zap, Crown, Lock, Timer, AlertTriangle } from "lucide-react";
+import { Swords, Link2, Users, Trophy, Crown, Lock, Timer, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import CleanHeader from "@/components/CleanHeader";
 import CommonFooter from "@/components/CommonFooter";
 import ChainReactionMultiplayer from "@/components/vocabulary/ChainReactionMultiplayer";
-import SpeedQuizBattle from "@/components/battle/SpeedQuizBattle";
 import WaitingRoomsList from "@/components/battle/WaitingRoomsList";
 import GuestJoinedNotification from "@/components/battle/GuestJoinedNotification";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,15 +33,6 @@ const battleGames: BattleGame[] = [
     icon: Link2,
     available: true,
     gradient: "from-yellow-400 to-orange-500",
-  },
-  {
-    id: "speed-quiz",
-    nameKey: "battle.speedQuiz",
-    nameKoKey: "battle.speedQuizKo",
-    descriptionKey: "battle.speedQuizDesc",
-    icon: Zap,
-    available: true,
-    gradient: "from-emerald-500 to-cyan-500",
   },
   {
     id: "dictation",
@@ -120,24 +110,6 @@ export default function Battle() {
     );
   }
 
-  if (selectedGame === "speed-quiz") {
-    return (
-      <div className="min-h-screen bg-background">
-        <CleanHeader />
-        <main className="container mx-auto px-4 py-6 pt-20">
-          <SpeedQuizBattle
-            onBack={() => {
-              setSelectedGame(null);
-              setInitialRoomCode(undefined);
-              setInitialGuestName(undefined);
-            }}
-            initialRoomCode={initialRoomCode}
-            initialGuestName={initialGuestName}
-          />
-        </main>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -461,147 +433,6 @@ export default function Battle() {
               </Card>
             </motion.div>
 
-            {/* ===== GAME 2: Speed Quiz Battle ===== */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="mb-12"
-            >
-              <Card className="relative overflow-hidden border-2 border-emerald-500/30 bg-gradient-to-br from-emerald-500/5 via-cyan-500/5 to-transparent">
-                {/* Glow effects */}
-                <div className="absolute top-0 left-0 w-80 h-80 bg-gradient-to-br from-emerald-500/20 to-cyan-500/10 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/2" />
-                <div className="absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-tl from-cyan-500/15 to-transparent rounded-full blur-3xl translate-y-1/2 translate-x-1/2" />
-                
-                <div className="relative p-6 sm:p-8 lg:p-12">
-                  {/* Game Header */}
-                  <div className="flex flex-wrap items-center gap-4 mb-8">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-xl shadow-emerald-500/30">
-                      <Zap className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-                        {t('battle.speedQuiz')}
-                      </h3>
-                      <p className="text-muted-foreground font-medium">{t('battle.speedQuizKo')}</p>
-                    </div>
-                    <span className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white text-sm font-bold rounded-full shadow-lg">
-                      ⚡ SPEED
-                    </span>
-                  </div>
-
-                  {/* Rules Grid */}
-                  <div className="grid gap-6 lg:grid-cols-2 mb-8">
-                    {/* How to Play */}
-                    <div className="space-y-4">
-                      <h4 className="text-xl font-bold flex items-center gap-2">
-                        <span className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-500">📖</span>
-                        {t('battle.guide.howToPlay')}
-                      </h4>
-                      <div className="space-y-3 pl-10">
-                        <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/30 border border-border/50">
-                          <span className="w-6 h-6 rounded-full bg-emerald-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
-                          <p className="text-sm sm:text-base">{t('battle.guide.speedQuiz.step1')}</p>
-                        </div>
-                        <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/30 border border-border/50">
-                          <span className="w-6 h-6 rounded-full bg-cyan-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
-                          <p className="text-sm sm:text-base">{t('battle.guide.speedQuiz.step2')}</p>
-                        </div>
-                        <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/30 border border-border/50">
-                          <span className="w-6 h-6 rounded-full bg-teal-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
-                          <p className="text-sm sm:text-base">{t('battle.guide.speedQuiz.step3')}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Example */}
-                    <div className="space-y-4">
-                      <h4 className="text-xl font-bold flex items-center gap-2">
-                        <span className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-500">💡</span>
-                        {t('battle.guide.example')}
-                      </h4>
-                      <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-cyan-500/5 border border-emerald-500/20">
-                        <div className="space-y-3">
-                          <div className="p-3 rounded-xl bg-card border border-border">
-                            <p className="text-sm text-muted-foreground mb-2">Q. "감사하다"의 뜻은?</p>
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                              <span className="px-3 py-2 bg-muted/50 rounded-lg">① 슬프다</span>
-                              <span className="px-3 py-2 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-lg border border-emerald-500/30">② 고맙다 ✓</span>
-                              <span className="px-3 py-2 bg-muted/50 rounded-lg">③ 화나다</span>
-                              <span className="px-3 py-2 bg-muted/50 rounded-lg">④ 기쁘다</span>
-                            </div>
-                          </div>
-                        </div>
-                        <p className="text-center text-sm text-muted-foreground mt-3">
-                          {t('battle.guide.speedQuiz.exampleDesc')}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Scoring Explanation */}
-                  <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-cyan-500/5 to-emerald-500/10 border border-emerald-500/20 mb-8">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg">
-                        <Zap className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <h5 className="font-bold text-lg">{t('battle.guide.speedQuiz.scoring')}</h5>
-                        <p className="text-sm text-muted-foreground">{t('battle.guide.speedQuiz.scoringDesc')}</p>
-                      </div>
-                    </div>
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                        <span className="text-2xl">✅</span>
-                        <div>
-                          <p className="font-semibold text-emerald-600 dark:text-emerald-400">+10점</p>
-                          <p className="text-xs text-muted-foreground">{t('battle.guide.speedQuiz.correctPoint')}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
-                        <span className="text-2xl">⚡</span>
-                        <div>
-                          <p className="font-semibold text-cyan-600 dark:text-cyan-400">+5점 보너스</p>
-                          <p className="text-xs text-muted-foreground">{t('battle.guide.speedQuiz.fastBonus')}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Rules Cards */}
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="p-4 rounded-xl bg-card/50 border border-border/50 text-center">
-                      <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mx-auto mb-3">
-                        <span className="text-xl font-bold text-blue-500">10</span>
-                      </div>
-                      <p className="font-bold text-lg">{t('battle.guide.speedQuiz.totalQuestions')}</p>
-                      <p className="text-xs text-muted-foreground">{t('battle.guide.speedQuiz.questionsDesc')}</p>
-                    </div>
-                    <div className="p-4 rounded-xl bg-card/50 border border-border/50 text-center">
-                      <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center mx-auto mb-3">
-                        <Timer className="w-6 h-6 text-red-500" />
-                      </div>
-                      <p className="font-bold text-lg">10{t('battle.guide.seconds')}</p>
-                      <p className="text-xs text-muted-foreground">{t('battle.guide.speedQuiz.timeLimit')}</p>
-                    </div>
-                    <div className="p-4 rounded-xl bg-card/50 border border-border/50 text-center">
-                      <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center mx-auto mb-3">
-                        <span className="text-xl">📚</span>
-                      </div>
-                      <p className="font-bold text-lg">{t('battle.guide.speedQuiz.quizTypes')}</p>
-                      <p className="text-xs text-muted-foreground">{t('battle.guide.speedQuiz.quizTypesDesc')}</p>
-                    </div>
-                    <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/10 border border-emerald-500/30 text-center">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-emerald-500/30">
-                        <Crown className="w-6 h-6 text-white" />
-                      </div>
-                      <p className="font-bold text-lg text-emerald-600 dark:text-emerald-400">+1,000P</p>
-                      <p className="text-xs text-muted-foreground">{t('battle.guide.winReward')}</p>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
 
             {/* ===== WIN STREAK BONUS SECTION ===== */}
             <motion.div
@@ -716,7 +547,7 @@ export default function Battle() {
                 <div className="p-6 sm:p-8">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg">
-                      <Zap className="w-6 h-6 text-white" />
+                      <Swords className="w-6 h-6 text-white" />
                     </div>
                     <h3 className="text-2xl font-black">{t('battle.guide.quickRules')}</h3>
                   </div>
