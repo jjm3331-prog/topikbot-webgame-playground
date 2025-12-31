@@ -88,12 +88,21 @@ const MockExamManager = () => {
   const [parsing, setParsing] = useState(false);
   const [questions, setQuestions] = useState<MockQuestion[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  
+
+  // Accurate counts (not affected by list pagination)
+  const [questionCounts, setQuestionCounts] = useState({
+    all: 0,
+    listening: 0,
+    reading: 0,
+    writing: 0,
+  });
+  const [filteredTotalCount, setFilteredTotalCount] = useState(0);
+
   // List section filter and pagination
   const [listSectionFilter, setListSectionFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 20;
-  
+
   // Input form state
   const [examType, setExamType] = useState<string>("topik1");
   const [section, setSection] = useState<string>("reading");
@@ -102,35 +111,79 @@ const MockExamManager = () => {
   const [explanationText, setExplanationText] = useState("");
   const [listeningScript, setListeningScript] = useState("");
   const [generatingAudio, setGeneratingAudio] = useState(false);
-  
+
   // Preview state
   const [parsedQuestions, setParsedQuestions] = useState<ParsedQuestion[]>([]);
   const [showPreview, setShowPreview] = useState(false);
   const [savingQuestions, setSavingQuestions] = useState(false);
-  
+
   // Edit state
   const [editingQuestion, setEditingQuestion] = useState<MockQuestion | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-
-  useEffect(() => {
-    loadQuestions();
-  }, []);
 
   // Reset page when filter changes
   useEffect(() => {
     setCurrentPage(1);
   }, [listSectionFilter, searchQuery]);
 
+  useEffect(() => {
+    loadQuestions();
+  }, [currentPage, listSectionFilter, searchQuery]);
+
   const loadQuestions = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const q = searchQuery.trim();
+      const from = (currentPage - 1) * ITEMS_PER_PAGE;
+      const to = from + ITEMS_PER_PAGE - 1;
+
+      // 1) Accurate global counts (all sections)
+      const [total, listening, reading, writing] = await Promise.all([
+        supabase.from("mock_question_bank").select("id", { count: "exact", head: true }),
+        supabase.from("mock_question_bank").select("id", { count: "exact", head: true }).eq("section", "listening"),
+        supabase.from("mock_question_bank").select("id", { count: "exact", head: true }).eq("section", "reading"),
+        supabase.from("mock_question_bank").select("id", { count: "exact", head: true }).eq("section", "writing"),
+      ]);
+
+      const countsError = total.error || listening.error || reading.error || writing.error;
+      if (countsError) throw countsError;
+
+      setQuestionCounts({
+        all: total.count ?? 0,
+        listening: listening.count ?? 0,
+        reading: reading.count ?? 0,
+        writing: writing.count ?? 0,
+      });
+
+      // 2) List query (paged + filter + search)
+      let listCountQuery = supabase
+        .from("mock_question_bank")
+        .select("id", { count: "exact", head: true });
+
+      let listQuery = supabase
         .from("mock_question_bank")
         .select("*")
         .order("created_at", { ascending: false })
-        .limit(500);
+        .range(from, to);
 
+      if (listSectionFilter !== "all") {
+        listCountQuery = listCountQuery.eq("section", listSectionFilter);
+        listQuery = listQuery.eq("section", listSectionFilter);
+      }
+
+      if (q) {
+        const orExpr = `question_text.ilike.%${q}%,exam_type.ilike.%${q}%`;
+        listCountQuery = listCountQuery.or(orExpr);
+        listQuery = listQuery.or(orExpr);
+      }
+
+      const [{ count: filteredCount, error: filteredCountError }, { data, error }] =
+        await Promise.all([listCountQuery, listQuery]);
+
+      if (filteredCountError) throw filteredCountError;
       if (error) throw error;
+
+      setFilteredTotalCount(filteredCount ?? 0);
       setQuestions(data || []);
     } catch (error: any) {
       console.error("Load questions error:", error);
@@ -416,29 +469,11 @@ const MockExamManager = () => {
     }
   };
 
-  // Filter by section and search query
-  const filteredQuestions = questions.filter((q) => {
-    const matchesSearch = 
-      q.question_text.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      q.exam_type.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesSection = listSectionFilter === "all" || q.section === listSectionFilter;
-    return matchesSearch && matchesSection;
-  });
+  // Server-side pagination uses filteredTotalCount
+  const totalPages = Math.ceil(filteredTotalCount / ITEMS_PER_PAGE);
 
-  // Pagination
-  const totalPages = Math.ceil(filteredQuestions.length / ITEMS_PER_PAGE);
-  const paginatedQuestions = filteredQuestions.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
-
-  // Section counts for tabs
-  const sectionCounts = {
-    all: questions.length,
-    listening: questions.filter(q => q.section === 'listening').length,
-    reading: questions.filter(q => q.section === 'reading').length,
-    writing: questions.filter(q => q.section === 'writing').length,
-  };
+  // Section counts for filter buttons
+  const sectionCounts = questionCounts;
 
   const getExamTypeBadge = (type: string) => {
     const normalized = (type || '').toUpperCase().replace(/[_\s]/g, '');
@@ -471,7 +506,7 @@ const MockExamManager = () => {
           </TabsTrigger>
           <TabsTrigger value="list" className="flex items-center gap-2">
             <FileText className="w-4 h-4" />
-            문제 목록 ({questions.length})
+            문제 목록 ({questionCounts.all})
           </TabsTrigger>
         </TabsList>
 
@@ -736,7 +771,7 @@ const MockExamManager = () => {
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin text-primary" />
                 </div>
-              ) : filteredQuestions.length === 0 ? (
+              ) : filteredTotalCount === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p>등록된 문제가 없습니다.</p>
@@ -751,7 +786,7 @@ const MockExamManager = () => {
               ) : (
                 <>
                   <div className="space-y-3 max-h-[500px] overflow-y-auto mb-4">
-                    {paginatedQuestions.map((q, index) => (
+                    {questions.map((q, index) => (
                       <motion.div
                         key={q.id}
                         initial={{ opacity: 0, y: 10 }}
@@ -817,7 +852,7 @@ const MockExamManager = () => {
                   {totalPages > 1 && (
                     <div className="flex items-center justify-between pt-4 border-t">
                       <p className="text-sm text-muted-foreground">
-                        전체 {filteredQuestions.length}개 중 {(currentPage - 1) * ITEMS_PER_PAGE + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredQuestions.length)}개
+                        전체 {filteredTotalCount}개 중 {(currentPage - 1) * ITEMS_PER_PAGE + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredTotalCount)}개
                       </p>
                       <div className="flex items-center gap-2">
                         <Button
