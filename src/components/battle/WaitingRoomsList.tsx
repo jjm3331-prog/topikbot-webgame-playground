@@ -10,10 +10,12 @@ import {
   Crown,
   Swords,
   Clock,
-  Zap
+  Zap,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -27,7 +29,7 @@ interface WaitingRoom {
 }
 
 interface WaitingRoomsListProps {
-  onJoinRoom: (roomCode: string, gameType: string) => void;
+  onJoinRoom: (roomCode: string, gameType: string, guestName?: string) => void;
   isLoggedIn: boolean;
 }
 
@@ -39,6 +41,8 @@ export default function WaitingRoomsList({ onJoinRoom, isLoggedIn }: WaitingRoom
   const [rooms, setRooms] = useState<WaitingRoom[]>([]);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState<string | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState<WaitingRoom | null>(null);
+  const [guestNickname, setGuestNickname] = useState("");
 
   // Clean up old rooms (24시간 이상 된 waiting 방 삭제)
   const cleanupOldRooms = async () => {
@@ -120,16 +124,42 @@ export default function WaitingRoomsList({ onJoinRoom, isLoggedIn }: WaitingRoom
     };
   }, []);
 
-  const handleJoin = (room: WaitingRoom) => {
+  // Generate random nickname
+  const generateRandomNickname = () => {
+    const adjectives = ["빠른", "용감한", "똑똒한", "귀여운", "멋진", "신나는", "활발한", "재미있는"];
+    const nouns = ["호랑이", "토끼", "용", "펭귄", "고양이", "강아지", "여우", "곰"];
+    const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const noun = nouns[Math.floor(Math.random() * nouns.length)];
+    const num = Math.floor(Math.random() * 100);
+    return `${adj}${noun}${num}`;
+  };
+
+  const openNicknameDialog = (room: WaitingRoom) => {
     if (!isLoggedIn) {
       toast.error(t('battle.loginRequired'), {
         description: t('battle.loginDesc'),
       });
       return;
     }
-    setJoining(room.id);
-    const gameType = room.connection_mode === "semantic" ? "semantic" : "word-chain";
-    onJoinRoom(room.room_code, gameType);
+    setSelectedRoom(room);
+    setGuestNickname(generateRandomNickname());
+  };
+
+  const confirmJoin = () => {
+    if (!selectedRoom || !guestNickname.trim()) {
+      toast.error(t('battle.semanticGame.enterName'));
+      return;
+    }
+    setJoining(selectedRoom.id);
+    const gameType = selectedRoom.connection_mode === "semantic" ? "semantic" : "word-chain";
+    onJoinRoom(selectedRoom.room_code, gameType, guestNickname.trim());
+    setSelectedRoom(null);
+    setGuestNickname("");
+  };
+
+  const cancelJoin = () => {
+    setSelectedRoom(null);
+    setGuestNickname("");
   };
 
   const getGameIcon = (mode: string) => {
@@ -162,7 +192,72 @@ export default function WaitingRoomsList({ onJoinRoom, isLoggedIn }: WaitingRoom
   }
 
   return (
-    <Card className="overflow-hidden">
+    <>
+      {/* Nickname Dialog */}
+      <AnimatePresence>
+        {selectedRoom && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={cancelJoin}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm"
+            >
+              <Card className="p-6 space-y-5">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-bold">{t('battle.enterGuestNickname')}</h3>
+                  <Button variant="ghost" size="icon" onClick={cancelJoin}>
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    <Crown className="w-5 h-5 text-yellow-500" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">vs</p>
+                      <p className="font-bold">{selectedRoom.host_name}</p>
+                    </div>
+                  </div>
+
+                  <Input
+                    value={guestNickname}
+                    onChange={(e) => setGuestNickname(e.target.value)}
+                    placeholder={t('battle.enterNicknamePlaceholder')}
+                    className="text-lg h-12"
+                    maxLength={20}
+                    autoFocus
+                    onKeyDown={(e) => e.key === 'Enter' && confirmJoin()}
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={cancelJoin} className="flex-1">
+                    {t('battle.semanticGame.cancel')}
+                  </Button>
+                  <Button
+                    onClick={confirmJoin}
+                    disabled={!guestNickname.trim()}
+                    className="flex-1 bg-gradient-to-r from-yellow-400 to-orange-500"
+                  >
+                    <Zap className="w-4 h-4 mr-2" />
+                    {t('battle.joinWithNickname')}
+                  </Button>
+                </div>
+              </Card>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <Card className="overflow-hidden">
       {/* Header */}
       <div className="p-4 sm:p-6 border-b border-border flex items-center justify-between bg-gradient-to-r from-muted/50 to-muted/30">
         <div className="flex items-center gap-3">
@@ -221,7 +316,7 @@ export default function WaitingRoomsList({ onJoinRoom, isLoggedIn }: WaitingRoom
                       className={`group relative p-4 rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 cursor-pointer ${
                         joining === room.id ? "opacity-50 pointer-events-none" : ""
                       }`}
-                      onClick={() => handleJoin(room)}
+                      onClick={() => openNicknameDialog(room)}
                     >
                       <div className="flex items-center gap-4">
                         {/* Game Icon */}
@@ -260,7 +355,7 @@ export default function WaitingRoomsList({ onJoinRoom, isLoggedIn }: WaitingRoom
                               className={`bg-gradient-to-r ${gradient} hover:opacity-90 text-white shadow-lg gap-1.5`}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleJoin(room);
+                                openNicknameDialog(room);
                               }}
                             >
                               <Zap className="w-4 h-4" />
@@ -281,5 +376,6 @@ export default function WaitingRoomsList({ onJoinRoom, isLoggedIn }: WaitingRoom
         )}
       </div>
     </Card>
+    </>
   );
 }
