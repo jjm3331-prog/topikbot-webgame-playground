@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import CleanHeader from "@/components/CleanHeader";
 import CommonFooter from "@/components/CommonFooter";
 import ChainReactionMultiplayer from "@/components/vocabulary/ChainReactionMultiplayer";
-import SemanticBattle from "@/components/battle/SemanticBattle";
+import SpeedQuizBattle from "@/components/battle/SpeedQuizBattle";
 import WaitingRoomsList from "@/components/battle/WaitingRoomsList";
 import GuestJoinedNotification from "@/components/battle/GuestJoinedNotification";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,13 +36,13 @@ const battleGames: BattleGame[] = [
     gradient: "from-yellow-400 to-orange-500",
   },
   {
-    id: "semantic",
-    nameKey: "battle.semantic",
-    nameKoKey: "battle.semanticKo",
-    descriptionKey: "battle.semanticDesc",
-    icon: Brain,
+    id: "speed-quiz",
+    nameKey: "battle.speedQuiz",
+    nameKoKey: "battle.speedQuizKo",
+    descriptionKey: "battle.speedQuizDesc",
+    icon: Zap,
     available: true,
-    gradient: "from-purple-500 to-pink-500",
+    gradient: "from-emerald-500 to-cyan-500",
   },
   {
     id: "speed-quiz",
@@ -241,12 +241,12 @@ export default function Battle() {
     );
   }
 
-  if (selectedGame === "semantic") {
+  if (selectedGame === "speed-quiz") {
     return (
       <div className="min-h-screen bg-background">
         <CleanHeader />
         <main className="container mx-auto px-4 py-6 pt-20">
-          <SemanticBattle
+          <SpeedQuizBattle
             onBack={() => {
               setSelectedGame(null);
               setInitialRoomCode(undefined);

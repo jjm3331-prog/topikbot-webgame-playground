@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export type GameResult = "win" | "lose" | "draw";
-export type GameType = "chain_reaction" | "semantic_battle";
+export type GameType = "chain_reaction" | "semantic_battle" | "speed_quiz_battle";
 
 interface SaveGameRecordParams {
   gameType: GameType;

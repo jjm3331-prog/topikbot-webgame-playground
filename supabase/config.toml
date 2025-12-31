@@ -171,3 +171,6 @@ verify_jwt = false
 
 [functions.translate-explanations]
 verify_jwt = true
+
+[functions.speed-quiz]
+verify_jwt = false
