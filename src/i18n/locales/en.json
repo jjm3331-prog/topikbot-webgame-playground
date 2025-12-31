@@ -799,6 +799,31 @@
       "aiScoringDesc": "AI evaluates word relevance from 0-100 points",
       "passDesc": "Pass! Next turn",
       "failDesc": "Low relevance, 1 warning",
+
+      "quickRules": "Quick Rules",
+      "players": "1v1 Battle",
+      "playersDesc": "Real-time match after login",
+      "timeLimit": "20s Limit",
+      "timeLimitDesc": "Fast thinking required",
+      "warningSystem": "Warning System",
+      "warningSystemDesc": "Wrong/timeout/duplicate = warning",
+      "rewards": "Win Rewards",
+      "rewardsDesc": "+1,000 pts + streak bonus",
+
+      "streakTitle": "🔥 Win Streak Bonus System",
+      "streakDesc": "Win consecutively to earn extra bonus points!",
+      "consecutiveWins": " win streak",
+      "bonusPoints": "Bonus points",
+      "maxBonus": "Max bonus",
+      "streakNote": "Streak resets on defeat. Your best streak is saved to your profile!",
+
+      "wordChain": {
+        "step1": "Enter a word that starts with your opponent's last syllable",
+        "step2": "No answer within 20 seconds = 1 warning!",
+        "step3": "2 warnings = defeat, opponent wins",
+        "exampleDesc": "Example chain: 사랑 → 랑데부 → 부자"
+      },
+
       "speedQuiz": {
         "scoring": "Scoring System",
         "scoringDesc": "Points determined by correctness and speed",
