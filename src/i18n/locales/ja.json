@@ -607,6 +607,18 @@
       "roomCodeLabel": "ルームコード",
       "roomCodeHint": "自動参加リンクが機能しない場合、友達はこのコードを入力できます"
     },
+    "wordChainGame": {
+      "overview": "前の単語の最後の音節で単語をつなげます。",
+      "overviewExample": "例：\"사랑\" → \"랑데부\" → \"부자\"",
+      "timeoutWarnDesc": "時間切れ=警告！",
+      "warningDesc": "間違いまたは時間切れは警告としてカウントされます。",
+      "dueumTitle": "두음법칙ルール",
+      "rewardTitle": "+1,000ポイント",
+      "rewardDesc": "勝利してボーナスポイントを獲得！",
+      "yourTurn": "🎯 あなたの番！単語を入力して！",
+      "opponentTurn": "⏳ {{name}}の番...",
+      "warningCount": "警告 {{count}}"
+    },
     "semanticGame": {
       "overview": "前の単語と意味的に関連する単語を言います（最後の音節ではありません）。",
       "overviewExample": "例：「海」→「波」、「学校」→「先生」",

@@ -605,6 +605,18 @@
       "roomCodeLabel": "Xona kodi",
       "roomCodeHint": "Avtomatik qo'shilish havolasi ishlamasa, do'stingiz bu kodni kiritishi mumkin"
     },
+    "wordChainGame": {
+      "overview": "Oldingi so'zning oxirgi bo'g'ini bilan so'z ulang.",
+      "overviewExample": "Misol: \"사랑\" → \"랑데부\" → \"부자\"",
+      "timeoutWarnDesc": "Vaqt tugasa = ogohlantirish!",
+      "warningDesc": "Noto'g'ri so'z yoki vaqt tugashi ogohlantirish hisoblanadi.",
+      "dueumTitle": "두음법칙 qoidasi",
+      "rewardTitle": "+1,000 ball",
+      "rewardDesc": "G'alaba qozonib bonus ball oling!",
+      "yourTurn": "🎯 Navbatingiz! So'z kiriting!",
+      "opponentTurn": "⏳ {{name}} navbati...",
+      "warningCount": "Ogohlantirish {{count}}"
+    },
     "semanticGame": {
       "overview": "Oldingi so'z bilan ma'no jihatidan bog'liq so'z ayting (oxirgi bo'g'in emas).",
       "overviewExample": "Misol: «바다» → «파도» (dengiz → to'lqin), «학교» → «선생님» (maktab → o'qituvchi)",

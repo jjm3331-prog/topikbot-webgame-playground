@@ -668,6 +668,18 @@
       "roomCodeLabel": "Mã phòng",
       "roomCodeHint": "Bạn bè có thể nhập mã này nếu link tự động không hoạt động"
     },
+    "wordChainGame": {
+      "overview": "Nối từ theo âm tiết cuối của từ trước đó.",
+      "overviewExample": "Ví dụ: \"사랑\" → \"랑데부\" → \"부자\"",
+      "timeoutWarnDesc": "Hết giờ = cảnh báo!",
+      "warningDesc": "Từ sai hoặc hết giờ đều tính cảnh báo.",
+      "dueumTitle": "Luật đueum (두음법칙)",
+      "rewardTitle": "+1,000 điểm",
+      "rewardDesc": "Chiến thắng để nhận điểm thưởng!",
+      "yourTurn": "🎯 Tới lượt bạn! Hãy nhập từ!",
+      "opponentTurn": "⏳ Lượt của {{name}}...",
+      "warningCount": "Cảnh báo {{count}}"
+    },
     "semanticGame": {
       "overview": "Nói từ theo ý nghĩa liên quan, không phải âm tiết cuối.",
       "overviewExample": "Ví dụ: \"바다\" → \"파도\" (biển → sóng), \"학교\" → \"선생님\" (trường → giáo viên)",
