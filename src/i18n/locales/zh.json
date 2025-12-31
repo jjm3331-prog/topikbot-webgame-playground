@@ -733,7 +733,22 @@
       "maxBonus": "最大奖励",
       "streakNote": "连胜记录在失败时重置。最高连胜保存到个人资料！",
       "wordChain": { "step1": "输入以对手最后音节开头的词", "step2": "20秒内未回答=1次警告！", "step3": "2次警告=失败，对手获胜" },
-      "semantic": { "step1": "输入与前词语义相关的词", "step2": "AI评分相关性（70+分=通过）", "step3": "超时、低分、重复=警告", "exampleDesc": "海和浪密切相关（95分），学校和老师也高度相关（88分）" }
+      "semantic": { "step1": "输入与前词语义相关的词", "step2": "AI评分相关性（70+分=通过）", "step3": "超时、低分、重复=警告", "exampleDesc": "海和浪密切相关（95分），学校和老师也高度相关（88分）" },
+      "speedQuiz": {
+        "scoring": "计分系统",
+        "scoringDesc": "分数由正误与速度决定",
+        "correctPoint": "答对基础得分",
+        "fastBonus": "5秒内作答额外加分",
+        "totalQuestions": "共10题",
+        "questionsDesc": "题目总数",
+        "timeLimit": "每题时间限制",
+        "quizTypes": "3种题型",
+        "quizTypesDesc": "词汇、语法、表达",
+        "step1": "将出现TOPIK词汇、语法、表达题",
+        "step2": "10秒内选择答案！越快奖励越多！",
+        "step3": "10题中答对更多者获胜！",
+        "exampleDesc": "答对+10分，5秒内作答额外+5分速度奖励"
+      }
     },
     "currentStreak": "🔥 {{count}}连胜中",
     "maxStreak": "最高连胜"
