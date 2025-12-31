@@ -569,6 +569,8 @@
     "secondsPerTurn": "Har navbat 20 soniya",
     "warnings": "2 ogohlantirish = mag'lubiyat",
     "waitingForOpponent": "Raqib kutilmoqda...",
+    "shareCodeDesc": "Quyidagi xona kodini do'stingizga yuboring, u qo'shila oladi.",
+    "cancel": "Bekor qilish",
     "waitingDesc": "Xona kutish ro'yxatiga qo'shildi. Kimdir qo'shilganda o'yin avtomatik boshlanadi.",
     "enterGuestNickname": "Taxallus kiriting",
     "enterNicknamePlaceholder": "Taxallusingizni kiriting...",

@@ -632,6 +632,8 @@
     "secondsPerTurn": "20 seconds per turn",
     "warnings": "2 warnings = defeat",
     "waitingForOpponent": "Waiting for opponent...",
+    "shareCodeDesc": "Share the room code below so your friend can join.",
+    "cancel": "Cancel",
     "waitingDesc": "Your room is now in the waiting list. Game starts when someone joins.",
     "enterGuestNickname": "Enter Nickname",
     "enterNicknamePlaceholder": "Enter your nickname...",

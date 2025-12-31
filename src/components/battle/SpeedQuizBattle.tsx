@@ -377,7 +377,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
 
             if (newRoom.status === "waiting" && newRoom.host_ready && newRoom.guest_ready && !autoStartTriggeredRef.current) {
               autoStartTriggeredRef.current = true;
-              setTimeout(() => void startGame(), 200);
+              setTimeout(() => void startGame(newRoom), 200);
             }
           }
 
@@ -457,17 +457,22 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
     answersChannelRef.current = aChannel;
   };
 
-  const startGame = async () => {
+  const startGame = async (roomToStart?: Room) => {
     const me = playerIdRef.current;
-    if (!room || room.host_id !== me) return;
+    const r = roomToStart ?? roomRef.current;
+    if (!r || r.host_id !== me) return;
 
     try {
-      await supabase
+      const { error } = await supabase
         .from("chain_reaction_rooms")
         .update({ status: "playing", started_at: new Date().toISOString(), host_score: 0, guest_score: 0 })
-        .eq("id", room.id);
+        .eq("id", r.id);
+      if (error) throw error;
       clearHostedRoom();
-    } catch (err) {}
+    } catch (err) {
+      console.error("[SpeedQuiz] Failed to start game:", err);
+      toast({ title: t("battle.roomNotAvailable"), variant: "destructive" });
+    }
   };
 
   const startCountdown = (roomId: string) => {
