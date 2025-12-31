@@ -95,6 +95,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   const [copied, setCopied] = useState(false);
   const [connectionMode, setConnectionMode] = useState<"semantic" | "phonetic">("phonetic");
   const guestJoinNotifiedRef = useRef(false);
+  const autoStartTriggeredRef = useRef(false);
 
   // Realtime moves
   const [moves, setMoves] = useState<MoveRow[]>([]);
@@ -537,15 +538,40 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
           const phase = gamePhaseRef.current;
 
-          if (isHost && newRoom.guest_id && !guestJoinNotifiedRef.current) {
-            guestJoinNotifiedRef.current = true;
-            playBeep(784, 120, "sine");
-            vibrate([80, 40, 120]);
-            toast({
-              title: "상대가 참가했습니다",
-              description: newRoom.guest_name ? `${newRoom.guest_name}님이 들어왔습니다.` : undefined,
-              duration: 8000,
-            });
+          // Host: guest joined → notify + auto-ready + auto-start
+          if (isHost && newRoom.guest_id) {
+            if (!guestJoinNotifiedRef.current) {
+              guestJoinNotifiedRef.current = true;
+              playBeep(784, 120, "sine");
+              vibrate([80, 40, 120]);
+              toast({
+                title: "상대가 참가했습니다",
+                description: newRoom.guest_name ? `${newRoom.guest_name}님이 들어왔습니다.` : undefined,
+                duration: 6000,
+              });
+            }
+
+            // Make sure both are ready so "참가 → 즉시 시작"이 되게 함
+            if (newRoom.status === "waiting" && (!newRoom.host_ready || !newRoom.guest_ready)) {
+              void supabase
+                .from("chain_reaction_rooms")
+                .update({
+                  host_ready: true,
+                  guest_ready: newRoom.guest_id ? true : false,
+                })
+                .eq("id", newRoom.id);
+            }
+
+            // Auto-start once when conditions are met
+            if (
+              newRoom.status === "waiting" &&
+              newRoom.host_ready &&
+              newRoom.guest_ready &&
+              !autoStartTriggeredRef.current
+            ) {
+              autoStartTriggeredRef.current = true;
+              setTimeout(() => void startGame(), 150);
+            }
           }
 
           if (newRoom.guest_id && (phase === "waiting" || phase === "creating" || phase === "joining")) {
