@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -648,16 +648,68 @@ export default function SemanticBattle({ onBack, initialRoomCode, initialGuestNa
     }
   };
 
-  const handleSubmitWord = async () => {
-    if (!room || !isMyTurn || !currentInput.trim() || isValidating || !lastWord) return;
+  const wordSchema = z
+    .string()
+    .trim()
+    .min(1)
+    .max(20)
+    .refine((v) => !/\s{2,}/.test(v), "invalid");
 
-    const word = currentInput.trim();
+  const ensureLastWord = useCallback(async (): Promise<string | null> => {
+    if (lastWord) return lastWord;
+
+    try {
+      const { data, error } = await supabase
+        .from("chain_reaction_moves")
+        .select("*")
+        .eq("room_id", roomRef.current?.id || "")
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      if (error) throw error;
+      const latest = data?.[0] as MoveRow | undefined;
+      if (!latest?.word) return null;
+
+      // hydrate local state so UI becomes consistent
+      if (!moveIdsRef.current.has(latest.id)) {
+        moveIdsRef.current.add(latest.id);
+        setMoves((prev) => (prev.length ? prev : [latest]));
+        setUsedWords((prev) => (prev.length ? prev : [latest.word]));
+      }
+
+      return latest.word;
+    } catch (e) {
+      console.error("[SemanticBattle] ensureLastWord failed", e);
+      return null;
+    }
+  }, [lastWord]);
+
+  const handleSubmitWord = async () => {
+    if (!room || !isMyTurn || !currentInput.trim() || isValidating) return;
+
+    const parsed = wordSchema.safeParse(currentInput);
+    if (!parsed.success) {
+      toast({ title: t("battle.semanticGame.validatingError"), variant: "destructive" });
+      return;
+    }
+
+    const word = parsed.data;
+
+    // lastWord can be temporarily missing due to realtime timing; ensure it before validating.
+    const prev = await ensureLastWord();
+    if (!prev) {
+      toast({ title: t("battle.semanticGame.waitOpponent"), description: t("battle.semanticGame.currentWord") });
+      return;
+    }
+
+    console.log("[SemanticBattle] submit", { roomId: room.id, prev, word, isMyTurn });
+
     setIsValidating(true);
     setLastValidation(null);
 
     try {
       const { data, error } = await supabase.functions.invoke("semantic-validate", {
-        body: { previousWord: lastWord, newWord: word, usedWords },
+        body: { previousWord: prev, newWord: word, usedWords },
       });
 
       if (error) throw error;
@@ -675,7 +727,7 @@ export default function SemanticBattle({ onBack, initialRoomCode, initialGuestNa
             player_name: playerName,
             word: word,
             connection_mode: "semantic",
-            chain_length: moves.length + 1,
+            chain_length: (moves?.length || 0) + 1,
             score_delta: result.score,
           })
           .select("*")
@@ -685,19 +737,22 @@ export default function SemanticBattle({ onBack, initialRoomCode, initialGuestNa
 
         if (insertedMove && !moveIdsRef.current.has(insertedMove.id)) {
           moveIdsRef.current.add(insertedMove.id);
-          setMoves((prev) => [...prev, insertedMove as MoveRow]);
-          setUsedWords((prev) => [...prev, (insertedMove as MoveRow).word]);
+          setMoves((prevMoves) => [...prevMoves, insertedMove as MoveRow]);
+          setUsedWords((prevWords) => [...prevWords, (insertedMove as MoveRow).word]);
         }
 
         const scoreField = isHost ? "host_score" : "guest_score";
         const currentScore = (isHost ? room.host_score : room.guest_score) || 0;
         const nextTurn = isHost ? room.guest_id : room.host_id;
 
-        await supabase.from("chain_reaction_rooms").update({
-          [scoreField]: currentScore + result.score,
-          current_turn_player_id: nextTurn,
-          turn_start_at: new Date().toISOString(),
-        }).eq("id", room.id);
+        await supabase
+          .from("chain_reaction_rooms")
+          .update({
+            [scoreField]: currentScore + result.score,
+            current_turn_player_id: nextTurn,
+            turn_start_at: new Date().toISOString(),
+          })
+          .eq("id", room.id);
 
         setCurrentInput("");
         playBeep(660, 100);
@@ -711,27 +766,34 @@ export default function SemanticBattle({ onBack, initialRoomCode, initialGuestNa
 
         if (newWarnings > MAX_WARNINGS) {
           const winnerId = isHost ? room.guest_id : room.host_id;
-          await supabase.from("chain_reaction_rooms").update({
-            status: "finished",
-            winner_id: winnerId,
-            finished_at: new Date().toISOString(),
-          }).eq("id", room.id);
-          } else {
-            const msg = i18n.language === "vi" ? result.reason_vi : result.reason_ko;
-            toast({
-              title: t("battle.semanticGame.warningToastTitle", { current: newWarnings, max: MAX_WARNINGS + 1 }),
-              description: msg,
-            });
-            const nextTurn = isHost ? room.guest_id : room.host_id;
-            await supabase.from("chain_reaction_rooms").update({
-            [warningField]: newWarnings,
-            current_turn_player_id: nextTurn,
-            turn_start_at: new Date().toISOString(),
-          }).eq("id", room.id);
+          await supabase
+            .from("chain_reaction_rooms")
+            .update({
+              status: "finished",
+              winner_id: winnerId,
+              finished_at: new Date().toISOString(),
+            })
+            .eq("id", room.id);
+        } else {
+          const msg = i18n.language === "vi" ? result.reason_vi : result.reason_ko;
+          toast({
+            title: t("battle.semanticGame.warningToastTitle", { current: newWarnings, max: MAX_WARNINGS + 1 }),
+            description: msg,
+          });
+          const nextTurn = isHost ? room.guest_id : room.host_id;
+          await supabase
+            .from("chain_reaction_rooms")
+            .update({
+              [warningField]: newWarnings,
+              current_turn_player_id: nextTurn,
+              turn_start_at: new Date().toISOString(),
+            })
+            .eq("id", room.id);
         }
         setCurrentInput("");
       }
     } catch (err) {
+      console.error("[SemanticBattle] submit failed", err);
       toast({ title: t("battle.semanticGame.validatingError"), variant: "destructive" });
     } finally {
       setIsValidating(false);
@@ -1269,15 +1331,26 @@ export default function SemanticBattle({ onBack, initialRoomCode, initialGuestNa
             ref={inputRef}
             value={currentInput}
             onChange={(e) => setCurrentInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSubmitWord()}
-            placeholder={isMyTurn ? t("battle.semanticGame.inputPlaceholder") : t("battle.semanticGame.waitTurn")}
-            disabled={!isMyTurn || isValidating}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                void handleSubmitWord();
+              }
+            }}
+            placeholder={
+              isMyTurn
+                ? lastWord
+                  ? t("battle.semanticGame.inputPlaceholder")
+                  : t("battle.semanticGame.currentWord")
+                : t("battle.semanticGame.waitTurn")
+            }
+            disabled={!isMyTurn || isValidating || !lastWord}
             className="flex-1 h-14 text-xl rounded-xl"
           />
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button 
-              onClick={handleSubmitWord} 
-              disabled={!isMyTurn || !currentInput.trim() || isValidating} 
+            <Button
+              onClick={() => void handleSubmitWord()}
+              disabled={!isMyTurn || !currentInput.trim() || isValidating || !lastWord}
               className="h-14 w-14 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500"
             >
               {isValidating ? <Loader2 className="w-6 h-6 animate-spin" /> : <Send className="w-6 h-6" />}
