@@ -9,6 +9,7 @@ import CleanHeader from "@/components/CleanHeader";
 import CommonFooter from "@/components/CommonFooter";
 import ChainReactionMultiplayer from "@/components/vocabulary/ChainReactionMultiplayer";
 import SemanticBattle from "@/components/battle/SemanticBattle";
+import WaitingRoomsList from "@/components/battle/WaitingRoomsList";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -504,7 +505,26 @@ export default function Battle() {
                     {t('common.login')}
                   </Button>
                 </div>
-              </Card>
+          </Card>
+            </motion.div>
+          </section>
+        )}
+
+        {/* Waiting Rooms List - Real-time Room Lobby */}
+        {isLoggedIn && (
+          <section className="container mx-auto px-4 mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <WaitingRoomsList 
+                isLoggedIn={!!isLoggedIn}
+                onJoinRoom={(roomCode, gameType) => {
+                  setInitialRoomCode(roomCode);
+                  setSelectedGame(gameType);
+                }}
+              />
             </motion.div>
           </section>
         )}
