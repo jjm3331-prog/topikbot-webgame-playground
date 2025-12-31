@@ -26,7 +26,7 @@ import confetti from "canvas-confetti";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { clearHostedRoom, saveHostedRoom } from "@/components/battle/GuestJoinedNotification";
-import { saveGameRecord } from "@/lib/gameRecords";
+import { saveGameRecord, type StreakBonus } from "@/lib/gameRecords";
 
 interface ChainReactionMultiplayerProps {
   words: { id: number; korean: string; meaning: string }[];
@@ -116,6 +116,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   const [isValidating, setIsValidating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(3);
+  const [streakBonus, setStreakBonus] = useState<StreakBonus | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const channelRef = useRef<any>(null);
@@ -532,7 +533,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
           table: "chain_reaction_rooms",
           filter: `id=eq.${roomId}`,
         },
-        (payload) => {
+        async (payload) => {
           console.log("[ChainRT] room update:", payload);
           const newRoom = payload.new as Room;
           setRoom(newRoom);
@@ -581,13 +582,12 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
           if (newRoom.status === "finished" && phase !== "finished") {
             setGamePhase("finished");
-            const amHost = newRoom.host_id === playerId;
             const isWinner = newRoom.winner_id === playerId;
             const myScore = amHost ? (newRoom.host_score || 0) : (newRoom.guest_score || 0);
             const opponentScore = amHost ? (newRoom.guest_score || 0) : (newRoom.host_score || 0);
 
             // Save game record
-            saveGameRecord({
+            const recordResult = await saveGameRecord({
               gameType: "chain_reaction",
               result: isWinner ? "win" : "lose",
               myScore,
@@ -600,6 +600,11 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
               playWinSound();
               confetti({ particleCount: 150, spread: 100 });
               awardWinnerPoints();
+              
+              // Show streak bonus if applicable
+              if (recordResult.streakBonus) {
+                setStreakBonus(recordResult.streakBonus);
+              }
             } else {
               playLoseSound();
             }
@@ -1613,10 +1618,32 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.3 }}
-                className="mb-6 inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/50 rounded-2xl"
+                className="mb-6 space-y-3"
               >
-                <Trophy className="w-6 h-6 text-yellow-500" />
-                <span className="text-2xl font-black text-yellow-500">{t("battle.wordChainGame.winBonus")}</span>
+                <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/50 rounded-2xl">
+                  <Trophy className="w-6 h-6 text-yellow-500" />
+                  <span className="text-2xl font-black text-yellow-500">{t("battle.wordChainGame.winBonus")}</span>
+                </div>
+                
+                {/* Streak Bonus */}
+                {streakBonus && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/50 rounded-2xl"
+                  >
+                    <Flame className="w-6 h-6 text-red-500" />
+                    <span className="text-xl font-black text-red-500">
+                      🔥 {streakBonus.streakCount}{t("battle.streakWins")} +{streakBonus.bonusPoints.toLocaleString()}{t("battle.points")}
+                    </span>
+                    {streakBonus.isNewRecord && (
+                      <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full animate-pulse">
+                        {t("battle.newRecord")}
+                      </span>
+                    )}
+                  </motion.div>
+                )}
               </motion.div>
             )}
 
