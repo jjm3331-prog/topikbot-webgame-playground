@@ -3,6 +3,7 @@ import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Play,
@@ -526,7 +527,8 @@ export default function SemanticBattle({ onBack, initialRoomCode, initialGuestNa
     try {
       await supabase.from("chain_reaction_moves").insert({
         room_id: room.id,
-        player_id: "system",
+        // Use host id for the seed word to satisfy RLS (still displayed as system via player_name)
+        player_id: room.host_id,
         player_name: "시스템",
         word: startWord,
         connection_mode: "semantic",
@@ -1278,16 +1280,16 @@ export default function SemanticBattle({ onBack, initialRoomCode, initialGuestNa
         {/* Word chain */}
         <Card className="p-5 max-h-48 overflow-y-auto bg-gradient-to-br from-card to-muted/30 border-border/50">
           <div className="flex flex-wrap gap-2">
-            {moves.map((move, idx) => (
+            {moves.map((move) => (
               <motion.span
                 key={move.id}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 className={`px-4 py-2 rounded-xl text-sm font-bold shadow-lg ${
-                  move.player_id === "system" 
-                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-purple-500/20" 
-                    : move.player_id === playerId 
-                      ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow-green-500/20" 
+                  move.player_id === "system" || move.player_name === "시스템"
+                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-purple-500/20"
+                    : move.player_id === playerId
+                      ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow-green-500/20"
                       : "bg-gradient-to-r from-blue-400 to-cyan-500 text-white shadow-blue-500/20"
                 }`}
               >
@@ -1297,14 +1299,6 @@ export default function SemanticBattle({ onBack, initialRoomCode, initialGuestNa
             ))}
           </div>
         </Card>
-
-        {/* Current word */}
-        {lastWord && (
-          <div className="text-center py-5 bg-gradient-to-br from-card to-muted/30 rounded-2xl border border-border/50">
-            <p className="text-sm text-muted-foreground mb-2">{t("battle.semanticGame.currentWord")}</p>
-            <p className="text-5xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">{lastWord}</p>
-          </div>
-        )}
 
         {/* Validation feedback */}
         <AnimatePresence>
