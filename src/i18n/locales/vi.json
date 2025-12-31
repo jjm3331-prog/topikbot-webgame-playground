@@ -797,6 +797,17 @@
       "aiScoringDesc": "AI đánh giá mức độ liên quan từ 0-100 điểm",
       "passDesc": "Đạt! Lượt tiếp theo",
       "failDesc": "Liên quan thấp, 1 cảnh báo",
+      "speedQuiz": {
+        "scoring": "Hệ thống điểm",
+        "scoringDesc": "Điểm được tính dựa trên đúng/sai và tốc độ",
+        "correctPoint": "Điểm cơ bản cho đáp án đúng",
+        "fastBonus": "Thưởng khi trả lời trong 5 giây",
+        "totalQuestions": "10 câu hỏi",
+        "questionsDesc": "Tổng số câu hỏi",
+        "timeLimit": "Giới hạn thời gian mỗi câu",
+        "quizTypes": "3 loại",
+        "quizTypesDesc": "Từ vựng, Ngữ pháp, Biểu thức"
+      },
       "quickRules": "Tóm tắt quy tắc",
       "players": "Đấu 1:1",
       "playersDesc": "Ghép trận sau khi đăng nhập",
@@ -822,6 +833,12 @@
         "step2": "Phù thủy AI phán quyết kết nối (70+ = đạt)",
         "step3": "Hết giờ, điểm thấp, trùng = cảnh báo!",
         "exampleDesc": "Biển → Sóng (liên kết mạnh! 95đ), Trường → Giáo viên (liên tưởng phép thuật! 88đ)"
+      },
+      "speedQuiz": {
+        "step1": "Câu hỏi từ vựng, ngữ pháp, biểu thức TOPIK xuất hiện",
+        "step2": "Chọn đáp án trong 10 giây! Nhanh hơn = thưởng!",
+        "step3": "Ai đúng nhiều hơn trong 10 câu sẽ thắng!",
+        "exampleDesc": "+10đ cho đáp án đúng, +5đ thưởng tốc độ nếu trả lời trong 5 giây"
       }
     },
     "currentStreak": "🔥 {{count}} thắng liên tiếp",
