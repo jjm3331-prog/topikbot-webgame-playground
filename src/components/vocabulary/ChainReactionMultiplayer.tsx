@@ -297,10 +297,13 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       const autoJoin = async () => {
         try {
           const code = initialRoomCode.toUpperCase();
+          
+          // Find room with phonetic connection mode only
           const { data: roomData, error: findError } = await supabase
             .from("chain_reaction_rooms")
             .select()
             .eq("room_code", code)
+            .eq("connection_mode", "phonetic")
             .maybeSingle();
 
           if (findError) throw findError;
