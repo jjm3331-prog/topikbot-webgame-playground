@@ -87,6 +87,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
   const [roomCodeInput, setRoomCodeInput] = useState(initialRoomCode || "");
   const [copied, setCopied] = useState(false);
   const guestJoinNotifiedRef = useRef(false);
+  const autoStartTriggeredRef = useRef(false);
 
   const [moves, setMoves] = useState<MoveRow[]>([]);
   const moveIdsRef = useRef<Set<string>>(new Set());
@@ -379,15 +380,38 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
           setRoom(newRoom);
           const phase = gamePhaseRef.current;
 
-          if (isHost && newRoom.guest_id && !guestJoinNotifiedRef.current) {
-            guestJoinNotifiedRef.current = true;
-            playBeep(784, 120, "sine");
-            vibrate([80, 40, 120]);
-            toast({
-              title: t("battle.guestJoinedTitle"),
-              description: newRoom.guest_name ? t("battle.guestJoinedDesc", { name: newRoom.guest_name }) : undefined,
-              duration: 8000,
-            });
+          // Host: guest joined → notify + auto-ready + auto-start
+          if (isHost && newRoom.guest_id) {
+            if (!guestJoinNotifiedRef.current) {
+              guestJoinNotifiedRef.current = true;
+              playBeep(784, 120, "sine");
+              vibrate([80, 40, 120]);
+              toast({
+                title: t("battle.guestJoinedTitle"),
+                description: newRoom.guest_name ? t("battle.guestJoinedDesc", { name: newRoom.guest_name }) : undefined,
+                duration: 6000,
+              });
+            }
+
+            if (newRoom.status === "waiting" && (!newRoom.host_ready || !newRoom.guest_ready)) {
+              void supabase
+                .from("chain_reaction_rooms")
+                .update({
+                  host_ready: true,
+                  guest_ready: newRoom.guest_id ? true : false,
+                })
+                .eq("id", newRoom.id);
+            }
+
+            if (
+              newRoom.status === "waiting" &&
+              newRoom.host_ready &&
+              newRoom.guest_ready &&
+              !autoStartTriggeredRef.current
+            ) {
+              autoStartTriggeredRef.current = true;
+              setTimeout(() => void startGame(), 150);
+            }
           }
 
           if (newRoom.guest_id && (phase === "waiting" || phase === "creating" || phase === "joining")) {
