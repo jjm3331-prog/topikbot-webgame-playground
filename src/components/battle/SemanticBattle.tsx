@@ -699,29 +699,38 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
     setLastValidation(null);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/semantic-validate`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        },
-        body: JSON.stringify({ previousWord: lastWord, newWord: word, usedWords }),
+      const { data, error } = await supabase.functions.invoke("semantic-validate", {
+        body: { previousWord: lastWord, newWord: word, usedWords },
       });
 
-      const result = await response.json();
-      setLastValidation({ score: result.score, reason_ko: result.reason_ko, reason_vi: result.reason_vi });
+      if (error) throw error;
+
+      const result = data as any;
+      setLastValidation({ score: result?.score ?? 0, reason_ko: result?.reason_ko ?? "", reason_vi: result?.reason_vi ?? "" });
 
       if (result.valid) {
         // Success - insert move and switch turn
-        await supabase.from("chain_reaction_moves").insert({
-          room_id: room.id,
-          player_id: playerIdRef.current,
-          player_name: playerName,
-          word: word,
-          connection_mode: "semantic",
-          chain_length: moves.length + 1,
-          score_delta: result.score,
-        });
+        const { data: insertedMove, error: insertErr } = await supabase
+          .from("chain_reaction_moves")
+          .insert({
+            room_id: room.id,
+            player_id: playerIdRef.current,
+            player_name: playerName,
+            word: word,
+            connection_mode: "semantic",
+            chain_length: moves.length + 1,
+            score_delta: result.score,
+          })
+          .select("*")
+          .single();
+
+        if (insertErr) throw insertErr;
+
+        if (insertedMove && !moveIdsRef.current.has(insertedMove.id)) {
+          moveIdsRef.current.add(insertedMove.id);
+          setMoves((prev) => [...prev, insertedMove as MoveRow]);
+          setUsedWords((prev) => [...prev, (insertedMove as MoveRow).word]);
+        }
 
         const scoreField = isHost ? "host_score" : "guest_score";
         const currentScore = (isHost ? room.host_score : room.guest_score) || 0;
