@@ -799,6 +799,31 @@
       "aiScoringDesc": "AI가 두 단어의 연관성을 0~100점으로 평가합니다",
       "passDesc": "통과! 다음 턴으로",
       "failDesc": "관련성 부족, 경고 1회",
+
+      "quickRules": "빠른 규칙",
+      "players": "1:1 대전",
+      "playersDesc": "로그인 후 실시간 매칭",
+      "timeLimit": "20초 제한",
+      "timeLimitDesc": "빠른 판단이 필요해요",
+      "warningSystem": "경고 시스템",
+      "warningSystemDesc": "오답/시간초과/중복=경고",
+      "rewards": "승리 보상",
+      "rewardsDesc": "1,000P + 연승 보너스",
+
+      "streakTitle": "🔥 연승 보너스 시스템",
+      "streakDesc": "연승할수록 추가 보너스 포인트를 받아요!",
+      "consecutiveWins": "연승",
+      "bonusPoints": "추가 보너스",
+      "maxBonus": "최대 보너스",
+      "streakNote": "연승 기록은 패배 시 리셋됩니다. 최고 연승은 프로필에 저장돼요!",
+
+      "wordChain": {
+        "step1": "상대가 말한 단어의 마지막 음절로 시작하는 단어를 입력",
+        "step2": "20초 안에 입력하지 못하면 경고 1회!",
+        "step3": "경고 2회면 패배, 상대 승리",
+        "exampleDesc": "사랑 → 랑데부 → 부자"
+      },
+
       "speedQuiz": {
         "scoring": "점수 시스템",
         "scoringDesc": "정답과 스피드에 따라 점수가 결정됩니다",

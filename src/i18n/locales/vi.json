@@ -799,6 +799,31 @@
       "aiScoringDesc": "AI đánh giá mức độ liên quan từ 0-100 điểm",
       "passDesc": "Đạt! Lượt tiếp theo",
       "failDesc": "Liên quan thấp, 1 cảnh báo",
+
+      "quickRules": "Luật nhanh",
+      "players": "Đấu 1v1",
+      "playersDesc": "Ghép trận thời gian thực sau khi đăng nhập",
+      "timeLimit": "Giới hạn 20 giây",
+      "timeLimitDesc": "Cần suy nghĩ nhanh",
+      "warningSystem": "Hệ thống cảnh báo",
+      "warningSystemDesc": "Sai/hết giờ/trùng = cảnh báo",
+      "rewards": "Phần thưởng thắng",
+      "rewardsDesc": "+1,000 điểm + thưởng chuỗi thắng",
+
+      "streakTitle": "🔥 Hệ thống thưởng chuỗi thắng",
+      "streakDesc": "Thắng liên tiếp để nhận thêm điểm thưởng!",
+      "consecutiveWins": " thắng liên tiếp",
+      "bonusPoints": "Điểm thưởng",
+      "maxBonus": "Thưởng tối đa",
+      "streakNote": "Chuỗi thắng sẽ reset khi thua. Kỷ lục thắng được lưu trong hồ sơ!",
+
+      "wordChain": {
+        "step1": "Nhập từ bắt đầu bằng âm tiết cuối của đối thủ",
+        "step2": "Không trả lời trong 20 giây = 1 cảnh báo!",
+        "step3": "2 cảnh báo = thua, đối thủ thắng",
+        "exampleDesc": "Ví dụ chuỗi: 사랑 → 랑데부 → 부자"
+      },
+
       "speedQuiz": {
         "scoring": "Hệ thống điểm",
         "scoringDesc": "Điểm được tính dựa trên đúng/sai và tốc độ",
