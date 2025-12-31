@@ -21,7 +21,10 @@ import {
   Trophy,
   Headphones,
   Notebook,
-  HelpCircle
+  HelpCircle,
+  Swords,
+  Target,
+  TrendingUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +34,7 @@ import { toast } from "@/hooks/use-toast";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { useSubscription } from "@/hooks/useSubscription";
+import { getGameStats, getRecentGameRecords, type GameStats, type GameRecord } from "@/lib/gameRecords";
 
 interface Profile {
   id: string;
@@ -63,6 +67,10 @@ const Profile = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
+  // Game stats states
+  const [gameStats, setGameStats] = useState<GameStats | null>(null);
+  const [recentGames, setRecentGames] = useState<GameRecord[]>([]);
+
   useEffect(() => {
     const fetchProfile = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -88,6 +96,13 @@ const Profile = () => {
         if (data.avatar_url) {
           setAvatarUrl(data.avatar_url);
         }
+        
+        // Fetch game stats
+        const stats = await getGameStats(session.user.id);
+        setGameStats(stats);
+        
+        const records = await getRecentGameRecords(session.user.id, 5);
+        setRecentGames(records);
       }
       setLoading(false);
     };
@@ -479,6 +494,88 @@ const Profile = () => {
               </div>
             </div>
           </motion.div>
+
+          {/* Battle Stats Section */}
+          {gameStats && gameStats.totalGames > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.12 }}
+              className="glass-card rounded-2xl p-6 mb-6"
+            >
+              <h3 className="font-semibold text-foreground flex items-center gap-2 mb-4">
+                <Swords className="w-4 h-4" />
+                {t('profile.battleStats')}
+              </h3>
+
+              {/* Stats Overview */}
+              <div className="grid grid-cols-4 gap-3 mb-4">
+                <div className="text-center p-3 rounded-xl bg-green-500/10 border border-green-500/20">
+                  <p className="text-2xl font-bold text-green-500">{gameStats.wins}</p>
+                  <p className="text-xs text-muted-foreground">{t('profile.wins')}</p>
+                </div>
+                <div className="text-center p-3 rounded-xl bg-red-500/10 border border-red-500/20">
+                  <p className="text-2xl font-bold text-red-500">{gameStats.losses}</p>
+                  <p className="text-xs text-muted-foreground">{t('profile.losses')}</p>
+                </div>
+                <div className="text-center p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
+                  <p className="text-2xl font-bold text-yellow-500">{gameStats.draws}</p>
+                  <p className="text-xs text-muted-foreground">{t('profile.draws')}</p>
+                </div>
+                <div className="text-center p-3 rounded-xl bg-primary/10 border border-primary/20">
+                  <p className="text-2xl font-bold text-primary">{gameStats.winRate}%</p>
+                  <p className="text-xs text-muted-foreground">{t('profile.winRate')}</p>
+                </div>
+              </div>
+
+              {/* Recent Games */}
+              {recentGames.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-1">
+                    <TrendingUp className="w-3 h-3" />
+                    {t('profile.recentGames')}
+                  </h4>
+                  <div className="space-y-2">
+                    {recentGames.map((game) => (
+                      <div 
+                        key={game.id}
+                        className={`flex items-center justify-between p-2 rounded-lg border ${
+                          game.result === 'win' 
+                            ? 'bg-green-500/5 border-green-500/20' 
+                            : game.result === 'lose'
+                              ? 'bg-red-500/5 border-red-500/20'
+                              : 'bg-yellow-500/5 border-yellow-500/20'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className={`text-xs font-bold px-2 py-0.5 rounded ${
+                            game.result === 'win' 
+                              ? 'bg-green-500/20 text-green-500' 
+                              : game.result === 'lose'
+                                ? 'bg-red-500/20 text-red-500'
+                                : 'bg-yellow-500/20 text-yellow-500'
+                          }`}>
+                            {game.result === 'win' ? t('profile.win') : game.result === 'lose' ? t('profile.lose') : t('profile.draw')}
+                          </span>
+                          <span className="text-sm text-foreground">
+                            vs {game.opponentName || t('profile.unknownPlayer')}
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-sm font-medium text-foreground">
+                            {game.myScore} - {game.opponentScore}
+                          </span>
+                          <p className="text-[10px] text-muted-foreground">
+                            {new Date(game.playedAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
 
           {/* Quick Menu (under profile) */}
           <motion.section

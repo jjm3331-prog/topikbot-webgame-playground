@@ -27,6 +27,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import RoomCodeCollapsible from "@/components/battle/RoomCodeCollapsible";
 import { saveHostedRoom, clearHostedRoom } from "@/components/battle/GuestJoinedNotification";
+import { saveGameRecord } from "@/lib/gameRecords";
 
 interface SemanticBattleProps {
   onBack: () => void;
@@ -379,7 +380,21 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
           }
           if (newRoom.status === "finished" && phase !== "finished") {
             setGamePhase("finished");
-            if (newRoom.winner_id === playerId) {
+            const isWinner = newRoom.winner_id === playerId;
+            const myScore = isHost ? (newRoom.host_score || 0) : (newRoom.guest_score || 0);
+            const opponentScore = isHost ? (newRoom.guest_score || 0) : (newRoom.host_score || 0);
+            
+            // Save game record
+            saveGameRecord({
+              gameType: "semantic_battle",
+              result: isWinner ? "win" : "lose",
+              myScore,
+              opponentScore,
+              opponentName: isHost ? newRoom.guest_name || undefined : newRoom.host_name,
+              roomId: newRoom.id,
+            });
+            
+            if (isWinner) {
               playWinSound();
               confetti({ particleCount: 150, spread: 100 });
               awardWinnerPoints();

@@ -28,6 +28,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import RoomCodeCollapsible from "@/components/battle/RoomCodeCollapsible";
 import { saveHostedRoom, clearHostedRoom } from "@/components/battle/GuestJoinedNotification";
+import { saveGameRecord } from "@/lib/gameRecords";
 
 interface ChainReactionMultiplayerProps {
   words: { id: number; korean: string; meaning: string }[];
@@ -535,10 +536,23 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
           if (newRoom.status === "finished" && phase !== "finished") {
             setGamePhase("finished");
-            if (newRoom.winner_id === playerId) {
+            const isWinner = newRoom.winner_id === playerId;
+            const myScore = isHost ? (newRoom.host_score || 0) : (newRoom.guest_score || 0);
+            const opponentScore = isHost ? (newRoom.guest_score || 0) : (newRoom.host_score || 0);
+            
+            // Save game record
+            saveGameRecord({
+              gameType: "chain_reaction",
+              result: isWinner ? "win" : "lose",
+              myScore,
+              opponentScore,
+              opponentName: isHost ? newRoom.guest_name || undefined : newRoom.host_name,
+              roomId: newRoom.id,
+            });
+            
+            if (isWinner) {
               playWinSound();
               confetti({ particleCount: 150, spread: 100 });
-              // Award 1000 points for winning
               awardWinnerPoints();
             } else {
               playLoseSound();
