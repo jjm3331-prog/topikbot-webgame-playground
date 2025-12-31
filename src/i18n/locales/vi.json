@@ -511,7 +511,9 @@
     "selectImage": "Vui lòng chọn file hình ảnh.",
     "fileTooLarge": "File quá lớn. Vui lòng chọn file dưới 5MB.",
     "avatarUpdated": "Đã cập nhật ảnh đại diện!",
-    "avatarUploadFailed": "Không thể tải ảnh lên. Vui lòng thử lại."
+    "avatarUploadFailed": "Không thể tải ảnh lên. Vui lòng thử lại.",
+    "currentStreak": "Chuỗi thắng hiện tại",
+    "maxStreak": "Kỷ lục thắng"
   },
   "ranking": {
     "title": "Bảng Xếp Hạng TOPIK",
@@ -802,7 +804,9 @@
         "step3": "Hết giờ, điểm thấp, trùng = cảnh báo",
         "exampleDesc": "Biển & sóng liên quan chặt (95đ), trường & giáo viên cũng liên quan (88đ)"
       }
-    }
+    },
+    "currentStreak": "🔥 {{count}} thắng liên tiếp",
+    "maxStreak": "Kỷ lục thắng"
   },
   "vocabulary": {
     "title": "Học từ vựng",

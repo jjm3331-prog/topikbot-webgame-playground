@@ -473,7 +473,9 @@
     "selectImage": "Iltimos, rasm faylini tanlang.",
     "fileTooLarge": "Fayl juda katta. 5MB dan kichik fayl tanlang.",
     "avatarUpdated": "Profil rasmi yangilandi!",
-    "avatarUploadFailed": "Rasmni yuklab bo'lmadi. Qayta urinib ko'ring."
+    "avatarUploadFailed": "Rasmni yuklab bo'lmadi. Qayta urinib ko'ring.",
+    "currentStreak": "Joriy ketma-ket g'alaba",
+    "maxStreak": "Eng yuqori ketma-ket"
   },
   "ranking": {
     "title": "TOPIK reytingi",
@@ -694,7 +696,55 @@
       "defeat": "😢 Mag'lubiyat",
       "victoryDesc": "+1,000 ball yutdingiz!",
       "defeatDesc": "{{name}} g'alaba qozondi!"
-    }
+    },
+    "guide": {
+      "title": "To'liq qo'llanma",
+      "subtitle": "O'yin usuli va ketma-ket g'alaba imtiyozlarini batafsil bilib oling!",
+      "howToPlay": "Qanday o'ynash",
+      "example": "Misol",
+      "seconds": "soniya",
+      "perTurn": "Har navbat chegarasi",
+      "warnings": " marta ogohlantirish",
+      "warningLose": " = mag'lubiyat",
+      "dueumRule": "두음법칙",
+      "dueumDesc": "ㄴ→ㅇ, ㄹ→ㄴ avtomatik qo'llaniladi",
+      "winReward": "G'alaba mukofoti",
+      "noDupe": "Takror taqiqlangan",
+      "noDupeDesc": "Avval aytilgan so'z ishlatib bo'lmaydi",
+      "aiScoring": "AI ma'no ball tizimi",
+      "aiScoringDesc": "AI ikki so'z bog'liqligini 0~100 ball bilan baholaydi",
+      "passDesc": "O'tdi! Keyingi navbat",
+      "failDesc": "Bog'liqlik past, 1 ogohlantirish",
+      "quickRules": "Asosiy qoidalar qisqacha",
+      "players": "1:1 bellashuv",
+      "playersDesc": "Kirganingizdan so'ng real vaqt o'yin",
+      "timeLimit": "20 soniya chegara",
+      "timeLimitDesc": "Tez qaror kerak",
+      "warningSystem": "Ogohlantirish tizimi",
+      "warningSystemDesc": "Noto'g'ri/vaqt tugashi ogohlantirish",
+      "rewards": "G'alaba mukofoti",
+      "rewardsDesc": "1,000P + ketma-ket bonus",
+      "streakTitle": "🔥 Ketma-ket g'alaba bonus tizimi",
+      "streakDesc": "Ketma-ket yutganingizda qo'shimcha bonus ball olasiz!",
+      "consecutiveWins": " ketma-ket g'alaba",
+      "bonusPoints": "Qo'shimcha bonus",
+      "maxBonus": "Maksimal bonus",
+      "streakNote": "Ketma-ket rekord mag'lubiyatda qaytariladi. Eng yuqori rekord profilingizda saqlanadi!",
+      "wordChain": {
+        "step1": "Raqibning oxirgi bo'g'ini bilan boshlanadigan so'z kiriting",
+        "step2": "20 soniyada kiritmasangiz 1 ogohlantirish!",
+        "step3": "2 ogohlantirish = mag'lubiyat, raqib g'alaba qozonadi",
+        "exampleDesc": "Oxirgi harf '랑' bilan boshlab '랑데부', yana '부' bilan '부자'"
+      },
+      "semantic": {
+        "step1": "Oldingi so'z bilan ma'no jihatidan bog'liq so'z kiriting",
+        "step2": "AI ikki so'z bog'liqligini ball bilan baholaydi (70+ ball o'tadi)",
+        "step3": "Vaqt tugashi, past ball, takror so'z ogohlantirish hisoblanadi",
+        "exampleDesc": "바다 va 파도 yaqin bog'liq (95 ball), 학교 va 선생님 ham bog'liq (88 ball)"
+      }
+    },
+    "currentStreak": "🔥 {{count}} ketma-ket g'alaba",
+    "maxStreak": "Eng yuqori ketma-ket"
   },
   "vocabulary": {
     "title": "Lug'at o'rganish",

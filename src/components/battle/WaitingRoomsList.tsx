@@ -303,6 +303,21 @@ export default function WaitingRoomsList({ onJoinRoom, isLoggedIn }: WaitingRoom
               <p className="text-[10px] text-muted-foreground">{t('battle.winRateLabel')}</p>
             </div>
           </div>
+          
+          {/* Current Win Streak Display */}
+          {myStats.currentStreak >= 2 && (
+            <div className="mt-3 pt-3 border-t border-border/50">
+              <div className="flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20">
+                <span className="text-lg">🔥</span>
+                <span className="font-bold text-orange-500">{t('battle.currentStreak', { count: myStats.currentStreak })}</span>
+                {myStats.currentStreak >= 3 && (
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-600 font-medium">
+                    +{myStats.currentStreak >= 5 ? '1,000' : myStats.currentStreak >= 4 ? '750' : '500'}P
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
         </Card>
       )}
 

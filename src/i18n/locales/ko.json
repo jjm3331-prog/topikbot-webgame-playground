@@ -511,7 +511,9 @@
     "selectImage": "이미지 파일을 선택해주세요.",
     "fileTooLarge": "파일이 너무 큽니다. 5MB 이하의 파일을 선택해주세요.",
     "avatarUpdated": "프로필 사진이 업데이트되었습니다!",
-    "avatarUploadFailed": "이미지를 업로드할 수 없습니다. 다시 시도해주세요."
+    "avatarUploadFailed": "이미지를 업로드할 수 없습니다. 다시 시도해주세요.",
+    "currentStreak": "현재 연승",
+    "maxStreak": "최고 연승"
   },
   "ranking": {
     "title": "TOPIK 랭킹",
@@ -803,7 +805,9 @@
         "step3": "시간 초과, 낮은 점수, 중복 단어는 경고로 처리됩니다",
         "exampleDesc": "바다와 파도는 밀접한 관계 (95점), 학교와 선생님도 연관성 높음 (88점)"
       }
-    }
+    },
+    "currentStreak": "🔥 {{count}}연승 중",
+    "maxStreak": "최고 연승"
   },
   "vocabulary": {
     "title": "어휘 학습",
