@@ -94,6 +94,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   const [roomCodeInput, setRoomCodeInput] = useState(initialRoomCode || "");
   const [copied, setCopied] = useState(false);
   const [connectionMode, setConnectionMode] = useState<"semantic" | "phonetic">("phonetic");
+  const guestJoinNotifiedRef = useRef(false);
 
   // Realtime moves
   const [moves, setMoves] = useState<MoveRow[]>([]);
@@ -325,7 +326,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
           const { data, error } = await supabase
             .from("chain_reaction_rooms")
-            .update({ guest_id: playerId, guest_name: autoNickname })
+            .update({ guest_id: playerId, guest_name: autoNickname, guest_ready: true })
             .eq("id", roomData.id)
             .select()
             .single();
@@ -436,6 +437,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
           host_name: playerName.trim(),
           connection_mode: "phonetic",
           status: "waiting",
+          host_ready: true,
         })
         .select()
         .single();
@@ -489,7 +491,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
       const { data, error } = await supabase
         .from("chain_reaction_rooms")
-        .update({ guest_id: playerId, guest_name: playerName.trim() })
+        .update({ guest_id: playerId, guest_name: playerName.trim(), guest_ready: true })
         .eq("id", roomData.id)
         .select()
         .single();
@@ -528,6 +530,17 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
           setRoom(newRoom);
 
           const phase = gamePhaseRef.current;
+
+          if (isHost && newRoom.guest_id && !guestJoinNotifiedRef.current) {
+            guestJoinNotifiedRef.current = true;
+            playBeep(784, 120, "sine");
+            vibrate([80, 40, 120]);
+            toast({
+              title: "상대가 참가했습니다",
+              description: newRoom.guest_name ? `${newRoom.guest_name}님이 들어왔습니다.` : undefined,
+              duration: 8000,
+            });
+          }
 
           if (newRoom.guest_id && (phase === "waiting" || phase === "creating" || phase === "joining")) {
             setGamePhase("ready");

@@ -86,6 +86,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
   const [playerName, setPlayerName] = useState("");
   const [roomCodeInput, setRoomCodeInput] = useState(initialRoomCode || "");
   const [copied, setCopied] = useState(false);
+  const guestJoinNotifiedRef = useRef(false);
 
   const [moves, setMoves] = useState<MoveRow[]>([]);
   const moveIdsRef = useRef<Set<string>>(new Set());
@@ -207,7 +208,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
 
           const { data, error } = await supabase
             .from("chain_reaction_rooms")
-            .update({ guest_id: playerId, guest_name: autoNickname })
+            .update({ guest_id: playerId, guest_name: autoNickname, guest_ready: true })
             .eq("id", roomData.id)
             .select()
             .single();
@@ -310,6 +311,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
           host_name: playerName.trim(),
           connection_mode: "semantic",
           status: "waiting",
+          host_ready: true,
         })
         .select()
         .single();
@@ -346,7 +348,7 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
 
       const { data, error } = await supabase
         .from("chain_reaction_rooms")
-        .update({ guest_id: playerId, guest_name: playerName.trim() })
+        .update({ guest_id: playerId, guest_name: playerName.trim(), guest_ready: true })
         .eq("id", roomData.id)
         .select()
         .single();
@@ -371,6 +373,17 @@ export default function SemanticBattle({ onBack, initialRoomCode }: SemanticBatt
           const newRoom = payload.new as Room;
           setRoom(newRoom);
           const phase = gamePhaseRef.current;
+
+          if (isHost && newRoom.guest_id && !guestJoinNotifiedRef.current) {
+            guestJoinNotifiedRef.current = true;
+            playBeep(784, 120, "sine");
+            vibrate([80, 40, 120]);
+            toast({
+              title: t("battle.guestJoinedTitle"),
+              description: newRoom.guest_name ? t("battle.guestJoinedDesc", { name: newRoom.guest_name }) : undefined,
+              duration: 8000,
+            });
+          }
 
           if (newRoom.guest_id && (phase === "waiting" || phase === "creating" || phase === "joining")) {
             setGamePhase("ready");
