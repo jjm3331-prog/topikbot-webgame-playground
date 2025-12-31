@@ -15,7 +15,6 @@ import {
   ArrowLeft,
   Crown,
   Timer,
-  AlertTriangle,
   Zap,
   BookOpen,
   Target,
@@ -91,7 +90,7 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
   const guestJoinNotifiedRef = useRef(false);
   const autoStartTriggeredRef = useRef(false);
 
-  // Quiz state
+  // Quiz state (synced via DB)
   const [currentQuestion, setCurrentQuestion] = useState<QuizQuestion | null>(null);
   const [questionNumber, setQuestionNumber] = useState(0);
   const [timeLeft, setTimeLeft] = useState(QUESTION_TIME_LIMIT);
@@ -108,7 +107,13 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const channelRef = useRef<any>(null);
+  const questionsChannelRef = useRef<any>(null);
+  const answersChannelRef = useRef<any>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+
+  const currentQuestionStartRef = useRef<string | null>(null);
+  const lastPublishedQuestionRef = useRef<number>(0);
+  const advanceTriggeredForQuestionRef = useRef<number>(0);
 
   useEffect(() => {
     gamePhaseRef.current = gamePhase;
@@ -121,7 +126,9 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
   useEffect(() => {
     const initAuthIdentity = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         const uid = session?.user?.id;
         if (uid) {
           setPlayerId(uid);
@@ -160,11 +167,22 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
     if (navigator.vibrate) navigator.vibrate(pattern);
   };
 
-  const playCorrectSound = () => { playBeep(880, 100, "sine"); vibrate(50); };
-  const playWrongSound = () => { playBeep(300, 200, "sawtooth"); vibrate([50, 50]); };
+  const playCorrectSound = () => {
+    playBeep(880, 100, "sine");
+    vibrate(50);
+  };
+  const playWrongSound = () => {
+    playBeep(300, 200, "sawtooth");
+    vibrate([50, 50]);
+  };
   const playCountdownBeep = (num: number) => {
-    if (num > 0) { playBeep(600, 100, "square"); vibrate(30); }
-    else { playBeep(880, 200, "sawtooth"); vibrate([50, 50, 100]); }
+    if (num > 0) {
+      playBeep(600, 100, "square");
+      vibrate(30);
+    } else {
+      playBeep(880, 200, "sawtooth");
+      vibrate([50, 50, 100]);
+    }
   };
   const playWinSound = () => {
     playBeep(523, 150, "sine");
@@ -178,7 +196,9 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
 
   const awardWinnerPoints = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session?.user?.id) return;
       const { data: profile } = await supabase.from("profiles").select("points").eq("id", session.user.id).maybeSingle();
       const currentPoints = profile?.points || 0;
