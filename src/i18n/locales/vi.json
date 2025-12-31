@@ -644,6 +644,11 @@
     "startNow": "Bắt đầu ngay",
     "startGame": "Bắt đầu",
     "challenger": "Đối thủ",
+    "guestKicked": "Đã đuổi khách ra khỏi phòng",
+    "kickGuest": "Đuổi",
+    "kickConfirm": "Bạn có chắc muốn đuổi khách?",
+    "playerLeftTitle": "Đối thủ đã rời đi",
+    "playerLeftDesc": "Đối thủ đã rời game, bạn thắng!",
     "invite": {
       "copied": "Đã copy!",
       "copyInvite": "Copy link mời",

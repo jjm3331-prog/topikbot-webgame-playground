@@ -581,6 +581,11 @@
     "startNow": "Начать сейчас",
     "startGame": "Начать игру",
     "challenger": "Соперник",
+    "guestKicked": "Гость удалён из комнаты",
+    "kickGuest": "Выгнать",
+    "kickConfirm": "Вы уверены, что хотите выгнать гостя?",
+    "playerLeftTitle": "Соперник вышел",
+    "playerLeftDesc": "Соперник покинул игру, вы победили!",
     "invite": {
       "copied": "Скопировано!",
       "copyInvite": "Скопировать ссылку",

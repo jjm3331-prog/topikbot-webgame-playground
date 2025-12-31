@@ -581,6 +581,11 @@
     "startNow": "Hozir boshlash",
     "startGame": "O'yinni boshlash",
     "challenger": "Raqib",
+    "guestKicked": "Mehmon chiqarildi",
+    "kickGuest": "Chiqarish",
+    "kickConfirm": "Haqiqatan ham mehmonni chiqarmoqchimisiz?",
+    "playerLeftTitle": "Raqib chiqib ketdi",
+    "playerLeftDesc": "Raqib o'yindan chiqdi, siz yutdingiz!",
     "invite": {
       "copied": "Nusxalandi!",
       "copyInvite": "Taklif havolasini nusxalash",
