@@ -469,8 +469,9 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
     if (!r || r.host_id !== me) return;
 
     try {
-      // Schedule a synchronized start time (3s countdown) so host/guest start together.
-      const scheduledStartAt = new Date(Date.now() + 3200).toISOString();
+      // Schedule a synchronized start time so host/guest show the same 3-2-1.
+      // Give ~1s propagation buffer, then do a 3s countdown.
+      const scheduledStartAt = new Date(Date.now() + 4000).toISOString();
 
       const { error } = await supabase
         .from("chain_reaction_rooms")
@@ -493,37 +494,60 @@ export default function SpeedQuizBattle({ onBack, initialRoomCode, initialGuestN
     setGamePhase("countdown");
 
     const targetMs = startedAt ? new Date(startedAt).getTime() : Date.now() + 3000;
+    const countdownStartMs = targetMs - 3000;
+
+    let countdownStarted = false;
     let lastShown: number | null = null;
 
     if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
 
-    const tick = () => {
-      const remainingMs = targetMs - Date.now();
-      const remainingSec = Math.max(0, Math.ceil(remainingMs / 1000));
+    const beginCountdown = () => {
+      countdownStarted = true;
 
-      if (lastShown !== remainingSec) {
-        lastShown = remainingSec;
-        setCountdown(remainingSec);
-        playCountdownBeep(remainingSec);
-      }
+      const tick = () => {
+        const now = Date.now();
+        const remainingMs = targetMs - now;
 
-      if (remainingSec <= 0) {
-        if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
-        countdownTimerRef.current = null;
+        // Always show 3,2,1 then START (0)
+        const remainingSec = Math.max(0, Math.min(3, Math.ceil(remainingMs / 1000)));
 
-        setGamePhase("playing");
-
-        // Host publishes first question
-        if (isHostRef.current) {
-          publishNextQuestion(roomId, 1);
-        } else {
-          setIsLoading(true);
+        if (lastShown !== remainingSec) {
+          lastShown = remainingSec;
+          setCountdown(remainingSec);
+          playCountdownBeep(remainingSec);
         }
-      }
+
+        if (remainingMs <= 0) {
+          if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
+          countdownTimerRef.current = null;
+
+          setGamePhase("playing");
+
+          // Host publishes first question
+          if (isHostRef.current) {
+            publishNextQuestion(roomId, 1);
+          } else {
+            setIsLoading(true);
+          }
+        }
+      };
+
+      tick();
+      countdownTimerRef.current = setInterval(tick, 100);
     };
 
-    tick();
-    countdownTimerRef.current = setInterval(tick, 150);
+    // If we received the "playing" event early (propagation buffer), wait until the shared countdown start.
+    const now = Date.now();
+    if (now < countdownStartMs) {
+      setCountdown(3);
+      const delay = countdownStartMs - now;
+      setTimeout(() => {
+        if (!countdownStarted) beginCountdown();
+      }, delay);
+      return;
+    }
+
+    beginCountdown();
   };
 
   // Host generates & publishes question to DB
