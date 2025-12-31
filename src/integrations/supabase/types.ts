@@ -466,6 +466,48 @@ export type Database = {
         }
         Relationships: []
       }
+      game_records: {
+        Row: {
+          created_at: string
+          game_type: string
+          id: string
+          my_score: number | null
+          opponent_id: string | null
+          opponent_name: string | null
+          opponent_score: number | null
+          played_at: string
+          result: string
+          room_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          game_type: string
+          id?: string
+          my_score?: number | null
+          opponent_id?: string | null
+          opponent_name?: string | null
+          opponent_score?: number | null
+          played_at?: string
+          result: string
+          room_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          game_type?: string
+          id?: string
+          my_score?: number | null
+          opponent_id?: string | null
+          opponent_name?: string | null
+          opponent_score?: number | null
+          played_at?: string
+          result?: string
+          room_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       grammar_ox_questions: {
         Row: {
           created_at: string
@@ -1288,6 +1330,9 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          battle_draws: number
+          battle_losses: number
+          battle_wins: number
           created_at: string
           current_streak: number
           hp: number
@@ -1303,6 +1348,9 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          battle_draws?: number
+          battle_losses?: number
+          battle_wins?: number
           created_at?: string
           current_streak?: number
           hp?: number
@@ -1318,6 +1366,9 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          battle_draws?: number
+          battle_losses?: number
+          battle_wins?: number
           created_at?: string
           current_streak?: number
           hp?: number
