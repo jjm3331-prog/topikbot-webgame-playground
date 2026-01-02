@@ -273,21 +273,77 @@ function parseMarkdownForDay(
       if (trimmedLine.startsWith("![")) continue;
       if (trimmedLine.startsWith("|")) continue;
       if (/^\d+\)/.test(trimmedLine)) continue; // Skip answer choices like "1)"
+      if (/^##\s*\d+\./.test(trimmedLine)) continue; // Skip exercise headers like "## 1."
+      if (/^보기/.test(trimmedLine)) continue; // Skip "보기" (examples)
 
       // Root header pattern:
       // - "### 그림 도圖" / "#### 전하다 전傳"
       // - "자취 적蹟·跡·迹" (no #)
+      // - Pattern for "반의어" sections: "차다  \n만滿" (two lines)
+      // - Pattern with bold: "### 입入" or "들어가다 **입入**"
       const rootHeaderPatterns = [
         /^#{2,4}\s+(.+?)\s+([가-힣/]+)\s*([一-龥々\u4e00-\u9fff\u3400-\u4dbf·]+)$/,
         /^([가-힣/]+)\s+([가-힣/]+)\s*([一-龥々\u4e00-\u9fff\u3400-\u4dbf·]+)$/, // Without #
+        // "### 입入" pattern (combined reading+hanja after ###)
+        /^#{2,4}\s+([가-힣/]+)\s*([一-龥々\u4e00-\u9fff\u3400-\u4dbf·]+)$/,
+        // "들어가다 **입入**" pattern with bold
+        /^([가-힣/\s]+?)\s+\*\*([가-힣/]+)([一-龥々\u4e00-\u9fff\u3400-\u4dbf·]+)\*\*$/,
       ];
 
       let rootMatch: RegExpMatchArray | null = null;
-      for (const pattern of rootHeaderPatterns) {
-        const match = trimmedLine.match(pattern);
+      let patternIndex = -1;
+      for (let p = 0; p < rootHeaderPatterns.length; p++) {
+        const match = trimmedLine.match(rootHeaderPatterns[p]);
         if (match) {
           rootMatch = match;
+          patternIndex = p;
           break;
+        }
+      }
+
+      // NEW: Two-line root pattern for various sections
+      // Line 1: Korean meaning (e.g., "차다" or "강하다" or "느끼다")
+      // Line 2: Reading + Hanja (e.g., "만滿" or "강强" or "감感")
+      if (!rootMatch) {
+        // Flexible Korean meaning pattern (may include /, space, or end with 하다)
+        if (/^[가-힣\/\s]+(?:하다)?$/.test(trimmedLine) && trimmedLine.length < 30) {
+          // Check if next line has reading+hanja pattern (with or without bold)
+          const nextLine = dayLines[i + 1]?.trim();
+          if (nextLine) {
+            // Pattern: "감感" or "**감感**" or "감감" (duplicate like 감감)
+            const hanjaPatterns = [
+              /^([가-힣]+)([一-龥々\u4e00-\u9fff\u3400-\u4dbf]+)$/, // Simple: 만滿
+              /^\*\*([가-힣]+)([一-龥々\u4e00-\u9fff\u3400-\u4dbf]+)\*\*$/, // Bold: **만滿**
+              /^([가-힣]+)\s*([一-龥々\u4e00-\u9fff\u3400-\u4dbf]+)$/, // With space: 만 滿
+            ];
+            
+            for (const pattern of hanjaPatterns) {
+              const hanjaMatch = nextLine.match(pattern);
+              if (hanjaMatch) {
+                // Save previous root if it has words
+                if (currentRoot && currentRoot.words.length > 0) {
+                  roots.push(currentRoot);
+                }
+
+                currentRoot = {
+                  meaning_ko: trimmedLine.replace(/\s+/g, ' ').trim(),
+                  reading_ko: hanjaMatch[1],
+                  hanja: hanjaMatch[2].charAt(0),
+                  meaning_en: "",
+                  meaning_ja: "",
+                  meaning_zh: "",
+                  meaning_vi: "",
+                  words: [],
+                };
+
+                collectingMeanings = true;
+                meaningLines = [];
+                i++; // Skip the next line (reading+hanja)
+                break;
+              }
+            }
+            if (currentRoot && collectingMeanings) continue;
+          }
         }
       }
 
@@ -297,9 +353,24 @@ function parseMarkdownForDay(
           roots.push(currentRoot);
         }
 
-        const meaningKo = rootMatch[1].trim();
-        const readingKo = rootMatch[2].trim();
-        const hanja = rootMatch[3].replace(/[·]/g, ""); // Remove middle dots
+        let meaningKo: string, readingKo: string, hanja: string;
+        
+        if (patternIndex === 2) {
+          // Pattern: "### 입入" (no meaning, just reading+hanja)
+          meaningKo = "";
+          readingKo = rootMatch[1].trim();
+          hanja = rootMatch[2].replace(/[·]/g, "");
+        } else if (patternIndex === 3) {
+          // Pattern: "들어가다 **입入**" (meaning, then bold reading+hanja)
+          meaningKo = rootMatch[1].trim();
+          readingKo = rootMatch[2].trim();
+          hanja = rootMatch[3].replace(/[·]/g, "");
+        } else {
+          // Original patterns
+          meaningKo = rootMatch[1].trim();
+          readingKo = rootMatch[2].trim();
+          hanja = rootMatch[3]?.replace(/[·]/g, "") || "";
+        }
 
         currentRoot = {
           meaning_ko: meaningKo,
