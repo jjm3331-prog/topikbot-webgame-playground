@@ -85,6 +85,7 @@ interface HanjaRoot {
 
 interface HanjaWord {
   word: string;
+  meaning_ko?: string;
   meaning_en: string;
   meaning_ja: string;
   meaning_zh: string;
@@ -111,12 +112,17 @@ serve(async (req) => {
       );
     }
 
+    console.log(`Processing Day ${dayNumber}...`);
+
     // Parse the markdown content for the specific day
     const parsedData = parseMarkdownForDay(markdown, dayNumber);
 
     if (!parsedData || parsedData.roots.length === 0) {
       return new Response(
-        JSON.stringify({ error: `No data found for Day ${dayNumber}` }),
+        JSON.stringify({ 
+          error: `No data found for Day ${dayNumber}`, 
+          debug: { linesScanned: parsedData?.debug?.linesScanned || 0 }
+        }),
         { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -174,6 +180,8 @@ serve(async (req) => {
 
     // Insert roots and words
     let rootOrder = 0;
+    let totalWords = 0;
+    
     for (const root of parsedData.roots) {
       const { data: rootData, error: rootError } = await supabaseClient
         .from("hanja_roots")
@@ -191,7 +199,10 @@ serve(async (req) => {
         .select("id")
         .single();
 
-      if (rootError) throw rootError;
+      if (rootError) {
+        console.error("Root insert error:", rootError);
+        throw rootError;
+      }
 
       // Insert words for this root
       let wordOrder = 0;
@@ -201,6 +212,7 @@ serve(async (req) => {
           .insert({
             root_id: rootData.id,
             word: word.word,
+            meaning_ko: word.meaning_ko || null,
             meaning_en: word.meaning_en,
             meaning_ja: word.meaning_ja,
             meaning_zh: word.meaning_zh,
@@ -208,16 +220,22 @@ serve(async (req) => {
             display_order: wordOrder++,
           });
 
-        if (wordError) throw wordError;
+        if (wordError) {
+          console.error("Word insert error:", wordError);
+          throw wordError;
+        }
+        totalWords++;
       }
     }
+
+    console.log(`Day ${dayNumber}: ${parsedData.roots.length} roots, ${totalWords} words`);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         dayNumber, 
         rootsCount: parsedData.roots.length,
-        wordsCount: parsedData.roots.reduce((acc, r) => acc + r.words.length, 0)
+        wordsCount: totalWords
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
@@ -232,166 +250,187 @@ serve(async (req) => {
   }
 });
 
-function parseMarkdownForDay(markdown: string, dayNumber: number): { roots: HanjaRoot[] } {
+function parseMarkdownForDay(markdown: string, dayNumber: number): { roots: HanjaRoot[], debug?: { linesScanned: number } } {
   const roots: HanjaRoot[] = [];
   const lines = markdown.split("\n");
 
   // Find the start of the target day section
-  // Pattern: "Day 01 예술과 문화" or "### Day 01"
   const dayStr = String(dayNumber).padStart(2, "0");
-  const dayPattern = new RegExp(`Day\\s*${dayStr}\\b`, "i");
-  const nextDayPattern = /Day\s*\d{2}\b/i;
-
+  
   let inTargetDay = false;
   let dayContent: string[] = [];
-  let foundDayHeader = false;
-
+  
+  // Look for patterns like "Day 01 예술과 문화" or "### Day 02"
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-
-    // Check for day header
-    if (dayPattern.test(line)) {
-      inTargetDay = true;
-      foundDayHeader = true;
-      continue;
-    }
-
-    if (inTargetDay) {
-      // Check for next day or unit header
-      if (foundDayHeader && nextDayPattern.test(line) && !dayPattern.test(line)) {
-        break; // Next day found, stop
-      }
-      // Also stop at unit headers like "## 2"
-      if (/^##\s*\d+\s*$/.test(line.trim())) {
+    const trimmedLine = line.trim();
+    
+    // Check for day header - multiple patterns
+    // Pattern 1: "Day 01 예술과 문화"
+    // Pattern 2: "### Day 02 전통과 유산 1"
+    const dayMatch = trimmedLine.match(/^(?:#{1,4}\s*)?Day\s*(\d+)\b/i);
+    
+    if (dayMatch) {
+      const foundDay = parseInt(dayMatch[1], 10);
+      
+      if (foundDay === dayNumber) {
+        inTargetDay = true;
+        continue;
+      } else if (inTargetDay && foundDay !== dayNumber) {
+        // Found next day, stop
         break;
       }
+    }
+    
+    // Stop at exercise sections (numbered headers)
+    if (inTargetDay && /^#{1,4}\s*\d+\.\s+/.test(trimmedLine)) {
+      break;
+    }
+    
+    // Stop at unit headers like "## 2" or "## 3"
+    if (inTargetDay && /^##\s+\d+\s*$/.test(trimmedLine)) {
+      break;
+    }
+    
+    if (inTargetDay) {
       dayContent.push(line);
     }
   }
 
   if (dayContent.length === 0) {
     console.log(`No content found for Day ${dayNumber}`);
-    return { roots };
+    return { roots, debug: { linesScanned: lines.length } };
   }
 
   console.log(`Found ${dayContent.length} lines for Day ${dayNumber}`);
-
-  // Parse roots from day content
-  // Pattern: ### 한글의미 한자음漢字 (e.g., "### 그림 도圖")
-  // Alternative: "### 그림 화畫" or "#### 보여주다/행하다 연演"
-  const rootPattern = /^#{2,4}\s+(.+?)\s+([가-힣]+)([一-龥々]+)$/;
-
+  
+  // Parse roots and words
+  // Multiple patterns for root headers:
+  // Pattern 1: "### 그림 도圖" (### meaning_ko reading_koHanja)
+  // Pattern 2: "#### 전하다 전傳" (#### meaning_ko reading_koHanja)
+  // Pattern 3: "자취 적蹟·跡·迹" (meaning_ko reading_koHanja with middle dots)
+  
   let currentRoot: HanjaRoot | null = null;
-  let meaningBuffer: string[] = [];
-  let wordsBuffer: string[] = [];
-  let parsingState: "meanings" | "words" | "idle" = "idle";
-
+  let collectingMeanings = false;
+  let meaningLines: string[] = [];
+  
+  // Extended hanja regex to include more character ranges
+  const hanjaChars = "[一-龥々\u4e00-\u9fff\u3400-\u4dbf·]+";
+  
   for (let i = 0; i < dayContent.length; i++) {
-    const line = dayContent[i].trim();
-
-    // Skip empty lines, images, and tables
-    if (!line || line.startsWith("![") || line.startsWith("| ") || line.startsWith("|")) continue;
-
-    // Check for root header
-    const rootMatch = line.match(rootPattern);
-
+    const line = dayContent[i];
+    const trimmedLine = line.trim();
+    
+    // Skip empty lines, images, tables, exercise numbers
+    if (!trimmedLine) continue;
+    if (trimmedLine.startsWith("![")) continue;
+    if (trimmedLine.startsWith("|")) continue;
+    if (/^\d+\)/.test(trimmedLine)) continue; // Skip answer choices like "1)"
+    
+    // Root header pattern: "### 그림 도圖" or "#### 전하다 전傳"
+    // Also handle: "자취 적蹟·跡·迹" without #
+    const rootHeaderPatterns = [
+      /^#{2,4}\s+(.+?)\s+([가-힣/]+)\s*([一-龥々\u4e00-\u9fff\u3400-\u4dbf·]+)$/,
+      /^([가-힣/]+)\s+([가-힣/]+)\s*([一-龥々\u4e00-\u9fff\u3400-\u4dbf·]+)$/, // Without #
+    ];
+    
+    let rootMatch = null;
+    for (const pattern of rootHeaderPatterns) {
+      const match = trimmedLine.match(pattern);
+      if (match) {
+        rootMatch = match;
+        break;
+      }
+    }
+    
     if (rootMatch) {
-      // Save previous root if exists
-      if (currentRoot && (wordsBuffer.length > 0 || meaningBuffer.length > 0)) {
-        if (wordsBuffer.length > 0) {
-          currentRoot.words = parseWords(wordsBuffer);
-        }
+      // Save previous root if it has words
+      if (currentRoot && currentRoot.words.length > 0) {
         roots.push(currentRoot);
       }
-
-      const meaningKo = rootMatch[1].replace(/[\/\\]/g, "/").trim();
-      const readingKo = rootMatch[2];
-      const hanja = rootMatch[3];
-
+      
+      const meaningKo = rootMatch[1].trim();
+      const readingKo = rootMatch[2].trim();
+      const hanja = rootMatch[3].replace(/[·]/g, ""); // Remove middle dots
+      
       currentRoot = {
         meaning_ko: meaningKo,
         reading_ko: readingKo,
-        hanja: hanja,
+        hanja: hanja.charAt(0), // Take just the first hanja character
         meaning_en: "",
         meaning_ja: "",
         meaning_zh: "",
         meaning_vi: "",
         words: [],
       };
-
-      meaningBuffer = [];
-      wordsBuffer = [];
-      parsingState = "meanings";
+      
+      collectingMeanings = true;
+      meaningLines = [];
       continue;
     }
-
+    
     if (currentRoot) {
-      // Parse meaning lines (4 lines after root header)
-      if (parsingState === "meanings") {
-        // Check if this line looks like a word line
-        if (/^[가-힣]+\s+.+\s*\//.test(line)) {
-          // This is a word line, switch to words mode
-          parsingState = "words";
-          wordsBuffer.push(line);
-        } else if (meaningBuffer.length < 4) {
-          meaningBuffer.push(line);
-          if (meaningBuffer.length === 4) {
-            // English, Japanese, Chinese, Vietnamese in order
-            currentRoot.meaning_en = meaningBuffer[0] || "";
-            currentRoot.meaning_ja = meaningBuffer[1] || "";
-            currentRoot.meaning_zh = meaningBuffer[2] || "";
-            currentRoot.meaning_vi = meaningBuffer[3] || "";
-            parsingState = "words";
+      // Collect root meanings (up to 4 lines after header)
+      if (collectingMeanings && meaningLines.length < 4) {
+        // Check if this is a word line (Korean word followed by meaning and slashes)
+        if (/^[가-힣]+(?:\s+[가-힣]+)?\s+.+\//.test(trimmedLine)) {
+          collectingMeanings = false;
+          // Parse meanings collected so far
+          if (meaningLines.length > 0) {
+            currentRoot.meaning_en = meaningLines[0] || "";
+            currentRoot.meaning_ja = meaningLines[1] || "";
+            currentRoot.meaning_zh = meaningLines[2] || "";
+            currentRoot.meaning_vi = meaningLines[3] || "";
           }
+        } else if (!trimmedLine.includes("/") && !trimmedLine.startsWith("#")) {
+          meaningLines.push(trimmedLine);
+          if (meaningLines.length === 4) {
+            currentRoot.meaning_en = meaningLines[0] || "";
+            currentRoot.meaning_ja = meaningLines[1] || "";
+            currentRoot.meaning_zh = meaningLines[2] || "";
+            currentRoot.meaning_vi = meaningLines[3] || "";
+            collectingMeanings = false;
+          }
+          continue;
         }
-        continue;
       }
-
+      
       // Parse word lines
-      if (parsingState === "words") {
-        // Word pattern: 단어 English / Japanese / Chinese / Vietnamese
-        if (/^[가-힣]+\s+.+\s*\//.test(line)) {
-          wordsBuffer.push(line);
-        }
-      }
-    }
-  }
-
-  // Don't forget the last root
-  if (currentRoot && (wordsBuffer.length > 0 || meaningBuffer.length > 0)) {
-    if (wordsBuffer.length > 0) {
-      currentRoot.words = parseWords(wordsBuffer);
-    }
-    roots.push(currentRoot);
-  }
-
-  console.log(`Parsed ${roots.length} roots for Day ${dayNumber}`);
-
-  return { roots };
-}
-
-function parseWords(lines: string[]): HanjaWord[] {
-  const words: HanjaWord[] = [];
-
-  for (const line of lines) {
-    // Pattern: 가요 pop(ular) song, K-pop / 歌谣 / 歌曲 / bài hát
-    const parts = line.split(" / ");
-    if (parts.length >= 1) {
-      // First part has Korean word and English meaning
-      const firstPart = parts[0];
-      const wordMatch = firstPart.match(/^([가-힣]+)\s+(.+)$/);
-
+      // Pattern: "지도 map / 地図 / 地图 / bản đồ"
+      // Or: "가요 pop(ular) song, K-pop / 歌谣 / 歌曲 / bài hát"
+      // Or: "변하다 to change / 变わる / 变 / thay đổi, biến đổi"
+      const wordMatch = trimmedLine.match(/^([가-힣]+(?:\s*[一-龥々\u4e00-\u9fff]*)?)\s+(.+?)\s*\/\s*(.+?)\s*\/\s*(.+?)\s*\/\s*(.+)$/);
+      
       if (wordMatch) {
-        words.push({
-          word: wordMatch[1],
+        const koreanWord = wordMatch[1].trim();
+        // Remove any Hanja from the word
+        const cleanWord = koreanWord.replace(/[一-龥々\u4e00-\u9fff]+/g, "").trim();
+        
+        currentRoot.words.push({
+          word: cleanWord || koreanWord,
           meaning_en: wordMatch[2].trim(),
-          meaning_ja: parts[1]?.trim() || "",
-          meaning_zh: parts[2]?.trim() || "",
-          meaning_vi: parts[3]?.trim() || "",
+          meaning_ja: wordMatch[3].trim(),
+          meaning_zh: wordMatch[4].trim(),
+          meaning_vi: wordMatch[5].trim(),
         });
       }
     }
   }
+  
+  // Don't forget the last root
+  if (currentRoot && currentRoot.words.length > 0) {
+    roots.push(currentRoot);
+  }
 
-  return words;
+  console.log(`Parsed ${roots.length} roots for Day ${dayNumber}`);
+  
+  // Debug first few roots
+  if (roots.length > 0) {
+    console.log(`First root: ${roots[0].meaning_ko} ${roots[0].reading_ko}${roots[0].hanja}, ${roots[0].words.length} words`);
+    if (roots.length > 1) {
+      console.log(`Second root: ${roots[1].meaning_ko} ${roots[1].reading_ko}${roots[1].hanja}, ${roots[1].words.length} words`);
+    }
+  }
+
+  return { roots, debug: { linesScanned: dayContent.length } };
 }
