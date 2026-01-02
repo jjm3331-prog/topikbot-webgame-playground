@@ -2859,11 +2859,15 @@
     "loginDesc": "Please log in to save your progress.",
     "backToList": "Back to list",
     "wordsProgress": "{{mastered}}/{{total}} words",
+    "wordsLearned": "Words learned",
+    "complete": "Complete",
     "prevDay": "Previous Day",
     "nextDay": "Next Day",
     "relatedWords": "Related Words",
     "markMastered": "Mark as mastered",
-    "markUnmastered": "Unmark mastered"
+    "markUnmastered": "Unmark mastered",
+    "exampleSentence": "Example",
+    "noExample": "No example sentence available yet."
   }
 }
 

@@ -2590,11 +2590,15 @@
     "loginDesc": "Taraqqiyotni saqlash uchun tizimga kiring.",
     "backToList": "Ro'yxatga qaytish",
     "wordsProgress": "{{mastered}}/{{total}} so'z",
+    "wordsLearned": "O'rganilgan so'zlar",
+    "complete": "Bajarildi",
     "prevDay": "Oldingi Day",
     "nextDay": "Keyingi Day",
     "relatedWords": "Bog'liq so'zlar",
     "markMastered": "O'zlashtirilgan deb belgilash",
-    "markUnmastered": "Belgini olib tashlash"
+    "markUnmastered": "Belgini olib tashlash",
+    "exampleSentence": "Misol",
+    "noExample": "Hali misol yo'q."
   }
 }
 

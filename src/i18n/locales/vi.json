@@ -2878,11 +2878,15 @@
     "loginDesc": "Vui lòng đăng nhập để lưu tiến độ.",
     "backToList": "Quay lại danh sách",
     "wordsProgress": "{{mastered}}/{{total}} từ",
+    "wordsLearned": "Từ đã học",
+    "complete": "Hoàn thành",
     "prevDay": "Day trước",
     "nextDay": "Day tiếp theo",
     "relatedWords": "Từ liên quan",
     "markMastered": "Đánh dấu đã học",
-    "markUnmastered": "Bỏ đánh dấu"
+    "markUnmastered": "Bỏ đánh dấu",
+    "exampleSentence": "Ví dụ",
+    "noExample": "Chưa có câu ví dụ."
   }
 }
 
