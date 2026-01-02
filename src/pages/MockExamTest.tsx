@@ -638,7 +638,12 @@ const MockExamTest = () => {
       audioRef.current.src = "";
     }
 
-    const audio = new Audio(url);
+    const audio = new Audio();
+    // CORS 설정 - cross-origin 리소스 재생 허용
+    audio.crossOrigin = "anonymous";
+    // preload 힌트
+    audio.preload = "auto";
+    audio.src = url;
     audio.playbackRate = playbackSpeed;
     audioRef.current = audio;
 
