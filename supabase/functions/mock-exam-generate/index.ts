@@ -1138,8 +1138,8 @@ async function handleStreamingGeneration(
         let geminiResponse: Response | null = null;
         let lastError = "";
         
-        // 최대 5분 (300초) 타임아웃 - Gemini API가 허용하는 최대치
-        const GEMINI_TIMEOUT_MS = 300000; // 5 minutes
+        // 최대 10분 (600초) 타임아웃 - 듣기 문제 생성 시 TTS까지 포함
+        const GEMINI_TIMEOUT_MS = 600000; // 10 minutes
         
         for (let attempt = 0; attempt < 3; attempt++) {
           try {
@@ -1147,7 +1147,7 @@ async function handleStreamingGeneration(
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
             
-            sendProgress("generating", 30 + attempt * 2, `🤖 Gemini 2.5 Pro 호출 중... (시도 ${attempt + 1}/3, 최대 5분)`);
+            sendProgress("generating", 30 + attempt * 2, `🤖 Gemini 2.5 Pro 호출 중... (시도 ${attempt + 1}/3, 최대 10분)`);
             
             geminiResponse = await fetch(
               `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:streamGenerateContent?key=${GEMINI_API_KEY}&alt=sse`,
@@ -1202,7 +1202,7 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
             }
           } catch (fetchError: any) {
             if (fetchError.name === 'AbortError') {
-              lastError = `타임아웃 (5분 초과) - 문제 수를 줄여서 다시 시도해주세요.`;
+              lastError = `타임아웃 (10분 초과) - 문제 수를 줄여서 다시 시도해주세요.`;
               console.error(`Gemini timeout after ${GEMINI_TIMEOUT_MS}ms on attempt ${attempt + 1}`);
             } else {
               lastError = fetchError.message || "Network error";
