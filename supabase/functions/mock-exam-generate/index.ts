@@ -335,6 +335,29 @@ async function generateListeningAudio(
 ): Promise<string | null> {
   if (!GEMINI_API_KEY || !script) return null;
 
+  const presetCfg = TTS_PRESETS[preset] ?? TTS_PRESETS.exam;
+
+  const sniffAudio = (bytes: Uint8Array): { ext: "mp3" | "wav"; contentType: string } | null => {
+    // WAV: RIFF....WAVE
+    if (
+      bytes.length >= 12 &&
+      bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 &&
+      bytes[8] === 0x57 && bytes[9] === 0x41 && bytes[10] === 0x56 && bytes[11] === 0x45
+    ) {
+      return { ext: "wav", contentType: "audio/wav" };
+    }
+
+    // MP3: ID3 tag or frame sync 0xFF 0xFB/0xF3/0xF2
+    if (bytes.length >= 3 && bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33) {
+      return { ext: "mp3", contentType: "audio/mpeg" };
+    }
+    if (bytes.length >= 2 && bytes[0] === 0xff && (bytes[1] & 0xe0) === 0xe0) {
+      return { ext: "mp3", contentType: "audio/mpeg" };
+    }
+
+    return null;
+  };
+
   const detectSpeaker = (raw: string): { speakerKey: "male" | "female" | "other"; text: string } => {
     const line = raw.trim();
     const m = line.match(/^\s*(남자|여자|남성|여성|남|여|A|B|C|D)\s*[:：]\s*(.*)$/i);
@@ -374,46 +397,77 @@ async function generateListeningAudio(
   };
 
   try {
-    const presetCfg = TTS_PRESETS[preset] ?? TTS_PRESETS.exam;
     console.log(`🎵 Generating Gemini TTS audio for Q${questionNumber} preset=${preset}...`);
 
-    const rawLines = script
-      .split(/\r?\n/)
-      .map((l) => l.trim())
-      .filter(Boolean);
+    // 1) Generate once first (single voice) so we can reliably detect the format.
+    //    If Gemini returns WAV (common), concatenating segments will break the container.
+    const singlePassBytes = await synthesizeGeminiTTS(
+      script.trim(),
+      presetCfg.voiceFemale,
+      presetCfg.prompt,
+    );
+    const detected = sniffAudio(singlePassBytes);
 
-    const segments = rawLines.length
-      ? rawLines.map(detectSpeaker).filter((s) => s.text)
-      : [{ speakerKey: "other" as const, text: script.trim() }];
+    let finalBytes = singlePassBytes;
+    let contentType = detected?.contentType ?? "application/octet-stream";
+    let ext: "mp3" | "wav" = detected?.ext ?? "wav";
 
-    const uniqueSpeakers = new Set(segments.map((s) => s.speakerKey));
-    const isMultiSpeaker = uniqueSpeakers.size >= 2 && (uniqueSpeakers.has("male") || uniqueSpeakers.has("female"));
+    // 2) If it's MP3, we can do multi-speaker by concatenating MP3 frames (strip ID3 after first).
+    if (detected?.ext === "mp3") {
+      const rawLines = script
+        .split(/\r?\n/)
+        .map((l) => l.trim())
+        .filter(Boolean);
 
-    const audioParts: Uint8Array[] = [];
+      const segments = rawLines.length
+        ? rawLines.map(detectSpeaker).filter((s) => s.text)
+        : [{ speakerKey: "other" as const, text: script.trim() }];
 
-    for (let i = 0; i < segments.length; i++) {
-      const seg = segments[i];
-      const voiceName = seg.speakerKey === "male" 
-        ? presetCfg.voiceMale 
-        : presetCfg.voiceFemale;
+      const uniqueSpeakers = new Set(segments.map((s) => s.speakerKey));
+      const isMultiSpeaker =
+        uniqueSpeakers.size >= 2 && (uniqueSpeakers.has("male") || uniqueSpeakers.has("female"));
 
-      const t = seg.text.endsWith(".") || seg.text.endsWith("?") || seg.text.endsWith("!") 
-        ? seg.text 
-        : `${seg.text}.`;
+      if (isMultiSpeaker) {
+        const audioParts: Uint8Array[] = [];
 
-      const bytes = await synthesizeGeminiTTS(t, voiceName, presetCfg.prompt);
-      const finalBytes = i === 0 ? bytes : stripLeadingId3(bytes.buffer);
-      audioParts.push(finalBytes);
+        for (let i = 0; i < segments.length; i++) {
+          const seg = segments[i];
+          const voiceName = seg.speakerKey === "male" ? presetCfg.voiceMale : presetCfg.voiceFemale;
+
+          const t = seg.text.endsWith(".") || seg.text.endsWith("?") || seg.text.endsWith("!")
+            ? seg.text
+            : `${seg.text}.`;
+
+          const bytes = await synthesizeGeminiTTS(t, voiceName, presetCfg.prompt);
+          const withoutId3 = i === 0 ? bytes : stripLeadingId3(bytes.buffer);
+          audioParts.push(withoutId3);
+        }
+
+        finalBytes = audioParts.length === 1 ? audioParts[0] : concatBytes(audioParts);
+        contentType = "audio/mpeg";
+        ext = "mp3";
+      } else {
+        // Single speaker MP3 already generated in singlePassBytes
+        contentType = "audio/mpeg";
+        ext = "mp3";
+      }
+    } else {
+      // WAV path (or unknown): keep singlePassBytes only to ensure it's playable.
+      // We'll treat unknown as WAV to maximize browser compatibility.
+      contentType = detected?.contentType ?? "audio/wav";
+      ext = detected?.ext ?? "wav";
     }
 
-    const finalBytes = audioParts.length === 1 ? audioParts[0] : concatBytes(audioParts);
+    console.log(
+      `🔎 TTS audio detected format for Q${questionNumber}: ext=${ext}, contentType=${contentType}, bytes=${finalBytes.length}`,
+    );
 
-    const fileName = `mock-exam/${examType}/listening_q${questionNumber}_${Date.now()}.mp3`;
+    const fileName = `mock-exam/${examType}/listening_q${questionNumber}_${Date.now()}.${ext}`;
 
     const { error: uploadError } = await supabase.storage
       .from("podcast-audio")
-      .upload(fileName, finalBytes.buffer, {
-        contentType: "audio/mpeg",
+      .upload(fileName, finalBytes, {
+        contentType,
         upsert: true,
       });
 
@@ -423,7 +477,7 @@ async function generateListeningAudio(
     }
 
     const { data: urlData } = supabase.storage.from("podcast-audio").getPublicUrl(fileName);
-    console.log(`✅ Gemini TTS audio generated for Q${questionNumber} (multiSpeaker: ${isMultiSpeaker})`);
+    console.log(`✅ Gemini TTS audio generated for Q${questionNumber}`);
     return urlData.publicUrl;
   } catch (error) {
     console.error("Gemini TTS generation error:", error);
