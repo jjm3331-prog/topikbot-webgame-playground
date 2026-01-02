@@ -250,187 +250,176 @@ serve(async (req) => {
   }
 });
 
-function parseMarkdownForDay(markdown: string, dayNumber: number): { roots: HanjaRoot[], debug?: { linesScanned: number } } {
-  const roots: HanjaRoot[] = [];
+function parseMarkdownForDay(
+  markdown: string,
+  dayNumber: number
+): { roots: HanjaRoot[]; debug?: { linesScanned: number } } {
   const lines = markdown.split("\n");
 
-  // Find the start of the target day section
-  const dayStr = String(dayNumber).padStart(2, "0");
-  
-  let inTargetDay = false;
-  let dayContent: string[] = [];
-  
-  // Look for patterns like "Day 01 예술과 문화" or "### Day 02"
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const trimmedLine = line.trim();
-    
-    // Check for day header - multiple patterns
-    // Pattern 1: "Day 01 예술과 문화"
-    // Pattern 2: "### Day 02 전통과 유산 1"
-    const dayMatch = trimmedLine.match(/^(?:#{1,4}\s*)?Day\s*(\d+)\b/i);
-    
-    if (dayMatch) {
-      const foundDay = parseInt(dayMatch[1], 10);
-      
-      if (foundDay === dayNumber) {
-        inTargetDay = true;
-        continue;
-      } else if (inTargetDay && foundDay !== dayNumber) {
-        // Found next day, stop
-        break;
-      }
-    }
-    
-    // Stop at exercise sections (numbered headers)
-    if (inTargetDay && /^#{1,4}\s*\d+\.\s+/.test(trimmedLine)) {
-      break;
-    }
-    
-    // Stop at unit headers like "## 2" or "## 3"
-    if (inTargetDay && /^##\s+\d+\s*$/.test(trimmedLine)) {
-      break;
-    }
-    
-    if (inTargetDay) {
-      dayContent.push(line);
-    }
-  }
+  // Helper: parse a single day section (already sliced) into roots/words.
+  const parseDaySection = (dayLines: string[]) => {
+    const roots: HanjaRoot[] = [];
 
-  if (dayContent.length === 0) {
-    console.log(`No content found for Day ${dayNumber}`);
-    return { roots, debug: { linesScanned: lines.length } };
-  }
+    let currentRoot: HanjaRoot | null = null;
+    let collectingMeanings = false;
+    let meaningLines: string[] = [];
 
-  console.log(`Found ${dayContent.length} lines for Day ${dayNumber}`);
-  
-  // Parse roots and words
-  // Multiple patterns for root headers:
-  // Pattern 1: "### 그림 도圖" (### meaning_ko reading_koHanja)
-  // Pattern 2: "#### 전하다 전傳" (#### meaning_ko reading_koHanja)
-  // Pattern 3: "자취 적蹟·跡·迹" (meaning_ko reading_koHanja with middle dots)
-  
-  let currentRoot: HanjaRoot | null = null;
-  let collectingMeanings = false;
-  let meaningLines: string[] = [];
-  
-  // Extended hanja regex to include more character ranges
-  const hanjaChars = "[一-龥々\u4e00-\u9fff\u3400-\u4dbf·]+";
-  
-  for (let i = 0; i < dayContent.length; i++) {
-    const line = dayContent[i];
-    const trimmedLine = line.trim();
-    
-    // Skip empty lines, images, tables, exercise numbers
-    if (!trimmedLine) continue;
-    if (trimmedLine.startsWith("![")) continue;
-    if (trimmedLine.startsWith("|")) continue;
-    if (/^\d+\)/.test(trimmedLine)) continue; // Skip answer choices like "1)"
-    
-    // Root header pattern: "### 그림 도圖" or "#### 전하다 전傳"
-    // Also handle: "자취 적蹟·跡·迹" without #
-    const rootHeaderPatterns = [
-      /^#{2,4}\s+(.+?)\s+([가-힣/]+)\s*([一-龥々\u4e00-\u9fff\u3400-\u4dbf·]+)$/,
-      /^([가-힣/]+)\s+([가-힣/]+)\s*([一-龥々\u4e00-\u9fff\u3400-\u4dbf·]+)$/, // Without #
-    ];
-    
-    let rootMatch = null;
-    for (const pattern of rootHeaderPatterns) {
-      const match = trimmedLine.match(pattern);
-      if (match) {
-        rootMatch = match;
-        break;
-      }
-    }
-    
-    if (rootMatch) {
-      // Save previous root if it has words
-      if (currentRoot && currentRoot.words.length > 0) {
-        roots.push(currentRoot);
-      }
-      
-      const meaningKo = rootMatch[1].trim();
-      const readingKo = rootMatch[2].trim();
-      const hanja = rootMatch[3].replace(/[·]/g, ""); // Remove middle dots
-      
-      currentRoot = {
-        meaning_ko: meaningKo,
-        reading_ko: readingKo,
-        hanja: hanja.charAt(0), // Take just the first hanja character
-        meaning_en: "",
-        meaning_ja: "",
-        meaning_zh: "",
-        meaning_vi: "",
-        words: [],
-      };
-      
-      collectingMeanings = true;
-      meaningLines = [];
-      continue;
-    }
-    
-    if (currentRoot) {
-      // Collect root meanings (up to 4 lines after header)
-      if (collectingMeanings && meaningLines.length < 4) {
-        // Check if this is a word line (Korean word followed by meaning and slashes)
-        if (/^[가-힣]+(?:\s+[가-힣]+)?\s+.+\//.test(trimmedLine)) {
-          collectingMeanings = false;
-          // Parse meanings collected so far
-          if (meaningLines.length > 0) {
-            currentRoot.meaning_en = meaningLines[0] || "";
-            currentRoot.meaning_ja = meaningLines[1] || "";
-            currentRoot.meaning_zh = meaningLines[2] || "";
-            currentRoot.meaning_vi = meaningLines[3] || "";
-          }
-        } else if (!trimmedLine.includes("/") && !trimmedLine.startsWith("#")) {
-          meaningLines.push(trimmedLine);
-          if (meaningLines.length === 4) {
-            currentRoot.meaning_en = meaningLines[0] || "";
-            currentRoot.meaning_ja = meaningLines[1] || "";
-            currentRoot.meaning_zh = meaningLines[2] || "";
-            currentRoot.meaning_vi = meaningLines[3] || "";
-            collectingMeanings = false;
-          }
-          continue;
+    for (let i = 0; i < dayLines.length; i++) {
+      const line = dayLines[i];
+      const trimmedLine = line.trim();
+
+      // Skip empty lines, images, tables, exercise numbers
+      if (!trimmedLine) continue;
+      if (trimmedLine.startsWith("![")) continue;
+      if (trimmedLine.startsWith("|")) continue;
+      if (/^\d+\)/.test(trimmedLine)) continue; // Skip answer choices like "1)"
+
+      // Root header pattern:
+      // - "### 그림 도圖" / "#### 전하다 전傳"
+      // - "자취 적蹟·跡·迹" (no #)
+      const rootHeaderPatterns = [
+        /^#{2,4}\s+(.+?)\s+([가-힣/]+)\s*([一-龥々\u4e00-\u9fff\u3400-\u4dbf·]+)$/,
+        /^([가-힣/]+)\s+([가-힣/]+)\s*([一-龥々\u4e00-\u9fff\u3400-\u4dbf·]+)$/, // Without #
+      ];
+
+      let rootMatch: RegExpMatchArray | null = null;
+      for (const pattern of rootHeaderPatterns) {
+        const match = trimmedLine.match(pattern);
+        if (match) {
+          rootMatch = match;
+          break;
         }
       }
-      
-      // Parse word lines
-      // Pattern: "지도 map / 地図 / 地图 / bản đồ"
-      // Or: "가요 pop(ular) song, K-pop / 歌谣 / 歌曲 / bài hát"
-      // Or: "변하다 to change / 变わる / 变 / thay đổi, biến đổi"
-      const wordMatch = trimmedLine.match(/^([가-힣]+(?:\s*[一-龥々\u4e00-\u9fff]*)?)\s+(.+?)\s*\/\s*(.+?)\s*\/\s*(.+?)\s*\/\s*(.+)$/);
-      
-      if (wordMatch) {
-        const koreanWord = wordMatch[1].trim();
-        // Remove any Hanja from the word
-        const cleanWord = koreanWord.replace(/[一-龥々\u4e00-\u9fff]+/g, "").trim();
-        
-        currentRoot.words.push({
-          word: cleanWord || koreanWord,
-          meaning_en: wordMatch[2].trim(),
-          meaning_ja: wordMatch[3].trim(),
-          meaning_zh: wordMatch[4].trim(),
-          meaning_vi: wordMatch[5].trim(),
-        });
+
+      if (rootMatch) {
+        // Save previous root if it has words
+        if (currentRoot && currentRoot.words.length > 0) {
+          roots.push(currentRoot);
+        }
+
+        const meaningKo = rootMatch[1].trim();
+        const readingKo = rootMatch[2].trim();
+        const hanja = rootMatch[3].replace(/[·]/g, ""); // Remove middle dots
+
+        currentRoot = {
+          meaning_ko: meaningKo,
+          reading_ko: readingKo,
+          hanja: hanja.charAt(0), // Take just the first hanja character
+          meaning_en: "",
+          meaning_ja: "",
+          meaning_zh: "",
+          meaning_vi: "",
+          words: [],
+        };
+
+        collectingMeanings = true;
+        meaningLines = [];
+        continue;
+      }
+
+      if (currentRoot) {
+        // Collect root meanings (up to 4 lines after header)
+        if (collectingMeanings && meaningLines.length < 4) {
+          // If this looks like a word line, stop collecting meanings
+          if (/^[가-힣]+(?:\s+[가-힣]+)?\s+.+\//.test(trimmedLine)) {
+            collectingMeanings = false;
+            if (meaningLines.length > 0) {
+              currentRoot.meaning_en = meaningLines[0] || "";
+              currentRoot.meaning_ja = meaningLines[1] || "";
+              currentRoot.meaning_zh = meaningLines[2] || "";
+              currentRoot.meaning_vi = meaningLines[3] || "";
+            }
+          } else if (!trimmedLine.includes("/") && !trimmedLine.startsWith("#")) {
+            meaningLines.push(trimmedLine);
+            if (meaningLines.length === 4) {
+              currentRoot.meaning_en = meaningLines[0] || "";
+              currentRoot.meaning_ja = meaningLines[1] || "";
+              currentRoot.meaning_zh = meaningLines[2] || "";
+              currentRoot.meaning_vi = meaningLines[3] || "";
+              collectingMeanings = false;
+            }
+            continue;
+          }
+        }
+
+        // Word line pattern: "지도 map / 地図 / 地图 / bản đồ"
+        const wordMatch = trimmedLine.match(
+          /^([가-힣]+(?:\s*[一-龥々\u4e00-\u9fff]*)?)\s+(.+?)\s*\/\s*(.+?)\s*\/\s*(.+?)\s*\/\s*(.+)$/
+        );
+
+        if (wordMatch) {
+          const koreanWord = wordMatch[1].trim();
+          const cleanWord = koreanWord
+            .replace(/[一-龥々\u4e00-\u9fff]+/g, "")
+            .trim();
+
+          currentRoot.words.push({
+            word: cleanWord || koreanWord,
+            meaning_en: wordMatch[2].trim(),
+            meaning_ja: wordMatch[3].trim(),
+            meaning_zh: wordMatch[4].trim(),
+            meaning_vi: wordMatch[5].trim(),
+          });
+        }
       }
     }
-  }
-  
-  // Don't forget the last root
-  if (currentRoot && currentRoot.words.length > 0) {
-    roots.push(currentRoot);
-  }
 
-  console.log(`Parsed ${roots.length} roots for Day ${dayNumber}`);
-  
-  // Debug first few roots
-  if (roots.length > 0) {
-    console.log(`First root: ${roots[0].meaning_ko} ${roots[0].reading_ko}${roots[0].hanja}, ${roots[0].words.length} words`);
-    if (roots.length > 1) {
-      console.log(`Second root: ${roots[1].meaning_ko} ${roots[1].reading_ko}${roots[1].hanja}, ${roots[1].words.length} words`);
+    if (currentRoot && currentRoot.words.length > 0) {
+      roots.push(currentRoot);
+    }
+
+    return roots;
+  };
+
+  // The markdown includes multiple occurrences of the same "Day NN" (cover, contents, exercises).
+  // We scan all occurrences and choose the first one that parses into actual roots.
+  const dayHeaderRe = /^(?:#{1,4}\s*)?Day\s*(\d+)\b/i;
+  let candidateCount = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const t = lines[i].trim();
+    const m = t.match(dayHeaderRe);
+    if (!m) continue;
+
+    const foundDay = parseInt(m[1], 10);
+    if (foundDay !== dayNumber) continue;
+
+    // Slice until next day header OR unit header OR exercise section.
+    const section: string[] = [];
+    for (let j = i + 1; j < lines.length; j++) {
+      const tt = lines[j].trim();
+
+      if (dayHeaderRe.test(tt)) break;
+      if (/^#{1,4}\s*\d+\.\s+/.test(tt)) break; // exercises
+      if (/^##\s+\d+\s*$/.test(tt)) break; // unit index
+
+      section.push(lines[j]);
+    }
+
+    candidateCount++;
+
+    const roots = parseDaySection(section);
+    if (roots.length > 0) {
+      console.log(
+        `Day ${dayNumber}: selected occurrence #${candidateCount} (sectionLines=${section.length}, roots=${roots.length})`
+      );
+
+      console.log(
+        `First root: ${roots[0].meaning_ko} ${roots[0].reading_ko}${roots[0].hanja}, ${roots[0].words.length} words`
+      );
+      if (roots.length > 1) {
+        console.log(
+          `Second root: ${roots[1].meaning_ko} ${roots[1].reading_ko}${roots[1].hanja}, ${roots[1].words.length} words`
+        );
+      }
+
+      return { roots, debug: { linesScanned: section.length } };
     }
   }
 
-  return { roots, debug: { linesScanned: dayContent.length } };
+  console.log(
+    `Day ${dayNumber}: no valid section found (candidates=${candidateCount}, totalLines=${lines.length})`
+  );
+  return { roots: [], debug: { linesScanned: lines.length } };
 }
+
