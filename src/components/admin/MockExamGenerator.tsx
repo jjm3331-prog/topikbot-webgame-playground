@@ -1199,10 +1199,10 @@ const MockExamGenerator = () => {
                   <div className="flex-1">
                     <Label htmlFor="generateAudio" className="cursor-pointer flex items-center gap-2">
                       <Volume2 className="w-4 h-4 text-cyan-500" />
-                      ElevenLabs TTS 음성 자동 생성
+                      Gemini Flash TTS 음성 자동 생성
                     </Label>
                     <p className="text-xs text-muted-foreground mt-1">
-                      생성된 대화 스크립트를 자연스러운 한국어 음성으로 변환합니다.
+                      생성된 대화 스크립트를 한국어 네이티브급 자연스러운 음성으로 변환합니다.
                     </p>
                   </div>
                 </div>
