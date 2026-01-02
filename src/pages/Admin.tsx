@@ -22,6 +22,7 @@ import VocabTranslationManager from "@/components/admin/VocabTranslationManager"
 import MockExamManager from "@/components/admin/MockExamManager";
 import MockExamGenerator from "@/components/admin/MockExamGenerator";
 import HanjaImporter from "@/components/admin/HanjaImporter";
+import HanjaExampleGenerator from "@/components/admin/HanjaExampleGenerator";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -1289,7 +1290,10 @@ const Admin = () => {
 
           {/* Hanja Tab */}
           <TabsContent value="hanja">
-            <HanjaImporter />
+            <div className="space-y-6">
+              <HanjaImporter />
+              <HanjaExampleGenerator />
+            </div>
           </TabsContent>
 
           {/* Vocabulary Tab */}
