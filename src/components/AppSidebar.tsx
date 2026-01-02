@@ -82,9 +82,9 @@ export const AppSidebar = ({ username, avatarUrl, isOpen, onClose, isCollapsed, 
       emoji: "📚",
       items: [
         { icon: Sparkles, labelKey: "sidebar.items.learningHub", href: "/learning-hub", isHighlight: true },
-        { icon: Video, labelKey: "sidebar.items.videoLearning", href: "/video-hub", isHighlight: true },
-        { icon: GraduationCap, labelKey: "sidebar.items.mockExam", href: "/mock-exam", isHighlight: true },
         { icon: BookOpen, labelKey: "sidebar.items.hanjaMindmap", href: "/hanja-mindmap", isPremium: true },
+        { icon: GraduationCap, labelKey: "sidebar.items.mockExam", href: "/mock-exam", isPremium: true },
+        { icon: Video, labelKey: "sidebar.items.shorts", href: "/video-hub", isHighlight: true },
         { icon: MessageSquare, labelKey: "sidebar.items.community", href: "/board-hub", isHighlight: true },
       ],
       defaultOpen: true
