@@ -157,7 +157,7 @@ const MockExamTest = () => {
   useEffect(() => {
     if (!audioRef.current) return;
     audioRef.current.pause();
-    audioRef.current.currentTime = 0;
+    audioRef.current.src = "";
     setIsPlaying(false);
   }, [currentQuestion?.id]);
   
@@ -621,65 +621,55 @@ const MockExamTest = () => {
     });
   };
 
-  const handlePlayAudio = async () => {
+  const handlePlayAudio = () => {
     const url = currentQuestion?.question_audio_url;
     if (!url) return;
 
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-      audioRef.current.preload = "auto";
-      // Some browsers can be picky with media from other origins
-      audioRef.current.crossOrigin = "anonymous";
-      audioRef.current.onended = () => setIsPlaying(false);
-      audioRef.current.onerror = () => {
-        console.error("[MockExamTest] audio error", {
-          src: audioRef.current?.src,
-          networkState: audioRef.current?.networkState,
-          readyState: audioRef.current?.readyState,
-          error: audioRef.current?.error,
-        });
-        setIsPlaying(false);
-        toast({
-          title: "오디오 재생 실패",
-          description: "브라우저가 음성을 로드하지 못했습니다. 잠시 후 다시 시도해주세요.",
-          variant: "destructive",
-        });
-      };
-    }
-
-    const audio = audioRef.current;
-
-    if (isPlaying) {
-      audio.pause();
+    // Toggle off if already playing
+    if (isPlaying && audioRef.current) {
+      audioRef.current.pause();
       setIsPlaying(false);
       return;
     }
 
-    try {
-      if (audio.src !== url) {
-        audio.src = url;
-      }
-      audio.playbackRate = playbackSpeed;
-      // Ensures the new src is picked up immediately in Safari-like engines
-      audio.load();
+    // Create new Audio element each time to avoid CORS/state issues
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = "";
+    }
 
-      const playPromise = audio.play();
-      if (playPromise) await playPromise;
+    const audio = new Audio(url);
+    audio.playbackRate = playbackSpeed;
+    audioRef.current = audio;
 
+    audio.onended = () => setIsPlaying(false);
+    audio.onerror = (e) => {
+      console.error("[MockExamTest] audio error", e, {
+        src: audio.src,
+        networkState: audio.networkState,
+        readyState: audio.readyState,
+        error: audio.error,
+      });
+      setIsPlaying(false);
+      toast({
+        title: "오디오 재생 실패",
+        description: "음성 파일을 로드하지 못했습니다.",
+        variant: "destructive",
+      });
+    };
+
+    // Play immediately - this is called from a user click event
+    audio.play().then(() => {
       setIsPlaying(true);
       setPlayCount((prev) => {
         const count = prev.get(currentQuestion.id) || 0;
         return new Map(prev).set(currentQuestion.id, count + 1);
       });
-    } catch (error) {
-      console.error("[MockExamTest] audio play() rejected", { url, error });
+    }).catch((err) => {
+      console.error("[MockExamTest] play() rejected", err);
       setIsPlaying(false);
-      toast({
-        title: "오디오 재생 차단됨",
-        description: "브라우저 정책(자동재생/오디오 권한) 때문에 재생이 거부되었습니다. 다시 눌러주세요.",
-        variant: "destructive",
-      });
-    }
+      // Don't show toast - just log. User can click again.
+    });
   };
 
   const handleSpeedChange = (value: number[]) => {
