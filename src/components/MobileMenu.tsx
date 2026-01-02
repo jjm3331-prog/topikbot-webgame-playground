@@ -67,7 +67,7 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
   const handleLogout = async () => {
     setIsOpen(false);
     await safeSignOut();
-    window.location.href = "/";
+    navigate("/", { replace: true });
   };
 
   const handleNavigate = (path: string) => {

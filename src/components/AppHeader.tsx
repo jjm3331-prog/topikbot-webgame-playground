@@ -38,7 +38,7 @@ const AppHeader = ({
 
   const handleLogout = async () => {
     await safeSignOut();
-    window.location.href = "/";
+    navigate("/", { replace: true });
   };
 
   const handleBack = () => {
