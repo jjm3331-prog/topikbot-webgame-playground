@@ -2810,7 +2810,46 @@
       "description": "Choose the section to practice",
       "listening": "Listening",
       "reading": "Reading",
-      "writing": "Writing"
+       "writing": "Writing"
+     }
+   },
+  "hanjaMindmapPage": {
+    "seo": {
+      "title": "Hanja Mindmap | 2,300 Hanja Words",
+      "description": "Learn 2,300 TOPIK Hanja-based words with a mindmap. Complete the 82-day structured vocabulary plan."
+    },
+    "loading": "Loading...",
+    "hero": {
+      "badge": "Mindmap Hanja Vocabulary",
+      "title": "Hanja Words 2300",
+      "subtitleLine1": "Learn 2,300 upper-intermediate Hanja words with a mindmap!",
+      "subtitleLine2": "Master TOPIK vocabulary with an 82-day structured plan"
+    },
+    "progress": {
+      "label": "Overall Progress",
+      "completed": "{{completedDays}}/{{totalDays}} days completed"
+    },
+    "guide": {
+      "toggle": "Study Guide",
+      "aria": "Study method guide",
+      "title": "Study Method Guide",
+      "step1": { "title": "Explore the mindmap", "desc": "Click a Hanja root to see derived words" },
+      "step2": { "title": "Learn meanings", "desc": "Understand meanings in multiple languages" },
+      "step3": { "title": "Master check", "desc": "Check learned words to manage your progress" },
+      "step4": { "title": "Finish 1 day daily", "desc": "82 days to fully master 2,300 words" }
+    },
+    "premium": {
+      "featureName": "Hanja Mindmap"
+    },
+    "units": {
+      "aria": "Units and day list",
+      "unitMeta": "{{days}} days · {{completed}}/{{days}} completed",
+      "dayLabel": "Day {{day}}"
+    },
+    "empty": {
+      "title": "Content is being prepared",
+      "desc": "Hanja mindmap content will be updated soon."
     }
   }
 }
+

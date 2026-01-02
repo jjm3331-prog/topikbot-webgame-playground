@@ -2948,7 +2948,45 @@
       "description": "연습할 영역을 선택하세요",
       "listening": "듣기",
       "reading": "읽기",
-      "writing": "쓰기"
+    }
+  },
+  "hanjaMindmapPage": {
+    "seo": {
+      "title": "한자어 마인드맵 | 한자어 2300",
+      "description": "한자어 마인드맵으로 TOPIK 어휘 2,300개를 82일 완성으로 학습하세요."
+    },
+    "loading": "로딩 중...",
+    "hero": {
+      "badge": "마인드맵 한자어 학습",
+      "title": "한자어 2300",
+      "subtitleLine1": "마인드맵으로 배우는 중·고급 한자어 2,300개!",
+      "subtitleLine2": "82일 완성 체계적인 TOPIK 어휘 마스터"
+    },
+    "progress": {
+      "label": "전체 진도",
+      "completed": "{{completedDays}}/{{totalDays}} Day 완료"
+    },
+    "guide": {
+      "toggle": "학습 가이드",
+      "aria": "학습 방법 가이드",
+      "title": "학습 방법 가이드",
+      "step1": { "title": "마인드맵 탐색", "desc": "한자 뿌리를 클릭하여 파생 단어를 확인하세요" },
+      "step2": { "title": "다국어 뜻 학습", "desc": "영어, 일본어, 중국어, 베트남어로 의미 파악" },
+      "step3": { "title": "단어 마스터 체크", "desc": "학습한 단어를 체크하여 진도를 관리하세요" },
+      "step4": { "title": "매일 1 Day 완성", "desc": "82일이면 2,300개 어휘 완전 정복!" }
+    },
+    "premium": {
+      "featureName": "한자어 마인드맵"
+    },
+    "units": {
+      "aria": "유닛 및 Day 목록",
+      "unitMeta": "{{days}} Day · {{completed}}/{{days}} 완료",
+      "dayLabel": "Day {{day}}"
+    },
+    "empty": {
+      "title": "데이터 준비 중",
+      "desc": "한자어 마인드맵 콘텐츠가 곧 업데이트됩니다."
     }
   }
 }
+

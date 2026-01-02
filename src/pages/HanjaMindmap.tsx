@@ -1,10 +1,15 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { 
-  BookOpen, ChevronRight, GraduationCap, Crown, 
-  Info, ChevronDown, Brain, Sparkles, Target, Play
+import {
+  Brain,
+  ChevronDown,
+  ChevronRight,
+  Info,
+  Sparkles,
+  Target,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
@@ -18,12 +23,14 @@ interface HanjaUnit {
   id: string;
   unit_number: number;
   title_ko: string;
+  title_en: string | null;
 }
 
 interface HanjaDay {
   id: string;
   day_number: number;
   topic_ko: string;
+  topic_en: string | null;
   unit_id: string;
 }
 
@@ -57,6 +64,7 @@ const UNIT_COLORS: { [key: number]: string } = {
 
 export default function HanjaMindmap() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const { isPremium, loading: subLoading, user } = useSubscription();
   const [units, setUnits] = useState<HanjaUnit[]>([]);
   const [days, setDays] = useState<HanjaDay[]>([]);
@@ -65,28 +73,38 @@ export default function HanjaMindmap() {
   const [loading, setLoading] = useState(true);
   const [showGuide, setShowGuide] = useState(false);
 
+  const isKoUI = useMemo(() => {
+    const lng = i18n.language || "ko";
+    return lng.toLowerCase().startsWith("ko");
+  }, [i18n.language]);
+
+  useEffect(() => {
+    // SEO: title/description per language
+    document.title = t("hanjaMindmapPage.seo.title");
+    const meta = document.querySelector('meta[name="description"]');
+    if (meta) meta.setAttribute("content", t("hanjaMindmapPage.seo.description"));
+  }, [t, i18n.language]);
+
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const fetchData = async () => {
     try {
-      // Fetch units
       const { data: unitsData } = await supabase
         .from("hanja_units")
-        .select("*")
+        .select("id, unit_number, title_ko, title_en")
         .order("unit_number");
 
-      // Fetch days
       const { data: daysData } = await supabase
         .from("hanja_days")
-        .select("*")
+        .select("id, day_number, topic_ko, topic_en, unit_id")
         .order("day_number");
 
       if (unitsData) setUnits(unitsData);
       if (daysData) setDays(daysData);
 
-      // Fetch user progress if logged in
       if (user) {
         const { data: progressData } = await supabase
           .from("hanja_learning_progress")
@@ -95,7 +113,7 @@ export default function HanjaMindmap() {
 
         if (progressData) {
           const progressMap = new Map<string, UserProgress>();
-          progressData.forEach(p => {
+          progressData.forEach((p) => {
             progressMap.set(p.day_id, p);
           });
           setUserProgress(progressMap);
@@ -109,31 +127,26 @@ export default function HanjaMindmap() {
   };
 
   const toggleUnit = (unitNumber: number) => {
-    setExpandedUnits(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(unitNumber)) {
-        newSet.delete(unitNumber);
-      } else {
-        newSet.add(unitNumber);
-      }
-      return newSet;
+    setExpandedUnits((prev) => {
+      const next = new Set(prev);
+      if (next.has(unitNumber)) next.delete(unitNumber);
+      else next.add(unitNumber);
+      return next;
     });
   };
 
-  const getDaysForUnit = (unitId: string) => {
-    return days.filter(day => day.unit_id === unitId);
-  };
+  const getDaysForUnit = (unitId: string) => days.filter((day) => day.unit_id === unitId);
+  const getProgressForDay = (dayId: string): UserProgress | undefined => userProgress.get(dayId);
 
-  const getProgressForDay = (dayId: string): UserProgress | undefined => {
-    return userProgress.get(dayId);
-  };
+  const getUnitTitle = (unit: HanjaUnit) => (isKoUI ? unit.title_ko : unit.title_en ?? unit.title_ko);
+  const getDayTopic = (day: HanjaDay) => (isKoUI ? day.topic_ko : day.topic_en ?? day.topic_ko);
 
   const handleDayClick = (dayNumber: number) => {
     navigate(`/hanja-mindmap/${dayNumber}`);
   };
 
   const totalDays = days.length;
-  const completedDays = Array.from(userProgress.values()).filter(p => p.completed).length;
+  const completedDays = Array.from(userProgress.values()).filter((p) => p.completed).length;
   const overallProgress = totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0;
 
   if (loading || subLoading) {
@@ -141,7 +154,7 @@ export default function HanjaMindmap() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <Brain className="w-12 h-12 text-primary mx-auto animate-pulse" />
-          <p className="mt-4 text-muted-foreground">로딩 중...</p>
+          <p className="mt-4 text-muted-foreground">{t("hanjaMindmapPage.loading")}</p>
         </div>
       </div>
     );
@@ -152,36 +165,42 @@ export default function HanjaMindmap() {
       <CleanHeader />
 
       <main className="pt-20 pb-24">
-        <div className="container max-w-4xl mx-auto px-4">
+        <section className="container max-w-4xl mx-auto px-4">
           {/* Hero Section */}
-          <motion.div
+          <motion.header
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-8"
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-4">
               <Brain className="w-5 h-5" />
-              <span className="text-sm font-medium">마인드맵 한자어 학습</span>
-              <Badge variant="secondary" className="bg-gradient-to-r from-korean-orange to-korean-pink text-white text-xs">
-                Premium
+              <span className="text-sm font-medium">{t("hanjaMindmapPage.hero.badge")}</span>
+              <Badge
+                variant="secondary"
+                className="bg-gradient-to-r from-korean-orange to-korean-pink text-white text-xs"
+              >
+                {t("common.premium")}
               </Badge>
             </div>
-            
+
             <h1 className="text-3xl md:text-4xl font-heading font-bold mb-3 bg-gradient-to-r from-korean-orange via-korean-pink to-korean-purple bg-clip-text text-transparent">
-              한자어 2300
+              {t("hanjaMindmapPage.hero.title")}
             </h1>
-            
+
             <p className="text-muted-foreground max-w-xl mx-auto mb-6">
-              마인드맵으로 배우는 중·고급 한자어 2,300개!<br />
-              82일 완성 체계적인 TOPIK 어휘 마스터
+              {t("hanjaMindmapPage.hero.subtitleLine1")}
+              <br />
+              {t("hanjaMindmapPage.hero.subtitleLine2")}
             </p>
 
             {/* Progress Card */}
             {user && (
               <Card className="p-4 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 mb-6">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">전체 진도</span>
-                  <span className="text-sm text-muted-foreground">{completedDays}/{totalDays} Day 완료</span>
+                  <span className="text-sm font-medium">{t("hanjaMindmapPage.progress.label")}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {t("hanjaMindmapPage.progress.completed", { completedDays, totalDays })}
+                  </span>
                 </div>
                 <div className="h-3 bg-muted rounded-full overflow-hidden">
                   <motion.div
@@ -202,26 +221,27 @@ export default function HanjaMindmap() {
               className="gap-2"
             >
               <Info className="w-4 h-4" />
-              학습 가이드
+              {t("hanjaMindmapPage.guide.toggle")}
               <ChevronDown className={`w-4 h-4 transition-transform ${showGuide ? "rotate-180" : ""}`} />
             </Button>
-          </motion.div>
+          </motion.header>
 
           {/* Learning Guide */}
           <AnimatePresence>
             {showGuide && (
-              <motion.div
+              <motion.section
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 className="mb-8 overflow-hidden"
+                aria-label={t("hanjaMindmapPage.guide.aria")}
               >
                 <Card className="p-6 bg-gradient-to-br from-muted/50 to-muted/30 border-border/50">
-                  <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                  <h2 className="font-semibold text-lg mb-4 flex items-center gap-2">
                     <Sparkles className="w-5 h-5 text-primary" />
-                    학습 방법 가이드
-                  </h3>
-                  
+                    {t("hanjaMindmapPage.guide.title")}
+                  </h2>
+
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-3">
                       <div className="flex gap-3">
@@ -229,63 +249,61 @@ export default function HanjaMindmap() {
                           <span className="text-korean-orange font-bold text-sm">1</span>
                         </div>
                         <div>
-                          <p className="font-medium text-sm">마인드맵 탐색</p>
-                          <p className="text-xs text-muted-foreground">한자 뿌리를 클릭하여 파생 단어를 확인하세요</p>
+                          <p className="font-medium text-sm">{t("hanjaMindmapPage.guide.step1.title")}</p>
+                          <p className="text-xs text-muted-foreground">{t("hanjaMindmapPage.guide.step1.desc")}</p>
                         </div>
                       </div>
-                      
+
                       <div className="flex gap-3">
                         <div className="w-8 h-8 rounded-full bg-korean-pink/20 flex items-center justify-center shrink-0">
                           <span className="text-korean-pink font-bold text-sm">2</span>
                         </div>
                         <div>
-                          <p className="font-medium text-sm">다국어 뜻 학습</p>
-                          <p className="text-xs text-muted-foreground">영어, 일본어, 중국어, 베트남어로 의미 파악</p>
+                          <p className="font-medium text-sm">{t("hanjaMindmapPage.guide.step2.title")}</p>
+                          <p className="text-xs text-muted-foreground">{t("hanjaMindmapPage.guide.step2.desc")}</p>
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-3">
                       <div className="flex gap-3">
                         <div className="w-8 h-8 rounded-full bg-korean-purple/20 flex items-center justify-center shrink-0">
                           <span className="text-korean-purple font-bold text-sm">3</span>
                         </div>
                         <div>
-                          <p className="font-medium text-sm">단어 마스터 체크</p>
-                          <p className="text-xs text-muted-foreground">학습한 단어를 체크하여 진도를 관리하세요</p>
+                          <p className="font-medium text-sm">{t("hanjaMindmapPage.guide.step3.title")}</p>
+                          <p className="text-xs text-muted-foreground">{t("hanjaMindmapPage.guide.step3.desc")}</p>
                         </div>
                       </div>
-                      
+
                       <div className="flex gap-3">
                         <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
                           <span className="text-emerald-500 font-bold text-sm">4</span>
                         </div>
                         <div>
-                          <p className="font-medium text-sm">매일 1 Day 완성</p>
-                          <p className="text-xs text-muted-foreground">82일이면 2,300개 어휘 완전 정복!</p>
+                          <p className="font-medium text-sm">{t("hanjaMindmapPage.guide.step4.title")}</p>
+                          <p className="text-xs text-muted-foreground">{t("hanjaMindmapPage.guide.step4.desc")}</p>
                         </div>
                       </div>
                     </div>
                   </div>
                 </Card>
-              </motion.div>
+              </motion.section>
             )}
           </AnimatePresence>
 
           {/* Premium Banner for non-premium users */}
-          {!isPremium && <PremiumPreviewBanner featureName="한자어 마인드맵" />}
+          {!isPremium && <PremiumPreviewBanner featureName={t("hanjaMindmapPage.premium.featureName")} />}
 
           {/* Units List */}
-          <div className="space-y-4">
+          <section className="space-y-4" aria-label={t("hanjaMindmapPage.units.aria")}>
             {units.map((unit, index) => {
               const unitDays = getDaysForUnit(unit.id);
               const isExpanded = expandedUnits.has(unit.unit_number);
-              const completedInUnit = unitDays.filter(day => 
-                getProgressForDay(day.id)?.completed
-              ).length;
+              const completedInUnit = unitDays.filter((day) => getProgressForDay(day.id)?.completed).length;
 
               return (
-                <motion.div
+                <motion.article
                   key={unit.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -298,17 +316,24 @@ export default function HanjaMindmap() {
                       className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors"
                     >
                       <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${UNIT_COLORS[unit.unit_number] || "from-gray-500 to-slate-600"} flex items-center justify-center shadow-lg`}>
+                        <div
+                          className={`w-12 h-12 rounded-xl bg-gradient-to-br ${UNIT_COLORS[unit.unit_number] || "from-gray-500 to-slate-600"} flex items-center justify-center shadow-lg`}
+                        >
                           <span className="text-white font-bold">{unit.unit_number}</span>
                         </div>
                         <div className="text-left">
-                          <h3 className="font-semibold text-foreground">{unit.title_ko}</h3>
+                          <h3 className="font-semibold text-foreground">{getUnitTitle(unit)}</h3>
                           <p className="text-sm text-muted-foreground">
-                            {unitDays.length} Day · {completedInUnit}/{unitDays.length} 완료
+                            {t("hanjaMindmapPage.units.unitMeta", {
+                              days: unitDays.length,
+                              completed: completedInUnit,
+                            })}
                           </p>
                         </div>
                       </div>
-                      <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                      <ChevronDown
+                        className={`w-5 h-5 text-muted-foreground transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                      />
                     </button>
 
                     {/* Days List */}
@@ -332,25 +357,23 @@ export default function HanjaMindmap() {
                                   whileTap={{ scale: 0.98 }}
                                   onClick={() => handleDayClick(day.day_number)}
                                   className={`p-3 rounded-xl border transition-all text-left ${
-                                    isCompleted 
-                                      ? "bg-primary/10 border-primary/30" 
+                                    isCompleted
+                                      ? "bg-primary/10 border-primary/30"
                                       : "bg-muted/30 border-border hover:border-primary/50 hover:bg-muted/50"
                                   }`}
                                 >
                                   <div className="flex items-center justify-between mb-1">
                                     <span className="text-xs font-medium text-muted-foreground">
-                                      Day {String(day.day_number).padStart(2, "0")}
+                                      {t("hanjaMindmapPage.units.dayLabel", {
+                                        day: String(day.day_number).padStart(2, "0"),
+                                      })}
                                     </span>
-                                    {isCompleted && (
-                                      <Target className="w-4 h-4 text-primary" />
-                                    )}
+                                    {isCompleted && <Target className="w-4 h-4 text-primary" />}
                                   </div>
-                                  <p className="text-sm font-medium text-foreground truncate">
-                                    {day.topic_ko}
-                                  </p>
+                                  <p className="text-sm font-medium text-foreground truncate">{getDayTopic(day)}</p>
                                   {progress && progress.total_words > 0 && (
                                     <div className="mt-2 h-1 bg-muted rounded-full overflow-hidden">
-                                      <div 
+                                      <div
                                         className="h-full bg-primary transition-all"
                                         style={{ width: `${(progress.mastered_words / progress.total_words) * 100}%` }}
                                       />
@@ -364,7 +387,7 @@ export default function HanjaMindmap() {
                       )}
                     </AnimatePresence>
                   </Card>
-                </motion.div>
+                </motion.article>
               );
             })}
 
@@ -372,14 +395,12 @@ export default function HanjaMindmap() {
             {units.length === 0 && (
               <Card className="p-12 text-center">
                 <Brain className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">데이터 준비 중</h3>
-                <p className="text-muted-foreground">
-                  한자어 마인드맵 콘텐츠가 곧 업데이트됩니다.
-                </p>
+                <h3 className="text-lg font-semibold mb-2">{t("hanjaMindmapPage.empty.title")}</h3>
+                <p className="text-muted-foreground">{t("hanjaMindmapPage.empty.desc")}</p>
               </Card>
             )}
-          </div>
-        </div>
+          </section>
+        </section>
       </main>
 
       <AppFooter />
