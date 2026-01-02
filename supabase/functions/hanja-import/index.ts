@@ -373,9 +373,14 @@ function parseMarkdownForDay(
 
   // The markdown includes multiple occurrences of the same "Day NN" (cover, contents, exercises).
   // We scan all occurrences and choose the first one that parses into actual roots.
-  const dayHeaderRe = /^(?:#{1,4}\s*)?Day\s*(\d+)\b/i;
+  // NEW STRATEGY: Look for the ACTUAL content by searching for "Day NN" followed by the topic name,
+  // and then look for the ### Hanja root headers which indicate actual content.
+  
+  const dayHeaderRe = /^(?:#{1,4}\s*)?Day\s*0?(\d+)\b/i;
+  const dayTopic = DAY_TOPICS[dayNumber];
   let candidateCount = 0;
-
+  
+  // Strategy 1: Find the main content section (after "Day XX Topic" and contains ### roots)
   for (let i = 0; i < lines.length; i++) {
     const t = lines[i].trim();
     const m = t.match(dayHeaderRe);
@@ -384,20 +389,31 @@ function parseMarkdownForDay(
     const foundDay = parseInt(m[1], 10);
     if (foundDay !== dayNumber) continue;
 
-    // Slice until next day header OR unit header OR exercise section.
-    const section: string[] = [];
+    candidateCount++;
+    
+    // Find the next Day header to determine section end
+    let sectionEnd = lines.length;
     for (let j = i + 1; j < lines.length; j++) {
       const tt = lines[j].trim();
-
-      if (dayHeaderRe.test(tt)) break;
-      if (/^#{1,4}\s*\d+\.\s+/.test(tt)) break; // exercises
-      if (/^##\s+\d+\s*$/.test(tt)) break; // unit index
-
-      section.push(lines[j]);
+      const nextDayMatch = tt.match(dayHeaderRe);
+      if (nextDayMatch) {
+        const nextDay = parseInt(nextDayMatch[1], 10);
+        // Only break if it's a different day
+        if (nextDay !== dayNumber) {
+          sectionEnd = j;
+          break;
+        }
+      }
+      // Also break on unit headers like "## 2" or "## 현대 문화와 전통문화"
+      if (/^##\s+\d+\s*$/.test(tt)) {
+        sectionEnd = j;
+        break;
+      }
     }
 
-    candidateCount++;
-
+    // Slice the full section from current Day header to next Day/Unit header
+    const section = lines.slice(i + 1, sectionEnd);
+    
     const roots = parseDaySection(section);
     if (roots.length > 0) {
       console.log(
@@ -414,6 +430,37 @@ function parseMarkdownForDay(
       }
 
       return { roots, debug: { linesScanned: section.length } };
+    }
+  }
+
+  // Strategy 2: Fallback - search for the topic name directly followed by ### hanja roots
+  if (dayTopic) {
+    console.log(`Day ${dayNumber}: trying fallback with topic "${dayTopic}"`);
+    
+    for (let i = 0; i < lines.length; i++) {
+      const t = lines[i].trim();
+      // Look for the topic name as a standalone line (after image)
+      if (t === dayTopic) {
+        // Find section end (next Day or Unit)
+        let sectionEnd = lines.length;
+        for (let j = i + 1; j < lines.length; j++) {
+          const tt = lines[j].trim();
+          if (dayHeaderRe.test(tt) || /^##\s+\d+\s*$/.test(tt)) {
+            sectionEnd = j;
+            break;
+          }
+        }
+        
+        const section = lines.slice(i, sectionEnd);
+        const roots = parseDaySection(section);
+        
+        if (roots.length > 0) {
+          console.log(
+            `Day ${dayNumber}: fallback found via topic (sectionLines=${section.length}, roots=${roots.length})`
+          );
+          return { roots, debug: { linesScanned: section.length } };
+        }
+      }
     }
   }
 
