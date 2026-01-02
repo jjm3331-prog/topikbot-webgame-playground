@@ -2,27 +2,16 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Korean voice options - WaveNet and Neural2 are highest quality
-const KOREAN_VOICES = {
-  // WaveNet voices (premium quality)
-  "ko-KR-Wavenet-A": { gender: "FEMALE", type: "WaveNet" },
-  "ko-KR-Wavenet-B": { gender: "FEMALE", type: "WaveNet" },
-  "ko-KR-Wavenet-C": { gender: "MALE", type: "WaveNet" },
-  "ko-KR-Wavenet-D": { gender: "MALE", type: "WaveNet" },
-  // Neural2 voices (newest, most natural)
-  "ko-KR-Neural2-A": { gender: "FEMALE", type: "Neural2" },
-  "ko-KR-Neural2-B": { gender: "FEMALE", type: "Neural2" },
-  "ko-KR-Neural2-C": { gender: "MALE", type: "Neural2" },
-  // Standard voices (more affordable)
-  "ko-KR-Standard-A": { gender: "FEMALE", type: "Standard" },
-  "ko-KR-Standard-B": { gender: "FEMALE", type: "Standard" },
-  "ko-KR-Standard-C": { gender: "MALE", type: "Standard" },
-  "ko-KR-Standard-D": { gender: "MALE", type: "Standard" },
-};
+// Gemini Flash TTS voices (all support Korean)
+const VOICES = [
+  "Kore", "Aoede", "Charon", "Fenrir", "Puck", "Zephyr", 
+  "Leda", "Orus", "Achernar", "Gacrux", "Sulafat"
+] as const;
+
+type GeminiVoice = typeof VOICES[number];
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -30,94 +19,104 @@ serve(async (req) => {
   }
 
   try {
-    const { text, voice, speed } = await req.json();
+    const { text, voice, speed, prompt } = await req.json();
 
-    if (!text) {
+    if (!text || typeof text !== "string" || text.trim().length === 0) {
       return new Response(
         JSON.stringify({ error: "Text is required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const GOOGLE_CLOUD_API_KEY = Deno.env.get("GOOGLE_CLOUD_API_KEY");
-    if (!GOOGLE_CLOUD_API_KEY) {
-      console.error("GOOGLE_CLOUD_API_KEY is not configured");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) {
+      console.error("GEMINI_API_KEY not configured");
       return new Response(
         JSON.stringify({ error: "TTS service not configured" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Default to Neural2 female voice for best quality
-    const selectedVoice = voice || "ko-KR-Neural2-A";
-    const speakingRate = speed || 0.9; // Slightly slower for learning
+    // Truncate text (Gemini TTS has 4000 byte limit per text field)
+    const truncatedText = text.trim().slice(0, 2000);
+    
+    // Select voice (default: Kore - female, natural for Korean)
+    const selectedVoice: GeminiVoice = VOICES.includes(voice) ? voice : "Kore";
+    
+    // Build prompt for speaking style
+    let stylePrompt = prompt || "Read naturally and clearly in Korean.";
+    if (speed && speed < 0.8) {
+      stylePrompt = "Read slowly and clearly. " + stylePrompt;
+    } else if (speed && speed > 1.2) {
+      stylePrompt = "Read quickly but clearly. " + stylePrompt;
+    }
 
-    console.log(`Google TTS request: voice=${selectedVoice}, speed=${speakingRate}, text length=${text.length}`);
+    console.log(`Generating TTS: voice=${selectedVoice}, text length=${truncatedText.length}`);
 
-    const requestBody = {
-      input: { text: text.slice(0, 5000) }, // Google TTS limit is 5000 chars
-      voice: {
-        languageCode: "ko-KR",
-        name: selectedVoice,
-      },
-      audioConfig: {
-        audioEncoding: "MP3",
-        speakingRate: speakingRate,
-        pitch: 0, // Natural pitch
-        volumeGainDb: 0,
-        effectsProfileId: ["headphone-class-device"], // Optimized for headphones
-      },
-    };
-
+    // Call Gemini Flash TTS via Cloud Text-to-Speech API with API key
     const response = await fetch(
-      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GOOGLE_CLOUD_API_KEY}`,
+      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify({
+          input: {
+            text: truncatedText,
+            prompt: stylePrompt,
+          },
+          voice: {
+            languageCode: "ko-KR",
+            name: selectedVoice,
+            model_name: "gemini-2.5-flash-tts",
+          },
+          audioConfig: {
+            audioEncoding: "MP3",
+          },
+        }),
       }
     );
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Google TTS API error: ${response.status} - ${errorText}`);
+      console.error("Gemini TTS API error:", response.status, errorText);
       return new Response(
-        JSON.stringify({ error: `TTS API error: ${response.status}` }),
-        { status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const data = await response.json();
-    
-    if (!data.audioContent) {
-      console.error("No audio content in response");
-      return new Response(
-        JSON.stringify({ error: "No audio generated" }),
+        JSON.stringify({ error: "TTS generation failed", details: errorText }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Decode base64 to binary
-    const binaryString = atob(data.audioContent);
+    const data = await response.json();
+    const audioContent = data.audioContent;
+
+    if (!audioContent) {
+      console.error("No audio content in response:", data);
+      return new Response(
+        JSON.stringify({ error: "No audio content returned" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Decode base64 and return as audio
+    const binaryString = atob(audioContent);
     const bytes = new Uint8Array(binaryString.length);
     for (let i = 0; i < binaryString.length; i++) {
       bytes[i] = binaryString.charCodeAt(i);
     }
 
-    console.log(`Google TTS success: generated ${bytes.length} bytes`);
+    console.log(`TTS generated successfully: ${bytes.length} bytes`);
 
     return new Response(bytes, {
       headers: {
         ...corsHeaders,
         "Content-Type": "audio/mpeg",
-        "Cache-Control": "public, max-age=86400", // Cache for 24 hours
+        "Cache-Control": "public, max-age=86400",
       },
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    console.error("Google TTS error:", message);
+    console.error("TTS error:", message);
     return new Response(
       JSON.stringify({ error: message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

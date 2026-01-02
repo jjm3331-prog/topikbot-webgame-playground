@@ -19,23 +19,25 @@ function cleanupAudio() {
   }
 }
 
-export type GoogleTTSVoice = 
-  | "ko-KR-Neural2-A" // Female (recommended)
-  | "ko-KR-Neural2-B" // Female
-  | "ko-KR-Neural2-C" // Male
-  | "ko-KR-Wavenet-A" // Female
-  | "ko-KR-Wavenet-B" // Female
-  | "ko-KR-Wavenet-C" // Male
-  | "ko-KR-Wavenet-D" // Male
-  | "ko-KR-Standard-A" // Female (cheaper)
-  | "ko-KR-Standard-B" // Female
-  | "ko-KR-Standard-C" // Male
-  | "ko-KR-Standard-D"; // Male
+// Gemini Flash TTS voices
+export type GeminiVoice = 
+  | "Kore"      // Female (recommended for Korean)
+  | "Aoede"     // Female
+  | "Zephyr"    // Female
+  | "Leda"      // Female
+  | "Gacrux"    // Female
+  | "Sulafat"   // Female
+  | "Charon"    // Male
+  | "Fenrir"    // Male
+  | "Puck"      // Male
+  | "Orus"      // Male
+  | "Achernar"; // Female
 
 export interface GoogleTTSOptions {
-  voice?: GoogleTTSVoice;
-  speed?: number; // 0.25 to 4.0, default 0.9
+  voice?: GeminiVoice;
+  speed?: number; // affects prompt style
   truncate?: number;
+  prompt?: string; // style prompt for Gemini TTS
 }
 
 export async function playGoogleTTS(
@@ -45,9 +47,10 @@ export async function playGoogleTTS(
   const cleaned = (text || "").trim();
   if (!cleaned) return;
 
-  const truncate = opts?.truncate ?? 800;
-  const speed = opts?.speed ?? 0.9;
-  const voice = opts?.voice ?? "ko-KR-Neural2-A";
+  const truncate = opts?.truncate ?? 2000;
+  const speed = opts?.speed ?? 1.0;
+  const voice = opts?.voice ?? "Kore";
+  const prompt = opts?.prompt ?? "Read naturally and clearly in Korean.";
 
   cleanupAudio();
 
@@ -63,7 +66,8 @@ export async function playGoogleTTS(
       body: JSON.stringify({ 
         text: cleaned.slice(0, truncate), 
         speed,
-        voice 
+        voice,
+        prompt,
       }),
     }
   );
