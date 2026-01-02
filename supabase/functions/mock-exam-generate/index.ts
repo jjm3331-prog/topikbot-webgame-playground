@@ -278,24 +278,29 @@ async function synthesizeGeminiTTS(
 ): Promise<Uint8Array> {
   if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not configured");
 
+  // Use Gemini API directly (generativelanguage.googleapis.com)
+  // This bypasses Cloud Text-to-Speech API restrictions
   const resp = await fetch(
-    `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GEMINI_API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${GEMINI_API_KEY}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        input: { 
-          text,
-          prompt: stylePrompt,
-        },
-        voice: {
-          languageCode: "ko-KR",
-          name: voiceName,
-          modelName: "gemini-2.5-flash-tts",
-        },
-        audioConfig: {
-          audioEncoding: "MP3",
-        },
+        contents: [{
+          parts: [{ 
+            text: `${stylePrompt}\n\n${text}` 
+          }]
+        }],
+        generationConfig: {
+          response_modalities: ["AUDIO"],
+          speech_config: {
+            voice_config: {
+              prebuilt_voice_config: {
+                voice_name: voiceName
+              }
+            }
+          }
+        }
       }),
     }
   );
@@ -307,8 +312,13 @@ async function synthesizeGeminiTTS(
   }
 
   const data = await resp.json();
-  const audioContent = data?.audioContent;
-  if (!audioContent) throw new Error("No audioContent returned from Gemini TTS");
+  
+  // Extract audio from Gemini response
+  const audioContent = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+  if (!audioContent) {
+    console.error("No audio in Gemini response:", JSON.stringify(data).slice(0, 500));
+    throw new Error("No audioContent returned from Gemini TTS");
+  }
 
   const binaryString = atob(audioContent);
   const bytes = new Uint8Array(binaryString.length);
