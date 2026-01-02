@@ -22,6 +22,7 @@ import {
   Calendar,
   CheckCircle,
   Zap,
+  RefreshCw,
 } from "lucide-react";
 import { Swords } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -201,10 +202,55 @@ const Dashboard = () => {
           >
             <div className="flex items-start gap-3 sm:gap-4">
               <span className="text-3xl sm:text-4xl md:text-5xl flex-shrink-0">👋</span>
-              <div className="min-w-0">
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground leading-tight">
-                  {t('dashboard.welcome', { name: profile?.username || 'User' })}
-                </h1>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground leading-tight">
+                    {t('dashboard.welcome', { name: profile?.username || 'User' })}
+                  </h1>
+                  {/* 강력 새로고침 버튼 - PWA용 캐시 클리어 */}
+                  <button
+                    onClick={async () => {
+                      try {
+                        // 1. Service Worker 캐시 전체 삭제
+                        if ('caches' in window) {
+                          const cacheNames = await caches.keys();
+                          await Promise.all(cacheNames.map(name => caches.delete(name)));
+                        }
+                        
+                        // 2. Service Worker 등록 해제 후 재등록
+                        if ('serviceWorker' in navigator) {
+                          const registrations = await navigator.serviceWorker.getRegistrations();
+                          await Promise.all(registrations.map(reg => reg.unregister()));
+                        }
+                        
+                        // 3. LocalStorage / SessionStorage 클리어 (선택적)
+                        // localStorage.clear();
+                        // sessionStorage.clear();
+                        
+                        toast({
+                          title: "캐시 삭제 완료",
+                          description: "모든 캐시가 삭제되었습니다. 새로고침합니다...",
+                        });
+                        
+                        // 4. 강력 새로고침 (캐시 무시)
+                        setTimeout(() => {
+                          window.location.reload();
+                        }, 500);
+                      } catch (error) {
+                        console.error("Cache clear error:", error);
+                        toast({
+                          title: "오류",
+                          description: "캐시 삭제 중 오류가 발생했습니다.",
+                          variant: "destructive",
+                        });
+                      }
+                    }}
+                    className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center transition-all hover:rotate-180 duration-500 active:scale-90"
+                    title="강력 새로고침 (캐시 삭제)"
+                  >
+                    <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
+                  </button>
+                </div>
                 <p className="text-sm sm:text-base text-muted-foreground mt-0.5 sm:mt-1">{t('dashboard.whatToLearn')}</p>
               </div>
             </div>
