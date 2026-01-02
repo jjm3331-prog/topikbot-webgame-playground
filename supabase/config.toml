@@ -180,3 +180,6 @@ verify_jwt = false
 
 [functions.hanja-generate-examples]
 verify_jwt = true
+
+[functions.google-tts]
+verify_jwt = false
