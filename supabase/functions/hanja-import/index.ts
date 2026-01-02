@@ -440,15 +440,15 @@ function parseMarkdownForDay(
     }
 
     // Count root headers in this candidate slice.
+    // NOTE: In the book markdown, many root lines are NOT strict headings (they can be plain text).
+    // So we count ANY line that parseRootHeader() recognizes.
     let rootHeaders = 0;
     for (let k = i + 1; k < end; k++) {
       const t = lines[k].trim();
       if (exerciseRe.test(t)) break; // stop at exercises/answer section
 
-      if (/^#{3,6}\s+/.test(t)) {
-        const info = parseRootHeader(t, lines[k + 1]);
-        if (info?.hanja) rootHeaders++;
-      }
+      const info = parseRootHeader(t, lines[k + 1]);
+      if (info?.hanja) rootHeaders++;
     }
 
     candidates.push({ start: i, end, rootHeaders });
