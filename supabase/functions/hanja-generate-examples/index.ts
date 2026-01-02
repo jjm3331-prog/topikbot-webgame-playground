@@ -71,6 +71,9 @@ async function generateExamplesForWord(word: HanjaWord): Promise<GeneratedConten
 - 모든 번역은 자연스럽고 정확하게
 - JSON 형식만 반환, 추가 설명 없음`;
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25_000);
+
   try {
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -78,18 +81,23 @@ async function generateExamplesForWord(word: HanjaWord): Promise<GeneratedConten
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
+      signal: controller.signal,
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: "You are a Korean language education expert. Always respond with valid JSON only." },
-          { role: "user", content: prompt }
+          {
+            role: "system",
+            content: "You are a Korean language education expert. Always respond with valid JSON only.",
+          },
+          { role: "user", content: prompt },
         ],
         temperature: 0.7,
       }),
     });
 
     if (!response.ok) {
-      console.error("LLM API error:", response.status, await response.text());
+      const bodyText = await response.text().catch(() => "");
+      console.error("LLM API error:", response.status, bodyText);
       return null;
     }
 
@@ -116,8 +124,15 @@ async function generateExamplesForWord(word: HanjaWord): Promise<GeneratedConten
     const parsed = JSON.parse(jsonStr) as GeneratedContent;
     return parsed;
   } catch (error) {
-    console.error("Error generating examples for word:", word.word, error);
+    const isAbort = error instanceof DOMException && error.name === "AbortError";
+    console.error(
+      "Error generating examples for word:",
+      word.word,
+      isAbort ? "(timeout)" : error,
+    );
     return null;
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
@@ -135,6 +150,11 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+    // Hard cap per-request work to avoid function timeouts.
+    const effectiveBatchSize = Math.max(1, Math.min(Number(batchSize) || 1, 5));
+    const requestStartedAt = Date.now();
+    const TIME_BUDGET_MS = 25_000;
+
     // Get the day ID
     const { data: day, error: dayError } = await supabase
       .from("hanja_days")
@@ -145,7 +165,7 @@ serve(async (req) => {
     if (dayError || !day) {
       return new Response(
         JSON.stringify({ error: `Day ${dayNumber} not found` }),
-        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -158,11 +178,11 @@ serve(async (req) => {
     if (rootsError || !roots?.length) {
       return new Response(
         JSON.stringify({ error: `No roots found for day ${dayNumber}` }),
-        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const rootIds = roots.map(r => r.id);
+    const rootIds = roots.map((r) => r.id);
 
     // Get words for these roots
     let wordsQuery = supabase
@@ -175,7 +195,7 @@ serve(async (req) => {
       wordsQuery = wordsQuery.or("example_sentence.is.null,example_sentence.eq.");
     }
 
-    const { data: words, error: wordsError } = await wordsQuery.limit(batchSize);
+    const { data: words, error: wordsError } = await wordsQuery.limit(effectiveBatchSize);
 
     if (wordsError) {
       throw wordsError;
@@ -183,13 +203,14 @@ serve(async (req) => {
 
     if (!words?.length) {
       return new Response(
-        JSON.stringify({ 
-          success: true, 
+        JSON.stringify({
+          success: true,
           message: "All words already have examples",
           processed: 0,
-          remaining: 0
+          remaining: 0,
+          time_budget_reached: false,
         }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -198,10 +219,16 @@ serve(async (req) => {
       processed: 0,
       success: 0,
       failed: 0,
-      words: [] as { word: string; status: string }[]
+      words: [] as { word: string; status: string }[],
+      time_budget_reached: false,
     };
 
     for (const word of words) {
+      if (Date.now() - requestStartedAt > TIME_BUDGET_MS) {
+        results.time_budget_reached = true;
+        break;
+      }
+
       const generated = await generateExamplesForWord(word);
 
       if (generated) {
@@ -240,8 +267,8 @@ serve(async (req) => {
 
       results.processed++;
 
-      // Small delay to avoid rate limiting
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Small delay to reduce 429 rate-limits from AI gateway
+      await new Promise((resolve) => setTimeout(resolve, 350));
     }
 
     // Count remaining words without examples
@@ -258,15 +285,17 @@ serve(async (req) => {
         success: results.success,
         failed: results.failed,
         words: results.words,
-        remaining: remainingCount || 0
+        remaining: remainingCount || 0,
+        time_budget_reached: results.time_budget_reached,
+        effective_batch_size: effectiveBatchSize,
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error) {
     console.error("hanja-generate-examples error:", error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
 });
