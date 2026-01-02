@@ -183,25 +183,27 @@ export default function HanjaMindmapDay() {
         .eq("day_id", dayData.id)
         .order("display_order");
 
-      if (rootsData) {
-        setRoots(rootsData);
+      const safeRoots = rootsData ?? [];
+      setRoots(safeRoots);
 
-        const rootIds = rootsData.map(r => r.id);
+      // Avoid `.in()` with empty array (can cause non-2xx errors).
+      if (safeRoots.length > 0) {
+        const rootIds = safeRoots.map((r) => r.id);
         const { data: wordsData } = await supabase
           .from("hanja_words")
           .select("*")
           .in("root_id", rootIds)
           .order("display_order");
 
-        if (wordsData) {
-          const wordsMap = new Map<string, HanjaWord[]>();
-          wordsData.forEach(word => {
-            const existing = wordsMap.get(word.root_id) || [];
-            existing.push(word as HanjaWord);
-            wordsMap.set(word.root_id, existing);
-          });
-          setWords(wordsMap);
-        }
+        const wordsMap = new Map<string, HanjaWord[]>();
+        (wordsData ?? []).forEach((word) => {
+          const existing = wordsMap.get(word.root_id) || [];
+          existing.push(word as HanjaWord);
+          wordsMap.set(word.root_id, existing);
+        });
+        setWords(wordsMap);
+      } else {
+        setWords(new Map());
       }
 
       if (user) {
@@ -455,178 +457,199 @@ export default function HanjaMindmapDay() {
           </motion.div>
 
           {/* 마인드맵 시각화 - 개선된 버전 */}
-          <div className="relative w-full aspect-square max-w-[800px] mx-auto my-8 md:my-12">
-            {/* 배경 장식 */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 rounded-3xl" />
-            
-            {/* SVG 연결선 - 곡선으로 개선 */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 800 800">
-              <defs>
-                {roots.map((root, index) => (
-                  <linearGradient 
-                    key={`gradient-${root.id}`} 
-                    id={`line-gradient-${index}`}
-                    x1="0%" y1="0%" x2="100%" y2="0%"
-                  >
-                    <stop offset="0%" stopColor={NODE_COLORS[index % NODE_COLORS.length].line} stopOpacity="0.3" />
-                    <stop offset="50%" stopColor={NODE_COLORS[index % NODE_COLORS.length].line} stopOpacity="0.8" />
-                    <stop offset="100%" stopColor={NODE_COLORS[index % NODE_COLORS.length].line} stopOpacity="0.3" />
-                  </linearGradient>
-                ))}
-              </defs>
-              
+          {roots.length === 0 ? (
+            <Card className="p-8 md:p-10 text-center bg-gradient-to-br from-muted/40 to-muted/20 border-border/60">
+              <div className="mx-auto mb-4 w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <Lightbulb className="w-7 h-7 text-primary" />
+              </div>
+              <h2 className="text-xl font-heading font-bold text-foreground">
+                {t("hanjaMindmapDay.empty.title", "이 Day는 아직 준비 중입니다")}
+              </h2>
+              <p className="mt-2 text-muted-foreground">
+                {t("hanjaMindmapDay.empty.desc", "다른 Day를 먼저 학습해 주세요.")}
+              </p>
+            </Card>
+          ) : (
+            <div className="relative w-full aspect-square max-w-[800px] mx-auto my-8 md:my-12">
+              {/* 배경 장식 */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 rounded-3xl" />
+
+              {/* SVG 연결선 - 곡선으로 개선 */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 800 800">
+                <defs>
+                  {roots.map((root, index) => (
+                    <linearGradient
+                      key={`gradient-${root.id}`}
+                      id={`line-gradient-${index}`}
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="0%"
+                    >
+                      <stop offset="0%" stopColor={NODE_COLORS[index % NODE_COLORS.length].line} stopOpacity="0.3" />
+                      <stop offset="50%" stopColor={NODE_COLORS[index % NODE_COLORS.length].line} stopOpacity="0.8" />
+                      <stop offset="100%" stopColor={NODE_COLORS[index % NODE_COLORS.length].line} stopOpacity="0.3" />
+                    </linearGradient>
+                  ))}
+                </defs>
+
+                {roots.map((root, index) => {
+                  const pos = nodePositions[index];
+                  if (!pos) return null;
+                  const isHovered = hoveredRoot === root.id;
+
+                  // 베지어 곡선 제어점 계산
+                  const startX = 400;
+                  const startY = 400;
+                  const endX = 400 + pos.x;
+                  const endY = 400 + pos.y;
+                  const midX = (startX + endX) / 2;
+                  const midY = (startY + endY) / 2;
+                  // 곡선 효과를 위한 제어점
+                  const controlOffset = 30;
+                  const controlX = midX + controlOffset * Math.sin((pos.angle * Math.PI) / 180);
+                  const controlY = midY - controlOffset * Math.cos((pos.angle * Math.PI) / 180);
+
+                  return (
+                    <motion.path
+                      key={`line-${root.id}`}
+                      initial={{ pathLength: 0, opacity: 0 }}
+                      animate={{
+                        pathLength: 1,
+                        opacity: isHovered ? 1 : 0.6,
+                        strokeWidth: isHovered ? 4 : 2.5,
+                      }}
+                      transition={{ delay: 0.3 + index * 0.08, duration: 0.6 }}
+                      d={`M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`}
+                      stroke={`url(#line-gradient-${index})`}
+                      strokeWidth="2.5"
+                      fill="none"
+                      strokeLinecap="round"
+                    />
+                  );
+                })}
+              </svg>
+
+              {/* 중앙 노드 (주제) - 더 화려하게 */}
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 150, damping: 15, delay: 0.2 }}
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
+              >
+                <div className="relative group">
+                  {/* 외부 글로우 효과 */}
+                  <div className="absolute inset-0 -m-4 rounded-full bg-gradient-to-br from-primary/20 to-korean-pink/20 blur-xl animate-pulse" />
+
+                  {/* 메인 노드 */}
+                  <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full bg-gradient-to-br from-primary via-korean-orange to-korean-pink shadow-2xl shadow-primary/40 flex flex-col items-center justify-center text-white border-4 border-white/30 group-hover:scale-105 transition-transform duration-300">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                      className="absolute inset-0 rounded-full border-2 border-dashed border-white/20"
+                    />
+                    <Sparkles className="w-7 h-7 mb-2 animate-pulse" />
+                    <span className="text-lg md:text-xl font-bold text-center px-4 leading-tight drop-shadow-lg">
+                      {getDayTopic()}
+                    </span>
+                    <Badge className="mt-2 bg-white/20 text-white border-0 text-xs">Day {day}</Badge>
+                  </div>
+
+                  {/* 장식 링들 */}
+                  <motion.div
+                    className="absolute inset-0 -m-6 rounded-full border-2 border-primary/20"
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  />
+                  <motion.div
+                    className="absolute inset-0 -m-10 rounded-full border border-primary/10"
+                    animate={{ scale: [1, 1.08, 1] }}
+                    transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
+                  />
+                </div>
+              </motion.div>
+
+              {/* 한자 루트 노드들 - 더 세련되게 */}
               {roots.map((root, index) => {
                 const pos = nodePositions[index];
                 if (!pos) return null;
-                const isHovered = hoveredRoot === root.id;
-                
-                // 베지어 곡선 제어점 계산
-                const startX = 400;
-                const startY = 400;
-                const endX = 400 + pos.x;
-                const endY = 400 + pos.y;
-                const midX = (startX + endX) / 2;
-                const midY = (startY + endY) / 2;
-                // 곡선 효과를 위한 제어점
-                const controlOffset = 30;
-                const controlX = midX + controlOffset * Math.sin((pos.angle * Math.PI) / 180);
-                const controlY = midY - controlOffset * Math.cos((pos.angle * Math.PI) / 180);
-                
+                const color = NODE_COLORS[index % NODE_COLORS.length];
+                const rootWords = getWordsForRoot(root.id);
+                const masteredInRoot = rootWords.filter((w) => masteredWords.has(w.id)).length;
+                const isComplete = masteredInRoot === rootWords.length && rootWords.length > 0;
+
                 return (
-                  <motion.path
-                    key={`line-${root.id}`}
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ 
-                      pathLength: 1, 
-                      opacity: isHovered ? 1 : 0.6,
-                      strokeWidth: isHovered ? 4 : 2.5
+                  <motion.div
+                    key={root.id}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.4 + index * 0.08, type: "spring", stiffness: 150, damping: 15 }}
+                    className="absolute z-10"
+                    style={{
+                      left: `calc(50% + ${pos.x}px)`,
+                      top: `calc(50% + ${pos.y}px)`,
+                      transform: "translate(-50%, -50%)",
                     }}
-                    transition={{ delay: 0.3 + index * 0.08, duration: 0.6 }}
-                    d={`M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`}
-                    stroke={`url(#line-gradient-${index})`}
-                    strokeWidth="2.5"
-                    fill="none"
-                    strokeLinecap="round"
-                  />
+                    onMouseEnter={() => setHoveredRoot(root.id)}
+                    onMouseLeave={() => setHoveredRoot(null)}
+                  >
+                    <motion.button
+                      onClick={() => setSelectedRoot(root)}
+                      whileHover={{ scale: 1.15, rotate: [0, -2, 2, 0] }}
+                      whileTap={{ scale: 0.95 }}
+                      className="relative group cursor-pointer"
+                    >
+                      {/* 글로우 효과 */}
+                      <div
+                        className={`absolute inset-0 -m-2 rounded-2xl bg-gradient-to-br ${color.bg} opacity-30 blur-lg group-hover:opacity-50 transition-opacity`}
+                      />
+
+                      {/* 메인 카드 */}
+                      <div
+                        className={`relative w-22 h-22 md:w-28 md:h-28 rounded-2xl bg-gradient-to-br ${color.bg} shadow-xl ${color.glow} shadow-lg ring-2 ${color.border} flex flex-col items-center justify-center text-white overflow-hidden`}
+                      >
+                        {/* 배경 패턴 */}
+                        <div className="absolute inset-0 opacity-10">
+                          <div className="absolute top-0 right-0 w-16 h-16 bg-white/20 rounded-full -translate-y-1/2 translate-x-1/2" />
+                          <div className="absolute bottom-0 left-0 w-12 h-12 bg-white/20 rounded-full translate-y-1/2 -translate-x-1/2" />
+                        </div>
+
+                        <span className="text-3xl md:text-4xl font-bold drop-shadow-lg relative z-10">{root.hanja}</span>
+                        <span className="text-xs md:text-sm opacity-90 mt-0.5 relative z-10">{root.reading_ko}</span>
+
+                        {/* 완료 표시 */}
+                        {isComplete && (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white"
+                          >
+                            <Check className="w-3.5 h-3.5 text-white" />
+                          </motion.div>
+                        )}
+                      </div>
+
+                      {/* 진행도 배지 */}
+                      <div
+                        className={`absolute -bottom-2 left-1/2 -translate-x-1/2 ${color.accent} text-xs font-bold px-2.5 py-1 rounded-full shadow-md whitespace-nowrap`}
+                      >
+                        {masteredInRoot}/{rootWords.length}
+                      </div>
+
+                      {/* 호버 시 의미 표시 */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 5 }}
+                        whileHover={{ opacity: 1, y: 0 }}
+                        className="absolute -bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap text-sm font-medium text-foreground bg-background/95 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-lg border pointer-events-none"
+                      >
+                        {getRootMeaning(root)}
+                      </motion.div>
+                    </motion.button>
+                  </motion.div>
                 );
               })}
-            </svg>
-
-            {/* 중앙 노드 (주제) - 더 화려하게 */}
-            <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 150, damping: 15, delay: 0.2 }}
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
-            >
-              <div className="relative group">
-                {/* 외부 글로우 효과 */}
-                <div className="absolute inset-0 -m-4 rounded-full bg-gradient-to-br from-primary/20 to-korean-pink/20 blur-xl animate-pulse" />
-                
-                {/* 메인 노드 */}
-                <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full bg-gradient-to-br from-primary via-korean-orange to-korean-pink shadow-2xl shadow-primary/40 flex flex-col items-center justify-center text-white border-4 border-white/30 group-hover:scale-105 transition-transform duration-300">
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    className="absolute inset-0 rounded-full border-2 border-dashed border-white/20"
-                  />
-                  <Sparkles className="w-7 h-7 mb-2 animate-pulse" />
-                  <span className="text-lg md:text-xl font-bold text-center px-4 leading-tight drop-shadow-lg">
-                    {getDayTopic()}
-                  </span>
-                  <Badge className="mt-2 bg-white/20 text-white border-0 text-xs">
-                    Day {day}
-                  </Badge>
-                </div>
-                
-                {/* 장식 링들 */}
-                <motion.div 
-                  className="absolute inset-0 -m-6 rounded-full border-2 border-primary/20"
-                  animate={{ scale: [1, 1.05, 1] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                />
-                <motion.div 
-                  className="absolute inset-0 -m-10 rounded-full border border-primary/10"
-                  animate={{ scale: [1, 1.08, 1] }}
-                  transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
-                />
-              </div>
-            </motion.div>
-
-            {/* 한자 루트 노드들 - 더 세련되게 */}
-            {roots.map((root, index) => {
-              const pos = nodePositions[index];
-              if (!pos) return null;
-              const color = NODE_COLORS[index % NODE_COLORS.length];
-              const rootWords = getWordsForRoot(root.id);
-              const masteredInRoot = rootWords.filter(w => masteredWords.has(w.id)).length;
-              const isComplete = masteredInRoot === rootWords.length && rootWords.length > 0;
-
-              return (
-                <motion.div
-                  key={root.id}
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.4 + index * 0.08, type: "spring", stiffness: 150, damping: 15 }}
-                  className="absolute z-10"
-                  style={{
-                    left: `calc(50% + ${pos.x}px)`,
-                    top: `calc(50% + ${pos.y}px)`,
-                    transform: 'translate(-50%, -50%)',
-                  }}
-                  onMouseEnter={() => setHoveredRoot(root.id)}
-                  onMouseLeave={() => setHoveredRoot(null)}
-                >
-                  <motion.button
-                    onClick={() => setSelectedRoot(root)}
-                    whileHover={{ scale: 1.15, rotate: [0, -2, 2, 0] }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`relative group cursor-pointer`}
-                  >
-                    {/* 글로우 효과 */}
-                    <div className={`absolute inset-0 -m-2 rounded-2xl bg-gradient-to-br ${color.bg} opacity-30 blur-lg group-hover:opacity-50 transition-opacity`} />
-                    
-                    {/* 메인 카드 */}
-                    <div className={`relative w-22 h-22 md:w-28 md:h-28 rounded-2xl bg-gradient-to-br ${color.bg} shadow-xl ${color.glow} shadow-lg ring-2 ${color.border} flex flex-col items-center justify-center text-white overflow-hidden`}>
-                      {/* 배경 패턴 */}
-                      <div className="absolute inset-0 opacity-10">
-                        <div className="absolute top-0 right-0 w-16 h-16 bg-white/20 rounded-full -translate-y-1/2 translate-x-1/2" />
-                        <div className="absolute bottom-0 left-0 w-12 h-12 bg-white/20 rounded-full translate-y-1/2 -translate-x-1/2" />
-                      </div>
-                      
-                      <span className="text-3xl md:text-4xl font-bold drop-shadow-lg relative z-10">{root.hanja}</span>
-                      <span className="text-xs md:text-sm opacity-90 mt-0.5 relative z-10">{root.reading_ko}</span>
-                      
-                      {/* 완료 표시 */}
-                      {isComplete && (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white"
-                        >
-                          <Check className="w-3.5 h-3.5 text-white" />
-                        </motion.div>
-                      )}
-                    </div>
-                    
-                    {/* 진행도 배지 */}
-                    <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 ${color.accent} text-xs font-bold px-2.5 py-1 rounded-full shadow-md whitespace-nowrap`}>
-                      {masteredInRoot}/{rootWords.length}
-                    </div>
-                    
-                    {/* 호버 시 의미 표시 */}
-                    <motion.div 
-                      initial={{ opacity: 0, y: 5 }}
-                      whileHover={{ opacity: 1, y: 0 }}
-                      className="absolute -bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap text-sm font-medium text-foreground bg-background/95 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-lg border pointer-events-none"
-                    >
-                      {getRootMeaning(root)}
-                    </motion.div>
-                  </motion.button>
-                </motion.div>
-              );
-            })}
-          </div>
+            </div>
+          )}
 
           {/* 하단 네비게이션 */}
           <div className="flex items-center justify-between mt-8 max-w-md mx-auto">
