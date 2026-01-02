@@ -25,6 +25,8 @@ export default function HanjaImporter() {
   const [dbStats, setDbStats] = useState({ units: 0, days: 0, roots: 0, words: 0 });
   const [showDetails, setShowDetails] = useState(false);
 
+  const [cancelRequested, setCancelRequested] = useState(false);
+
   useEffect(() => {
     loadDbStats();
   }, []);
@@ -85,10 +87,8 @@ export default function HanjaImporter() {
           body: { markdown, dayNumber },
         });
 
-        // Supabase client-level error (network, non-2xx, etc.)
         if (error) {
           const message = error.message || "Unknown error";
-          // Retry only for transient failures
           const shouldRetry = attempt < maxAttempts && /fetch|timeout|network|5\d\d/i.test(message);
           if (shouldRetry) {
             await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
@@ -97,7 +97,6 @@ export default function HanjaImporter() {
           return { dayNumber, status: "error", error: message };
         }
 
-        // Function-level error payload
         const result = data as any;
         if (result?.error) {
           return {
@@ -127,6 +126,14 @@ export default function HanjaImporter() {
     return { dayNumber, status: "error", error: "Unknown error" };
   };
 
+  const stopImport = () => {
+    setCancelRequested(true);
+    toast({
+      title: "중지 요청됨",
+      description: "현재 Day 처리 후 안전하게 중지합니다.",
+    });
+  };
+
   const startImport = async () => {
     if (!markdown) {
       toast({
@@ -137,6 +144,7 @@ export default function HanjaImporter() {
       return;
     }
 
+    setCancelRequested(false);
     setImporting(true);
 
     const initialStatuses: ImportStatus[] = [];
@@ -146,27 +154,36 @@ export default function HanjaImporter() {
     let localSuccess = 0;
 
     for (let i = 1; i <= 82; i++) {
-      setCurrentDay(i);
+      if (cancelRequested) break;
 
+      setCurrentDay(i);
       setImportStatuses((prev) => prev.map((s) => (s.dayNumber === i ? { ...s, status: "loading" } : s)));
 
       const result = await importSingleDay(i);
-      if (result.status === "success") localSuccess++;
 
+      // If user requested cancel while awaiting, mark this day but stop afterward.
+      if (result.status === "success") localSuccess++;
       setImportStatuses((prev) => prev.map((s) => (s.dayNumber === i ? result : s)));
 
-      // Small delay between days to avoid overwhelming the server
+      if (cancelRequested) break;
+
       await new Promise((resolve) => setTimeout(resolve, 250));
     }
+
+    const wasCanceled = cancelRequested;
 
     setImporting(false);
     setCurrentDay(0);
     await loadDbStats();
 
     toast({
-      title: "임포트 완료",
-      description: `${localSuccess}/82 Day 성공적으로 임포트됨`,
+      title: wasCanceled ? "임포트 중지됨" : "임포트 완료",
+      description: wasCanceled ? "요청에 의해 중지했습니다." : `${localSuccess}/82 Day 성공적으로 임포트됨`,
     });
+
+    if (wasCanceled) {
+      setCancelRequested(false);
+    }
   };
 
   const progress = currentDay > 0 ? Math.round((currentDay / 82) * 100) : 0;
@@ -255,6 +272,12 @@ export default function HanjaImporter() {
               )}
               2. 82일 전체 재임포트(덮어쓰기)
             </Button>
+
+            {importing && (
+              <Button variant="destructive" onClick={stopImport}>
+                중지
+              </Button>
+            )}
           </div>
 
           {/* Progress */}
