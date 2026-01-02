@@ -2575,11 +2575,15 @@
     "loginDesc": "進捗を保存するにはログインしてください。",
     "backToList": "リストに戻る",
     "wordsProgress": "{{mastered}}/{{total}} 単語",
+    "wordsLearned": "学習済み単語",
+    "complete": "完了",
     "prevDay": "前のDay",
     "nextDay": "次のDay",
     "relatedWords": "関連単語",
     "markMastered": "習得済みにする",
-    "markUnmastered": "習得を解除"
+    "markUnmastered": "習得を解除",
+    "exampleSentence": "例文",
+    "noExample": "例文はまだありません。"
   }
 }
 

@@ -2580,11 +2580,15 @@
     "loginDesc": "Войдите, чтобы сохранить прогресс.",
     "backToList": "Назад к списку",
     "wordsProgress": "{{mastered}}/{{total}} слов",
+    "wordsLearned": "Слов изучено",
+    "complete": "Выполнено",
     "prevDay": "Предыдущий Day",
     "nextDay": "Следующий Day",
     "relatedWords": "Связанные слова",
     "markMastered": "Отметить как изученное",
-    "markUnmastered": "Снять отметку"
+    "markUnmastered": "Снять отметку",
+    "exampleSentence": "Пример",
+    "noExample": "Примеров пока нет."
   }
 }
 

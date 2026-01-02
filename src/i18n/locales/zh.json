@@ -2589,11 +2589,15 @@
     "loginDesc": "请登录以保存学习进度。",
     "backToList": "返回列表",
     "wordsProgress": "{{mastered}}/{{total}} 个词",
+    "wordsLearned": "已学词汇",
+    "complete": "完成",
     "prevDay": "上一Day",
     "nextDay": "下一Day",
     "relatedWords": "相关词汇",
     "markMastered": "标记为已掌握",
-    "markUnmastered": "取消标记"
+    "markUnmastered": "取消标记",
+    "exampleSentence": "例句",
+    "noExample": "暂无例句。"
   }
 }
 

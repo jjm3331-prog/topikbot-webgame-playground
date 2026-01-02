@@ -729,7 +729,21 @@ export type Database = {
       hanja_words: {
         Row: {
           created_at: string
+          definition_en: string | null
+          definition_ja: string | null
+          definition_ko: string | null
+          definition_ru: string | null
+          definition_uz: string | null
+          definition_vi: string | null
+          definition_zh: string | null
           display_order: number
+          example_sentence: string | null
+          example_translation_en: string | null
+          example_translation_ja: string | null
+          example_translation_ru: string | null
+          example_translation_uz: string | null
+          example_translation_vi: string | null
+          example_translation_zh: string | null
           id: string
           meaning_en: string | null
           meaning_ja: string | null
@@ -741,7 +755,21 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          definition_en?: string | null
+          definition_ja?: string | null
+          definition_ko?: string | null
+          definition_ru?: string | null
+          definition_uz?: string | null
+          definition_vi?: string | null
+          definition_zh?: string | null
           display_order?: number
+          example_sentence?: string | null
+          example_translation_en?: string | null
+          example_translation_ja?: string | null
+          example_translation_ru?: string | null
+          example_translation_uz?: string | null
+          example_translation_vi?: string | null
+          example_translation_zh?: string | null
           id?: string
           meaning_en?: string | null
           meaning_ja?: string | null
@@ -753,7 +781,21 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          definition_en?: string | null
+          definition_ja?: string | null
+          definition_ko?: string | null
+          definition_ru?: string | null
+          definition_uz?: string | null
+          definition_vi?: string | null
+          definition_zh?: string | null
           display_order?: number
+          example_sentence?: string | null
+          example_translation_en?: string | null
+          example_translation_ja?: string | null
+          example_translation_ru?: string | null
+          example_translation_uz?: string | null
+          example_translation_vi?: string | null
+          example_translation_zh?: string | null
           id?: string
           meaning_en?: string | null
           meaning_ja?: string | null

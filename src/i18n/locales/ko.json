@@ -2997,11 +2997,15 @@
     "loginDesc": "학습 진도를 저장하려면 로그인하세요.",
     "backToList": "목록으로",
     "wordsProgress": "{{mastered}}/{{total}} 단어",
+    "wordsLearned": "단어 학습 완료",
+    "complete": "완료",
     "prevDay": "이전 Day",
     "nextDay": "다음 Day",
     "relatedWords": "관련 단어",
     "markMastered": "학습 완료",
-    "markUnmastered": "학습 완료 취소"
+    "markUnmastered": "학습 완료 취소",
+    "exampleSentence": "예문",
+    "noExample": "예문이 아직 준비되지 않았습니다."
   }
 }
 
