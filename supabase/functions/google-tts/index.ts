@@ -5,7 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Gemini 2.5 Flash TTS voices (Korean optimized)
+// Gemini 2.5 Flash TTS voices
 const VOICES = [
   "Kore", "Aoede", "Charon", "Fenrir", "Puck", "Zephyr",
   "Leda", "Orus", "Achernar", "Gacrux", "Sulafat"
@@ -40,41 +40,44 @@ serve(async (req) => {
     // Truncate text (Gemini TTS limit)
     const truncatedText = text.trim().slice(0, 5000);
 
-    // Select voice (default: Kore - female, natural for Korean)
+    // Select voice (default: Kore - natural Korean voice)
     const selectedVoice: GeminiVoice = VOICES.includes(voice) ? voice : "Kore";
 
-    // Build style prompt
-    let stylePrompt = prompt || "Read naturally and clearly in Korean.";
+    // Build style instruction
+    let styleInstruction = prompt || "Read naturally and clearly in Korean.";
     if (speed && speed < 0.8) {
-      stylePrompt = "Read slowly and clearly. " + stylePrompt;
+      styleInstruction = "Read slowly and clearly. " + styleInstruction;
     } else if (speed && speed > 1.2) {
-      stylePrompt = "Read quickly but clearly. " + stylePrompt;
+      styleInstruction = "Read quickly but clearly. " + styleInstruction;
     }
 
-    console.log(`Generating Gemini TTS: voice=${selectedVoice}, text length=${truncatedText.length}`);
+    console.log(`Generating Gemini Flash TTS: voice=${selectedVoice}, text length=${truncatedText.length}`);
 
-    // Call Gemini 2.5 Flash TTS via Cloud Text-to-Speech API
-    // Uses modelName parameter for Gemini TTS model
+    // Use Gemini API directly (generativelanguage.googleapis.com)
+    // This bypasses Cloud Text-to-Speech API restrictions
     const response = await fetch(
-      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          input: {
-            text: truncatedText,
-            ...(stylePrompt ? { prompt: stylePrompt } : {}),
-          },
-          voice: {
-            languageCode: "ko-KR",
-            name: selectedVoice,
-            modelName: "gemini-2.5-flash-tts",
-          },
-          audioConfig: {
-            audioEncoding: "MP3",
-          },
+          contents: [{
+            parts: [{ 
+              text: `${styleInstruction}\n\n${truncatedText}` 
+            }]
+          }],
+          generationConfig: {
+            response_modalities: ["AUDIO"],
+            speech_config: {
+              voice_config: {
+                prebuilt_voice_config: {
+                  voice_name: selectedVoice
+                }
+              }
+            }
+          }
         }),
       }
     );
@@ -89,29 +92,37 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const audioContent = data.audioContent;
+    
+    // Extract audio from Gemini response
+    // Response format: { candidates: [{ content: { parts: [{ inlineData: { mimeType, data } }] } }] }
+    const audioData = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    const mimeType = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType || "audio/wav";
 
-    if (!audioContent) {
-      console.error("No audio content in response:", data);
+    if (!audioData) {
+      console.error("No audio content in Gemini response:", JSON.stringify(data).slice(0, 500));
       return new Response(
-        JSON.stringify({ error: "No audio content returned" }),
+        JSON.stringify({ error: "No audio content returned", response: JSON.stringify(data).slice(0, 500) }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Decode base64 and return as audio
-    const binaryString = atob(audioContent);
+    // Decode base64 audio
+    const binaryString = atob(audioData);
     const bytes = new Uint8Array(binaryString.length);
     for (let i = 0; i < binaryString.length; i++) {
       bytes[i] = binaryString.charCodeAt(i);
     }
 
-    console.log(`Gemini TTS generated: ${bytes.length} bytes`);
+    console.log(`Gemini Flash TTS generated: ${bytes.length} bytes, mimeType=${mimeType}`);
+
+    // Determine content type (Gemini returns WAV by default)
+    const contentType = mimeType.includes("wav") ? "audio/wav" : 
+                        mimeType.includes("mp3") ? "audio/mpeg" : mimeType;
 
     return new Response(bytes, {
       headers: {
         ...corsHeaders,
-        "Content-Type": "audio/mpeg",
+        "Content-Type": contentType,
         "Cache-Control": "public, max-age=86400",
       },
     });
