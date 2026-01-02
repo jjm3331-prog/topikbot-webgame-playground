@@ -18,12 +18,12 @@ const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 // ElevenLabs Korean Native Voice Presets (복구)
 // ============================================
 // 기존에 사용하던 커스텀 한국어 네이티브 보이스 ID
-// Korean TTS Voices - 한국어 전용 목소리
+// Korean TTS Voices - ElevenLabs 공식 한국어 지원 목소리
 const ELEVENLABS_VOICES = {
-  // 여자 목소리: Yuna (한국어 여성 목소리)
-  female: "jsCqWAovK2LkecY7zXl4",
-  // 남자 목소리: Joon (한국어 남성 목소리)  
-  male: "Am2vGuP7pKnfdJL3mtXU",
+  // 여자 목소리: Jessica (다국어 지원, 한국어 포함)
+  female: "cgSgspJ2msm6clMCkdW9",
+  // 남자 목소리: Brian (다국어 지원, 한국어 포함)  
+  male: "nPczCjzI2devNBz1zQrb",
 } as const;
 
 // TTS Presets for different use cases
