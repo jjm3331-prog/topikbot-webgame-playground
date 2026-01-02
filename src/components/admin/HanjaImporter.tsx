@@ -79,35 +79,25 @@ export default function HanjaImporter() {
     }
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/hanja-import`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${session?.access_token}`,
-          },
-          body: JSON.stringify({ markdown, dayNumber }),
-        }
-      );
+      const { data, error } = await supabase.functions.invoke("hanja-import", {
+        body: { markdown, dayNumber },
+      });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        return { 
-          dayNumber, 
-          status: "error", 
-          error: result.error || "Unknown error" 
+      if (error) {
+        return {
+          dayNumber,
+          status: "error",
+          error: error.message || "Unknown error",
         };
       }
+
+      const result = data as any;
 
       return {
         dayNumber,
         status: "success",
-        rootsCount: result.rootsCount,
-        wordsCount: result.wordsCount,
+        rootsCount: result?.rootsCount,
+        wordsCount: result?.wordsCount,
       };
     } catch (error) {
       return {
@@ -129,40 +119,34 @@ export default function HanjaImporter() {
     }
 
     setImporting(true);
-    
-    // Initialize all days as pending
+
     const initialStatuses: ImportStatus[] = [];
-    for (let i = 1; i <= 82; i++) {
-      initialStatuses.push({ dayNumber: i, status: "pending" });
-    }
+    for (let i = 1; i <= 82; i++) initialStatuses.push({ dayNumber: i, status: "pending" });
     setImportStatuses(initialStatuses);
 
-    // Process one day at a time
+    let localSuccess = 0;
+
     for (let i = 1; i <= 82; i++) {
       setCurrentDay(i);
-      
-      setImportStatuses(prev => 
-        prev.map(s => s.dayNumber === i ? { ...s, status: "loading" } : s)
-      );
+
+      setImportStatuses((prev) => prev.map((s) => (s.dayNumber === i ? { ...s, status: "loading" } : s)));
 
       const result = await importSingleDay(i);
+      if (result.status === "success") localSuccess++;
 
-      setImportStatuses(prev => 
-        prev.map(s => s.dayNumber === i ? result : s)
-      );
+      setImportStatuses((prev) => prev.map((s) => (s.dayNumber === i ? result : s)));
 
       // Small delay between days to avoid overwhelming the server
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, 250));
     }
 
     setImporting(false);
     setCurrentDay(0);
     await loadDbStats();
 
-    const successCount = importStatuses.filter(s => s.status === "success").length;
     toast({
       title: "임포트 완료",
-      description: `${successCount}/82 Day 성공적으로 임포트됨`,
+      description: `${localSuccess}/82 Day 성공적으로 임포트됨`,
     });
   };
 
@@ -250,7 +234,7 @@ export default function HanjaImporter() {
               ) : (
                 <Upload className="w-4 h-4 mr-2" />
               )}
-              2. 82일 전체 임포트
+              2. 82일 전체 재임포트(덮어쓰기)
             </Button>
           </div>
 
