@@ -481,11 +481,11 @@ function parseMarkdownForDay(
     const topic = DAY_TOPICS[dayNumber];
     const nextTopic = DAY_TOPICS[dayNumber + 1];
 
+    const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
     if (topic) {
-      const topicRe = new RegExp(`^\\s*${topic.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")}\\s*$`);
-      const nextTopicRe = nextTopic
-        ? new RegExp(`^\\s*${nextTopic.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")}\\s*$`)
-        : null;
+      const topicRe = new RegExp(`^\\s*${escapeRegExp(topic)}\\s*$`);
+      const nextTopicRe = nextTopic ? new RegExp(`^\\s*${escapeRegExp(nextTopic)}\\s*$`) : null;
 
       const startIdx = lines.findIndex((l) => topicRe.test(l.trim()));
       if (startIdx !== -1) {
@@ -496,14 +496,12 @@ function parseMarkdownForDay(
             endIdx = j;
             break;
           }
-          if (dayHeaderRe.test(t) && !t.match(dayHeaderRe)?.[1].startsWith("0")) {
-            // keep scanning; do nothing (defensive)
-          }
           if (/^##\s*\d+\.?\s*$/.test(t)) {
             endIdx = j;
             break;
           }
         }
+
         sectionStart = startIdx;
         sectionEnd = endIdx;
         selection = "topic-fallback";

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,7 +25,7 @@ export default function HanjaImporter() {
   const [dbStats, setDbStats] = useState({ units: 0, days: 0, roots: 0, words: 0 });
   const [showDetails, setShowDetails] = useState(false);
 
-  const [cancelRequested, setCancelRequested] = useState(false);
+  const cancelRef = useRef(false);
 
   useEffect(() => {
     loadDbStats();
@@ -127,7 +127,7 @@ export default function HanjaImporter() {
   };
 
   const stopImport = () => {
-    setCancelRequested(true);
+    cancelRef.current = true;
     toast({
       title: "중지 요청됨",
       description: "현재 Day 처리 후 안전하게 중지합니다.",
@@ -144,7 +144,7 @@ export default function HanjaImporter() {
       return;
     }
 
-    setCancelRequested(false);
+    cancelRef.current = false;
     setImporting(true);
 
     const initialStatuses: ImportStatus[] = [];
@@ -154,23 +154,22 @@ export default function HanjaImporter() {
     let localSuccess = 0;
 
     for (let i = 1; i <= 82; i++) {
-      if (cancelRequested) break;
+      if (cancelRef.current) break;
 
       setCurrentDay(i);
       setImportStatuses((prev) => prev.map((s) => (s.dayNumber === i ? { ...s, status: "loading" } : s)));
 
       const result = await importSingleDay(i);
 
-      // If user requested cancel while awaiting, mark this day but stop afterward.
       if (result.status === "success") localSuccess++;
       setImportStatuses((prev) => prev.map((s) => (s.dayNumber === i ? result : s)));
 
-      if (cancelRequested) break;
+      if (cancelRef.current) break;
 
       await new Promise((resolve) => setTimeout(resolve, 250));
     }
 
-    const wasCanceled = cancelRequested;
+    const wasCanceled = cancelRef.current;
 
     setImporting(false);
     setCurrentDay(0);
@@ -181,9 +180,7 @@ export default function HanjaImporter() {
       description: wasCanceled ? "요청에 의해 중지했습니다." : `${localSuccess}/82 Day 성공적으로 임포트됨`,
     });
 
-    if (wasCanceled) {
-      setCancelRequested(false);
-    }
+    cancelRef.current = false;
   };
 
   const progress = currentDay > 0 ? Math.round((currentDay / 82) * 100) : 0;
