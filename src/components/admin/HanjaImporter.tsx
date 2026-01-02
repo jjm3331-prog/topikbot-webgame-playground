@@ -80,7 +80,7 @@ export default function HanjaImporter() {
       return { dayNumber, status: "error", error: "Markdown not loaded" };
     }
 
-    const maxAttempts = 3;
+    const maxAttempts = 8;
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         const { data, error } = await supabase.functions.invoke("hanja-import", {
@@ -89,21 +89,32 @@ export default function HanjaImporter() {
 
         if (error) {
           const message = error.message || "Unknown error";
-          const shouldRetry = attempt < maxAttempts && /fetch|timeout|network|5\d\d/i.test(message);
+          // Retry on any transient-ish errors (network, timeouts, 5xx, non-2xx).
+          const shouldRetry =
+            attempt < maxAttempts &&
+            /fetch|timeout|network|5\d\d|non-2xx|rate|429|temporar|connection|gateway|service/i.test(message);
+
           if (shouldRetry) {
-            await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
+            await new Promise((resolve) => setTimeout(resolve, Math.min(6000, 700 * attempt)));
             continue;
           }
+
           return { dayNumber, status: "error", error: message };
         }
 
         const result = data as any;
         if (result?.error) {
-          return {
-            dayNumber,
-            status: "error",
-            error: typeof result.error === "string" ? result.error : "Function returned an error",
-          };
+          const message = typeof result.error === "string" ? result.error : "Function returned an error";
+          const shouldRetry =
+            attempt < maxAttempts &&
+            /timeout|5\d\d|temporar|gateway|service|rate|429/i.test(message);
+
+          if (shouldRetry) {
+            await new Promise((resolve) => setTimeout(resolve, Math.min(6000, 700 * attempt)));
+            continue;
+          }
+
+          return { dayNumber, status: "error", error: message };
         }
 
         return {
@@ -116,7 +127,7 @@ export default function HanjaImporter() {
         const message = e instanceof Error ? e.message : "Unknown error";
         const shouldRetry = attempt < maxAttempts;
         if (shouldRetry) {
-          await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
+          await new Promise((resolve) => setTimeout(resolve, Math.min(6000, 700 * attempt)));
           continue;
         }
         return { dayNumber, status: "error", error: message };

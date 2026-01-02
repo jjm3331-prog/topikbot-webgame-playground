@@ -153,30 +153,58 @@ serve(async (req) => {
 
     let { data: dayData } = await supabaseClient
       .from("hanja_days")
-      .select("id")
+      .select("id, unit_id")
       .eq("day_number", dayNumber)
       .single();
 
     if (!dayData) {
       const { data: newDay, error: dayError } = await supabaseClient
         .from("hanja_days")
-        .insert({ 
-          unit_id: unitData.id, 
-          day_number: dayNumber, 
-          topic_ko: dayTopic 
+        .insert({
+          unit_id: unitData.id,
+          day_number: dayNumber,
+          topic_ko: dayTopic,
         })
-        .select("id")
+        .select("id, unit_id")
         .single();
 
       if (dayError) throw dayError;
       dayData = newDay;
+    } else {
+      // Ensure day is linked to correct unit/topic (older imports may have null unit_id).
+      if (!dayData.unit_id || dayData.unit_id !== unitData.id) {
+        const { error: updErr } = await supabaseClient
+          .from("hanja_days")
+          .update({ unit_id: unitData.id, topic_ko: dayTopic })
+          .eq("id", dayData.id);
+        if (updErr) throw updErr;
+      }
     }
 
-    // Delete existing roots and words for this day (to allow re-import)
-    await supabaseClient
+    // Delete existing roots/words for this day (to allow re-import)
+    // NOTE: words.root_id is nullable, so deleting roots may leave orphans; clean words explicitly.
+    const { data: existingRoots, error: rootsSelErr } = await supabaseClient
+      .from("hanja_roots")
+      .select("id")
+      .eq("day_id", dayData.id);
+
+    if (rootsSelErr) throw rootsSelErr;
+
+    const rootIds = (existingRoots ?? []).map((r: { id: string }) => r.id);
+    if (rootIds.length > 0) {
+      const { error: delWordsErr } = await supabaseClient
+        .from("hanja_words")
+        .delete()
+        .in("root_id", rootIds);
+      if (delWordsErr) throw delWordsErr;
+    }
+
+    const { error: delRootsErr } = await supabaseClient
       .from("hanja_roots")
       .delete()
       .eq("day_id", dayData.id);
+
+    if (delRootsErr) throw delRootsErr;
 
     // Insert roots and words with deduplication
     let rootOrder = 0;
@@ -215,11 +243,13 @@ serve(async (req) => {
         throw rootError;
       }
 
-      // Insert words for this root with deduplication
+      // Insert words for this root with deduplication (batch insert for performance)
+      const wordsToInsert: Array<Record<string, unknown>> = [];
       let wordOrder = 0;
+
       for (const word of root.words) {
         const wordKey = word.word;
-        
+
         // Skip duplicate words within this day
         if (insertedWordKeys.has(wordKey)) {
           console.log(`Skipping duplicate word: ${wordKey}`);
@@ -227,24 +257,25 @@ serve(async (req) => {
         }
         insertedWordKeys.add(wordKey);
 
-        const { error: wordError } = await supabaseClient
-          .from("hanja_words")
-          .insert({
-            root_id: rootData.id,
-            word: word.word,
-            meaning_ko: word.meaning_ko || null,
-            meaning_en: word.meaning_en,
-            meaning_ja: word.meaning_ja,
-            meaning_zh: word.meaning_zh,
-            meaning_vi: word.meaning_vi,
-            display_order: wordOrder++,
-          });
+        wordsToInsert.push({
+          root_id: rootData.id,
+          word: word.word,
+          meaning_ko: word.meaning_ko || null,
+          meaning_en: word.meaning_en,
+          meaning_ja: word.meaning_ja,
+          meaning_zh: word.meaning_zh,
+          meaning_vi: word.meaning_vi,
+          display_order: wordOrder++,
+        });
+      }
 
+      if (wordsToInsert.length > 0) {
+        const { error: wordError } = await supabaseClient.from("hanja_words").insert(wordsToInsert);
         if (wordError) {
-          console.error("Word insert error:", wordError);
+          console.error("Word batch insert error:", wordError);
           throw wordError;
         }
-        totalWords++;
+        totalWords += wordsToInsert.length;
       }
     }
 
