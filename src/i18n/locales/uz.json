@@ -2581,6 +2581,20 @@
       "title": "Ma'lumot tayyorlanmoqda",
       "desc": "Hanja mindmap kontenti tez orada yangilanadi."
     }
+  },
+  "hanjaMindmapDay": {
+    "noData": "Ma'lumot yo'q",
+    "noDataDesc": "Day {{day}} uchun ma'lumot topilmadi.",
+    "loading": "Day {{day}} yuklanmoqda...",
+    "loginRequired": "Kirish talab qilinadi",
+    "loginDesc": "Taraqqiyotni saqlash uchun tizimga kiring.",
+    "backToList": "Ro'yxatga qaytish",
+    "wordsProgress": "{{mastered}}/{{total}} so'z",
+    "prevDay": "Oldingi Day",
+    "nextDay": "Keyingi Day",
+    "relatedWords": "Bog'liq so'zlar",
+    "markMastered": "O'zlashtirilgan deb belgilash",
+    "markUnmastered": "Belgini olib tashlash"
   }
 }
 

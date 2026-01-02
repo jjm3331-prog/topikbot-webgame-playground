@@ -2566,6 +2566,20 @@
       "title": "準備中",
       "desc": "漢字語マインドマップのコンテンツは近日更新予定です。"
     }
+  },
+  "hanjaMindmapDay": {
+    "noData": "データなし",
+    "noDataDesc": "Day {{day}} のデータがありません。",
+    "loading": "Day {{day}} を読み込み中...",
+    "loginRequired": "ログインが必要",
+    "loginDesc": "進捗を保存するにはログインしてください。",
+    "backToList": "リストに戻る",
+    "wordsProgress": "{{mastered}}/{{total}} 単語",
+    "prevDay": "前のDay",
+    "nextDay": "次のDay",
+    "relatedWords": "関連単語",
+    "markMastered": "習得済みにする",
+    "markUnmastered": "習得を解除"
   }
 }
 
