@@ -11,43 +11,29 @@ const corsHeaders = {
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 const COHERE_API_KEY = Deno.env.get("COHERE_API_KEY");
-// ElevenLabs is deprecated for new generation - using Gemini Flash TTS now
+const GOOGLE_CLOUD_API_KEY = Deno.env.get("GOOGLE_CLOUD_API_KEY");
+// ElevenLabs is deprecated for new generation - using Google Cloud TTS now
 // const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
-// Gemini Flash TTS Voice Presets - Korean Native Voices (High Quality)
-// 한국어 네이티브 최고 품질 보이스
-const GEMINI_VOICES = {
-  female: "Kore",    // 여성 - 한국어 네이티브급 자연스러움 (추천)
-  male: "Charon",    // 남성 - 차분하고 명확한 발음
-  female_alt: "Aoede", // 여성 대안 - 부드러운 톤
-  male_alt: "Puck",   // 남성 대안 - 젊은 느낌
-} as const;
-
-// TTS Presets for different use cases
+// TTS Presets (Google Cloud Text-to-Speech)
+// NOTE: We select a real Korean voice dynamically from the /voices endpoint
+// so we don't depend on hardcoded voice names.
 const TTS_PRESETS = {
   exam: {
-    voiceFemale: GEMINI_VOICES.female,
-    voiceMale: GEMINI_VOICES.male,
-    prompt: "Read clearly and precisely in Korean, like a TOPIK exam audio. Moderate pace, clear pronunciation.",
-    speed: "normal",
+    label: "exam",
+    speakingRate: 0.95,
   },
   learning: {
-    voiceFemale: GEMINI_VOICES.female,
-    voiceMale: GEMINI_VOICES.male,
-    prompt: "Read slowly and clearly in Korean for language learners. Emphasize each word distinctly.",
-    speed: "slow",
+    label: "learning",
+    speakingRate: 0.85,
   },
   natural: {
-    voiceFemale: GEMINI_VOICES.female_alt,
-    voiceMale: GEMINI_VOICES.male_alt,
-    prompt: "Read naturally in Korean like a casual conversation. Natural rhythm and intonation.",
-    speed: "normal",
+    label: "natural",
+    speakingRate: 1.0,
   },
   formal: {
-    voiceFemale: GEMINI_VOICES.female,
-    voiceMale: GEMINI_VOICES.male,
-    prompt: "Read formally in Korean like a news anchor or official announcement. Clear and authoritative.",
-    speed: "normal",
+    label: "formal",
+    speakingRate: 0.98,
   },
 } as const;
 
@@ -272,9 +258,89 @@ async function ragSearch(
   }
 }
 
-// Generate TTS audio using Gemini Flash TTS (replaces ElevenLabs)
+// Generate TTS audio using Google Cloud Text-to-Speech
 // - Removes speaker labels like "남자:"/"여자:" from spoken audio
 // - If multiple speakers are detected, alternates voices per speaker and concatenates segments
+let cachedKoVoices: any[] = [];
+
+async function getKoreanVoices(): Promise<any[]> {
+  if (cachedKoVoices.length) return cachedKoVoices;
+  if (!GOOGLE_CLOUD_API_KEY) return [];
+
+  const resp = await fetch(
+    `https://texttospeech.googleapis.com/v1/voices?key=${GOOGLE_CLOUD_API_KEY}`,
+    { method: "GET" }
+  );
+
+  if (!resp.ok) {
+    const t = await resp.text().catch(() => "");
+    console.error("TTS voices list error:", resp.status, t);
+    return [];
+  }
+
+  const data = await resp.json();
+  const voices = Array.isArray(data.voices) ? data.voices : [];
+
+  // Keep only Korean voices
+  cachedKoVoices = voices.filter((v: any) =>
+    Array.isArray(v.languageCodes) && v.languageCodes.includes("ko-KR")
+  );
+  return cachedKoVoices;
+}
+
+function pickBestVoice(voices: any[], gender: "MALE" | "FEMALE" | "NEUTRAL" = "FEMALE") {
+  const byGender = voices.filter((v: any) => (v.ssmlGender || "").toUpperCase() === gender);
+  const candidates = byGender.length ? byGender : voices;
+
+  // Prefer Neural2, then Wavenet, then whatever
+  const prefer = (pattern: RegExp) => candidates.find((v: any) => pattern.test(String(v.name)));
+  return (
+    prefer(/Neural2/i) ||
+    prefer(/Wavenet/i) ||
+    candidates[0] ||
+    null
+  );
+}
+
+async function synthesizeMp3(text: string, voiceName: string | null, gender: "MALE" | "FEMALE" | "NEUTRAL", speakingRate: number): Promise<Uint8Array> {
+  if (!GOOGLE_CLOUD_API_KEY) throw new Error("GOOGLE_CLOUD_API_KEY not configured");
+
+  const resp = await fetch(
+    `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GOOGLE_CLOUD_API_KEY}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        input: { text },
+        voice: {
+          languageCode: "ko-KR",
+          ...(voiceName ? { name: voiceName } : {}),
+          ssmlGender: gender,
+        },
+        audioConfig: {
+          audioEncoding: "MP3",
+          speakingRate,
+        },
+      }),
+    }
+  );
+
+  if (!resp.ok) {
+    const t = await resp.text().catch(() => "");
+    console.error("TTS synth error:", resp.status, t);
+    throw new Error(`TTS synth failed (${resp.status})`);
+  }
+
+  const data = await resp.json();
+  const audioContent = data?.audioContent;
+  if (!audioContent) throw new Error("No audioContent returned");
+
+  const binaryString = atob(audioContent);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
+  return bytes;
+}
+
 async function generateListeningAudio(
   script: string,
   questionNumber: number,
@@ -282,11 +348,10 @@ async function generateListeningAudio(
   supabase: any,
   preset: keyof typeof TTS_PRESETS = "exam",
 ): Promise<string | null> {
-  if (!GEMINI_API_KEY || !script) return null;
+  if (!GOOGLE_CLOUD_API_KEY || !script) return null;
 
   const detectSpeaker = (raw: string): { speakerKey: "male" | "female" | "other"; text: string } => {
     const line = raw.trim();
-    // Examples: "남자:", "여자:", "남:", "여:", "A:", "B:" (Korean/ASCII colons)
     const m = line.match(/^\s*(남자|여자|남성|여성|남|여|A|B|C|D)\s*[:：]\s*(.*)$/i);
     if (!m) return { speakerKey: "other", text: line };
 
@@ -295,12 +360,10 @@ async function generateListeningAudio(
 
     if (["여자", "여성", "여"].includes(label)) return { speakerKey: "female", text };
     if (["남자", "남성", "남"].includes(label)) return { speakerKey: "male", text };
-
-    // A/B/C/D: treat as alternating speakers but default to other
     return { speakerKey: "other", text };
   };
 
-  const stripLeadingId3 = (buf: ArrayBuffer): Uint8Array => {
+  const stripLeadingId3 = (buf: ArrayBufferLike): Uint8Array => {
     const bytes = new Uint8Array(buf);
     // ID3 header: "ID3" + ver(2) + flags(1) + size(4, syncsafe)
     if (bytes.length >= 10 && bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33) {
@@ -327,11 +390,9 @@ async function generateListeningAudio(
   };
 
   try {
-    console.log(`🎵 Generating Gemini Flash TTS audio for Q${questionNumber} with ${preset} preset...`);
+    const presetCfg = TTS_PRESETS[preset] ?? TTS_PRESETS.exam;
+    console.log(`🎵 Generating TTS audio for Q${questionNumber} preset=${preset}...`);
 
-    const baseSettings = TTS_PRESETS[preset];
-
-    // Split into segments (multi-speaker) by line breaks; ignore empty lines
     const rawLines = script
       .split(/\r?\n/)
       .map((l) => l.trim())
@@ -341,82 +402,25 @@ async function generateListeningAudio(
       ? rawLines.map(detectSpeaker).filter((s) => s.text)
       : [{ speakerKey: "other" as const, text: script.trim() }];
 
+    const voices = await getKoreanVoices();
+    const voiceFemale = pickBestVoice(voices, "FEMALE")?.name ?? null;
+    const voiceMale = pickBestVoice(voices, "MALE")?.name ?? null;
+
     const uniqueSpeakers = new Set(segments.map((s) => s.speakerKey));
     const isMultiSpeaker = uniqueSpeakers.size >= 2 && (uniqueSpeakers.has("male") || uniqueSpeakers.has("female"));
 
-    const voiceBySpeaker: Record<"male" | "female" | "other", string> = {
-      female: baseSettings.voiceFemale,
-      male: baseSettings.voiceMale,
-      other: baseSettings.voiceFemale, // default to female
-    };
-
-    // Build audio buffer(s)
     const audioParts: Uint8Array[] = [];
 
     for (let i = 0; i < segments.length; i++) {
       const seg = segments[i];
-      const voiceName = isMultiSpeaker ? voiceBySpeaker[seg.speakerKey] : baseSettings.voiceFemale;
+      const gender: "MALE" | "FEMALE" | "NEUTRAL" = seg.speakerKey === "male" ? "MALE" : "FEMALE";
+      const voiceName = isMultiSpeaker ? (gender === "MALE" ? voiceMale : voiceFemale) : voiceFemale;
 
-      // Add a short pause between lines by punctuation (natural for TTS)
-      const text = seg.text.endsWith(".") || seg.text.endsWith("?") || seg.text.endsWith("!")
-        ? `${seg.text}`
-        : `${seg.text}.`;
+      const t = seg.text.endsWith(".") || seg.text.endsWith("?") || seg.text.endsWith("!") ? seg.text : `${seg.text}.`;
 
-      // Build style prompt based on preset speed
-      let stylePrompt = baseSettings.prompt;
-      if (baseSettings.speed === "slow") {
-        stylePrompt = "Read slowly and clearly. " + stylePrompt;
-      }
-
-      // Call Gemini Flash TTS via Cloud Text-to-Speech API
-      const response = await fetch(
-        `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GEMINI_API_KEY}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            input: {
-              text,
-              prompt: stylePrompt,
-            },
-            voice: {
-              languageCode: "ko-KR",
-              name: voiceName,
-              model_name: "gemini-2.5-flash-tts",
-            },
-            audioConfig: {
-              audioEncoding: "MP3",
-            },
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const t = await response.text().catch(() => "");
-        console.error("Gemini Flash TTS error:", response.status, t);
-        return null;
-      }
-
-      const data = await response.json();
-      const audioContent = data.audioContent;
-
-      if (!audioContent) {
-        console.error("No audio content in Gemini TTS response");
-        return null;
-      }
-
-      // Decode base64 to bytes
-      const binaryString = atob(audioContent);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let j = 0; j < binaryString.length; j++) {
-        bytes[j] = binaryString.charCodeAt(j);
-      }
-
-      // Strip ID3 on subsequent segments to avoid repeated headers when concatenating
+      const bytes = await synthesizeMp3(t, voiceName, gender, presetCfg.speakingRate);
       const finalBytes = i === 0 ? bytes : stripLeadingId3(bytes.buffer);
-      audioParts.push(finalBytes instanceof Uint8Array ? finalBytes : bytes);
+      audioParts.push(finalBytes);
     }
 
     const finalBytes = audioParts.length === 1 ? audioParts[0] : concatBytes(audioParts);
@@ -436,15 +440,13 @@ async function generateListeningAudio(
     }
 
     const { data: urlData } = supabase.storage.from("podcast-audio").getPublicUrl(fileName);
-
-    console.log(`✅ Gemini TTS audio generated for Q${questionNumber} (multiSpeaker: ${isMultiSpeaker})`);
+    console.log(`✅ TTS audio generated for Q${questionNumber} (multiSpeaker: ${isMultiSpeaker})`);
     return urlData.publicUrl;
   } catch (error) {
-    console.error("Gemini TTS generation error:", error);
+    console.error("TTS generation error:", error);
     return null;
   }
 }
-
 /**
  * TOPIK II 듣기 그림 문제 유형 (1-3번 문항)
  * 
