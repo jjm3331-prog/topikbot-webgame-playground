@@ -2829,7 +2829,46 @@
       "description": "Chọn phần để luyện tập",
       "listening": "Nghe",
       "reading": "Đọc",
-      "writing": "Viết"
+       "writing": "Viết"
+     }
+   },
+  "hanjaMindmapPage": {
+    "seo": {
+      "title": "Mindmap Hán Hàn | 2.300 từ",
+      "description": "Học 2.300 từ Hán Hàn cho TOPIK bằng mindmap và lộ trình 82 ngày."
+    },
+    "loading": "Đang tải...",
+    "hero": {
+      "badge": "Học từ Hán Hàn bằng mindmap",
+      "title": "Hán Hàn 2300",
+      "subtitleLine1": "Học 2.300 từ Hán Hàn trình độ trung–cao với mindmap!",
+      "subtitleLine2": "Hoàn thành 82 ngày – master từ vựng TOPIK có hệ thống"
+    },
+    "progress": {
+      "label": "Tiến độ tổng",
+      "completed": "Hoàn thành {{completedDays}}/{{totalDays}} ngày"
+    },
+    "guide": {
+      "toggle": "Hướng dẫn học",
+      "aria": "Hướng dẫn phương pháp học",
+      "title": "Hướng dẫn phương pháp học",
+      "step1": { "title": "Khám phá mindmap", "desc": "Nhấp vào gốc Hán tự để xem từ phái sinh" },
+      "step2": { "title": "Học nghĩa đa ngôn ngữ", "desc": "Hiểu nghĩa bằng nhiều ngôn ngữ" },
+      "step3": { "title": "Đánh dấu đã master", "desc": "Đánh dấu từ đã học để quản lý tiến độ" },
+      "step4": { "title": "Mỗi ngày 1 Day", "desc": "82 ngày để chinh phục 2.300 từ" }
+    },
+    "premium": {
+      "featureName": "Mindmap Hán Hàn"
+    },
+    "units": {
+      "aria": "Danh sách Unit và Day",
+      "unitMeta": "{{days}} ngày · hoàn thành {{completed}}/{{days}}",
+      "dayLabel": "Day {{day}}"
+    },
+    "empty": {
+      "title": "Đang chuẩn bị dữ liệu",
+      "desc": "Nội dung mindmap Hán Hàn sẽ sớm được cập nhật."
     }
   }
 }
+

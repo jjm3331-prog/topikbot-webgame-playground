@@ -2541,7 +2541,46 @@
       "description": "Mashq qilish uchun bo'limni tanlang",
       "listening": "Tinglash",
       "reading": "O'qish",
-      "writing": "Yozish"
+       "writing": "Yozish"
+     }
+   },
+  "hanjaMindmapPage": {
+    "seo": {
+      "title": "Hanja mindmap | 2 300 so'z",
+      "description": "Mindmap yordamida TOPIK uchun 2 300 hanja-so'zni o'rganing. 82 kunlik tizimli lug'at rejasi."
+    },
+    "loading": "Yuklanmoqda...",
+    "hero": {
+      "badge": "Mindmap hanja so'zlari",
+      "title": "Hanja 2300",
+      "subtitleLine1": "Mindmap bilan 2 300 ta o'rta-yuqori darajadagi hanja so'zni o'rganing!",
+      "subtitleLine2": "TOPIK lug'atini 82 kunda tizimli ravishda o'zlashtiring"
+    },
+    "progress": {
+      "label": "Umumiy progress",
+      "completed": "{{completedDays}}/{{totalDays}} kun bajarildi"
+    },
+    "guide": {
+      "toggle": "O‘quv qo‘llanma",
+      "aria": "O‘rganish usuli qo‘llanmasi",
+      "title": "O‘rganish usuli qo‘llanmasi",
+      "step1": { "title": "Mindmapni o'rganing", "desc": "Hanja ildizini bosib hosila so'zlarni ko'ring" },
+      "step2": { "title": "Ma'nolarni o'rganing", "desc": "Ma'noni bir nechta tillarda tushuning" },
+      "step3": { "title": "Master belgilash", "desc": "O'rgangan so'zlarni belgilab progressni boshqaring" },
+      "step4": { "title": "Har kuni 1 kun", "desc": "82 kunda 2 300 so'zni to'liq o'zlashtiring" }
+    },
+    "premium": {
+      "featureName": "Hanja mindmap"
+    },
+    "units": {
+      "aria": "Unit va Day ro'yxati",
+      "unitMeta": "{{days}} kun · {{completed}}/{{days}} bajarildi",
+      "dayLabel": "Day {{day}}"
+    },
+    "empty": {
+      "title": "Ma'lumot tayyorlanmoqda",
+      "desc": "Hanja mindmap kontenti tez orada yangilanadi."
     }
   }
 }
+

@@ -2540,7 +2540,46 @@
       "description": "选择要练习的部分",
       "listening": "听力",
       "reading": "阅读",
-      "writing": "写作"
+       "writing": "写作"
+     }
+   },
+  "hanjaMindmapPage": {
+    "seo": {
+      "title": "汉字词思维导图 | 2,300词",
+      "description": "用思维导图学习TOPIK汉字词2,300个，82天系统掌握词汇。"
+    },
+    "loading": "加载中...",
+    "hero": {
+      "badge": "思维导图汉字词学习",
+      "title": "汉字词 2300",
+      "subtitleLine1": "用思维导图学习2,300个中高级汉字词！",
+      "subtitleLine2": "82天系统掌握TOPIK词汇"
+    },
+    "progress": {
+      "label": "总体进度",
+      "completed": "已完成 {{completedDays}}/{{totalDays}} 天"
+    },
+    "guide": {
+      "toggle": "学习指南",
+      "aria": "学习方法指南",
+      "title": "学习方法指南",
+      "step1": { "title": "探索思维导图", "desc": "点击汉字词根查看派生词" },
+      "step2": { "title": "学习词义", "desc": "用多语言理解词义" },
+      "step3": { "title": "掌握打卡", "desc": "勾选已学词汇管理进度" },
+      "step4": { "title": "每天完成1天", "desc": "82天彻底掌握2,300词" }
+    },
+    "premium": {
+      "featureName": "汉字词思维导图"
+    },
+    "units": {
+      "aria": "单元与天数列表",
+      "unitMeta": "{{days}} 天 · 已完成 {{completed}}/{{days}}",
+      "dayLabel": "Day {{day}}"
+    },
+    "empty": {
+      "title": "内容准备中",
+      "desc": "汉字词思维导图内容即将更新。"
     }
   }
 }
+

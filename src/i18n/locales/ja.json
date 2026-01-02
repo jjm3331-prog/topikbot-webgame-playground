@@ -2526,7 +2526,46 @@
       "description": "練習するセクションを選んでください",
       "listening": "聞き取り",
       "reading": "読解",
-      "writing": "作文"
+       "writing": "作文"
+     }
+   },
+  "hanjaMindmapPage": {
+    "seo": {
+      "title": "漢字語マインドマップ | 2,300語",
+      "description": "マインドマップでTOPIK漢字語2,300語を学習。82日で体系的に語彙をマスター。"
+    },
+    "loading": "読み込み中...",
+    "hero": {
+      "badge": "マインドマップ漢字語学習",
+      "title": "漢字語 2300",
+      "subtitleLine1": "マインドマップで中・上級の漢字語2,300語を学習！",
+      "subtitleLine2": "82日で完成する体系的なTOPIK語彙マスター"
+    },
+    "progress": {
+      "label": "全体進捗",
+      "completed": "{{completedDays}}/{{totalDays}}日 完了"
+    },
+    "guide": {
+      "toggle": "学習ガイド",
+      "aria": "学習方法ガイド",
+      "title": "学習方法ガイド",
+      "step1": { "title": "マインドマップ探索", "desc": "漢字のルートをクリックして派生語を確認" },
+      "step2": { "title": "意味を学ぶ", "desc": "多言語で意味を把握" },
+      "step3": { "title": "マスターチェック", "desc": "学習した単語をチェックして進捗管理" },
+      "step4": { "title": "毎日1Day", "desc": "82日で2,300語を完全攻略" }
+    },
+    "premium": {
+      "featureName": "漢字語マインドマップ"
+    },
+    "units": {
+      "aria": "ユニットとDay一覧",
+      "unitMeta": "{{days}}日 · {{completed}}/{{days}}完了",
+      "dayLabel": "Day {{day}}"
+    },
+    "empty": {
+      "title": "準備中",
+      "desc": "漢字語マインドマップのコンテンツは近日更新予定です。"
     }
   }
 }
+
