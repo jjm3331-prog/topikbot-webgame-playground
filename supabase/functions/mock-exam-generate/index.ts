@@ -1114,7 +1114,7 @@ async function handleStreamingGeneration(
   
   // 듣기 문제는 Claude 사용, 나머지는 Gemini 2.5 Pro
   const useClaude = params.section === 'listening';
-  const modelName = useClaude ? 'claude-sonnet-4-20250514' : (Deno.env.get("GEMINI_MODEL") || "gemini-2.5-pro");
+  const modelName = useClaude ? 'claude-sonnet-4-5-20250929' : (Deno.env.get("GEMINI_MODEL") || "gemini-2.5-pro");
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -1162,7 +1162,7 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
                 },
                 signal: abortController.signal,
                 body: JSON.stringify({
-                  model: 'claude-sonnet-4-20250514',
+                  model: 'claude-sonnet-4-5-20250929',
                   max_tokens: 16384,
                   stream: true,
                   system: 'You are a TOPIK exam question generator. Always respond in valid JSON format with a "questions" array. Output only JSON, no other text.',
