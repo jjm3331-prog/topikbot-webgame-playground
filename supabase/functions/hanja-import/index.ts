@@ -284,74 +284,87 @@ function extractFirstHanja(text: string): string {
 // Check if line is a root header and extract info
 function parseRootHeader(line: string, nextLine?: string): { meaning_ko: string; reading_ko: string; hanja: string } | null {
   const trimmed = line.trim();
-  
-  // Skip empty, images, tables, exercises
+
+  // Skip empty, images, tables, obvious exercise/choice lines
   if (!trimmed) return null;
   if (trimmed.startsWith("![")) return null;
   if (trimmed.startsWith("|")) return null;
   if (/^\d+\)/.test(trimmed)) return null;
-  if (/^#{2,4}\s*\d+\./.test(trimmed)) return null; // Exercise headers like "#### 1." 
+  if (/^#{2,6}\s*\d+\./.test(trimmed)) return null; // Exercise headers like "#### 1."
   if (/^보기/.test(trimmed)) return null;
   if (trimmed.startsWith("①") || trimmed.startsWith("②") || trimmed.startsWith("③") || trimmed.startsWith("④")) return null;
-  
-  // Pattern 1: "### 그림 도圖" or "#### 전하다 전傳"
-  const pattern1 = trimmed.match(/^#{2,4}\s+(.+?)\s+([가-힣/]+)\s*([一-龥々\u4e00-\u9fff\u3400-\u4dbf·]+)$/);
-  if (pattern1) {
+
+  // Word lines contain many slashes; prevent false positives (e.g. "유료 pay / 有料 / ...")
+  if ((trimmed.match(/\//g)?.length ?? 0) >= 2) return null;
+
+  // ===== Pattern A: "### 그림 도圖" or "#### 전하다 전傳" =====
+  const patternA = trimmed.match(
+    /^#{2,4}\s+(.+?)\s+([가-힣/]+)\s*([一-龥々\u4e00-\u9fff\u3400-\u4dbf·]+)$/
+  );
+  if (patternA) {
     return {
-      meaning_ko: pattern1[1].trim(),
-      reading_ko: pattern1[2].trim(),
-      hanja: extractFirstHanja(pattern1[3]),
+      meaning_ko: patternA[1].trim(),
+      reading_ko: patternA[2].trim(),
+      hanja: extractFirstHanja(patternA[3]),
     };
   }
-  
-  // Pattern 2: "### 입入" (reading+hanja combined after ###)
-  const pattern2 = trimmed.match(/^#{2,4}\s+([가-힣/]+)\s*([一-龥々\u4e00-\u9fff\u3400-\u4dbf·]+)$/);
-  if (pattern2) {
+
+  // ===== Pattern B: "### 입入" (reading+hanja only) =====
+  const patternB = trimmed.match(/^#{2,4}\s+([가-힣/]+)\s*([一-龥々\u4e00-\u9fff\u3400-\u4dbf·]+)$/);
+  if (patternB) {
     return {
       meaning_ko: "",
-      reading_ko: pattern2[1].trim(),
-      hanja: extractFirstHanja(pattern2[2]),
+      reading_ko: patternB[1].trim(),
+      hanja: extractFirstHanja(patternB[2]),
     };
   }
-  
-  // Pattern 3: Two-line format (Korean meaning line + reading+hanja line)
-  // Line 1: "묘사하다/본따다" or "창조하다" or "살펴보다"
-  // Line 2: "사寫" or "창創" or "감鑑"
-  if (nextLine && /^[가-힣\/\s]+(?:하다)?$/.test(trimmed) && trimmed.length < 30) {
+
+  // ===== Pattern C: "있다 **존存**" (meaning + bold reading+hanja) =====
+  const patternC = trimmed.match(
+    /^(.+?)\s+\*\*([가-힣/]+)\s*([一-龥々\u4e00-\u9fff\u3400-\u4dbf]+)\*\*$/
+  );
+  if (patternC) {
+    return {
+      meaning_ko: patternC[1].replace(/\s+/g, " ").trim(),
+      reading_ko: patternC[2].trim(),
+      hanja: extractFirstHanja(patternC[3]),
+    };
+  }
+
+  // ===== Pattern D: Two-line format (meaning line + next line "감鑑" or "**감鑑**") =====
+  if (nextLine && /^[가-힣\s\/]+(?:하다)?$/.test(trimmed) && trimmed.length < 40) {
     const nextTrimmed = nextLine.trim();
-    
-    // Check if next line is reading+hanja (with or without bold)
-    // Patterns: "감鑑", "**감鑑**", "창創"
+
     const hanjaPatterns = [
       /^([가-힣]+)\s*([一-龥々\u4e00-\u9fff\u3400-\u4dbf]+)$/,
       /^\*\*([가-힣]+)\s*([一-龥々\u4e00-\u9fff\u3400-\u4dbf]+)\*\*$/,
     ];
-    
+
     for (const pattern of hanjaPatterns) {
       const match = nextTrimmed.match(pattern);
       if (match) {
         return {
-          meaning_ko: trimmed.replace(/\s+/g, ' ').trim(),
+          meaning_ko: trimmed.replace(/\s+/g, " ").trim(),
           reading_ko: match[1].trim(),
           hanja: extractFirstHanja(match[2]),
         };
       }
     }
   }
-  
-  // Pattern 4: Non-header format like "자취 적蹟·跡·迹" without ###
-  const pattern4 = trimmed.match(/^([가-힣/]+)\s+([가-힣/]+)\s*([一-龥々\u4e00-\u9fff\u3400-\u4dbf·]+)$/);
-  if (pattern4 && !trimmed.startsWith("#")) {
-    // Make sure it's not a word line (word lines have / separators for translations)
-    if (!trimmed.includes("/") || trimmed.split("/").length <= 2) {
-      return {
-        meaning_ko: pattern4[1].trim(),
-        reading_ko: pattern4[2].trim(),
-        hanja: extractFirstHanja(pattern4[3]),
-      };
-    }
+
+  // ===== Pattern E: Plain text format like "자취 적蹟·跡·迹" or "있다 유有" =====
+  // NOTE: This must run after word-line guard above.
+  const patternE = trimmed.match(
+    /^(.+?)\s+([가-힣/]+)\s*([一-龥々\u4e00-\u9fff\u3400-\u4dbf·]+)$/
+  );
+  if (patternE && !trimmed.startsWith("#")) {
+    return {
+      meaning_ko: patternE[1].replace(/\s+/g, " ").trim(),
+      reading_ko: patternE[2].trim(),
+      hanja: extractFirstHanja(patternE[3]),
+    };
   }
-  
+
   return null;
 }
 
