@@ -1118,8 +1118,11 @@ async function handleStreamingGeneration(
   supabase: any
 ): Promise<Response> {
   const encoder = new TextEncoder();
-  const geminiModel = Deno.env.get("GEMINI_MODEL") || "gemini-2.5-pro";
   const systemPrompt = buildSystemPrompt(params, ragContext);
+  
+  // 듣기 문제는 GPT-5 사용, 나머지는 Gemini 2.5 Pro
+  const useGPT5 = params.section === 'listening';
+  const modelName = useGPT5 ? 'gpt-5-2025-08-07' : (Deno.env.get("GEMINI_MODEL") || "gemini-2.5-pro");
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -1132,69 +1135,92 @@ async function handleStreamingGeneration(
 
         sendProgress("rag", 20, "📚 RAG 검색 완료");
         
-        sendProgress("generating", 30, "🤖 Gemini 2.5 Pro 문제 생성 시작...");
+        const modelLabel = useGPT5 ? "GPT-5 (듣기 전용)" : "Gemini 2.5 Pro";
+        sendProgress("generating", 30, `🤖 ${modelLabel} 문제 생성 시작...`);
 
-        // Call Gemini with streaming - with retry logic
-        let geminiResponse: Response | null = null;
+        let aiResponse: Response | null = null;
         let lastError = "";
         
         // 최대 10분 (600초) 타임아웃 - 듣기 문제 생성 시 TTS까지 포함
-        const GEMINI_TIMEOUT_MS = 600000; // 10 minutes
+        const AI_TIMEOUT_MS = 600000; // 10 minutes
+        
+        const userPrompt = `${systemPrompt}\n\n---\n\n${params.questionCount}개의 ${params.section} 문제를 생성해주세요.
+${params.topic ? `주제/문법: ${params.topic}` : ''}
+난이도: ${params.difficulty}
+모든 문제는 실제 TOPIK 시험과 동일한 형식이어야 합니다.`;
         
         for (let attempt = 0; attempt < 3; attempt++) {
           try {
-            // AbortController로 타임아웃 설정
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
+            const abortController = new AbortController();
+            const timeoutId = setTimeout(() => abortController.abort(), AI_TIMEOUT_MS);
             
-            sendProgress("generating", 30 + attempt * 2, `🤖 Gemini 2.5 Pro 호출 중... (시도 ${attempt + 1}/3, 최대 10분)`);
+            sendProgress("generating", 30 + attempt * 2, `🤖 ${modelLabel} 호출 중... (시도 ${attempt + 1}/3, 최대 10분)`);
             
-            geminiResponse = await fetch(
-              `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:streamGenerateContent?key=${GEMINI_API_KEY}&alt=sse`,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                signal: controller.signal,
+            if (useGPT5) {
+              // GPT-5 API 호출 (듣기 문제용)
+              console.log(`🎧 Using GPT-5 for listening questions`);
+              aiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                  'Content-Type': 'application/json',
+                },
+                signal: abortController.signal,
                 body: JSON.stringify({
-                  contents: [{
-                    role: "user",
-                    parts: [{
-                      text: `${systemPrompt}\n\n---\n\n${params.questionCount}개의 ${params.section} 문제를 생성해주세요.
-${params.topic ? `주제/문법: ${params.topic}` : ''}
-난이도: ${params.difficulty}
-모든 문제는 실제 TOPIK 시험과 동일한 형식이어야 합니다.`
-                    }]
-                  }],
-                  generationConfig: {
-                    temperature: 0.7,
-                    topP: 0.95,
-                    topK: 40,
-                    maxOutputTokens: 65536,
-                    responseMimeType: "application/json",
-                    thinkingConfig: {
-                      thinkingBudget: 24576,  // 씽킹버젯 최대치 적용
-                    },
-                  },
-                  safetySettings: [
-                    { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-                    { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-                    { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
-                    { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+                  model: 'gpt-5-2025-08-07',
+                  messages: [
+                    { role: 'system', content: 'You are a TOPIK exam question generator. Always respond in valid JSON format with a "questions" array.' },
+                    { role: 'user', content: userPrompt }
                   ],
+                  max_completion_tokens: 65536,
+                  response_format: { type: 'json_object' },
+                  stream: true,
                 }),
-              }
-            );
+              });
+            } else {
+              // Gemini API 호출 (읽기/쓰기 문제용)
+              aiResponse = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:streamGenerateContent?key=${GEMINI_API_KEY}&alt=sse`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  signal: abortController.signal,
+                  body: JSON.stringify({
+                    contents: [{
+                      role: "user",
+                      parts: [{ text: userPrompt }]
+                    }],
+                    generationConfig: {
+                      temperature: 0.7,
+                      topP: 0.95,
+                      topK: 40,
+                      maxOutputTokens: 65536,
+                      responseMimeType: "application/json",
+                      thinkingConfig: {
+                        thinkingBudget: 24576,
+                      },
+                    },
+                    safetySettings: [
+                      { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                      { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                      { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                      { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+                    ],
+                  }),
+                }
+              );
+            }
             
             clearTimeout(timeoutId);
 
-            if (geminiResponse.ok) break;
+            if (aiResponse.ok) break;
             
-            const errorText = await geminiResponse.text();
-            lastError = `Gemini API error: ${geminiResponse.status}`;
-            console.error(`Gemini attempt ${attempt + 1} failed:`, geminiResponse.status, errorText.slice(0, 200));
+            const errorText = await aiResponse.text();
+            lastError = `API error: ${aiResponse.status}`;
+            console.error(`${modelLabel} attempt ${attempt + 1} failed:`, aiResponse.status, errorText.slice(0, 200));
             
             // Retry on 503 (overloaded) or 429 (rate limit)
-            if (geminiResponse.status === 503 || geminiResponse.status === 429) {
+            if (aiResponse.status === 503 || aiResponse.status === 429) {
               sendProgress("generating", 32, `⏳ 재시도 중... (${attempt + 1}/3)`);
               await new Promise(r => setTimeout(r, 3000 * (attempt + 1))); // Exponential backoff
             } else {
@@ -1203,10 +1229,10 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
           } catch (fetchError: any) {
             if (fetchError.name === 'AbortError') {
               lastError = `타임아웃 (10분 초과) - 문제 수를 줄여서 다시 시도해주세요.`;
-              console.error(`Gemini timeout after ${GEMINI_TIMEOUT_MS}ms on attempt ${attempt + 1}`);
+              console.error(`${modelLabel} timeout after ${AI_TIMEOUT_MS}ms on attempt ${attempt + 1}`);
             } else {
               lastError = fetchError.message || "Network error";
-              console.error(`Gemini fetch error attempt ${attempt + 1}:`, lastError);
+              console.error(`${modelLabel} fetch error attempt ${attempt + 1}:`, lastError);
             }
             if (attempt < 2) {
               await new Promise(r => setTimeout(r, 3000 * (attempt + 1)));
@@ -1214,12 +1240,12 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
           }
         }
 
-        if (!geminiResponse || !geminiResponse.ok) {
-          throw new Error(lastError || "Gemini API 호출 실패. 잠시 후 다시 시도해주세요.");
+        if (!aiResponse || !aiResponse.ok) {
+          throw new Error(lastError || "AI API 호출 실패. 잠시 후 다시 시도해주세요.");
         }
 
         // Stream the response
-        const reader = geminiResponse.body?.getReader();
+        const reader = aiResponse.body?.getReader();
         if (!reader) throw new Error("No response body");
 
         let fullContent = "";
@@ -1240,7 +1266,16 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
                 if (jsonStr.trim() === '[DONE]') continue;
                 
                 const parsed = JSON.parse(jsonStr);
-                const text = parsed.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                
+                // GPT-5와 Gemini의 응답 형식이 다름
+                let text = '';
+                if (useGPT5) {
+                  // OpenAI GPT-5 스트리밍 형식
+                  text = parsed.choices?.[0]?.delta?.content || '';
+                } else {
+                  // Gemini 스트리밍 형식
+                  text = parsed.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                }
                 
                 if (text) {
                   fullContent += text;
@@ -1274,8 +1309,8 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
           if (jsonContent.endsWith("```")) jsonContent = jsonContent.slice(0, -3);
           parsed = JSON.parse(jsonContent.trim());
         } catch (e) {
-          console.error("Failed to parse Gemini response:", fullContent.slice(0, 500));
-          throw new Error("Failed to parse Gemini response as JSON");
+          console.error("Failed to parse AI response:", fullContent.slice(0, 500));
+          throw new Error("Failed to parse AI response as JSON");
         }
 
         // Validate questions
@@ -1369,7 +1404,7 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
           questions: validQuestions,
           ragUsed: !!ragContext,
           ragDocCount: ragContext ? ragContext.split('---').length : 0,
-          model: geminiModel,
+          model: modelName,
         });
         controller.enqueue(encoder.encode(`data: ${finalData}\n\n`));
         controller.close();
