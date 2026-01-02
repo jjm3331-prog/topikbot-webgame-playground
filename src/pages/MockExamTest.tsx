@@ -152,6 +152,14 @@ const MockExamTest = () => {
   const isListeningSection = currentQuestion?.section === 'listening';
   const isWritingSection = currentQuestion?.section === 'writing';
   const isReadingSection = currentQuestion?.section === 'reading';
+
+  // When moving between questions, stop any ongoing audio cleanly.
+  useEffect(() => {
+    if (!audioRef.current) return;
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+    setIsPlaying(false);
+  }, [currentQuestion?.id]);
   
   const [writingAnswers, setWritingAnswers] = useState<Map<string, string>>(new Map());
   
@@ -613,27 +621,63 @@ const MockExamTest = () => {
     });
   };
 
-  const handlePlayAudio = () => {
-    if (!currentQuestion?.question_audio_url) return;
-    
+  const handlePlayAudio = async () => {
+    const url = currentQuestion?.question_audio_url;
+    if (!url) return;
+
     if (!audioRef.current) {
-      audioRef.current = new Audio(currentQuestion.question_audio_url);
-      audioRef.current.playbackRate = playbackSpeed;
+      audioRef.current = new Audio();
+      audioRef.current.preload = "auto";
+      // Some browsers can be picky with media from other origins
+      audioRef.current.crossOrigin = "anonymous";
       audioRef.current.onended = () => setIsPlaying(false);
+      audioRef.current.onerror = () => {
+        console.error("[MockExamTest] audio error", {
+          src: audioRef.current?.src,
+          networkState: audioRef.current?.networkState,
+          readyState: audioRef.current?.readyState,
+          error: audioRef.current?.error,
+        });
+        setIsPlaying(false);
+        toast({
+          title: "오디오 재생 실패",
+          description: "브라우저가 음성을 로드하지 못했습니다. 잠시 후 다시 시도해주세요.",
+          variant: "destructive",
+        });
+      };
     }
-    
+
+    const audio = audioRef.current;
+
     if (isPlaying) {
-      audioRef.current.pause();
+      audio.pause();
       setIsPlaying(false);
-    } else {
-      audioRef.current.src = currentQuestion.question_audio_url;
-      audioRef.current.playbackRate = playbackSpeed;
-      audioRef.current.play();
+      return;
+    }
+
+    try {
+      if (audio.src !== url) {
+        audio.src = url;
+      }
+      audio.playbackRate = playbackSpeed;
+      // Ensures the new src is picked up immediately in Safari-like engines
+      audio.load();
+
+      const playPromise = audio.play();
+      if (playPromise) await playPromise;
+
       setIsPlaying(true);
-      
-      setPlayCount(prev => {
+      setPlayCount((prev) => {
         const count = prev.get(currentQuestion.id) || 0;
         return new Map(prev).set(currentQuestion.id, count + 1);
+      });
+    } catch (error) {
+      console.error("[MockExamTest] audio play() rejected", { url, error });
+      setIsPlaying(false);
+      toast({
+        title: "오디오 재생 차단됨",
+        description: "브라우저 정책(자동재생/오디오 권한) 때문에 재생이 거부되었습니다. 다시 눌러주세요.",
+        variant: "destructive",
       });
     }
   };
