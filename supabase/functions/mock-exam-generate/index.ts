@@ -725,9 +725,13 @@ ${params.topic ? `- 주제/문법: ${params.topic}` : ''}
 각 문제에는 반드시 지문(읽기 텍스트)이 포함되어야 합니다.`;
   } else if (params.section === 'listening') {
     // 듣기 세부 설정 파싱
-    const questionType = params.listeningQuestionType || 'mixed';
+    let questionType = params.listeningQuestionType || 'mixed';
     const dialogueLen = params.dialogueLength || 'auto';
     const speakers = params.speakerCount || 'auto';
+
+    const isTopik1 = params.examType === 'topik1';
+    // TOPIK I에는 21~50 세트형(=TOPIK II 전용) 지시가 들어오면 자동으로 혼합으로 교정
+    if (isTopik1 && questionType === '21-50-set') questionType = 'mixed';
 
     // 문제 유형별 설정
     const questionTypeGuide: Record<string, { partRange: string; turns: string; description: string; isSet?: boolean }> = {
@@ -736,10 +740,11 @@ ${params.topic ? `- 주제/문법: ${params.topic}` : ''}
       "9-12": { partRange: "9~12", turns: "3-4턴", description: "대화의 장소/화제/목적 파악" },
       "13-16": { partRange: "13~16", turns: "4-6턴", description: "세부 내용 파악" },
       "17-20": { partRange: "17~20", turns: "5-8턴", description: "화자의 의도/태도/후속 행동 파악" },
+      // ⚠️ 세트형은 TOPIK II에만 존재
       "21-50-set": { partRange: "21~50", turns: "6-10턴", description: "세트형 문제 (2문항 1세트, 대화/담화 공유)", isSet: true },
     };
 
-    const isSetQuestion = questionType === '21-50-set';
+    const isSetQuestion = !isTopik1 && questionType === '21-50-set';
 
     // 대화 길이 설정
     const dialogueLengthGuide: Record<string, string> = {
@@ -758,8 +763,21 @@ ${params.topic ? `- 주제/문법: ${params.topic}` : ''}
     };
 
     prompt += `
+### ✅ TOPIK I vs TOPIK II 난이도 차별화 규칙 (반드시 준수)
+- **TOPIK I(초급)**: 일상/생활 주제, 짧은 문장, 기본 고빈도 어휘, 직접 정보 위주, 추론 최소, 함정 적게.
+- **TOPIK II(중급~고급)**: 사회/직장/뉴스/강연 주제, 긴 문장·접속 표현, 추상어/한자어/관용 포함, **의도·태도·뉘앙스 추론** 필수, 오답 더 그럴듯하게.
+(그리고 beginner/intermediate/advanced는 위 시험 차이를 바탕으로 추가 조정)
+
 ### 듣기 영역 문제 유형
-${questionType === 'mixed' ? `
+${questionType === 'mixed' ? (isTopik1 ? `
+- [1~4] 적절한 대답 고르기 (간단한 질문-응답)
+- [5~8] 그림 보고 알맞은 대화 고르기
+- [9~12] 대화의 장소/화제/목적 파악
+- [13~16] 세부 내용 파악 (대화 내용과 같은 것)
+- [17~20] 화자의 의도/태도/후속 행동 파악
+
+**TOPIK I에서는 세트형 문제를 만들지 마세요.**
+` : `
 - [1~4] 적절한 대답 고르기 (간단한 질문-응답)
 - [5~8] 그림 보고 알맞은 대화 고르기
 - [9~12] 대화의 장소/화제/목적 파악
@@ -767,7 +785,7 @@ ${questionType === 'mixed' ? `
 - [17~20] 화자의 의도/태도/후속 행동 파악
 - [21~50] 세트형 문제 (2문항 1세트)
 
-다양한 유형을 골고루 생성하세요.` : isSetQuestion ? `
+다양한 유형을 골고루 생성하세요.`) : isSetQuestion ? `
 ⚠️ **세트형 문제 생성 (2문항 1세트)**
 
 TOPIK II 듣기 영역 21~50번은 **세트형 문제**입니다.
