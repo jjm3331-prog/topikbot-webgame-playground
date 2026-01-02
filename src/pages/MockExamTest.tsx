@@ -135,6 +135,7 @@ const MockExamTest = () => {
   const [playCount, setPlayCount] = useState<Map<string, number>>(new Map());
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioObjectUrlRef = useRef<string | null>(null);
   
   const isPracticeMode = examPreset ? 
     examPreset.settings.explanationTiming === 'immediate' : 
@@ -155,9 +156,14 @@ const MockExamTest = () => {
 
   // When moving between questions, stop any ongoing audio cleanly.
   useEffect(() => {
-    if (!audioRef.current) return;
-    audioRef.current.pause();
-    audioRef.current.src = "";
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = "";
+    }
+    if (audioObjectUrlRef.current) {
+      URL.revokeObjectURL(audioObjectUrlRef.current);
+      audioObjectUrlRef.current = null;
+    }
     setIsPlaying(false);
   }, [currentQuestion?.id]);
   
@@ -621,7 +627,7 @@ const MockExamTest = () => {
     });
   };
 
-  const handlePlayAudio = () => {
+  const handlePlayAudio = async () => {
     const url = currentQuestion?.question_audio_url;
     if (!url) return;
 
@@ -632,49 +638,72 @@ const MockExamTest = () => {
       return;
     }
 
-    // Create new Audio element each time to avoid CORS/state issues
+    // Clean up previous audio/object URL
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.src = "";
     }
+    if (audioObjectUrlRef.current) {
+      URL.revokeObjectURL(audioObjectUrlRef.current);
+      audioObjectUrlRef.current = null;
+    }
 
-    const audio = new Audio();
-    // CORS 설정 - cross-origin 리소스 재생 허용
-    audio.crossOrigin = "anonymous";
-    // preload 힌트
-    audio.preload = "auto";
-    audio.src = url;
-    audio.playbackRate = playbackSpeed;
-    audioRef.current = audio;
+    try {
+      // 모바일에서 cross-origin WAV를 <audio src=url>로 바로 재생 실패하는 케이스가 있어,
+      // 먼저 fetch로 blob을 받아 objectURL로 재생합니다.
+      const res = await fetch(url, { mode: "cors", cache: "no-store" });
+      if (!res.ok) {
+        throw new Error(`audio fetch failed: ${res.status}`);
+      }
 
-    audio.onended = () => setIsPlaying(false);
-    audio.onerror = (e) => {
-      console.error("[MockExamTest] audio error", e, {
-        src: audio.src,
-        networkState: audio.networkState,
-        readyState: audio.readyState,
-        error: audio.error,
-      });
-      setIsPlaying(false);
-      toast({
-        title: "오디오 재생 실패",
-        description: "음성 파일을 로드하지 못했습니다.",
-        variant: "destructive",
-      });
-    };
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      audioObjectUrlRef.current = objectUrl;
 
-    // Play immediately - this is called from a user click event
-    audio.play().then(() => {
+      const audio = new Audio();
+      audio.preload = "auto";
+      audio.src = objectUrl;
+      audio.playbackRate = playbackSpeed;
+      audioRef.current = audio;
+
+      audio.onended = () => {
+        setIsPlaying(false);
+        if (audioObjectUrlRef.current) {
+          URL.revokeObjectURL(audioObjectUrlRef.current);
+          audioObjectUrlRef.current = null;
+        }
+      };
+
+      audio.onerror = (e) => {
+        console.error("[MockExamTest] audio error", e, {
+          src: audio.src,
+          networkState: audio.networkState,
+          readyState: audio.readyState,
+          error: audio.error,
+        });
+        setIsPlaying(false);
+        toast({
+          title: "오디오 재생 실패",
+          description: "음성 파일을 로드하지 못했습니다.",
+          variant: "destructive",
+        });
+      };
+
+      await audio.play();
       setIsPlaying(true);
       setPlayCount((prev) => {
         const count = prev.get(currentQuestion.id) || 0;
         return new Map(prev).set(currentQuestion.id, count + 1);
       });
-    }).catch((err) => {
-      console.error("[MockExamTest] play() rejected", err);
+    } catch (err) {
+      console.error("[MockExamTest] audio fetch/play failed", err, { url });
       setIsPlaying(false);
-      // Don't show toast - just log. User can click again.
-    });
+      toast({
+        title: "오디오 재생 실패",
+        description: "네트워크/포맷 문제로 재생할 수 없습니다.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSpeedChange = (value: number[]) => {
