@@ -406,12 +406,8 @@ function parseWordLine(line: string): HanjaWord | null {
 function parseMarkdownForDay(
   markdown: string,
   dayNumber: number
-): { roots: HanjaRoot[]; debug?: { sectionStart: number; sectionEnd: number; sectionLines: number } } {
+): { roots: HanjaRoot[]; debug?: { sectionStart: number; sectionEnd: number; sectionLines: number; selection?: string } } {
   const lines = markdown.split("\n");
-
-  // Find the best section for this day.
-  // The markdown contains many "Day XX" mentions (cover text, TOC, answer keys).
-  // We pick the candidate section that contains the MOST root headers (#### ... 한자).
 
   const dayHeaderRe = /^(?:#{1,6}\s*)?Day\s*0?(\d+)\b/i;
   const exerciseRe = /^#{2,6}\s*\d+\./; // Exercise headers like "#### 1."
@@ -431,7 +427,6 @@ function parseMarkdownForDay(
     const foundDay = parseInt(match[1], 10);
     if (foundDay !== dayNumber) continue;
 
-    // Determine candidate end (next Day header for a different day, or next Unit header)
     let end = lines.length;
     for (let j = i + 1; j < lines.length; j++) {
       const t = lines[j].trim();
@@ -452,14 +447,13 @@ function parseMarkdownForDay(
       }
     }
 
-    // Count root headers in this candidate slice.
-    // NOTE: In the book markdown, many root lines are NOT strict headings (they can be plain text).
-    // So we count ANY line that parseRootHeader() recognizes.
+    // Ignore tiny candidates (TOC/answer-key lines like "Day 01" without content)
+    if (end - i < 40) continue;
+
     let rootHeaders = 0;
     for (let k = i + 1; k < end; k++) {
       const t = lines[k].trim();
-      if (exerciseRe.test(t)) break; // stop at exercises/answer section
-
+      if (exerciseRe.test(t)) break;
       const info = parseRootHeader(t, lines[k + 1]);
       if (info?.hanja) rootHeaders++;
     }
@@ -478,18 +472,54 @@ function parseMarkdownForDay(
     else if (c.rootHeaders === best.rootHeaders && c.start > best.start) best = c;
   }
 
-  const sectionStart = best?.start ?? -1;
-  const sectionEnd = best?.end ?? -1;
+  let sectionStart = best?.start ?? -1;
+  let sectionEnd = best?.end ?? -1;
+  let selection: "day-header" | "topic-fallback" = "day-header";
+
+  // Fallback for Day 01 style where real content starts at the topic title (not a Day header).
+  if (sectionStart === -1 || sectionEnd === -1 || (best?.rootHeaders ?? 0) === 0) {
+    const topic = DAY_TOPICS[dayNumber];
+    const nextTopic = DAY_TOPICS[dayNumber + 1];
+
+    if (topic) {
+      const topicRe = new RegExp(`^\\s*${topic.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")}\\s*$`);
+      const nextTopicRe = nextTopic
+        ? new RegExp(`^\\s*${nextTopic.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")}\\s*$`)
+        : null;
+
+      const startIdx = lines.findIndex((l) => topicRe.test(l.trim()));
+      if (startIdx !== -1) {
+        let endIdx = lines.length;
+        for (let j = startIdx + 1; j < lines.length; j++) {
+          const t = lines[j].trim();
+          if (nextTopicRe && nextTopicRe.test(t)) {
+            endIdx = j;
+            break;
+          }
+          if (dayHeaderRe.test(t) && !t.match(dayHeaderRe)?.[1].startsWith("0")) {
+            // keep scanning; do nothing (defensive)
+          }
+          if (/^##\s*\d+\.?\s*$/.test(t)) {
+            endIdx = j;
+            break;
+          }
+        }
+        sectionStart = startIdx;
+        sectionEnd = endIdx;
+        selection = "topic-fallback";
+      }
+    }
+  }
 
   if (sectionStart === -1 || sectionEnd === -1) {
     console.log(`Day ${dayNumber}: No section found`);
-    return { roots: [], debug: { sectionStart: -1, sectionEnd: -1, sectionLines: 0 } };
+    return { roots: [], debug: { sectionStart: -1, sectionEnd: -1, sectionLines: 0, selection: "none" } };
   }
 
   const sectionLines = lines.slice(sectionStart, sectionEnd);
 
   console.log(
-    `Day ${dayNumber}: Section from line ${sectionStart} to ${sectionEnd} (${sectionLines.length} lines), rootHeaders=${best?.rootHeaders ?? 0}`
+    `Day ${dayNumber}: Section from line ${sectionStart} to ${sectionEnd} (${sectionLines.length} lines), rootHeaders=${best?.rootHeaders ?? 0}, selection=${selection}`
   );
 
   // Parse the section to extract roots and words
@@ -537,7 +567,7 @@ function parseMarkdownForDay(
       meaningLines = [];
 
       // If this was a two-line pattern, skip the next line
-      if (nextLine && /^[가-힣\/\s]+(?:하다)?$/.test(trimmed) && trimmed.length < 30) {
+      if (nextLine && /^[가-힣\s\/]+(?:하다)?$/.test(trimmed) && trimmed.length < 40) {
         const nextTrimmed = nextLine.trim();
         if (/^(?:\*\*)?[가-힣]+\s*[一-龥々\u4e00-\u9fff\u3400-\u4dbf]+(?:\*\*)?$/.test(nextTrimmed)) {
           skipNextLine = true;
@@ -611,6 +641,7 @@ function parseMarkdownForDay(
       sectionStart,
       sectionEnd,
       sectionLines: sectionLines.length,
+      selection,
     },
   };
 }
