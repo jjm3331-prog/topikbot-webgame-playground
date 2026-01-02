@@ -11,29 +11,38 @@ const corsHeaders = {
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 const COHERE_API_KEY = Deno.env.get("COHERE_API_KEY");
-const GOOGLE_CLOUD_API_KEY = Deno.env.get("GOOGLE_CLOUD_API_KEY");
-// ElevenLabs is deprecated for new generation - using Google Cloud TTS now
-// const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
+// ElevenLabs is deprecated - using Gemini 2.5 Flash TTS now
 
-// TTS Presets (Google Cloud Text-to-Speech)
-// NOTE: We select a real Korean voice dynamically from the /voices endpoint
-// so we don't depend on hardcoded voice names.
+// Gemini 2.5 Flash TTS Voice Presets
+// Korean optimized voices
+const GEMINI_VOICES = {
+  female: "Kore",      // 여성 - 한국어 최적화 (추천)
+  male: "Charon",      // 남성 - 차분하고 명확
+  female_alt: "Aoede", // 여성 대안
+  male_alt: "Puck",    // 남성 대안
+} as const;
+
+// TTS Presets for different use cases
 const TTS_PRESETS = {
   exam: {
-    label: "exam",
-    speakingRate: 0.95,
+    voiceFemale: GEMINI_VOICES.female,
+    voiceMale: GEMINI_VOICES.male,
+    prompt: "Read clearly and precisely in Korean, like a TOPIK exam audio. Moderate pace, clear pronunciation.",
   },
   learning: {
-    label: "learning",
-    speakingRate: 0.85,
+    voiceFemale: GEMINI_VOICES.female,
+    voiceMale: GEMINI_VOICES.male,
+    prompt: "Read slowly and clearly in Korean for language learners. Emphasize each word distinctly.",
   },
   natural: {
-    label: "natural",
-    speakingRate: 1.0,
+    voiceFemale: GEMINI_VOICES.female_alt,
+    voiceMale: GEMINI_VOICES.male_alt,
+    prompt: "Read naturally in Korean like a casual conversation. Natural rhythm and intonation.",
   },
   formal: {
-    label: "formal",
-    speakingRate: 0.98,
+    voiceFemale: GEMINI_VOICES.female,
+    voiceMale: GEMINI_VOICES.male,
+    prompt: "Read formally in Korean like a news anchor or official announcement. Clear and authoritative.",
   },
 } as const;
 
@@ -258,68 +267,34 @@ async function ragSearch(
   }
 }
 
-// Generate TTS audio using Google Cloud Text-to-Speech
+// Generate TTS audio using Gemini 2.5 Flash TTS
 // - Removes speaker labels like "남자:"/"여자:" from spoken audio
 // - If multiple speakers are detected, alternates voices per speaker and concatenates segments
-let cachedKoVoices: any[] = [];
 
-async function getKoreanVoices(): Promise<any[]> {
-  if (cachedKoVoices.length) return cachedKoVoices;
-  if (!GOOGLE_CLOUD_API_KEY) return [];
-
-  const resp = await fetch(
-    `https://texttospeech.googleapis.com/v1/voices?key=${GOOGLE_CLOUD_API_KEY}`,
-    { method: "GET" }
-  );
-
-  if (!resp.ok) {
-    const t = await resp.text().catch(() => "");
-    console.error("TTS voices list error:", resp.status, t);
-    return [];
-  }
-
-  const data = await resp.json();
-  const voices = Array.isArray(data.voices) ? data.voices : [];
-
-  // Keep only Korean voices
-  cachedKoVoices = voices.filter((v: any) =>
-    Array.isArray(v.languageCodes) && v.languageCodes.includes("ko-KR")
-  );
-  return cachedKoVoices;
-}
-
-function pickBestVoice(voices: any[], gender: "MALE" | "FEMALE" | "NEUTRAL" = "FEMALE") {
-  const byGender = voices.filter((v: any) => (v.ssmlGender || "").toUpperCase() === gender);
-  const candidates = byGender.length ? byGender : voices;
-
-  // Prefer Neural2, then Wavenet, then whatever
-  const prefer = (pattern: RegExp) => candidates.find((v: any) => pattern.test(String(v.name)));
-  return (
-    prefer(/Neural2/i) ||
-    prefer(/Wavenet/i) ||
-    candidates[0] ||
-    null
-  );
-}
-
-async function synthesizeMp3(text: string, voiceName: string | null, gender: "MALE" | "FEMALE" | "NEUTRAL", speakingRate: number): Promise<Uint8Array> {
-  if (!GOOGLE_CLOUD_API_KEY) throw new Error("GOOGLE_CLOUD_API_KEY not configured");
+async function synthesizeGeminiTTS(
+  text: string, 
+  voiceName: string, 
+  stylePrompt: string
+): Promise<Uint8Array> {
+  if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not configured");
 
   const resp = await fetch(
-    `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GOOGLE_CLOUD_API_KEY}`,
+    `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GEMINI_API_KEY}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        input: { text },
+        input: { 
+          text,
+          prompt: stylePrompt,
+        },
         voice: {
           languageCode: "ko-KR",
-          ...(voiceName ? { name: voiceName } : {}),
-          ssmlGender: gender,
+          name: voiceName,
+          modelName: "gemini-2.5-flash-tts",
         },
         audioConfig: {
           audioEncoding: "MP3",
-          speakingRate,
         },
       }),
     }
@@ -327,13 +302,13 @@ async function synthesizeMp3(text: string, voiceName: string | null, gender: "MA
 
   if (!resp.ok) {
     const t = await resp.text().catch(() => "");
-    console.error("TTS synth error:", resp.status, t);
-    throw new Error(`TTS synth failed (${resp.status})`);
+    console.error("Gemini TTS error:", resp.status, t);
+    throw new Error(`Gemini TTS failed (${resp.status}): ${t}`);
   }
 
   const data = await resp.json();
   const audioContent = data?.audioContent;
-  if (!audioContent) throw new Error("No audioContent returned");
+  if (!audioContent) throw new Error("No audioContent returned from Gemini TTS");
 
   const binaryString = atob(audioContent);
   const bytes = new Uint8Array(binaryString.length);
@@ -348,7 +323,7 @@ async function generateListeningAudio(
   supabase: any,
   preset: keyof typeof TTS_PRESETS = "exam",
 ): Promise<string | null> {
-  if (!GOOGLE_CLOUD_API_KEY || !script) return null;
+  if (!GEMINI_API_KEY || !script) return null;
 
   const detectSpeaker = (raw: string): { speakerKey: "male" | "female" | "other"; text: string } => {
     const line = raw.trim();
@@ -365,7 +340,6 @@ async function generateListeningAudio(
 
   const stripLeadingId3 = (buf: ArrayBufferLike): Uint8Array => {
     const bytes = new Uint8Array(buf);
-    // ID3 header: "ID3" + ver(2) + flags(1) + size(4, syncsafe)
     if (bytes.length >= 10 && bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33) {
       const size =
         ((bytes[6] & 0x7f) << 21) |
@@ -391,7 +365,7 @@ async function generateListeningAudio(
 
   try {
     const presetCfg = TTS_PRESETS[preset] ?? TTS_PRESETS.exam;
-    console.log(`🎵 Generating TTS audio for Q${questionNumber} preset=${preset}...`);
+    console.log(`🎵 Generating Gemini TTS audio for Q${questionNumber} preset=${preset}...`);
 
     const rawLines = script
       .split(/\r?\n/)
@@ -402,10 +376,6 @@ async function generateListeningAudio(
       ? rawLines.map(detectSpeaker).filter((s) => s.text)
       : [{ speakerKey: "other" as const, text: script.trim() }];
 
-    const voices = await getKoreanVoices();
-    const voiceFemale = pickBestVoice(voices, "FEMALE")?.name ?? null;
-    const voiceMale = pickBestVoice(voices, "MALE")?.name ?? null;
-
     const uniqueSpeakers = new Set(segments.map((s) => s.speakerKey));
     const isMultiSpeaker = uniqueSpeakers.size >= 2 && (uniqueSpeakers.has("male") || uniqueSpeakers.has("female"));
 
@@ -413,12 +383,15 @@ async function generateListeningAudio(
 
     for (let i = 0; i < segments.length; i++) {
       const seg = segments[i];
-      const gender: "MALE" | "FEMALE" | "NEUTRAL" = seg.speakerKey === "male" ? "MALE" : "FEMALE";
-      const voiceName = isMultiSpeaker ? (gender === "MALE" ? voiceMale : voiceFemale) : voiceFemale;
+      const voiceName = seg.speakerKey === "male" 
+        ? presetCfg.voiceMale 
+        : presetCfg.voiceFemale;
 
-      const t = seg.text.endsWith(".") || seg.text.endsWith("?") || seg.text.endsWith("!") ? seg.text : `${seg.text}.`;
+      const t = seg.text.endsWith(".") || seg.text.endsWith("?") || seg.text.endsWith("!") 
+        ? seg.text 
+        : `${seg.text}.`;
 
-      const bytes = await synthesizeMp3(t, voiceName, gender, presetCfg.speakingRate);
+      const bytes = await synthesizeGeminiTTS(t, voiceName, presetCfg.prompt);
       const finalBytes = i === 0 ? bytes : stripLeadingId3(bytes.buffer);
       audioParts.push(finalBytes);
     }
@@ -440,10 +413,10 @@ async function generateListeningAudio(
     }
 
     const { data: urlData } = supabase.storage.from("podcast-audio").getPublicUrl(fileName);
-    console.log(`✅ TTS audio generated for Q${questionNumber} (multiSpeaker: ${isMultiSpeaker})`);
+    console.log(`✅ Gemini TTS audio generated for Q${questionNumber} (multiSpeaker: ${isMultiSpeaker})`);
     return urlData.publicUrl;
   } catch (error) {
-    console.error("TTS generation error:", error);
+    console.error("Gemini TTS generation error:", error);
     return null;
   }
 }
