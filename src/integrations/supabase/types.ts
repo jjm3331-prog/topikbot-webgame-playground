@@ -544,6 +544,235 @@ export type Database = {
         }
         Relationships: []
       }
+      hanja_days: {
+        Row: {
+          created_at: string
+          day_number: number
+          id: string
+          topic_en: string | null
+          topic_ko: string
+          unit_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          day_number: number
+          id?: string
+          topic_en?: string | null
+          topic_ko: string
+          unit_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          day_number?: number
+          id?: string
+          topic_en?: string | null
+          topic_ko?: string
+          unit_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hanja_days_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "hanja_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hanja_learning_progress: {
+        Row: {
+          completed: boolean
+          created_at: string
+          day_id: string | null
+          id: string
+          last_studied_at: string | null
+          mastered_words: number
+          total_words: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          day_id?: string | null
+          id?: string
+          last_studied_at?: string | null
+          mastered_words?: number
+          total_words?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          day_id?: string | null
+          id?: string
+          last_studied_at?: string | null
+          mastered_words?: number
+          total_words?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hanja_learning_progress_day_id_fkey"
+            columns: ["day_id"]
+            isOneToOne: false
+            referencedRelation: "hanja_days"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hanja_mastered_words: {
+        Row: {
+          id: string
+          mastered_at: string
+          user_id: string
+          word_id: string | null
+        }
+        Insert: {
+          id?: string
+          mastered_at?: string
+          user_id: string
+          word_id?: string | null
+        }
+        Update: {
+          id?: string
+          mastered_at?: string
+          user_id?: string
+          word_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hanja_mastered_words_word_id_fkey"
+            columns: ["word_id"]
+            isOneToOne: false
+            referencedRelation: "hanja_words"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hanja_roots: {
+        Row: {
+          created_at: string
+          day_id: string | null
+          display_order: number
+          hanja: string
+          id: string
+          meaning_en: string | null
+          meaning_ja: string | null
+          meaning_ko: string
+          meaning_vi: string | null
+          meaning_zh: string | null
+          reading_ko: string
+        }
+        Insert: {
+          created_at?: string
+          day_id?: string | null
+          display_order?: number
+          hanja: string
+          id?: string
+          meaning_en?: string | null
+          meaning_ja?: string | null
+          meaning_ko: string
+          meaning_vi?: string | null
+          meaning_zh?: string | null
+          reading_ko: string
+        }
+        Update: {
+          created_at?: string
+          day_id?: string | null
+          display_order?: number
+          hanja?: string
+          id?: string
+          meaning_en?: string | null
+          meaning_ja?: string | null
+          meaning_ko?: string
+          meaning_vi?: string | null
+          meaning_zh?: string | null
+          reading_ko?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hanja_roots_day_id_fkey"
+            columns: ["day_id"]
+            isOneToOne: false
+            referencedRelation: "hanja_days"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hanja_units: {
+        Row: {
+          created_at: string
+          id: string
+          title_en: string | null
+          title_ko: string
+          unit_number: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          title_en?: string | null
+          title_ko: string
+          unit_number: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          title_en?: string | null
+          title_ko?: string
+          unit_number?: number
+        }
+        Relationships: []
+      }
+      hanja_words: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          meaning_en: string | null
+          meaning_ja: string | null
+          meaning_ko: string | null
+          meaning_vi: string | null
+          meaning_zh: string | null
+          root_id: string | null
+          word: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          meaning_en?: string | null
+          meaning_ja?: string | null
+          meaning_ko?: string | null
+          meaning_vi?: string | null
+          meaning_zh?: string | null
+          root_id?: string | null
+          word: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          meaning_en?: string | null
+          meaning_ja?: string | null
+          meaning_ko?: string | null
+          meaning_vi?: string | null
+          meaning_zh?: string | null
+          root_id?: string | null
+          word?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hanja_words_root_id_fkey"
+            columns: ["root_id"]
+            isOneToOne: false
+            referencedRelation: "hanja_roots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       headhunting_applications: {
         Row: {
           additional_skills: string | null

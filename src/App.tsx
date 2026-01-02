@@ -65,6 +65,8 @@ import MockExamTest from "./pages/MockExamTest";
 import MockExamReport from "./pages/MockExamReport";
 import MockExamMistakes from "./pages/MockExamMistakes";
 import AdminMockExam from "./pages/AdminMockExam";
+import HanjaMindmap from "./pages/HanjaMindmap";
+import HanjaMindmapDay from "./pages/HanjaMindmapDay";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWAWelcome from "./components/PWAWelcome";
 import SplashScreen from "./components/SplashScreen";
@@ -229,6 +231,8 @@ const App = () => {
               <Route path="/mock-exam/report/:attemptId" element={<ProtectedRoute><MockExamReport /></ProtectedRoute>} />
               <Route path="/mock-exam/mistakes" element={<ProtectedRoute><MockExamMistakes /></ProtectedRoute>} />
               <Route path="/admin/mock-exam" element={<ProtectedRoute><AdminMockExam /></ProtectedRoute>} />
+              <Route path="/hanja-mindmap" element={<ProtectedRoute><HanjaMindmap /></ProtectedRoute>} />
+              <Route path="/hanja-mindmap/:dayNumber" element={<ProtectedRoute><HanjaMindmapDay /></ProtectedRoute>} />
               <Route path="/board-hub" element={<ProtectedRoute><BoardHub /></ProtectedRoute>} />
               <Route path="/board/:boardType" element={<ProtectedRoute><Board /></ProtectedRoute>} />
               <Route path="/board/:boardType/:postId" element={<ProtectedRoute><BoardPost /></ProtectedRoute>} />
