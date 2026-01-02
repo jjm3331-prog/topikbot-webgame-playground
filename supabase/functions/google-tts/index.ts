@@ -5,8 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Google Cloud TTS: we accept the existing "GeminiVoice" strings from the client,
-// but we map them to a real ko-KR voice dynamically.
+// Gemini 2.5 Flash TTS voices (Korean optimized)
 const VOICES = [
   "Kore", "Aoede", "Charon", "Fenrir", "Puck", "Zephyr",
   "Leda", "Orus", "Achernar", "Gacrux", "Sulafat"
@@ -29,65 +28,52 @@ serve(async (req) => {
       );
     }
 
-    const GOOGLE_CLOUD_API_KEY = Deno.env.get("GOOGLE_CLOUD_API_KEY");
-    if (!GOOGLE_CLOUD_API_KEY) {
-      console.error("GOOGLE_CLOUD_API_KEY not configured");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) {
+      console.error("GEMINI_API_KEY not configured");
       return new Response(
         JSON.stringify({ error: "TTS service not configured" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Truncate text (keep requests reasonable)
-    const truncatedText = text.trim().slice(0, 2000);
+    // Truncate text (Gemini TTS limit)
+    const truncatedText = text.trim().slice(0, 5000);
 
-    // Map the existing voice string to a gender (male/female) and pick a real ko-KR voice dynamically
+    // Select voice (default: Kore - female, natural for Korean)
     const selectedVoice: GeminiVoice = VOICES.includes(voice) ? voice : "Kore";
-    const maleVoices = new Set<GeminiVoice>(["Charon", "Fenrir", "Puck", "Orus"]);
-    const gender = maleVoices.has(selectedVoice) ? "MALE" : "FEMALE";
 
-    console.log(`Generating TTS (Google Cloud): gender=${gender}, text length=${truncatedText.length}`);
-
-    const voicesResp = await fetch(
-      `https://texttospeech.googleapis.com/v1/voices?key=${GOOGLE_CLOUD_API_KEY}`,
-      { method: "GET" }
-    );
-
-    let voiceName: string | undefined;
-    if (voicesResp.ok) {
-      const voicesData = await voicesResp.json();
-      const voices = Array.isArray(voicesData.voices) ? voicesData.voices : [];
-      const ko = voices.filter((v: any) => Array.isArray(v.languageCodes) && v.languageCodes.includes("ko-KR"));
-      const byGender = ko.filter((v: any) => String(v.ssmlGender || "").toUpperCase() === gender);
-      const candidates = byGender.length ? byGender : ko;
-      const pick = (re: RegExp) => candidates.find((v: any) => re.test(String(v.name)));
-      voiceName = (pick(/Neural2/i) || pick(/Wavenet/i) || candidates[0])?.name;
-    } else {
-      const t = await voicesResp.text().catch(() => "");
-      console.warn("voices list failed:", voicesResp.status, t);
+    // Build style prompt
+    let stylePrompt = prompt || "Read naturally and clearly in Korean.";
+    if (speed && speed < 0.8) {
+      stylePrompt = "Read slowly and clearly. " + stylePrompt;
+    } else if (speed && speed > 1.2) {
+      stylePrompt = "Read quickly but clearly. " + stylePrompt;
     }
 
-    // speakingRate (speed): Google Cloud supports 0.25~4.0
-    const speakingRate = Math.min(4.0, Math.max(0.25, Number(speed || 1.0)));
+    console.log(`Generating Gemini TTS: voice=${selectedVoice}, text length=${truncatedText.length}`);
 
-    // Call Google Cloud Text-to-Speech
+    // Call Gemini 2.5 Flash TTS via Cloud Text-to-Speech API
+    // Uses modelName parameter for Gemini TTS model
     const response = await fetch(
-      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GOOGLE_CLOUD_API_KEY}`,
+      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          input: { text: truncatedText },
+          input: {
+            text: truncatedText,
+            ...(stylePrompt ? { prompt: stylePrompt } : {}),
+          },
           voice: {
             languageCode: "ko-KR",
-            ...(voiceName ? { name: voiceName } : {}),
-            ssmlGender: gender,
+            name: selectedVoice,
+            modelName: "gemini-2.5-flash-tts",
           },
           audioConfig: {
             audioEncoding: "MP3",
-            speakingRate,
           },
         }),
       }
@@ -120,7 +106,7 @@ serve(async (req) => {
       bytes[i] = binaryString.charCodeAt(i);
     }
 
-    console.log(`TTS generated successfully: ${bytes.length} bytes`);
+    console.log(`Gemini TTS generated: ${bytes.length} bytes`);
 
     return new Response(bytes, {
       headers: {
