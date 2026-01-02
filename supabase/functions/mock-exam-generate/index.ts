@@ -10,6 +10,7 @@ const corsHeaders = {
 // Direct API Keys
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
 const COHERE_API_KEY = Deno.env.get("COHERE_API_KEY");
 const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
@@ -1111,9 +1112,9 @@ async function handleStreamingGeneration(
   const encoder = new TextEncoder();
   const systemPrompt = buildSystemPrompt(params, ragContext);
   
-  // 듣기 문제는 GPT-5 사용, 나머지는 Gemini 2.5 Pro
-  const useGPT5 = params.section === 'listening';
-  const modelName = useGPT5 ? 'gpt-5-2025-08-07' : (Deno.env.get("GEMINI_MODEL") || "gemini-2.5-pro");
+  // 듣기 문제는 Claude 사용, 나머지는 Gemini 2.5 Pro
+  const useClaude = params.section === 'listening';
+  const modelName = useClaude ? 'claude-sonnet-4-20250514' : (Deno.env.get("GEMINI_MODEL") || "gemini-2.5-pro");
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -1126,7 +1127,7 @@ async function handleStreamingGeneration(
 
         sendProgress("rag", 20, "📚 RAG 검색 완료");
         
-        const modelLabel = useGPT5 ? "GPT-5 (듣기 전용)" : "Gemini 2.5 Pro";
+        const modelLabel = useClaude ? "Claude Sonnet 4 (듣기 전용)" : "Gemini 2.5 Pro";
         sendProgress("generating", 30, `🤖 ${modelLabel} 문제 생성 시작...`);
 
         let aiResponse: Response | null = null;
@@ -1138,7 +1139,9 @@ async function handleStreamingGeneration(
         const userPrompt = `${systemPrompt}\n\n---\n\n${params.questionCount}개의 ${params.section} 문제를 생성해주세요.
 ${params.topic ? `주제/문법: ${params.topic}` : ''}
 난이도: ${params.difficulty}
-모든 문제는 실제 TOPIK 시험과 동일한 형식이어야 합니다.`;
+모든 문제는 실제 TOPIK 시험과 동일한 형식이어야 합니다.
+
+반드시 JSON 형식으로만 응답하세요. 다른 텍스트 없이 JSON만 출력하세요.`;
         
         for (let attempt = 0; attempt < 3; attempt++) {
           try {
@@ -1147,25 +1150,25 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
             
             sendProgress("generating", 30 + attempt * 2, `🤖 ${modelLabel} 호출 중... (시도 ${attempt + 1}/3, 최대 10분)`);
             
-            if (useGPT5) {
-              // GPT-5 API 호출 (듣기 문제용)
-              console.log(`🎧 Using GPT-5 for listening questions`);
-              aiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+            if (useClaude) {
+              // Claude API 호출 (듣기 문제용) - 스트리밍
+              console.log(`🎧 Using Claude Sonnet 4 for listening questions`);
+              aiResponse = await fetch('https://api.anthropic.com/v1/messages', {
                 method: 'POST',
                 headers: {
-                  'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                  'x-api-key': ANTHROPIC_API_KEY!,
+                  'anthropic-version': '2023-06-01',
                   'Content-Type': 'application/json',
                 },
                 signal: abortController.signal,
                 body: JSON.stringify({
-                  model: 'gpt-5-2025-08-07',
+                  model: 'claude-sonnet-4-20250514',
+                  max_tokens: 16384,
+                  stream: true,
+                  system: 'You are a TOPIK exam question generator. Always respond in valid JSON format with a "questions" array. Output only JSON, no other text.',
                   messages: [
-                    { role: 'system', content: 'You are a TOPIK exam question generator. Always respond in valid JSON format with a "questions" array.' },
                     { role: 'user', content: userPrompt }
                   ],
-                  max_completion_tokens: 65536,
-                  response_format: { type: 'json_object' },
-                  stream: true,
                 }),
               });
             } else {
@@ -1258,11 +1261,13 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
                 
                 const parsed = JSON.parse(jsonStr);
                 
-                // GPT-5와 Gemini의 응답 형식이 다름
+                // Claude와 Gemini의 응답 형식이 다름
                 let text = '';
-                if (useGPT5) {
-                  // OpenAI GPT-5 스트리밍 형식
-                  text = parsed.choices?.[0]?.delta?.content || '';
+                if (useClaude) {
+                  // Anthropic Claude 스트리밍 형식
+                  if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
+                    text = parsed.delta.text || '';
+                  }
                 } else {
                   // Gemini 스트리밍 형식
                   text = parsed.candidates?.[0]?.content?.parts?.[0]?.text || '';
@@ -1285,6 +1290,9 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
               } catch (e) {
                 // Ignore parse errors for partial chunks
               }
+            } else if (line.startsWith('event: ')) {
+              // Claude SSE event 처리
+              continue;
             }
           }
         }
