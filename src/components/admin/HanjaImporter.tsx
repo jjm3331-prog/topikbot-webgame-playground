@@ -78,34 +78,53 @@ export default function HanjaImporter() {
       return { dayNumber, status: "error", error: "Markdown not loaded" };
     }
 
-    try {
-      const { data, error } = await supabase.functions.invoke("hanja-import", {
-        body: { markdown, dayNumber },
-      });
+    const maxAttempts = 3;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const { data, error } = await supabase.functions.invoke("hanja-import", {
+          body: { markdown, dayNumber },
+        });
 
-      if (error) {
+        // Supabase client-level error (network, non-2xx, etc.)
+        if (error) {
+          const message = error.message || "Unknown error";
+          // Retry only for transient failures
+          const shouldRetry = attempt < maxAttempts && /fetch|timeout|network|5\d\d/i.test(message);
+          if (shouldRetry) {
+            await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
+            continue;
+          }
+          return { dayNumber, status: "error", error: message };
+        }
+
+        // Function-level error payload
+        const result = data as any;
+        if (result?.error) {
+          return {
+            dayNumber,
+            status: "error",
+            error: typeof result.error === "string" ? result.error : "Function returned an error",
+          };
+        }
+
         return {
           dayNumber,
-          status: "error",
-          error: error.message || "Unknown error",
+          status: "success",
+          rootsCount: result?.rootsCount,
+          wordsCount: result?.wordsCount,
         };
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "Unknown error";
+        const shouldRetry = attempt < maxAttempts;
+        if (shouldRetry) {
+          await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
+          continue;
+        }
+        return { dayNumber, status: "error", error: message };
       }
-
-      const result = data as any;
-
-      return {
-        dayNumber,
-        status: "success",
-        rootsCount: result?.rootsCount,
-        wordsCount: result?.wordsCount,
-      };
-    } catch (error) {
-      return {
-        dayNumber,
-        status: "error",
-        error: error instanceof Error ? error.message : "Unknown error",
-      };
     }
+
+    return { dayNumber, status: "error", error: "Unknown error" };
   };
 
   const startImport = async () => {
