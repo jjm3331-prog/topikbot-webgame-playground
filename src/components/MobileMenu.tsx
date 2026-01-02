@@ -82,6 +82,8 @@ const MobileMenu = ({ username, avatarUrl, isLoggedIn, userStats }: MobileMenuPr
 
   const topikItems = [
     { path: "/learning-hub", icon: Sparkles, labelKey: "mobileMenu.items.learningHub", isHighlight: true },
+    { path: "/hanja-mindmap", icon: GraduationCap, labelKey: "menu.items.hanjaMindmap", isHighlight: true },
+    { path: "/mock-exam", icon: GraduationCap, labelKey: "menu.items.mockExam", isHighlight: true },
     { path: "/shorts", icon: Smartphone, labelKey: "menu.items.shorts", isHighlight: true },
     { path: "/board-hub", icon: MessageSquare, labelKey: "mobileMenu.items.community", isHighlight: true },
   ];
