@@ -61,6 +61,7 @@ const baseMenuCategories: MenuCategory[] = [
     emoji: "📚",
     items: [
       { icon: Sparkles, labelKey: "menu.items.learningHub", href: "/learning-hub", isHighlight: true },
+      { icon: GraduationCap, labelKey: "menu.items.hanjaMindmap", href: "/hanja-mindmap", isPremium: true },
       { icon: GraduationCap, labelKey: "menu.items.mockExam", href: "/mock-exam", isPremium: true, isHighlight: true },
       { icon: Smartphone, labelKey: "menu.items.shorts", href: "/shorts", isHighlight: true },
       { icon: MessageSquare, labelKey: "menu.items.community", href: "/board-hub", isHighlight: true },
