@@ -684,27 +684,28 @@ export default function HanjaMindmapDay() {
 
       <AppFooter />
 
-      {/* 루트 상세 모달 - 언어스위칭 100% 적용 */}
+      {/* 루트 상세 모달 - 최고급 UX/UI 적용 */}
       <AnimatePresence>
         {selectedRoot && (
           <Dialog open={!!selectedRoot} onOpenChange={(open) => !open && setSelectedRoot(null)}>
-            <DialogContent className="max-w-lg max-h-[85vh] overflow-auto p-0">
+            <DialogContent className="w-[95vw] max-w-lg p-0 overflow-hidden bg-card border-border/50 shadow-2xl rounded-2xl max-h-[85vh] flex flex-col">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
+                className="flex flex-col h-full"
               >
-                {/* 헤더 */}
-                <div className={`p-6 bg-gradient-to-br ${NODE_COLORS[roots.indexOf(selectedRoot) % NODE_COLORS.length].bg} text-white`}>
-                  <div className="flex items-center gap-4">
-                    <div className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex flex-col items-center justify-center">
-                      <span className="text-3xl font-bold">{selectedRoot.hanja}</span>
-                      <span className="text-sm opacity-90">{selectedRoot.reading_ko}</span>
+                {/* 헤더 - 고정 */}
+                <div className={`p-4 sm:p-6 bg-gradient-to-br ${NODE_COLORS[roots.indexOf(selectedRoot) % NODE_COLORS.length].bg} text-white flex-shrink-0`}>
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-sm flex flex-col items-center justify-center flex-shrink-0">
+                      <span className="text-2xl sm:text-3xl font-bold">{selectedRoot.hanja}</span>
+                      <span className="text-xs sm:text-sm opacity-90">{selectedRoot.reading_ko}</span>
                     </div>
-                    <div>
-                      <h2 className="text-2xl font-bold">{getRootMeaning(selectedRoot)}</h2>
+                    <div className="min-w-0 flex-1">
+                      <h2 className="text-xl sm:text-2xl font-bold truncate">{getRootMeaning(selectedRoot)}</h2>
                       {!isKorean && (
-                        <p className="text-white/80 text-sm mt-1">
+                        <p className="text-white/80 text-xs sm:text-sm mt-1 truncate">
                           {LANGUAGE_FLAGS.ko} {selectedRoot.meaning_ko}
                         </p>
                       )}
@@ -712,59 +713,62 @@ export default function HanjaMindmapDay() {
                   </div>
                 </div>
 
-                <div className="p-6">
-                  {/* 단어 목록 */}
-                  <div className="space-y-3">
-                    <h4 className="font-bold text-foreground flex items-center gap-2">
-                      <BookOpen className="w-4 h-4 text-primary" />
-                      {t('hanjaMindmapDay.relatedWords', '관련 단어')} 
-                      <Badge variant="secondary" className="ml-auto">
-                        {getWordsForRoot(selectedRoot.id).length}
-                      </Badge>
-                    </h4>
-                    
-                    <div className="space-y-2">
-                      {getWordsForRoot(selectedRoot.id).map((word) => {
-                        const isMastered = masteredWords.has(word.id);
-                        
-                        return (
-                          <motion.div
-                            key={word.id}
-                            whileHover={{ scale: 1.01, x: 4 }}
-                            className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                              isMastered 
-                                ? "bg-primary/10 border-primary/30" 
-                                : "bg-card border-border hover:border-primary/50 hover:shadow-md"
-                            }`}
-                            onClick={() => setSelectedWord(word)}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    toggleMastered(word.id);
-                                  }}
-                                  className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all ${
-                                    isMastered 
-                                      ? "bg-primary border-primary text-white scale-110" 
-                                      : "border-muted-foreground/30 hover:border-primary hover:scale-110"
-                                  }`}
-                                >
-                                  {isMastered && <Check className="w-4 h-4" />}
-                                </button>
-                                <div>
-                                  <p className="font-bold text-lg text-foreground">{word.word}</p>
-                                  <p className="text-sm text-muted-foreground">
-                                    {getWordMeaning(word)}
-                                  </p>
+                {/* 스크롤 가능한 단어 목록 */}
+                <div className="flex-1 overflow-y-auto overscroll-contain">
+                  <div className="p-4 sm:p-6">
+                    <div className="space-y-3">
+                      <h4 className="font-bold text-foreground flex items-center gap-2 text-sm sm:text-base sticky top-0 bg-card py-2 -mt-2">
+                        <BookOpen className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span>{t('hanjaMindmapDay.relatedWords', '관련 단어')}</span>
+                        <Badge variant="secondary" className="ml-auto text-xs">
+                          {getWordsForRoot(selectedRoot.id).length}
+                        </Badge>
+                      </h4>
+                      
+                      <div className="space-y-2">
+                        {getWordsForRoot(selectedRoot.id).map((word) => {
+                          const isMastered = masteredWords.has(word.id);
+                          
+                          return (
+                            <motion.div
+                              key={word.id}
+                              whileHover={{ scale: 1.01 }}
+                              whileTap={{ scale: 0.99 }}
+                              className={`p-3 sm:p-4 rounded-xl border-2 cursor-pointer transition-all active:scale-[0.98] ${
+                                isMastered 
+                                  ? "bg-primary/10 border-primary/30" 
+                                  : "bg-card border-border hover:border-primary/50 hover:shadow-md"
+                              }`}
+                              onClick={() => setSelectedWord(word)}
+                            >
+                              <div className="flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-3 min-w-0 flex-1">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      toggleMastered(word.id);
+                                    }}
+                                    className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
+                                      isMastered 
+                                        ? "bg-primary border-primary text-white" 
+                                        : "border-muted-foreground/30 hover:border-primary"
+                                    }`}
+                                  >
+                                    {isMastered && <Check className="w-3 h-3 sm:w-4 sm:h-4" />}
+                                  </button>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="font-bold text-base sm:text-lg text-foreground truncate">{word.word}</p>
+                                    <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                                      {getWordMeaning(word)}
+                                    </p>
+                                  </div>
                                 </div>
+                                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground flex-shrink-0" />
                               </div>
-                              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                            </div>
-                          </motion.div>
-                        );
-                      })}
+                            </motion.div>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -774,124 +778,133 @@ export default function HanjaMindmapDay() {
         )}
       </AnimatePresence>
 
-      {/* 단어 상세 모달 - 정의 + 예문 표시 */}
+      {/* 단어 상세 모달 - 최고급 UX/UI 적용 */}
       <AnimatePresence>
         {selectedWord && (
           <Dialog open={!!selectedWord} onOpenChange={(open) => !open && setSelectedWord(null)}>
-            <DialogContent className="max-w-md p-0 overflow-hidden">
+            <DialogContent className="w-[95vw] max-w-lg p-0 overflow-hidden bg-card border-border/50 shadow-2xl rounded-2xl max-h-[90vh] flex flex-col">
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
+                className="flex flex-col h-full"
               >
-                {/* 헤더 */}
-                <div className="p-6 bg-gradient-to-br from-primary/10 to-secondary/10 border-b">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="text-3xl font-bold text-foreground flex items-center gap-2">
+                {/* 헤더 - 고정 */}
+                <div className="p-4 sm:p-6 bg-gradient-to-br from-primary/15 via-primary/10 to-secondary/10 border-b border-border/50 flex-shrink-0">
+                  <div className="flex items-center gap-3">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-primary/20 flex items-center justify-center">
+                      <span className="text-2xl sm:text-3xl font-bold text-primary">{selectedWord.word}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h2 className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2 truncate">
                         {selectedWord.word}
                         {masteredWords.has(selectedWord.id) && (
-                          <Star className="w-6 h-6 text-yellow-500 fill-yellow-500" />
+                          <Star className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500 fill-yellow-500 flex-shrink-0" />
                         )}
                       </h2>
+                      <p className="text-sm text-muted-foreground mt-0.5 truncate">
+                        {getWordMeaning(selectedWord)}
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-6 space-y-5">
-                  {/* 한국어 의미 */}
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                      {LANGUAGE_FLAGS.ko}
-                      <span>한국어</span>
-                    </div>
-                    <p className="text-lg text-foreground font-medium">
-                      {selectedWord.meaning_ko || selectedWord.definition_ko || "-"}
-                    </p>
-                  </div>
-
-                  {/* 사용자 언어 의미 (한국어가 아닌 경우) */}
-                  {!isKorean && (
-                    <>
-                      <Separator />
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                          {LANGUAGE_FLAGS[currentLang] || "🌐"}
-                          <span>{getCurrentLanguageName()}</span>
-                        </div>
-                        <p className="text-lg text-foreground font-medium">
-                          {getWordDefinition(selectedWord) || getWordMeaning(selectedWord) || "-"}
+                {/* 스크롤 가능한 컨텐츠 영역 */}
+                <div className="flex-1 overflow-y-auto overscroll-contain">
+                  <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+                    {/* 한국어 의미 */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-primary uppercase tracking-wider">
+                        <span className="text-base">{LANGUAGE_FLAGS.ko}</span>
+                        <span>한국어</span>
+                      </div>
+                      <div className="p-3 sm:p-4 rounded-xl bg-muted/50 border border-border/50">
+                        <p className="text-base sm:text-lg text-foreground font-medium leading-relaxed">
+                          {selectedWord.definition_ko || selectedWord.meaning_ko || "-"}
                         </p>
                       </div>
-                    </>
-                  )}
+                    </div>
 
-                  {/* 예문 섹션 */}
-                  {selectedWord.example_sentence && (
-                    <>
-                      <Separator />
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    {/* 사용자 언어 의미 (한국어가 아닌 경우) */}
+                    {!isKorean && (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-primary uppercase tracking-wider">
+                          <span className="text-base">{LANGUAGE_FLAGS[currentLang] || "🌐"}</span>
+                          <span>{getCurrentLanguageName()}</span>
+                        </div>
+                        <div className="p-3 sm:p-4 rounded-xl bg-primary/5 border border-primary/20">
+                          <p className="text-base sm:text-lg text-foreground font-medium leading-relaxed">
+                            {getWordDefinition(selectedWord) || getWordMeaning(selectedWord) || "-"}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 예문 섹션 */}
+                    {selectedWord.example_sentence && (
+                      <div className="space-y-3 pt-2">
+                        <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
                           <Lightbulb className="w-4 h-4" />
                           <span>{t('hanjaMindmapDay.exampleSentence', '예문')}</span>
                         </div>
                         
                         {/* 한국어 예문 */}
-                        <Card className="p-4 bg-primary/5 border-primary/20">
-                          <div className="flex items-start gap-2">
-                            <span className="text-lg">{LANGUAGE_FLAGS.ko}</span>
-                            <p className="text-foreground font-medium leading-relaxed">
+                        <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border border-amber-200/50 dark:border-amber-800/50">
+                          <div className="flex items-start gap-2 sm:gap-3">
+                            <span className="text-base sm:text-lg flex-shrink-0 mt-0.5">{LANGUAGE_FLAGS.ko}</span>
+                            <p className="text-sm sm:text-base text-foreground font-medium leading-relaxed break-words">
                               {selectedWord.example_sentence}
                             </p>
                           </div>
-                        </Card>
+                        </div>
                         
                         {/* 번역된 예문 (한국어가 아닌 경우) */}
                         {!isKorean && getExampleTranslation(selectedWord) && (
-                          <Card className="p-4 bg-muted/50">
-                            <div className="flex items-start gap-2">
-                              <span className="text-lg">{LANGUAGE_FLAGS[currentLang] || "🌐"}</span>
-                              <p className="text-foreground leading-relaxed">
+                          <div className="p-3 sm:p-4 rounded-xl bg-muted/50 border border-border/50">
+                            <div className="flex items-start gap-2 sm:gap-3">
+                              <span className="text-base sm:text-lg flex-shrink-0 mt-0.5">{LANGUAGE_FLAGS[currentLang] || "🌐"}</span>
+                              <p className="text-sm sm:text-base text-foreground leading-relaxed break-words">
                                 {getExampleTranslation(selectedWord)}
                               </p>
                             </div>
-                          </Card>
+                          </div>
                         )}
                       </div>
-                    </>
-                  )}
+                    )}
 
-                  {/* 예문이 없는 경우 안내 */}
-                  {!selectedWord.example_sentence && (
-                    <>
-                      <Separator />
-                      <div className="text-center py-4 text-muted-foreground text-sm">
-                        <Lightbulb className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                        <p>{t('hanjaMindmapDay.noExample', '예문이 아직 준비되지 않았습니다.')}</p>
+                    {/* 예문이 없는 경우 안내 */}
+                    {!selectedWord.example_sentence && (
+                      <div className="text-center py-6 sm:py-8">
+                        <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-3 rounded-full bg-muted/50 flex items-center justify-center">
+                          <Lightbulb className="w-6 h-6 sm:w-7 sm:h-7 text-muted-foreground/50" />
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {t('hanjaMindmapDay.noExample', '예문이 아직 준비되지 않았습니다.')}
+                        </p>
                       </div>
-                    </>
-                  )}
+                    )}
+                  </div>
                 </div>
 
-                {/* 하단 버튼 */}
-                <div className="p-4 border-t bg-muted/30">
+                {/* 하단 버튼 - 고정 */}
+                <div className="p-4 border-t border-border/50 bg-card flex-shrink-0">
                   <Button
                     onClick={() => toggleMastered(selectedWord.id)}
-                    className={`w-full h-12 text-base font-medium ${
+                    className={`w-full h-11 sm:h-12 text-sm sm:text-base font-semibold rounded-xl transition-all ${
                       masteredWords.has(selectedWord.id) 
-                        ? "bg-muted text-muted-foreground hover:bg-muted/80" 
-                        : "bg-primary hover:bg-primary/90"
+                        ? "bg-muted hover:bg-muted/80 text-muted-foreground" 
+                        : "bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-lg shadow-primary/25"
                     }`}
                     variant={masteredWords.has(selectedWord.id) ? "outline" : "default"}
                   >
                     {masteredWords.has(selectedWord.id) ? (
                       <>
-                        <Check className="w-5 h-5 mr-2" />
+                        <Check className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                         {t('hanjaMindmapDay.markUnmastered', '학습 완료 취소')}
                       </>
                     ) : (
                       <>
-                        <Star className="w-5 h-5 mr-2" />
+                        <Star className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                         {t('hanjaMindmapDay.markMastered', '학습 완료')}
                       </>
                     )}
