@@ -826,17 +826,70 @@ const MockExamTest = () => {
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  {/* Audio Controls */}
+                  {/* Audio Controls with Speed Slider */}
                   {isListeningSection && currentQuestion.question_audio_url && (
-                    <Button
-                      variant={isPlaying ? "secondary" : "default"}
-                      size="sm"
-                      onClick={handlePlayAudio}
-                      className="gap-1.5"
-                    >
-                      {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                      {isPlaying ? "재생중" : "듣기"}
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant={isPlaying ? "secondary" : "default"}
+                        size="sm"
+                        onClick={handlePlayAudio}
+                        className="gap-1.5"
+                      >
+                        {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                        {isPlaying ? "재생중" : "듣기"}
+                      </Button>
+                      
+                      {/* Speed Control Popover */}
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="gap-1.5 text-xs"
+                          >
+                            <Gauge className="w-3.5 h-3.5" />
+                            {playbackSpeed}x
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-64 p-4" side="bottom" align="end">
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium">재생 속도</span>
+                              <Badge variant="secondary" className="font-mono">
+                                {playbackSpeed.toFixed(1)}x
+                              </Badge>
+                            </div>
+                            <Slider
+                              value={[playbackSpeed]}
+                              onValueChange={handleSpeedChange}
+                              min={0.5}
+                              max={2.0}
+                              step={0.1}
+                              className="w-full"
+                            />
+                            <div className="flex justify-between text-xs text-muted-foreground">
+                              <span>느리게 0.5x</span>
+                              <span>보통 1.0x</span>
+                              <span>빠르게 2.0x</span>
+                            </div>
+                            {/* Quick Speed Presets */}
+                            <div className="grid grid-cols-4 gap-1.5 pt-2 border-t">
+                              {[0.7, 1.0, 1.25, 1.5].map((speed) => (
+                                <Button
+                                  key={speed}
+                                  variant={playbackSpeed === speed ? "default" : "outline"}
+                                  size="sm"
+                                  className="text-xs h-7"
+                                  onClick={() => handleSpeedChange([speed])}
+                                >
+                                  {speed}x
+                                </Button>
+                              ))}
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
                   )}
                   
                   {/* Flag */}

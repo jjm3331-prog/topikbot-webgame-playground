@@ -11,45 +11,43 @@ const corsHeaders = {
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 const COHERE_API_KEY = Deno.env.get("COHERE_API_KEY");
-const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
+// ElevenLabs is deprecated for new generation - using Gemini Flash TTS now
+// const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
-// TTS Voice Presets - Korean Native Voices (High Quality)
-// 사용자 지정 최고 품질 한국어 네이티브 보이스
-const KOREAN_VOICES = {
-  female: "ksaI0TCD9BstzEzlxj4q", // 사용자 지정 여성 목소리
-  male: "WqVy7827vjE2r3jWvbnP",   // 사용자 지정 남성 목소리
+// Gemini Flash TTS Voice Presets - Korean Native Voices (High Quality)
+// 한국어 네이티브 최고 품질 보이스
+const GEMINI_VOICES = {
+  female: "Kore",    // 여성 - 한국어 네이티브급 자연스러움 (추천)
+  male: "Charon",    // 남성 - 차분하고 명확한 발음
+  female_alt: "Aoede", // 여성 대안 - 부드러운 톤
+  male_alt: "Puck",   // 남성 대안 - 젊은 느낌
 } as const;
 
-// eleven_v3 모델의 stability 값은 반드시 [0.0, 0.5, 1.0] 중 하나여야 함
-// 0.0 = Creative, 0.5 = Natural, 1.0 = Robust
+// TTS Presets for different use cases
 const TTS_PRESETS = {
   exam: {
-    voiceId: KOREAN_VOICES.female, // Default to female Korean native
-    stability: 1.0, // Robust - 시험용 명확한 발음
-    similarity_boost: 0.85,
-    style: 0.15,
-    speed: 0.8, // Slower for exam (clear delivery)
+    voiceFemale: GEMINI_VOICES.female,
+    voiceMale: GEMINI_VOICES.male,
+    prompt: "Read clearly and precisely in Korean, like a TOPIK exam audio. Moderate pace, clear pronunciation.",
+    speed: "normal",
   },
   learning: {
-    voiceId: KOREAN_VOICES.female,
-    stability: 1.0, // Robust - 학습용 명확한 발음
-    similarity_boost: 0.8,
-    style: 0.2,
-    speed: 0.75, // Even slower for learners
+    voiceFemale: GEMINI_VOICES.female,
+    voiceMale: GEMINI_VOICES.male,
+    prompt: "Read slowly and clearly in Korean for language learners. Emphasize each word distinctly.",
+    speed: "slow",
   },
   natural: {
-    voiceId: KOREAN_VOICES.male,
-    stability: 0.5, // Natural - 자연스러운 발화
-    similarity_boost: 0.75,
-    style: 0.4,
-    speed: 0.9,
+    voiceFemale: GEMINI_VOICES.female_alt,
+    voiceMale: GEMINI_VOICES.male_alt,
+    prompt: "Read naturally in Korean like a casual conversation. Natural rhythm and intonation.",
+    speed: "normal",
   },
   formal: {
-    voiceId: KOREAN_VOICES.female,
-    stability: 1.0, // Robust - 격식체 명확한 발음
-    similarity_boost: 0.9,
-    style: 0.1,
-    speed: 0.85,
+    voiceFemale: GEMINI_VOICES.female,
+    voiceMale: GEMINI_VOICES.male,
+    prompt: "Read formally in Korean like a news anchor or official announcement. Clear and authoritative.",
+    speed: "normal",
   },
 } as const;
 
@@ -274,7 +272,7 @@ async function ragSearch(
   }
 }
 
-// Generate TTS audio using ElevenLabs with preset
+// Generate TTS audio using Gemini Flash TTS (replaces ElevenLabs)
 // - Removes speaker labels like "남자:"/"여자:" from spoken audio
 // - If multiple speakers are detected, alternates voices per speaker and concatenates segments
 async function generateListeningAudio(
@@ -284,7 +282,7 @@ async function generateListeningAudio(
   supabase: any,
   preset: keyof typeof TTS_PRESETS = "exam",
 ): Promise<string | null> {
-  if (!ELEVENLABS_API_KEY || !script) return null;
+  if (!GEMINI_API_KEY || !script) return null;
 
   const detectSpeaker = (raw: string): { speakerKey: "male" | "female" | "other"; text: string } => {
     const line = raw.trim();
@@ -329,7 +327,7 @@ async function generateListeningAudio(
   };
 
   try {
-    console.log(`🎵 Generating audio for Q${questionNumber} with ${preset} preset...`);
+    console.log(`🎵 Generating Gemini Flash TTS audio for Q${questionNumber} with ${preset} preset...`);
 
     const baseSettings = TTS_PRESETS[preset];
 
@@ -347,9 +345,9 @@ async function generateListeningAudio(
     const isMultiSpeaker = uniqueSpeakers.size >= 2 && (uniqueSpeakers.has("male") || uniqueSpeakers.has("female"));
 
     const voiceBySpeaker: Record<"male" | "female" | "other", string> = {
-      female: KOREAN_VOICES.female, // Seoyeon - Korean native female
-      male: KOREAN_VOICES.male,     // Junwoo - Korean native male
-      other: baseSettings.voiceId,
+      female: baseSettings.voiceFemale,
+      male: baseSettings.voiceMale,
+      other: baseSettings.voiceFemale, // default to female
     };
 
     // Build audio buffer(s)
@@ -357,42 +355,68 @@ async function generateListeningAudio(
 
     for (let i = 0; i < segments.length; i++) {
       const seg = segments[i];
-      const voiceId = isMultiSpeaker ? voiceBySpeaker[seg.speakerKey] : baseSettings.voiceId;
+      const voiceName = isMultiSpeaker ? voiceBySpeaker[seg.speakerKey] : baseSettings.voiceFemale;
 
       // Add a short pause between lines by punctuation (natural for TTS)
       const text = seg.text.endsWith(".") || seg.text.endsWith("?") || seg.text.endsWith("!")
-        ? `${seg.text} ...`
-        : `${seg.text}. ...`;
+        ? `${seg.text}`
+        : `${seg.text}.`;
 
-      const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-        method: "POST",
-        headers: {
-          "xi-api-key": ELEVENLABS_API_KEY,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          text,
-          model_id: "eleven_v3", // 최신 V3 모델
-          output_format: "mp3_44100_128",
-          voice_settings: {
-            stability: baseSettings.stability,
-            similarity_boost: baseSettings.similarity_boost,
-            style: baseSettings.style,
-            speed: baseSettings.speed,
+      // Build style prompt based on preset speed
+      let stylePrompt = baseSettings.prompt;
+      if (baseSettings.speed === "slow") {
+        stylePrompt = "Read slowly and clearly. " + stylePrompt;
+      }
+
+      // Call Gemini Flash TTS via Cloud Text-to-Speech API
+      const response = await fetch(
+        `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        }),
-      });
+          body: JSON.stringify({
+            input: {
+              text,
+              prompt: stylePrompt,
+            },
+            voice: {
+              languageCode: "ko-KR",
+              name: voiceName,
+              model_name: "gemini-2.5-flash-tts",
+            },
+            audioConfig: {
+              audioEncoding: "MP3",
+            },
+          }),
+        }
+      );
 
       if (!response.ok) {
         const t = await response.text().catch(() => "");
-        console.error("ElevenLabs TTS error:", response.status, t);
+        console.error("Gemini Flash TTS error:", response.status, t);
         return null;
       }
 
-      const buf = await response.arrayBuffer();
+      const data = await response.json();
+      const audioContent = data.audioContent;
+
+      if (!audioContent) {
+        console.error("No audio content in Gemini TTS response");
+        return null;
+      }
+
+      // Decode base64 to bytes
+      const binaryString = atob(audioContent);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let j = 0; j < binaryString.length; j++) {
+        bytes[j] = binaryString.charCodeAt(j);
+      }
+
       // Strip ID3 on subsequent segments to avoid repeated headers when concatenating
-      const bytes = i === 0 ? new Uint8Array(buf) : stripLeadingId3(buf);
-      audioParts.push(bytes);
+      const finalBytes = i === 0 ? bytes : stripLeadingId3(bytes.buffer);
+      audioParts.push(finalBytes instanceof Uint8Array ? finalBytes : bytes);
     }
 
     const finalBytes = audioParts.length === 1 ? audioParts[0] : concatBytes(audioParts);
@@ -413,10 +437,10 @@ async function generateListeningAudio(
 
     const { data: urlData } = supabase.storage.from("podcast-audio").getPublicUrl(fileName);
 
-    console.log(`✅ Audio generated for Q${questionNumber} (multiSpeaker: ${isMultiSpeaker})`);
+    console.log(`✅ Gemini TTS audio generated for Q${questionNumber} (multiSpeaker: ${isMultiSpeaker})`);
     return urlData.publicUrl;
   } catch (error) {
-    console.error("TTS generation error:", error);
+    console.error("Gemini TTS generation error:", error);
     return null;
   }
 }
@@ -1327,7 +1351,7 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
         }
 
         // Generate audio for listening questions
-        if (params.section === 'listening' && params.generateAudio !== false && ELEVENLABS_API_KEY) {
+        if (params.section === 'listening' && params.generateAudio !== false && GEMINI_API_KEY) {
           sendProgress("audio", 92, "🎵 TTS 음성 생성 중...");
           
           const ttsPreset = params.ttsPreset || 'exam';
@@ -1507,7 +1531,7 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
     console.log(`✅ Generated ${validQuestions.length} valid questions`);
 
     // Generate audio for listening questions
-    if (params.section === 'listening' && params.generateAudio !== false && ELEVENLABS_API_KEY) {
+    if (params.section === 'listening' && params.generateAudio !== false && GEMINI_API_KEY) {
       const ttsPreset = params.ttsPreset || 'exam';
       
       for (let i = 0; i < validQuestions.length; i++) {
