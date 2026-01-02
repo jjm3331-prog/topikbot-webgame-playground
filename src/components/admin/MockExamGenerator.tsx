@@ -1534,9 +1534,18 @@ const MockExamGenerator = () => {
                                   </Label>
                                   <p className="mt-1 text-sm whitespace-pre-wrap">{question.listening_script}</p>
                                   {question.question_audio_url && (
-                                    <audio controls className="w-full mt-2">
-                                      <source src={question.question_audio_url} type="audio/mpeg" />
-                                    </audio>
+                                    <audio
+                                      controls
+                                      className="w-full mt-2"
+                                      src={question.question_audio_url}
+                                      preload="metadata"
+                                      onError={(e) => {
+                                        console.log("[MockExamGenerator] audio error", {
+                                          url: question.question_audio_url,
+                                          error: (e.currentTarget as HTMLAudioElement).error,
+                                        });
+                                      }}
+                                    />
                                   )}
                                 </div>
                               )}
