@@ -44,7 +44,7 @@ export default function HanjaExampleGenerator() {
   const [showDetails, setShowDetails] = useState(false);
   const [startDay, setStartDay] = useState(1);
   const [endDay, setEndDay] = useState(82);
-  const [batchSize, setBatchSize] = useState(5);
+  const [batchSize, setBatchSize] = useState(3);
   const [pauseRef, setPauseRef] = useState(false);
 
   useEffect(() => {
@@ -67,51 +67,49 @@ export default function HanjaExampleGenerator() {
     });
   };
 
-  const generateForDay = async (dayNumber: number): Promise<{ success: boolean; processed: number; successCount: number; failedCount: number }> => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        throw new Error("Not authenticated");
-      }
+  const generateForDay = async (
+    dayNumber: number,
+  ): Promise<{ success: boolean; processed: number; successCount: number; failedCount: number }> => {
+    const effectiveBatchSize = Math.max(1, Math.min(batchSize, 5));
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/hanja-generate-examples`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${session.access_token}`,
+    // lightweight retry to survive transient gateway hiccups/timeouts
+    for (let attempt = 0; attempt < 4; attempt++) {
+      try {
+        const { data, error } = await supabase.functions.invoke("hanja-generate-examples", {
+          body: {
+            dayNumber,
+            batchSize: effectiveBatchSize,
+            skipExisting: true,
           },
-          body: JSON.stringify({ 
-            dayNumber, 
-            batchSize,
-            skipExisting: true 
-          }),
+        });
+
+        if (error) {
+          throw error;
         }
-      );
 
-      const result = await response.json();
+        const result: any = data;
+        return {
+          success: true,
+          processed: result?.processed || 0,
+          successCount: result?.success || 0,
+          failedCount: result?.failed || 0,
+        };
+      } catch (error: any) {
+        const msg = String(error?.message || error);
+        const waitMs = 800 * Math.pow(2, attempt);
+        console.error(`Day ${dayNumber} generation error (attempt ${attempt + 1}):`, msg);
 
-      if (!response.ok) {
-        throw new Error(result.error || "Unknown error");
+        // quick backoff, then retry
+        await new Promise((r) => setTimeout(r, waitMs));
       }
-
-      return {
-        success: true,
-        processed: result.processed || 0,
-        successCount: result.success || 0,
-        failedCount: result.failed || 0,
-      };
-    } catch (error) {
-      console.error(`Day ${dayNumber} generation error:`, error);
-      return {
-        success: false,
-        processed: 0,
-        successCount: 0,
-        failedCount: 0,
-      };
     }
+
+    return {
+      success: false,
+      processed: 0,
+      successCount: 0,
+      failedCount: 0,
+    };
   };
 
   const startGeneration = async () => {
@@ -348,9 +346,9 @@ export default function HanjaExampleGenerator() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="3">3개씩</SelectItem>
-                  <SelectItem value="5">5개씩</SelectItem>
-                  <SelectItem value="10">10개씩</SelectItem>
+                  <SelectItem value="1">1개씩 (안전)</SelectItem>
+                  <SelectItem value="3">3개씩 (권장)</SelectItem>
+                  <SelectItem value="5">5개씩 (빠름)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -477,7 +475,7 @@ export default function HanjaExampleGenerator() {
           {/* Info */}
           <p className="text-xs text-muted-foreground">
             💡 Lovable AI (Gemini 2.5 Flash)를 사용하여 한국어 예문과 7개국어 번역을 자동 생성합니다.
-            이미 예문이 있는 단어는 건너뜁니다.
+            이미 예문이 있는 단어는 건너뜁니다. 타임아웃 방지를 위해 요청당 처리량을 자동으로 제한합니다.
           </p>
         </CardContent>
       </Card>
