@@ -290,7 +290,7 @@ function parseRootHeader(line: string, nextLine?: string): { meaning_ko: string;
   if (trimmed.startsWith("![")) return null;
   if (trimmed.startsWith("|")) return null;
   if (/^\d+\)/.test(trimmed)) return null;
-  if (/^##\s*\d+\./.test(trimmed)) return null;
+  if (/^#{2,4}\s*\d+\./.test(trimmed)) return null; // Exercise headers like "#### 1." 
   if (/^보기/.test(trimmed)) return null;
   if (trimmed.startsWith("①") || trimmed.startsWith("②") || trimmed.startsWith("③") || trimmed.startsWith("④")) return null;
   
@@ -395,116 +395,112 @@ function parseMarkdownForDay(
   dayNumber: number
 ): { roots: HanjaRoot[]; debug?: { sectionStart: number; sectionEnd: number; sectionLines: number } } {
   const lines = markdown.split("\n");
-  
-  // Find the exact section for this day
-  // Strategy: Find "Day XX" header that is followed by content (### headers with hanja roots)
-  // NOT the table of contents or exercise sections
-  
-  const dayHeaderRe = /^(?:#{1,4}\s*)?Day\s*0?(\d+)\b/i;
-  const exerciseRe = /^#{2,4}\s*\d+\./; // Exercise headers like "#### 1."
-  
-  let sectionStart = -1;
-  let sectionEnd = lines.length;
-  
-  // Find all occurrences of "Day XX" for our day number
-  const occurrences: { start: number; hasContent: boolean }[] = [];
-  
+
+  // Find the best section for this day.
+  // The markdown contains many "Day XX" mentions (cover text, TOC, answer keys).
+  // We pick the candidate section that contains the MOST root headers (#### ... 한자).
+
+  const dayHeaderRe = /^(?:#{1,6}\s*)?Day\s*0?(\d+)\b/i;
+  const exerciseRe = /^#{2,6}\s*\d+\./; // Exercise headers like "#### 1."
+
+  type Candidate = {
+    start: number;
+    end: number;
+    rootHeaders: number;
+  };
+
+  const candidates: Candidate[] = [];
+
   for (let i = 0; i < lines.length; i++) {
     const match = lines[i].trim().match(dayHeaderRe);
-    if (match && parseInt(match[1], 10) === dayNumber) {
-      // Check if this section has actual content (### root headers with hanja)
-      let hasContent = false;
-      for (let j = i + 1; j < Math.min(i + 100, lines.length); j++) {
-        const checkLine = lines[j].trim();
-        
-        // If we hit next Day header, stop checking
-        if (dayHeaderRe.test(checkLine)) {
-          const nextDay = parseInt(checkLine.match(dayHeaderRe)![1], 10);
-          if (nextDay !== dayNumber) break;
-        }
-        
-        // If we find a root header pattern, this section has content
-        if (parseRootHeader(checkLine, lines[j + 1]?.trim())) {
-          hasContent = true;
-          break;
-        }
-        
-        // If we find word lines, this section has content
-        if (parseWordLine(checkLine)) {
-          hasContent = true;
+    if (!match) continue;
+
+    const foundDay = parseInt(match[1], 10);
+    if (foundDay !== dayNumber) continue;
+
+    // Determine candidate end (next Day header for a different day, or next Unit header)
+    let end = lines.length;
+    for (let j = i + 1; j < lines.length; j++) {
+      const t = lines[j].trim();
+
+      const nextDayMatch = t.match(dayHeaderRe);
+      if (nextDayMatch) {
+        const nextDay = parseInt(nextDayMatch[1], 10);
+        if (nextDay !== dayNumber) {
+          end = j;
           break;
         }
       }
-      
-      occurrences.push({ start: i, hasContent });
-    }
-  }
-  
-  // Pick the occurrence that has content
-  for (const occ of occurrences) {
-    if (occ.hasContent) {
-      sectionStart = occ.start;
-      break;
-    }
-  }
-  
-  // Fallback: if no content-bearing occurrence found, try first one
-  if (sectionStart === -1 && occurrences.length > 0) {
-    sectionStart = occurrences[0].start;
-  }
-  
-  if (sectionStart === -1) {
-    console.log(`Day ${dayNumber}: No section found`);
-    return { roots: [], debug: { sectionStart: -1, sectionEnd: -1, sectionLines: 0 } };
-  }
-  
-  // Find section end: next Day header (different day number) or next Unit header
-  for (let i = sectionStart + 1; i < lines.length; i++) {
-    const trimmed = lines[i].trim();
-    
-    // Check for next Day header
-    const dayMatch = trimmed.match(dayHeaderRe);
-    if (dayMatch) {
-      const foundDay = parseInt(dayMatch[1], 10);
-      if (foundDay !== dayNumber) {
-        sectionEnd = i;
+
+      // Unit header like "## 2." or "## 2" etc.
+      if (/^##\s*\d+\.?\s*$/.test(t)) {
+        end = j;
         break;
       }
     }
-    
-    // Check for Unit header like "## 2" (standalone number) or "## 현대 문화와"
-    if (/^##\s+\d+\s*$/.test(trimmed)) {
-      sectionEnd = i;
-      break;
+
+    // Count root headers in this candidate slice.
+    let rootHeaders = 0;
+    for (let k = i + 1; k < end; k++) {
+      const t = lines[k].trim();
+      if (exerciseRe.test(t)) break; // stop at exercises/answer section
+
+      if (/^#{3,6}\s+/.test(t)) {
+        const info = parseRootHeader(t, lines[k + 1]);
+        if (info?.hanja) rootHeaders++;
+      }
     }
+
+    candidates.push({ start: i, end, rootHeaders });
   }
-  
+
+  // Choose the candidate with the most root headers; on tie, choose the later one
+  let best: Candidate | null = null;
+  for (const c of candidates) {
+    if (!best) {
+      best = c;
+      continue;
+    }
+    if (c.rootHeaders > best.rootHeaders) best = c;
+    else if (c.rootHeaders === best.rootHeaders && c.start > best.start) best = c;
+  }
+
+  const sectionStart = best?.start ?? -1;
+  const sectionEnd = best?.end ?? -1;
+
+  if (sectionStart === -1 || sectionEnd === -1) {
+    console.log(`Day ${dayNumber}: No section found`);
+    return { roots: [], debug: { sectionStart: -1, sectionEnd: -1, sectionLines: 0 } };
+  }
+
   const sectionLines = lines.slice(sectionStart, sectionEnd);
-  
-  console.log(`Day ${dayNumber}: Section from line ${sectionStart} to ${sectionEnd} (${sectionLines.length} lines)`);
-  
+
+  console.log(
+    `Day ${dayNumber}: Section from line ${sectionStart} to ${sectionEnd} (${sectionLines.length} lines), rootHeaders=${best?.rootHeaders ?? 0}`
+  );
+
   // Parse the section to extract roots and words
   const roots: HanjaRoot[] = [];
   let currentRoot: HanjaRoot | null = null;
   let collectingMeanings = false;
   let meaningLines: string[] = [];
   let skipNextLine = false;
-  
+
   for (let i = 0; i < sectionLines.length; i++) {
     if (skipNextLine) {
       skipNextLine = false;
       continue;
     }
-    
+
     const line = sectionLines[i];
     const trimmed = line.trim();
     const nextLine = sectionLines[i + 1];
-    
-    // Skip exercises section (once we hit exercises, stop parsing)
+
+    // Stop when the exercises section begins
     if (exerciseRe.test(trimmed)) {
       break;
     }
-    
+
     // Try to parse as root header
     const rootInfo = parseRootHeader(trimmed, nextLine);
     if (rootInfo && rootInfo.hanja) {
@@ -512,7 +508,7 @@ function parseMarkdownForDay(
       if (currentRoot && currentRoot.words.length > 0) {
         roots.push(currentRoot);
       }
-      
+
       currentRoot = {
         meaning_ko: rootInfo.meaning_ko,
         reading_ko: rootInfo.reading_ko,
@@ -523,10 +519,10 @@ function parseMarkdownForDay(
         meaning_vi: "",
         words: [],
       };
-      
+
       collectingMeanings = true;
       meaningLines = [];
-      
+
       // If this was a two-line pattern, skip the next line
       if (nextLine && /^[가-힣\/\s]+(?:하다)?$/.test(trimmed) && trimmed.length < 30) {
         const nextTrimmed = nextLine.trim();
@@ -534,18 +530,16 @@ function parseMarkdownForDay(
           skipNextLine = true;
         }
       }
-      
+
       continue;
     }
-    
+
     // If we have a current root, try to collect meanings or words
     if (currentRoot) {
       // Collect root meanings (up to 4 lines after header: en, ja, zh, vi)
       if (collectingMeanings && meaningLines.length < 4) {
-        // Check if this is a word line (has 4 slash-separated parts)
         const wordInfo = parseWordLine(trimmed);
         if (wordInfo) {
-          // Stop collecting meanings, this is a word
           collectingMeanings = false;
           if (meaningLines.length > 0) {
             currentRoot.meaning_en = meaningLines[0] || "";
@@ -556,8 +550,8 @@ function parseMarkdownForDay(
           currentRoot.words.push(wordInfo);
           continue;
         }
-        
-        // Check if this looks like a meaning line (short, no slashes, not a header)
+
+        // Meaning lines are short, no slashes, not headers
         if (trimmed && !trimmed.includes("/") && !trimmed.startsWith("#") && trimmed.length < 100) {
           meaningLines.push(trimmed);
           if (meaningLines.length === 4) {
@@ -570,37 +564,41 @@ function parseMarkdownForDay(
           continue;
         }
       }
-      
-      // Try to parse as word line
+
       const wordInfo = parseWordLine(trimmed);
       if (wordInfo) {
         currentRoot.words.push(wordInfo);
       }
     }
   }
-  
+
   // Don't forget the last root
   if (currentRoot && currentRoot.words.length > 0) {
     roots.push(currentRoot);
   }
-  
+
   // Log summary
   if (roots.length > 0) {
     console.log(`Day ${dayNumber}: Parsed ${roots.length} roots`);
-    console.log(`  First root: ${roots[0].meaning_ko} ${roots[0].reading_ko}${roots[0].hanja}, ${roots[0].words.length} words`);
+    console.log(
+      `  First root: ${roots[0].meaning_ko} ${roots[0].reading_ko}${roots[0].hanja}, ${roots[0].words.length} words`
+    );
     if (roots.length > 1) {
-      console.log(`  Second root: ${roots[1].meaning_ko} ${roots[1].reading_ko}${roots[1].hanja}, ${roots[1].words.length} words`);
+      console.log(
+        `  Second root: ${roots[1].meaning_ko} ${roots[1].reading_ko}${roots[1].hanja}, ${roots[1].words.length} words`
+      );
     }
   } else {
     console.log(`Day ${dayNumber}: No roots parsed`);
   }
-  
-  return { 
-    roots, 
-    debug: { 
-      sectionStart, 
-      sectionEnd, 
-      sectionLines: sectionLines.length 
-    } 
+
+  return {
+    roots,
+    debug: {
+      sectionStart,
+      sectionEnd,
+      sectionLines: sectionLines.length,
+    },
   };
 }
+
