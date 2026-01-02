@@ -2850,6 +2850,20 @@
       "title": "Content is being prepared",
       "desc": "Hanja mindmap content will be updated soon."
     }
+  },
+  "hanjaMindmapDay": {
+    "noData": "No data",
+    "noDataDesc": "No data for Day {{day}}.",
+    "loading": "Loading Day {{day}}...",
+    "loginRequired": "Login required",
+    "loginDesc": "Please log in to save your progress.",
+    "backToList": "Back to list",
+    "wordsProgress": "{{mastered}}/{{total}} words",
+    "prevDay": "Previous Day",
+    "nextDay": "Next Day",
+    "relatedWords": "Related Words",
+    "markMastered": "Mark as mastered",
+    "markUnmastered": "Unmark mastered"
   }
 }
 

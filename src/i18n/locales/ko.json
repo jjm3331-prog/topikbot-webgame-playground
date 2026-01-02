@@ -2988,6 +2988,20 @@
       "title": "데이터 준비 중",
       "desc": "한자어 마인드맵 콘텐츠가 곧 업데이트됩니다."
     }
+  },
+  "hanjaMindmapDay": {
+    "noData": "데이터 없음",
+    "noDataDesc": "Day {{day}} 데이터가 없습니다.",
+    "loading": "Day {{day}} 로딩 중...",
+    "loginRequired": "로그인 필요",
+    "loginDesc": "학습 진도를 저장하려면 로그인하세요.",
+    "backToList": "목록으로",
+    "wordsProgress": "{{mastered}}/{{total}} 단어",
+    "prevDay": "이전 Day",
+    "nextDay": "다음 Day",
+    "relatedWords": "관련 단어",
+    "markMastered": "학습 완료",
+    "markUnmastered": "학습 완료 취소"
   }
 }
 

@@ -2571,6 +2571,20 @@
       "title": "Контент готовится",
       "desc": "Контент mindmap ханча скоро будет обновлён."
     }
+  },
+  "hanjaMindmapDay": {
+    "noData": "Нет данных",
+    "noDataDesc": "Нет данных для Day {{day}}.",
+    "loading": "Загрузка Day {{day}}...",
+    "loginRequired": "Требуется вход",
+    "loginDesc": "Войдите, чтобы сохранить прогресс.",
+    "backToList": "Назад к списку",
+    "wordsProgress": "{{mastered}}/{{total}} слов",
+    "prevDay": "Предыдущий Day",
+    "nextDay": "Следующий Day",
+    "relatedWords": "Связанные слова",
+    "markMastered": "Отметить как изученное",
+    "markUnmastered": "Снять отметку"
   }
 }
 

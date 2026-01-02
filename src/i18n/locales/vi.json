@@ -2869,6 +2869,20 @@
       "title": "Đang chuẩn bị dữ liệu",
       "desc": "Nội dung mindmap Hán Hàn sẽ sớm được cập nhật."
     }
+  },
+  "hanjaMindmapDay": {
+    "noData": "Không có dữ liệu",
+    "noDataDesc": "Không có dữ liệu cho Day {{day}}.",
+    "loading": "Đang tải Day {{day}}...",
+    "loginRequired": "Yêu cầu đăng nhập",
+    "loginDesc": "Vui lòng đăng nhập để lưu tiến độ.",
+    "backToList": "Quay lại danh sách",
+    "wordsProgress": "{{mastered}}/{{total}} từ",
+    "prevDay": "Day trước",
+    "nextDay": "Day tiếp theo",
+    "relatedWords": "Từ liên quan",
+    "markMastered": "Đánh dấu đã học",
+    "markUnmastered": "Bỏ đánh dấu"
   }
 }
 
