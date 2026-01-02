@@ -11,38 +11,39 @@ const corsHeaders = {
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 const COHERE_API_KEY = Deno.env.get("COHERE_API_KEY");
-// ElevenLabs is deprecated - using Gemini 2.5 Flash TTS now
+const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
-// Gemini 2.5 Flash TTS Voice Presets
-// Korean optimized voices
-const GEMINI_VOICES = {
-  female: "Kore",      // 여성 - 한국어 최적화 (추천)
-  male: "Charon",      // 남성 - 차분하고 명확
-  female_alt: "Aoede", // 여성 대안
-  male_alt: "Puck",    // 남성 대안
+// ============================================
+// ElevenLabs Korean Native Voice Presets (복구)
+// ============================================
+// 기존에 사용하던 커스텀 한국어 네이티브 보이스 ID
+const ELEVENLABS_VOICES = {
+  female: "ksaI0TCD9BstzEzlxj4q",
+  male: "WqVy7827vjE2r3jWvbnP",
 } as const;
 
 // TTS Presets for different use cases
 const TTS_PRESETS = {
   exam: {
-    voiceFemale: GEMINI_VOICES.female,
-    voiceMale: GEMINI_VOICES.male,
-    prompt: "Read clearly and precisely in Korean, like a TOPIK exam audio. Moderate pace, clear pronunciation.",
+    voiceFemale: ELEVENLABS_VOICES.female,
+    voiceMale: ELEVENLABS_VOICES.male,
+    // ElevenLabs는 별도 스타일 프롬프트를 받지 않으므로 로그/설명용
+    prompt: "TOPIK 시험용: 명확하고 또렷한 발음, 중간 속도",
   },
   learning: {
-    voiceFemale: GEMINI_VOICES.female,
-    voiceMale: GEMINI_VOICES.male,
-    prompt: "Read slowly and clearly in Korean for language learners. Emphasize each word distinctly.",
+    voiceFemale: ELEVENLABS_VOICES.female,
+    voiceMale: ELEVENLABS_VOICES.male,
+    prompt: "학습용: 천천히 또렷하게",
   },
   natural: {
-    voiceFemale: GEMINI_VOICES.female_alt,
-    voiceMale: GEMINI_VOICES.male_alt,
-    prompt: "Read naturally in Korean like a casual conversation. Natural rhythm and intonation.",
+    voiceFemale: ELEVENLABS_VOICES.female,
+    voiceMale: ELEVENLABS_VOICES.male,
+    prompt: "자연스러운 대화 톤",
   },
   formal: {
-    voiceFemale: GEMINI_VOICES.female,
-    voiceMale: GEMINI_VOICES.male,
-    prompt: "Read formally in Korean like a news anchor or official announcement. Clear and authoritative.",
+    voiceFemale: ELEVENLABS_VOICES.female,
+    voiceMale: ELEVENLABS_VOICES.male,
+    prompt: "격식 있는 톤",
   },
 } as const;
 
@@ -267,63 +268,46 @@ async function ragSearch(
   }
 }
 
-// Generate TTS audio using Gemini 2.5 Flash TTS
+// Generate TTS audio using ElevenLabs (복구)
 // - Removes speaker labels like "남자:"/"여자:" from spoken audio
-// - If multiple speakers are detected, alternates voices per speaker and concatenates segments
+// - If multiple speakers are detected, alternates voices per speaker and concatenates MP3 segments
 
-async function synthesizeGeminiTTS(
-  text: string, 
-  voiceName: string, 
-  stylePrompt: string
+async function synthesizeElevenLabsTTS(
+  text: string,
+  voiceId: string,
 ): Promise<Uint8Array> {
-  if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not configured");
+  if (!ELEVENLABS_API_KEY) throw new Error("ELEVENLABS_API_KEY not configured");
 
-  // Use Gemini API directly (generativelanguage.googleapis.com)
-  // This bypasses Cloud Text-to-Speech API restrictions
   const resp = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${GEMINI_API_KEY}`,
+    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "xi-api-key": ELEVENLABS_API_KEY,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
-        contents: [{
-          parts: [{ 
-            text: `${stylePrompt}\n\n${text}` 
-          }]
-        }],
-        generationConfig: {
-          response_modalities: ["AUDIO"],
-          speech_config: {
-            voice_config: {
-              prebuilt_voice_config: {
-                voice_name: voiceName
-              }
-            }
-          }
-        }
+        text,
+        model_id: "eleven_v3",
+        voice_settings: {
+          // 기존 세팅값 복구
+          stability: 1.0,
+          similarity_boost: 0.9,
+          style: 0.2,
+          use_speaker_boost: true,
+        },
       }),
     }
   );
 
   if (!resp.ok) {
     const t = await resp.text().catch(() => "");
-    console.error("Gemini TTS error:", resp.status, t);
-    throw new Error(`Gemini TTS failed (${resp.status}): ${t}`);
+    console.error("ElevenLabs TTS error:", resp.status, t);
+    throw new Error(`ElevenLabs TTS failed (${resp.status})`);
   }
 
-  const data = await resp.json();
-  
-  // Extract audio from Gemini response
-  const audioContent = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-  if (!audioContent) {
-    console.error("No audio in Gemini response:", JSON.stringify(data).slice(0, 500));
-    throw new Error("No audioContent returned from Gemini TTS");
-  }
-
-  const binaryString = atob(audioContent);
-  const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
-  return bytes;
+  const buf = await resp.arrayBuffer();
+  return new Uint8Array(buf);
 }
 
 async function generateListeningAudio(
@@ -333,30 +317,9 @@ async function generateListeningAudio(
   supabase: any,
   preset: keyof typeof TTS_PRESETS = "exam",
 ): Promise<string | null> {
-  if (!GEMINI_API_KEY || !script) return null;
+  if (!script) return null;
 
   const presetCfg = TTS_PRESETS[preset] ?? TTS_PRESETS.exam;
-
-  const sniffAudio = (bytes: Uint8Array): { ext: "mp3" | "wav"; contentType: string } | null => {
-    // WAV: RIFF....WAVE
-    if (
-      bytes.length >= 12 &&
-      bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 &&
-      bytes[8] === 0x57 && bytes[9] === 0x41 && bytes[10] === 0x56 && bytes[11] === 0x45
-    ) {
-      return { ext: "wav", contentType: "audio/wav" };
-    }
-
-    // MP3: ID3 tag or frame sync 0xFF 0xFB/0xF3/0xF2
-    if (bytes.length >= 3 && bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33) {
-      return { ext: "mp3", contentType: "audio/mpeg" };
-    }
-    if (bytes.length >= 2 && bytes[0] === 0xff && (bytes[1] & 0xe0) === 0xe0) {
-      return { ext: "mp3", contentType: "audio/mpeg" };
-    }
-
-    return null;
-  };
 
   const detectSpeaker = (raw: string): { speakerKey: "male" | "female" | "other"; text: string } => {
     const line = raw.trim();
@@ -397,77 +360,51 @@ async function generateListeningAudio(
   };
 
   try {
-    console.log(`🎵 Generating Gemini TTS audio for Q${questionNumber} preset=${preset}...`);
+    console.log(`🎵 Generating ElevenLabs TTS audio for Q${questionNumber} preset=${preset}...`);
 
-    // 1) Generate once first (single voice) so we can reliably detect the format.
-    //    If Gemini returns WAV (common), concatenating segments will break the container.
-    const singlePassBytes = await synthesizeGeminiTTS(
-      script.trim(),
-      presetCfg.voiceFemale,
-      presetCfg.prompt,
-    );
-    const detected = sniffAudio(singlePassBytes);
+    const rawLines = script
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter(Boolean);
 
-    let finalBytes = singlePassBytes;
-    let contentType = detected?.contentType ?? "application/octet-stream";
-    let ext: "mp3" | "wav" = detected?.ext ?? "wav";
+    const segments = rawLines.length
+      ? rawLines.map(detectSpeaker).filter((s) => s.text)
+      : [{ speakerKey: "other" as const, text: script.trim() }];
 
-    // 2) If it's MP3, we can do multi-speaker by concatenating MP3 frames (strip ID3 after first).
-    if (detected?.ext === "mp3") {
-      const rawLines = script
-        .split(/\r?\n/)
-        .map((l) => l.trim())
-        .filter(Boolean);
+    const uniqueSpeakers = new Set(segments.map((s) => s.speakerKey));
+    const isMultiSpeaker =
+      uniqueSpeakers.size >= 2 && (uniqueSpeakers.has("male") || uniqueSpeakers.has("female"));
 
-      const segments = rawLines.length
-        ? rawLines.map(detectSpeaker).filter((s) => s.text)
-        : [{ speakerKey: "other" as const, text: script.trim() }];
+    let finalBytes: Uint8Array;
 
-      const uniqueSpeakers = new Set(segments.map((s) => s.speakerKey));
-      const isMultiSpeaker =
-        uniqueSpeakers.size >= 2 && (uniqueSpeakers.has("male") || uniqueSpeakers.has("female"));
+    if (isMultiSpeaker) {
+      const audioParts: Uint8Array[] = [];
 
-      if (isMultiSpeaker) {
-        const audioParts: Uint8Array[] = [];
+      for (let i = 0; i < segments.length; i++) {
+        const seg = segments[i];
+        const voiceId = seg.speakerKey === "male" ? presetCfg.voiceMale : presetCfg.voiceFemale;
 
-        for (let i = 0; i < segments.length; i++) {
-          const seg = segments[i];
-          const voiceName = seg.speakerKey === "male" ? presetCfg.voiceMale : presetCfg.voiceFemale;
+        const t = seg.text.endsWith(".") || seg.text.endsWith("?") || seg.text.endsWith("!")
+          ? seg.text
+          : `${seg.text}.`;
 
-          const t = seg.text.endsWith(".") || seg.text.endsWith("?") || seg.text.endsWith("!")
-            ? seg.text
-            : `${seg.text}.`;
-
-          const bytes = await synthesizeGeminiTTS(t, voiceName, presetCfg.prompt);
-          const withoutId3 = i === 0 ? bytes : stripLeadingId3(bytes.buffer);
-          audioParts.push(withoutId3);
-        }
-
-        finalBytes = audioParts.length === 1 ? audioParts[0] : concatBytes(audioParts);
-        contentType = "audio/mpeg";
-        ext = "mp3";
-      } else {
-        // Single speaker MP3 already generated in singlePassBytes
-        contentType = "audio/mpeg";
-        ext = "mp3";
+        const bytes = await synthesizeElevenLabsTTS(t, voiceId);
+        const withoutId3 = i === 0 ? bytes : stripLeadingId3(bytes.buffer);
+        audioParts.push(withoutId3);
       }
+
+      finalBytes = audioParts.length === 1 ? audioParts[0] : concatBytes(audioParts);
     } else {
-      // WAV path (or unknown): keep singlePassBytes only to ensure it's playable.
-      // We'll treat unknown as WAV to maximize browser compatibility.
-      contentType = detected?.contentType ?? "audio/wav";
-      ext = detected?.ext ?? "wav";
+      // Single voice: 그대로 합성
+      finalBytes = await synthesizeElevenLabsTTS(script.trim(), presetCfg.voiceFemale);
     }
 
-    console.log(
-      `🔎 TTS audio detected format for Q${questionNumber}: ext=${ext}, contentType=${contentType}, bytes=${finalBytes.length}`,
-    );
-
-    const fileName = `mock-exam/${examType}/listening_q${questionNumber}_${Date.now()}.${ext}`;
+    const fileName = `mock-exam/${examType}/listening_q${questionNumber}_${Date.now()}.mp3`;
 
     const { error: uploadError } = await supabase.storage
       .from("podcast-audio")
       .upload(fileName, finalBytes, {
-        contentType,
+        contentType: "audio/mpeg",
         upsert: true,
       });
 
@@ -477,10 +414,10 @@ async function generateListeningAudio(
     }
 
     const { data: urlData } = supabase.storage.from("podcast-audio").getPublicUrl(fileName);
-    console.log(`✅ Gemini TTS audio generated for Q${questionNumber}`);
+    console.log(`✅ ElevenLabs TTS audio generated for Q${questionNumber}`);
     return urlData.publicUrl;
   } catch (error) {
-    console.error("Gemini TTS generation error:", error);
+    console.error("ElevenLabs TTS generation error:", error);
     return null;
   }
 }
