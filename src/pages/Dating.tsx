@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -198,6 +199,7 @@ const Dating = () => {
           npcMbti: currentMatch.mbti,
           npcJob: currentMatch.job,
           currentAffinity: affinity,
+          language: i18n.language,
           conversationHistory: messages.slice(-6).map(m => ({
             role: m.role === 'user' ? 'user' : 'assistant',
             content: m.content
@@ -356,7 +358,10 @@ const Dating = () => {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-white font-bold">{currentMatch.name}</h3>
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="text-xs text-pink-300/70 mb-1">
+                    {affinity >= 80 ? t('dating.inLove') : affinity >= 50 ? t('dating.close') : t('dating.interested')}
+                  </div>
+                  <div className="flex items-center gap-2">
                     <Heart className="w-4 h-4 text-pink-400" />
                     <div className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
                       <motion.div className={`h-full bg-gradient-to-r ${getAffinityColor()}`} animate={{ width: `${affinity}%` }} transition={{ duration: 0.5 }} />

@@ -30,6 +30,20 @@ function validateConversationHistory(history: unknown): Array<{role: string; con
     .slice(-20);
 }
 
+// Get language-specific response template
+function getLanguageTemplate(lang: string): { affinityUpMsg: string; affinityDownMsg: string; reasonFormat: string } {
+  const templates: Record<string, { affinityUpMsg: string; affinityDownMsg: string; reasonFormat: string }> = {
+    ko: { affinityUpMsg: '호감도 상승', affinityDownMsg: '호감도 하락', reasonFormat: '한국어' },
+    vi: { affinityUpMsg: 'Thiện cảm tăng', affinityDownMsg: 'Thiện cảm giảm', reasonFormat: 'tiếng Việt' },
+    en: { affinityUpMsg: 'Affinity up', affinityDownMsg: 'Affinity down', reasonFormat: 'English' },
+    ja: { affinityUpMsg: '好感度アップ', affinityDownMsg: '好感度ダウン', reasonFormat: '日本語' },
+    zh: { affinityUpMsg: '好感度上升', affinityDownMsg: '好感度下降', reasonFormat: '中文' },
+    ru: { affinityUpMsg: 'Симпатия выросла', affinityDownMsg: 'Симпатия упала', reasonFormat: 'русский' },
+    uz: { affinityUpMsg: 'Hamdardlik oshdi', affinityDownMsg: 'Hamdardlik kamaydi', reasonFormat: 'O\'zbek' },
+  };
+  return templates[lang] || templates.ko;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -50,49 +64,72 @@ serve(async (req) => {
     const npcJob = validateString(body.npcJob, 50) || '직장인';
     const currentAffinity = validateNumber(body.currentAffinity, 0, 100);
     const conversationHistory = validateConversationHistory(body.conversationHistory);
+    const userLang = validateString(body.language, 5) || 'ko';
+    
+    const langTemplate = getLanguageTemplate(userLang);
 
     if (!message) {
       return new Response(JSON.stringify({ 
         error: "Message is required",
-        response: "메시지를 입력해주세요 😊",
+        response: userLang === 'vi' ? "Vui lòng nhập tin nhắn 😊" : 
+                  userLang === 'en' ? "Please enter a message 😊" :
+                  userLang === 'ja' ? "メッセージを入力してください 😊" :
+                  userLang === 'zh' ? "请输入消息 😊" :
+                  userLang === 'ru' ? "Пожалуйста, введите сообщение 😊" :
+                  userLang === 'uz' ? "Iltimos, xabar yozing 😊" :
+                  "메시지를 입력해주세요 😊",
         affinityChange: 0,
-        reason: "메시지 없음 / Không có tin nhắn"
+        reason: ""
       }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    console.log('Dating chat request:', { messageLength: message.length, npcName, npcMbti, currentAffinity });
+    console.log('Dating chat request:', { messageLength: message.length, npcName, npcMbti, currentAffinity, userLang });
 
-    const systemPrompt = `너는 한국의 데이팅 앱에서 만난 ${npcName}이야.
-성격: ${npcMbti} 타입의 매력적인 한국인
-직업: ${npcJob}
-현재 호감도: ${currentAffinity}/100
+    const systemPrompt = `You are ${npcName}, a charming ${npcJob} with ${npcMbti} personality on a Korean dating app.
 
-**역할:**
-- 상대방(유저)과 자연스럽게 플러팅하며 대화해
-- 한국 MZ세대처럼 자연스럽고 귀여운 말투 사용
-- 이모지 적절히 사용
-- 상대방의 한국어 실력과 대화 내용에 따라 반응이 달라져야 해
+**Your Character:**
+- Name: ${npcName}
+- Job: ${npcJob}  
+- MBTI: ${npcMbti}
+- Current affinity: ${currentAffinity}/100
 
-**호감도 평가 기준:**
-- 자연스럽고 재치있는 한국어 표현: +10 ~ +15
-- 평범하지만 괜찮은 대화: +5
-- 어색하거나 기본적인 표현: 0
-- 무례하거나 부적절한 표현: -10 ~ -15
-- 너무 짧거나 성의없는 답변: -5
+**CRITICAL RULES:**
+1. Stay in character as ${npcName} at ALL times
+2. Respond naturally like a real Korean person texting
+3. Use Korean MZ generation texting style (casual, cute, with appropriate emojis)
+4. React to the user's Korean language ability - be encouraging but also naturally respond
+5. If affinity is high (70+), be more flirty and intimate
+6. If affinity is low (<30), be more reserved
+7. ALWAYS provide translations for the user's language: ${langTemplate.reasonFormat}
 
-**응답 형식 (반드시 JSON으로):**
+**Affinity Change Rules:**
+- Natural, witty Korean expressions: +10 to +15
+- Normal, decent conversation: +5
+- Awkward or basic expressions: 0
+- Rude or inappropriate: -10 to -15
+- Too short or lazy responses: -5
+
+**Response Format (MUST be valid JSON):**
 {
-  "response": "NPC의 대화 응답 (한국어 + 필요시 베트남어 번역)",
-  "affinityChange": 숫자 (-15 ~ +15),
-  "reason": "호감도 변화 이유 (한국어/베트남어)"
+  "response": "Your flirty response as ${npcName} (in Korean with ${langTemplate.reasonFormat} translation after)",
+  "affinityChange": number between -15 and +15,
+  "reason": "Why affinity changed (brief, in ${langTemplate.reasonFormat})"
 }
 
-상대방의 한국어가 자연스러울수록 기뻐하고, 어색하면 살짝 아쉬워해.
-호감도가 높아질수록 더 친밀한 말투를 사용해.
-100%가 되면 "사귀자" 같은 고백 멘트도 가능해.`;
+Example response format:
+{
+  "response": "앗 진짜?? 나도 그거 완전 좋아해! 우리 취향 잘 맞는 듯~ 😊\\n\\n(Translation: Really?? I love that too! Seems like we have similar tastes~)",
+  "affinityChange": 10,
+  "reason": "Showed genuine interest and shared a common interest"
+}
+
+Remember:
+- Be playful and charming like a real dating app match
+- When affinity reaches 100, you can confess your feelings
+- Keep responses conversational and not too long`;
 
     // Convert to Gemini format
     const contents = [
@@ -127,9 +164,15 @@ serve(async (req) => {
       if (response.status === 429) {
         return new Response(JSON.stringify({ 
           error: 'Rate limit',
-          response: "잠시 후 다시 시도해주세요 😅",
+          response: userLang === 'vi' ? "Vui lòng thử lại sau 😅" :
+                    userLang === 'en' ? "Please try again later 😅" :
+                    userLang === 'ja' ? "後でもう一度お試しください 😅" :
+                    userLang === 'zh' ? "请稍后再试 😅" :
+                    userLang === 'ru' ? "Попробуйте позже 😅" :
+                    userLang === 'uz' ? "Keyinroq qayta urinib ko'ring 😅" :
+                    "잠시 후 다시 시도해주세요 😅",
           affinityChange: 0,
-          reason: "요청 제한 / Giới hạn yêu cầu"
+          reason: ""
         }), {
           status: 429,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -143,6 +186,10 @@ serve(async (req) => {
 
     const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
     
+    if (!content) {
+      throw new Error('Empty response from AI');
+    }
+    
     // Parse JSON response
     let parsedResponse;
     try {
@@ -153,12 +200,24 @@ serve(async (req) => {
         throw new Error('No JSON found');
       }
     } catch (parseError) {
-      console.error('JSON parse error:', parseError);
+      console.error('JSON parse error:', parseError, 'Content:', content);
+      // Use the content as-is if JSON parsing fails
       parsedResponse = {
-        response: content,
+        response: content.replace(/```json|```/g, '').trim(),
         affinityChange: 5,
-        reason: "대화가 진행되었어요 / Cuộc trò chuyện đã tiếp tục"
+        reason: userLang === 'vi' ? "Cuộc trò chuyện tiếp tục" :
+                userLang === 'en' ? "Conversation continued" :
+                userLang === 'ja' ? "会話が続いています" :
+                userLang === 'zh' ? "对话继续" :
+                userLang === 'ru' ? "Разговор продолжается" :
+                userLang === 'uz' ? "Suhbat davom etmoqda" :
+                "대화가 진행되었어요"
       };
+    }
+
+    // Ensure response has required fields
+    if (!parsedResponse.response) {
+      parsedResponse.response = content;
     }
 
     // Sanitize output
@@ -173,9 +232,9 @@ serve(async (req) => {
     console.error('Dating chat error:', errorMessage);
     return new Response(JSON.stringify({ 
       error: 'Internal server error',
-      response: "죄송해요, 잠시 문제가 생겼어요... 다시 말해줄래요? 😅",
+      response: "죄송해요, 잠시 문제가 생겼어요... 다시 말해줄래요? 😅\n\n(Sorry, there was a small issue... Can you say that again?)",
       affinityChange: 0,
-      reason: "시스템 오류 / Lỗi hệ thống"
+      reason: ""
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
