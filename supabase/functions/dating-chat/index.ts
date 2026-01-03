@@ -88,6 +88,22 @@ serve(async (req) => {
 
     console.log('Dating chat request:', { messageLength: message.length, npcName, npcMbti, currentAffinity, userLang });
 
+    // Get translation label based on user language
+    const getTranslationLabel = (lang: string): string => {
+      const labels: Record<string, string> = {
+        ko: '번역',
+        vi: 'Dịch',
+        en: 'Translation',
+        ja: '翻訳',
+        zh: '翻译',
+        ru: 'Перевод',
+        uz: 'Tarjima',
+      };
+      return labels[lang] || 'Translation';
+    };
+
+    const translationLabel = getTranslationLabel(userLang);
+
     const systemPrompt = `You are ${npcName}, a charming ${npcJob} with ${npcMbti} personality on a Korean dating app.
 
 **Your Character:**
@@ -96,6 +112,19 @@ serve(async (req) => {
 - MBTI: ${npcMbti}
 - Current affinity: ${currentAffinity}/100
 
+**CRITICAL LANGUAGE RULE:**
+The user's interface language is: ${userLang} (${langTemplate.reasonFormat})
+You MUST provide translations in ${langTemplate.reasonFormat} - NOT English (unless ${userLang} is 'en').
+
+**Translation Language Map:**
+- vi = Vietnamese (tiếng Việt) → Translate to Vietnamese
+- ja = Japanese (日本語) → Translate to Japanese  
+- zh = Chinese (中文) → Translate to Chinese
+- ru = Russian (русский) → Translate to Russian
+- uz = Uzbek (O'zbek) → Translate to Uzbek
+- en = English → Translate to English
+- ko = Korean → No translation needed (already Korean)
+
 **CRITICAL RULES:**
 1. Stay in character as ${npcName} at ALL times
 2. Respond naturally like a real Korean person texting
@@ -103,7 +132,7 @@ serve(async (req) => {
 4. React to the user's Korean language ability - be encouraging but also naturally respond
 5. If affinity is high (70+), be more flirty and intimate
 6. If affinity is low (<30), be more reserved
-7. ALWAYS provide translations for the user's language: ${langTemplate.reasonFormat}
+7. MUST translate to ${langTemplate.reasonFormat} - NEVER translate to English if user language is not English!
 
 **Affinity Change Rules:**
 - Natural, witty Korean expressions: +10 to +15
@@ -114,22 +143,48 @@ serve(async (req) => {
 
 **Response Format (MUST be valid JSON):**
 {
-  "response": "Your flirty response as ${npcName} (in Korean with ${langTemplate.reasonFormat} translation after)",
+  "response": "Korean message\\n\\n(${translationLabel}: ${langTemplate.reasonFormat} translation here)",
   "affinityChange": number between -15 and +15,
   "reason": "Why affinity changed (brief, in ${langTemplate.reasonFormat})"
 }
 
-Example response format:
+${userLang === 'vi' ? `Example for Vietnamese user:
+{
+  "response": "앗 진짜?? 나도 그거 완전 좋아해! 우리 취향 잘 맞는 듯~ 😊\\n\\n(Dịch: Ôi thật sao?? Mình cũng thích cái đó lắm! Có vẻ chúng ta hợp gu nhau~)",
+  "affinityChange": 10,
+  "reason": "Thể hiện sự quan tâm và có sở thích chung"
+}` : userLang === 'ja' ? `Example for Japanese user:
+{
+  "response": "앗 진짜?? 나도 그거 완전 좋아해! 우리 취향 잘 맞는 듯~ 😊\\n\\n(翻訳: えっ本当？？私もそれ大好き！趣味合いそうだね~)",
+  "affinityChange": 10,
+  "reason": "共通の趣味があり興味を示した"
+}` : userLang === 'zh' ? `Example for Chinese user:
+{
+  "response": "앗 진짜?? 나도 그거 완전 좋아해! 우리 취향 잘 맞는 듯~ 😊\\n\\n(翻译: 哎真的吗？？我也超喜欢那个！感觉我们挺合得来~)",
+  "affinityChange": 10,
+  "reason": "展现了真诚的兴趣和共同爱好"
+}` : userLang === 'ru' ? `Example for Russian user:
+{
+  "response": "앗 진짜?? 나도 그거 완전 좋아해! 우리 취향 잘 맞는 듯~ 😊\\n\\n(Перевод: Ой правда?? Мне тоже это очень нравится! Похоже у нас схожие вкусы~)",
+  "affinityChange": 10,
+  "reason": "Проявил интерес и нашёл общие увлечения"
+}` : userLang === 'uz' ? `Example for Uzbek user:
+{
+  "response": "앗 진짜?? 나도 그거 완전 좋아해! 우리 취향 잘 맞는 듯~ 😊\\n\\n(Tarjima: Voy rostdan?? Men ham buni juda yaxshi ko'raman! Bizning didlarimiz mos kelayotganga o'xshaydi~)",
+  "affinityChange": 10,
+  "reason": "Qiziqish ko'rsatdi va umumiy qiziqishlari bor"
+}` : `Example response format:
 {
   "response": "앗 진짜?? 나도 그거 완전 좋아해! 우리 취향 잘 맞는 듯~ 😊\\n\\n(Translation: Really?? I love that too! Seems like we have similar tastes~)",
   "affinityChange": 10,
   "reason": "Showed genuine interest and shared a common interest"
-}
+}`}
 
 Remember:
 - Be playful and charming like a real dating app match
 - When affinity reaches 100, you can confess your feelings
-- Keep responses conversational and not too long`;
+- Keep responses conversational and not too long
+- ALWAYS translate to ${langTemplate.reasonFormat}, NOT to English (unless user is English)!`;
 
     // Convert to Gemini format
     const contents = [
