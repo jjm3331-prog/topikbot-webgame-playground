@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import i18n from '@/i18n/config';
 import { ArrowLeft, Music, Sparkles, Check, X, Lightbulb, RotateCcw, Trophy, Youtube, Timer, Zap, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +22,13 @@ interface Question {
   hint: string;
   difficulty: string;
   points: number;
+}
+
+interface AIQuiz {
+  question: string;
+  options: string[];
+  correctIndex: number;
+  funFact: string;
 }
 
 const TIMER_DURATION = 20;
@@ -45,6 +53,10 @@ const KPop = () => {
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoKey, setVideoKey] = useState(0);
   const [scoreSaved, setScoreSaved] = useState(false);
+  const [aiQuiz, setAiQuiz] = useState<AIQuiz | null>(null);
+  const [aiQuizLoading, setAiQuizLoading] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [quizAnswered, setQuizAnswered] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -110,6 +122,9 @@ const KPop = () => {
       setGameComplete(false);
       setTimeLeft(TIMER_DURATION);
       setVideoKey((prev) => prev + 1);
+      setAiQuiz(null);
+      setSelectedOption(null);
+      setQuizAnswered(false);
     } catch (error) {
       console.error('[KPop] loadQuestions failed:', error);
       toast.error(t('kpop.loadFailed'));
@@ -168,7 +183,7 @@ const KPop = () => {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(prev => prev + 1);
       setUserAnswer('');
@@ -177,8 +192,41 @@ const KPop = () => {
       setTimeLeft(TIMER_DURATION);
       setVideoLoaded(false);
       setVideoKey(prev => prev + 1);
+      setAiQuiz(null);
+      setSelectedOption(null);
+      setQuizAnswered(false);
     } else {
       setGameComplete(true);
+    }
+  };
+
+  // Load AI Quiz for current artist
+  const loadAiQuiz = async () => {
+    if (!currentQuestion || aiQuizLoading) return;
+    setAiQuizLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('kpop-quiz-ai', {
+        body: { artist: currentQuestion.artist, song: currentQuestion.song, language: i18n.language }
+      });
+      if (error) throw error;
+      setAiQuiz(data);
+    } catch (err) {
+      console.error('[KPop] AI Quiz error:', err);
+      toast.error(t('kpop.aiQuizError'));
+    } finally {
+      setAiQuizLoading(false);
+    }
+  };
+
+  const handleAiQuizAnswer = (idx: number) => {
+    if (quizAnswered || !aiQuiz) return;
+    setSelectedOption(idx);
+    setQuizAnswered(true);
+    if (idx === aiQuiz.correctIndex) {
+      setScore(prev => prev + 10);
+      toast.success(`${t('kpop.correct')} +10${t('kpop.score')}`);
+    } else {
+      toast.error(t('kpop.wrong'));
     }
   };
 

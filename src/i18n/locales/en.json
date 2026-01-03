@@ -1712,6 +1712,11 @@
   "kpop": {
     "title": "K-POP MV Quiz",
     "complete": "Game Complete!",
+    "aiQuizTitle": "Artist Quiz",
+    "aiQuizLoading": "Generating AI Quiz...",
+    "funFact": "Fun Fact",
+    "selectAnswer": "Select your answer",
+    "aiQuizError": "Failed to generate AI quiz",
     "score": "pts",
     "backToDashboard": "Dashboard",
     "playAgain": "Play Again",

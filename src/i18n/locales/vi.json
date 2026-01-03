@@ -1727,6 +1727,11 @@
   "kpop": {
     "title": "K-POP MV Quiz",
     "complete": "Hoàn thành!",
+    "aiQuizTitle": "Quiz nghệ sĩ",
+    "aiQuizLoading": "Đang tạo quiz AI...",
+    "funFact": "Bạn có biết",
+    "selectAnswer": "Chọn đáp án",
+    "aiQuizError": "Không thể tạo quiz AI",
     "score": "điểm",
     "backToDashboard": "Về Dashboard",
     "playAgain": "Chơi lại",
