@@ -941,7 +941,13 @@
       "next": "Далее", 
       "showResults": "Результаты", 
       "closeQuiz": "Закрыть тест",
-      "changeSettings": "Изменить настройки"
+      "changeSettings": "Изменить настройки",
+      "back": "Назад",
+      "restart": "Сначала",
+      "quiz": "TOPIK тест"
+    },
+    "settings": {
+      "speed": "Скорость"
     },
     "setup": {
       "levelTitle": "Выберите уровень TOPIK",

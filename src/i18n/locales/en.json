@@ -1070,7 +1070,13 @@
       "next": "Next", 
       "showResults": "Show results", 
       "closeQuiz": "Close Quiz",
-      "changeSettings": "Change Settings"
+      "changeSettings": "Change Settings",
+      "back": "Back",
+      "restart": "Restart",
+      "quiz": "TOPIK Quiz"
+    },
+    "settings": {
+      "speed": "Speed"
     },
     "setup": {
       "levelTitle": "Select TOPIK Level",
