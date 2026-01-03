@@ -20,37 +20,60 @@ serve(async (req) => {
 
     console.log(`[KPop Quiz AI] Generating quiz for ${artist} - ${song}, lang: ${language}`);
 
-    const languageMap: Record<string, string> = {
-      ko: "한국어",
-      en: "English",
-      vi: "Tiếng Việt",
-      ja: "日本語",
-      zh: "中文",
-      ru: "Русский",
-      uz: "O'zbekcha"
+    const languageInstructions: Record<string, string> = {
+      ko: "모든 답변을 한국어로 작성하세요.",
+      en: "Write all responses in English.",
+      vi: "Viết tất cả các câu trả lời bằng tiếng Việt.",
+      ja: "すべての回答を日本語で書いてください。",
+      zh: "用中文写所有回答。",
+      ru: "Напишите все ответы на русском языке.",
+      uz: "Barcha javoblarni o'zbek tilida yozing."
     };
 
-    const langName = languageMap[language] || "한국어";
+    const langInstruction = languageInstructions[language] || languageInstructions.ko;
 
-    const systemPrompt = `You are a K-Pop trivia expert. Generate fun and interesting multiple-choice quiz questions about K-Pop artists.
-    
-RULES:
-- Create 1 engaging quiz question about the given artist/group
-- Question types: debut year, member names, album names, awards, fun facts, collaborations, fandom name, etc.
-- Provide 4 answer options (A, B, C, D)
-- One correct answer, three plausible wrong answers
-- Make it fun and educational for K-Pop fans
-- Respond in ${langName}
+    const systemPrompt = `You are an expert K-Pop quiz master with encyclopedic knowledge of Korean pop music, artists, and entertainment industry. Your mission is to create ENGAGING, FUN, and CREATIVE trivia questions that K-Pop fans will love.
 
-OUTPUT FORMAT (JSON only, no markdown):
+${langInstruction}
+
+CRITICAL RULES:
+1. Create ONE unique, interesting quiz question about the given K-Pop artist/group
+2. Questions should be entertaining and make fans excited to answer
+3. Include 4 answer options - 1 correct, 3 plausible but incorrect
+4. Wrong options should be believable (real K-Pop facts, just not about this artist)
+5. Add a fun fact that reveals interesting trivia after answering
+
+CREATIVE QUESTION CATEGORIES (randomly pick one):
+- 🎤 Debut & History: "In which year did ${artist} make their legendary debut?"
+- 👥 Member Facts: Fun facts about individual members, positions, real names, birthdays
+- 🏆 Awards & Records: Billboard achievements, music show wins, Daesangs
+- 💿 Discography: Album names, title tracks, hidden gems, B-sides
+- 🎬 Music Videos: MV concepts, filming locations, easter eggs, view counts
+- 🌟 Fandom: Official fandom name, lightstick colors, fan chants
+- 🤝 Collaborations: Featured artists, OSTs, special stages
+- 📱 Social Media: Viral moments, famous quotes, variety show appearances
+- 🎭 Concepts: Different era concepts, styling changes, image transformations
+- 🌍 World Tours: Concert venues, special performances, fan interactions
+- 🎵 Behind the Scenes: Song writing credits, production involvement, trainee period
+- 💕 Fun Facts: Hobbies, nicknames, friendship with other idols
+
+RESPONSE FORMAT (JSON only, no markdown, no code blocks):
 {
-  "question": "quiz question text",
-  "options": ["A option", "B option", "C option", "D option"],
+  "question": "Your creative, engaging question here",
+  "options": ["Correct Answer", "Wrong Option 1", "Wrong Option 2", "Wrong Option 3"],
   "correctIndex": 0,
-  "funFact": "interesting fact about the answer"
-}`;
+  "funFact": "An amazing trivia fact that fans will love learning!"
+}
 
-    const userPrompt = `Generate a fun K-Pop trivia question about: ${artist}${song ? ` (related to the song "${song}")` : ""}`;
+IMPORTANT:
+- Shuffle the correct answer position (don't always put it at index 0)
+- Make questions feel fresh and unique each time
+- Include emojis in the question to make it visually appealing
+- Fun fact should be genuinely interesting, not generic`;
+
+    const userPrompt = `Create an exciting K-Pop trivia question about: ${artist}${song ? ` (The song "${song}" can be included as context but create varied questions about the artist/group in general)` : ""}
+
+Make it fun, engaging, and test real K-Pop knowledge! 🎵`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -69,12 +92,14 @@ OUTPUT FORMAT (JSON only, no markdown):
 
     if (!response.ok) {
       if (response.status === 429) {
+        console.error("[KPop Quiz AI] Rate limit exceeded");
         return new Response(JSON.stringify({ error: "Rate limit exceeded" }), {
           status: 429,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
+        console.error("[KPop Quiz AI] Payment required");
         return new Response(JSON.stringify({ error: "Payment required" }), {
           status: 402,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -82,29 +107,34 @@ OUTPUT FORMAT (JSON only, no markdown):
       }
       const errText = await response.text();
       console.error("[KPop Quiz AI] API error:", response.status, errText);
-      throw new Error("AI API error");
+      throw new Error(`AI API error: ${response.status}`);
     }
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || "";
 
+    console.log("[KPop Quiz AI] Raw response:", content.substring(0, 200));
+
     // Parse JSON from response
     let quiz;
     try {
       // Remove markdown code blocks if present
-      const jsonStr = content.replace(/```json\n?|\n?```/g, "").trim();
-      quiz = JSON.parse(jsonStr);
+      let jsonStr = content.replace(/```json\n?|\n?```/g, "").trim();
+      // Try to extract JSON object
+      const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        quiz = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error("No JSON found in response");
+      }
+      
+      // Validate quiz structure
+      if (!quiz.question || !Array.isArray(quiz.options) || quiz.options.length !== 4 || typeof quiz.correctIndex !== 'number') {
+        throw new Error("Invalid quiz structure");
+      }
     } catch (parseError) {
       console.error("[KPop Quiz AI] Parse error:", parseError, "Content:", content);
-      // Fallback quiz
-      quiz = {
-        question: language === "ko" 
-          ? `${artist}에 대해 알고 계신가요?`
-          : `Do you know about ${artist}?`,
-        options: ["A", "B", "C", "D"],
-        correctIndex: 0,
-        funFact: ""
-      };
+      throw new Error("Failed to parse AI response");
     }
 
     console.log("[KPop Quiz AI] Generated quiz:", quiz.question);
