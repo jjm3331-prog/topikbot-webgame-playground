@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { User, LogOut, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import NotificationBell from "@/components/NotificationBell";
@@ -16,6 +18,7 @@ interface AppLayoutProps {
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [username, setUsername] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -23,7 +26,9 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session) {
         const { data } = await supabase
           .from("profiles")
@@ -42,8 +47,8 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   const handleLogout = async () => {
     await safeSignOut();
     toast({
-      title: "Đăng xuất thành công",
-      description: "Hẹn gặp lại bạn!",
+      title: t("header.logoutSuccess"),
+      description: t("header.logoutMessage"),
     });
     navigate("/");
   };
@@ -91,6 +96,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 
           {/* Right side - Actions */}
           <div className="flex items-center gap-3">
+            <LanguageSelector />
             <ThemeToggle />
             <NotificationBell />
             
