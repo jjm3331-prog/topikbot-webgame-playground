@@ -99,41 +99,66 @@ const KPop = () => {
     }
   }, [gameComplete, scoreSaved, score]);
 
-  const loadQuestions = async (selectedDifficulty?: string | null) => {
+  const [allQuestions, setAllQuestions] = useState<Question[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+
+  const loadAllQuestions = async () => {
     setIsLoading(true);
-    setVideoLoaded(false);
     try {
-      const { data, error } = await supabase.functions.invoke('kpop-lyrics', {
-        body: {
-          difficulty: selectedDifficulty,
-          excludeIds: usedIds,
-          count: 5,
-          validate: true,
-        },
-      });
+      const { data, error } = await supabase
+        .from('kpop_lyrics')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      setQuestions((data as any)?.questions || []);
-      setCurrentIndex(0);
-      setUserAnswer('');
-      setShowHint(false);
-      setIsAnswered(false);
-      setGameComplete(false);
-      setTimeLeft(TIMER_DURATION);
-      setVideoKey((prev) => prev + 1);
-      setAiQuiz(null);
-      setSelectedOption(null);
-      setQuizAnswered(false);
+      const mapped = (data || []).map((q: any) => ({
+        id: q.id,
+        artist: q.artist,
+        song: q.song,
+        youtubeId: q.youtube_id,
+        timestamp: q.timestamp || 0,
+        lyricLine: q.lyric_line,
+        answer: q.answer,
+        hint: q.hint || '',
+        difficulty: q.difficulty,
+        points: q.points || 10
+      }));
+      
+      setAllQuestions(mapped);
+      setTotalCount(mapped.length);
+      if (mapped.length > 0) {
+        setQuestions([mapped[0]]);
+        setCurrentIndex(0);
+      }
     } catch (error) {
-      console.error('[KPop] loadQuestions failed:', error);
+      console.error('[KPop] loadAllQuestions failed:', error);
       toast.error(t('kpop.loadFailed'));
     } finally {
       setIsLoading(false);
     }
   };
 
-  useEffect(() => { loadQuestions(); }, []);
+  const [globalIndex, setGlobalIndex] = useState(0);
+
+  const goToMV = (newIndex: number) => {
+    if (newIndex < 0 || newIndex >= allQuestions.length) return;
+    setGlobalIndex(newIndex);
+    setQuestions([allQuestions[newIndex]]);
+    setCurrentIndex(0);
+    setUserAnswer('');
+    setShowHint(false);
+    setIsAnswered(false);
+    setTimeLeft(TIMER_DURATION);
+    setVideoLoaded(false);
+    setVideoKey(prev => prev + 1);
+    setAiQuiz(null);
+    setSelectedOption(null);
+    setQuizAnswered(false);
+  };
+
+  useEffect(() => { loadAllQuestions(); }, []);
 
   useEffect(() => {
     if (timerMode && !isAnswered && !isLoading && questions.length > 0) {
@@ -183,20 +208,21 @@ const KPop = () => {
     }
   };
 
-  const handleNext = async () => {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex(prev => prev + 1);
-      setUserAnswer('');
-      setShowHint(false);
-      setIsAnswered(false);
-      setTimeLeft(TIMER_DURATION);
-      setVideoLoaded(false);
-      setVideoKey(prev => prev + 1);
-      setAiQuiz(null);
-      setSelectedOption(null);
-      setQuizAnswered(false);
+  const handleNextMV = () => {
+    if (globalIndex < allQuestions.length - 1) {
+      goToMV(globalIndex + 1);
     } else {
-      setGameComplete(true);
+      // Loop back to first
+      goToMV(0);
+    }
+  };
+
+  const handlePrevMV = () => {
+    if (globalIndex > 0) {
+      goToMV(globalIndex - 1);
+    } else {
+      // Loop to last
+      goToMV(allQuestions.length - 1);
     }
   };
 
@@ -231,7 +257,7 @@ const KPop = () => {
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') isAnswered ? handleNext() : handleSubmit();
+    if (e.key === 'Enter') isAnswered ? handleNextMV() : handleSubmit();
   };
 
   if (isLoading) {
@@ -259,7 +285,7 @@ const KPop = () => {
             </div>
             <div className="flex gap-3">
               <Button onClick={() => navigate('/dashboard')} variant="outline" className="flex-1 border-gray-600"><ArrowLeft className="w-4 h-4 mr-2" />{t('kpop.backToDashboard')}</Button>
-              <Button onClick={() => { setScore(0); setStreak(0); setScoreSaved(false); setGameComplete(false); loadQuestions(difficulty); }} className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500"><RotateCcw className="w-4 h-4 mr-2" />{t('kpop.playAgain')}</Button>
+              <Button onClick={() => { setScore(0); setStreak(0); setScoreSaved(false); setGameComplete(false); goToMV(0); }} className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500"><RotateCcw className="w-4 h-4 mr-2" />{t('kpop.playAgain')}</Button>
             </div>
           </motion.div>
         </div>
@@ -282,11 +308,11 @@ const KPop = () => {
 
       <div className="max-w-lg mx-auto px-4 py-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-gray-400 text-sm">{currentIndex + 1} / {questions.length}</span>
+          <span className="text-gray-400 text-sm">{globalIndex + 1} / {totalCount}</span>
           {streak > 0 && <span className="text-orange-400 text-sm">🔥 {streak}</span>}
         </div>
         <div className="h-2 bg-gray-800 rounded-full overflow-hidden mb-4">
-          <motion.div className="h-full bg-gradient-to-r from-pink-500 to-purple-500" animate={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }} />
+          <motion.div className="h-full bg-gradient-to-r from-pink-500 to-purple-500" animate={{ width: `${((globalIndex + 1) / Math.max(totalCount, 1)) * 100}%` }} />
         </div>
 
         <div className="flex items-center justify-between mb-3">
@@ -300,13 +326,14 @@ const KPop = () => {
           )}
         </div>
 
-        <div className="flex gap-1.5 mb-4">
-          {[null, 'easy', 'medium', 'hard'].map((d) => (
-            <button key={d || 'all'} onClick={() => { setDifficulty(d); setScore(0); setStreak(0); setUsedIds([]); loadQuestions(d); }}
-              className={`flex-1 py-1.5 rounded-lg text-xs font-medium ${difficulty === d ? (d === 'easy' ? 'bg-green-500 text-white' : d === 'medium' ? 'bg-yellow-500 text-black' : d === 'hard' ? 'bg-red-500 text-white' : 'bg-purple-500 text-white') : 'bg-white/10 text-gray-300'}`}>
-              {d === null ? t('kpop.all') : d === 'easy' ? t('kpop.easy') : d === 'medium' ? t('kpop.medium') : t('kpop.hard')}
-            </button>
-          ))}
+        {/* Prev/Next MV Navigation */}
+        <div className="flex gap-2 mb-4">
+          <Button onClick={handlePrevMV} variant="outline" className="flex-1 border-pink-500/50 text-pink-400 hover:bg-pink-500/20">
+            ← {t('kpop.prevMV') || 'Prev MV'}
+          </Button>
+          <Button onClick={handleNextMV} className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500">
+            {t('kpop.nextMV') || 'Next MV'} →
+          </Button>
         </div>
       </div>
 
@@ -371,7 +398,7 @@ const KPop = () => {
                   </div>
                 </div>
               ) : (
-                <Button onClick={handleNext} className="w-full bg-gradient-to-r from-cyan-500 to-blue-500">{currentIndex < questions.length - 1 ? `${t('kpop.next')} →` : `${t('kpop.viewResult')} 🏆`}</Button>
+                <Button onClick={handleNextMV} className="w-full bg-gradient-to-r from-cyan-500 to-blue-500">{t('kpop.nextMV') || 'Next MV'} →</Button>
               )}
             </div>
           </motion.div>

@@ -1801,7 +1801,9 @@
     "aiQuizLoading": "AI 퀴즈 생성중...",
     "funFact": "재미있는 사실",
     "selectAnswer": "정답을 선택하세요",
-    "aiQuizError": "AI 퀴즈 생성 실패"
+    "aiQuizError": "AI 퀴즈 생성 실패",
+    "prevMV": "이전 MV",
+    "nextMV": "다음 MV"
   },
   "quiz": {
     "title": "관용어 퀴즈",

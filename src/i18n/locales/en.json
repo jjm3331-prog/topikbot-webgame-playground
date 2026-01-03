@@ -1717,6 +1717,8 @@
     "funFact": "Fun Fact",
     "selectAnswer": "Select your answer",
     "aiQuizError": "Failed to generate AI quiz",
+    "prevMV": "Prev MV",
+    "nextMV": "Next MV",
     "score": "pts",
     "backToDashboard": "Dashboard",
     "playAgain": "Play Again",
