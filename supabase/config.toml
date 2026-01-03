@@ -186,3 +186,12 @@ verify_jwt = false
 
 [functions.batch-audio-generate]
 verify_jwt = false
+
+[functions.kpop-quiz-ai]
+verify_jwt = false
+
+[functions.kdrama-quiz-ai]
+verify_jwt = false
+
+[functions.idiom-slang-quiz]
+verify_jwt = false
