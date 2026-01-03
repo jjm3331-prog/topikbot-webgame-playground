@@ -148,20 +148,32 @@ const KDrama = () => {
     }
   };
 
+  // Auto-load AI Quiz when scene changes
+  useEffect(() => {
+    if (currentScene && !aiQuiz && !aiQuizLoading) {
+      loadAiQuiz();
+    }
+  }, [globalIndex, currentScene]);
+
   // Load AI Quiz
   const loadAiQuiz = async () => {
     if (!currentScene || aiQuizLoading) return;
     setAiQuizLoading(true);
+    setAiQuiz(null);
+    setSelectedOption(null);
+    setQuizAnswered(false);
+    
     try {
       const { data, error } = await supabase.functions.invoke('kdrama-quiz-ai', {
         body: { 
           drama: currentScene.drama, 
           dramaEn: currentScene.dramaEn,
-          character: currentScene.character,
+          context: currentScene.context,
           language: i18n.language 
         }
       });
       if (error) throw error;
+      if (data.error) throw new Error(data.error);
       setAiQuiz(data);
     } catch (err) {
       console.error('[KDrama] AI Quiz error:', err);
