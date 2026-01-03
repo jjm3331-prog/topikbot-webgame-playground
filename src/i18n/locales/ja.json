@@ -261,7 +261,9 @@
   "language": {
     "select": "言語を選択",
     "current": "現在の言語",
-    "hint": "言語を選択すると、アプリ全体が切り替わります"
+    "hint": "言語を選択すると、アプリ全体が切り替わります",
+    "changed": "言語が{{language}}に変更されました",
+    "supportedCount": "{{count}}言語"
   },
   "dashboard": {
     "loading": "読み込み中...",

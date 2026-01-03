@@ -276,7 +276,9 @@
   "language": {
     "select": "Select Language",
     "current": "Current Language",
-    "hint": "Select a language to switch the entire app"
+    "hint": "Select a language to switch the entire app",
+    "changed": "Language changed to {{language}}",
+    "supportedCount": "{{count}} languages"
   },
   "dashboard": {
     "loading": "Loading...",

@@ -36,7 +36,7 @@ interface MenuItem {
 export const CompactDropdown = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
+  const [activeSubmenuKey, setActiveSubmenuKey] = useState<string | null>(null);
 
   const menuItems: MenuItem[] = [
     {
@@ -86,7 +86,7 @@ export const CompactDropdown = ({ isOpen, onClose }: { isOpen: boolean; onClose:
 
   const handleNavigation = (href: string) => {
     onClose();
-    setActiveSubmenu(null);
+    setActiveSubmenuKey(null);
     if (href.startsWith("#")) {
       const element = document.querySelector(href);
       element?.scrollIntoView({ behavior: "smooth" });
@@ -96,10 +96,10 @@ export const CompactDropdown = ({ isOpen, onClose }: { isOpen: boolean; onClose:
   };
 
   const handleBack = () => {
-    setActiveSubmenu(null);
+    setActiveSubmenuKey(null);
   };
 
-  const activeMenu = menuItems.find(m => t(m.labelKey) === activeSubmenu);
+  const activeMenu = activeSubmenuKey ? menuItems.find((m) => m.labelKey === activeSubmenuKey) : undefined;
 
   return (
     <AnimatePresence>
@@ -110,9 +110,9 @@ export const CompactDropdown = ({ isOpen, onClose }: { isOpen: boolean; onClose:
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => {
-              onClose();
-              setActiveSubmenu(null);
-            }}
+               onClose();
+               setActiveSubmenuKey(null);
+             }}
             className="fixed inset-0 z-40"
             style={{ top: "64px" }}
           />
@@ -126,7 +126,7 @@ export const CompactDropdown = ({ isOpen, onClose }: { isOpen: boolean; onClose:
             style={{ top: "72px" }}
           >
             <AnimatePresence mode="wait">
-              {!activeSubmenu ? (
+              {!activeSubmenuKey ? (
                 <motion.div
                   key="main"
                   initial={{ opacity: 0, x: -20 }}
@@ -138,8 +138,8 @@ export const CompactDropdown = ({ isOpen, onClose }: { isOpen: boolean; onClose:
                   {menuItems.map((item) => (
                     <button
                       key={item.labelKey}
-                      onClick={() => setActiveSubmenu(t(item.labelKey))}
-                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted transition-colors"
+                       onClick={() => setActiveSubmenuKey(item.labelKey)}
+                       className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <span className="text-lg">{item.emoji}</span>
@@ -159,8 +159,8 @@ export const CompactDropdown = ({ isOpen, onClose }: { isOpen: boolean; onClose:
                     </button>
                   </div>
                 </motion.div>
-              ) : (
-                <motion.div
+               ) : (
+                 <motion.div
                   key="submenu"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -174,7 +174,7 @@ export const CompactDropdown = ({ isOpen, onClose }: { isOpen: boolean; onClose:
                   >
                     <ChevronLeft className="w-4 h-4 text-muted-foreground" />
                     <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      {activeMenu?.emoji} {activeSubmenu}
+                       {activeMenu?.emoji} {activeMenu ? t(activeMenu.labelKey) : ""}
                     </span>
                   </button>
 
@@ -188,7 +188,7 @@ export const CompactDropdown = ({ isOpen, onClose }: { isOpen: boolean; onClose:
                       <span className="text-sm font-medium text-foreground">{t(item.labelKey)}</span>
                       {item.isPremium && (
                         <span className="ml-auto px-1.5 py-0.5 bg-accent text-accent-foreground text-[10px] font-bold rounded">
-                          Premium
+                           {t("common.premium")}
                         </span>
                       )}
                     </button>
