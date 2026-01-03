@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Menu, ChevronDown, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { CompactDropdown } from "@/components/CompactDropdown";
 
 export const SimpleHeader = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -41,13 +44,14 @@ export const SimpleHeader = () => {
               className="flex items-center gap-2 font-medium text-muted-foreground hover:text-foreground"
             >
               {isMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-              Menu
+              {t("header.menu")}
               <ChevronDown className={`w-4 h-4 transition-transform ${isMenuOpen ? "rotate-180" : ""}`} />
             </Button>
           </nav>
 
           {/* Actions */}
           <div className="flex items-center gap-2 sm:gap-3">
+            <LanguageSelector />
             <ThemeToggle />
             
             {/* Mobile Menu Toggle */}
@@ -60,14 +64,14 @@ export const SimpleHeader = () => {
               {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
 
-            {/* Login Button */}
-            <Button 
-              onClick={() => navigate("/auth")}
-              size="sm"
-              className="btn-primary text-primary-foreground rounded-lg font-medium px-3 text-xs sm:text-sm"
-            >
-              Đăng nhập
-            </Button>
+          {/* Login Button */}
+          <Button
+            onClick={() => navigate("/auth")}
+            size="sm"
+            className="btn-primary text-primary-foreground rounded-lg font-medium px-3 text-xs sm:text-sm"
+          >
+            {t("header.login")}
+          </Button>
           </div>
         </div>
       </motion.header>
