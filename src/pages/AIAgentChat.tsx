@@ -171,7 +171,7 @@ const AIAgentChat = () => {
       setCopiedId(messageId);
       setTimeout(() => setCopiedId(null), 2000);
     } catch (err) {
-      toast({ title: "복사 실패", variant: "destructive" });
+      toast({ title: t("aiAgent.copyFailed"), variant: "destructive" });
     }
   };
 
@@ -279,7 +279,7 @@ const AIAgentChat = () => {
 
     Array.from(files).forEach((file) => {
       if (file.size > 10 * 1024 * 1024) {
-        toast({ title: "파일이 너무 큽니다 (최대 10MB)", variant: "destructive" });
+        toast({ title: t("aiAgent.fileTooLarge"), variant: "destructive" });
         return;
       }
 
@@ -439,7 +439,7 @@ const AIAgentChat = () => {
         if (!file) return;
 
         if (file.size > 10 * 1024 * 1024) {
-          toast({ title: "파일이 너무 큽니다", variant: "destructive" });
+          toast({ title: t("aiAgent.fileTooLarge"), variant: "destructive" });
           return;
         }
 
@@ -452,7 +452,7 @@ const AIAgentChat = () => {
         reader.readAsDataURL(file);
       });
 
-      toast({ title: "이미지 추가됨" });
+      toast({ title: t("aiAgent.imageAdded") });
     }
   }, [toast]);
 

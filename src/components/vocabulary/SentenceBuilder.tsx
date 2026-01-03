@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,6 +38,7 @@ const TIME_BONUS_THRESHOLD = 15; // 15초 이내 보너스
 const TIME_BONUS_PERFECT = 8; // 8초 이내 퍼펙트 보너스
 
 const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
+  const { t } = useTranslation();
   const { getMeaning, getCurrentLanguage, languageLabels } = useVocabulary();
   
   const [puzzles, setPuzzles] = useState<SentencePuzzle[]>([]);
@@ -315,7 +317,7 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
     return (
       <div className="text-center py-12">
         <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
-        <p className="text-muted-foreground">AI 교란 조각 생성 중...</p>
+        <p className="text-muted-foreground">{t("sentenceBuilder.aiLoading")}</p>
       </div>
     );
   }
@@ -323,8 +325,8 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
   if (puzzles.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground mb-4">이 레벨의 문장 데이터가 없습니다.</p>
-        <Button onClick={fetchAndGeneratePuzzles}>다시 시도</Button>
+        <p className="text-muted-foreground mb-4">{t("sentenceBuilder.noData")}</p>
+        <Button onClick={fetchAndGeneratePuzzles}>{t("sentenceBuilder.retry")}</Button>
       </div>
     );
   }
@@ -342,14 +344,14 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
         <div className="w-24 h-24 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center mx-auto mb-6">
           <Sparkles className="w-12 h-12 text-white" />
         </div>
-        <h2 className="text-2xl font-bold mb-2">문장 완성 완료!</h2>
-        <p className="text-4xl font-bold text-primary mb-2">{score}점</p>
+        <h2 className="text-2xl font-bold mb-2">{t("sentenceBuilder.complete")}</h2>
+        <p className="text-4xl font-bold text-primary mb-2">{score}{t("sentenceBuilder.points")}</p>
         <p className="text-muted-foreground mb-6">
-          {puzzles.length}문장 • 정확도 {percentage}%
+          {puzzles.length}{t("sentenceBuilder.sentences")} • {t("sentenceBuilder.accuracy")} {percentage}%
         </p>
         <Button onClick={handleRestart} size="lg">
           <RotateCcw className="w-4 h-4 mr-2" />
-          다시 시작
+          {t("sentenceBuilder.restart")}
         </Button>
       </motion.div>
     );
@@ -391,7 +393,7 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
               🔥 {streak}연속!
             </motion.span>
           )}
-          <span className="text-lg font-bold text-primary">{score}점</span>
+          <span className="text-lg font-bold text-primary">{score}{t("sentenceBuilder.points")}</span>
         </div>
       </div>
 
@@ -404,7 +406,7 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
         >
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-500 text-sm font-medium">
             <Zap className="w-4 h-4" />
-            {timeLeft > TIME_LIMIT - TIME_BONUS_PERFECT ? "⚡ 퍼펙트 보너스 +10점" : "빠른 보너스 +5점"}
+            {timeLeft > TIME_LIMIT - TIME_BONUS_PERFECT ? t("sentenceBuilder.perfectBonus") : t("sentenceBuilder.fastBonus")}
           </span>
         </motion.div>
       )}
@@ -439,8 +441,8 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
 
       {/* Instructions */}
       <div className="text-center text-sm text-muted-foreground">
-        <p>드래그하여 올바른 순서로 배열하고, 불필요한 조각은 휴지통으로 버리세요</p>
-        <p className="text-xs mt-1 text-amber-500">⚠️ AI가 생성한 오답 조각이 섞여 있습니다!</p>
+        <p>{t("sentenceBuilder.instruction")}</p>
+        <p className="text-xs mt-1 text-amber-500">⚠️ {t("sentenceBuilder.aiWarning")}</p>
       </div>
 
       {/* Drag & Drop Reorder Area */}
@@ -489,7 +491,7 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
                   </Button>
                 )}
                 {showResult && currentPuzzle.distractors.includes(part) && (
-                  <span className="text-xs text-red-500 font-medium">AI 오답</span>
+                  <span className="text-xs text-red-500 font-medium">{t("sentenceBuilder.aiWrong")}</span>
                 )}
               </Reorder.Item>
             ))}
@@ -498,7 +500,7 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
 
         {orderedParts.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
-            모든 조각이 휴지통에 있습니다
+            {t("sentenceBuilder.allInTrash")}
           </div>
         )}
       </motion.div>
@@ -508,7 +510,7 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
         <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-3">
             <Trash2 className="w-4 h-4 text-red-400" />
-            <span className="text-sm text-red-400 font-medium">버린 조각 (클릭하여 복원)</span>
+            <span className="text-sm text-red-400 font-medium">{t("sentenceBuilder.trashLabel")}</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {discardedParts.map((part) => (
@@ -542,17 +544,17 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
             <div>
               <div className="flex items-center justify-center gap-2 mb-2">
                 <CheckCircle2 className="w-6 h-6" />
-                <span className="font-bold text-lg">완벽해요!</span>
+                <span className="font-bold text-lg">{t("sentenceBuilder.perfect")}</span>
               </div>
               <div className="flex items-center justify-center gap-2 text-sm">
-                <span>기본 +15점</span>
+                <span>{t("sentenceBuilder.basePoints")}</span>
                 {timeBonus > 0 && (
                   <span className="text-amber-500 font-bold">
-                    ⚡ 시간 보너스 +{timeBonus}점
+                    ⚡ {t("sentenceBuilder.timeBonus")} +{timeBonus}{t("sentenceBuilder.points")}
                   </span>
                 )}
                 {streak > 1 && (
-                  <span className="text-orange-500">연속 +{Math.min(streak - 1, 4) * 3}점</span>
+                  <span className="text-orange-500">{t("sentenceBuilder.streakBonus")} +{Math.min(streak - 1, 4) * 3}{t("sentenceBuilder.points")}</span>
                 )}
               </div>
             </div>
@@ -561,17 +563,17 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
               <div className="flex items-center justify-center gap-2 mb-2">
                 <XCircle className="w-6 h-6" />
                 <span className="font-bold text-lg">
-                  {timeLeft === 0 ? "시간 초과!" : "다시 도전!"}
+                  {timeLeft === 0 ? t("sentenceBuilder.timeUp") : t("sentenceBuilder.tryAgain")}
                 </span>
               </div>
               <p className="text-sm">
-                정답: {currentPuzzle.correctParts.join(' ')}
+                {t("sentenceBuilder.correctAnswer")}: {currentPuzzle.correctParts.join(' ')}
               </p>
               {discardedParts.some(p => currentPuzzle.correctParts.some(c => c === p)) && (
-                <p className="text-xs mt-1">❌ 필요한 조각을 버렸어요</p>
+                <p className="text-xs mt-1">❌ {t("sentenceBuilder.discardedNeeded")}</p>
               )}
               {orderedParts.some(p => currentPuzzle.distractors.includes(p)) && (
-                <p className="text-xs mt-1">❌ 불필요한 조각이 포함되어 있어요</p>
+                <p className="text-xs mt-1">❌ {t("sentenceBuilder.hasDistractor")}</p>
               )}
             </div>
           )}
@@ -589,7 +591,7 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
                 className="border-amber-500/50 text-amber-500 hover:bg-amber-500/10"
               >
                 <Lightbulb className="w-4 h-4 mr-1" />
-                힌트 (-3점)
+                {t("sentenceBuilder.hint")}
               </Button>
             )}
             <Button 
@@ -598,12 +600,12 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
               size="lg"
               className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
             >
-              확인하기
+              {t("sentenceBuilder.check")}
             </Button>
           </>
         ) : (
           <Button onClick={handleNext} size="lg">
-            다음 문장 <ArrowRight className="w-4 h-4 ml-1" />
+            {t("sentenceBuilder.next")} <ArrowRight className="w-4 h-4 ml-1" />
           </Button>
         )}
       </div>

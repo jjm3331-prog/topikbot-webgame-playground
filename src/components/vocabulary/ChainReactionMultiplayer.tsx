@@ -313,17 +313,17 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
         if (findError) throw findError;
         if (!roomData) {
-          toast({ title: "방을 찾을 수 없습니다", variant: "destructive" });
+          toast({ title: t("chainReaction.roomNotFound"), variant: "destructive" });
           setGamePhase("menu");
           return;
         }
         if (roomData.status === "playing" || roomData.status === "finished") {
-          toast({ title: "이미 진행 중이거나 종료된 방입니다", variant: "destructive" });
+          toast({ title: t("chainReaction.roomInProgress"), variant: "destructive" });
           setGamePhase("menu");
           return;
         }
         if (roomData.guest_id) {
-          toast({ title: "이미 다른 사람이 참가했습니다", variant: "destructive" });
+          toast({ title: t("chainReaction.roomFull"), variant: "destructive" });
           setGamePhase("menu");
           return;
         }
@@ -343,7 +343,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
         toast({ title: `${guestName}(으)로 참가 완료!` });
       } catch (err) {
         console.error("Auto join failed:", err);
-        toast({ title: "자동 참가 실패", variant: "destructive" });
+        toast({ title: t("chainReaction.autoJoinFailed"), variant: "destructive" });
         setGamePhase("menu");
       }
     };
@@ -417,7 +417,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
         guest_ready: false,
         host_ready: false,
       }).eq("id", room.id);
-      toast({ title: "게스트를 강퇴했습니다" });
+      toast({ title: t("chainReaction.kickedGuest") });
     } catch (err) {
       console.error("Failed to kick guest:", err);
     }
@@ -426,7 +426,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   // Create room
   const createRoom = async () => {
     if (!playerName.trim()) {
-      toast({ title: "이름을 입력해주세요", variant: "destructive" });
+      toast({ title: t("chainReaction.enterName"), variant: "destructive" });
       return;
     }
     setGamePhase("creating");
@@ -460,7 +460,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       saveHostedRoom(data.id, playerId);
     } catch (err) {
       console.error("Failed to create room:", err);
-      toast({ title: "방 생성 실패", variant: "destructive" });
+      toast({ title: t("chainReaction.createFailed"), variant: "destructive" });
       setGamePhase("menu");
     }
   };
@@ -468,7 +468,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   // Join room
   const joinRoom = async () => {
     if (!playerName.trim() || !roomCodeInput.trim()) {
-      toast({ title: "이름과 방 코드를 입력해주세요", variant: "destructive" });
+      toast({ title: t("chainReaction.enterNameAndCode"), variant: "destructive" });
       return;
     }
     setGamePhase("joining");
@@ -483,17 +483,17 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
       if (findError) throw findError;
       if (!roomData) {
-        toast({ title: "방을 찾을 수 없습니다", variant: "destructive" });
+        toast({ title: t("chainReaction.roomNotFound"), variant: "destructive" });
         setGamePhase("menu");
         return;
       }
       if (roomData.status === "playing" || roomData.status === "finished") {
-        toast({ title: "이미 진행 중이거나 종료된 방입니다", variant: "destructive" });
+        toast({ title: t("chainReaction.roomInProgress"), variant: "destructive" });
         setGamePhase("menu");
         return;
       }
       if (roomData.guest_id) {
-        toast({ title: "이미 다른 사람이 참가했습니다", variant: "destructive" });
+        toast({ title: t("chainReaction.roomFull"), variant: "destructive" });
         setGamePhase("menu");
         return;
       }
