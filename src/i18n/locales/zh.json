@@ -1036,7 +1036,7 @@
     "interviewerTypes": { "friendly": "友好型", "strict": "严格型", "pressure": "压力型", "technical": "技术型" },
     "interviewerDescs": { "friendly": "轻松氛围，鼓励支持", "strict": "逻辑思维，具体回答", "pressure": "压力测试，挑战性问题", "technical": "专业知识，深度技术问题" },
     "scoreLabels": { "content": "内容", "communication": "沟通", "korean": "韩语", "attitude": "态度", "jobFit": "岗位匹配" },
-    "micError": "需要麦克风权限", "allowMicAccess": "请允许麦克风访问。", "voiceNotRecognized": "未识别到语音", "tryAgain": "请重试。", "voiceRecognitionError": "语音识别错误", "selectAll": "请全部选择", "selectAllDesc": "请选择公司、职位和面试官类型。", "errorOccurred": "发生错误", "cannotStartInterview": "无法开始面试，请重试。", "noResponse": "无响应。",
+    "micError": "需要麦克风权限", "speechError": "语音识别错误", "startError": "面试开始错误", "allowMicAccess": "请允许麦克风访问。", "voiceNotRecognized": "未识别到语音", "tryAgain": "请重试。", "voiceRecognitionError": "语音识别错误", "selectAll": "请全部选择", "selectAllDesc": "请选择公司、职位和面试官类型。", "errorOccurred": "发生错误", "cannotStartInterview": "无法开始面试，请重试。", "noResponse": "无响应。",
     "ttsEnabled": "语音输出已启用", "ttsDisabled": "语音输出已禁用", "clickToListen": "点击收听面试官回复"
   },
   "kdrama": {

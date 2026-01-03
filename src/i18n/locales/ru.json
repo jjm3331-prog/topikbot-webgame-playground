@@ -1034,7 +1034,7 @@
     "interviewerTypes": { "friendly": "Дружелюбный", "strict": "Строгий", "pressure": "Под давлением", "technical": "Технический" },
     "interviewerDescs": { "friendly": "Расслабленная атмосфера, поддержка", "strict": "Логическое мышление, конкретные ответы", "pressure": "Стресс-тест, сложные вопросы", "technical": "Профессиональные знания, глубокие вопросы" },
     "scoreLabels": { "content": "Содержание", "communication": "Общение", "korean": "Корейский", "attitude": "Отношение", "jobFit": "Соответствие должности" },
-    "micError": "Требуется доступ к микрофону", "allowMicAccess": "Пожалуйста, разрешите доступ к микрофону.", "voiceNotRecognized": "Голос не распознан", "tryAgain": "Попробуйте снова.", "voiceRecognitionError": "Ошибка распознавания голоса", "selectAll": "Выберите все", "selectAllDesc": "Выберите компанию, должность и тип интервьюера.", "errorOccurred": "Произошла ошибка", "cannotStartInterview": "Невозможно начать интервью. Попробуйте снова.", "noResponse": "Нет ответа.",
+    "micError": "Требуется доступ к микрофону", "speechError": "Ошибка распознавания речи", "startError": "Ошибка запуска интервью", "allowMicAccess": "Пожалуйста, разрешите доступ к микрофону.", "voiceNotRecognized": "Голос не распознан", "tryAgain": "Попробуйте снова.", "voiceRecognitionError": "Ошибка распознавания голоса", "selectAll": "Выберите все", "selectAllDesc": "Выберите компанию, должность и тип интервьюера.", "errorOccurred": "Произошла ошибка", "cannotStartInterview": "Невозможно начать интервью. Попробуйте снова.", "noResponse": "Нет ответа.",
     "ttsEnabled": "Голосовой вывод включен", "ttsDisabled": "Голосовой вывод отключен", "clickToListen": "Нажмите, чтобы прослушать ответ интервьюера"
   },
   "kdrama": {

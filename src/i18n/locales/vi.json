@@ -1280,7 +1280,7 @@
     "interviewerTypes": { "friendly": "Thân thiện", "strict": "Nghiêm khắc", "pressure": "Áp lực cao", "technical": "Kỹ thuật" },
     "interviewerDescs": { "friendly": "Không khí thoải mái, động viên, khuyến khích", "strict": "Yêu cầu logic, câu trả lời cụ thể", "pressure": "Stress test, câu hỏi thách thức", "technical": "Câu hỏi chuyên môn, kỹ năng chuyên sâu" },
     "scoreLabels": { "content": "Nội dung", "communication": "Giao tiếp", "korean": "Tiếng Hàn", "attitude": "Thái độ", "jobFit": "Phù hợp vị trí" },
-    "micError": "Lỗi microphone", "allowMicAccess": "Vui lòng cho phép truy cập microphone.", "voiceNotRecognized": "Không nhận diện được giọng nói", "tryAgain": "Vui lòng thử lại.", "voiceRecognitionError": "Lỗi nhận diện giọng nói", "selectAll": "Vui lòng chọn đầy đủ", "selectAllDesc": "Chọn công ty, vị trí và loại phỏng vấn.", "errorOccurred": "Đã xảy ra lỗi", "cannotStartInterview": "Không thể bắt đầu phỏng vấn. Vui lòng thử lại.", "noResponse": "Không có phản hồi.",
+    "micError": "Lỗi microphone", "speechError": "Lỗi nhận diện giọng nói", "startError": "Lỗi bắt đầu phỏng vấn", "allowMicAccess": "Vui lòng cho phép truy cập microphone.", "voiceNotRecognized": "Không nhận diện được giọng nói", "tryAgain": "Vui lòng thử lại.", "voiceRecognitionError": "Lỗi nhận diện giọng nói", "selectAll": "Vui lòng chọn đầy đủ", "selectAllDesc": "Chọn công ty, vị trí và loại phỏng vấn.", "errorOccurred": "Đã xảy ra lỗi", "cannotStartInterview": "Không thể bắt đầu phỏng vấn. Vui lòng thử lại.", "noResponse": "Không có phản hồi.",
     "ttsEnabled": "Đã bật phát âm thanh", "ttsDisabled": "Đã tắt phát âm thanh", "clickToListen": "Nhấn để nghe câu trả lời của người phỏng vấn"
   },
   "kdrama": {
