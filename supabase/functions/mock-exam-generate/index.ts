@@ -61,6 +61,116 @@ const RAG_CONFIG = {
   EMBEDDING_DIMENSIONS: 1536,
 };
 
+// Cache Configuration for listening questions
+const CACHE_CONFIG = {
+  // 캐시 만료 시간 (24시간)
+  EXPIRY_HOURS: 24,
+  // 캐시 키에 포함할 필드들
+  KEY_FIELDS: ['examType', 'section', 'difficulty', 'topic', 'questionCount', 'listeningQuestionType', 'dialogueLength', 'speakerCount'] as const,
+};
+
+// Generate a stable hash for cache key
+function generateCacheKey(params: GenerateRequest): string {
+  const keyData: Record<string, any> = {};
+  for (const field of CACHE_CONFIG.KEY_FIELDS) {
+    keyData[field] = params[field as keyof GenerateRequest] ?? null;
+  }
+  // 정렬된 JSON으로 일관된 해시 생성
+  const sortedJson = JSON.stringify(keyData, Object.keys(keyData).sort());
+  
+  // Simple hash function (djb2)
+  let hash = 5381;
+  for (let i = 0; i < sortedJson.length; i++) {
+    hash = ((hash << 5) + hash) + sortedJson.charCodeAt(i);
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return `listening_${Math.abs(hash).toString(16)}`;
+}
+
+// Check cache for existing questions
+async function checkCache(
+  supabase: any,
+  cacheKey: string
+): Promise<{ questions: GeneratedQuestion[] } | null> {
+  try {
+    const { data, error } = await supabase
+      .from('ai_response_cache')
+      .select('id, response, expires_at, hit_count')
+      .eq('cache_key', cacheKey)
+      .eq('function_name', 'mock-exam-generate')
+      .gt('expires_at', new Date().toISOString())
+      .maybeSingle();
+
+    if (error) {
+      console.error('[CACHE] Check error:', error.message);
+      return null;
+    }
+
+    if (data) {
+      console.log(`[CACHE] ✅ HIT! Key: ${cacheKey}, Hits: ${(data.hit_count || 0) + 1}`);
+      
+      // Increment hit count
+      await supabase.rpc('increment_cache_hit', { p_id: data.id });
+      
+      return data.response as { questions: GeneratedQuestion[] };
+    }
+
+    console.log(`[CACHE] ❌ MISS. Key: ${cacheKey}`);
+    return null;
+  } catch (e) {
+    console.error('[CACHE] Check exception:', e);
+    return null;
+  }
+}
+
+// Save to cache
+async function saveToCache(
+  supabase: any,
+  cacheKey: string,
+  params: GenerateRequest,
+  questions: GeneratedQuestion[]
+): Promise<void> {
+  try {
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + CACHE_CONFIG.EXPIRY_HOURS);
+
+    // 오디오 URL이 있는 문제만 캐싱 (TTS 비용 절감이 주 목적)
+    const questionsWithAudio = questions.filter(q => q.question_audio_url);
+    if (questionsWithAudio.length === 0) {
+      console.log('[CACHE] No questions with audio, skipping cache');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('ai_response_cache')
+      .upsert({
+        cache_key: cacheKey,
+        function_name: 'mock-exam-generate',
+        request_params: {
+          examType: params.examType,
+          section: params.section,
+          difficulty: params.difficulty,
+          topic: params.topic,
+          questionCount: params.questionCount,
+          listeningQuestionType: params.listeningQuestionType,
+        },
+        response: { questions },
+        expires_at: expiresAt.toISOString(),
+        hit_count: 0,
+      }, {
+        onConflict: 'cache_key',
+      });
+
+    if (error) {
+      console.error('[CACHE] Save error:', error.message);
+    } else {
+      console.log(`[CACHE] 💾 Saved! Key: ${cacheKey}, Questions: ${questions.length}`);
+    }
+  } catch (e) {
+    console.error('[CACHE] Save exception:', e);
+  }
+}
+
 interface GenerateRequest {
   examType: "topik1" | "topik2";
   section: "listening" | "reading" | "writing";
@@ -1140,11 +1250,19 @@ async function handleStreamingGeneration(
   supabase: any
 ): Promise<Response> {
   const encoder = new TextEncoder();
-  const systemPrompt = buildSystemPrompt(params, ragContext);
   
   // 듣기 문제는 Claude 사용, 나머지는 Gemini 2.5 Pro
   const useClaude = params.section === 'listening';
   const modelName = useClaude ? 'claude-sonnet-4-5-20250929' : (Deno.env.get("GEMINI_MODEL") || "gemini-2.5-pro");
+
+  // 🚀 듣기 문제 캐시 체크 (토큰 절감)
+  const cacheKey = params.section === 'listening' ? generateCacheKey(params) : '';
+  let cachedResponse: { questions: GeneratedQuestion[] } | null = null;
+  
+  if (params.section === 'listening' && cacheKey) {
+    console.log(`[CACHE] 🔍 Checking cache for listening questions: ${cacheKey}`);
+    cachedResponse = await checkCache(supabase, cacheKey);
+  }
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -1155,10 +1273,36 @@ async function handleStreamingGeneration(
           controller.enqueue(encoder.encode(`data: ${data}\n\n`));
         };
 
+        // 🚀 캐시 히트 시 즉시 반환 (토큰 0 소모!)
+        if (cachedResponse && cachedResponse.questions?.length > 0) {
+          console.log(`[CACHE] ⚡ Returning ${cachedResponse.questions.length} cached questions`);
+          
+          sendProgress("cache", 10, "💾 캐시에서 문제 로드 중...");
+          sendProgress("cache", 50, `💾 캐시 히트! ${cachedResponse.questions.length}개 문제 발견`);
+          sendProgress("complete", 100, "🎉 캐시에서 즉시 로드 완료! (토큰 0 소모)");
+
+          const finalData = JSON.stringify({
+            type: "complete",
+            success: true,
+            questions: cachedResponse.questions,
+            ragUsed: false,
+            ragDocCount: 0,
+            model: "cache",
+            cached: true,
+            cacheKey: cacheKey,
+          });
+          controller.enqueue(encoder.encode(`data: ${finalData}\n\n`));
+          controller.close();
+          return;
+        }
+
         sendProgress("rag", 20, "📚 RAG 검색 완료");
         
         const modelLabel = useClaude ? "Claude Sonnet 4 (듣기 전용)" : "Gemini 2.5 Pro";
         sendProgress("generating", 30, `🤖 ${modelLabel} 문제 생성 시작...`);
+        
+        // 캐시 미스 시 프롬프트 생성
+        const systemPrompt = buildSystemPrompt(params, ragContext);
 
         let aiResponse: Response | null = null;
         let lastError = "";
@@ -1424,6 +1568,12 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
           }
         }
 
+        // 🚀 듣기 문제 캐시 저장 (다음 요청에서 토큰 절감)
+        if (params.section === 'listening' && cacheKey && validQuestions.length > 0) {
+          sendProgress("cache", 98, "💾 캐시 저장 중...");
+          await saveToCache(supabase, cacheKey, params, validQuestions);
+        }
+
         sendProgress("complete", 100, "🎉 생성 완료!");
 
         // Send final result
@@ -1434,6 +1584,8 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
           ragUsed: !!ragContext,
           ragDocCount: ragContext ? ragContext.split('---').length : 0,
           model: modelName,
+          cached: false,
+          cacheKey: cacheKey || undefined,
         });
         controller.enqueue(encoder.encode(`data: ${finalData}\n\n`));
         controller.close();
