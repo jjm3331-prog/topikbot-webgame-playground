@@ -91,33 +91,27 @@ const KPop = () => {
     setIsLoading(true);
     setVideoLoaded(false);
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kpop-lyrics`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({
-            difficulty: selectedDifficulty,
-            excludeIds: usedIds,
-            validate: true,
-          }),
-        }
-      );
+      const { data, error } = await supabase.functions.invoke('kpop-lyrics', {
+        body: {
+          difficulty: selectedDifficulty,
+          excludeIds: usedIds,
+          count: 5,
+          validate: true,
+        },
+      });
 
-      if (!response.ok) throw new Error('Failed to load');
-      const data = await response.json();
-      setQuestions(data.questions || []);
+      if (error) throw error;
+
+      setQuestions((data as any)?.questions || []);
       setCurrentIndex(0);
       setUserAnswer('');
       setShowHint(false);
       setIsAnswered(false);
       setGameComplete(false);
       setTimeLeft(TIMER_DURATION);
-      setVideoKey(prev => prev + 1);
+      setVideoKey((prev) => prev + 1);
     } catch (error) {
+      console.error('[KPop] loadQuestions failed:', error);
       toast.error(t('kpop.loadFailed'));
     } finally {
       setIsLoading(false);
