@@ -129,7 +129,19 @@ ${slangExamples.slice(0, 50).join(', ')}... 등 다양한 신조어에서 선택
 3. Choose expressions from the FULL range of possibilities, not just common ones
 4. Each quiz must feel completely fresh and different
 
-${langInstructions[language] || langInstructions.en}
+## BILINGUAL OUTPUT REQUIREMENT:
+For EVERY text field (meaning, example, options), you MUST provide BOTH Korean AND the target language (${language}) together.
+- If target language is 'ko', only Korean is needed
+- If target language is NOT 'ko', format as: "한국어 설명 / Target language translation"
+
+Example for Vietnamese (vi):
+- meaning: "기준이 까다롭다 / Có tiêu chuẩn cao, khó tính"
+- example: "그녀는 눈이 높아서 아무나 안 만나요. / Cô ấy có tiêu chuẩn cao nên không gặp ai cũng được."
+- options: ["기준이 까다롭다 / Có tiêu chuẩn cao", "시력이 좋다 / Thị lực tốt", ...]
+
+Example for English (en):
+- meaning: "기준이 까다롭다 / To have high standards"
+- example: "그녀는 눈이 높아서 아무나 안 만나요. / She has high standards so she doesn't date just anyone."
 
 ## CATEGORY INSTRUCTIONS:
 ${categoryPrompt}
@@ -153,10 +165,10 @@ ${categoryPrompt}
 {
   "questions": [
     {
-      "expression": "한국어 표현 (ALWAYS in Korean)",
-      "meaning": "정확한 의미 설명 (in target language)",
-      "example": "실제 대화/상황 예문 (in target language with Korean expression)",
-      "options": ["정답", "그럴듯한 오답1", "그럴듯한 오답2", "그럴듯한 오답3"],
+      "expression": "한국어 표현 (ALWAYS in Korean only)",
+      "meaning": "한국어 설명 / ${language === 'ko' ? '한국어만' : 'Translation in ' + language}",
+      "example": "한국어 예문 / ${language === 'ko' ? '한국어만' : 'Translation in ' + language}",
+      "options": ["한국어 정답 / 번역", "한국어 오답1 / 번역", "한국어 오답2 / 번역", "한국어 오답3 / 번역"],
       "correctIndex": 0-3 (RANDOMIZE this!),
       "category": "idiom" or "slang",
       "difficulty": "easy"/"medium"/"hard"
@@ -171,6 +183,7 @@ ${categoryPrompt}
 - Examples must be realistic everyday situations
 - For slang: use terms from 2020-2025
 - For idioms: include both common and lesser-known expressions
+- EVERY meaning, example, and option MUST have bilingual format (Korean / ${language}) unless ${language} is 'ko'
 
 Generate exactly ${count} UNIQUE questions with maximum variety!`;
 
@@ -220,26 +233,50 @@ Generate exactly ${count} UNIQUE questions with maximum variety!`;
     } catch (parseError) {
       console.error("[idiom-slang-quiz] Parse error:", parseError);
       // Return fallback questions
+      const bilingualFallbacks: Record<string, { meaning: string; example: string; options: string[] }[]> = {
+        ko: [
+          { meaning: "기준이 까다롭다", example: "그녀는 눈이 높아서 아무나 안 만나요.", options: ["기준이 까다롭다", "시력이 좋다", "키가 크다", "자만하다"] },
+          { meaning: "갓(God) + 인생, 부지런하고 계획적인 삶", example: "요즘 갓생 살려고 새벽 5시에 일어나요.", options: ["부지런한 삶", "게으른 삶", "신앙생활", "파티생활"] }
+        ],
+        vi: [
+          { meaning: "기준이 까다롭다 / Có tiêu chuẩn cao, khó tính", example: "그녀는 눈이 높아서 아무나 안 만나요. / Cô ấy có tiêu chuẩn cao nên không hẹn hò với bất kỳ ai.", options: ["기준이 까다롭다 / Có tiêu chuẩn cao", "시력이 좋다 / Thị lực tốt", "키가 크다 / Cao lớn", "자만하다 / Kiêu ngạo"] },
+          { meaning: "갓(God) + 인생 / God + Cuộc sống, sống siêng năng và có kế hoạch", example: "요즘 갓생 살려고 새벽 5시에 일어나요. / Dạo này tôi dậy lúc 5 giờ sáng để sống cuộc đời tốt nhất.", options: ["부지런한 삶 / Cuộc sống siêng năng", "게으른 삶 / Cuộc sống lười biếng", "신앙생활 / Cuộc sống tôn giáo", "파티생활 / Cuộc sống tiệc tùng"] }
+        ],
+        en: [
+          { meaning: "기준이 까다롭다 / To have high standards", example: "그녀는 눈이 높아서 아무나 안 만나요. / She has high standards so she doesn't date just anyone.", options: ["기준이 까다롭다 / To have high standards", "시력이 좋다 / To have good eyesight", "키가 크다 / To be tall", "자만하다 / To be arrogant"] },
+          { meaning: "갓(God) + 인생 / God + Life, living a diligent life", example: "요즘 갓생 살려고 새벽 5시에 일어나요. / I wake up at 5am trying to live my best life.", options: ["부지런한 삶 / Diligent life", "게으른 삶 / Lazy life", "신앙생활 / Religious life", "파티생활 / Party life"] }
+        ],
+        zh: [
+          { meaning: "기준이 까다롭다 / 眼光高，挑剔", example: "그녀는 눈이 높아서 아무나 안 만나요. / 她眼光很高，不会随便约会。", options: ["기준이 까다롭다 / 眼光高", "시력이 좋다 / 视力好", "키가 크다 / 个子高", "자만하다 / 自大"] },
+          { meaning: "갓(God) + 인생 / God + 人生，勤奋有计划的生活", example: "요즘 갓생 살려고 새벽 5시에 일어나요. / 最近为了过充实的生活，凌晨5点起床。", options: ["부지런한 삶 / 勤奋的生活", "게으른 삶 / 懒惰的生活", "신앙생활 / 信仰生活", "파티생활 / 派对生活"] }
+        ],
+        ja: [
+          { meaning: "기준이 까다롭다 / 目が高い、基準が厳しい", example: "그녀는 눈이 높아서 아무나 안 만나요. / 彼女は目が高いので誰とでもは付き合いません。", options: ["기준이 까다롭다 / 基準が高い", "시력이 좋다 / 視力が良い", "키가 크다 / 背が高い", "자만하다 / うぬぼれている"] },
+          { meaning: "갓(God) + 인생 / God + 人生、勤勉で計画的な生活", example: "요즘 갓생 살려고 새벽 5시에 일어나요. / 最近充実した生活のために朝5時に起きています。", options: ["부지런한 삶 / 勤勉な生活", "게으른 삶 / 怠惰な生活", "신앙생활 / 信仰生活", "파티생활 / パーティー生活"] }
+        ],
+        ru: [
+          { meaning: "기준이 까다롭다 / Высокие стандарты, придирчивый", example: "그녀는 눈이 높아서 아무나 안 만나요. / У неё высокие стандарты, она не встречается с кем попало.", options: ["기준이 까다롭다 / Высокие стандарты", "시력이 좋다 / Хорошее зрение", "키가 크다 / Высокий рост", "자만하다 / Высокомерный"] },
+          { meaning: "갓(God) + 인생 / God + Жизнь, усердная и планомерная жизнь", example: "요즘 갓생 살려고 새벽 5시에 일어나요. / Сейчас встаю в 5 утра, чтобы жить лучшей жизнью.", options: ["부지런한 삶 / Усердная жизнь", "게으른 삶 / Ленивая жизнь", "신앙생활 / Религиозная жизнь", "파티생활 / Вечеринки"] }
+        ],
+        uz: [
+          { meaning: "기준이 까다롭다 / Talabi yuqori, tanlab oluvchi", example: "그녀는 눈이 높아서 아무나 안 만나요. / Uning talabi yuqori, hamma bilan uchrashavermaydi.", options: ["기준이 까다롭다 / Talabi yuqori", "시력이 좋다 / Ko'rish yaxshi", "키가 크다 / Bo'yi baland", "자만하다 / Manman"] },
+          { meaning: "갓(God) + 인생 / God + Hayot, tirishqoq va rejali hayot", example: "요즘 갓생 살려고 새벽 5시에 일어나요. / Hozir eng yaxshi hayot uchun ertalab 5 da turaman.", options: ["부지런한 삶 / Tirishqoq hayot", "게으른 삶 / Dangasa hayot", "신앙생활 / Diniy hayot", "파티생활 / Ziyofat hayoti"] }
+        ]
+      };
+      
+      const fallback = bilingualFallbacks[language] || bilingualFallbacks.en;
       quiz = {
         questions: [
           {
             expression: "눈이 높다",
-            meaning: language === 'ko' ? "기준이 까다롭다" : "To have high standards",
-            example: language === 'ko' ? "그녀는 눈이 높아서 아무나 안 만나요." : "She has high standards so she doesn't date just anyone.",
-            options: language === 'ko' 
-              ? ["기준이 까다롭다", "시력이 좋다", "키가 크다", "자만하다"]
-              : ["To have high standards", "To have good eyesight", "To be tall", "To be arrogant"],
+            ...fallback[0],
             correctIndex: 0,
             category: "idiom",
             difficulty: "easy"
           },
           {
             expression: "갓생",
-            meaning: language === 'ko' ? "갓(God) + 인생, 부지런하고 계획적인 삶" : "God + Life, living a diligent and planned life",
-            example: language === 'ko' ? "요즘 갓생 살려고 새벽 5시에 일어나요." : "I wake up at 5am these days trying to live my best life.",
-            options: language === 'ko'
-              ? ["부지런한 삶", "게으른 삶", "신앙생활", "파티생활"]
-              : ["Diligent life", "Lazy life", "Religious life", "Party life"],
+            ...fallback[1],
             correctIndex: 0,
             category: "slang",
             difficulty: "easy"
