@@ -414,6 +414,21 @@ const MockExamTest = () => {
       };
       const limitedQuestions = shuffledQuestions.slice(0, Math.min(questionLimits[mode] || 30, shuffledQuestions.length));
       
+      // Parse option_images properly
+      const parseOptionImages = (optImages: any): string[] | undefined => {
+        if (!optImages) return undefined;
+        if (Array.isArray(optImages)) return optImages as string[];
+        if (typeof optImages === 'string') {
+          try {
+            const parsed = JSON.parse(optImages);
+            return Array.isArray(parsed) ? parsed : undefined;
+          } catch {
+            return undefined;
+          }
+        }
+        return undefined;
+      };
+
       const formattedQuestions: Question[] = limitedQuestions.map(q => ({
         id: q.id,
         question_text: q.question_text,
@@ -424,6 +439,7 @@ const MockExamTest = () => {
         question_number: q.question_number || undefined,
         question_audio_url: q.question_audio_url || undefined,
         question_image_url: q.question_image_url || undefined,
+        option_images: parseOptionImages((q as any).option_images),
         explanation_ko: q.explanation_ko || undefined,
         explanation_vi: q.explanation_vi || undefined,
         explanation_en: q.explanation_en || undefined,
@@ -502,7 +518,25 @@ const MockExamTest = () => {
         return;
       }
       
-      const formattedQuestions: Question[] = questionData.map(q => ({
+      // Parse option_images properly
+      const parseOptionImages = (optImages: any): string[] | undefined => {
+        if (!optImages) return undefined;
+        if (Array.isArray(optImages)) return optImages as string[];
+        if (typeof optImages === 'string') {
+          try {
+            const parsed = JSON.parse(optImages);
+            return Array.isArray(parsed) ? parsed : undefined;
+          } catch {
+            return undefined;
+          }
+        }
+        return undefined;
+      };
+
+      // Shuffle questions for random order
+      const shuffledQuestions = [...questionData].sort(() => Math.random() - 0.5);
+      
+      const formattedQuestions: Question[] = shuffledQuestions.map(q => ({
         id: q.id,
         question_text: q.question_text,
         options: Array.isArray(q.options) ? q.options as string[] : [],
@@ -511,9 +545,14 @@ const MockExamTest = () => {
         part_number: q.part_number,
         question_audio_url: q.question_audio_url || undefined,
         question_image_url: q.question_image_url || undefined,
+        option_images: parseOptionImages((q as any).option_images),
         explanation_ko: q.explanation_ko || undefined,
         explanation_vi: q.explanation_vi || undefined,
-        explanation_en: q.explanation_en || undefined
+        explanation_en: q.explanation_en || undefined,
+        explanation_ja: q.explanation_ja || undefined,
+        explanation_zh: q.explanation_zh || undefined,
+        explanation_ru: q.explanation_ru || undefined,
+        explanation_uz: q.explanation_uz || undefined,
       }));
       
       setQuestions(formattedQuestions);
@@ -1036,14 +1075,73 @@ const MockExamTest = () => {
               
               {/* Multiple Choice Options */}
               {!isWritingSection && (
-                <div className="space-y-3">
+                <div className={cn(
+                  "gap-3",
+                  currentQuestion.option_images && currentQuestion.option_images.length > 0
+                    ? "grid grid-cols-2"
+                    : "space-y-3"
+                )}>
                   {currentQuestion.options.map((option, idx) => {
                     const answer = answers.get(currentQuestion.id);
                     const isSelected = answer?.user_answer === idx;
                     const isCorrect = (idx + 1) === currentQuestion.correct_answer;
                     const showResult = isPracticeMode && answer !== undefined;
                     const circledNumbers = ['①', '②', '③', '④'];
+                    const optionImage = currentQuestion.option_images?.[idx];
                     
+                    // Image-based options (grid layout)
+                    if (optionImage) {
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => handleAnswer(idx)}
+                          disabled={isPracticeMode && answer !== undefined}
+                          className={cn(
+                            "rounded-xl border-2 transition-all overflow-hidden group",
+                            !showResult && isSelected && "border-primary ring-2 ring-primary/30",
+                            !showResult && !isSelected && "border-border hover:border-primary/50",
+                            showResult && isCorrect && "border-green-500 ring-2 ring-green-500/30",
+                            showResult && isSelected && !isCorrect && "border-destructive ring-2 ring-destructive/30"
+                          )}
+                        >
+                          <div className="relative">
+                            <img 
+                              src={optionImage} 
+                              alt={`선택지 ${idx + 1}`}
+                              className="w-full h-32 object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = `https://placehold.co/200x120/1a1a2e/ffffff?text=${circledNumbers[idx]}`;
+                              }}
+                            />
+                            <div className={cn(
+                              "absolute top-2 left-2 w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold",
+                              isSelected ? "bg-primary text-primary-foreground" : "bg-background/80 text-foreground",
+                              showResult && isCorrect && "bg-green-500 text-white",
+                              showResult && isSelected && !isCorrect && "bg-destructive text-white"
+                            )}>
+                              {circledNumbers[idx]}
+                            </div>
+                            {showResult && isCorrect && (
+                              <div className="absolute top-2 right-2">
+                                <CheckCircle2 className="w-6 h-6 text-green-500 bg-white rounded-full" />
+                              </div>
+                            )}
+                            {showResult && isSelected && !isCorrect && (
+                              <div className="absolute top-2 right-2">
+                                <X className="w-6 h-6 text-destructive bg-white rounded-full" />
+                              </div>
+                            )}
+                          </div>
+                          {option && option !== circledNumbers[idx] && (
+                            <div className="p-2 text-sm text-center bg-muted/50">
+                              {option}
+                            </div>
+                          )}
+                        </button>
+                      );
+                    }
+                    
+                    // Text-based options (list layout)
                     return (
                       <button
                         key={idx}
