@@ -158,7 +158,7 @@ async function saveToCache(
         expires_at: expiresAt.toISOString(),
         hit_count: 0,
       }, {
-        onConflict: 'cache_key',
+        onConflict: 'function_name,cache_key',
       });
 
     if (error) {
