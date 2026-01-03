@@ -1006,6 +1006,57 @@ export type Database = {
         }
         Relationships: []
       }
+      kpop_lyrics: {
+        Row: {
+          answer: string
+          artist: string
+          created_at: string
+          difficulty: string
+          genre: string | null
+          hint: string | null
+          id: string
+          is_active: boolean
+          lyric_line: string
+          points: number
+          song: string
+          timestamp: number
+          updated_at: string
+          youtube_id: string
+        }
+        Insert: {
+          answer: string
+          artist: string
+          created_at?: string
+          difficulty?: string
+          genre?: string | null
+          hint?: string | null
+          id?: string
+          is_active?: boolean
+          lyric_line: string
+          points?: number
+          song: string
+          timestamp?: number
+          updated_at?: string
+          youtube_id: string
+        }
+        Update: {
+          answer?: string
+          artist?: string
+          created_at?: string
+          difficulty?: string
+          genre?: string | null
+          hint?: string | null
+          id?: string
+          is_active?: boolean
+          lyric_line?: string
+          points?: number
+          song?: string
+          timestamp?: number
+          updated_at?: string
+          youtube_id?: string
+        }
+        Relationships: []
+      }
       learning_progress: {
         Row: {
           category: string
