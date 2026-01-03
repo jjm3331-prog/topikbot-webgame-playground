@@ -1349,24 +1349,43 @@
   },
   "dating": {
     "title": "恋爱模拟",
+    "description": "与虚拟约会对象聊天学韩语",
+    "swipe": "滑动",
+    "match": "配对成功！",
+    "startChat": "开始聊天",
     "noMoreProfiles": "没有更多资料了！",
     "restart": "重新开始",
-    "startConversation": "开始对话",
-    "match": "配对成功！",
+    "affinity": "好感度",
+    "mbti": "MBTI相性",
+    "miniGame": "小游戏",
+    "spin": "幸运转盘",
+    "sendMessage": "发送消息",
     "inputPlaceholder": "输入消息...",
-    "coupleAlbum": "情侣相册",
-    "noCouplePhotos": "达到100%好感度后生成AI情侣照片！",
-    "endingCollection": "结局收集",
-    "noEndingsYet": "暂无解锁结局，请达到100%好感度！",
-    "romanticEnding": "浪漫",
-    "friendEnding": "好友",
-    "tsundereEnding": "傲娇",
-    "dramaticEnding": "戏剧性",
-    "back": "返回",
-    "photoGenComplete": "情侣照片生成完成！",
+    "endings": "结局收集",
+    "album": "情侣相册",
+    "generatePhoto": "生成情侣照",
+    "generating": "生成中...",
+    "photoGenerated": "💕 情侣照片生成完成！",
     "checkAlbum": "去相册查看！",
-    "miniGameComplete": "小游戏完成！",
-    "affinityPlus": "好感度"
+    "photoGenerationFailed": "照片生成失败",
+    "miniGameComplete": "🎮 小游戏完成！",
+    "affinityBonus": "好感度 +{{bonus}}！",
+    "affinityUp": "好感度 +{{value}}",
+    "affinityDown": "好感度 {{value}}",
+    "albumEmpty": "达到100%好感度后",
+    "albumEmptyDesc": "生成AI情侣照片！",
+    "backToSwipe": "返回滑动",
+    "endingRomantic": "💕 浪漫",
+    "endingFriend": "🤝 好友",
+    "endingTsundere": "😤 傲娇",
+    "endingDramatic": "🎬 戏剧性",
+    "ending": "结局",
+    "noEndings": "暂无解锁结局",
+    "noEndingsDesc": "请达到100%好感度！",
+    "greeting": "嗨！很高兴认识你~ 我是{{name}}！",
+    "inLove": "💕 坠入爱河！",
+    "close": "😊 越来越亲密",
+    "interested": "🤔 感兴趣"
   },
   "manager": {
     "title": "LUKATO经纪人",
@@ -2574,7 +2593,15 @@
     "mistakes": {
       "noMistakes": "没有错题",
       "noMistakesDesc": "模拟考试的错题将保存在这里",
-      "startExam": "开始模拟考试"
+      "startExam": "开始模拟考试",
+      "loadError": "加载错题本时出错",
+      "masteredComplete": "已掌握！",
+      "masteredCancel": "取消掌握",
+      "masteredDesc": "你已掌握这道题",
+      "reviewAgain": "再复习一次",
+      "deleteComplete": "错题已删除",
+      "reviewComplete": "复习完成！",
+      "goodJob": "辛苦了！"
     },
     "error": {
       "notFound": "未找到考试记录"
@@ -2677,8 +2704,21 @@
     "mistake": {
       "viewInVideo": "在视频中查看",
       "reviewAgain": "再次学习",
-      "markComplete": "标记完成"
+      "markComplete": "标记完成",
+      "searchPlaceholder": "搜索单词...",
+      "filterAll": "全部",
+      "filterLearning": "学习中",
+      "filterComplete": "已完成",
+      "noSavedWords": "还没有保存的单词",
+      "noSearchResults": "没有搜索结果",
+      "clickToSave": "观看视频时点击不认识的单词保存到这里",
+      "complete": "完成",
+      "wrongCount": "错了{{count}}次",
+      "addNote": "添加笔记..."
     }
+  },
+  "listening": {
+    "inputPlaceholder": "用韩语输入你听到的内容"
   }
 }
 

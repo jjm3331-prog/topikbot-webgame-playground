@@ -1357,24 +1357,43 @@
   },
   "dating": {
     "title": "Uchrashuv Simulyatori",
+    "description": "Virtual uchrashuvlar orqali koreys tilini o'rganing",
+    "swipe": "Suring",
+    "match": "Mos keldi!",
+    "startChat": "Suhbatni boshlash",
     "noMoreProfiles": "Boshqa profil yo'q!",
     "restart": "Qaytadan boshlash",
-    "startConversation": "Suhbatni boshlash",
-    "match": "Mos keldi!",
+    "affinity": "Yoqtirish",
+    "mbti": "MBTI mosligi",
+    "miniGame": "Mini o'yin",
+    "spin": "Omad g'ildiragi",
+    "sendMessage": "Yuborish",
     "inputPlaceholder": "Xabar yozing...",
-    "coupleAlbum": "Juftlik albomi",
-    "noCouplePhotos": "100% yoqtirish darajasiga yeting va AI juftlik surati yaratilinadi!",
-    "endingCollection": "Yakunlar to'plami",
-    "noEndingsYet": "Hali ochilgan yakunlar yo'q. 100% yoqtirish darajasiga yeting!",
-    "romanticEnding": "Romantik",
-    "friendEnding": "Do'st",
-    "tsundereEnding": "Tsundere",
-    "dramaticEnding": "Dramatik",
-    "back": "Orqaga",
-    "photoGenComplete": "Juftlik surati yaratildi!",
+    "endings": "Yakunlar to'plami",
+    "album": "Juftlik albomi",
+    "generatePhoto": "Juftlik suratini yaratish",
+    "generating": "Yaratilmoqda...",
+    "photoGenerated": "💕 Juftlik surati yaratildi!",
     "checkAlbum": "Albomda tekshiring!",
-    "miniGameComplete": "Mini-o'yin tugadi!",
-    "affinityPlus": "Yoqtirish"
+    "photoGenerationFailed": "Surat yaratishda xato",
+    "miniGameComplete": "🎮 Mini-o'yin tugadi!",
+    "affinityBonus": "Yoqtirish +{{bonus}}!",
+    "affinityUp": "Yoqtirish +{{value}}",
+    "affinityDown": "Yoqtirish {{value}}",
+    "albumEmpty": "100% yoqtirish darajasiga yeting",
+    "albumEmptyDesc": "AI juftlik surati yaratilinadi!",
+    "backToSwipe": "Surish sahifasiga",
+    "endingRomantic": "💕 Romantik",
+    "endingFriend": "🤝 Do'st",
+    "endingTsundere": "😤 Tsundere",
+    "endingDramatic": "🎬 Dramatik",
+    "ending": "Yakun",
+    "noEndings": "Hali ochilgan yakunlar yo'q",
+    "noEndingsDesc": "100% yoqtirish darajasiga yeting!",
+    "greeting": "Salom! Tanishganimdan xursandman~ Men {{name}}man!",
+    "inLove": "💕 Oshiq bo'ldim!",
+    "close": "😊 Yaqinlashmoqdamiz",
+    "interested": "🤔 Qiziqaman"
   },
   "manager": {
     "title": "LUKATO Menejer",
@@ -2575,7 +2594,15 @@
     "mistakes": {
       "noMistakes": "Xatolar yo'q",
       "noMistakesDesc": "Sinov imtihonlaridan noto'g'ri javoblar bu yerda saqlanadi",
-      "startExam": "Sinov imtihonini boshlash"
+      "startExam": "Sinov imtihonini boshlash",
+      "loadError": "Xato daftarini yuklashda xatolik",
+      "masteredComplete": "O'zlashtirildi!",
+      "masteredCancel": "O'zlashtirish bekor qilindi",
+      "masteredDesc": "Siz bu savolni o'zlashtirgansiz",
+      "reviewAgain": "Yana takrorlang",
+      "deleteComplete": "Xato o'chirildi",
+      "reviewComplete": "Takrorlash tugadi!",
+      "goodJob": "Yaxshi ish!"
     },
     "error": {
       "notFound": "Imtihon yozuvi topilmadi"
@@ -2678,8 +2705,21 @@
     "mistake": {
       "viewInVideo": "Videoda ko'rish",
       "reviewAgain": "Qayta o'rganish",
-      "markComplete": "Bajarildi deb belgilash"
+      "markComplete": "Bajarildi deb belgilash",
+      "searchPlaceholder": "So'z qidirish...",
+      "filterAll": "Hammasi",
+      "filterLearning": "O'rganilmoqda",
+      "filterComplete": "Tugallangan",
+      "noSavedWords": "Hali saqlangan so'zlar yo'q",
+      "noSearchResults": "Qidiruv natijalari yo'q",
+      "clickToSave": "Video tomosha qilayotganda noma'lum so'zlarni bosib bu yerda saqlang",
+      "complete": "Tugallangan",
+      "wrongCount": "{{count}} marta xato",
+      "addNote": "Eslatma qo'shish..."
     }
+  },
+  "listening": {
+    "inputPlaceholder": "Eshitganingizni koreys tilida yozing"
   }
 }
 

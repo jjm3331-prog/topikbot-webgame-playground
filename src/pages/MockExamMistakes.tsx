@@ -133,7 +133,7 @@ const MockExamMistakes = () => {
       setLoading(false);
     } catch (error) {
       console.error('Load mistakes error:', error);
-      toast({ title: "오답노트를 불러오는 중 오류가 발생했습니다", variant: "destructive" });
+      toast({ title: t("mockExam.mistakes.loadError"), variant: "destructive" });
       setLoading(false);
     }
   };
@@ -198,8 +198,8 @@ const MockExamMistakes = () => {
       ));
 
       toast({ 
-        title: newMastered ? "마스터 완료!" : "마스터 취소",
-        description: newMastered ? "이 문제를 마스터했습니다" : "다시 복습하세요"
+        title: newMastered ? t("mockExam.mistakes.masteredComplete") : t("mockExam.mistakes.masteredCancel"),
+        description: newMastered ? t("mockExam.mistakes.masteredDesc") : t("mockExam.mistakes.reviewAgain")
       });
     } catch (error) {
       console.error('Toggle mastered error:', error);
@@ -214,7 +214,7 @@ const MockExamMistakes = () => {
         .eq('id', id);
 
       setMistakes(prev => prev.filter(m => m.id !== id));
-      toast({ title: "오답 삭제 완료" });
+      toast({ title: t("mockExam.mistakes.deleteComplete") });
     } catch (error) {
       console.error('Delete mistake error:', error);
     }
@@ -371,11 +371,11 @@ const MockExamMistakes = () => {
                       setCurrentReviewIndex(currentReviewIndex + 1);
                     } else {
                       setReviewMode(false);
-                      toast({ title: "복습 완료!", description: "수고하셨습니다" });
+                      toast({ title: t("mockExam.mistakes.reviewComplete"), description: t("mockExam.mistakes.goodJob") });
                     }
                   }}
                 >
-                  다음
+                  {t("common.next")}
                 </Button>
                 <Button
                   onClick={() => {
