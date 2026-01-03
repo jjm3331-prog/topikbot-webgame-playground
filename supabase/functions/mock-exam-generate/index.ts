@@ -1326,13 +1326,18 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
             sendProgress("generating", 30 + attempt * 2, `🤖 ${modelLabel} 호출 중... (시도 ${attempt + 1}/3, 최대 10분)`);
             
             if (useClaude) {
-              // Claude API 호출 (듣기 문제용) - 스트리밍
-              console.log(`🎧 Using Claude Sonnet 4 for listening questions`);
+              // Claude API 호출 (듣기 문제용) - 스트리밍 + Anthropic 프롬프트 캐싱 (90% 비용 절감)
+              console.log(`🎧 Using Claude Sonnet 4 for listening questions (with prompt caching)`);
+              
+              // 시스템 프롬프트 - cache_control 적용으로 반복 요청 시 90% 비용 절감
+              const systemPromptText = 'You are a TOPIK exam question generator. Always respond in valid JSON format with a "questions" array. Output only JSON, no other text.';
+              
               aiResponse = await fetch('https://api.anthropic.com/v1/messages', {
                 method: 'POST',
                 headers: {
                   'x-api-key': ANTHROPIC_API_KEY!,
                   'anthropic-version': '2023-06-01',
+                  'anthropic-beta': 'prompt-caching-2024-07-31', // 🚀 프롬프트 캐싱 활성화!
                   'Content-Type': 'application/json',
                 },
                 signal: abortController.signal,
@@ -1340,7 +1345,12 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
                   model: 'claude-sonnet-4-5-20250929',
                   max_tokens: 16384,
                   stream: true,
-                  system: 'You are a TOPIK exam question generator. Always respond in valid JSON format with a "questions" array. Output only JSON, no other text.',
+                  // 시스템 메시지에 cache_control 적용 - 핵심 비용 절감!
+                  system: [{
+                    type: 'text',
+                    text: systemPromptText,
+                    cache_control: { type: 'ephemeral' }
+                  }],
                   messages: [
                     { role: 'user', content: userPrompt }
                   ],
