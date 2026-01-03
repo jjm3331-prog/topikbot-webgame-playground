@@ -1161,7 +1161,13 @@
       "next": "Sau", 
       "showResults": "Xem kết quả", 
       "closeQuiz": "Đóng Quiz",
-      "changeSettings": "Đổi cài đặt"
+      "changeSettings": "Đổi cài đặt",
+      "back": "Quay lại",
+      "restart": "Bắt đầu lại",
+      "quiz": "TOPIK Quiz"
+    },
+    "settings": {
+      "speed": "Tốc độ"
     },
     "setup": {
       "levelTitle": "Chọn cấp độ TOPIK",

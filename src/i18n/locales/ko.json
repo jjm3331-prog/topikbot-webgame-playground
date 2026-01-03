@@ -1071,7 +1071,13 @@
       "next": "다음", 
       "showResults": "결과 보기", 
       "closeQuiz": "퀴즈 닫기",
-      "changeSettings": "설정 변경"
+      "changeSettings": "설정 변경",
+      "back": "뒤로",
+      "restart": "다시 시작",
+      "quiz": "TOPIK 퀴즈"
+    },
+    "settings": {
+      "speed": "속도"
     },
     "setup": {
       "levelTitle": "TOPIK 레벨 선택",

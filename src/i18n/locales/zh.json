@@ -943,7 +943,13 @@
       "next": "下一题", 
       "showResults": "查看结果", 
       "closeQuiz": "关闭测验",
-      "changeSettings": "更改设置"
+      "changeSettings": "更改设置",
+      "back": "返回",
+      "restart": "重新开始",
+      "quiz": "TOPIK测验"
+    },
+    "settings": {
+      "speed": "速度"
     },
     "setup": {
       "levelTitle": "选择TOPIK级别",

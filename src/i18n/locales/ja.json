@@ -943,7 +943,13 @@
       "next": "次へ", 
       "showResults": "結果を見る", 
       "closeQuiz": "クイズを閉じる",
-      "changeSettings": "設定変更"
+      "changeSettings": "設定変更",
+      "back": "戻る",
+      "restart": "最初から",
+      "quiz": "TOPIKクイズ"
+    },
+    "settings": {
+      "speed": "速度"
     },
     "setup": {
       "levelTitle": "TOPIKレベルを選択",

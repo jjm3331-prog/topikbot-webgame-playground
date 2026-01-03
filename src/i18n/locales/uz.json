@@ -951,7 +951,13 @@
       "next": "Keyingi", 
       "showResults": "Natijalar", 
       "closeQuiz": "Testni yopish",
-      "changeSettings": "Sozlamalarni o'zgartirish"
+      "changeSettings": "Sozlamalarni o'zgartirish",
+      "back": "Orqaga",
+      "restart": "Qaytadan",
+      "quiz": "TOPIK test"
+    },
+    "settings": {
+      "speed": "Tezlik"
     },
     "setup": {
       "levelTitle": "TOPIK darajasini tanlang",
