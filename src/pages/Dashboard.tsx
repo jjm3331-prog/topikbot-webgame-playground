@@ -228,8 +228,8 @@ const Dashboard = () => {
                         // sessionStorage.clear();
                         
                         toast({
-                          title: "캐시 삭제 완료",
-                          description: "모든 캐시가 삭제되었습니다. 새로고침합니다...",
+                          title: t('dashboard.cache.cleared'),
+                          description: t('dashboard.cache.clearedDesc'),
                         });
                         
                         // 4. 강력 새로고침 (캐시 무시)
@@ -239,14 +239,14 @@ const Dashboard = () => {
                       } catch (error) {
                         console.error("Cache clear error:", error);
                         toast({
-                          title: "오류",
-                          description: "캐시 삭제 중 오류가 발생했습니다.",
+                          title: t('common.error'),
+                          description: t('dashboard.cache.error'),
                           variant: "destructive",
                         });
                       }
                     }}
                     className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center transition-all hover:rotate-180 duration-500 active:scale-90"
-                    title="강력 새로고침 (캐시 삭제)"
+                    title={t('dashboard.cache.refreshTitle')}
                   >
                     <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                   </button>

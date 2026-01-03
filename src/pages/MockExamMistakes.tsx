@@ -285,7 +285,7 @@ const MockExamMistakes = () => {
                   const Icon = getSectionIcon(question?.section || '');
                   return <Icon className="w-4 h-4" />;
                 })()}
-                <span>{question?.section === 'listening' ? '듣기' : question?.section === 'reading' ? '읽기' : '쓰기'}</span>
+                <span>{question?.section === 'listening' ? t('mockExam.sections.listening') : question?.section === 'reading' ? t('mockExam.sections.reading') : t('mockExam.sections.writing')}</span>
                 <span>•</span>
                 <span>Part {question?.part_number}</span>
               </div>
@@ -502,23 +502,23 @@ const MockExamMistakes = () => {
           </div>
           <Select value={sectionFilter} onValueChange={setSectionFilter}>
             <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="영역" />
+              <SelectValue placeholder={t('mockExam.filter.section')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">전체 영역</SelectItem>
-              <SelectItem value="listening">듣기</SelectItem>
-              <SelectItem value="reading">읽기</SelectItem>
-              <SelectItem value="writing">쓰기</SelectItem>
+              <SelectItem value="all">{t('mockExam.filter.allSections')}</SelectItem>
+              <SelectItem value="listening">{t('mockExam.sections.listening')}</SelectItem>
+              <SelectItem value="reading">{t('mockExam.sections.reading')}</SelectItem>
+              <SelectItem value="writing">{t('mockExam.sections.writing')}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="상태" />
+              <SelectValue placeholder={t('mockExam.filter.status')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">전체</SelectItem>
-              <SelectItem value="unmastered">미마스터</SelectItem>
-              <SelectItem value="mastered">마스터</SelectItem>
+              <SelectItem value="all">{t('mockExam.filter.all')}</SelectItem>
+              <SelectItem value="unmastered">{t('mockExam.filter.unmastered')}</SelectItem>
+              <SelectItem value="mastered">{t('mockExam.mastered')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -527,10 +527,10 @@ const MockExamMistakes = () => {
         {filteredMistakes.length === 0 ? (
           <Card className="p-12 text-center">
             <BookOpen className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-xl font-bold mb-2">오답이 없습니다</h3>
-            <p className="text-muted-foreground mb-4">모의고사를 풀고 틀린 문제가 여기에 저장됩니다</p>
+            <h3 className="text-xl font-bold mb-2">{t('mockExam.mistakes.noMistakes')}</h3>
+            <p className="text-muted-foreground mb-4">{t('mockExam.mistakes.noMistakesDesc')}</p>
             <Button onClick={() => navigate('/mock-exam')}>
-              모의고사 시작하기
+              {t('mockExam.mistakes.startExam')}
             </Button>
           </Card>
         ) : (
@@ -561,8 +561,8 @@ const MockExamMistakes = () => {
                               <div>
                                 <div className="flex items-center gap-2 mb-1">
                                   <Badge variant="outline" className="text-xs">
-                                    {mistake.question?.section === 'listening' ? '듣기' : 
-                                     mistake.question?.section === 'reading' ? '읽기' : '쓰기'}
+                                    {mistake.question?.section === 'listening' ? t('mockExam.sections.listening') : 
+                                     mistake.question?.section === 'reading' ? t('mockExam.sections.reading') : t('mockExam.sections.writing')}
                                   </Badge>
                                   <Badge variant="outline" className="text-xs">
                                     Part {mistake.question?.part_number}
@@ -570,7 +570,7 @@ const MockExamMistakes = () => {
                                   {mistake.mastered && (
                                     <Badge className="bg-green-500 text-white text-xs">
                                       <Star className="w-3 h-3 mr-1" />
-                                      마스터
+                                      {t('mockExam.mastered')}
                                     </Badge>
                                   )}
                                 </div>

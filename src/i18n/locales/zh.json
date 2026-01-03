@@ -332,6 +332,12 @@
       "badge": "RAG AI",
       "title": "LUKATO Q&A Agent",
       "description": "使用最强Q&A Agent直接询问高级模型！"
+    },
+    "cache": {
+      "cleared": "缓存已清除",
+      "clearedDesc": "所有缓存已清除。正在刷新...",
+      "error": "清除缓存时发生错误。",
+      "refreshTitle": "强制刷新（清除缓存）"
     }
   },
   "auth": {
@@ -1306,7 +1312,10 @@
     "newQuestionsBtn": "生成新题目",
     "totalQuestions": "题目总数",
     "topikStyle": "TOPIK 风格",
-    "aiTts": "AI TTS"
+    "aiTts": "AI TTS",
+    "dbLoadFailed": "无法从DB加载问题",
+    "usingFallback": "使用示例问题代替。",
+    "ttsFailed": "TTS请求失败"
   },
   "kdrama": {
     "title": "韩剧配音",
@@ -2549,7 +2558,27 @@
       "listening": "听力",
       "reading": "阅读",
        "writing": "写作"
-     }
+     },
+    "filter": {
+      "section": "部分",
+      "allSections": "所有部分",
+      "status": "状态",
+      "all": "全部",
+      "unmastered": "未掌握"
+    },
+    "mastered": "已掌握",
+    "analysis": {
+      "listening": "听力分析",
+      "reading": "阅读分析"
+    },
+    "mistakes": {
+      "noMistakes": "没有错题",
+      "noMistakesDesc": "模拟考试的错题将保存在这里",
+      "startExam": "开始模拟考试"
+    },
+    "error": {
+      "notFound": "未找到考试记录"
+    }
    },
   "hanjaMindmapPage": {
     "seo": {
@@ -2643,6 +2672,13 @@
     "noEndings": "还没有解锁的结局",
     "backToSwipe": "返回",
     "unlockedEndings": "已解锁结局"
+  },
+  "video": {
+    "mistake": {
+      "viewInVideo": "在视频中查看",
+      "reviewAgain": "再次学习",
+      "markComplete": "标记完成"
+    }
   }
 }
 

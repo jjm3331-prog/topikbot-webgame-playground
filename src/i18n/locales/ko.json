@@ -347,6 +347,12 @@
       "badge": "RAG AI",
       "title": "LUKATO Q&A Agent",
       "description": "최고 성능의 Q&A 에이전트로 프리미엄 모델에 직접 질문하세요!"
+    },
+    "cache": {
+      "cleared": "캐시 삭제 완료",
+      "clearedDesc": "모든 캐시가 삭제되었습니다. 새로고침합니다...",
+      "error": "캐시 삭제 중 오류가 발생했습니다.",
+      "refreshTitle": "강력 새로고침 (캐시 삭제)"
     }
   },
   "auth": {
@@ -1725,7 +1731,10 @@
     "yourScore": "당신의 점수",
     "tryAgainBtn": "다시 시도",
     "playAgain": "다시 하기",
-    "newQuestionsBtn": "새 문제 생성"
+    "newQuestionsBtn": "새 문제 생성",
+    "dbLoadFailed": "DB 문제 로드 실패",
+    "usingFallback": "기본 문제로 연습합니다.",
+    "ttsFailed": "TTS 요청 실패"
   },
   "parttime": {
     "title": "아르바이트",
@@ -2985,6 +2994,26 @@
       "listening": "듣기",
       "reading": "읽기",
       "writing": "쓰기"
+    },
+    "filter": {
+      "section": "영역",
+      "allSections": "전체 영역",
+      "status": "상태",
+      "all": "전체",
+      "unmastered": "미마스터"
+    },
+    "mastered": "마스터",
+    "analysis": {
+      "listening": "듣기 분석",
+      "reading": "읽기 분석"
+    },
+    "mistakes": {
+      "noMistakes": "오답이 없습니다",
+      "noMistakesDesc": "모의고사를 풀고 틀린 문제가 여기에 저장됩니다",
+      "startExam": "모의고사 시작하기"
+    },
+    "error": {
+      "notFound": "시험 기록을 찾을 수 없습니다"
     }
   },
   "hanjaMindmapPage": {
@@ -3079,6 +3108,13 @@
     "noEndings": "아직 해금된 엔딩이 없어요",
     "backToSwipe": "돌아가기",
     "unlockedEndings": "해금된 엔딩"
+  },
+  "video": {
+    "mistake": {
+      "viewInVideo": "영상에서 보기",
+      "reviewAgain": "다시 학습하기",
+      "markComplete": "학습 완료"
+    }
   }
 }
 
