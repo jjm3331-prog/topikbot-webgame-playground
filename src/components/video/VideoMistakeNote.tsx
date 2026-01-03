@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,6 +34,7 @@ interface VideoMistakeNoteProps {
 }
 
 export default function VideoMistakeNote({ videoId, onSeekTo }: VideoMistakeNoteProps) {
+  const { t } = useTranslation();
   const [mistakes, setMistakes] = useState<VideoMistake[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -279,7 +281,7 @@ export default function VideoMistakeNote({ videoId, onSeekTo }: VideoMistakeNote
                         size="sm"
                         variant="outline"
                         onClick={() => onSeekTo(mistake.timestamp_start)}
-                        title="영상에서 보기"
+                        title={t('video.mistake.viewInVideo')}
                       >
                         <Play className="w-4 h-4" />
                       </Button>
@@ -288,7 +290,7 @@ export default function VideoMistakeNote({ videoId, onSeekTo }: VideoMistakeNote
                       size="sm"
                       variant={mistake.mastered ? 'outline' : 'default'}
                       onClick={() => handleToggleMastered(mistake)}
-                      title={mistake.mastered ? '다시 학습하기' : '학습 완료'}
+                      title={mistake.mastered ? t('video.mistake.reviewAgain') : t('video.mistake.markComplete')}
                     >
                       <CheckCircle className="w-4 h-4" />
                     </Button>

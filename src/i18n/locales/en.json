@@ -347,6 +347,12 @@
       "badge": "RAG AI",
       "title": "LUKATO Q&A Agent",
       "description": "Ask premium models directly with the highest-performance Q&A Agent!"
+    },
+    "cache": {
+      "cleared": "Cache Cleared",
+      "clearedDesc": "All caches have been cleared. Refreshing...",
+      "error": "An error occurred while clearing cache.",
+      "refreshTitle": "Hard Refresh (Clear Cache)"
     }
   },
   "auth": {
@@ -1311,7 +1317,10 @@
     "yourScore": "Your Score",
     "tryAgainBtn": "Try Again",
     "playAgain": "Play Again",
-    "newQuestionsBtn": "Generate New Questions"
+    "newQuestionsBtn": "Generate New Questions",
+    "dbLoadFailed": "Failed to load DB questions",
+    "usingFallback": "Using sample questions instead.",
+    "ttsFailed": "TTS request failed"
   },
   "dating": {
     "title": "Dating Sim",
@@ -2824,7 +2833,27 @@
       "listening": "Listening",
       "reading": "Reading",
        "writing": "Writing"
-     }
+     },
+    "filter": {
+      "section": "Section",
+      "allSections": "All Sections",
+      "status": "Status",
+      "all": "All",
+      "unmastered": "Unmastered"
+    },
+    "mastered": "Mastered",
+    "analysis": {
+      "listening": "Listening Analysis",
+      "reading": "Reading Analysis"
+    },
+    "mistakes": {
+      "noMistakes": "No mistakes yet",
+      "noMistakesDesc": "Wrong answers from mock exams will be saved here",
+      "startExam": "Start Mock Exam"
+    },
+    "error": {
+      "notFound": "Exam record not found"
+    }
    },
   "hanjaMindmapPage": {
     "seo": {
@@ -2918,6 +2947,13 @@
     "noEndings": "No endings unlocked yet",
     "backToSwipe": "Go Back",
     "unlockedEndings": "Unlocked Endings"
+  },
+  "video": {
+    "mistake": {
+      "viewInVideo": "View in Video",
+      "reviewAgain": "Review Again",
+      "markComplete": "Mark Complete"
+    }
   }
 }
 

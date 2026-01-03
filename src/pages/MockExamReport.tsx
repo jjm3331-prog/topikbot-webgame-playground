@@ -91,7 +91,7 @@ const MockExamReport = () => {
         .single();
 
       if (attemptError || !attemptData) {
-        toast({ title: "시험 기록을 찾을 수 없습니다", variant: "destructive" });
+        toast({ title: t('mockExam.error.notFound'), variant: "destructive" });
         navigate('/mock-exam');
         return;
       }
@@ -320,7 +320,7 @@ const MockExamReport = () => {
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-muted-foreground">듣기</span>
+                    <span className="text-muted-foreground">{t('mockExam.sections.listening')}</span>
                     <Headphones className="w-5 h-5 text-blue-500" />
                   </div>
                   <p className="text-3xl font-bold">{report.scores.listening}%</p>
@@ -331,7 +331,7 @@ const MockExamReport = () => {
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-muted-foreground">읽기</span>
+                    <span className="text-muted-foreground">{t('mockExam.sections.reading')}</span>
                     <BookOpen className="w-5 h-5 text-emerald-500" />
                   </div>
                   <p className="text-3xl font-bold">{report.scores.reading}%</p>
@@ -411,7 +411,7 @@ const MockExamReport = () => {
                     <CardHeader className="pb-3">
                       <CardTitle className="flex items-center gap-2">
                         <Headphones className="w-5 h-5 text-blue-500" />
-                        듣기 분석
+                        {t('mockExam.analysis.listening')}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -425,7 +425,7 @@ const MockExamReport = () => {
                     <CardHeader className="pb-3">
                       <CardTitle className="flex items-center gap-2">
                         <BookOpen className="w-5 h-5 text-emerald-500" />
-                        읽기 분석
+                        {t('mockExam.analysis.reading')}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>

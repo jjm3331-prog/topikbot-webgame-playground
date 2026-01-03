@@ -347,6 +347,12 @@
       "badge": "RAG AI",
       "title": "LUKATO Q&A Agent",
       "description": "Hỏi trực tiếp các mô hình Premium với Q&A Agent hiệu suất cao nhất!"
+    },
+    "cache": {
+      "cleared": "Xóa Cache Thành Công",
+      "clearedDesc": "Tất cả cache đã được xóa. Đang làm mới...",
+      "error": "Đã xảy ra lỗi khi xóa cache.",
+      "refreshTitle": "Làm mới mạnh (Xóa Cache)"
     }
   },
   "auth": {
@@ -1674,7 +1680,10 @@
     "yourScore": "Điểm của bạn",
     "tryAgainBtn": "Thử lại",
     "playAgain": "Chơi lại",
-    "newQuestionsBtn": "Tạo câu hỏi mới"
+    "newQuestionsBtn": "Tạo câu hỏi mới",
+    "dbLoadFailed": "Không thể tải câu hỏi từ DB",
+    "usingFallback": "Sử dụng câu hỏi mẫu thay thế.",
+    "ttsFailed": "Yêu cầu TTS thất bại"
   },
   "parttime": {
     "title": "Làm thêm",
@@ -2866,7 +2875,27 @@
       "listening": "Nghe",
       "reading": "Đọc",
        "writing": "Viết"
-     }
+     },
+    "filter": {
+      "section": "Phần",
+      "allSections": "Tất cả phần",
+      "status": "Trạng thái",
+      "all": "Tất cả",
+      "unmastered": "Chưa master"
+    },
+    "mastered": "Đã master",
+    "analysis": {
+      "listening": "Phân tích nghe",
+      "reading": "Phân tích đọc"
+    },
+    "mistakes": {
+      "noMistakes": "Không có lỗi nào",
+      "noMistakesDesc": "Câu trả lời sai từ thi thử sẽ được lưu ở đây",
+      "startExam": "Bắt đầu thi thử"
+    },
+    "error": {
+      "notFound": "Không tìm thấy bản ghi thi"
+    }
    },
   "hanjaMindmapPage": {
     "seo": {
@@ -2960,6 +2989,13 @@
     "noEndings": "Chưa mở khóa kết thúc nào",
     "backToSwipe": "Quay lại",
     "unlockedEndings": "Kết thúc đã mở khóa"
+  },
+  "video": {
+    "mistake": {
+      "viewInVideo": "Xem trong video",
+      "reviewAgain": "Học lại",
+      "markComplete": "Đánh dấu hoàn thành"
+    }
   }
 }
 

@@ -330,6 +330,12 @@
       "badge": "RAG AI",
       "title": "LUKATO Q&A Агент",
       "description": "Задавайте вопросы премиум-моделям напрямую с нашим лучшим Q&A Агентом!"
+    },
+    "cache": {
+      "cleared": "Кэш очищен",
+      "clearedDesc": "Весь кэш очищен. Обновление...",
+      "error": "Ошибка при очистке кэша.",
+      "refreshTitle": "Принудительное обновление (Очистка кэша)"
     }
   },
   "auth": {
@@ -1304,7 +1310,10 @@
     "newQuestionsBtn": "Создать новые вопросы",
     "totalQuestions": "Всего вопросов",
     "topikStyle": "Стиль TOPIK",
-    "aiTts": "AI TTS"
+    "aiTts": "AI TTS",
+    "dbLoadFailed": "Не удалось загрузить вопросы из БД",
+    "usingFallback": "Используются примеры вопросов.",
+    "ttsFailed": "Ошибка запроса TTS"
   },
   "kdrama": {
     "title": "Дубляж К-дорамы",
@@ -2540,7 +2549,27 @@
       "listening": "Аудирование",
       "reading": "Чтение",
        "writing": "Письмо"
-     }
+     },
+    "filter": {
+      "section": "Раздел",
+      "allSections": "Все разделы",
+      "status": "Статус",
+      "all": "Все",
+      "unmastered": "Не освоено"
+    },
+    "mastered": "Освоено",
+    "analysis": {
+      "listening": "Анализ аудирования",
+      "reading": "Анализ чтения"
+    },
+    "mistakes": {
+      "noMistakes": "Ошибок пока нет",
+      "noMistakesDesc": "Неправильные ответы из пробных экзаменов будут сохранены здесь",
+      "startExam": "Начать пробный экзамен"
+    },
+    "error": {
+      "notFound": "Запись экзамена не найдена"
+    }
    },
   "hanjaMindmapPage": {
     "seo": {
@@ -2634,6 +2663,13 @@
     "noEndings": "Концовок пока нет",
     "backToSwipe": "Назад",
     "unlockedEndings": "Разблокированные концовки"
+  },
+  "video": {
+    "mistake": {
+      "viewInVideo": "Смотреть в видео",
+      "reviewAgain": "Повторить",
+      "markComplete": "Отметить выполненным"
+    }
   }
 }
 

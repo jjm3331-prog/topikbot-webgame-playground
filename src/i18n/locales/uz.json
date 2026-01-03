@@ -330,6 +330,12 @@
       "badge": "RAG AI",
       "title": "LUKATO Q&A Agent",
       "description": "Eng yaxshi Q&A Agent bilan premium modellardan to'g'ridan-to'g'ri so'rang!"
+    },
+    "cache": {
+      "cleared": "Kesh Tozalandi",
+      "clearedDesc": "Barcha kesh tozalandi. Yangilanmoqda...",
+      "error": "Keshni tozalashda xato yuz berdi.",
+      "refreshTitle": "Kuchli yangilash (Keshni tozalash)"
     }
   },
   "auth": {
@@ -1314,7 +1320,10 @@
     "newQuestionsBtn": "Yangi savollar yaratish",
     "totalQuestions": "Jami savollar",
     "topikStyle": "TOPIK uslubi",
-    "aiTts": "AI TTS"
+    "aiTts": "AI TTS",
+    "dbLoadFailed": "DBdan savollarni yuklab bo'lmadi",
+    "usingFallback": "Namuna savollardan foydalanilmoqda.",
+    "ttsFailed": "TTS so'rovi muvaffaqiyatsiz"
   },
   "kdrama": {
     "title": "K-Drama Dublyaj",
@@ -2550,7 +2559,27 @@
       "listening": "Tinglash",
       "reading": "O'qish",
        "writing": "Yozish"
-     }
+     },
+    "filter": {
+      "section": "Bo'lim",
+      "allSections": "Barcha bo'limlar",
+      "status": "Holat",
+      "all": "Hammasi",
+      "unmastered": "O'zlashtirilmagan"
+    },
+    "mastered": "O'zlashtirilgan",
+    "analysis": {
+      "listening": "Tinglash tahlili",
+      "reading": "O'qish tahlili"
+    },
+    "mistakes": {
+      "noMistakes": "Xatolar yo'q",
+      "noMistakesDesc": "Sinov imtihonlaridan noto'g'ri javoblar bu yerda saqlanadi",
+      "startExam": "Sinov imtihonini boshlash"
+    },
+    "error": {
+      "notFound": "Imtihon yozuvi topilmadi"
+    }
    },
   "hanjaMindmapPage": {
     "seo": {
@@ -2644,6 +2673,13 @@
     "noEndings": "Hali ochilgan yakun yo'q",
     "backToSwipe": "Orqaga",
     "unlockedEndings": "Ochilgan yakunlar"
+  },
+  "video": {
+    "mistake": {
+      "viewInVideo": "Videoda ko'rish",
+      "reviewAgain": "Qayta o'rganish",
+      "markComplete": "Bajarildi deb belgilash"
+    }
   }
 }
 

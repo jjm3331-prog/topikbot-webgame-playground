@@ -321,8 +321,8 @@ const ListeningPractice = () => {
       console.error('Error fetching listening questions from DB:', error);
       setListeningQuestions(fallbackQuestions);
       toast({
-        title: "DB 문제 로드 실패",
-        description: "기본 문제로 연습합니다.",
+        title: t('listening.dbLoadFailed'),
+        description: t('listening.usingFallback'),
         variant: "destructive",
       });
     } finally {
@@ -367,7 +367,7 @@ const ListeningPractice = () => {
         );
 
         if (!response.ok) {
-          throw new Error("TTS 요청 실패");
+          throw new Error(t('listening.ttsFailed'));
         }
 
         const audioBlob = await response.blob();

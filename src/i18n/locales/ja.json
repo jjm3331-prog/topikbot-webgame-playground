@@ -332,6 +332,12 @@
       "badge": "RAG AI",
       "title": "LUKATO Q&A Agent",
       "description": "最高性能のQ&Aエージェントでプレミアムモデルに直接質問！"
+    },
+    "cache": {
+      "cleared": "キャッシュ削除完了",
+      "clearedDesc": "すべてのキャッシュが削除されました。更新します...",
+      "error": "キャッシュ削除中にエラーが発生しました。",
+      "refreshTitle": "強制更新（キャッシュ削除）"
     }
   },
   "auth": {
@@ -1449,7 +1455,10 @@
     "newQuestionsBtn": "新しい問題を生成",
     "totalQuestions": "合計問題数",
     "topikStyle": "TOPIK スタイル",
-    "aiTts": "AI TTS"
+    "aiTts": "AI TTS",
+    "dbLoadFailed": "DB問題読み込み失敗",
+    "usingFallback": "サンプル問題を使用します。",
+    "ttsFailed": "TTSリクエスト失敗"
   },
   "kdrama": {
     "title": "Kドラマ吹き替え",
@@ -2535,7 +2544,27 @@
       "listening": "聞き取り",
       "reading": "読解",
        "writing": "作文"
-     }
+     },
+    "filter": {
+      "section": "セクション",
+      "allSections": "全セクション",
+      "status": "状態",
+      "all": "すべて",
+      "unmastered": "未マスター"
+    },
+    "mastered": "マスター",
+    "analysis": {
+      "listening": "聞き取り分析",
+      "reading": "読解分析"
+    },
+    "mistakes": {
+      "noMistakes": "誤答がありません",
+      "noMistakesDesc": "模擬試験の誤答がここに保存されます",
+      "startExam": "模擬試験を始める"
+    },
+    "error": {
+      "notFound": "試験記録が見つかりません"
+    }
    },
   "hanjaMindmapPage": {
     "seo": {
@@ -2629,6 +2658,13 @@
     "noEndings": "解放されたエンディングがありません",
     "backToSwipe": "戻る",
     "unlockedEndings": "解放されたエンディング"
+  },
+  "video": {
+    "mistake": {
+      "viewInVideo": "動画で見る",
+      "reviewAgain": "もう一度学習",
+      "markComplete": "学習完了"
+    }
   }
 }
 
