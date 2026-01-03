@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,6 +30,7 @@ interface OXSpeedProps {
 }
 
 const OXSpeed = ({ level, onMistake }: OXSpeedProps) => {
+  const { t } = useTranslation();
   const [questions, setQuestions] = useState<OXQuestion[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -158,7 +160,7 @@ const OXSpeed = ({ level, onMistake }: OXSpeedProps) => {
     return (
       <div className="text-center py-12">
         <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
-        <p className="text-muted-foreground">문제 로딩 중...</p>
+        <p className="text-muted-foreground">{t("oxSpeed.loading")}</p>
       </div>
     );
   }
@@ -167,9 +169,9 @@ const OXSpeed = ({ level, onMistake }: OXSpeedProps) => {
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground mb-4">
-          이 레벨의 O/X 문제가 없습니다.
+          {t("oxSpeed.noQuestions")}
         </p>
-        <Button onClick={fetchQuestions}>다시 시도</Button>
+        <Button onClick={fetchQuestions}>{t("oxSpeed.retry")}</Button>
       </div>
     );
   }
@@ -184,12 +186,12 @@ const OXSpeed = ({ level, onMistake }: OXSpeedProps) => {
         <div className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center mx-auto mb-6">
           <Timer className="w-12 h-12 text-white" />
         </div>
-        <h2 className="text-2xl font-bold mb-2">O/X 스피드 퀴즈</h2>
+        <h2 className="text-2xl font-bold mb-2">{t("oxSpeed.title")}</h2>
         <p className="text-muted-foreground mb-6">
-          5문제 연속! 5초 안에 O 또는 X를 선택하세요
+          {t("oxSpeed.description")}
         </p>
         <Button onClick={startGame} size="lg" className="bg-gradient-to-r from-orange-500 to-red-500">
-          시작하기
+          {t("oxSpeed.start")}
         </Button>
       </motion.div>
     );
@@ -206,14 +208,14 @@ const OXSpeed = ({ level, onMistake }: OXSpeedProps) => {
         <div className="w-24 h-24 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center mx-auto mb-6">
           <CheckCircle2 className="w-12 h-12 text-white" />
         </div>
-        <h2 className="text-2xl font-bold mb-2">완료! ⚡</h2>
-        <p className="text-4xl font-bold text-primary mb-2">{score}점</p>
+        <h2 className="text-2xl font-bold mb-2">{t("oxSpeed.complete")} ⚡</h2>
+        <p className="text-4xl font-bold text-primary mb-2">{score}{t("oxSpeed.points")}</p>
         <p className="text-muted-foreground mb-6">
-          정답률: {accuracy}% | 최고 연속: {streak}
+          {t("oxSpeed.accuracy")}: {accuracy}% | {t("oxSpeed.maxStreak")}: {streak}
         </p>
         <Button onClick={handleRestart} size="lg">
           <RotateCcw className="w-4 h-4 mr-2" />
-          다시 도전
+          {t("oxSpeed.tryAgain")}
         </Button>
       </motion.div>
     );
@@ -242,7 +244,7 @@ const OXSpeed = ({ level, onMistake }: OXSpeedProps) => {
           <div className={`text-2xl font-bold ${timeLeft <= 2 ? 'text-red-500 animate-pulse' : 'text-foreground'}`}>
             ⏱️ {timeLeft}s
           </div>
-          <span className="text-lg font-bold text-primary">{score}점</span>
+          <span className="text-lg font-bold text-primary">{score}{t("oxSpeed.points")}</span>
         </div>
       </div>
 
@@ -326,8 +328,8 @@ const OXSpeed = ({ level, onMistake }: OXSpeedProps) => {
               <p className={`text-lg font-bold mb-2 ${
                 selectedAnswer === currentQuestion.is_correct ? 'text-green-500' : 'text-red-500'
               }`}>
-                {selectedAnswer === currentQuestion.is_correct ? '정답! ✅' : '오답! ❌'}
-                {timeLeft === 0 && ' (시간 초과)'}
+                {selectedAnswer === currentQuestion.is_correct ? t("oxSpeed.correct") : t("oxSpeed.wrong")}
+                {timeLeft === 0 && ` (${t("oxSpeed.timeout")})`}
               </p>
               <p className="text-muted-foreground">
                 {currentQuestion.explanation}
@@ -350,7 +352,7 @@ const OXSpeed = ({ level, onMistake }: OXSpeedProps) => {
           className="flex justify-center"
         >
           <Button onClick={handleNext} size="lg">
-            {currentIndex < questions.length - 1 ? '다음 문제' : '결과 보기'}
+            {currentIndex < questions.length - 1 ? t("oxSpeed.next") : t("oxSpeed.viewResults")}
           </Button>
         </motion.div>
       )}

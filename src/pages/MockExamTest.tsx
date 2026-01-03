@@ -210,14 +210,14 @@ const MockExamTest = () => {
   useEffect(() => {
     const initExam = async () => {
       if (invalidRoute) {
-        toast({ title: '잘못된 접근', description: '선택한 영역/파트 경로가 올바르지 않습니다.', variant: 'destructive' });
+        toast({ title: t('mockExamTest.invalidRoute'), description: t('mockExamTest.invalidRouteDesc'), variant: 'destructive' });
         navigate('/mock-exam');
         return;
       }
 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        toast({ title: "로그인이 필요합니다", variant: "destructive" });
+        toast({ title: t('mockExamTest.loginRequired'), variant: "destructive" });
         navigate('/auth');
         return;
       }
@@ -335,7 +335,7 @@ const MockExamTest = () => {
             safePartNumber,
             countError,
           });
-          toast({ title: '문제를 불러올 수 없습니다', description: '잠시 후 다시 시도해주세요.', variant: 'destructive' });
+          toast({ title: t('mockExamTest.loadFailed'), description: t('mockExamTest.tryLater'), variant: 'destructive' });
           navigate('/mock-exam');
           return;
         }
@@ -343,8 +343,8 @@ const MockExamTest = () => {
         if (!count || count <= 0) {
           console.warn('[MockExamTest] no questions for this route', { examType, mode, section, safePartNumber });
           toast({
-            title: '문제 준비중',
-            description: '선택한 영역/파트에 아직 문제가 없습니다. 다른 항목을 선택해주세요.',
+            title: t('mockExamTest.preparing'),
+            description: t('mockExamTest.noQuestions'),
           });
           navigate('/mock-exam');
           return;
@@ -373,7 +373,7 @@ const MockExamTest = () => {
 
       if (error) {
         console.error('[MockExamTest] question load error', { examType, mode, section, safePartNumber, error });
-        toast({ title: '문제를 불러올 수 없습니다', description: '잠시 후 다시 시도해주세요.', variant: 'destructive' });
+        toast({ title: t('mockExamTest.loadFailed'), description: t('mockExamTest.tryLater'), variant: 'destructive' });
         navigate('/mock-exam');
         return;
       }
@@ -388,8 +388,8 @@ const MockExamTest = () => {
       if (!questionData.length) {
         console.warn('[MockExamTest] no questions found after filtering', { examType, mode, section, safePartNumber });
         toast({
-          title: '문제 준비중',
-          description: '현재 조건으로 출제할 문제가 없습니다. 다른 난이도/항목을 선택해주세요.',
+          title: t('mockExamTest.preparing'),
+          description: t('mockExamTest.noQuestionsFilter'),
         });
         navigate('/mock-exam');
         return;
@@ -492,7 +492,7 @@ const MockExamTest = () => {
       
     } catch (error) {
       console.error('Failed to start exam:', error);
-      toast({ title: "시험 시작 실패", variant: "destructive" });
+      toast({ title: t('mockExamTest.startFailed'), variant: "destructive" });
     }
   };
 
@@ -819,7 +819,7 @@ const MockExamTest = () => {
       
     } catch (error) {
       console.error('Submit failed:', error);
-      toast({ title: "제출 실패", variant: "destructive" });
+      toast({ title: t('mockExamTest.submitFailed'), variant: "destructive" });
     }
   };
 
