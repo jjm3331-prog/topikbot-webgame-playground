@@ -1407,13 +1407,31 @@
     "spin": "럭키 스핀",
     "sendMessage": "메시지 전송",
     "inputPlaceholder": "메시지를 입력하세요...",
-    "endings": "엔딩 모음",
+    "endings": "엔딩 컬렉션",
     "album": "커플 앨범",
     "generatePhoto": "커플 사진 생성",
     "generating": "생성 중...",
-    "photoGenerated": "커플 사진 생성 완료!",
-    "affinityUp": "호감도 상승",
-    "affinityDown": "호감도 하락"
+    "photoGenerated": "💕 커플 사진 생성 완료!",
+    "checkAlbum": "앨범에서 확인하세요!",
+    "photoGenerationFailed": "사진 생성 실패",
+    "miniGameComplete": "🎮 미니게임 완료!",
+    "affinityBonus": "호감도 +{{bonus}}!",
+    "affinityUp": "호감도 +{{value}}",
+    "affinityDown": "호감도 {{value}}",
+    "albumEmpty": "호감도 100%를 달성하면",
+    "albumEmptyDesc": "AI 커플 사진이 생성돼요!",
+    "backToSwipe": "스와이프로",
+    "endingRomantic": "💕 로맨틱",
+    "endingFriend": "🤝 베프",
+    "endingTsundere": "😤 츤데레",
+    "endingDramatic": "🎬 드라마틱",
+    "ending": "엔딩",
+    "noEndings": "아직 해금된 엔딩이 없어요",
+    "noEndingsDesc": "호감도 100%를 달성하세요!",
+    "greeting": "안녕! 반가워요~ 저는 {{name}}이에요!",
+    "inLove": "💕 푹 빠졌어!",
+    "close": "😊 가까운 사이",
+    "interested": "🤔 관심있어"
   },
   "manager": {
     "title": "LUKATO 매니저",
@@ -3010,7 +3028,15 @@
     "mistakes": {
       "noMistakes": "오답이 없습니다",
       "noMistakesDesc": "모의고사를 풀고 틀린 문제가 여기에 저장됩니다",
-      "startExam": "모의고사 시작하기"
+      "startExam": "모의고사 시작하기",
+      "loadError": "오답노트를 불러오는 중 오류가 발생했습니다",
+      "masteredComplete": "마스터 완료!",
+      "masteredCancel": "마스터 취소",
+      "masteredDesc": "이 문제를 마스터했습니다",
+      "reviewAgain": "다시 복습하세요",
+      "deleteComplete": "오답 삭제 완료",
+      "reviewComplete": "복습 완료!",
+      "goodJob": "수고하셨습니다"
     },
     "error": {
       "notFound": "시험 기록을 찾을 수 없습니다"
@@ -3113,8 +3139,21 @@
     "mistake": {
       "viewInVideo": "영상에서 보기",
       "reviewAgain": "다시 학습하기",
-      "markComplete": "학습 완료"
+      "markComplete": "학습 완료",
+      "searchPlaceholder": "단어 검색...",
+      "filterAll": "전체",
+      "filterLearning": "학습중",
+      "filterComplete": "완료",
+      "noSavedWords": "아직 저장된 단어가 없습니다",
+      "noSearchResults": "검색 결과가 없습니다",
+      "clickToSave": "영상 학습 중 모르는 단어를 클릭하면 여기에 저장됩니다",
+      "complete": "완료",
+      "wrongCount": "{{count}}회 틀림",
+      "addNote": "메모 추가..."
     }
+  },
+  "listening": {
+    "inputPlaceholder": "들은 내용을 한국어로 입력하세요"
   }
 }
 

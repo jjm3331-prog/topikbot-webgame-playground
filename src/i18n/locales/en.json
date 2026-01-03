@@ -1324,31 +1324,43 @@
   },
   "dating": {
     "title": "Dating Sim",
+    "description": "Learn Korean by chatting with virtual dates",
+    "swipe": "Swipe",
+    "match": "It's a Match!",
+    "startChat": "Start Chat",
     "noMoreProfiles": "No more profiles!",
     "restart": "Start Over",
-    "startConversation": "Start Conversation",
-    "match": "It's a Match!",
-    "mbti": "MBTI",
-    "game": "Game",
-    "spin": "Spin",
+    "affinity": "Affinity",
+    "mbti": "MBTI Compatibility",
+    "miniGame": "Mini Game",
+    "spin": "Lucky Spin",
+    "sendMessage": "Send Message",
     "inputPlaceholder": "Type message...",
-    "coupleAlbum": "Couple Album",
-    "coupleAlbumVi": "Couple Album",
-    "noCouplePhotos": "Achieve 100% affinity to generate AI couple photos!",
-    "endingCollection": "Ending Collection",
-    "noEndingsYet": "No endings unlocked yet. Achieve 100% affinity!",
-    "romanticEnding": "Romantic",
-    "friendEnding": "BFF",
-    "tsundereEnding": "Tsundere",
-    "dramaticEnding": "Dramatic",
-    "back": "Back",
-    "photoGenComplete": "Couple photo generated!",
+    "endings": "Ending Collection",
+    "album": "Couple Album",
+    "generatePhoto": "Generate Couple Photo",
+    "generating": "Generating...",
+    "photoGenerated": "💕 Couple photo generated!",
     "checkAlbum": "Check it in the album!",
-    "photoGenFailed": "Photo generation failed",
-    "tryAgain": "Please try again",
-    "error": "Error",
-    "miniGameComplete": "Mini-game complete!",
-    "affinityPlus": "Affinity"
+    "photoGenerationFailed": "Photo generation failed",
+    "miniGameComplete": "🎮 Mini-game complete!",
+    "affinityBonus": "Affinity +{{bonus}}!",
+    "affinityUp": "Affinity +{{value}}",
+    "affinityDown": "Affinity {{value}}",
+    "albumEmpty": "Achieve 100% affinity to",
+    "albumEmptyDesc": "generate AI couple photos!",
+    "backToSwipe": "Back to Swipe",
+    "endingRomantic": "💕 Romantic",
+    "endingFriend": "🤝 BFF",
+    "endingTsundere": "😤 Tsundere",
+    "endingDramatic": "🎬 Dramatic",
+    "ending": "Ending",
+    "noEndings": "No endings unlocked yet",
+    "noEndingsDesc": "Achieve 100% affinity!",
+    "greeting": "Hi! Nice to meet you~ I'm {{name}}!",
+    "inLove": "💕 In Love!",
+    "close": "😊 Getting Close",
+    "interested": "🤔 Interested"
   },
   "manager": {
     "title": "LUKATO Manager",
@@ -2849,7 +2861,15 @@
     "mistakes": {
       "noMistakes": "No mistakes yet",
       "noMistakesDesc": "Wrong answers from mock exams will be saved here",
-      "startExam": "Start Mock Exam"
+      "startExam": "Start Mock Exam",
+      "loadError": "Error loading mistake notebook",
+      "masteredComplete": "Mastered!",
+      "masteredCancel": "Mastery cancelled",
+      "masteredDesc": "You've mastered this question",
+      "reviewAgain": "Review again",
+      "deleteComplete": "Mistake deleted",
+      "reviewComplete": "Review complete!",
+      "goodJob": "Well done!"
     },
     "error": {
       "notFound": "Exam record not found"
@@ -2952,8 +2972,21 @@
     "mistake": {
       "viewInVideo": "View in Video",
       "reviewAgain": "Review Again",
-      "markComplete": "Mark Complete"
+      "markComplete": "Mark Complete",
+      "searchPlaceholder": "Search words...",
+      "filterAll": "All",
+      "filterLearning": "Learning",
+      "filterComplete": "Complete",
+      "noSavedWords": "No saved words yet",
+      "noSearchResults": "No search results",
+      "clickToSave": "Click on unknown words while watching to save them here",
+      "complete": "Complete",
+      "wrongCount": "Wrong {{count}} times",
+      "addNote": "Add note..."
     }
+  },
+  "listening": {
+    "inputPlaceholder": "Type what you heard in Korean"
   }
 }
 

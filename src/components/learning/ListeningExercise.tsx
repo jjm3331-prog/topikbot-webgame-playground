@@ -303,7 +303,7 @@ const ListeningExercise = ({ questions, onComplete }: ListeningExerciseProps) =>
         <Input
           value={userAnswer}
           onChange={(e) => setUserAnswer(e.target.value)}
-          placeholder="들은 내용을 한국어로 입력하세요"
+          placeholder={t("listening.inputPlaceholder")}
           className="text-lg py-6"
           disabled={showResult}
           onKeyDown={(e) => {

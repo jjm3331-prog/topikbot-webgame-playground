@@ -173,7 +173,7 @@ export default function VideoMistakeNote({ videoId, onSeekTo }: VideoMistakeNote
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="단어 검색..."
+            placeholder={t("video.mistake.searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -185,21 +185,21 @@ export default function VideoMistakeNote({ videoId, onSeekTo }: VideoMistakeNote
             size="sm"
             onClick={() => setFilter('all')}
           >
-            전체 ({mistakes.length})
+            {t("video.mistake.filterAll")} ({mistakes.length})
           </Button>
           <Button
             variant={filter === 'unmastered' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setFilter('unmastered')}
           >
-            학습중 ({mistakes.filter(m => !m.mastered).length})
+            {t("video.mistake.filterLearning")} ({mistakes.filter(m => !m.mastered).length})
           </Button>
           <Button
             variant={filter === 'mastered' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setFilter('mastered')}
           >
-            완료 ({mistakes.filter(m => m.mastered).length})
+            {t("video.mistake.filterComplete")} ({mistakes.filter(m => m.mastered).length})
           </Button>
         </div>
       </div>
@@ -211,12 +211,12 @@ export default function VideoMistakeNote({ videoId, onSeekTo }: VideoMistakeNote
             <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-50" />
             <p>
               {mistakes.length === 0 
-                ? '아직 저장된 단어가 없습니다'
-                : '검색 결과가 없습니다'
+                ? t("video.mistake.noSavedWords")
+                : t("video.mistake.noSearchResults")
               }
             </p>
             <p className="text-sm mt-2">
-              영상 학습 중 모르는 단어를 클릭하면 여기에 저장됩니다
+              {t("video.mistake.clickToSave")}
             </p>
           </CardContent>
         </Card>
@@ -236,11 +236,11 @@ export default function VideoMistakeNote({ videoId, onSeekTo }: VideoMistakeNote
                       {mistake.mastered && (
                         <Badge variant="secondary" className="text-xs">
                           <CheckCircle className="w-3 h-3 mr-1" />
-                          완료
+                          {t("video.mistake.complete")}
                         </Badge>
                       )}
                       <Badge variant="outline" className="text-xs">
-                        {mistake.mistake_count}회 틀림
+                        {t("video.mistake.wrongCount", { count: mistake.mistake_count })}
                       </Badge>
                     </div>
 
@@ -267,7 +267,7 @@ export default function VideoMistakeNote({ videoId, onSeekTo }: VideoMistakeNote
 
                     {/* Notes */}
                     <Textarea
-                      placeholder="메모 추가..."
+                      placeholder={t("video.mistake.addNote")}
                       value={mistake.notes || ''}
                       onChange={(e) => handleUpdateNotes(mistake, e.target.value)}
                       className="mt-2 text-sm min-h-[60px]"

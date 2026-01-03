@@ -1343,10 +1343,10 @@
     "playAgain": "Chơi lại"
   },
   "dating": {
-    "title": "Mô phỏng hẹn hò",
+    "title": "Mô phỏng Hẹn hò",
     "description": "Học tiếng Hàn qua trò chuyện với người ảo",
     "swipe": "Vuốt",
-    "match": "Khớp!",
+    "match": "Ghép đôi thành công!",
     "startChat": "Bắt đầu trò chuyện",
     "noMoreProfiles": "Hết hồ sơ rồi!",
     "restart": "Bắt đầu lại",
@@ -1360,9 +1360,27 @@
     "album": "Album đôi",
     "generatePhoto": "Tạo ảnh đôi",
     "generating": "Đang tạo...",
-    "photoGenerated": "Đã tạo ảnh đôi!",
-    "affinityUp": "Tăng độ thân mật",
-    "affinityDown": "Giảm độ thân mật"
+    "photoGenerated": "💕 Đã tạo ảnh đôi!",
+    "checkAlbum": "Kiểm tra trong album!",
+    "photoGenerationFailed": "Tạo ảnh thất bại",
+    "miniGameComplete": "🎮 Hoàn thành mini game!",
+    "affinityBonus": "Độ thân mật +{{bonus}}!",
+    "affinityUp": "Độ thân mật +{{value}}",
+    "affinityDown": "Độ thân mật {{value}}",
+    "albumEmpty": "Đạt 100% độ thân mật để",
+    "albumEmptyDesc": "tạo ảnh đôi AI!",
+    "backToSwipe": "Quay lại vuốt",
+    "endingRomantic": "💕 Lãng mạn",
+    "endingFriend": "🤝 Bạn thân",
+    "endingTsundere": "😤 Tsundere",
+    "endingDramatic": "🎬 Kịch tính",
+    "ending": "Kết thúc",
+    "noEndings": "Chưa mở khóa kết thúc nào",
+    "noEndingsDesc": "Đạt 100% độ thân mật!",
+    "greeting": "Xin chào! Rất vui được gặp bạn~ Mình là {{name}}!",
+    "inLove": "💕 Yêu rồi!",
+    "close": "😊 Thân thiết",
+    "interested": "🤔 Quan tâm"
   },
   "manager": {
     "title": "LUKATO Manager",
@@ -2891,7 +2909,15 @@
     "mistakes": {
       "noMistakes": "Không có lỗi nào",
       "noMistakesDesc": "Câu trả lời sai từ thi thử sẽ được lưu ở đây",
-      "startExam": "Bắt đầu thi thử"
+      "startExam": "Bắt đầu thi thử",
+      "loadError": "Lỗi khi tải sổ lỗi",
+      "masteredComplete": "Đã master!",
+      "masteredCancel": "Hủy master",
+      "masteredDesc": "Bạn đã master câu hỏi này",
+      "reviewAgain": "Ôn lại",
+      "deleteComplete": "Đã xóa lỗi",
+      "reviewComplete": "Ôn tập hoàn tất!",
+      "goodJob": "Bạn làm tốt lắm!"
     },
     "error": {
       "notFound": "Không tìm thấy bản ghi thi"
@@ -2994,8 +3020,21 @@
     "mistake": {
       "viewInVideo": "Xem trong video",
       "reviewAgain": "Học lại",
-      "markComplete": "Đánh dấu hoàn thành"
+      "markComplete": "Đánh dấu hoàn thành",
+      "searchPlaceholder": "Tìm từ...",
+      "filterAll": "Tất cả",
+      "filterLearning": "Đang học",
+      "filterComplete": "Hoàn thành",
+      "noSavedWords": "Chưa có từ nào được lưu",
+      "noSearchResults": "Không có kết quả tìm kiếm",
+      "clickToSave": "Nhấn vào từ không biết khi xem video để lưu ở đây",
+      "complete": "Hoàn thành",
+      "wrongCount": "Sai {{count}} lần",
+      "addNote": "Thêm ghi chú..."
     }
+  },
+  "listening": {
+    "inputPlaceholder": "Nhập nội dung bạn nghe được bằng tiếng Hàn"
   }
 }
 
