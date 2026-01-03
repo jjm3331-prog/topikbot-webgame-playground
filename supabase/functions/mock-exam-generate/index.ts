@@ -381,27 +381,30 @@ async function generateListeningAudio(
 
     let finalBytes: Uint8Array;
 
-    if (isMultiSpeaker) {
-      const audioParts: Uint8Array[] = [];
+    // 항상 세그먼트별로 처리 (라벨 제거된 텍스트만 TTS로 전송)
+    const audioParts: Uint8Array[] = [];
 
-      for (let i = 0; i < segments.length; i++) {
-        const seg = segments[i];
-        const voiceId = seg.speakerKey === "male" ? presetCfg.voiceMale : presetCfg.voiceFemale;
+    for (let i = 0; i < segments.length; i++) {
+      const seg = segments[i];
+      
+      // 화자에 따라 목소리 선택 (other는 기본 여자 목소리)
+      const voiceId = seg.speakerKey === "male" 
+        ? presetCfg.voiceMale 
+        : presetCfg.voiceFemale;
 
-        const t = seg.text.endsWith(".") || seg.text.endsWith("?") || seg.text.endsWith("!")
-          ? seg.text
-          : `${seg.text}.`;
+      // "남자:", "여자:" 라벨이 제거된 순수 텍스트만 TTS로 전송
+      const cleanText = seg.text.endsWith(".") || seg.text.endsWith("?") || seg.text.endsWith("!")
+        ? seg.text
+        : `${seg.text}.`;
 
-        const bytes = await synthesizeElevenLabsTTS(t, voiceId);
-        const withoutId3 = i === 0 ? bytes : stripLeadingId3(bytes.buffer);
-        audioParts.push(withoutId3);
-      }
+      console.log(`🎤 Segment ${i + 1}: speaker=${seg.speakerKey}, voice=${voiceId === presetCfg.voiceMale ? 'male' : 'female'}, text="${cleanText.slice(0, 50)}..."`);
 
-      finalBytes = audioParts.length === 1 ? audioParts[0] : concatBytes(audioParts);
-    } else {
-      // Single voice: 그대로 합성
-      finalBytes = await synthesizeElevenLabsTTS(script.trim(), presetCfg.voiceFemale);
+      const bytes = await synthesizeElevenLabsTTS(cleanText, voiceId);
+      const withoutId3 = i === 0 ? bytes : stripLeadingId3(bytes.buffer);
+      audioParts.push(withoutId3);
     }
+
+    finalBytes = audioParts.length === 1 ? audioParts[0] : concatBytes(audioParts);
 
     const fileName = `mock-exam/${examType}/listening_q${questionNumber}_${Date.now()}.mp3`;
 
