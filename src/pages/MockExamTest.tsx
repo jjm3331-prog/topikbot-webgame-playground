@@ -666,6 +666,15 @@ const MockExamTest = () => {
       audio.playbackRate = playbackSpeed;
       audioRef.current = audio;
 
+      // Some browsers fire a late/spurious `error` even after playback has started.
+      // Track if we have ever entered an actual playing state for this audio.
+      let playbackEverStarted = false;
+      const markStarted = () => {
+        playbackEverStarted = true;
+      };
+      audio.addEventListener("playing", markStarted, { once: true });
+      audio.addEventListener("timeupdate", markStarted, { once: true });
+
       audio.onended = () => {
         setIsPlaying(false);
         if (audioObjectUrlRef.current) {
@@ -675,16 +684,17 @@ const MockExamTest = () => {
       };
 
       audio.onerror = (e) => {
-        // 이미 재생 중이거나 재생 완료된 경우 에러 무시
-        // (일부 브라우저에서 재생 후에도 spurious error 이벤트 발생)
-        if (audio.currentTime > 0 || audio.readyState >= 2) {
-          console.warn("[MockExamTest] audio error ignored (already played)", {
+        // If playback has started at any point, ignore the error toast.
+        if (playbackEverStarted || audio.currentTime > 0 || audio.readyState >= 2 || audio.paused === false) {
+          console.warn("[MockExamTest] audio error ignored (playback already started)", {
             currentTime: audio.currentTime,
             readyState: audio.readyState,
+            paused: audio.paused,
+            networkState: audio.networkState,
           });
           return;
         }
-        
+
         console.error("[MockExamTest] audio error", e, {
           src: audio.src,
           networkState: audio.networkState,
