@@ -158,7 +158,7 @@ async function saveToCache(
         expires_at: expiresAt.toISOString(),
         hit_count: 0,
       }, {
-        onConflict: 'ai_response_cache_function_cache_key_unique',
+        onConflict: 'function_name,cache_key',
         ignoreDuplicates: false,
       });
 
