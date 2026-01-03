@@ -121,7 +121,23 @@ ${slangExamples.slice(0, 50).join(', ')}... 등 다양한 신조어에서 선택
     const randomSeed = Math.floor(Math.random() * 1000000);
     const timestamp = Date.now();
 
+    // Language name mapping for clear instructions
+    const languageNames: Record<string, string> = {
+      ko: 'Korean',
+      vi: 'Vietnamese',
+      en: 'English',
+      zh: 'Chinese (Simplified)',
+      ja: 'Japanese',
+      ru: 'Russian',
+      uz: "O'zbek (Uzbek)"
+    };
+    
+    const targetLangName = languageNames[language] || 'English';
+
     const systemPrompt = `You are an expert Korean language quiz generator with deep knowledge of Korean idioms (관용어/속담) and MZ generation slang (신조어).
+
+## CRITICAL - TARGET LANGUAGE: ${targetLangName} (code: ${language})
+ALL translations MUST be in ${targetLangName}. DO NOT use English unless the target language IS English.
 
 ## CRITICAL RULES FOR VARIETY:
 1. NEVER repeat expressions from previous sessions
@@ -129,19 +145,43 @@ ${slangExamples.slice(0, 50).join(', ')}... 등 다양한 신조어에서 선택
 3. Choose expressions from the FULL range of possibilities, not just common ones
 4. Each quiz must feel completely fresh and different
 
-## BILINGUAL OUTPUT REQUIREMENT:
-For EVERY text field (meaning, example, options), you MUST provide BOTH Korean AND the target language (${language}) together.
+## BILINGUAL OUTPUT REQUIREMENT - VERY IMPORTANT:
+For EVERY text field (meaning, example, options), you MUST provide BOTH Korean AND ${targetLangName} together.
 - If target language is 'ko', only Korean is needed
-- If target language is NOT 'ko', format as: "한국어 설명 / Target language translation"
+- If target language is NOT 'ko', format as: "한국어 / ${targetLangName} translation"
 
-Example for Vietnamese (vi):
+### EXAMPLES BY LANGUAGE:
+
+${language === 'vi' ? `For Vietnamese (vi):
 - meaning: "기준이 까다롭다 / Có tiêu chuẩn cao, khó tính"
-- example: "그녀는 눈이 높아서 아무나 안 만나요. / Cô ấy có tiêu chuẩn cao nên không gặp ai cũng được."
-- options: ["기준이 까다롭다 / Có tiêu chuẩn cao", "시력이 좋다 / Thị lực tốt", ...]
+- example: "그녀는 눈이 높아서 아무나 안 만나요. / Cô ấy có tiêu chuẩn cao nên không hẹn hò với ai cũng được."
+- options: ["기준이 까다롭다 / Có tiêu chuẩn cao", "시력이 좋다 / Thị lực tốt", ...]` : ''}
 
-Example for English (en):
+${language === 'en' ? `For English (en):
 - meaning: "기준이 까다롭다 / To have high standards"
 - example: "그녀는 눈이 높아서 아무나 안 만나요. / She has high standards so she doesn't date just anyone."
+- options: ["기준이 까다롭다 / High standards", "시력이 좋다 / Good eyesight", ...]` : ''}
+
+${language === 'zh' ? `For Chinese (zh):
+- meaning: "기준이 까다롭다 / 标准高，挑剔"
+- example: "그녀는 눈이 높아서 아무나 안 만나요. / 她标准很高，不会随便约会。"
+- options: ["기준이 까다롭다 / 标准高", "시력이 좋다 / 视力好", ...]` : ''}
+
+${language === 'ja' ? `For Japanese (ja):
+- meaning: "기준이 까다롭다 / 基準が高い、目が高い"
+- example: "그녀는 눈이 높아서 아무나 안 만나요. / 彼女は目が高いので誰とでも付き合わない。"
+- options: ["기준이 까다롭다 / 基準が高い", "시력이 좋다 / 視力が良い", ...]` : ''}
+
+${language === 'ru' ? `For Russian (ru):
+- meaning: "기준이 까다롭다 / Высокие стандарты, придирчивый"
+- example: "그녀는 눈이 높아서 아무나 안 만나요. / У неё высокие стандарты, она не встречается с кем попало."
+- options: ["기준이 까다롭다 / Высокие стандарты", "시력이 좋다 / Хорошее зрение", ...]` : ''}
+
+${language === 'uz' ? `For Uzbek (uz):
+- meaning: "기준이 까다롭다 / Talabi yuqori, tanlab oluvchi"
+- example: "그녀는 눈이 높아서 아무나 안 만나요. / Uning talabi yuqori, hamma bilan uchrashavermaydi."
+- options: ["기준이 까다롭다 / Talabi yuqori", "시력이 좋다 / Ko'rish yaxshi", "키가 크다 / Bo'yi baland", "자만하다 / Manman"]
+- For slang "갓생": meaning: "God + 인생 / God + Hayot, tirishqoq hayot", example: "요즘 갓생 살려고 새벽 5시에 일어나요. / Eng yaxshi hayot uchun ertalab 5 da turaman."` : ''}
 
 ## CATEGORY INSTRUCTIONS:
 ${categoryPrompt}
@@ -166,9 +206,9 @@ ${categoryPrompt}
   "questions": [
     {
       "expression": "한국어 표현 (ALWAYS in Korean only)",
-      "meaning": "한국어 설명 / ${language === 'ko' ? '한국어만' : 'Translation in ' + language}",
-      "example": "한국어 예문 / ${language === 'ko' ? '한국어만' : 'Translation in ' + language}",
-      "options": ["한국어 정답 / 번역", "한국어 오답1 / 번역", "한국어 오답2 / 번역", "한국어 오답3 / 번역"],
+      "meaning": "한국어 설명 / ${language === 'ko' ? '한국어만' : targetLangName + ' translation here'}",
+      "example": "한국어 예문 / ${language === 'ko' ? '한국어만' : targetLangName + ' translation here'}",
+      "options": ["한국어 / ${targetLangName}", "한국어 / ${targetLangName}", "한국어 / ${targetLangName}", "한국어 / ${targetLangName}"],
       "correctIndex": 0-3 (RANDOMIZE this!),
       "category": "idiom" or "slang",
       "difficulty": "easy"/"medium"/"hard"
@@ -177,13 +217,14 @@ ${categoryPrompt}
 }
 
 ## QUALITY REQUIREMENTS:
+- ALL translations MUST be in ${targetLangName} - NOT English (unless target IS English)
 - correctIndex must be RANDOMLY distributed (0, 1, 2, or 3)
 - Wrong options must be plausible but clearly incorrect
 - Mix of easy (30%), medium (50%), hard (20%) difficulties
 - Examples must be realistic everyday situations
 - For slang: use terms from 2020-2025
 - For idioms: include both common and lesser-known expressions
-- EVERY meaning, example, and option MUST have bilingual format (Korean / ${language}) unless ${language} is 'ko'
+- EVERY meaning, example, and option MUST have bilingual format (Korean / ${targetLangName}) unless ${language} is 'ko'
 
 Generate exactly ${count} UNIQUE questions with maximum variety!`;
 
