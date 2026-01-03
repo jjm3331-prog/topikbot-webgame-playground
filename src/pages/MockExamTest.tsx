@@ -675,6 +675,16 @@ const MockExamTest = () => {
       };
 
       audio.onerror = (e) => {
+        // 이미 재생 중이거나 재생 완료된 경우 에러 무시
+        // (일부 브라우저에서 재생 후에도 spurious error 이벤트 발생)
+        if (audio.currentTime > 0 || audio.readyState >= 2) {
+          console.warn("[MockExamTest] audio error ignored (already played)", {
+            currentTime: audio.currentTime,
+            readyState: audio.readyState,
+          });
+          return;
+        }
+        
         console.error("[MockExamTest] audio error", e, {
           src: audio.src,
           networkState: audio.networkState,
