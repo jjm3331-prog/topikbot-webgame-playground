@@ -1,15 +1,21 @@
 /**
- * i18n Validation Utilities
- * Validates that all language files have the same keys
+ * i18n Validation Utilities (DEV)
+ *
+ * Goals:
+ * - Detect missing keys across locales (vs reference)
+ * - Detect extra keys (keys present in non-reference but missing in reference)
+ * - Detect non-string leaf values (accidental objects/arrays)
+ *
+ * NOTE: This module is meant for development only.
  */
 
-import ko from '@/i18n/locales/ko.json';
-import vi from '@/i18n/locales/vi.json';
-import en from '@/i18n/locales/en.json';
-import ja from '@/i18n/locales/ja.json';
-import zh from '@/i18n/locales/zh.json';
-import ru from '@/i18n/locales/ru.json';
-import uz from '@/i18n/locales/uz.json';
+import ko from "@/i18n/locales/ko.json";
+import vi from "@/i18n/locales/vi.json";
+import en from "@/i18n/locales/en.json";
+import ja from "@/i18n/locales/ja.json";
+import zh from "@/i18n/locales/zh.json";
+import ru from "@/i18n/locales/ru.json";
+import uz from "@/i18n/locales/uz.json";
 
 type TranslationObject = Record<string, unknown>;
 
@@ -23,254 +29,209 @@ const locales: Record<string, TranslationObject> = {
   uz,
 };
 
+export type I18nLeafTypeIssue = {
+  key: string;
+  lang: string;
+  foundType: string;
+};
+
+export type I18nMissingKey = {
+  key: string;
+  inLang: string;
+  missingInLang: string;
+};
+
+export type I18nValidationReport = {
+  valid: boolean;
+  referenceLang: string;
+  missingKeys: I18nMissingKey[];
+  extraKeys: { key: string; extraInLang: string; referenceLang: string }[];
+  leafTypeIssues: I18nLeafTypeIssue[];
+  summary: {
+    missingByLang: Record<string, number>;
+    extraByLang: Record<string, number>;
+    leafTypeIssuesByLang: Record<string, number>;
+  };
+};
+
 /**
- * Get all keys from a nested object as dot-notation paths
+ * Get all leaf keys from a nested object as dot-notation paths.
+ * A "leaf" is a non-object value (string/number/etc) OR an array.
  */
-function getAllKeys(obj: TranslationObject, prefix = ''): string[] {
+function getAllLeafKeys(obj: TranslationObject, prefix = ""): string[] {
   const keys: string[] = [];
-  
+
   for (const key of Object.keys(obj)) {
     const fullKey = prefix ? `${prefix}.${key}` : key;
     const value = obj[key];
-    
-    if (value && typeof value === 'object' && !Array.isArray(value)) {
-      keys.push(...getAllKeys(value as TranslationObject, fullKey));
+
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      keys.push(...getAllLeafKeys(value as TranslationObject, fullKey));
     } else {
       keys.push(fullKey);
     }
   }
-  
+
   return keys;
 }
 
-/**
- * Find missing keys in a locale compared to reference locale
- */
-function findMissingKeys(
-  referenceLocale: TranslationObject,
-  targetLocale: TranslationObject,
-  refLangCode: string,
-  targetLangCode: string
-): { key: string; inLang: string; missingInLang: string }[] {
-  const refKeys = getAllKeys(referenceLocale);
-  const targetKeys = new Set(getAllKeys(targetLocale));
-  
-  return refKeys
-    .filter(key => !targetKeys.has(key))
-    .map(key => ({
-      key,
-      inLang: refLangCode,
-      missingInLang: targetLangCode,
-    }));
+function getLeafValue(obj: TranslationObject, path: string): unknown {
+  const parts = path.split(".");
+  let current: unknown = obj;
+
+  for (const part of parts) {
+    if (current && typeof current === "object" && part in (current as object)) {
+      current = (current as Record<string, unknown>)[part];
+    } else {
+      return undefined;
+    }
+  }
+
+  return current;
+}
+
+function describeType(v: unknown): string {
+  if (v === null) return "null";
+  if (Array.isArray(v)) return "array";
+  return typeof v;
 }
 
 /**
- * Validate all locales have the same keys as the Korean (ko) reference
- * Returns array of missing key info
+ * Validate all locales have the same keys as the reference, and that leafs are strings.
  */
-export function validateI18nKeys(): {
-  valid: boolean;
-  missingKeys: { key: string; inLang: string; missingInLang: string }[];
-  summary: Record<string, number>;
-} {
-  const missingKeys: { key: string; inLang: string; missingInLang: string }[] = [];
-  const summary: Record<string, number> = {};
-  
-  // Use Korean as reference
-  const referenceLocale = locales.ko;
-  
+export function validateI18nKeys(referenceLang: keyof typeof locales = "ko"): I18nValidationReport {
+  const refLocale = locales[referenceLang];
+  const refKeys = getAllLeafKeys(refLocale);
+  const refKeySet = new Set(refKeys);
+
+  const missingKeys: I18nMissingKey[] = [];
+  const extraKeys: { key: string; extraInLang: string; referenceLang: string }[] = [];
+  const leafTypeIssues: I18nLeafTypeIssue[] = [];
+
+  const missingByLang: Record<string, number> = {};
+  const extraByLang: Record<string, number> = {};
+  const leafTypeIssuesByLang: Record<string, number> = {};
+
   for (const [langCode, locale] of Object.entries(locales)) {
-    if (langCode === 'ko') continue;
-    
-    const missing = findMissingKeys(referenceLocale, locale, 'ko', langCode);
-    missingKeys.push(...missing);
-    summary[langCode] = missing.length;
+    if (langCode === referenceLang) continue;
+
+    const targetKeys = getAllLeafKeys(locale);
+    const targetKeySet = new Set(targetKeys);
+
+    // Missing (ref -> target)
+    const missing = refKeys.filter((k) => !targetKeySet.has(k));
+    missingByLang[langCode] = missing.length;
+    missingKeys.push(
+      ...missing.map((key) => ({
+        key,
+        inLang: String(referenceLang),
+        missingInLang: langCode,
+      }))
+    );
+
+    // Extra (target -> ref)
+    const extra = targetKeys.filter((k) => !refKeySet.has(k));
+    extraByLang[langCode] = extra.length;
+    extraKeys.push(
+      ...extra.map((key) => ({
+        key,
+        extraInLang: langCode,
+        referenceLang: String(referenceLang),
+      }))
+    );
+
+    // Leaf type checks: every ref key must exist and be string
+    let typeIssues = 0;
+    for (const key of refKeys) {
+      const v = getLeafValue(locale, key);
+      if (typeof v !== "string") {
+        // undefined is already covered by missing keys, but we still count as type issue
+        typeIssues++;
+        leafTypeIssues.push({ key, lang: langCode, foundType: describeType(v) });
+      }
+    }
+    leafTypeIssuesByLang[langCode] = typeIssues;
   }
-  
+
+  const valid = missingKeys.length === 0 && extraKeys.length === 0 && leafTypeIssues.length === 0;
+
   return {
-    valid: missingKeys.length === 0,
+    valid,
+    referenceLang: String(referenceLang),
     missingKeys,
-    summary,
+    extraKeys,
+    leafTypeIssues,
+    summary: {
+      missingByLang,
+      extraByLang,
+      leafTypeIssuesByLang,
+    },
   };
 }
 
 /**
- * Check specific section keys across all locales
+ * DEV logger. Prints compact summaries first, then allows deep inspection.
  */
-export function checkSectionKeys(sectionPath: string): Record<string, boolean> {
-  const result: Record<string, boolean> = {};
-  
-  for (const [langCode, locale] of Object.entries(locales)) {
-    const parts = sectionPath.split('.');
-    let current: unknown = locale;
-    
-    for (const part of parts) {
-      if (current && typeof current === 'object' && part in (current as object)) {
-        current = (current as Record<string, unknown>)[part];
-      } else {
-        current = undefined;
-        break;
-      }
-    }
-    
-    result[langCode] = current !== undefined;
-  }
-  
-  return result;
-}
+export function logI18nValidation(referenceLang: keyof typeof locales = "ko"): void {
+  if (!import.meta.env.DEV) return;
 
-/**
- * Log validation results to console (for development)
- */
-export function logI18nValidation(): void {
-  if (import.meta.env.DEV) {
-    const { valid, missingKeys, summary } = validateI18nKeys();
-    
-    if (!valid) {
-      console.group('🌐 i18n Validation');
-      console.warn('Missing translation keys found:');
-      console.table(summary);
-      
-      // Group by missing language
-      const byLang = missingKeys.reduce((acc, { key, missingInLang }) => {
-        if (!acc[missingInLang]) acc[missingInLang] = [];
-        acc[missingInLang].push(key);
-        return acc;
-      }, {} as Record<string, string[]>);
-      
-      for (const [lang, keys] of Object.entries(byLang)) {
-        console.groupCollapsed(`${lang}: ${keys.length} missing keys`);
-        keys.slice(0, 10).forEach(k => console.log(`  - ${k}`));
-        if (keys.length > 10) console.log(`  ... and ${keys.length - 10} more`);
-        console.groupEnd();
-      }
-      console.groupEnd();
-    } else {
-      console.log('✅ i18n: All translation keys are present in all locales');
-    }
-    
-    // Check writingPage.cache specifically
-    const cacheCheck = checkSectionKeys('writingPage.cache');
-    const allHaveCache = Object.values(cacheCheck).every(Boolean);
-    
-    if (!allHaveCache) {
-      console.warn('❌ writingPage.cache missing in:', 
-        Object.entries(cacheCheck)
-          .filter(([, has]) => !has)
-          .map(([lang]) => lang)
-          .join(', ')
-      );
-    } else {
-      console.log('✅ writingPage.cache: Present in all locales');
-    }
-    
-    // Check writing cache toast keys
-    const writingCacheKeys = [
-      'writing.resultFromHistory',
-      'writing.cachedResult', 
-      'writing.gradingComplete',
-      'writing.scoreResult',
-      'writing.gradingError',
-      'writing.saveError',
-    ];
-    
-    const missingWritingKeys: { lang: string; key: string }[] = [];
-    
-    for (const [langCode, locale] of Object.entries(locales)) {
-      for (const keyPath of writingCacheKeys) {
-        const parts = keyPath.split('.');
-        let current: unknown = locale;
-        
-        for (const part of parts) {
-          if (current && typeof current === 'object' && part in (current as object)) {
-            current = (current as Record<string, unknown>)[part];
-          } else {
-            current = undefined;
-            break;
-          }
-        }
-        
-        if (current === undefined) {
-          missingWritingKeys.push({ lang: langCode, key: keyPath });
-        }
-      }
-    }
-    
-    if (missingWritingKeys.length > 0) {
-      console.warn('❌ Missing writing cache keys:', missingWritingKeys);
-    } else {
-      console.log('✅ Writing cache/toast keys: Present in all locales');
-    }
-  }
-}
+  const report = validateI18nKeys(referenceLang);
 
-/**
- * Smoke test function to verify language-specific output
- * Returns the translated strings for cache messages in a given language
- */
-export function getWritingCacheTranslations(langCode: string): Record<string, string | undefined> {
-  const locale = locales[langCode];
-  if (!locale) return {};
-  
-  const keys = [
-    'writing.resultFromHistory',
-    'writing.cachedResult',
-    'writing.gradingComplete', 
-    'writing.scoreResult',
-    'writing.gradingError',
-    'writing.saveError',
-    'writingPage.cache.title',
-    'writingPage.cache.message',
-    'writingPage.cache.savedTime',
-    'writingPage.cache.viewFresh',
-  ];
-  
-  const result: Record<string, string | undefined> = {};
-  
-  for (const keyPath of keys) {
-    const parts = keyPath.split('.');
-    let current: unknown = locale;
-    
-    for (const part of parts) {
-      if (current && typeof current === 'object' && part in (current as object)) {
-        current = (current as Record<string, unknown>)[part];
-      } else {
-        current = undefined;
-        break;
-      }
-    }
-    
-    result[keyPath] = typeof current === 'string' ? current : undefined;
+  if (report.valid) {
+    console.log("✅ i18n: All locales match reference and contain string leafs");
+    return;
   }
-  
-  return result;
-}
 
-/**
- * Run smoke test for all languages and log results
- */
-export function runWritingCacheSmokeTest(): void {
-  if (import.meta.env.DEV) {
-    console.group('🧪 Writing Cache Translation Smoke Test');
-    
-    const langs = ['ko', 'vi', 'en', 'ja', 'zh', 'ru', 'uz'];
-    
-    for (const lang of langs) {
-      const translations = getWritingCacheTranslations(lang);
-      const missing = Object.entries(translations)
-        .filter(([, v]) => v === undefined)
-        .map(([k]) => k);
-      
-      if (missing.length > 0) {
-        console.warn(`❌ ${lang}: Missing ${missing.length} keys:`, missing);
-      } else {
-        console.log(`✅ ${lang}: All cache keys present`);
-        // Show sample translation to verify language
-        const sample = translations['writing.resultFromHistory'];
-        console.log(`   Sample: "${sample}"`);
-      }
-    }
-    
+  console.group("🌐 i18n Validation (DEV)");
+  console.info("Reference:", report.referenceLang);
+  console.warn("Missing keys summary:");
+  console.table(report.summary.missingByLang);
+  console.warn("Extra keys summary:");
+  console.table(report.summary.extraByLang);
+  console.warn("Leaf type issues summary:");
+  console.table(report.summary.leafTypeIssuesByLang);
+
+  const maxList = 50;
+
+  if (report.missingKeys.length) {
+    console.groupCollapsed(`Missing keys (${report.missingKeys.length})`);
+    report.missingKeys.slice(0, maxList).forEach((x) => console.log(`${x.missingInLang} missing ${x.key}`));
+    if (report.missingKeys.length > maxList) console.log(`... +${report.missingKeys.length - maxList} more`);
     console.groupEnd();
   }
+
+  if (report.extraKeys.length) {
+    console.groupCollapsed(`Extra keys (${report.extraKeys.length})`);
+    report.extraKeys.slice(0, maxList).forEach((x) => console.log(`${x.extraInLang} extra ${x.key}`));
+    if (report.extraKeys.length > maxList) console.log(`... +${report.extraKeys.length - maxList} more`);
+    console.groupEnd();
+  }
+
+  if (report.leafTypeIssues.length) {
+    console.groupCollapsed(`Leaf type issues (${report.leafTypeIssues.length})`);
+    report.leafTypeIssues
+      .slice(0, maxList)
+      .forEach((x) => console.log(`${x.lang} ${x.key} -> ${x.foundType}`));
+    if (report.leafTypeIssues.length > maxList) console.log(`... +${report.leafTypeIssues.length - maxList} more`);
+    console.groupEnd();
+  }
+
+  console.groupEnd();
+}
+
+/**
+ * Minimal smoke test helper for future use.
+ */
+export function getTranslationSnapshot(langCode: string, keyPaths: string[]): Record<string, string | undefined> {
+  const locale = locales[langCode];
+  if (!locale) return {};
+
+  const result: Record<string, string | undefined> = {};
+
+  for (const keyPath of keyPaths) {
+    const v = getLeafValue(locale, keyPath);
+    result[keyPath] = typeof v === "string" ? v : undefined;
+  }
+
+  return result;
 }
