@@ -57,7 +57,7 @@ export const LanguageSelector = () => {
     // Show toast notification
     toast({
       title: `${selectedLang.flag} ${selectedLang.nativeName}`,
-      description: getLanguageChangeMessage(code),
+      description: t("language.changed", { language: selectedLang.nativeName }),
       duration: 3000,
     });
 
@@ -72,18 +72,6 @@ export const LanguageSelector = () => {
     setIsTransitioning(false);
   };
 
-  const getLanguageChangeMessage = (code: LanguageCode): string => {
-    const messages: Record<LanguageCode, string> = {
-      ko: '언어가 한국어로 변경되었습니다',
-      vi: 'Ngôn ngữ đã được chuyển sang Tiếng Việt',
-      en: 'Language changed to English',
-      ja: '言語が日本語に変更されました',
-      zh: '语言已切换为中文',
-      ru: 'Язык изменен на русский',
-      uz: "Til o'zbek tiliga o'zgartirildi",
-    };
-    return messages[code];
-  };
 
   // Close on click outside
   useEffect(() => {
@@ -226,7 +214,9 @@ export const LanguageSelector = () => {
                     <span className="text-sm font-bold text-foreground">{t("language.select")}</span>
                     <div className="flex items-center gap-1 mt-0.5">
                       <Sparkles className="w-3 h-3 text-amber-500" />
-                      <span className="text-[10px] text-muted-foreground font-medium">7 Languages</span>
+                      <span className="text-[10px] text-muted-foreground font-medium">
+                        {t("language.supportedCount", { count: languages.length })}
+                      </span>
                     </div>
                   </div>
                 </div>

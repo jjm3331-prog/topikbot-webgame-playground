@@ -259,7 +259,9 @@
   "language": {
     "select": "Tilni tanlang",
     "current": "Joriy til",
-    "hint": "Tilni tanlash butun ilovani o'zgartiradi"
+    "hint": "Tilni tanlash butun ilovani o'zgartiradi",
+    "changed": "Til {{language}} ga o'zgartirildi",
+    "supportedCount": "{{count}} ta til"
   },
   "dashboard": {
     "loading": "Yuklanmoqda...",

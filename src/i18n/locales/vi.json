@@ -276,7 +276,9 @@
   "language": {
     "select": "Chọn ngôn ngữ",
     "current": "Ngôn ngữ hiện tại",
-    "hint": "Chọn ngôn ngữ để chuyển toàn bộ ứng dụng"
+    "hint": "Chọn ngôn ngữ để chuyển toàn bộ ứng dụng",
+    "changed": "Ngôn ngữ đã được chuyển sang {{language}}",
+    "supportedCount": "{{count}} ngôn ngữ"
   },
   "dashboard": {
     "loading": "Đang tải...",

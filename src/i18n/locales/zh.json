@@ -261,7 +261,9 @@
   "language": {
     "select": "选择语言",
     "current": "当前语言",
-    "hint": "选择语言将切换整个应用"
+    "hint": "选择语言将切换整个应用",
+    "changed": "语言已切换为{{language}}",
+    "supportedCount": "{{count}}种语言"
   },
   "dashboard": {
     "loading": "加载中...",
