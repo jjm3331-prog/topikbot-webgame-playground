@@ -1487,11 +1487,23 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
         // Parse the complete content
         let parsed: { questions: GeneratedQuestion[] };
         try {
-          let jsonContent = fullContent;
-          if (jsonContent.startsWith("```json")) jsonContent = jsonContent.slice(7);
-          if (jsonContent.startsWith("```")) jsonContent = jsonContent.slice(3);
-          if (jsonContent.endsWith("```")) jsonContent = jsonContent.slice(0, -3);
-          parsed = JSON.parse(jsonContent.trim());
+          let jsonContent = fullContent.trim();
+          
+          // 마크다운 코드블록 제거 (```json ... ``` 또는 ``` ... ```)
+          // 정규식으로 더 강력하게 처리
+          jsonContent = jsonContent.replace(/^```(?:json)?\s*\n?/i, '');
+          jsonContent = jsonContent.replace(/\n?```\s*$/i, '');
+          jsonContent = jsonContent.trim();
+          
+          // JSON 시작점 찾기 (혹시 앞에 다른 텍스트가 있을 경우)
+          const jsonStartIdx = jsonContent.indexOf('{');
+          if (jsonStartIdx > 0) {
+            console.log(`⚠️ JSON 시작 전 ${jsonStartIdx}자 제거`);
+            jsonContent = jsonContent.slice(jsonStartIdx);
+          }
+          
+          parsed = JSON.parse(jsonContent);
+          console.log(`✅ JSON 파싱 성공: ${parsed.questions?.length || 0}개 문제`);
         } catch (e) {
           console.error("Failed to parse AI response:", fullContent.slice(0, 500));
           throw new Error("Failed to parse AI response as JSON");
