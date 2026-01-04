@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Canvas as FabricCanvas, PencilBrush } from "fabric";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { RotateCcw, Check, ChevronLeft, ChevronRight } from "lucide-react";
@@ -34,6 +35,7 @@ const calculateFontSize = (text: string, canvasSize: number): number => {
 };
 
 const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps) => {
+  const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const guideCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -232,16 +234,16 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
     setScores(newScores);
 
     if (score >= 70) {
-      toast.success(`Tuyệt vời! ${score} điểm`, {
-        description: "Chữ viết rất đẹp! 👏",
+      toast.success(t("hangulTracing.excellent", { score }), {
+        description: t("hangulTracing.excellentDesc"),
       });
     } else if (score >= 40) {
-      toast.info(`Khá tốt! ${score} điểm`, {
-        description: "Hãy luyện thêm một chút nữa!",
+      toast.info(t("hangulTracing.good", { score }), {
+        description: t("hangulTracing.goodDesc"),
       });
     } else {
-      toast.warning(`Thử lại nhé! ${score} điểm`, {
-        description: "Hãy viết theo chữ mẫu.",
+      toast.warning(t("hangulTracing.tryAgain", { score }), {
+        description: t("hangulTracing.tryAgainDesc"),
       });
     }
 
@@ -298,8 +300,8 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
     const avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
     return (
       <div className={cn("flex flex-col items-center gap-6 p-4 sm:p-6", className)}>
-        <h2 className="text-xl sm:text-2xl font-bold">Hoàn thành! 🎉</h2>
-        <div className="text-4xl sm:text-5xl font-bold text-primary">{avgScore} điểm</div>
+        <h2 className="text-xl sm:text-2xl font-bold">{t("hangulTracing.complete")} 🎉</h2>
+        <div className="text-4xl sm:text-5xl font-bold text-primary">{avgScore} {t("hangulTracing.points")}</div>
         <div className="flex flex-wrap gap-2 justify-center max-w-full">
           {characters.map((item, idx) => {
             const charLen = item.korean.length;
@@ -329,7 +331,7 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
         </div>
         <Button onClick={handleRestart} className="gap-2">
           <RotateCcw className="w-4 h-4" />
-          Luyện lại
+          {t("hangulTracing.restart")}
         </Button>
       </div>
     );
@@ -390,12 +392,12 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
 
         <Button variant="outline" onClick={handleClear} className="gap-2 text-sm px-3 sm:px-4">
           <RotateCcw className="w-4 h-4" />
-          Xóa
+          {t("hangulTracing.clear")}
         </Button>
 
         <Button onClick={handleCheck} className="gap-2 text-sm px-3 sm:px-4">
           <Check className="w-4 h-4" />
-          Kiểm tra
+          {t("hangulTracing.check")}
         </Button>
 
         <Button
@@ -411,7 +413,7 @@ const HangulTracing = ({ characters, onComplete, className }: HangulTracingProps
 
       {/* Hint */}
       <p className="text-xs sm:text-sm text-muted-foreground text-center px-4">
-        Hãy dùng ngón tay hoặc chuột viết theo chữ mẫu
+        {t("hangulTracing.hint")}
       </p>
     </div>
   );

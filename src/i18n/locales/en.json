@@ -1012,7 +1012,19 @@
     "headhunting": { "badge": "Premium Exclusive Service", "title1": "Direct connection to", "title2": "Korean companies", "desc1": "Professional headhunter team for job support", "free": "100% free", "desc2": "From local Korean companies to job opportunities in Seoul!", "tag1": "500+ companies", "tag2": "Resume consulting", "tag3": "Visa support", "cta": "Apply now", "ctaSub": "Completely free" },
     "features": { "badge": "LUKATO AI", "title": "Complete 4 skills learning", "skills": "4 skills", "listen": "Listening", "read": "Reading", "write": "Writing", "speak": "Speaking" },
     "games": { "badge": "K-Culture", "korean": "Korean", "survival": "AI Survival", "dating": "Seoul Dating", "wordChain": "Word Chain", "dubbing": "Dubbing", "kpopQuiz": "K-POP Quiz", "partTime": "Part-time", "badgeNew": "New", "badgeHot": "Hot", "badgeStar": "⭐" },
-    "testimonials": { "title": "Real reviews from learners" },
+    "testimonials": { "title": "Real reviews from learners" }
+  },
+  "testimonials": {
+    "default": {
+      "1": { "text": "From zero Korean, I passed TOPIK 6 in 8 months! AI games helped me learn grammar naturally.", "name": "TOPIK 6", "period": "8 months" },
+      "2": { "text": "AI Writing grading is more detailed than real teachers. My Writing score went from 30 to 70!", "name": "TOPIK 5", "period": "6 months" },
+      "3": { "text": "Daily Speaking practice with AI gave me native-level pronunciation. Job interview success!", "name": "Samsung Employee", "period": "1 year" },
+      "4": { "text": "K-Drama dubbing helped me learn natural intonation. Now I watch Korean dramas without subtitles!", "name": "TOPIK 4", "period": "5 months" },
+      "5": { "text": "Headhunting service is amazing! Got free CV consulting and landed a job in Korea.", "name": "Seoul IT Engineer", "period": "3 months" },
+      "6": { "text": "10,000+ TOPIK materials are truly different. Closest to the real exam!", "name": "TOPIK 6", "period": "10 months" }
+    }
+  },
+  "landing": {
     "pricing": { "title1": "Fair price,", "local": "local", "title2": "global quality", "free": "Free", "forever": "Free forever", "start": "Get started", "month": "month", "upgrade": "Upgrade" },
     "finalCta": { "title1": "TOPIK", "title2": "conquest", "desc": "TOPIK professors + LUKATO AI =", "noRival": "Unbeatable combo", "cta": "Start now" }
   },
@@ -3740,5 +3752,19 @@
         "description": "A fateful meeting! A story like a drama unfolded."
       }
     }
+  },
+  "hangulTracing": {
+    "excellent": "Excellent! {{score}} points",
+    "excellentDesc": "Beautiful handwriting! 👏",
+    "good": "Good! {{score}} points",
+    "goodDesc": "Just a little more practice!",
+    "tryAgain": "Try again! {{score}} points",
+    "tryAgainDesc": "Follow the character outline.",
+    "complete": "Complete!",
+    "points": "points",
+    "restart": "Practice Again",
+    "clear": "Clear",
+    "check": "Check",
+    "hint": "Use your finger or mouse to trace the character"
   }
 }

@@ -928,6 +928,16 @@
     "pricing": { "title1": "リーズナブルな価格、", "local": "ローカル", "title2": "グローバル品質", "free": "無料", "forever": "永久無料", "start": "始める", "month": "月", "upgrade": "アップグレード" },
     "finalCta": { "title1": "TOPIK", "title2": "制覇", "desc": "TOPIK教授 + LUKATO AI =", "noRival": "最強の組み合わせ", "cta": "今すぐ始める" }
   },
+  "testimonials": {
+    "default": {
+      "1": { "text": "ゼロから韓国語を始めて8ヶ月でTOPIK6級合格！AIゲームで文法を自然に学べました。", "name": "TOPIK 6級", "period": "8ヶ月" },
+      "2": { "text": "AIのライティング添削は先生より細かい。ライティングスコアが30から70に上がりました！", "name": "TOPIK 5級", "period": "6ヶ月" },
+      "3": { "text": "毎日AIとスピーキング練習してネイティブレベルの発音に。就職面接も成功！", "name": "サムスン社員", "period": "1年" },
+      "4": { "text": "K-ドラマ吹替で自然なイントネーションを学べました。字幕なしで韓国ドラマを見ています！", "name": "TOPIK 4級", "period": "5ヶ月" },
+      "5": { "text": "ヘッドハンティングサービス最高！無料CV相談を受けて韓国で就職しました。", "name": "ソウルITエンジニア", "period": "3ヶ月" },
+      "6": { "text": "10,000以上のTOPIK教材が本当に違います。実際の試験に最も近い！", "name": "TOPIK 6級", "period": "10ヶ月" }
+    }
+  },
 "grammar": {
     "title": "文法学習",
     "description": "ミニゲームで文法をマスター",
@@ -3438,5 +3448,19 @@
         "description": "運命の出会い! まるでドラマのような物語が展開しました。"
       }
     }
+  },
+  "hangulTracing": {
+    "excellent": "素晴らしい! {{score}}点",
+    "excellentDesc": "とても綺麗な字ですね! 👏",
+    "good": "いいですね! {{score}}点",
+    "goodDesc": "もう少し練習しましょう!",
+    "tryAgain": "もう一度! {{score}}点",
+    "tryAgainDesc": "文字の形に沿って書いてみてください。",
+    "complete": "完了!",
+    "points": "点",
+    "restart": "もう一度練習",
+    "clear": "消す",
+    "check": "確認",
+    "hint": "指やマウスで文字の形をなぞってください"
   }
 }

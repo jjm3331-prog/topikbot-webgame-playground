@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
@@ -13,20 +14,22 @@ interface Testimonial {
   display_order: number;
 }
 
-const defaultTestimonials = [
-  { text: "Từ zero tiếng Hàn, mình đậu TOPIK 6 trong 8 tháng! Game AI giúp học ngữ pháp tự nhiên.", name: "TOPIK 6", period: "8 tháng", emoji: "🏆" },
-  { text: "AI chấm Writing chi tiết hơn giáo viên thật. Điểm Writing tăng từ 30 lên 70!", name: "TOPIK 5", period: "6 tháng", emoji: "✍️" },
-  { text: "Luyện Speaking với AI mỗi ngày, phát âm chuẩn bản xứ. Phỏng vấn việc làm thành công!", name: "Nhân viên Samsung", period: "1 năm", emoji: "🎤" },
-  { text: "K-Drama dubbing giúp học ngữ điệu tự nhiên. Nghe hiểu phim Hàn không cần phụ đề!", name: "TOPIK 4", period: "5 tháng", emoji: "🎬" },
-  { text: "Headhunting service tuyệt vời! Được tư vấn CV miễn phí và có việc làm tại Hàn Quốc.", name: "Kỹ sư IT Seoul", period: "3 tháng", emoji: "💼" },
-  { text: "10,000+ tài liệu TOPIK thực sự khác biệt. Đề thi sát với đề thật nhất!", name: "TOPIK 6", period: "10 tháng", emoji: "📚" },
-];
-
 interface TestimonialsSectionProps {
   t: (key: string) => string;
 }
 
 export const TestimonialsSection = ({ t }: TestimonialsSectionProps) => {
+  const { t: translate } = useTranslation();
+  
+  const defaultTestimonials = [
+    { text: translate("testimonials.default.1.text"), name: translate("testimonials.default.1.name"), period: translate("testimonials.default.1.period"), emoji: "🏆" },
+    { text: translate("testimonials.default.2.text"), name: translate("testimonials.default.2.name"), period: translate("testimonials.default.2.period"), emoji: "✍️" },
+    { text: translate("testimonials.default.3.text"), name: translate("testimonials.default.3.name"), period: translate("testimonials.default.3.period"), emoji: "🎤" },
+    { text: translate("testimonials.default.4.text"), name: translate("testimonials.default.4.name"), period: translate("testimonials.default.4.period"), emoji: "🎬" },
+    { text: translate("testimonials.default.5.text"), name: translate("testimonials.default.5.name"), period: translate("testimonials.default.5.period"), emoji: "💼" },
+    { text: translate("testimonials.default.6.text"), name: translate("testimonials.default.6.name"), period: translate("testimonials.default.6.period"), emoji: "📚" },
+  ];
+  
   const { data: dbTestimonials } = useQuery({
     queryKey: ["testimonials"],
     queryFn: async () => {

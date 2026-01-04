@@ -936,6 +936,16 @@
     "pricing": { "title1": "Adolatli narx,", "local": "mahalliy", "title2": "global sifat", "free": "Bepul", "forever": "Abadiy bepul", "start": "Boshlash", "month": "oy", "upgrade": "Yangilash" },
     "finalCta": { "title1": "TOPIK", "title2": "zabt etish", "desc": "TOPIK professorlari + LUKATO AI =", "noRival": "Yengilmas kombinatsiya", "cta": "Hozir boshlash" }
   },
+  "testimonials": {
+    "default": {
+      "1": { "text": "Koreys tilini noldan boshlab 8 oyda TOPIK 6 darajasidan o'tdim! AI o'yinlari grammatikani tabiiy o'rganishga yordam berdi.", "name": "TOPIK 6", "period": "8 oy" },
+      "2": { "text": "AI yozuv tekshiruvi o'qituvchidan batafsilroq. Yozuv balli 30dan 70ga ko'tarildi!", "name": "TOPIK 5", "period": "6 oy" },
+      "3": { "text": "Har kuni AI bilan gaplashish mashqi ona tili darajasidagi talaffuzni berdi. Ish suhbati muvaffaqiyatli!", "name": "Samsung xodimi", "period": "1 yil" },
+      "4": { "text": "K-Drama dublyaj tabiiy ohangni o'rganishga yordam berdi. Endi koreys dramalarini subtitrsiz ko'raman!", "name": "TOPIK 4", "period": "5 oy" },
+      "5": { "text": "Headhunting xizmati ajoyib! Bepul CV maslahati oldim va Koreyada ish topdim.", "name": "Seul IT muhandisi", "period": "3 oy" },
+      "6": { "text": "10,000+ TOPIK materiallar haqiqatan farq qiladi. Haqiqiy imtihonga eng yaqin!", "name": "TOPIK 6", "period": "10 oy" }
+    }
+  },
   "lesson": {
     "correct": "To'g'ri! 👏",
     "incorrect": "Noto'g'ri 😅",
@@ -3454,5 +3464,19 @@
         "description": "Taqdiriy uchrashuv! Drama kabi hikoya paydo bo'ldi."
       }
     }
+  },
+  "hangulTracing": {
+    "excellent": "Ajoyib! {{score}} ball",
+    "excellentDesc": "Chiroyli yozuv! 👏",
+    "good": "Yaxshi! {{score}} ball",
+    "goodDesc": "Bir oz ko'proq mashq qiling!",
+    "tryAgain": "Qayta urinib ko'ring! {{score}} ball",
+    "tryAgainDesc": "Belgi shaklini kuzating.",
+    "complete": "Tugadi!",
+    "points": "ball",
+    "restart": "Qayta mashq",
+    "clear": "Tozalash",
+    "check": "Tekshirish",
+    "hint": "Barmoq yoki sichqoncha bilan belgi shaklini chizing"
   }
 }
