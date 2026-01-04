@@ -403,51 +403,143 @@ const MockExamTest = () => {
         return;
       }
       
-      // ========== 실전모드(full): TOPIK 시험 형식에 맞게 섹션별 문제 수 배분 ==========
+      // ========== 실전모드(full): TOPIK 시험 형식에 맞게 파트별 문제 수 배분 ==========
       let limitedQuestions: typeof questionData = [];
       
       if (mode === 'full' && examPreset?.sections) {
-        // 실제 TOPIK 시험 형식에 맞게 섹션별로 정확한 문제 수 배분
-        const sectionOrder = ['listening', 'reading', 'writing'];
+        // 실제 TOPIK 출제 형식 정의 (파트별 문제 수)
+        // TOPIK I 듣기: 30문제 (1~4번: 그림 4문제, 5~6번: 대화응답 2문제, 7~10번: 장소/주제 4문제, 11~14번: 일치 4문제, 15~16번: 중심생각 2문제, 17~21번: 담화 5문제, 22~24번: 이유/의도 3문제, 25~30번: 내용일치 6문제)
+        // TOPIK I 읽기: 40문제 (1~4번: 주제 4문제, 5~8번: 빈칸 4문제, 9~12번: 순서 4문제, 13~15번: 빈칸(문장) 3문제, 16~18번: 내용일치 3문제, 19~24번: 중심내용 6문제, 25~31번: 세부내용 7문제, 32~39번: 순서배열 8문제, 40번: 글의목적 1문제)
+        // TOPIK II 듣기: 50문제, TOPIK II 읽기: 50문제
         
-        const missing: Array<{ section: string; needed: number; have: number }> = [];
-
+        const TOPIK_PART_DISTRIBUTION: Record<string, Record<string, Array<{part: number, count: number}>>> = {
+          'TOPIK_I': {
+            'listening': [
+              { part: 1, count: 4 },   // 1~4번: 그림 고르기
+              { part: 2, count: 2 },   // 5~6번: 대화 응답
+              { part: 3, count: 4 },   // 7~10번: 장소/주제
+              { part: 4, count: 4 },   // 11~14번: 일치/불일치
+              { part: 5, count: 2 },   // 15~16번: 중심생각
+              { part: 7, count: 5 },   // 17~21번: 담화 이해
+              { part: 9, count: 3 },   // 22~24번: 이유/의도
+              { part: 11, count: 6 },  // 25~30번: 내용 일치
+            ],
+            'reading': [
+              { part: 1, count: 4 },   // 1~4번: 주제 찾기
+              { part: 2, count: 4 },   // 5~8번: 빈칸 채우기
+              { part: 3, count: 4 },   // 9~12번: 순서 배열
+              { part: 4, count: 6 },   // 13~18번: 내용 일치
+              { part: 5, count: 8 },   // 19~26번: 중심 내용
+              { part: 6, count: 7 },   // 27~33번: 세부 내용
+              { part: 7, count: 7 },   // 34~40번: 글의 목적/태도
+            ],
+          },
+          'TOPIK_II': {
+            'listening': [
+              { part: 1, count: 4 },   // 1~4번: 그림 고르기
+              { part: 2, count: 4 },   // 5~8번: 대화 응답
+              { part: 9, count: 4 },   // 9~12번: 행동 고르기
+              { part: 13, count: 4 },  // 13~16번: 내용 일치
+              { part: 17, count: 4 },  // 17~20번: 중심 생각
+              { part: 18, count: 6 },  // 21~26번: 담화 이해(1)
+              { part: 19, count: 6 },  // 27~32번: 담화 이해(2)
+              { part: 20, count: 6 },  // 33~38번: 담화 이해(3)
+              { part: 21, count: 6 },  // 39~44번: 담화 이해(4)
+              { part: 22, count: 6 },  // 45~50번: 담화 이해(5)
+            ],
+            'reading': [
+              { part: 1, count: 4 },   // 1~4번: 빈칸 채우기
+              { part: 2, count: 4 },   // 5~8번: 유사표현
+              { part: 3, count: 4 },   // 9~12번: 내용 일치
+              { part: 4, count: 6 },   // 13~18번: 순서 배열
+              { part: 5, count: 6 },   // 19~24번: 빈칸(문장)
+              { part: 6, count: 6 },   // 25~30번: 신문기사 제목
+              { part: 7, count: 6 },   // 31~36번: 세부 내용
+              { part: 8, count: 6 },   // 37~42번: 필자 의도
+              { part: 9, count: 4 },   // 43~46번: 긴 지문(1)
+              { part: 10, count: 4 },  // 47~50번: 긴 지문(2)
+            ],
+            'writing': [
+              { part: 51, count: 1 },  // 51번: 빈칸 채우기
+              { part: 52, count: 1 },  // 52번: 빈칸 채우기
+              { part: 53, count: 1 },  // 53번: 그래프/표 설명
+              { part: 54, count: 1 },  // 54번: 논술
+            ],
+          },
+        };
+        
+        const sectionOrder = ['listening', 'reading', 'writing'];
+        const distribution = TOPIK_PART_DISTRIBUTION[dbExamType] || TOPIK_PART_DISTRIBUTION['TOPIK_I'];
+        
         for (const sec of sectionOrder) {
           const sectionConfig = examPreset.sections[sec as keyof typeof examPreset.sections];
           if (!sectionConfig) continue;
 
-          const sectionQuestions = questionData
-            .filter(q => q.section === sec)
-            .sort((a, b) => (a.part_number || 0) - (b.part_number || 0) || (a.question_number || 0) - (b.question_number || 0));
-
-          const neededCount = sectionConfig.questionCount;
-          if (sectionQuestions.length < neededCount) {
-            missing.push({ section: sec, needed: neededCount, have: sectionQuestions.length });
+          const partDist = distribution[sec];
+          if (!partDist) {
+            // 파트 분포가 정의되지 않은 섹션은 기존 방식
+            const sectionQuestions = questionData
+              .filter(q => q.section === sec)
+              .sort(() => Math.random() - 0.5);
+            limitedQuestions = limitedQuestions.concat(sectionQuestions.slice(0, sectionConfig.questionCount));
+            continue;
           }
 
-          // 섹션별 필요 문제 수만큼(정확히) 추출
-          const selected = sectionQuestions.slice(0, neededCount);
-          limitedQuestions = limitedQuestions.concat(selected);
+          // 각 파트에서 정해진 수만큼 랜덤 선택
+          for (const { part, count } of partDist) {
+            const partQuestions = questionData
+              .filter(q => q.section === sec && q.part_number === part)
+              .sort(() => Math.random() - 0.5);
+            
+            // 해당 파트에 문제가 부족하면 다른 파트에서 보충
+            const selected = partQuestions.slice(0, count);
+            limitedQuestions = limitedQuestions.concat(selected);
+          }
         }
 
-        // ✅ 실전은 "부족하면 시작하지 않음" (임의 축소 금지)
-        if (missing.length) {
-          console.warn('[MockExamTest] insufficient questions for real exam preset', { dbExamType, missing });
-          toast({
-            title: t('mockExamTest.preparing'),
-            description: t('mockExamTest.noQuestions'),
-            variant: 'destructive',
-          });
-          navigate('/mock-exam');
-          return;
+        // 문제 수가 부족한 경우 다른 파트에서 보충
+        for (const sec of sectionOrder) {
+          const sectionConfig = examPreset.sections[sec as keyof typeof examPreset.sections];
+          if (!sectionConfig) continue;
+          
+          const currentSectionQuestions = limitedQuestions.filter(q => q.section === sec);
+          const needed = sectionConfig.questionCount;
+          const shortage = needed - currentSectionQuestions.length;
+          
+          if (shortage > 0) {
+            // 이미 선택된 문제 ID 제외하고 보충
+            const selectedIds = new Set(limitedQuestions.map(q => q.id));
+            const supplementQuestions = questionData
+              .filter(q => q.section === sec && !selectedIds.has(q.id))
+              .sort(() => Math.random() - 0.5)
+              .slice(0, shortage);
+            limitedQuestions = limitedQuestions.concat(supplementQuestions);
+          }
         }
+
+        // 섹션 내에서 part_number, question_number 순으로 정렬
+        limitedQuestions.sort((a, b) => {
+          const sectionOrder = { 'listening': 0, 'reading': 1, 'writing': 2 };
+          const secA = sectionOrder[a.section as keyof typeof sectionOrder] ?? 99;
+          const secB = sectionOrder[b.section as keyof typeof sectionOrder] ?? 99;
+          if (secA !== secB) return secA - secB;
+          const partA = a.part_number || 0;
+          const partB = b.part_number || 0;
+          if (partA !== partB) return partA - partB;
+          return (a.question_number || 0) - (b.question_number || 0);
+        });
         
-        console.log('[MockExamTest] Full mode question distribution:', {
+        console.log('[MockExamTest] Full mode question distribution by part:', {
           examType: dbExamType,
           total: limitedQuestions.length,
           listening: limitedQuestions.filter(q => q.section === 'listening').length,
+          listeningByPart: limitedQuestions
+            .filter(q => q.section === 'listening')
+            .reduce((acc, q) => { acc[q.part_number || 0] = (acc[q.part_number || 0] || 0) + 1; return acc; }, {} as Record<number, number>),
           reading: limitedQuestions.filter(q => q.section === 'reading').length,
-          writing: limitedQuestions.filter(q => q.section === 'writing').length,
+          readingByPart: limitedQuestions
+            .filter(q => q.section === 'reading')
+            .reduce((acc, q) => { acc[q.part_number || 0] = (acc[q.part_number || 0] || 0) + 1; return acc; }, {} as Record<number, number>),
         });
       } else {
         // 연습 모드: 기존 로직
