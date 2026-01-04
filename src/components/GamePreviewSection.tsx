@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import GlassCard from "./GlassCard";
 import NeonText from "./NeonText";
@@ -33,6 +34,7 @@ const scenarios = [
 ];
 
 const GamePreviewSection = () => {
+  const { t } = useTranslation();
   const [selectedScenario, setSelectedScenario] = useState(scenarios[0]);
 
   return (
@@ -44,10 +46,10 @@ const GamePreviewSection = () => {
         {/* Section Header */}
         <div className="text-center mb-16 space-y-4">
           <span className="text-sm font-tech text-accent tracking-widest uppercase">
-            Game Preview
+            {t("gamePreview.badge", "Game Preview")}
           </span>
           <h2 className="text-4xl md:text-5xl font-display">
-            <NeonText variant="gradient">게임 미리보기</NeonText>
+            <NeonText variant="gradient">{t("gamePreview.title", "게임 미리보기")}</NeonText>
           </h2>
         </div>
 
@@ -129,7 +131,7 @@ const GamePreviewSection = () => {
                     <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
                     <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                   </div>
-                  <span className="text-xs">AI가 응답 중...</span>
+                  <span className="text-xs">{t("gamePreview.aiTyping", "AI가 응답 중...")}</span>
                 </div>
               </div>
 
@@ -138,11 +140,11 @@ const GamePreviewSection = () => {
                 <div className="flex gap-2">
                   <input
                     type="text"
-                    placeholder="한국어로 대답하세요..."
+                    placeholder={t("gamePreview.inputPlaceholder", "한국어로 대답하세요...")}
                     className="flex-1 bg-background/50 border border-border/50 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
                   />
                   <Button variant="neon" size="sm">
-                    전송
+                    {t("gamePreview.send", "전송")}
                   </Button>
                 </div>
               </div>
@@ -157,7 +159,7 @@ const GamePreviewSection = () => {
               style={{ animationDelay: "400ms", animationFillMode: "forwards" }}
             >
               <h3 className="text-xl font-display mb-4">
-                <NeonText variant="cyan">시나리오 선택</NeonText>
+                <NeonText variant="cyan">{t("gamePreview.scenarioSelect", "시나리오 선택")}</NeonText>
               </h3>
               <div className="space-y-3">
                 {scenarios.map((scenario) => (
@@ -203,7 +205,7 @@ const GamePreviewSection = () => {
               style={{ animationDelay: "600ms", animationFillMode: "forwards" }}
             >
               <h3 className="text-xl font-display mb-4">
-                <NeonText variant="gold">TOPIK 레벨</NeonText>
+                <NeonText variant="gold">{t("gamePreview.topikLevel", "TOPIK 레벨")}</NeonText>
               </h3>
               <LevelSelector />
             </div>

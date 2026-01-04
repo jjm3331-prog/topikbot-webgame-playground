@@ -346,7 +346,11 @@
     "ai": {
       "badge": "RAG AI",
       "title": "LUKATO Q&A Agent",
-      "description": "최고 성능의 Q&A 에이전트로 프리미엄 모델에 직접 질문하세요!"
+      "description": "최고 성능의 Q&A 에이전트로 프리미엄 모델에 직접 질문하세요!",
+      "loginRequired": "로그인이 필요합니다",
+      "login": "로그인",
+      "dailyLimitReached": "오늘 무료 질문을 모두 사용했습니다",
+      "upgradePremium": "프리미엄 업그레이드"
     },
     "cache": {
       "cleared": "캐시 삭제 완료",
@@ -952,7 +956,15 @@
     "incorrect": "오답입니다 😅",
     "checkAnswer": "정답 확인",
     "nextQuestion": "다음 문제",
-    "viewResults": "결과 보기"
+    "viewResults": "결과 보기",
+    "complete": "학습 완료!",
+    "wellDone": "수고하셨습니다",
+    "scoreUnit": "점",
+    "score": "점수",
+    "lessonComplete": "학습 완료!",
+    "scoreSaved": "점수가 저장되었습니다: {{score}}점",
+    "saveFailed": "저장 실패",
+    "progressSaveFailed": "진도 저장에 실패했습니다."
   },
 "grammar": {
     "title": "문법 학습",
@@ -2947,6 +2959,7 @@
     "modes": {
       "full": {
         "title": "실전 모의고사",
+        "shortTitle": "실전 모의고사",
         "description": "실제 시험과 동일한 환경에서 전체 문항 풀기",
         "features": {
           "timeLimit": "시간 제한",
@@ -2956,6 +2969,7 @@
       },
       "section": {
         "title": "영역별 연습",
+        "shortTitle": "영역별 연습",
         "description": "듣기/읽기 영역을 선택해서 집중 훈련",
         "features": {
           "selectSection": "영역 선택",
@@ -2965,6 +2979,7 @@
       },
       "part": {
         "title": "Part별 연습",
+        "shortTitle": "파트별 훈련",
         "description": "특정 문제 유형만 집중적으로 훈련",
         "features": {
           "typePractice": "유형별 훈련",
@@ -2974,6 +2989,7 @@
       },
       "weakness": {
         "title": "약점 집중",
+        "shortTitle": "약점 집중",
         "description": "AI가 분석한 취약 유형 맞춤 문제",
         "features": {
           "aiAnalysis": "AI 분석",
@@ -2981,6 +2997,29 @@
           "efficientLearning": "효율적 학습"
         }
       }
+    },
+    "difficulty": {
+      "beginner": {
+        "label": "하",
+        "fullLabel": "Easy",
+        "description": "기초 문법과 일상 어휘"
+      },
+      "intermediate": {
+        "label": "중",
+        "fullLabel": "Normal",
+        "description": "실전 수준의 중급 문제"
+      },
+      "advanced": {
+        "label": "상",
+        "fullLabel": "Hard",
+        "description": "고급 어휘와 복잡한 문법"
+      }
+    },
+    "stats": {
+      "questions": "문제 보유",
+      "analysis": "실시간 분석",
+      "languagesValue": "7개국",
+      "languages": "언어 지원"
     },
     "features": {
       "aiGeneration": {
@@ -3375,6 +3414,14 @@
         "tip2Vi": "한국어를 잘하면 더 많이 벌어요"
       }
     }
+  },
+  "gamePreview": {
+    "badge": "Game Preview",
+    "title": "게임 미리보기",
+    "aiTyping": "AI가 응답 중...",
+    "inputPlaceholder": "한국어로 대답하세요...",
+    "send": "전송",
+    "scenarioSelect": "시나리오 선택",
+    "topikLevel": "TOPIK 레벨"
   }
 }
-
