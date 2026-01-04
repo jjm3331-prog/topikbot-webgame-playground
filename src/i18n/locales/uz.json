@@ -3342,5 +3342,117 @@
     "practiceAgain": "Qayta mashq qilish",
     "nextSentence": "Keyingi gap",
     "start": "Soya takrorlashni boshlash"
+  },
+  "mistakeNote": {
+    "title": "Xato daftari",
+    "loading": "Xato daftari yuklanmoqda...",
+    "loginRequired": {
+      "title": "Kirish talab qilinadi",
+      "description": "Xato daftaridan foydalanish uchun tizimga kiring."
+    },
+    "questions": {
+      "vocabulary": "Bu so'z nimani anglatadi?",
+      "cloze": "Bo'sh joyga qaysi so'z mos keladi?",
+      "grammarOX": "Bu gap to'g'rimi?",
+      "idiom": "Bu maqolning haqiqiy ma'nosi nima?"
+    },
+    "explanationLabel": "Tushuntirish:",
+    "unknownType": "Noma'lum savol turi.",
+    "perfect": {
+      "title": "Mukammal!",
+      "description1": "Takrorlash uchun xato yo'q.",
+      "description2": "O'rganishni davom ettiring, noto'g'ri javoblar bu yerda avtomatik saqlanadi."
+    },
+    "complete": {
+      "title": "Takrorlash tugadi!",
+      "stats": "{{total}} dan {{correct}} ta to'g'ri ({{percentage}}%)",
+      "excellent": "Ajoyib! Ko'p xatolarni engdingiz!",
+      "good": "Yaxshi! Bir oz ko'proq mashq qilsangiz mukammal bo'ladi!",
+      "keepGoing": "Davom eting! Takrorlash eslab qolish kalitidir!",
+      "reviewAgain": "Qayta takrorlash"
+    },
+    "intro": {
+      "description": "60 soniyada xatolaringizni takrorlang!",
+      "reviewCount": "Takrorlash uchun savollar: {{count}}",
+      "start": "60 soniyalik takrorlashni boshlash"
+    },
+    "types": {
+      "vocabulary": "So'z boyligi",
+      "cloze": "To'ldirish",
+      "grammarOX": "Grammatika O/X",
+      "idiom": "Maqollar"
+    },
+    "mistakeCount": "{{count}} marta noto'g'ri"
+  },
+  "dating": {
+    "luckySpin": {
+      "title": "Omadli aylanish",
+      "subtitle": "Omad g'ildiragini aylantiring!",
+      "spinning": "Aylanmoqda...",
+      "spin": "🎰 Aylantirish!",
+      "alreadySpun": "Bugun allaqachon aylantirgansiz",
+      "rewards": {
+        "affinity20": "+20 Hamdardlik",
+        "affinity15": "+15 Hamdardlik",
+        "affinity10": "+10 Hamdardlik",
+        "affinity8": "+8 Hamdardlik",
+        "affinity5": "+5 Hamdardlik",
+        "specialTopic": "Maxsus mavzu",
+        "dateItem": "Uchrashuv buyumi",
+        "luckyBonus": "Omadli bonus!"
+      }
+    },
+    "mbti": {
+      "title": "MBTI mosligi",
+      "subtitle": "MBTI moslik testi",
+      "npcMbti": "{{name}}ning MBTI",
+      "selectYours": "O'zingizning MBTIngizni tanlang",
+      "compatibility": "Moslik",
+      "advice": {
+        "destined": "Taqdiriy uchrashuv! Bir-biringizni mukammal tushunishingiz mumkin 💫",
+        "great": "Juda mos! Chuqur munosabat rivojlantirish mumkin 💕",
+        "different": "Farqlar jozibali! Harakat bilan yaxshi munosabat bo'lishi mumkin ✨",
+        "challenging": "Qiyin kombinatsiya, lekin bir-biringizdan ko'p narsa o'rganishingiz mumkin 📚",
+        "difficult": "Qiyin bo'lishi mumkin, lekin haqiqiy sevgi hamma narsani yengadi! 💪"
+      }
+    },
+    "miniGame": {
+      "title": "Mini o'yin",
+      "subtitle": "Hamdardlikni oshiring!",
+      "playWith": "{{name}} bilan o'ynash",
+      "telepathy": "Telepatiya o'yini",
+      "telepathySub": "Ular nimani o'ylayotganini toping",
+      "preference": "Afzallik testi",
+      "preferenceSub": "Bir-biringizning afzalliklarini bilib oling",
+      "guessNpc": "{{name}}ning tanlovini toping!",
+      "perfectMatch": "Mukammal mos!",
+      "goodMatch": "Yaxshi mos!",
+      "tryAgain": "Keyingi safar omad!",
+      "correct": "to'g'ri",
+      "affinity": "Hamdardlik",
+      "affinitySub": "Hamdardlik oshdi!",
+      "correctAnswer": "To'g'ri!",
+      "wrongAnswer": "{{name}} boshqa narsani tanladi"
+    },
+    "endings": {
+      "storyWith": "{{name}} bilan hikoya",
+      "addedToCollection": "Yakuniy to'plamga qo'shildi!",
+      "romantic": {
+        "title": "💕 Romantik yakuniy",
+        "description": "Shirin e'tirof bilan sevishganlar bo'ldingiz! Samimiy his-tuyg'ular bog'landi."
+      },
+      "friend": {
+        "title": "🤝 Eng yaqin do'st yakuniy",
+        "description": "Yaqin do'stlar bo'ldingiz! Romantikadan qimmatroq aloqa."
+      },
+      "tsundere": {
+        "title": "😤💕 Tsundere yakuniy",
+        "description": "Janjal orqali sevgi! Barcha o'yinlardan so'ng bir-biringizni tan oldingiz."
+      },
+      "dramatic": {
+        "title": "🎬 Dramatik yakuniy",
+        "description": "Taqdiriy uchrashuv! Drama kabi hikoya paydo bo'ldi."
+      }
+    }
   }
 }

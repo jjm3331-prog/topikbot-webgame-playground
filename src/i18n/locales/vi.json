@@ -3676,5 +3676,117 @@
     "practiceAgain": "Luyện lại",
     "nextSentence": "Câu tiếp theo",
     "start": "Bắt đầu Shadowing"
+  },
+  "mistakeNote": {
+    "title": "Sổ lỗi",
+    "loading": "Đang tải sổ lỗi...",
+    "loginRequired": {
+      "title": "Cần đăng nhập",
+      "description": "Vui lòng đăng nhập để sử dụng sổ lỗi."
+    },
+    "questions": {
+      "vocabulary": "Từ này nghĩa là gì?",
+      "cloze": "Từ nào điền vào chỗ trống?",
+      "grammarOX": "Câu này đúng không?",
+      "idiom": "Ý nghĩa thực sự của thành ngữ này là gì?"
+    },
+    "explanationLabel": "Giải thích:",
+    "unknownType": "Loại câu hỏi không xác định.",
+    "perfect": {
+      "title": "Hoàn hảo!",
+      "description1": "Không có lỗi để ôn tập.",
+      "description2": "Tiếp tục học và câu sai sẽ được tự động lưu tại đây."
+    },
+    "complete": {
+      "title": "Ôn tập hoàn thành!",
+      "stats": "{{correct}} trên {{total}} đúng ({{percentage}}%)",
+      "excellent": "Xuất sắc! Bạn đã vượt qua hầu hết các lỗi!",
+      "good": "Tốt! Luyện thêm một chút nữa sẽ hoàn hảo!",
+      "keepGoing": "Cố lên! Lặp lại là chìa khóa của trí nhớ!",
+      "reviewAgain": "Ôn tập lại"
+    },
+    "intro": {
+      "description": "Ôn tập lỗi trong 60 giây!",
+      "reviewCount": "Câu hỏi cần ôn: {{count}}",
+      "start": "Bắt đầu ôn 60 giây"
+    },
+    "types": {
+      "vocabulary": "Từ vựng",
+      "cloze": "Điền từ",
+      "grammarOX": "Ngữ pháp O/X",
+      "idiom": "Thành ngữ"
+    },
+    "mistakeCount": "Sai {{count}} lần"
+  },
+  "dating": {
+    "luckySpin": {
+      "title": "Vòng quay may mắn",
+      "subtitle": "Quay vòng may mắn!",
+      "spinning": "Đang quay...",
+      "spin": "🎰 Quay!",
+      "alreadySpun": "Bạn đã quay hôm nay rồi",
+      "rewards": {
+        "affinity20": "+20 Điểm thân mật",
+        "affinity15": "+15 Điểm thân mật",
+        "affinity10": "+10 Điểm thân mật",
+        "affinity8": "+8 Điểm thân mật",
+        "affinity5": "+5 Điểm thân mật",
+        "specialTopic": "Chủ đề đặc biệt",
+        "dateItem": "Vật phẩm hẹn hò",
+        "luckyBonus": "Bonus may mắn!"
+      }
+    },
+    "mbti": {
+      "title": "Tương hợp MBTI",
+      "subtitle": "Bài kiểm tra tương hợp MBTI",
+      "npcMbti": "MBTI của {{name}}",
+      "selectYours": "Chọn MBTI của bạn",
+      "compatibility": "Tương hợp",
+      "advice": {
+        "destined": "Cuộc gặp gỡ định mệnh! Hai bạn có thể hiểu nhau hoàn hảo 💫",
+        "great": "Rất hợp nhau! Có thể phát triển mối quan hệ sâu sắc 💕",
+        "different": "Sự khác biệt là điểm hấp dẫn! Cố gắng sẽ có mối quan hệ tốt ✨",
+        "challenging": "Sự kết hợp thử thách nhưng có thể học hỏi nhiều từ nhau 📚",
+        "difficult": "Có thể khó khăn nhưng tình yêu đích thực sẽ vượt qua tất cả! 💪"
+      }
+    },
+    "miniGame": {
+      "title": "Mini Game",
+      "subtitle": "Tăng điểm thân mật!",
+      "playWith": "Chơi với {{name}}",
+      "telepathy": "Trò chơi thần giao cách cảm",
+      "telepathySub": "Đoán suy nghĩ của họ",
+      "preference": "Bài kiểm tra sở thích",
+      "preferenceSub": "Tìm hiểu sở thích của nhau",
+      "guessNpc": "Đoán lựa chọn của {{name}}!",
+      "perfectMatch": "Tuyệt hợp!",
+      "goodMatch": "Hợp nhau!",
+      "tryAgain": "Lần sau may mắn hơn!",
+      "correct": "đúng",
+      "affinity": "Điểm thân mật",
+      "affinitySub": "Điểm thân mật tăng!",
+      "correctAnswer": "Đúng rồi!",
+      "wrongAnswer": "{{name}} đã chọn khác"
+    },
+    "endings": {
+      "storyWith": "Câu chuyện với {{name}}",
+      "addedToCollection": "Đã thêm vào bộ sưu tập kết thúc!",
+      "romantic": {
+        "title": "💕 Kết thúc lãng mạn",
+        "description": "Với lời tỏ tình ngọt ngào, hai bạn đã trở thành người yêu! Tình cảm chân thành đã kết nối hai trái tim."
+      },
+      "friend": {
+        "title": "🤝 Kết thúc bạn thân",
+        "description": "Hai bạn đã trở thành bạn thân! Sẽ là mối quan hệ quý giá hơn cả người yêu."
+      },
+      "tsundere": {
+        "title": "😤💕 Kết thúc Tsundere",
+        "description": "Cãi nhau nhưng vẫn yêu! Sau những lần đẩy-kéo, cuối cùng đã thừa nhận tình cảm."
+      },
+      "dramatic": {
+        "title": "🎬 Kết thúc kịch tính",
+        "description": "Cuộc gặp gỡ định mệnh! Một câu chuyện như phim đã được viết nên."
+      }
+    }
   }
 }
