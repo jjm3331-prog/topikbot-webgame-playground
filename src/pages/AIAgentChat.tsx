@@ -485,11 +485,6 @@ const AIAgentChat = () => {
           <ArrowLeft className="w-4 h-4" />
           <span className="text-sm">{t("common.backToDashboard")}</span>
         </Button>
-        <div className="flex-1" />
-        <Badge variant="outline" className="gap-1 text-xs">
-          <Crown className="w-3 h-3" />
-          {t("aiAgent.unlimited")}
-        </Badge>
       </div>
 
       <div className="flex-1 flex overflow-hidden">
