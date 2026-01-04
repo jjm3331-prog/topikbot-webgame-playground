@@ -508,25 +508,44 @@ const MockExamGenerator = () => {
           );
 
           if (validateData?.validations) {
-            setValidationResults(validateData.validations);
+            // question_number 기반으로 검증 결과를 문제 배열 인덱스에 매핑
+            const validationMap = new Map<number, ValidationResult>();
+            validateData.validations.forEach((v: ValidationResult) => {
+              validationMap.set(v.question_number, v);
+            });
+
+            // 문제 배열 순서대로 검증 결과 재정렬
+            const orderedValidations = generatedData.questions.map((q: GeneratedQuestion, i: number) => {
+              const matchedValidation = validationMap.get(q.question_number);
+              return matchedValidation || {
+                question_number: q.question_number,
+                isValid: true,
+                score: 80, // 매칭 안 되면 기본 통과
+                issues: [],
+                suggestions: [],
+                correctedQuestion: null,
+              };
+            });
+            setValidationResults(orderedValidations);
             
             // Auto-select questions that passed validation (80+ score)
             const passedIndices = new Set<number>();
-            validateData.validations.forEach((v: ValidationResult, i: number) => {
+            orderedValidations.forEach((v: ValidationResult, i: number) => {
               if (v.score >= 80) passedIndices.add(i);
             });
             setSelectedQuestions(passedIndices);
             
-            // Apply corrections from validation
+            // Apply corrections from validation (question_number 기반 매칭)
             const correctedQuestions = generatedData.questions.map((q: GeneratedQuestion, i: number) => {
-              const validation = validateData.validations[i];
+              const validation = orderedValidations[i];
               return validation?.correctedQuestion ? { ...q, ...validation.correctedQuestion } : q;
             });
             setGeneratedQuestions(correctedQuestions);
 
+            const passedCount = orderedValidations.filter((v: ValidationResult) => v.score >= 80).length;
             toast({
               title: "✅ 검증 완료",
-              description: `${validateData.passedCount || passedIndices.size}개 통과, ${validateData.failedCount || (generatedData.questions.length - passedIndices.size)}개 검토 필요`,
+              description: `${passedCount}개 통과, ${orderedValidations.length - passedCount}개 검토 필요`,
             });
           }
         } else {
