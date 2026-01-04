@@ -512,7 +512,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       subscribeToRoom(data.id);
     } catch (err) {
       console.error("Failed to join room:", err);
-      toast({ title: "방 참가 실패", variant: "destructive" });
+      toast({ title: t("battle.joinFailed", "방 참가 실패"), variant: "destructive" });
       setGamePhase("menu");
     }
   };
@@ -548,8 +548,8 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
               playBeep(784, 120, "sine");
               vibrate([80, 40, 120]);
               toast({
-                title: "상대가 참가했습니다",
-                description: newRoom.guest_name ? `${newRoom.guest_name}님이 들어왔습니다.` : undefined,
+                title: t("battle.opponentJoined", "상대가 참가했습니다"),
+                description: newRoom.guest_name ? t("battle.playerJoinedDesc", "{{name}}님이 들어왔습니다.", { name: newRoom.guest_name }) : undefined,
                 duration: 6000,
               });
             }
@@ -637,7 +637,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
   const startGame = async () => {
     if (!room || room.host_id !== playerId) return;
     if (!room.host_ready || !room.guest_ready) {
-      toast({ title: "양쪽 모두 준비해야 시작할 수 있습니다", variant: "destructive" });
+      toast({ title: t("battle.bothMustReady", "양쪽 모두 준비해야 시작할 수 있습니다"), variant: "destructive" });
       return;
     }
 
@@ -756,11 +756,11 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
         })
         .eq("id", room.id);
 
-      toast({ title: "⏰ 시간 초과! 패배했습니다", variant: "destructive" });
+      toast({ title: t("battle.timeoutLost", "⏰ 시간 초과! 패배했습니다"), variant: "destructive" });
     } else {
       // Give warning and pass turn
       playWarnBeep();
-      toast({ title: "⚠️ 경고! 시간 초과로 경고 1회 부여", variant: "destructive" });
+      toast({ title: t("battle.timeoutWarning", "⚠️ 경고! 시간 초과로 경고 1회 부여"), variant: "destructive" });
 
       const nextTurnPlayer = isHost ? room.guest_id : room.host_id;
 
@@ -835,7 +835,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
       setTurnTimeLeft(TURN_TIME_LIMIT);
     } catch (err) {
       console.error("Failed to submit word:", err);
-      toast({ title: "단어 전송 실패", variant: "destructive" });
+      toast({ title: t("battle.submitFailed", "단어 전송 실패"), variant: "destructive" });
     }
 
     inputRef.current?.focus();
@@ -1257,13 +1257,13 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                   : <Users className="w-6 h-6 text-muted-foreground/50" />
                 }
               </div>
-              <p className="font-bold text-lg">{room.guest_name || "Đang chờ..."}</p>
+              <p className="font-bold text-lg">{room.guest_name || t("battle.waiting", "Đang chờ...")}</p>
               {room.guest_id ? (
                 <>
                   <p className={`text-sm font-medium ${room.guest_ready ? "text-green-500" : "text-muted-foreground"}`}>
-                    {room.guest_ready ? "✅ Sẵn sàng" : "⏳ Chờ..."}
+                    {room.guest_ready ? t("battle.readyStatus", "✅ Sẵn sàng") : t("battle.waitingStatus", "⏳ Chờ...")}
                   </p>
-                  {!isHost && <p className="text-xs text-primary mt-1">Tôi</p>}
+                  {!isHost && <p className="text-xs text-primary mt-1">{t("battle.me", "Tôi")}</p>}
                   {isHost && (
                     <Button 
                       variant="ghost" 
@@ -1271,7 +1271,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
                       onClick={kickGuest}
                       className="mt-2 text-xs text-red-500 hover:text-red-600 hover:bg-red-500/10"
                     >
-                      강퇴
+                      {t("battle.kick", "강퇴")}
                     </Button>
                   )}
                 </>

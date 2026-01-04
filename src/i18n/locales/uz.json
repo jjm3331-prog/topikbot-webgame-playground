@@ -545,7 +545,40 @@
     "helpItem3": "Xato xabarlari va taklif-mulohazalar",
     "helpItem4": "O'quv kontenti bo'yicha savollar",
     "copyright": "© 2025 LUKATO AI. AI bilan aqlli imtihon tayyorgarligi.",
-    "platform": "Butun dunyo bo'ylab TOPIK imtihoni uchun AI o'quv platformasi"
+    "platform": "Butun dunyo bo'ylab TOPIK imtihoni uchun AI o'quv platformasi",
+    "kakao": {
+      "platform": "KakaoTalk",
+      "buttonText": "KakaoTalk ochiq chatga qo'shilish",
+      "description": "KakaoTalk orqali real vaqtda yordam oling",
+      "scanText": "QR kodni skanerlang yoki qo'shilish uchun pastdagi tugmani bosing",
+      "supportHours": "Jonli mijozlar yordami",
+      "supportTime": "Ish kunlari 09:00-18:00 (dam olish kunlari va bayramlarda dam)",
+      "helpTitle": "Sizga qanday yordam bera olamiz?",
+      "helpItem1": "Ilovadan foydalanish va funksiyalar",
+      "helpItem2": "To'lov va obuna bo'yicha",
+      "helpItem3": "Xato xabarlari va takliflar",
+      "helpItem4": "O'quv kontenti bo'yicha savollar",
+      "feature1": {
+        "title": "Tez javob",
+        "desc": "O'rtacha 30 daqiqada"
+      },
+      "feature2": {
+        "title": "Ekspert maslahati",
+        "desc": "TOPIK mutaxassisi maslahati"
+      },
+      "feature3": {
+        "title": "Shaxsiy yordam",
+        "desc": "1:1 individual yechimlar"
+      },
+      "headerTitle": "Mijozlarga yordam markazi",
+      "headerSubtitle": "LUKATO AI rasmiy yordami",
+      "heroTitle1": "KakaoTalk orqali",
+      "heroTitle2": "tez maslahat",
+      "badge": "KakaoTalk ochiq chat",
+      "onlineNow": "Hozir ishlayapti",
+      "footerCopyright": "© 2025 LUKATO AI. AI bilan aqlli imtihon tayyorgarligi.",
+      "footerPlatform": "Butun dunyo bo'ylab TOPIK AI o'quv platformasi"
+    }
   },
   "battle": {
     "title": "1:1 Real vaqt jang maydoni",
