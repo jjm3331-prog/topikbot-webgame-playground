@@ -928,6 +928,16 @@
     "pricing": { "title1": "合理价格，", "local": "本地", "title2": "全球品质", "free": "免费", "forever": "永久免费", "start": "开始", "month": "月", "upgrade": "升级" },
     "finalCta": { "title1": "TOPIK", "title2": "征服", "desc": "TOPIK教授 + LUKATO AI =", "noRival": "无敌组合", "cta": "立即开始" }
   },
+  "testimonials": {
+    "default": {
+      "1": { "text": "从零韩语开始，8个月通过TOPIK 6级！AI游戏帮助自然学习语法。", "name": "TOPIK 6级", "period": "8个月" },
+      "2": { "text": "AI写作批改比老师更细致。写作分数从30分提高到70分！", "name": "TOPIK 5级", "period": "6个月" },
+      "3": { "text": "每天与AI练习口语，发音达到母语水平。求职面试成功！", "name": "三星员工", "period": "1年" },
+      "4": { "text": "K-Drama配音帮助学习自然的语调。现在不用字幕就能看韩剧！", "name": "TOPIK 4级", "period": "5个月" },
+      "5": { "text": "猎头服务太棒了！获得免费简历咨询并在韩国找到工作。", "name": "首尔IT工程师", "period": "3个月" },
+      "6": { "text": "10,000+道TOPIK题库真的不一样。最接近真题！", "name": "TOPIK 6级", "period": "10个月" }
+    }
+  },
 "grammar": {
     "title": "语法学习",
     "description": "通过迷你游戏掌握语法",
@@ -3453,5 +3463,19 @@
         "description": "命运的相遇! 如电视剧般的故事展开了。"
       }
     }
+  },
+  "hangulTracing": {
+    "excellent": "太棒了! {{score}}分",
+    "excellentDesc": "字写得真漂亮! 👏",
+    "good": "不错! {{score}}分",
+    "goodDesc": "再练习一下就更好了!",
+    "tryAgain": "再试一次! {{score}}分",
+    "tryAgainDesc": "按照字的形状写。",
+    "complete": "完成!",
+    "points": "分",
+    "restart": "再练习",
+    "clear": "清除",
+    "check": "检查",
+    "hint": "用手指或鼠标按照字的形状写"
   }
 }

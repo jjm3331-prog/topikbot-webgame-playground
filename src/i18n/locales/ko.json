@@ -960,7 +960,19 @@
     "headhunting": { "badge": "프리미엄 독점 서비스", "title1": "직접 연결", "title2": "한국 기업", "desc1": "전문 헤드헌터 팀이 취업 지원", "free": "100% 무료", "desc2": "현지 한국 기업부터 서울 취업 기회까지!", "tag1": "500+ 기업", "tag2": "이력서 컨설팅", "tag3": "비자 지원", "cta": "지금 신청", "ctaSub": "완전 무료" },
     "features": { "badge": "LUKATO AI", "title": "TOPIK 6급을 위한 완벽한", "skills": "4 Skills", "listen": "듣기", "read": "읽기", "write": "쓰기", "speak": "말하기", "listenDesc": "500+ 문제", "readDesc": "1,000+ 문제", "writeDesc": "AI 24/7 첨삭", "speakDesc": "99% 원어민 정확도" },
     "games": { "badge": "K-Culture", "korean": "한국어", "survival": "AI 서바이벌", "dating": "서울 데이트", "wordChain": "끝말잇기", "dubbing": "더빙", "kpopQuiz": "K-POP 퀴즈", "partTime": "알바", "badgeNew": "New", "badgeHot": "Hot", "badgeStar": "⭐" },
-    "testimonials": { "title": "학습자들의 생생한 후기" },
+    "testimonials": { "title": "학습자들의 생생한 후기" }
+  },
+  "testimonials": {
+    "default": {
+      "1": { "text": "한국어 제로에서 시작해서 8개월 만에 TOPIK 6급 합격! AI 게임으로 문법을 자연스럽게 배웠어요.", "name": "TOPIK 6급", "period": "8개월" },
+      "2": { "text": "AI 쓰기 첨삭이 선생님보다 더 세밀해요. 쓰기 점수가 30점에서 70점으로 올랐어요!", "name": "TOPIK 5급", "period": "6개월" },
+      "3": { "text": "매일 AI와 스피킹 연습하니 발음이 원어민 수준이 되었어요. 취업 면접도 성공!", "name": "삼성 직원", "period": "1년" },
+      "4": { "text": "K-드라마 더빙으로 억양을 자연스럽게 배웠어요. 이제 자막 없이 한국 드라마를 봐요!", "name": "TOPIK 4급", "period": "5개월" },
+      "5": { "text": "헤드헌팅 서비스가 최고예요! 무료 이력서 컨설팅 받고 한국에서 취업했어요.", "name": "서울 IT 엔지니어", "period": "3개월" },
+      "6": { "text": "10,000개 이상의 TOPIK 문제가 정말 다릅니다. 실제 시험과 가장 유사해요!", "name": "TOPIK 6급", "period": "10개월" }
+    }
+  },
+  "landing": {
     "pricing": { "title1": "합리적인 가격,", "local": "현지", "title2": "글로벌 품질", "free": "무료", "forever": "평생 무료", "start": "시작하기", "month": "월", "upgrade": "업그레이드" },
     "finalCta": { "title1": "TOPIK", "title2": "정복", "desc": "TOPIK 출제 교수 + LUKATO AI =", "noRival": "최강 조합", "cta": "지금 시작하기" }
   },
@@ -3907,5 +3919,19 @@
         "description": "운명적인 만남! 마치 드라마 같은 이야기가 펼쳐졌어요."
       }
     }
+  },
+  "hangulTracing": {
+    "excellent": "훌륭해요! {{score}}점",
+    "excellentDesc": "글씨가 정말 예뻐요! 👏",
+    "good": "잘했어요! {{score}}점",
+    "goodDesc": "조금만 더 연습하면 완벽해요!",
+    "tryAgain": "다시 해볼까요? {{score}}점",
+    "tryAgainDesc": "글자 모양을 따라 써보세요.",
+    "complete": "완료!",
+    "points": "점",
+    "restart": "다시 연습",
+    "clear": "지우기",
+    "check": "확인",
+    "hint": "손가락이나 마우스로 글자 모양을 따라 써보세요"
   }
 }
