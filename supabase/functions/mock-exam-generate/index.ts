@@ -216,6 +216,12 @@ interface GeneratedQuestion {
   set_id?: string;
   // [21-50번] 세트 내 질문 유형: intent(의도), detail(세부내용), central_idea(중심생각), attitude(태도), speaking_style(말하는 방식)
   question_type_in_set?: "intent" | "detail" | "central_idea" | "attitude" | "speaking_style";
+  // [쓰기 53번] 그래프/도표 설명 문제용 필드
+  writing_prompt?: string;
+  model_answer?: string;
+  word_limit?: string;
+  // [쓰기 53번] 그래프 데이터 설명 (AI 이미지 생성용)
+  graph_data_description?: string;
 }
 
 // Generate embedding using OpenAI
@@ -789,6 +795,119 @@ async function generatePictureQuestionImage(
   }
 }
 
+// Generate graph/chart image for Writing Question 53 (도표 설명 문제)
+async function generateWritingGraphImage(
+  graphDataDescription: string,
+  examType: string,
+  supabase: any,
+): Promise<string | null> {
+  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+  if (!LOVABLE_API_KEY || !graphDataDescription) return null;
+
+  try {
+    console.log(`📊 [Writing Q53] Generating graph: ${graphDataDescription.slice(0, 80)}...`);
+
+    // 쓰기 53번 전용 - 실제 TOPIK 스타일 도표 이미지
+    const imagePrompt = `Create a TOPIK Korean language test STATISTICAL GRAPH/CHART image for Writing Question 53.
+
+The image must visualize the following data:
+${graphDataDescription}
+
+CRITICAL REQUIREMENTS:
+
+1. **LAYOUT OPTIONS** (choose one based on data):
+   - Option A: LINE GRAPH (선 그래프) - for trends over time
+   - Option B: BAR CHART (막대 그래프) - for comparisons
+   - Option C: PIE/DONUT CHART (원형 차트) - for percentages/proportions
+   - Option D: COMBINED (선 그래프 + 원형 차트) - for complex data with multiple aspects
+
+2. **KOREAN LABELS** (필수):
+   - Title in Korean at the top (e.g., "한국인의 여가 활동 조사", "연도별 출생률 변화")
+   - X-axis and Y-axis labels in Korean
+   - Legend items in Korean if applicable
+   - Percentage numbers or numerical values clearly visible
+   - Unit labels like "(만명)", "(%)", "(년)" where appropriate
+
+3. **DATA VISUALIZATION**:
+   - Clear, accurate representation of the described data
+   - Each data point/segment should be distinguishable
+   - Use professional grayscale or minimal colors (black, gray tones)
+   - Numbers and percentages should be clearly readable
+
+4. **TOPIK EXAM STYLE**:
+   - Clean, professional business/academic chart style
+   - Simple white background
+   - No decorative elements, just pure data visualization
+   - The chart should be suitable for a Korean language proficiency exam
+
+5. **DIMENSIONS**: Suitable for display in an exam paper (approximately 16:9 or 4:3 ratio)
+
+The resulting image should look like a chart from an official TOPIK exam paper that students need to describe in 200-300 characters.`;
+
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-image-preview",
+        messages: [{ role: "user", content: imagePrompt }],
+        modalities: ["image", "text"],
+      }),
+    });
+
+    if (!response.ok) {
+      console.error(`Writing graph image API error: ${response.status}`);
+      return null;
+    }
+
+    const data = await response.json();
+    const imageBase64 = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+
+    if (!imageBase64 || !imageBase64.startsWith("data:image/")) {
+      console.error("No valid writing graph image in response");
+      return null;
+    }
+
+    // Extract base64 and upload to storage
+    const base64Data = imageBase64.split(",")[1];
+    if (!base64Data) {
+      console.error("Invalid base64 format for writing graph image");
+      return null;
+    }
+
+    const binaryString = atob(base64Data);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let k = 0; k < binaryString.length; k++) {
+      bytes[k] = binaryString.charCodeAt(k);
+    }
+
+    const mimeMatch = imageBase64.match(/data:image\/(\w+);/);
+    const extension = mimeMatch ? mimeMatch[1] : "png";
+    const fileName = `mock-exam/${examType}/writing_q53_graph_${Date.now()}.${extension}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("podcast-audio")
+      .upload(fileName, bytes, {
+        contentType: `image/${extension}`,
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error("Writing graph image upload error:", uploadError);
+      return null;
+    }
+
+    const { data: urlData } = supabase.storage.from("podcast-audio").getPublicUrl(fileName);
+    console.log(`✅ Writing Q53 graph image uploaded: ${urlData.publicUrl}`);
+    return urlData.publicUrl;
+  } catch (error) {
+    console.error("Writing graph image generation error:", error);
+    return null;
+  }
+}
+
 // Build system prompt for Gemini
 function buildSystemPrompt(params: GenerateRequest, ragContext: string): string {
   const levelInfo = {
@@ -954,8 +1073,25 @@ ${params.topic ? `- 주제/문법: ${params.topic}` : ''}
   "model_answer": "모범 답안 전문 (51,52: 빈칸별 / 53,54: 전체 글)",
   "word_limit": "200-300자 또는 600-700자",
   "grammar_points": ["필수 문법"],
-  "vocabulary": ["핵심 어휘"]
+  "vocabulary": ["핵심 어휘"],
+  "graph_data_description": "[53번 전용] AI 이미지 생성용 도표/그래프 데이터 상세 설명. 예: '2020-2023년 한국인 여가 활동 조사. 선 그래프: 운동(2020: 45%, 2023: 60%), 독서(2020: 30%, 2023: 25%). 원형 차트: 운동 이유 - 건강 50%, 스트레스 해소 30%, 다이어트 20%'"
 }
+\`\`\`
+
+### ⚠️ 53번 그래프/도표 이미지 생성 필수 규칙
+
+53번 문제는 반드시 \`graph_data_description\` 필드를 포함해야 합니다!
+이 필드는 AI가 도표/그래프 이미지를 생성하는 데 사용됩니다.
+
+**graph_data_description 작성 가이드**:
+1. 그래프 유형 명시 (선 그래프, 막대 그래프, 원형 차트 등)
+2. 구체적인 수치 데이터 포함 (연도, 비율, 수량 등)
+3. 한국어 제목과 축 레이블 명시
+4. 비교 대상이나 변화 추이 설명
+
+**예시**:
+\`\`\`
+"graph_data_description": "제목: '직장인 스트레스 원인 조사 (2023)'. 원형 차트 데이터: 업무량 과다 35%, 대인관계 25%, 야근 20%, 급여 불만족 15%, 기타 5%. 추가 선 그래프: 연도별 스트레스 지수 변화 - 2019년 65점, 2020년 72점, 2021년 78점, 2022년 75점, 2023년 70점 (y축: 스트레스 지수 0-100)"
 \`\`\`
 `;
   } else if (params.section === 'listening') {
@@ -1643,8 +1779,19 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
           } as GeneratedQuestion;
         });
 
-        // Validate questions
+        // Validate questions - different rules for writing vs other sections
         let validQuestions = normalizedQuestions.filter((q) => {
+          // Writing section (쓰기): 주관식이므로 options와 correct_answer 검증 제외
+          if (params.section === 'writing') {
+            return (
+              q.question_text &&
+              q.explanation_ko &&
+              typeof q.part_number === "number" &&
+              q.part_number >= 51 &&
+              q.part_number <= 54
+            );
+          }
+          // Listening/Reading sections: 객관식 검증
           return (
             q.question_text &&
             Array.isArray(q.options) &&
@@ -1698,6 +1845,39 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
               }
               
               validQuestions[i].option_images = optionImages;
+            }
+          }
+        }
+
+        // 🖼️ Generate graph images for Writing Question 53 (도표 설명 문제)
+        if (params.section === 'writing') {
+          const writingQ53Questions = validQuestions.filter(
+            (q) => q.part_number === 53 && q.graph_data_description
+          );
+          
+          if (writingQ53Questions.length > 0) {
+            sendProgress("image", 89, "📊 쓰기 53번 도표/그래프 이미지 생성 중...");
+            
+            for (let i = 0; i < validQuestions.length; i++) {
+              const q = validQuestions[i];
+              if (q.part_number === 53 && q.graph_data_description) {
+                console.log(`[Writing Q53] Generating graph for question ${i + 1}...`);
+                sendProgress("image", 89 + (i / writingQ53Questions.length) * 3, 
+                  `📊 쓰기 53번 도표 이미지 생성 중... (${i + 1}/${writingQ53Questions.length})`);
+                
+                const graphImageUrl = await generateWritingGraphImage(
+                  q.graph_data_description,
+                  params.examType,
+                  supabase
+                );
+                
+                if (graphImageUrl) {
+                  validQuestions[i].question_image_url = graphImageUrl;
+                  console.log(`✅ Writing Q53 graph image generated: ${graphImageUrl}`);
+                } else {
+                  console.warn(`⚠️ Failed to generate graph image for Writing Q53`);
+                }
+              }
             }
           }
         }
@@ -1876,7 +2056,19 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
       throw new Error("Failed to parse Gemini response as JSON");
     }
 
+    // Validate questions - different rules for writing vs other sections
     let validQuestions = (parsed.questions || []).filter((q) => {
+      // Writing section (쓰기): 주관식이므로 options와 correct_answer 검증 제외
+      if (params.section === 'writing') {
+        return (
+          q.question_text &&
+          q.explanation_ko &&
+          typeof q.part_number === "number" &&
+          q.part_number >= 51 &&
+          q.part_number <= 54
+        );
+      }
+      // Listening/Reading sections: 객관식 검증
       return (
         q.question_text &&
         Array.isArray(q.options) &&
