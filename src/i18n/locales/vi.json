@@ -3378,7 +3378,93 @@
     "inputPlaceholder": "Trả lời bằng tiếng Hàn...",
     "send": "Gửi",
     "scenarioSelect": "Chọn Kịch bản",
-    "topikLevel": "Cấp độ TOPIK"
+    "topikLevel": "Cấp độ TOPIK",
+    "player": {
+      "name": "Người chơi",
+      "level": "Level 12"
+    },
+    "chat": {
+      "npc1": "Xin chào! Tôi có thể giúp gì?",
+      "npc1En": "Hello! How can I help you?",
+      "user1": "Cho tôi một ly Americano.",
+      "user1En": "One Americano, please.",
+      "npc2": "Vâng, bạn muốn size nào?",
+      "npc2En": "Sure, what size would you like?"
+    },
+    "scenarios": {
+      "cafeOrder": {
+        "title": "Gọi đồ tại quán cà phê",
+        "titleEn": "Ordering at a Cafe",
+        "location": "Quán cà phê Gangnam",
+        "difficulty": "Sơ cấp"
+      },
+      "subway": {
+        "title": "Đi tàu điện ngầm",
+        "titleEn": "Taking the Subway",
+        "location": "Tàu điện ngầm Seoul",
+        "difficulty": "Sơ cấp"
+      },
+      "restaurant": {
+        "title": "Ăn tại nhà hàng",
+        "titleEn": "Dining at a Restaurant",
+        "location": "Nhà hàng Myeongdong",
+        "difficulty": "Trung cấp"
+      }
+    }
+  },
+  "mistakeReview": {
+    "quizType": {
+      "synonym": "Từ đồng nghĩa",
+      "antonym": "Từ trái nghĩa",
+      "similar": "Từ tương tự"
+    },
+    "stats": {
+      "title": "Thống kê lỗi sai",
+      "button": "Thống kê",
+      "noRecord": "Chưa có bản ghi lỗi!",
+      "totalMistakes": "Tổng lỗi",
+      "levels": "Cấp độ",
+      "mostMistakes": "Lỗi nhiều nhất",
+      "levelDistribution": "Phân bố lỗi theo cấp độ",
+      "topMistakes": "Top 5 từ sai nhiều nhất",
+      "times": " lần",
+      "mistakeCount": "Số lần sai"
+    },
+    "quizMode": "Chế độ Quiz",
+    "allLevels": "Tất cả cấp độ",
+    "levelOnly": "Chỉ cấp {{level}}",
+    "perfect": "Hoàn hảo!",
+    "noMistakes": {
+      "all": "Không có lỗi để ôn tập. Luyện tập thêm ở các module khác!",
+      "level": "Không có lỗi cấp {{level}}. Kiểm tra tất cả cấp độ!"
+    },
+    "viewAllLevels": "Xem tất cả cấp độ ({{count}})",
+    "quizComplete": "Hoàn thành Quiz từ liên quan!",
+    "correct": "Đúng",
+    "accuracy": "Độ chính xác",
+    "result": {
+      "excellent": "Xuất sắc! Bạn hiểu rõ các từ liên quan!",
+      "good": "Tốt! Luyện tập thêm một chút là hoàn hảo.",
+      "needPractice": "Cần luyện tập thêm. Thử lại nhé!"
+    },
+    "restart": "Bắt đầu lại",
+    "relatedWordQuiz": "Quiz từ liên quan",
+    "quizDescription": "Ghép từ đồng nghĩa, trái nghĩa và từ tương tự từ các lỗi của bạn.",
+    "aiSearchBased": "AI tìm kiếm các từ liên quan chính xác.",
+    "wordsToReview": "Từ cần ôn tập",
+    "countUnit": "",
+    "loadingProgress": "Đang tải từ liên quan... ({{current}}/{{total}})",
+    "preparing": "Đang chuẩn bị...",
+    "startQuiz": "Bắt đầu Quiz",
+    "cannotGenerate": "Không thể tạo quiz. Vui lòng thử lại.",
+    "streak": "liên tiếp",
+    "findType": "Tìm {{type}}",
+    "selectType": "Chọn {{type}} của từ trên",
+    "correctAnswer": "Đúng rồi!",
+    "wrongAnswer": "Sai",
+    "theAnswer": "Đáp án",
+    "checkSource": "Kiểm tra nguồn",
+    "viewResult": "Xem kết quả"
   },
   "stats": {
     "progress": "Tiến độ",

@@ -3053,7 +3053,93 @@
     "inputPlaceholder": "Ответьте на корейском...",
     "send": "Отправить",
     "scenarioSelect": "Выбор сценария",
-    "topikLevel": "Уровень TOPIK"
+    "topikLevel": "Уровень TOPIK",
+    "player": {
+      "name": "Игрок",
+      "level": "Уровень 12"
+    },
+    "chat": {
+      "npc1": "Здравствуйте! Чем могу помочь?",
+      "npc1En": "Hello! How can I help you?",
+      "user1": "Один американо, пожалуйста.",
+      "user1En": "One Americano, please.",
+      "npc2": "Хорошо, какой размер?",
+      "npc2En": "Sure, what size would you like?"
+    },
+    "scenarios": {
+      "cafeOrder": {
+        "title": "Заказ в кафе",
+        "titleEn": "Ordering at a Cafe",
+        "location": "Кафе в Каннаме",
+        "difficulty": "Начальный"
+      },
+      "subway": {
+        "title": "Поездка на метро",
+        "titleEn": "Taking the Subway",
+        "location": "Сеульское метро",
+        "difficulty": "Начальный"
+      },
+      "restaurant": {
+        "title": "Обед в ресторане",
+        "titleEn": "Dining at a Restaurant",
+        "location": "Ресторан в Мёндоне",
+        "difficulty": "Средний"
+      }
+    }
+  },
+  "mistakeReview": {
+    "quizType": {
+      "synonym": "Синоним",
+      "antonym": "Антоним",
+      "similar": "Похожее"
+    },
+    "stats": {
+      "title": "Статистика ошибок",
+      "button": "Статистика",
+      "noRecord": "Пока нет записей ошибок!",
+      "totalMistakes": "Всего ошибок",
+      "levels": "Уровни",
+      "mostMistakes": "Больше всего ошибок",
+      "levelDistribution": "Распределение ошибок по уровням",
+      "topMistakes": "ТОП-5 слов с ошибками",
+      "times": " раз",
+      "mistakeCount": "Количество ошибок"
+    },
+    "quizMode": "Режим викторины",
+    "allLevels": "Все уровни",
+    "levelOnly": "Только {{level}} уровень",
+    "perfect": "Отлично!",
+    "noMistakes": {
+      "all": "Нет ошибок для повторения. Практикуйтесь в других модулях!",
+      "level": "Нет ошибок {{level}} уровня. Проверьте все уровни!"
+    },
+    "viewAllLevels": "Посмотреть все уровни ({{count}})",
+    "quizComplete": "Викторина по связанным словам завершена!",
+    "correct": "Правильно",
+    "accuracy": "Точность",
+    "result": {
+      "excellent": "Отлично! Вы хорошо понимаете связанные слова!",
+      "good": "Хорошо! Ещё немного практики и будет идеально.",
+      "needPractice": "Нужно больше практики. Попробуйте снова!"
+    },
+    "restart": "Начать заново",
+    "relatedWordQuiz": "Викторина связанных слов",
+    "quizDescription": "Сопоставьте синонимы, антонимы и похожие слова из ваших ошибок.",
+    "aiSearchBased": "ИИ-поиск находит точные связанные слова.",
+    "wordsToReview": "Слов для повторения",
+    "countUnit": "",
+    "loadingProgress": "Загрузка связанных слов... ({{current}}/{{total}})",
+    "preparing": "Подготовка...",
+    "startQuiz": "Начать викторину",
+    "cannotGenerate": "Не удалось создать викторину. Попробуйте снова.",
+    "streak": "подряд",
+    "findType": "Найти {{type}}",
+    "selectType": "Выберите {{type}} слова выше",
+    "correctAnswer": "Правильно!",
+    "wrongAnswer": "Неправильно",
+    "theAnswer": "Ответ",
+    "checkSource": "Проверить источник",
+    "viewResult": "Посмотреть результат"
   },
   "stats": {
     "progress": "Прогресс",

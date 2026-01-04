@@ -3063,7 +3063,93 @@
     "inputPlaceholder": "Koreys tilida javob bering...",
     "send": "Yuborish",
     "scenarioSelect": "Senariy tanlash",
-    "topikLevel": "TOPIK darajasi"
+    "topikLevel": "TOPIK darajasi",
+    "player": {
+      "name": "O'yinchi",
+      "level": "Daraja 12"
+    },
+    "chat": {
+      "npc1": "Salom! Sizga qanday yordam bera olaman?",
+      "npc1En": "Hello! How can I help you?",
+      "user1": "Bir amerikano bering.",
+      "user1En": "One Americano, please.",
+      "npc2": "Xo'p, qaysi o'lchamda?",
+      "npc2En": "Sure, what size would you like?"
+    },
+    "scenarios": {
+      "cafeOrder": {
+        "title": "Kafeda buyurtma berish",
+        "titleEn": "Ordering at a Cafe",
+        "location": "Gangnam kafesi",
+        "difficulty": "Boshlang'ich"
+      },
+      "subway": {
+        "title": "Metroga minish",
+        "titleEn": "Taking the Subway",
+        "location": "Seul metrosi",
+        "difficulty": "Boshlang'ich"
+      },
+      "restaurant": {
+        "title": "Restoranda ovqatlanish",
+        "titleEn": "Dining at a Restaurant",
+        "location": "Myeongdong restorani",
+        "difficulty": "O'rta"
+      }
+    }
+  },
+  "mistakeReview": {
+    "quizType": {
+      "synonym": "Sinonim",
+      "antonym": "Antonim",
+      "similar": "O'xshash"
+    },
+    "stats": {
+      "title": "Xato statistikasi",
+      "button": "Statistika",
+      "noRecord": "Hali xato yozuvlari yo'q!",
+      "totalMistakes": "Jami xatolar",
+      "levels": "Darajalar",
+      "mostMistakes": "Eng ko'p xatolar",
+      "levelDistribution": "Darajalar bo'yicha xatolar",
+      "topMistakes": "Eng ko'p xato qilingan 5 so'z",
+      "times": " marta",
+      "mistakeCount": "Xatolar soni"
+    },
+    "quizMode": "Viktorina rejimi",
+    "allLevels": "Barcha darajalar",
+    "levelOnly": "Faqat {{level}} daraja",
+    "perfect": "Ajoyib!",
+    "noMistakes": {
+      "all": "Takrorlash uchun xatolar yo'q. Boshqa modullarda mashq qiling!",
+      "level": "{{level}} daraja xatolari yo'q. Barcha darajalarni tekshiring!"
+    },
+    "viewAllLevels": "Barcha darajalarni ko'rish ({{count}})",
+    "quizComplete": "Bog'liq so'zlar viktorinasi yakunlandi!",
+    "correct": "To'g'ri",
+    "accuracy": "Aniqlik",
+    "result": {
+      "excellent": "Ajoyib! Siz bog'liq so'zlarni yaxshi tushunasiz!",
+      "good": "Yaxshi! Yana ozgina mashq va mukammal bo'ladi.",
+      "needPractice": "Ko'proq mashq kerak. Qaytadan urinib ko'ring!"
+    },
+    "restart": "Qayta boshlash",
+    "relatedWordQuiz": "Bog'liq so'zlar viktorinasi",
+    "quizDescription": "Xatolaringizdan sinonimlar, antonimlar va o'xshash so'zlarni toping.",
+    "aiSearchBased": "AI qidiruvi aniq bog'liq so'zlarni topadi.",
+    "wordsToReview": "Takrorlash uchun so'zlar",
+    "countUnit": "ta",
+    "loadingProgress": "Bog'liq so'zlar yuklanmoqda... ({{current}}/{{total}})",
+    "preparing": "Tayyorlanmoqda...",
+    "startQuiz": "Viktorinani boshlash",
+    "cannotGenerate": "Viktorina yaratib bo'lmadi. Qaytadan urinib ko'ring.",
+    "streak": "ketma-ket",
+    "findType": "{{type}} toping",
+    "selectType": "Yuqoridagi so'zning {{type}}ini tanlang",
+    "correctAnswer": "To'g'ri!",
+    "wrongAnswer": "Noto'g'ri",
+    "theAnswer": "Javob",
+    "checkSource": "Manbani tekshirish",
+    "viewResult": "Natijani ko'rish"
   },
   "stats": {
     "progress": "Rivojlanish",
