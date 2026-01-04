@@ -146,41 +146,44 @@ ALL translations MUST be in ${targetLangName}. DO NOT use English unless the tar
 4. Each quiz must feel completely fresh and different
 
 ## BILINGUAL OUTPUT REQUIREMENT - VERY IMPORTANT:
-For EVERY text field (meaning, example, options), you MUST provide BOTH Korean AND ${targetLangName} together.
-- If target language is 'ko', only Korean is needed
-- If target language is NOT 'ko', format as: "한국어 / ${targetLangName} translation"
+- meaning, example: MUST include BOTH Korean AND ${targetLangName} together.
+  - If target language is 'ko', only Korean is needed
+  - If target language is NOT 'ko', format as: "한국어 / ${targetLangName} translation"
+- options: MUST be ONLY the target language text (NO Korean in options).
+  - If target language is 'ko', options are Korean only
+  - If target language is NOT 'ko', options are ${targetLangName} only (no slash, no Korean)
 
 ### EXAMPLES BY LANGUAGE:
 
 ${language === 'vi' ? `For Vietnamese (vi):
 - meaning: "기준이 까다롭다 / Có tiêu chuẩn cao, khó tính"
 - example: "그녀는 눈이 높아서 아무나 안 만나요. / Cô ấy có tiêu chuẩn cao nên không hẹn hò với ai cũng được."
-- options: ["기준이 까다롭다 / Có tiêu chuẩn cao", "시력이 좋다 / Thị lực tốt", ...]` : ''}
+- options: ["Có tiêu chuẩn cao", "Thị lực tốt", "Cao lớn", "Kiêu ngạo"]` : ''}
 
 ${language === 'en' ? `For English (en):
 - meaning: "기준이 까다롭다 / To have high standards"
 - example: "그녀는 눈이 높아서 아무나 안 만나요. / She has high standards so she doesn't date just anyone."
-- options: ["기준이 까다롭다 / High standards", "시력이 좋다 / Good eyesight", ...]` : ''}
+- options: ["High standards", "Good eyesight", "Tall", "Arrogant"]` : ''}
 
 ${language === 'zh' ? `For Chinese (zh):
 - meaning: "기준이 까다롭다 / 标准高，挑剔"
 - example: "그녀는 눈이 높아서 아무나 안 만나요. / 她标准很高，不会随便约会。"
-- options: ["기준이 까다롭다 / 标准高", "시력이 좋다 / 视力好", ...]` : ''}
+- options: ["标准高", "视力好", "个子高", "自大"]` : ''}
 
 ${language === 'ja' ? `For Japanese (ja):
 - meaning: "기준이 까다롭다 / 基準が高い、目が高い"
 - example: "그녀는 눈이 높아서 아무나 안 만나요. / 彼女は目が高いので誰とでも付き合わない。"
-- options: ["기준이 까다롭다 / 基準が高い", "시력이 좋다 / 視力が良い", ...]` : ''}
+- options: ["基準が高い", "視力が良い", "背が高い", "自慢する"]` : ''}
 
 ${language === 'ru' ? `For Russian (ru):
 - meaning: "기준이 까다롭다 / Высокие стандарты, придирчивый"
 - example: "그녀는 눈이 높아서 아무나 안 만나요. / У неё высокие стандарты, она не встречается с кем попало."
-- options: ["기준이 까다롭다 / Высокие стандарты", "시력이 좋다 / Хорошее зрение", ...]` : ''}
+- options: ["Высокие стандарты", "Хорошее зрение", "Высокий рост", "Высокомерие"]` : ''}
 
 ${language === 'uz' ? `For Uzbek (uz):
 - meaning: "기준이 까다롭다 / Talabi yuqori, tanlab oluvchi"
 - example: "그녀는 눈이 높아서 아무나 안 만나요. / Uning talabi yuqori, hamma bilan uchrashavermaydi."
-- options: ["기준이 까다롭다 / Talabi yuqori", "시력이 좋다 / Ko'rish yaxshi", "키가 크다 / Bo'yi baland", "자만하다 / Manman"]
+- options: ["Talabi yuqori", "Ko'rish yaxshi", "Bo'yi baland", "Manman"]
 - For slang "갓생": meaning: "God + 인생 / God + Hayot, tirishqoq hayot", example: "요즘 갓생 살려고 새벽 5시에 일어나요. / Eng yaxshi hayot uchun ertalab 5 da turaman."` : ''}
 
 ## CATEGORY INSTRUCTIONS:
@@ -208,7 +211,7 @@ ${categoryPrompt}
       "expression": "한국어 표현 (ALWAYS in Korean only)",
       "meaning": "한국어 설명 / ${language === 'ko' ? '한국어만' : targetLangName + ' translation here'}",
       "example": "한국어 예문 / ${language === 'ko' ? '한국어만' : targetLangName + ' translation here'}",
-      "options": ["한국어 / ${targetLangName}", "한국어 / ${targetLangName}", "한국어 / ${targetLangName}", "한국어 / ${targetLangName}"],
+      "options": ["${targetLangName}", "${targetLangName}", "${targetLangName}", "${targetLangName}"],
       "correctIndex": 0-3 (RANDOMIZE this!),
       "category": "idiom" or "slang",
       "difficulty": "easy"/"medium"/"hard"

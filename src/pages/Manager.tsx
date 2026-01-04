@@ -113,8 +113,13 @@ export default function Manager() {
     }
   };
 
-  const getCategoryEmoji = (cat: string) => cat === 'idiom' ? '📚' : '🔥';
+  const getCategoryEmoji = (cat: string) => (cat === 'idiom' ? '📚' : '🔥');
 
+  const formatOption = (option: string) => {
+    const parts = option.split(' / ');
+    if (i18n.language === 'ko') return parts[0]?.trim() || option;
+    return (parts.length >= 2 ? parts.slice(1).join(' / ') : option).trim();
+  };
   // Menu Screen
   if (mode === 'menu') {
     return (
@@ -347,7 +352,7 @@ export default function Manager() {
                   <div className="flex items-center gap-3">
                     {isAnswered && idx === currentQuestion.correctIndex && <Check className="w-5 h-5 text-green-400" />}
                     {isAnswered && idx === selectedOption && idx !== currentQuestion.correctIndex && <X className="w-5 h-5 text-red-400" />}
-                    <span className="font-medium">{option}</span>
+                    <span className="font-medium">{formatOption(option)}</span>
                   </div>
                 </button>
               ))}
