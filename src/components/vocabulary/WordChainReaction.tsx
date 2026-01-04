@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "react-i18next";
 import ChainReactionMultiplayer from "./ChainReactionMultiplayer";
 
 interface Word {
@@ -40,6 +41,7 @@ interface ChainWord {
 }
 
 export default function WordChainReaction({ words, onComplete }: WordChainReactionProps) {
+  const { t } = useTranslation();
   const [gameState, setGameState] = useState<"ready" | "playing" | "finished" | "multiplayer">("ready");
   const [timeLeft, setTimeLeft] = useState(60);
   const [chain, setChain] = useState<ChainWord[]>([]);
@@ -114,7 +116,7 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
     
     // Check if word already in chain
     if (chain.some(c => c.word === newWord)) {
-      setError("이미 사용한 단어예요! / Từ đã dùng rồi!");
+      setError(t("wordChainReaction.errors.duplicate", "이미 사용한 단어예요!"));
       return;
     }
     
@@ -151,9 +153,9 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
     } else {
       if (connectionMode === "phonetic") {
         const lastChar = previousWord.charAt(previousWord.length - 1);
-        setError(`'${lastChar}'로 시작해야 해요! / Phải bắt đầu bằng '${lastChar}'!`);
+        setError(t("wordChainReaction.errors.phoneticStart", "'{{char}}'로 시작해야 해요!", { char: lastChar }));
       } else {
-        setError("의미적으로 연결되지 않아요! / Không liên kết về nghĩa!");
+        setError(t("wordChainReaction.errors.notConnected", "의미적으로 연결되지 않아요!"));
       }
     }
     
@@ -238,33 +240,36 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
           >
             <div className="text-7xl mb-4">⛓️💥</div>
             <h2 className="text-3xl font-black mb-2 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 bg-clip-text text-transparent">
-              Word Chain Reaction
+              {t("wordChainReaction.title", "Word Chain Reaction")}
             </h2>
             <p className="text-muted-foreground mb-6 text-lg">
-              단어 체인 리액션 / Chuỗi phản ứng từ vựng
+              {t("wordChainReaction.subtitle", "단어 체인 리액션")}
             </p>
           </motion.div>
           
           <div className="text-left bg-gradient-to-br from-muted/50 to-muted/30 rounded-xl p-5 mb-6 border border-border/50">
             <p className="font-bold mb-3 flex items-center gap-2 text-lg">
               <Sparkles className="w-5 h-5 text-primary" />
-              Cách chơi / 게임 방법
+              {t("wordChainReaction.howToPlay", "게임 방법")}
             </p>
             <ul className="space-y-2 text-muted-foreground">
               <li className="flex items-center gap-2">
-                <span className="bg-orange-500/20 px-2 py-0.5 rounded text-xs text-orange-600">60초</span>
-                Thời gian giới hạn / 제한 시간
+                <span className="bg-orange-500/20 px-2 py-0.5 rounded text-xs text-orange-600">{t("wordChainReaction.timeBadge", "60초")}</span>
+                {t("wordChainReaction.rules.timeLimit", "제한 시간")}
               </li>
               <li className="flex items-center gap-2">
                 <Link2 className="w-4 h-4 text-blue-500" />
-                Kết nối từ theo nghĩa hoặc âm / 의미 또는 끝말잇기
+                {t("wordChainReaction.rules.connectByMeaningOrSound", "의미 또는 끝말잇기")}
               </li>
               <li className="flex items-center gap-2">
                 <Zap className="w-4 h-4 text-yellow-500" />
-                Chuỗi càng dài = điểm tăng theo cấp số nhân!
+                {t("wordChainReaction.rules.longerChainMorePoints", "체인이 길수록 점수는 지수적으로 증가!")}
               </li>
               <li className="mt-3 text-foreground font-medium">
-                📈 체인 길이별 점수: 10 → 20 → 40 → 80 → 160...
+                {t(
+                  "wordChainReaction.rules.scoreByLength",
+                  "📈 체인 길이별 점수: 10 → 20 → 40 → 80 → 160...",
+                )}
               </li>
             </ul>
           </div>
@@ -277,7 +282,7 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
               className="gap-2"
             >
               <Link2 className="w-4 h-4" />
-              의미 연결 / Nghĩa
+              {t("wordChainReaction.mode.semantic", "의미 연결")}
             </Button>
             <Button
               variant={connectionMode === "phonetic" ? "default" : "outline"}
@@ -285,29 +290,33 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
               className="gap-2"
             >
               <ToggleRight className="w-4 h-4" />
-              끝말잇기
+              {t("wordChainReaction.mode.phonetic", "끝말잇기")}
             </Button>
           </div>
 
           {/* Game mode buttons */}
           <div className="flex flex-col sm:flex-row justify-center gap-3">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button onClick={startGame} size="lg" className="gap-2 text-lg px-8 py-6 bg-gradient-to-r from-orange-500 to-red-500 hover:opacity-90 w-full">
+              <Button
+                onClick={startGame}
+                size="lg"
+                className="gap-2 text-lg px-8 py-6 bg-gradient-to-r from-orange-500 to-red-500 hover:opacity-90 w-full"
+              >
                 <Play className="w-6 h-6" />
-                혼자하기 / Solo
+                {t("wordChainReaction.play.solo", "혼자하기")}
               </Button>
             </motion.div>
-            
+
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button 
-                onClick={() => setGameState("multiplayer")} 
-                size="lg" 
+              <Button
+                onClick={() => setGameState("multiplayer")}
+                size="lg"
                 variant="outline"
                 className="gap-2 text-lg px-8 py-6 border-2 border-purple-500/50 hover:bg-purple-500/10 w-full"
               >
                 <Swords className="w-6 h-6 text-purple-500" />
                 <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent font-bold">
-                  1:1 대결
+                  {t("wordChainReaction.play.duel", "1:1 대결")}
                 </span>
               </Button>
             </motion.div>
@@ -337,24 +346,28 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
             <Trophy className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 text-yellow-500 drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]" />
           </motion.div>
           <h2 className="text-2xl sm:text-3xl font-black mb-3 sm:mb-4 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-            체인 완료!
+            {t("wordChainReaction.finish.title", "체인 완료!")}
           </h2>
           <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
-            <motion.p 
+            <motion.p
               className="text-4xl sm:text-5xl font-black text-primary"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.3, type: "spring" }}
             >
-              {score}점
+              {score}{t("common.points")}
             </motion.p>
             <div className="flex justify-center gap-4 text-sm sm:text-base text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Link2 className="w-4 h-4 text-orange-400" />
-                <span>{chain.length} 체인 / chuỗi</span>
+                <span>
+                  {t("wordChainReaction.finish.chainCount", "{{chainCount}} 체인", {
+                    chainCount: chain.length,
+                  })}
+                </span>
               </div>
             </div>
-            
+
             {/* Show chain */}
             <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-muted/50 rounded-xl max-h-32 sm:max-h-40 overflow-y-auto">
               <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center">
@@ -371,27 +384,27 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
               </div>
             </div>
           </div>
-          
+
           {/* Action buttons */}
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-              <Button 
-                onClick={startGame} 
-                size="lg" 
+              <Button
+                onClick={startGame}
+                size="lg"
                 className="gap-2 text-base sm:text-lg px-6 sm:px-8 w-full sm:w-auto bg-gradient-to-r from-orange-500 to-red-500 hover:opacity-90"
               >
                 <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
-                다시하기 / Chơi lại
+                {t("wordChainReaction.finish.playAgain", "다시하기")}
               </Button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-              <Button 
-                onClick={() => onComplete(score, chain.length)} 
-                size="lg" 
+              <Button
+                onClick={() => onComplete(score, chain.length)}
+                size="lg"
                 variant="outline"
                 className="gap-2 text-base sm:text-lg px-6 sm:px-8 w-full sm:w-auto"
               >
-                완료 / Hoàn thành
+                {t("wordChainReaction.finish.complete", "완료")}
               </Button>
             </motion.div>
           </div>
@@ -431,28 +444,32 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
         </motion.div>
         
         <div className="text-right">
-          <motion.div 
+          <motion.div
             className="text-3xl font-black text-primary"
             animate={{ scale: score > 0 ? [1, 1.1, 1] : 1 }}
             transition={{ duration: 0.2 }}
           >
-            {score}점
+            {score}{t("common.points")}
           </motion.div>
           <div className="text-sm text-muted-foreground flex items-center gap-1 justify-end">
             <Link2 className="w-4 h-4" />
-            {chain.length} 체인
+            {t("wordChainReaction.inGame.chainCount", "{{chainCount}} 체인", { chainCount: chain.length })}
           </div>
         </div>
       </div>
 
       {/* Current mode indicator */}
       <div className="flex justify-center">
-        <div className={`px-4 py-2 rounded-full text-sm font-medium ${
-          connectionMode === "semantic" 
-            ? "bg-blue-500/20 text-blue-400 border border-blue-500/30" 
-            : "bg-orange-500/20 text-orange-400 border border-orange-500/30"
-        }`}>
-          {connectionMode === "semantic" ? "🔗 의미 연결 모드" : "🔤 끝말잇기 모드"}
+        <div
+          className={`px-4 py-2 rounded-full text-sm font-medium ${
+            connectionMode === "semantic"
+              ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+              : "bg-orange-500/20 text-orange-400 border border-orange-500/30"
+          }`}
+        >
+          {connectionMode === "semantic"
+            ? t("wordChainReaction.inGame.mode.semantic", "🔗 의미 연결 모드")
+            : t("wordChainReaction.inGame.mode.phonetic", "🔤 끝말잇기 모드")}
         </div>
       </div>
 
@@ -502,7 +519,9 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
         {/* Chain length score preview */}
         {chain.length > 0 && (
           <div className="mt-3 text-center text-sm text-muted-foreground">
-            다음 단어: +{calculateScore(chain.length + 1)}점
+            {t("wordChainReaction.inGame.nextWordBonus", "다음 단어: +{{points}}점", {
+              points: calculateScore(chain.length + 1),
+            })}
           </div>
         )}
       </Card>
@@ -519,8 +538,10 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
           onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
           placeholder={
             connectionMode === "phonetic" && chain.length > 0
-              ? `'${chain[chain.length - 1].word.slice(-1)}'로 시작하는 단어...`
-              : "연결할 단어를 입력하세요..."
+              ? t("wordChainReaction.input.placeholder.phonetic", "'{{char}}'로 시작하는 단어...", {
+                  char: chain[chain.length - 1].word.slice(-1),
+                })
+              : t("wordChainReaction.input.placeholder.default", "연결할 단어를 입력하세요...")
           }
           className="text-lg py-6"
           disabled={isValidating}
@@ -561,7 +582,7 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
           onClick={() => setConnectionMode("semantic")}
           className={connectionMode === "semantic" ? "bg-blue-500/20" : ""}
         >
-          의미 연결
+          {t("wordChainReaction.mode.semantic", "의미 연결")}
         </Button>
         <Button
           variant="ghost"
@@ -569,7 +590,7 @@ export default function WordChainReaction({ words, onComplete }: WordChainReacti
           onClick={() => setConnectionMode("phonetic")}
           className={connectionMode === "phonetic" ? "bg-orange-500/20" : ""}
         >
-          끝말잇기
+          {t("wordChainReaction.mode.phonetic", "끝말잇기")}
         </Button>
       </div>
     </div>

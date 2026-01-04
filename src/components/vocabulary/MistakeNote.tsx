@@ -148,7 +148,7 @@ const MistakeNote = ({ userId }: MistakeNoteProps) => {
         return (
           <div className="text-center">
             <p className="text-3xl font-bold text-foreground mb-4">{data.word}</p>
-            <p className="text-muted-foreground mb-6">이 단어의 뜻은?</p>
+            <p className="text-muted-foreground mb-6">{t("mistakeNote.questions.vocabulary", "이 단어의 뜻은?")}</p>
             
             <div className="grid grid-cols-1 gap-3">
               {/* Correct answer */}
@@ -182,7 +182,7 @@ const MistakeNote = ({ userId }: MistakeNoteProps) => {
         return (
           <div className="text-center">
             <p className="text-xl text-foreground mb-4">{data.sentence?.replace(data.blank_word, '_____')}</p>
-            <p className="text-muted-foreground mb-6">빈칸에 들어갈 단어는?</p>
+            <p className="text-muted-foreground mb-6">{t("mistakeNote.questions.cloze", "빈칸에 들어갈 단어는?")}</p>
             
             <div className="grid grid-cols-2 gap-3">
               <Button
@@ -209,7 +209,7 @@ const MistakeNote = ({ userId }: MistakeNoteProps) => {
         return (
           <div className="text-center">
             <p className="text-xl text-foreground mb-6">{data.statement}</p>
-            <p className="text-muted-foreground mb-6">이 문장은 맞을까요?</p>
+            <p className="text-muted-foreground mb-6">{t("mistakeNote.questions.grammarOX", "이 문장은 맞을까요?")}</p>
             
             <div className="flex gap-4 justify-center">
               <Button
@@ -242,7 +242,7 @@ const MistakeNote = ({ userId }: MistakeNoteProps) => {
                 animate={{ opacity: 1, y: 0 }}
                 className="mt-6 p-4 bg-muted rounded-xl text-left"
               >
-                <p className="text-sm text-muted-foreground">설명:</p>
+                <p className="text-sm text-muted-foreground">{t("mistakeNote.explanationLabel", "설명:")}</p>
                 <p className="text-foreground">{data.explanation}</p>
               </motion.div>
             )}
@@ -253,7 +253,7 @@ const MistakeNote = ({ userId }: MistakeNoteProps) => {
         return (
           <div className="text-center">
             <p className="text-3xl font-bold text-foreground mb-4">{data.idiom}</p>
-            <p className="text-muted-foreground mb-6">이 관용표현의 실제 의미는?</p>
+            <p className="text-muted-foreground mb-6">{t("mistakeNote.questions.idiom", "이 관용표현의 실제 의미는?")}</p>
             
             <div className="grid grid-cols-1 gap-3">
               <Button
@@ -277,7 +277,7 @@ const MistakeNote = ({ userId }: MistakeNoteProps) => {
         );
 
       default:
-        return <p>알 수 없는 문제 유형입니다.</p>;
+        return <p>{t("mistakeNote.unknownType", "알 수 없는 문제 유형입니다.")}</p>;
     }
   };
 
@@ -285,7 +285,7 @@ const MistakeNote = ({ userId }: MistakeNoteProps) => {
     return (
       <div className="text-center py-12">
         <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
-        <p className="text-muted-foreground">실수 노트 로딩 중...</p>
+        <p className="text-muted-foreground">{t("mistakeNote.loading", "실수 노트 로딩 중...")}</p>
       </div>
     );
   }
@@ -294,8 +294,8 @@ const MistakeNote = ({ userId }: MistakeNoteProps) => {
     return (
       <div className="text-center py-12">
         <AlertCircle className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-        <h2 className="text-xl font-bold mb-2">로그인이 필요합니다</h2>
-        <p className="text-muted-foreground">실수 노트를 사용하려면 로그인해주세요.</p>
+        <h2 className="text-xl font-bold mb-2">{t("mistakeNote.loginRequired.title", "로그인이 필요합니다")}</h2>
+        <p className="text-muted-foreground">{t("mistakeNote.loginRequired.description", "실수 노트를 사용하려면 로그인해주세요.")}</p>
       </div>
     );
   }
