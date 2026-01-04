@@ -170,6 +170,45 @@ const SPEAKER_OPTIONS = {
   auto: { label: "자동", description: "유형별 자동 설정" },
 };
 
+// 쓰기 문제 유형 설정 (51, 52, 53, 54번)
+const WRITING_QUESTION_TYPES = {
+  "51": {
+    label: "[51번] 실용문 빈칸 완성",
+    description: "감사문, 안내문, 초대문 등 실용문에서 빈칸(ㄱ, ㄴ) 채우기",
+    points: 10,
+    wordLimit: "각 20~30자",
+    icon: "📝",
+  },
+  "52": {
+    label: "[52번] 설명문 빈칸 완성",
+    description: "설명문/정보 텍스트에서 빈칸(ㄱ, ㄴ) 채우기",
+    points: 10,
+    wordLimit: "각 30~40자",
+    icon: "📄",
+  },
+  "53": {
+    label: "[53번] 도표/그래프 설명",
+    description: "그래프, 도표, 통계 자료를 분석하고 설명하는 글쓰기",
+    points: 30,
+    wordLimit: "200~300자",
+    icon: "📊",
+  },
+  "54": {
+    label: "[54번] 논술형 에세이",
+    description: "주제에 대해 논리적으로 의견을 서술하는 논술문",
+    points: 50,
+    wordLimit: "600~700자",
+    icon: "✍️",
+  },
+  "mixed": {
+    label: "혼합 (자동)",
+    description: "51~54번 다양한 유형 자동 생성",
+    points: "100",
+    wordLimit: "다양",
+    icon: "🔄",
+  },
+};
+
 const MockExamGenerator = () => {
   const { toast } = useToast();
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -188,6 +227,9 @@ const MockExamGenerator = () => {
   const [listeningQuestionType, setListeningQuestionType] = useState<string>("mixed");
   const [dialogueLength, setDialogueLength] = useState<string>("auto");
   const [speakerCount, setSpeakerCount] = useState<string>("auto");
+  
+  // 쓰기 세부 설정
+  const [writingQuestionType, setWritingQuestionType] = useState<string>("mixed");
   
   // Reference document
   const [referenceFile, setReferenceFile] = useState<File | null>(null);
@@ -362,6 +404,7 @@ const MockExamGenerator = () => {
             listeningQuestionType: section === 'listening' ? listeningQuestionType : undefined,
             dialogueLength: section === 'listening' ? dialogueLength : undefined,
             speakerCount: section === 'listening' ? speakerCount : undefined,
+            writingQuestionType: section === 'writing' ? writingQuestionType : undefined,
             stream: true,
           }),
           signal: abortControllerRef.current.signal,
@@ -1229,6 +1272,70 @@ const MockExamGenerator = () => {
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Writing Section Advanced Settings - 쓰기 문제 세부 설정 */}
+          {section === 'writing' && (
+            <div className="space-y-4 p-4 bg-gradient-to-r from-amber-500/5 to-orange-500/5 border border-amber-500/20 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <PenLine className="w-5 h-5 text-amber-500" />
+                <span className="font-medium text-amber-600">쓰기 문제 세부 설정</span>
+              </div>
+              
+              {/* 문제 유형 선택 */}
+              <div className="space-y-3">
+                <Label className="flex items-center gap-2">
+                  <Target className="w-4 h-4 text-amber-500" />
+                  문제 유형 선택 (51~54번)
+                </Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {Object.entries(WRITING_QUESTION_TYPES).map(([key, type]) => (
+                    <div
+                      key={key}
+                      onClick={() => setWritingQuestionType(key)}
+                      className={`p-3 rounded-lg border cursor-pointer transition-all ${
+                        writingQuestionType === key 
+                          ? 'border-amber-500 bg-amber-500/10 ring-2 ring-amber-500/30' 
+                          : 'border-border hover:border-amber-500/50 hover:bg-muted/50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-lg">{type.icon}</span>
+                        <span className="font-medium text-sm">{type.label}</span>
+                      </div>
+                      <div className="text-xs text-muted-foreground">{type.description}</div>
+                      <div className="flex items-center gap-2 mt-2 text-xs text-amber-600">
+                        <span>배점: {type.points}점</span>
+                        <span>•</span>
+                        <span>글자수: {type.wordLimit}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 53번 선택 시 안내 메시지 */}
+              {writingQuestionType === '53' && (
+                <Alert className="border-amber-500/30 bg-amber-500/5">
+                  <Image className="w-4 h-4 text-amber-500" />
+                  <AlertDescription className="text-amber-700">
+                    <strong>53번 도표/그래프 문제</strong>는 AI가 자동으로 그래프 이미지를 생성합니다.
+                    생성된 문제에 도표 이미지가 함께 첨부됩니다.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* 54번 선택 시 안내 메시지 */}
+              {writingQuestionType === '54' && (
+                <Alert className="border-amber-500/30 bg-amber-500/5">
+                  <BookOpen className="w-4 h-4 text-amber-500" />
+                  <AlertDescription className="text-amber-700">
+                    <strong>54번 논술형 에세이</strong>는 서론-본론-결론 구조의 600~700자 논술문입니다.
+                    실제 TOPIK 시험과 동일한 형식으로 출제됩니다.
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
           )}
 
