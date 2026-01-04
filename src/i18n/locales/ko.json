@@ -3795,5 +3795,117 @@
     "practiceAgain": "다시 연습",
     "nextSentence": "다음 문장",
     "start": "섀도잉 시작"
+  },
+  "mistakeNote": {
+    "title": "실수 노트",
+    "loading": "실수 노트 로딩 중...",
+    "loginRequired": {
+      "title": "로그인이 필요합니다",
+      "description": "실수 노트를 사용하려면 로그인해주세요."
+    },
+    "questions": {
+      "vocabulary": "이 단어의 뜻은?",
+      "cloze": "빈칸에 들어갈 단어는?",
+      "grammarOX": "이 문장은 맞을까요?",
+      "idiom": "이 관용표현의 실제 의미는?"
+    },
+    "explanationLabel": "설명:",
+    "unknownType": "알 수 없는 문제 유형입니다.",
+    "perfect": {
+      "title": "완벽해요!",
+      "description1": "복습할 실수가 없습니다.",
+      "description2": "다른 학습을 계속하면 틀린 문제가 여기에 자동 저장됩니다."
+    },
+    "complete": {
+      "title": "복습 완료!",
+      "stats": "{{total}}개 중 {{correct}}개 정답 ({{percentage}}%)",
+      "excellent": "훌륭해요! 대부분의 실수를 극복했습니다!",
+      "good": "좋아요! 조금 더 복습하면 완벽해질 거예요!",
+      "keepGoing": "괜찮아요! 반복 학습이 기억의 비결입니다!",
+      "reviewAgain": "다시 복습하기"
+    },
+    "intro": {
+      "description": "60초 안에 틀린 문제를 복습하세요!",
+      "reviewCount": "복습할 문제: {{count}}개",
+      "start": "60초 복습 시작"
+    },
+    "types": {
+      "vocabulary": "어휘",
+      "cloze": "빈칸",
+      "grammarOX": "문법 O/X",
+      "idiom": "관용표현"
+    },
+    "mistakeCount": "{{count}}회 틀림"
+  },
+  "dating": {
+    "luckySpin": {
+      "title": "럭키 스핀",
+      "subtitle": "행운의 룰렛을 돌려보세요!",
+      "spinning": "돌아가는 중...",
+      "spin": "🎰 스핀하기!",
+      "alreadySpun": "오늘은 이미 스핀했어요",
+      "rewards": {
+        "affinity20": "+20 호감도",
+        "affinity15": "+15 호감도",
+        "affinity10": "+10 호감도",
+        "affinity8": "+8 호감도",
+        "affinity5": "+5 호감도",
+        "specialTopic": "특별 주제",
+        "dateItem": "데이트 아이템",
+        "luckyBonus": "럭키 보너스!"
+      }
+    },
+    "mbti": {
+      "title": "MBTI 궁합",
+      "subtitle": "MBTI 궁합 테스트",
+      "npcMbti": "{{name}}의 MBTI",
+      "selectYours": "당신의 MBTI를 선택하세요",
+      "compatibility": "궁합",
+      "advice": {
+        "destined": "운명적인 만남! 서로를 완벽하게 이해할 수 있어요 💫",
+        "great": "아주 잘 맞아요! 깊은 관계를 발전시킬 수 있어요 💕",
+        "different": "서로 다른 점이 매력! 노력하면 좋은 관계가 될 거예요 ✨",
+        "challenging": "도전적인 조합이지만 서로에게서 많이 배울 수 있어요 📚",
+        "difficult": "어려울 수 있지만, 진정한 사랑은 모든 걸 극복해요! 💪"
+      }
+    },
+    "miniGame": {
+      "title": "미니게임",
+      "subtitle": "호감도를 높이세요!",
+      "playWith": "{{name}}와(과) 함께 게임하기",
+      "telepathy": "텔레파시 게임",
+      "telepathySub": "상대방의 생각을 맞춰보세요",
+      "preference": "취향 테스트",
+      "preferenceSub": "서로의 취향을 알아보세요",
+      "guessNpc": "{{name}}의 선택을 맞춰보세요!",
+      "perfectMatch": "완벽한 궁합!",
+      "goodMatch": "좋은 궁합이에요!",
+      "tryAgain": "다음엔 더 잘해봐요!",
+      "correct": "정답",
+      "affinity": "호감도",
+      "affinitySub": "호감도가 상승했어요!",
+      "correctAnswer": "정답이에요!",
+      "wrongAnswer": "{{name}}의 선택은 다른 거였어요"
+    },
+    "endings": {
+      "storyWith": "{{name}}와(과)의 이야기",
+      "addedToCollection": "엔딩 컬렉션에 추가됨!",
+      "romantic": {
+        "title": "💕 로맨틱 엔딩",
+        "description": "달콤한 고백과 함께 연인이 되었어요! 서로를 향한 진심이 통했네요."
+      },
+      "friend": {
+        "title": "🤝 베프 엔딩",
+        "description": "친한 친구가 되었어요! 연인보다 더 소중한 사이가 될 거예요."
+      },
+      "tsundere": {
+        "title": "😤💕 츤데레 엔딩",
+        "description": "싸우면서 사랑하는 사이! 밀당의 끝에 서로를 인정했어요."
+      },
+      "dramatic": {
+        "title": "🎬 드라마틱 엔딩",
+        "description": "운명적인 만남! 마치 드라마 같은 이야기가 펼쳐졌어요."
+      }
+    }
   }
 }

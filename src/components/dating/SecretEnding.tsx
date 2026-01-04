@@ -1,15 +1,14 @@
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Heart, Sparkles, Crown, Users, Drama, Star } from "lucide-react";
+import { Heart, Sparkles, Crown, Users, Star } from "lucide-react";
 
 export type EndingType = 'romantic' | 'friend' | 'tsundere' | 'dramatic';
 
 interface EndingData {
   type: EndingType;
-  title: string;
-  titleVi: string;
-  description: string;
-  descriptionVi: string;
+  titleKey: string;
+  descriptionKey: string;
   icon: React.ReactNode;
   color: string;
   bgGradient: string;
@@ -18,40 +17,32 @@ interface EndingData {
 const ENDINGS: Record<EndingType, EndingData> = {
   romantic: {
     type: 'romantic',
-    title: "💕 로맨틱 엔딩",
-    titleVi: "Kết thúc lãng mạn",
-    description: "달콤한 고백과 함께 연인이 되었어요! 서로를 향한 진심이 통했네요.",
-    descriptionVi: "Với lời tỏ tình ngọt ngào, hai bạn đã trở thành người yêu! Tình cảm chân thành đã kết nối hai trái tim.",
+    titleKey: "dating.endings.romantic.title",
+    descriptionKey: "dating.endings.romantic.description",
     icon: <Heart className="w-12 h-12 fill-pink-400 text-pink-400" />,
     color: "text-pink-400",
     bgGradient: "from-pink-900 via-red-900 to-pink-900",
   },
   friend: {
     type: 'friend',
-    title: "🤝 베프 엔딩",
-    titleVi: "Kết thúc bạn thân",
-    description: "친한 친구가 되었어요! 연인보다 더 소중한 사이가 될 거예요.",
-    descriptionVi: "Hai bạn đã trở thành bạn thân! Sẽ là mối quan hệ quý giá hơn cả người yêu.",
+    titleKey: "dating.endings.friend.title",
+    descriptionKey: "dating.endings.friend.description",
     icon: <Users className="w-12 h-12 text-blue-400" />,
     color: "text-blue-400",
     bgGradient: "from-blue-900 via-indigo-900 to-blue-900",
   },
   tsundere: {
     type: 'tsundere',
-    title: "😤💕 츤데레 엔딩",
-    titleVi: "Kết thúc Tsundere",
-    description: "싸우면서 사랑하는 사이! 밀당의 끝에 서로를 인정했어요.",
-    descriptionVi: "Cãi nhau nhưng vẫn yêu! Sau những lần đẩy-kéo, cuối cùng đã thừa nhận tình cảm.",
+    titleKey: "dating.endings.tsundere.title",
+    descriptionKey: "dating.endings.tsundere.description",
     icon: <Sparkles className="w-12 h-12 text-orange-400" />,
     color: "text-orange-400",
     bgGradient: "from-orange-900 via-red-900 to-orange-900",
   },
   dramatic: {
     type: 'dramatic',
-    title: "🎬 드라마틱 엔딩",
-    titleVi: "Kết thúc kịch tính",
-    description: "운명적인 만남! 마치 드라마 같은 이야기가 펼쳐졌어요.",
-    descriptionVi: "Cuộc gặp gỡ định mệnh! Một câu chuyện như phim đã được viết nên.",
+    titleKey: "dating.endings.dramatic.title",
+    descriptionKey: "dating.endings.dramatic.description",
     icon: <Crown className="w-12 h-12 text-yellow-400" />,
     color: "text-yellow-400",
     bgGradient: "from-purple-900 via-pink-900 to-purple-900",
@@ -66,6 +57,7 @@ interface SecretEndingProps {
 }
 
 const SecretEnding = ({ ending, npcName, npcImage, onClose }: SecretEndingProps) => {
+  const { t } = useTranslation();
   const endingData = ENDINGS[ending];
 
   return (
@@ -123,18 +115,11 @@ const SecretEnding = ({ ending, npcName, npcImage, onClose }: SecretEndingProps)
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className={`text-2xl font-bold ${endingData.color} mb-1`}
+          className={`text-2xl font-bold ${endingData.color} mb-4`}
         >
-          {endingData.title}
+          {t(endingData.titleKey)}
         </motion.h2>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="text-white/60 text-sm mb-4"
-        >
-          {endingData.titleVi}
-        </motion.p>
+
 
         {/* NPC Image */}
         <motion.div
@@ -153,9 +138,8 @@ const SecretEnding = ({ ending, npcName, npcImage, onClose }: SecretEndingProps)
           transition={{ delay: 0.8 }}
           className="bg-black/30 rounded-2xl p-4 mb-6"
         >
-          <p className="text-white font-bold mb-1">{npcName}와(과)의 이야기</p>
-          <p className="text-white/80 text-sm mb-2">{endingData.description}</p>
-          <p className="text-white/50 text-xs">{endingData.descriptionVi}</p>
+          <p className="text-white font-bold mb-1">{t("dating.endings.storyWith", { name: npcName })}</p>
+          <p className="text-white/80 text-sm">{t(endingData.descriptionKey)}</p>
         </motion.div>
 
         {/* Unlock Badge */}
@@ -166,7 +150,7 @@ const SecretEnding = ({ ending, npcName, npcImage, onClose }: SecretEndingProps)
           className="flex items-center justify-center gap-2 mb-6"
         >
           <Star className="w-5 h-5 text-yellow-400" />
-          <span className="text-yellow-400 text-sm font-medium">엔딩 컬렉션에 추가됨!</span>
+          <span className="text-yellow-400 text-sm font-medium">{t("dating.endings.addedToCollection")}</span>
           <Star className="w-5 h-5 text-yellow-400" />
         </motion.div>
 
@@ -174,7 +158,7 @@ const SecretEnding = ({ ending, npcName, npcImage, onClose }: SecretEndingProps)
           onClick={onClose}
           className="w-full bg-white/20 hover:bg-white/30 text-white"
         >
-          확인 / OK
+          {t("common.confirm")}
         </Button>
       </motion.div>
     </motion.div>

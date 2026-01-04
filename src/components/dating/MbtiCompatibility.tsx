@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Heart, Sparkles, Star } from "lucide-react";
 
@@ -30,30 +31,16 @@ const MBTI_COMPATIBILITY: Record<string, Record<string, number>> = {
 
 const MBTI_LIST = ["ENFP", "INTJ", "INFJ", "INTP", "ISFP", "ENFJ", "ESTP", "ISFJ", "ENTJ", "ESFP", "ISTP", "ESTJ", "ESFJ", "INFP", "ENTP", "ISTJ"];
 
-const getCompatibilityAdvice = (score: number): { advice: string; adviceVi: string } => {
-  if (score >= 85) return { 
-    advice: "운명적인 만남! 서로를 완벽하게 이해할 수 있어요 💫", 
-    adviceVi: "Cuộc gặp gỡ định mệnh! Hai bạn có thể hiểu nhau hoàn hảo 💫" 
-  };
-  if (score >= 70) return { 
-    advice: "아주 잘 맞아요! 깊은 관계를 발전시킬 수 있어요 💕", 
-    adviceVi: "Rất hợp nhau! Có thể phát triển mối quan hệ sâu sắc 💕" 
-  };
-  if (score >= 55) return { 
-    advice: "서로 다른 점이 매력! 노력하면 좋은 관계가 될 거예요 ✨", 
-    adviceVi: "Sự khác biệt là điểm hấp dẫn! Cố gắng sẽ có mối quan hệ tốt ✨" 
-  };
-  if (score >= 40) return { 
-    advice: "도전적인 조합이지만 서로에게서 많이 배울 수 있어요 📚", 
-    adviceVi: "Sự kết hợp thử thách nhưng có thể học hỏi nhiều từ nhau 📚" 
-  };
-  return { 
-    advice: "어려울 수 있지만, 진정한 사랑은 모든 걸 극복해요! 💪", 
-    adviceVi: "Có thể khó khăn nhưng tình yêu đích thực sẽ vượt qua tất cả! 💪" 
-  };
+const getCompatibilityAdviceKey = (score: number): string => {
+  if (score >= 85) return "dating.mbti.advice.destined";
+  if (score >= 70) return "dating.mbti.advice.great";
+  if (score >= 55) return "dating.mbti.advice.different";
+  if (score >= 40) return "dating.mbti.advice.challenging";
+  return "dating.mbti.advice.difficult";
 };
 
 const MbtiCompatibility = ({ npcName, npcMbti, onClose }: MbtiCompatibilityProps) => {
+  const { t } = useTranslation();
   const [userMbti, setUserMbti] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
 
@@ -68,7 +55,7 @@ const MbtiCompatibility = ({ npcName, npcMbti, onClose }: MbtiCompatibilityProps
   };
 
   const score = getScore();
-  const { advice, adviceVi } = getCompatibilityAdvice(score);
+  const adviceKey = getCompatibilityAdviceKey(score);
 
   return (
     <motion.div
@@ -84,20 +71,18 @@ const MbtiCompatibility = ({ npcName, npcMbti, onClose }: MbtiCompatibilityProps
       >
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-white flex items-center justify-center gap-2">
-            🔮 MBTI 궁합
+            🔮 {t("dating.mbti.title")}
           </h2>
-          <p className="text-white/60 text-sm mt-1">MBTI Compatibility Test</p>
+          <p className="text-white/60 text-sm mt-1">{t("dating.mbti.subtitle")}</p>
           <p className="text-pink-300 text-sm mt-2">
-            {npcName}의 MBTI: <span className="font-bold">{npcMbti}</span>
+            {t("dating.mbti.npcMbti", { name: npcName })}: <span className="font-bold">{npcMbti}</span>
           </p>
         </div>
 
         {!showResult ? (
           <div>
             <p className="text-white/80 text-center mb-4">
-              당신의 MBTI를 선택하세요
-              <br />
-              <span className="text-white/50 text-sm">Chọn MBTI của bạn</span>
+              {t("dating.mbti.selectYours")}
             </p>
             <div className="grid grid-cols-4 gap-2">
               {MBTI_LIST.map((mbti) => (
@@ -162,7 +147,7 @@ const MbtiCompatibility = ({ npcName, npcMbti, onClose }: MbtiCompatibilityProps
                 >
                   {score}%
                 </motion.span>
-                <span className="text-white/60 text-sm">궁합</span>
+                <span className="text-white/60 text-sm">{t("dating.mbti.compatibility")}</span>
               </div>
             </div>
 
@@ -180,15 +165,14 @@ const MbtiCompatibility = ({ npcName, npcMbti, onClose }: MbtiCompatibilityProps
             {/* Advice */}
             <div className="bg-white/10 rounded-2xl p-4 mb-6">
               <Sparkles className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
-              <p className="text-white text-sm">{advice}</p>
-              <p className="text-white/60 text-xs mt-2">{adviceVi}</p>
+              <p className="text-white text-sm">{t(adviceKey)}</p>
             </div>
 
             <Button
               onClick={onClose}
               className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
             >
-              확인 / OK
+              {t("common.confirm")}
             </Button>
           </motion.div>
         )}
@@ -199,7 +183,7 @@ const MbtiCompatibility = ({ npcName, npcMbti, onClose }: MbtiCompatibilityProps
             onClick={onClose}
             className="w-full mt-4 text-white/60 hover:text-white"
           >
-            닫기 / Đóng
+            {t("common.close")}
           </Button>
         )}
       </motion.div>

@@ -3326,5 +3326,117 @@
     "practiceAgain": "もう一度練習",
     "nextSentence": "次の文",
     "start": "シャドーイング開始"
+  },
+  "mistakeNote": {
+    "title": "間違いノート",
+    "loading": "間違いノートを読み込み中...",
+    "loginRequired": {
+      "title": "ログインが必要です",
+      "description": "間違いノートを使用するにはログインしてください。"
+    },
+    "questions": {
+      "vocabulary": "この単語の意味は?",
+      "cloze": "空欄に入る単語は?",
+      "grammarOX": "この文は正しいですか?",
+      "idiom": "この慣用句の本当の意味は?"
+    },
+    "explanationLabel": "説明:",
+    "unknownType": "不明な問題タイプです。",
+    "perfect": {
+      "title": "完璧!",
+      "description1": "復習する間違いがありません。",
+      "description2": "学習を続けると間違った問題がここに自動保存されます。"
+    },
+    "complete": {
+      "title": "復習完了!",
+      "stats": "{{total}}問中{{correct}}問正解 ({{percentage}}%)",
+      "excellent": "素晴らしい! ほとんどの間違いを克服しました!",
+      "good": "いいですね! もう少し復習すれば完璧です!",
+      "keepGoing": "大丈夫! 繰り返しが記憶の鍵です!",
+      "reviewAgain": "もう一度復習"
+    },
+    "intro": {
+      "description": "60秒で間違いを復習しましょう!",
+      "reviewCount": "復習する問題: {{count}}問",
+      "start": "60秒復習開始"
+    },
+    "types": {
+      "vocabulary": "語彙",
+      "cloze": "穴埋め",
+      "grammarOX": "文法O/X",
+      "idiom": "慣用句"
+    },
+    "mistakeCount": "{{count}}回間違い"
+  },
+  "dating": {
+    "luckySpin": {
+      "title": "ラッキースピン",
+      "subtitle": "運のルーレットを回そう!",
+      "spinning": "回転中...",
+      "spin": "🎰 スピン!",
+      "alreadySpun": "今日はもう回しました",
+      "rewards": {
+        "affinity20": "+20 好感度",
+        "affinity15": "+15 好感度",
+        "affinity10": "+10 好感度",
+        "affinity8": "+8 好感度",
+        "affinity5": "+5 好感度",
+        "specialTopic": "特別トピック",
+        "dateItem": "デートアイテム",
+        "luckyBonus": "ラッキーボーナス!"
+      }
+    },
+    "mbti": {
+      "title": "MBTI相性",
+      "subtitle": "MBTI相性テスト",
+      "npcMbti": "{{name}}のMBTI",
+      "selectYours": "あなたのMBTIを選択",
+      "compatibility": "相性",
+      "advice": {
+        "destined": "運命の出会い! お互いを完璧に理解できます 💫",
+        "great": "とても相性がいい! 深い関係を築けます 💕",
+        "different": "違いが魅力! 努力すれば良い関係になれます ✨",
+        "challenging": "挑戦的な組み合わせですが、お互いから学べます 📚",
+        "difficult": "難しいかもしれませんが、本当の愛はすべてを乗り越えます! 💪"
+      }
+    },
+    "miniGame": {
+      "title": "ミニゲーム",
+      "subtitle": "好感度を上げよう!",
+      "playWith": "{{name}}と遊ぶ",
+      "telepathy": "テレパシーゲーム",
+      "telepathySub": "相手の考えを当てよう",
+      "preference": "好み診断",
+      "preferenceSub": "お互いの好みを知ろう",
+      "guessNpc": "{{name}}の選択を当てよう!",
+      "perfectMatch": "完璧な相性!",
+      "goodMatch": "良い相性!",
+      "tryAgain": "次は頑張ろう!",
+      "correct": "正解",
+      "affinity": "好感度",
+      "affinitySub": "好感度が上がりました!",
+      "correctAnswer": "正解!",
+      "wrongAnswer": "{{name}}は別のものを選びました"
+    },
+    "endings": {
+      "storyWith": "{{name}}との物語",
+      "addedToCollection": "エンディングコレクションに追加!",
+      "romantic": {
+        "title": "💕 ロマンチックエンディング",
+        "description": "甘い告白と共に恋人になりました! お互いへの真心が通じました。"
+      },
+      "friend": {
+        "title": "🤝 親友エンディング",
+        "description": "親しい友達になりました! 恋人よりも大切な関係になるでしょう。"
+      },
+      "tsundere": {
+        "title": "😤💕 ツンデレエンディング",
+        "description": "喧嘩しながら愛し合う関係! 駆け引きの末にお互いを認めました。"
+      },
+      "dramatic": {
+        "title": "🎬 ドラマチックエンディング",
+        "description": "運命の出会い! まるでドラマのような物語が展開しました。"
+      }
+    }
   }
 }

@@ -3628,5 +3628,117 @@
     "practiceAgain": "Practice Again",
     "nextSentence": "Next Sentence",
     "start": "Start Shadowing"
+  },
+  "mistakeNote": {
+    "title": "Mistake Note",
+    "loading": "Loading mistake notes...",
+    "loginRequired": {
+      "title": "Login Required",
+      "description": "Please log in to use the mistake note."
+    },
+    "questions": {
+      "vocabulary": "What does this word mean?",
+      "cloze": "What word goes in the blank?",
+      "grammarOX": "Is this sentence correct?",
+      "idiom": "What is the actual meaning of this idiom?"
+    },
+    "explanationLabel": "Explanation:",
+    "unknownType": "Unknown question type.",
+    "perfect": {
+      "title": "Perfect!",
+      "description1": "No mistakes to review.",
+      "description2": "Continue learning and wrong answers will be saved here automatically."
+    },
+    "complete": {
+      "title": "Review Complete!",
+      "stats": "{{correct}} out of {{total}} correct ({{percentage}}%)",
+      "excellent": "Excellent! You've overcome most of your mistakes!",
+      "good": "Good! A little more practice and you'll be perfect!",
+      "keepGoing": "Keep going! Repetition is the key to memory!",
+      "reviewAgain": "Review Again"
+    },
+    "intro": {
+      "description": "Review your mistakes in 60 seconds!",
+      "reviewCount": "Questions to review: {{count}}",
+      "start": "Start 60-Second Review"
+    },
+    "types": {
+      "vocabulary": "Vocabulary",
+      "cloze": "Cloze",
+      "grammarOX": "Grammar O/X",
+      "idiom": "Idioms"
+    },
+    "mistakeCount": "Wrong {{count}} times"
+  },
+  "dating": {
+    "luckySpin": {
+      "title": "Lucky Spin",
+      "subtitle": "Spin the wheel of fortune!",
+      "spinning": "Spinning...",
+      "spin": "🎰 Spin!",
+      "alreadySpun": "You've already spun today",
+      "rewards": {
+        "affinity20": "+20 Affinity",
+        "affinity15": "+15 Affinity",
+        "affinity10": "+10 Affinity",
+        "affinity8": "+8 Affinity",
+        "affinity5": "+5 Affinity",
+        "specialTopic": "Special Topic",
+        "dateItem": "Date Item",
+        "luckyBonus": "Lucky Bonus!"
+      }
+    },
+    "mbti": {
+      "title": "MBTI Compatibility",
+      "subtitle": "MBTI Compatibility Test",
+      "npcMbti": "{{name}}'s MBTI",
+      "selectYours": "Select your MBTI",
+      "compatibility": "Compatibility",
+      "advice": {
+        "destined": "A destined meeting! You can understand each other perfectly 💫",
+        "great": "Great match! You can develop a deep relationship 💕",
+        "different": "Differences are attractive! With effort, you can have a great relationship ✨",
+        "challenging": "A challenging combination, but you can learn a lot from each other 📚",
+        "difficult": "It may be difficult, but true love overcomes everything! 💪"
+      }
+    },
+    "miniGame": {
+      "title": "Mini Game",
+      "subtitle": "Increase your affinity!",
+      "playWith": "Play with {{name}}",
+      "telepathy": "Telepathy Game",
+      "telepathySub": "Guess what they're thinking",
+      "preference": "Preference Test",
+      "preferenceSub": "Learn each other's preferences",
+      "guessNpc": "Guess {{name}}'s choice!",
+      "perfectMatch": "Perfect Match!",
+      "goodMatch": "Good Match!",
+      "tryAgain": "Better luck next time!",
+      "correct": "correct",
+      "affinity": "Affinity",
+      "affinitySub": "Affinity increased!",
+      "correctAnswer": "Correct!",
+      "wrongAnswer": "{{name}} chose something different"
+    },
+    "endings": {
+      "storyWith": "Story with {{name}}",
+      "addedToCollection": "Added to ending collection!",
+      "romantic": {
+        "title": "💕 Romantic Ending",
+        "description": "With a sweet confession, you became lovers! Your true feelings connected."
+      },
+      "friend": {
+        "title": "🤝 Best Friend Ending",
+        "description": "You became close friends! A bond more precious than romance."
+      },
+      "tsundere": {
+        "title": "😤💕 Tsundere Ending",
+        "description": "Love through arguments! After all the push and pull, you acknowledged each other."
+      },
+      "dramatic": {
+        "title": "🎬 Dramatic Ending",
+        "description": "A fateful meeting! A story like a drama unfolded."
+      }
+    }
   }
 }

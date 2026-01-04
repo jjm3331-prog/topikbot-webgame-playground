@@ -310,10 +310,10 @@ const MistakeNote = ({ userId }: MistakeNoteProps) => {
         >
           <Sparkles className="w-12 h-12 text-white" />
         </motion.div>
-        <h2 className="text-2xl font-bold mb-2">완벽해요! 🎉</h2>
+        <h2 className="text-2xl font-bold mb-2">{t("mistakeNote.perfect.title")} 🎉</h2>
         <p className="text-muted-foreground mb-6">
-          복습할 실수가 없습니다.<br />
-          다른 학습을 계속하면 틀린 문제가 여기에 자동 저장됩니다.
+          {t("mistakeNote.perfect.description1")}<br />
+          {t("mistakeNote.perfect.description2")}
         </p>
       </div>
     );
@@ -332,34 +332,34 @@ const MistakeNote = ({ userId }: MistakeNoteProps) => {
           <Trophy className="w-10 h-10 text-white" />
         </motion.div>
         
-        <h2 className="text-2xl font-bold mb-4">복습 완료! 🎉</h2>
+        <h2 className="text-2xl font-bold mb-4">{t("mistakeNote.complete.title")} 🎉</h2>
         
         <div className="mb-6 space-y-2">
-          <p className="text-3xl font-bold text-primary">{score}점</p>
+          <p className="text-3xl font-bold text-primary">{score}{t("common.pointsUnit")}</p>
           <p className="text-muted-foreground">
-            {mistakes.length}개 중 {correctCount}개 정답 ({percentage}%)
+            {t("mistakeNote.complete.stats", { total: mistakes.length, correct: correctCount, percentage })}
           </p>
         </div>
 
         <div className="p-4 bg-muted rounded-xl mb-6">
           {percentage >= 80 ? (
             <p className="text-green-600 dark:text-green-400 font-medium">
-              훌륭해요! 대부분의 실수를 극복했습니다! 💪
+              {t("mistakeNote.complete.excellent")} 💪
             </p>
           ) : percentage >= 50 ? (
             <p className="text-yellow-600 dark:text-yellow-400 font-medium">
-              좋아요! 조금 더 복습하면 완벽해질 거예요! 📚
+              {t("mistakeNote.complete.good")} 📚
             </p>
           ) : (
             <p className="text-orange-600 dark:text-orange-400 font-medium">
-              괜찮아요! 반복 학습이 기억의 비결입니다! 🔄
+              {t("mistakeNote.complete.keepGoing")} 🔄
             </p>
           )}
         </div>
 
         <Button onClick={handleStart} className="w-full">
           <RotateCcw className="w-4 h-4 mr-2" />
-          다시 복습하기
+          {t("mistakeNote.complete.reviewAgain")}
         </Button>
       </div>
     );
@@ -375,10 +375,10 @@ const MistakeNote = ({ userId }: MistakeNoteProps) => {
         >
           <BookX className="w-12 h-12 text-white" />
         </motion.div>
-        <h2 className="text-2xl font-bold mb-2">실수 노트</h2>
-        <p className="text-muted-foreground mb-2">60초 안에 틀린 문제를 복습하세요!</p>
+        <h2 className="text-2xl font-bold mb-2">{t("mistakeNote.title")}</h2>
+        <p className="text-muted-foreground mb-2">{t("mistakeNote.intro.description")}</p>
         <p className="text-sm text-primary mb-6">
-          복습할 문제: {mistakes.length}개
+          {t("mistakeNote.intro.reviewCount", { count: mistakes.length })}
         </p>
         
         <Button 
@@ -387,7 +387,7 @@ const MistakeNote = ({ userId }: MistakeNoteProps) => {
           className="bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600"
         >
           <Timer className="w-5 h-5 mr-2" />
-          60초 복습 시작
+          {t("mistakeNote.intro.start")}
         </Button>
       </div>
     );
@@ -401,7 +401,7 @@ const MistakeNote = ({ userId }: MistakeNoteProps) => {
           ⏱️ {timeLeft}s
         </div>
         <div className="text-right">
-          <div className="text-xl font-bold text-primary">{score}점</div>
+          <div className="text-xl font-bold text-primary">{score}{t("common.pointsUnit")}</div>
           <div className="text-sm text-muted-foreground">
             {currentIndex + 1} / {mistakes.length}
           </div>
@@ -432,12 +432,12 @@ const MistakeNote = ({ userId }: MistakeNoteProps) => {
             currentItem?.item_type === 'grammar_ox' ? 'bg-green-100 dark:bg-green-950/30 text-green-600 dark:text-green-400' :
             'bg-amber-100 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400'
           }`}>
-            {currentItem?.item_type === 'vocabulary' ? '어휘' :
-             currentItem?.item_type === 'cloze' ? '빈칸' :
-             currentItem?.item_type === 'grammar_ox' ? '문법 O/X' : '관용표현'}
+            {currentItem?.item_type === 'vocabulary' ? t("mistakeNote.types.vocabulary") :
+             currentItem?.item_type === 'cloze' ? t("mistakeNote.types.cloze") :
+             currentItem?.item_type === 'grammar_ox' ? t("mistakeNote.types.grammarOX") : t("mistakeNote.types.idiom")}
           </span>
           <span className="ml-2 px-2 py-1 bg-red-100 dark:bg-red-950/30 text-red-600 dark:text-red-400 rounded-full text-xs">
-            {currentItem?.mistake_count}회 틀림
+            {t("mistakeNote.mistakeCount", { count: currentItem?.mistake_count })}
           </span>
         </div>
 

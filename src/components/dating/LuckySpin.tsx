@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Gift, Sparkles, Star } from "lucide-react";
 
 interface SpinReward {
   id: number;
-  label: string;
-  labelVi: string;
+  labelKey: string;
   value: number;
   type: 'affinity' | 'topic' | 'item';
   color: string;
@@ -14,14 +14,14 @@ interface SpinReward {
 }
 
 const REWARDS: SpinReward[] = [
-  { id: 1, label: "+20 호감도", labelVi: "+20 điểm thân mật", value: 20, type: 'affinity', color: "#FF6B6B", icon: "💕" },
-  { id: 2, label: "+10 호감도", labelVi: "+10 điểm thân mật", value: 10, type: 'affinity', color: "#FFE66D", icon: "💗" },
-  { id: 3, label: "+5 호감도", labelVi: "+5 điểm thân mật", value: 5, type: 'affinity', color: "#4ECDC4", icon: "💖" },
-  { id: 4, label: "특별 주제", labelVi: "Chủ đề đặc biệt", value: 1, type: 'topic', color: "#A855F7", icon: "💬" },
-  { id: 5, label: "+15 호감도", labelVi: "+15 điểm thân mật", value: 15, type: 'affinity', color: "#F472B6", icon: "💝" },
-  { id: 6, label: "데이트 아이템", labelVi: "Vật phẩm hẹn hò", value: 1, type: 'item', color: "#818CF8", icon: "🎁" },
-  { id: 7, label: "+8 호감도", labelVi: "+8 điểm thân mật", value: 8, type: 'affinity', color: "#2DD4BF", icon: "💓" },
-  { id: 8, label: "럭키 보너스!", labelVi: "Bonus may mắn!", value: 25, type: 'affinity', color: "#FBBF24", icon: "🌟" },
+  { id: 1, labelKey: "dating.luckySpin.rewards.affinity20", value: 20, type: 'affinity', color: "#FF6B6B", icon: "💕" },
+  { id: 2, labelKey: "dating.luckySpin.rewards.affinity10", value: 10, type: 'affinity', color: "#FFE66D", icon: "💗" },
+  { id: 3, labelKey: "dating.luckySpin.rewards.affinity5", value: 5, type: 'affinity', color: "#4ECDC4", icon: "💖" },
+  { id: 4, labelKey: "dating.luckySpin.rewards.specialTopic", value: 1, type: 'topic', color: "#A855F7", icon: "💬" },
+  { id: 5, labelKey: "dating.luckySpin.rewards.affinity15", value: 15, type: 'affinity', color: "#F472B6", icon: "💝" },
+  { id: 6, labelKey: "dating.luckySpin.rewards.dateItem", value: 1, type: 'item', color: "#818CF8", icon: "🎁" },
+  { id: 7, labelKey: "dating.luckySpin.rewards.affinity8", value: 8, type: 'affinity', color: "#2DD4BF", icon: "💓" },
+  { id: 8, labelKey: "dating.luckySpin.rewards.luckyBonus", value: 25, type: 'affinity', color: "#FBBF24", icon: "🌟" },
 ];
 
 interface LuckySpinProps {
@@ -31,6 +31,7 @@ interface LuckySpinProps {
 }
 
 const LuckySpin = ({ onReward, canSpin, onClose }: LuckySpinProps) => {
+  const { t } = useTranslation();
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [result, setResult] = useState<SpinReward | null>(null);
@@ -76,9 +77,9 @@ const LuckySpin = ({ onReward, canSpin, onClose }: LuckySpinProps) => {
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-white flex items-center justify-center gap-2">
             <Gift className="w-6 h-6 text-pink-400" />
-            럭키 스핀
+            {t("dating.luckySpin.title")}
           </h2>
-          <p className="text-white/60 text-sm mt-1">Lucky Spin - Vòng quay may mắn</p>
+          <p className="text-white/60 text-sm mt-1">{t("dating.luckySpin.subtitle")}</p>
         </div>
 
         {/* Wheel */}
@@ -132,8 +133,7 @@ const LuckySpin = ({ onReward, canSpin, onClose }: LuckySpinProps) => {
           >
             <Sparkles className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
             <p className="text-2xl mb-1">{result.icon}</p>
-            <p className="text-white font-bold">{result.label}</p>
-            <p className="text-white/60 text-sm">{result.labelVi}</p>
+            <p className="text-white font-bold">{t(result.labelKey)}</p>
           </motion.div>
         )}
 
@@ -153,12 +153,12 @@ const LuckySpin = ({ onReward, canSpin, onClose }: LuckySpinProps) => {
                   >
                     🎰
                   </motion.span>
-                  돌아가는 중...
+                  {t("dating.luckySpin.spinning")}
                 </span>
               ) : canSpin ? (
-                "🎰 스핀하기! / Quay!"
+                t("dating.luckySpin.spin")
               ) : (
-                "오늘은 이미 스핀했어요"
+                t("dating.luckySpin.alreadySpun")
               )}
             </Button>
           ) : (
@@ -166,7 +166,7 @@ const LuckySpin = ({ onReward, canSpin, onClose }: LuckySpinProps) => {
               onClick={onClose}
               className="w-full bg-pink-500 hover:bg-pink-600"
             >
-              확인 / OK
+              {t("common.confirm")}
             </Button>
           )}
           
@@ -176,7 +176,7 @@ const LuckySpin = ({ onReward, canSpin, onClose }: LuckySpinProps) => {
               onClick={onClose}
               className="w-full text-white/60 hover:text-white"
             >
-              닫기 / Đóng
+              {t("common.close")}
             </Button>
           )}
         </div>
