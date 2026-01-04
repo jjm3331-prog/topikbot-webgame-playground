@@ -44,10 +44,67 @@ interface ValidationResult {
 
 const BATCH_SIZE = 5; // 5문제씩 배치 검증
 
-const systemPrompt = `당신은 TOPIK(한국어능력시험) 검수 전문가입니다.
-생성된 모의고사 문제의 품질을 검증하고 필요시 수정해야 합니다.
+// 섹션별 시스템 프롬프트 생성
+function getSystemPrompt(section: string): string {
+  const basePrompt = `당신은 TOPIK(한국어능력시험) 검수 전문가입니다.
+생성된 모의고사 문제의 품질을 검증하고 필요시 수정해야 합니다.`;
 
-## 검증 기준
+  // 쓰기(writing) 전용 검증 기준
+  if (section === 'writing') {
+    return `${basePrompt}
+
+## 쓰기 문제 검증 기준
+
+### 1. 한국어 정확성 (25점)
+- 맞춤법/띄어쓰기 오류
+- 문법적 오류
+- 자연스럽고 격식있는 표현
+
+### 2. 문제 형식 (25점)
+- TOPIK II 쓰기 공식 형식 준수
+- [51-52번] 빈칸 (ㄱ), (ㄴ) 형식이 명확한지
+- [53번] 도표/그래프 설명 문제의 자료가 적절한지
+- [54번] 논술 주제가 명확하고 논쟁 가능한지
+- 지시문이 명확한지 (글자 수, 조건 등)
+
+### 3. 모범답안/채점기준 품질 (30점)
+- 모범답안이 자연스럽고 문법적으로 완벽한지
+- 채점 기준이 명확하고 공정한지
+- 다양한 수준의 답안 예시 제공 여부
+- 부분 점수 기준이 합리적인지
+
+### 4. 해설 품질 (20점)
+- 해설이 작문 전략을 잘 설명하는지
+- 핵심 문법/어휘 포인트 설명
+- 오류 예시와 올바른 표현 대조
+- 다국어 해설 일관성
+
+## 중요: 쓰기 문제는 객관식이 아닙니다!
+- options 배열은 비어있거나 없을 수 있음 (정상)
+- correct_answer는 사용하지 않음 (정상)
+- 대신 model_answer, scoring_criteria 필드를 검증
+
+## 출력 형식
+{
+  "validations": [
+    {
+      "question_number": 문제 번호 (51, 52, 53, 54 중 하나),
+      "isValid": true/false,
+      "score": 0-100 점수,
+      "issues": ["발견된 문제점"],
+      "suggestions": ["개선 제안"],
+      "correctedQuestion": null 또는 수정된 문제 객체
+    }
+  ]
+}
+
+점수가 80점 미만인 문제는 correctedQuestion에 수정된 버전을 제공하세요.`;
+  }
+
+  // 듣기/읽기 (객관식) 검증 기준
+  return `${basePrompt}
+
+## 객관식 문제 검증 기준 (듣기/읽기)
 
 ### 1. 한국어 정확성 (30점)
 - 맞춤법/띄어쓰기 오류
@@ -70,21 +127,21 @@ const systemPrompt = `당신은 TOPIK(한국어능력시험) 검수 전문가입
 - 학습에 도움이 되는 내용
 
 ## 출력 형식
-각 문제에 대해 다음 JSON 형식으로 검증 결과를 반환하세요:
 {
   "validations": [
     {
       "question_number": 문제 번호,
       "isValid": true/false,
       "score": 0-100 점수,
-      "issues": ["발견된 문제점 1", "문제점 2"],
-      "suggestions": ["개선 제안 1", "제안 2"],
-      "correctedQuestion": null 또는 수정된 문제 객체 (수정이 필요한 경우)
+      "issues": ["발견된 문제점"],
+      "suggestions": ["개선 제안"],
+      "correctedQuestion": null 또는 수정된 문제 객체
     }
   ]
 }
 
 점수가 80점 미만인 문제는 correctedQuestion에 수정된 버전을 제공하세요.`;
+}
 
 // 단일 배치 검증 함수 (Gemini 직접 호출 + 씽킹버젯 최대치)
 async function validateBatch(
@@ -109,7 +166,7 @@ ${JSON.stringify(questions, null, 2)}
       body: JSON.stringify({
         contents: [{
           role: "user",
-          parts: [{ text: `${systemPrompt}\n\n---\n\n${userPrompt}` }]
+          parts: [{ text: `${getSystemPrompt(section)}\n\n---\n\n${userPrompt}` }]
         }],
         generationConfig: {
           temperature: 0.3,
