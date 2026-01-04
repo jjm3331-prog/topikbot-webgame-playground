@@ -865,20 +865,43 @@ const MockExamHub = () => {
                       )}
                     </motion.button>
 
-                    {selectedExamForStart === 'topik2' && (
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-                          setShowModeDialog(false);
-                          navigate('/writing-correction');
-                        }}
-                        className="h-28 flex flex-col items-center justify-center gap-3 rounded-xl bg-gradient-to-br from-purple-500/10 to-violet-500/10 border border-purple-500/20 hover:border-purple-500/40 transition-all"
-                      >
-                        <PenTool className="w-8 h-8 text-purple-500" />
-                        <span className="font-medium">{t('mockExam.dialog.writing')}</span>
-                      </motion.button>
-                    )}
+                    {selectedExamForStart === 'topik2' && (() => {
+                      const writingCount = availableSectionCounts['writing'] || 0;
+                      const writingDisabled = writingCount <= 0;
+
+                      return (
+                        <motion.button
+                          whileHover={writingDisabled ? undefined : { scale: 1.02 }}
+                          whileTap={writingDisabled ? undefined : { scale: 0.98 }}
+                          disabled={writingDisabled}
+                          onClick={() => {
+                            if (writingDisabled) {
+                              toast({
+                                title: t('mockExam.sectionPreparing', '문제 준비중'),
+                                description: t('mockExam.sectionNoDataWriting', '쓰기 영역 문제 데이터가 아직 없습니다. 다른 영역을 선택해주세요.'),
+                              });
+                              return;
+                            }
+                            setShowModeDialog(false);
+                            navigate(
+                              `/mock-exam/${selectedExamForStart}?mode=section&section=writing&difficulty=${selectedDifficulty}`
+                            );
+                          }}
+                          className={cn(
+                            'h-28 flex flex-col items-center justify-center gap-3 rounded-xl bg-gradient-to-br from-purple-500/10 to-violet-500/10 border transition-all',
+                            writingDisabled
+                              ? 'border-white/10 opacity-40 cursor-not-allowed'
+                              : 'border-purple-500/20 hover:border-purple-500/40'
+                          )}
+                        >
+                          <PenTool className="w-8 h-8 text-purple-500" />
+                          <span className="font-medium">{t('mockExam.dialog.writing')}</span>
+                          {writingDisabled && (
+                            <span className="text-[11px] text-muted-foreground">{t('mockExam.preparing', '준비중')}</span>
+                          )}
+                        </motion.button>
+                      );
+                    })()}
                   </>
                 );
               })()}
