@@ -412,17 +412,16 @@ const MockExamTest = () => {
         // TOPIK I 읽기: 40문제 (1~4번: 주제 4문제, 5~8번: 빈칸 4문제, 9~12번: 순서 4문제, 13~15번: 빈칸(문장) 3문제, 16~18번: 내용일치 3문제, 19~24번: 중심내용 6문제, 25~31번: 세부내용 7문제, 32~39번: 순서배열 8문제, 40번: 글의목적 1문제)
         // TOPIK II 듣기: 50문제, TOPIK II 읽기: 50문제
         
+        // 실제 TOPIK 출제 형식에 맞춘 파트별 문제 수 분배 (DB 재정리 후)
         const TOPIK_PART_DISTRIBUTION: Record<string, Record<string, Array<{part: number, count: number}>>> = {
           'TOPIK_I': {
             'listening': [
-              { part: 1, count: 4 },   // 1~4번: 그림 고르기
-              { part: 2, count: 2 },   // 5~6번: 대화 응답
-              { part: 3, count: 4 },   // 7~10번: 장소/주제
-              { part: 4, count: 4 },   // 11~14번: 일치/불일치
-              { part: 5, count: 2 },   // 15~16번: 중심생각
-              { part: 7, count: 5 },   // 17~21번: 담화 이해
-              { part: 9, count: 3 },   // 22~24번: 이유/의도
-              { part: 11, count: 6 },  // 25~30번: 내용 일치
+              { part: 1, count: 4 },   // 1~4번: 적절한 대답
+              { part: 2, count: 4 },   // 5~8번: 그림 대화
+              { part: 3, count: 4 },   // 9~12번: 장소/화제/목적
+              { part: 4, count: 4 },   // 13~16번: 세부 내용
+              { part: 5, count: 4 },   // 17~20번: 화자 의도/태도
+              { part: 6, count: 10 },  // 21~30번: 세트형 문제
             ],
             'reading': [
               { part: 1, count: 4 },   // 1~4번: 주제 찾기
@@ -437,15 +436,13 @@ const MockExamTest = () => {
           'TOPIK_II': {
             'listening': [
               { part: 1, count: 4 },   // 1~4번: 그림 고르기
-              { part: 2, count: 4 },   // 5~8번: 대화 응답
-              { part: 9, count: 4 },   // 9~12번: 행동 고르기
-              { part: 13, count: 4 },  // 13~16번: 내용 일치
-              { part: 17, count: 4 },  // 17~20번: 중심 생각
-              { part: 18, count: 6 },  // 21~26번: 담화 이해(1)
-              { part: 19, count: 6 },  // 27~32번: 담화 이해(2)
-              { part: 20, count: 6 },  // 33~38번: 담화 이해(3)
-              { part: 21, count: 6 },  // 39~44번: 담화 이해(4)
-              { part: 22, count: 6 },  // 45~50번: 담화 이해(5)
+              { part: 2, count: 4 },   // 5~8번: 이어질 말
+              { part: 3, count: 4 },   // 9~12번: 행동 고르기
+              { part: 4, count: 4 },   // 13~16번: 내용 일치
+              { part: 5, count: 4 },   // 17~20번: 중심 생각
+              { part: 6, count: 10 },  // 21~30번: 세트형 담화(1)
+              { part: 7, count: 10 },  // 31~40번: 세트형 담화(2)
+              { part: 8, count: 10 },  // 41~50번: 세트형 담화(3)
             ],
             'reading': [
               { part: 1, count: 4 },   // 1~4번: 빈칸 채우기
