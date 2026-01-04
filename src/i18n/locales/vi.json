@@ -180,7 +180,9 @@
     "playNow": "Chơi ngay",
     "learnNow": "Học ngay",
     "backToDashboard": "Quay lại Dashboard",
-    "locale": "vi-VN"
+    "locale": "vi-VN",
+    "previous": "Trước",
+    "delete": "Xóa"
   },
   "brand": {
     "name": "LUKATO AI",
@@ -818,7 +820,8 @@
       "victory": "🎉 Vụ án đã giải!",
       "defeat": "😢 Điều tra thất bại",
       "victoryDesc": "Thưởng thám tử +1,000 điểm!",
-      "defeatDesc": "Thám tử {{name}} giải trước!"
+      "defeatDesc": "Thám tử {{name}} giải trước!",
+      "system": "Hệ thống"
     },
     "speedQuizGame": {
       "overview": "Thi đua trả lời câu hỏi từ vựng, ngữ pháp và biểu thức TOPIK! Ai đúng nhiều hơn trong 10 câu sẽ thắng!",
@@ -3011,8 +3014,14 @@
       "reviewCount": "Ôn {{count}} câu chưa master",
       "delete": "Xóa",
       "deleteTitle": "Xóa lỗi",
-      "deleteConfirm": "Bạn có chắc muốn xóa lỗi này? Không thể hoàn tác."
+      "deleteConfirm": "Bạn có chắc muốn xóa lỗi này? Không thể hoàn tác.",
+      "noExplanation": "Chưa có giải thích.",
+      "showAnswer": "Xem đáp án",
+      "startReviewButton": "Bắt đầu ôn tập",
+      "reviewTimes": "{{count}} lần ôn",
+      "reviewAgainButton": "Ôn lại"
     },
+    "hub": "Trung tâm thi thử",
     "report": {
       "loading": "Đang tải kết quả...",
       "backToHub": "Trang thi thử",
@@ -3133,7 +3142,26 @@
     "noPhotos": "Chưa có ảnh đôi",
     "noEndings": "Chưa mở khóa kết thúc nào",
     "backToSwipe": "Quay lại",
-    "unlockedEndings": "Kết thúc đã mở khóa"
+    "unlockedEndings": "Kết thúc đã mở khóa",
+    "restart": "Chơi lại",
+    "miniGame": {
+      "title": "Mini Game",
+      "subtitle": "Mini Game - 미니게임",
+      "playWith": "Chơi với {{name}} và tăng độ thân thiết!",
+      "telepathy": "Đọc vị nhau",
+      "telepathySub": "이심전심 게임",
+      "preference": "Sở thích hợp nhau",
+      "preferenceSub": "취향 맞추기",
+      "perfectMatch": "Hoàn hảo!",
+      "goodMatch": "Tuyệt vời!",
+      "tryAgain": "Lần sau sẽ tốt hơn!",
+      "correct": "Đúng",
+      "affinity": "Độ thân thiết",
+      "affinitySub": "호감도",
+      "guessNpc": "Đoán xem {{name}} đang nghĩ gì!",
+      "correctAnswer": "Đúng rồi!",
+      "wrongAnswer": "Tiếc quá... {{name}} chọn khác"
+    }
   },
   "video": {
     "mistake": {

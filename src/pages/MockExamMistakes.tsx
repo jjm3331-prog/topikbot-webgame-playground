@@ -224,7 +224,7 @@ const MockExamMistakes = () => {
     const lang = i18n.language;
     if (lang === 'vi' && question?.explanation_vi) return question.explanation_vi;
     if (lang === 'en' && question?.explanation_en) return question.explanation_en;
-    return question?.explanation_ko || "해설이 없습니다.";
+    return question?.explanation_ko || t("mockExam.mistakes.noExplanation");
   };
 
   const getSectionIcon = (section: string) => {
@@ -354,12 +354,12 @@ const MockExamMistakes = () => {
               }}
               disabled={currentReviewIndex === 0}
             >
-              이전
+              {t("common.previous")}
             </Button>
 
             {!showAnswer ? (
               <Button onClick={() => setShowAnswer(true)}>
-                정답 확인
+                {t("mockExam.mistakes.showAnswer")}
               </Button>
             ) : (
               <div className="flex gap-2">
@@ -389,7 +389,7 @@ const MockExamMistakes = () => {
                   }}
                 >
                   <Star className="w-4 h-4 mr-1" />
-                  마스터
+                  {t("mockExam.mastered")}
                 </Button>
               </div>
             )}
@@ -408,7 +408,7 @@ const MockExamMistakes = () => {
         <div className="flex items-center justify-between mb-6">
           <Button variant="ghost" onClick={() => navigate('/mock-exam')}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            모의고사 허브
+            {t("mockExam.hub")}
           </Button>
         </div>
 
@@ -481,7 +481,7 @@ const MockExamMistakes = () => {
                     }}
                   >
                     <Target className="w-4 h-4 mr-2" />
-                    복습 시작
+                    {t("mockExam.mistakes.startReviewButton")}
                   </Button>
                 </div>
               </CardContent>
@@ -581,7 +581,7 @@ const MockExamMistakes = () => {
                             </div>
                             <div className="flex items-center gap-2">
                               <Badge variant="secondary" className="text-xs">
-                                {mistake.review_count}회 복습
+                                {t("mockExam.mistakes.reviewTimes", { count: mistake.review_count })}
                               </Badge>
                               {isExpanded ? (
                                 <ChevronUp className="w-5 h-5 text-muted-foreground" />
@@ -663,12 +663,12 @@ const MockExamMistakes = () => {
                               {mistake.mastered ? (
                                 <>
                                   <RotateCcw className="w-4 h-4 mr-1" />
-                                  다시 복습
+                                  {t("mockExam.mistakes.reviewAgainButton")}
                                 </>
                               ) : (
                                 <>
                                   <Star className="w-4 h-4 mr-1" />
-                                  마스터
+                                  {t("mockExam.mastered")}
                                 </>
                               )}
                             </Button>

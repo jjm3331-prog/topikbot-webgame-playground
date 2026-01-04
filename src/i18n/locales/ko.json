@@ -180,7 +180,9 @@
     "playNow": "지금 플레이",
     "learnNow": "지금 학습",
     "backToDashboard": "대시보드로 돌아가기",
-    "locale": "ko-KR"
+    "locale": "ko-KR",
+    "previous": "이전",
+    "delete": "삭제"
   },
   "brand": {
     "name": "LUKATO AI",
@@ -818,7 +820,8 @@
       "victory": "🎉 사건 해결!",
       "defeat": "😢 수사 실패",
       "victoryDesc": "명탐정 보너스 +1,000점!",
-      "defeatDesc": "{{name}} 탐정이 먼저 해결!"
+      "defeatDesc": "{{name}} 탐정이 먼저 해결!",
+      "system": "시스템"
     },
     "speedQuizGame": {
       "overview": "TOPIK 어휘, 문법, 표현 문제를 빠르게 풀어 승부를 겨뤄요! 10문제 중 더 많이 맞추면 승리!",
@@ -3130,8 +3133,14 @@
       "reviewCount": "{{count}}개의 미마스터 문제를 복습하세요",
       "delete": "삭제",
       "deleteTitle": "오답 삭제",
-      "deleteConfirm": "이 오답을 삭제하시겠습니까? 삭제 후 복구할 수 없습니다."
+      "deleteConfirm": "이 오답을 삭제하시겠습니까? 삭제 후 복구할 수 없습니다.",
+      "noExplanation": "해설이 없습니다.",
+      "showAnswer": "정답 확인",
+      "startReviewButton": "복습 시작",
+      "reviewTimes": "{{count}}회 복습",
+      "reviewAgainButton": "다시 복습"
     },
+    "hub": "모의고사 허브",
     "report": {
       "loading": "결과 로딩 중...",
       "backToHub": "모의고사 허브",
@@ -3252,7 +3261,26 @@
     "noPhotos": "아직 커플 사진이 없어요",
     "noEndings": "아직 해금된 엔딩이 없어요",
     "backToSwipe": "돌아가기",
-    "unlockedEndings": "해금된 엔딩"
+    "unlockedEndings": "해금된 엔딩",
+    "restart": "다시 시작",
+    "miniGame": {
+      "title": "미니게임",
+      "subtitle": "Mini Game - Trò chơi nhỏ",
+      "playWith": "{{name}}와(과) 게임하고 호감도를 올려요!",
+      "telepathy": "이심전심 게임",
+      "telepathySub": "Telepathy Game",
+      "preference": "취향 맞추기",
+      "preferenceSub": "Preference Match",
+      "perfectMatch": "완벽한 궁합!",
+      "goodMatch": "잘 맞아요!",
+      "tryAgain": "다음엔 더 잘해요!",
+      "correct": "정답",
+      "affinity": "호감도",
+      "affinitySub": "điểm thân mật",
+      "guessNpc": "{{name}}의 마음을 맞춰보세요!",
+      "correctAnswer": "정답!",
+      "wrongAnswer": "아쉬워요... {{name}}의 선택은 다른 거였어요"
+    }
   },
   "video": {
     "mistake": {

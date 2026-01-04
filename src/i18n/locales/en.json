@@ -180,7 +180,9 @@
     "playNow": "Play Now",
     "learnNow": "Learn Now",
     "backToDashboard": "Back to Dashboard",
-    "locale": "en-US"
+    "locale": "en-US",
+    "previous": "Previous",
+    "delete": "Delete"
   },
   "brand": {
     "name": "LUKATO AI",
@@ -818,7 +820,8 @@
       "victory": "🎉 Case Solved!",
       "defeat": "😢 Investigation Failed",
       "victoryDesc": "Detective bonus +1,000 pts!",
-      "defeatDesc": "Detective {{name}} solved it first!"
+      "defeatDesc": "Detective {{name}} solved it first!",
+      "system": "System"
     },
     "speedQuizGame": {
       "overview": "Race to answer TOPIK vocabulary, grammar, and expression questions! Whoever gets more correct out of 10 wins!",
@@ -2963,8 +2966,14 @@
       "reviewCount": "Review {{count}} unmastered questions",
       "delete": "Delete",
       "deleteTitle": "Delete Mistake",
-      "deleteConfirm": "Are you sure you want to delete this mistake? This cannot be undone."
+      "deleteConfirm": "Are you sure you want to delete this mistake? This cannot be undone.",
+      "noExplanation": "No explanation available.",
+      "showAnswer": "Show Answer",
+      "startReviewButton": "Start Review",
+      "reviewTimes": "{{count}} reviews",
+      "reviewAgainButton": "Review Again"
     },
+    "hub": "Mock Exam Hub",
     "report": {
       "loading": "Loading results...",
       "backToHub": "Mock Exam Hub",
@@ -3085,7 +3094,26 @@
     "noPhotos": "No couple photos yet",
     "noEndings": "No endings unlocked yet",
     "backToSwipe": "Go Back",
-    "unlockedEndings": "Unlocked Endings"
+    "unlockedEndings": "Unlocked Endings",
+    "restart": "Restart",
+    "miniGame": {
+      "title": "Mini Game",
+      "subtitle": "Mini Game - 미니게임",
+      "playWith": "Play with {{name}} and boost affinity!",
+      "telepathy": "Telepathy Game",
+      "telepathySub": "이심전심 게임",
+      "preference": "Preference Match",
+      "preferenceSub": "취향 맞추기",
+      "perfectMatch": "Perfect Match!",
+      "goodMatch": "Great Match!",
+      "tryAgain": "Better luck next time!",
+      "correct": "Correct",
+      "affinity": "Affinity",
+      "affinitySub": "호감도",
+      "guessNpc": "Guess what {{name}} is thinking!",
+      "correctAnswer": "Correct!",
+      "wrongAnswer": "So close... {{name}} chose something else"
+    }
   },
   "video": {
     "mistake": {
