@@ -291,15 +291,15 @@ const MockExamTest = () => {
       const dbExamType = mapExamTypeToDb(examType || 'topik1');
       const difficulty = searchParams.get('difficulty') || 'intermediate';
       
+      // ✅ 실전(full)은 "기출처럼 한 세트"가 핵심이라, 과거에 풀었던 문항 제외 로직을 적용하지 않는다.
+      // (연습/약점 모드만 중복 방지)
       const { data: answeredQuestions } = await supabase
         .from('mock_exam_answers')
         .select('question_id, mock_exam_attempts!inner(user_id)')
         .eq('mock_exam_attempts.user_id', userId);
-      
-      const answeredQuestionIds = new Set(
-        (answeredQuestions || []).map(a => a.question_id)
-      );
-      
+
+      const answeredQuestionIds = new Set((answeredQuestions || []).map(a => a.question_id));
+
       let query = supabase
         .from('mock_question_bank')
         .select('*')
@@ -364,12 +364,16 @@ const MockExamTest = () => {
         if (safePartNumber) {
           query = query.eq('part_number', safePartNumber);
         }
+        // 실전(full)은 난이도 필터/중복제거 없이 "시험 세트" 우선
         if (mode !== 'full' && difficulty !== 'all') {
           query = query.in('difficulty', difficultyValues);
         }
       }
 
-      const { data: allQuestionData, error } = await query.order('section').order('part_number').order('question_number');
+      const { data: allQuestionData, error } = await query
+        .order('section')
+        .order('part_number')
+        .order('question_number');
 
       if (error) {
         console.error('[MockExamTest] question load error', { examType, mode, section, safePartNumber, error });
@@ -378,11 +382,15 @@ const MockExamTest = () => {
         return;
       }
 
-      let questionData = (allQuestionData || []).filter((q) => !answeredQuestionIds.has(q.id));
-
-      if (questionData.length < 10 && allQuestionData && allQuestionData.length > 0) {
-        const shuffledAll = [...allQuestionData].sort(() => Math.random() - 0.5);
-        questionData = shuffledAll;
+      // ✅ 실전(full)은 "풀었던 문제 제외" 금지
+      // 연습/약점은 중복 최소화를 위해 제외 적용
+      let questionData = (allQuestionData || []);
+      if (mode !== 'full') {
+        questionData = questionData.filter((q) => !answeredQuestionIds.has(q.id));
+        // 너무 적으면 전체 풀로 fallback
+        if (questionData.length < 10 && allQuestionData && allQuestionData.length > 0) {
+          questionData = [...allQuestionData].sort(() => Math.random() - 0.5);
+        }
       }
 
       if (!questionData.length) {
@@ -402,18 +410,36 @@ const MockExamTest = () => {
         // 실제 TOPIK 시험 형식에 맞게 섹션별로 정확한 문제 수 배분
         const sectionOrder = ['listening', 'reading', 'writing'];
         
+        const missing: Array<{ section: string; needed: number; have: number }> = [];
+
         for (const sec of sectionOrder) {
           const sectionConfig = examPreset.sections[sec as keyof typeof examPreset.sections];
           if (!sectionConfig) continue;
-          
+
           const sectionQuestions = questionData
             .filter(q => q.section === sec)
             .sort((a, b) => (a.part_number || 0) - (b.part_number || 0) || (a.question_number || 0) - (b.question_number || 0));
-          
-          // 섹션별 필요 문제 수만큼 추출
+
           const neededCount = sectionConfig.questionCount;
-          const selected = sectionQuestions.slice(0, Math.min(neededCount, sectionQuestions.length));
+          if (sectionQuestions.length < neededCount) {
+            missing.push({ section: sec, needed: neededCount, have: sectionQuestions.length });
+          }
+
+          // 섹션별 필요 문제 수만큼(정확히) 추출
+          const selected = sectionQuestions.slice(0, neededCount);
           limitedQuestions = limitedQuestions.concat(selected);
+        }
+
+        // ✅ 실전은 "부족하면 시작하지 않음" (임의 축소 금지)
+        if (missing.length) {
+          console.warn('[MockExamTest] insufficient questions for real exam preset', { dbExamType, missing });
+          toast({
+            title: t('mockExamTest.preparing'),
+            description: t('mockExamTest.noQuestions'),
+            variant: 'destructive',
+          });
+          navigate('/mock-exam');
+          return;
         }
         
         console.log('[MockExamTest] Full mode question distribution:', {
