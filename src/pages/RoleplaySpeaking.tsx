@@ -110,10 +110,10 @@ const PRESET_SCENARIOS: Scenario[] = [
   { id: "meeting", icon: Users, color: "text-cyan-500" },
 ];
 
-// 레벨 옵션
+// 레벨 옵션 - badge는 컴포넌트에서 t()로 처리
 const LEVEL_OPTIONS = [
-  { id: "topik1", label: "TOPIK I", badge: "초급" },
-  { id: "topik2", label: "TOPIK II", badge: "중고급" },
+  { id: "topik1", label: "TOPIK I", badgeKey: "roleplay.level.beginner" },
+  { id: "topik2", label: "TOPIK II", badgeKey: "roleplay.level.intermediate" },
 ];
 
 // 난이도 옵션

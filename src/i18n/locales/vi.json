@@ -55,6 +55,14 @@
     "gameStartError": "Lỗi bắt đầu game",
     "gameStartErrorDesc": "Không thể bắt đầu game."
   },
+  "trial": {
+    "available": "Dùng thử miễn phí",
+    "freeToday": "Hôm nay bạn có thể dùng thử {{feature}} miễn phí 1 lần!",
+    "unlimitedAccess": "Sử dụng không giới hạn",
+    "completed": "Đã dùng thử hôm nay",
+    "nextTrialIn": "Lần dùng thử tiếp theo sau {{time}}",
+    "upgradePremium": "Nâng cấp Premium"
+  },
   "pwaWelcome": {
     "installComplete": "Cài đặt thành công!",
     "appAdded": "Game LUKATO đã được thêm vào màn hình chính.",
@@ -3304,5 +3312,62 @@
     "send": "Gửi",
     "scenarioSelect": "Chọn Kịch bản",
     "topikLevel": "Cấp độ TOPIK"
-  }
+  },
+  "stats": {
+    "progress": "Tiến độ",
+    "completed": "{{completed}}/{{total}} hoàn thành",
+    "totalScore": "Tổng điểm",
+    "points": "điểm",
+    "averageScore": "Điểm TB",
+    "scoreUnit": "đ",
+    "outOf100": "trên 100",
+    "studyTime": "Thời gian học",
+    "totalStudy": "tổng học tập",
+    "hoursMinutes": "{{hours}}h {{minutes}}p",
+    "minutes": "{{minutes}}p"
+  },
+  "category": {
+    "vocabulary": "Từ vựng",
+    "grammar": "Ngữ pháp",
+    "reading": "Đọc hiểu",
+    "listening": "Nghe hiểu",
+    "mockTest": "Thi thử"
+  },
+  "emotion": {
+    "fallenHard": "Hoàn toàn say mê!",
+    "loveIt": "Quá thích!",
+    "excited": "Hồi hộp~",
+    "goodFeeling": "Cảm giác tốt",
+    "interested": "Có hứng thú",
+    "notSure": "Chưa chắc",
+    "notGood": "Không tốt lắm..."
+  },
+  "idiom": {
+    "loading": "Đang tải thành ngữ...",
+    "title": "Thành ngữ Master",
+    "subtitle": "Ghép nghĩa đen ↔ nghĩa thực!",
+    "levelExpressions": "Biểu đạt TOPIK cấp {{level}}",
+    "previousScore": "Điểm trước",
+    "scoreUnit": "đ",
+    "restart": "Chơi lại",
+    "start": "Bắt đầu",
+    "tapToFlip": "Chạm để lật",
+    "literal": "Nghĩa đen",
+    "actualMeaning": "Nghĩa thực",
+    "situationExample": "Ví dụ tình huống",
+    "similarExpressions": "Biểu đạt tương tự",
+    "showExample": "Xem ví dụ",
+    "confused": "Lúng túng 😅",
+    "gotIt": "Hiểu rồi!"
+  },
+  "vocab": {
+    "flash": { "title": "Flash Loop", "desc": "Ghi nhớ nhanh với flashcard 3 giây" },
+    "match": { "title": "Ghép nghĩa", "desc": "Ghép Hàn ↔ ngôn ngữ của bạn" },
+    "cloze": { "title": "Điền chỗ trống", "desc": "Điền từ trong ngữ cảnh" },
+    "mistake": { "title": "Ôn lỗi sai", "desc": "Tập trung từ sai" },
+    "section": { "memorize": "Ghi nhớ", "memorizeDesc": "Ghi nhớ từ nhanh chóng", "context": "Ngữ cảnh", "contextDesc": "Học từ vựng trong câu" },
+    "level": { "beginner": "Sơ cấp", "intermediate": "Trung cấp", "advanced": "Cao cấp" },
+    "category": { "memorize": "Ghi nhớ", "context": "Ngữ cảnh" }
+  },
+  "roleplay": { "level": { "beginner": "Sơ cấp", "intermediate": "Trung cấp" } }
 }

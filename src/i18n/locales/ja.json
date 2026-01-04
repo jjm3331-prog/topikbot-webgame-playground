@@ -55,6 +55,14 @@
     "gameStartError": "ゲーム開始エラー",
     "gameStartErrorDesc": "ゲームを開始できませんでした。"
   },
+  "trial": {
+    "available": "無料トライアル可能",
+    "freeToday": "今日は{{feature}}を1回無料で体験できます！",
+    "unlimitedAccess": "無制限アクセス",
+    "completed": "本日のトライアル完了",
+    "nextTrialIn": "次の無料トライアルまで{{time}}",
+    "upgradePremium": "Premiumにアップグレード"
+  },
   "pwaWelcome": {
     "installComplete": "インストール完了！",
     "appAdded": "Game LUKATOがホーム画面に追加されました。",
@@ -2973,5 +2981,62 @@
     "send": "送信",
     "scenarioSelect": "シナリオ選択",
     "topikLevel": "TOPIKレベル"
-  }
+  },
+  "stats": {
+    "progress": "進捗率",
+    "completed": "{{completed}}/{{total}} 完了",
+    "totalScore": "総得点",
+    "points": "ポイント",
+    "averageScore": "平均得点",
+    "scoreUnit": "点",
+    "outOf100": "100点満点",
+    "studyTime": "学習時間",
+    "totalStudy": "総学習量",
+    "hoursMinutes": "{{hours}}時間{{minutes}}分",
+    "minutes": "{{minutes}}分"
+  },
+  "category": {
+    "vocabulary": "語彙",
+    "grammar": "文法",
+    "reading": "読解",
+    "listening": "聴解",
+    "mockTest": "模擬試験"
+  },
+  "emotion": {
+    "fallenHard": "完全に惚れた！",
+    "loveIt": "大好き！",
+    "excited": "ドキドキ〜",
+    "goodFeeling": "いい感じ",
+    "interested": "興味ある",
+    "notSure": "まだ分からない",
+    "notGood": "微妙かも..."
+  },
+  "idiom": {
+    "loading": "慣用句を読み込み中...",
+    "title": "慣用句マスター",
+    "subtitle": "直訳 ↔ 実際の意味を当てよう!",
+    "levelExpressions": "TOPIK {{level}}級の表現",
+    "previousScore": "前回のスコア",
+    "scoreUnit": "点",
+    "restart": "もう一度",
+    "start": "スタート",
+    "tapToFlip": "タップして裏返す",
+    "literal": "直訳",
+    "actualMeaning": "実際の意味",
+    "situationExample": "状況例",
+    "similarExpressions": "似た表現",
+    "showExample": "例を見る",
+    "confused": "迷った 😅",
+    "gotIt": "わかった！"
+  },
+  "vocab": {
+    "flash": { "title": "フラッシュ暗記", "desc": "3秒フラッシュカードで速記" },
+    "match": { "title": "意味マッチ", "desc": "韓国語↔母語マッチング" },
+    "cloze": { "title": "穴埋め", "desc": "文脈での穴埋めクイズ" },
+    "mistake": { "title": "誤答復習", "desc": "間違えた単語を集中学習" },
+    "section": { "memorize": "暗記エリア", "memorizeDesc": "単語を素早く暗記", "context": "文脈エリア", "contextDesc": "文中で語彙を学習" },
+    "level": { "beginner": "初級", "intermediate": "中級", "advanced": "上級" },
+    "category": { "memorize": "暗記", "context": "文脈" }
+  },
+  "roleplay": { "level": { "beginner": "初級", "intermediate": "中上級" } }
 }

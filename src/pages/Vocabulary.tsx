@@ -33,45 +33,45 @@ const moduleConfig = [
     id: "flash" as ModuleType, 
     icon: Zap, 
     title: "Flash Loop", 
-    titleKo: "플래시 암기",
-    desc: "3초 플래시카드로 빠른 암기",
-    category: "암기",
+    titleKey: "vocab.flash.title",
+    descKey: "vocab.flash.desc",
+    categoryKey: "vocab.category.memorize",
     color: "from-yellow-400 to-orange-500",
   },
   { 
     id: "match" as ModuleType, 
     icon: Shuffle, 
     title: "Meaning Match", 
-    titleKo: "뜻 매칭",
-    desc: "한국어 ↔ 내 언어 매칭 게임",
-    category: "암기",
+    titleKey: "vocab.match.title",
+    descKey: "vocab.match.desc",
+    categoryKey: "vocab.category.memorize",
     color: "from-pink-400 to-rose-500",
   },
   { 
     id: "cloze" as ModuleType, 
     icon: Brain, 
     title: "Mini Cloze", 
-    titleKo: "빈칸 채우기",
-    desc: "문맥 속 빈칸 퀴즈",
-    category: "맥락",
+    titleKey: "vocab.cloze.title",
+    descKey: "vocab.cloze.desc",
+    categoryKey: "vocab.category.context",
     color: "from-purple-400 to-pink-500",
   },
   { 
     id: "mistake" as ModuleType, 
     icon: Puzzle, 
     title: "Mistake Review", 
-    titleKo: "오답 복습",
-    desc: "틀린 단어 집중 학습",
-    category: "맥락",
+    titleKey: "vocab.mistake.title",
+    descKey: "vocab.mistake.desc",
+    categoryKey: "vocab.category.context",
     color: "from-red-400 to-orange-500",
   },
 ];
 
 // 급수 그룹 설정
 const levelGroups = [
-  { levels: [1, 2], label: "1-2급", sublabel: "초급", color: "from-green-400 to-emerald-500" },
-  { levels: [3, 4], label: "3-4급", sublabel: "중급", color: "from-blue-400 to-cyan-500" },
-  { levels: [5, 6], label: "5-6급", sublabel: "고급", color: "from-purple-500 to-pink-500" },
+  { levels: [1, 2], label: "1-2", sublabelKey: "vocab.level.beginner", color: "from-green-400 to-emerald-500" },
+  { levels: [3, 4], label: "3-4", sublabelKey: "vocab.level.intermediate", color: "from-blue-400 to-cyan-500" },
+  { levels: [5, 6], label: "5-6", sublabelKey: "vocab.level.advanced", color: "from-purple-500 to-pink-500" },
 ];
 
 const Vocabulary = () => {
@@ -352,7 +352,7 @@ const Vocabulary = () => {
                           {group.label}
                         </span>
                         <span className={`block text-xs font-medium mt-0.5 ${selectedLevelGroup === idx ? "text-white/80" : "text-muted-foreground"}`}>
-                          {group.sublabel}
+                          {t(group.sublabelKey)}
                         </span>
                       </div>
                       
@@ -414,7 +414,7 @@ const Vocabulary = () => {
                           <Icon className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <h2 className="font-bold text-lg">{module.titleKo}</h2>
+                          <h2 className="font-bold text-lg">{t(module.titleKey)}</h2>
                           <p className="text-sm text-muted-foreground">TOPIK {selectedLevel}급 • {languageLabels[currentLang]}</p>
                         </div>
                       </>
@@ -437,12 +437,12 @@ const Vocabulary = () => {
                       <Zap className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-foreground">암기 영역</h3>
-                      <p className="text-xs text-muted-foreground">단어를 빠르게 암기하세요</p>
+                      <h3 className="text-base font-bold text-foreground">{t("vocab.section.memorize", "암기 영역")}</h3>
+                      <p className="text-xs text-muted-foreground">{t("vocab.section.memorizeDesc", "단어를 빠르게 암기하세요")}</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {moduleConfig.filter(m => m.category === "암기").map((module, idx) => (
+                    {moduleConfig.filter(m => m.categoryKey === "vocab.category.memorize").map((module, idx) => (
                       <ModuleCard key={module.id} module={module} onClick={() => setActiveModule(module.id)} delay={idx * 0.1} />
                     ))}
                   </div>
@@ -455,12 +455,12 @@ const Vocabulary = () => {
                       <Brain className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-foreground">맥락 영역</h3>
-                      <p className="text-xs text-muted-foreground">문장 속에서 어휘를 학습하세요</p>
+                      <h3 className="text-base font-bold text-foreground">{t("vocab.section.context", "맥락 영역")}</h3>
+                      <p className="text-xs text-muted-foreground">{t("vocab.section.contextDesc", "문장 속에서 어휘를 학습하세요")}</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {moduleConfig.filter(m => m.category === "맥락").map((module, idx) => (
+                    {moduleConfig.filter(m => m.categoryKey === "vocab.category.context").map((module, idx) => (
                       <ModuleCard key={module.id} module={module} onClick={() => setActiveModule(module.id)} delay={idx * 0.1 + 0.2} />
                     ))}
                   </div>
@@ -478,6 +478,7 @@ const Vocabulary = () => {
 
 // Module Card Component - Premium Design
 const ModuleCard = ({ module, onClick, delay }: { module: typeof moduleConfig[0]; onClick: () => void; delay: number }) => {
+  const { t } = useTranslation();
   const Icon = module.icon;
   
   return (
@@ -527,10 +528,10 @@ const ModuleCard = ({ module, onClick, delay }: { module: typeof moduleConfig[0]
         
         {/* Text Content */}
         <h3 className="text-lg font-bold mb-1 text-foreground group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-foreground group-hover:to-foreground/80 transition-all duration-300">
-          {module.titleKo}
+          {t(module.titleKey)}
         </h3>
         <p className="text-sm text-muted-foreground group-hover:text-muted-foreground/90 transition-colors duration-300">
-          {module.desc}
+          {t(module.descKey)}
         </p>
         
         {/* Arrow Indicator */}

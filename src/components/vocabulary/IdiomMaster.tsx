@@ -173,7 +173,7 @@ const IdiomMaster = ({ level, onMistake }: IdiomMasterProps) => {
     return (
       <div className="text-center py-12">
         <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
-        <p className="text-muted-foreground">관용표현 로딩 중...</p>
+        <p className="text-muted-foreground">{t("idiom.loading", "관용표현 로딩 중...")}</p>
       </div>
     );
   }
@@ -188,13 +188,13 @@ const IdiomMaster = ({ level, onMistake }: IdiomMasterProps) => {
         >
           <Lightbulb className="w-12 h-12 text-white" />
         </motion.div>
-        <h2 className="text-2xl font-bold mb-2">관용표현 마스터</h2>
-        <p className="text-muted-foreground mb-2">직역 ↔ 실제 의미를 맞춰보세요!</p>
-        <p className="text-sm text-primary mb-6">TOPIK {level}급 표현</p>
+        <h2 className="text-2xl font-bold mb-2">{t("idiom.title", "관용표현 마스터")}</h2>
+        <p className="text-muted-foreground mb-2">{t("idiom.subtitle", "직역 ↔ 실제 의미를 맞춰보세요!")}</p>
+        <p className="text-sm text-primary mb-6">{t("idiom.levelExpressions", "TOPIK {{level}}급 표현", { level })}</p>
         
         {score > 0 && (
           <div className="mb-4 p-4 bg-muted rounded-xl">
-            <p className="text-lg">이전 점수: <span className="font-bold text-primary">{score}점</span></p>
+            <p className="text-lg">{t("idiom.previousScore", "이전 점수")}: <span className="font-bold text-primary">{score}{t("idiom.scoreUnit", "점")}</span></p>
           </div>
         )}
         
@@ -203,7 +203,7 @@ const IdiomMaster = ({ level, onMistake }: IdiomMasterProps) => {
           onClick={() => setGameStarted(true)}
           className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
         >
-          {score > 0 ? '다시 시작' : '시작하기'}
+          {score > 0 ? t("idiom.restart", "다시 시작") : t("idiom.start", "시작하기")}
         </Button>
       </div>
     );
@@ -218,7 +218,7 @@ const IdiomMaster = ({ level, onMistake }: IdiomMasterProps) => {
         <div className="text-sm text-muted-foreground">
           {currentIndex + 1} / {idioms.length}
         </div>
-        <div className="text-lg font-bold text-primary">{score}점</div>
+        <div className="text-lg font-bold text-primary">{score}{t("idiom.scoreUnit", "점")}</div>
       </div>
 
       {/* Progress Bar */}
@@ -244,7 +244,7 @@ const IdiomMaster = ({ level, onMistake }: IdiomMasterProps) => {
             className={`absolute inset-0 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-2xl p-6 flex flex-col items-center justify-center backface-hidden ${isFlipped ? 'invisible' : ''}`}
           >
             <p className="text-3xl font-bold text-foreground mb-4">{currentIdiom.idiom}</p>
-            <p className="text-muted-foreground text-sm">탭하여 뒤집기</p>
+            <p className="text-muted-foreground text-sm">{t("idiom.tapToFlip", "탭하여 뒤집기")}</p>
             <Button
               variant="ghost"
               size="sm"
@@ -263,9 +263,9 @@ const IdiomMaster = ({ level, onMistake }: IdiomMasterProps) => {
             className={`absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-2xl p-6 flex flex-col items-center justify-center backface-hidden rotate-y-180 ${!isFlipped ? 'invisible' : ''}`}
             style={{ transform: 'rotateY(180deg)' }}
           >
-            <p className="text-sm text-muted-foreground mb-2">직역</p>
+            <p className="text-sm text-muted-foreground mb-2">{t("idiom.literal", "직역")}</p>
             <p className="text-xl font-medium text-foreground mb-4">{currentIdiom.literal_meaning}</p>
-            <p className="text-sm text-muted-foreground mb-2">실제 의미</p>
+            <p className="text-sm text-muted-foreground mb-2">{t("idiom.actualMeaning", "실제 의미")}</p>
             <p className="text-xl font-bold text-primary">
               {i18n.language === 'vi' && currentIdiom.actual_meaning_vi 
                 ? currentIdiom.actual_meaning_vi 
@@ -287,7 +287,7 @@ const IdiomMaster = ({ level, onMistake }: IdiomMasterProps) => {
             <div className="flex items-start gap-3">
               <MessageCircle className="w-5 h-5 text-primary shrink-0 mt-1" />
               <div>
-                <p className="text-sm font-medium mb-1">상황 예시</p>
+                <p className="text-sm font-medium mb-1">{t("idiom.situationExample", "상황 예시")}</p>
                 <p className="text-foreground">{currentIdiom.situation_example}</p>
               </div>
             </div>
@@ -298,7 +298,7 @@ const IdiomMaster = ({ level, onMistake }: IdiomMasterProps) => {
       {/* Similar Expressions */}
       {currentIdiom.similar_expressions && currentIdiom.similar_expressions.length > 0 && isFlipped && (
         <div className="mb-6">
-          <p className="text-sm text-muted-foreground mb-2">비슷한 표현</p>
+          <p className="text-sm text-muted-foreground mb-2">{t("idiom.similarExpressions", "비슷한 표현")}</p>
           <div className="flex flex-wrap gap-2">
             {currentIdiom.similar_expressions.map((expr, idx) => (
               <span 
@@ -321,7 +321,7 @@ const IdiomMaster = ({ level, onMistake }: IdiomMasterProps) => {
             className="w-full"
           >
             <MessageCircle className="w-4 h-4 mr-2" />
-            상황 예시 보기
+            {t("idiom.showExample", "상황 예시 보기")}
           </Button>
         )}
 
@@ -333,7 +333,7 @@ const IdiomMaster = ({ level, onMistake }: IdiomMasterProps) => {
               disabled={answered}
               className={`flex-1 ${answered ? 'opacity-50' : 'hover:bg-red-50 hover:border-red-300 dark:hover:bg-red-950/30'}`}
             >
-              헷갈려요 😅
+              {t("idiom.confused", "헷갈려요 😅")}
             </Button>
             <Button
               onClick={() => handleAnswer(true)}
@@ -341,7 +341,7 @@ const IdiomMaster = ({ level, onMistake }: IdiomMasterProps) => {
               className={`flex-1 ${answered ? 'opacity-50' : 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600'}`}
             >
               <CheckCircle2 className="w-4 h-4 mr-2" />
-              알겠어요!
+              {t("idiom.gotIt", "알겠어요!")}
             </Button>
           </div>
         )}

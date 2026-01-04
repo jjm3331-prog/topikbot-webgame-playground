@@ -55,6 +55,14 @@
     "gameStartError": "Game Start Error",
     "gameStartErrorDesc": "Failed to start the game."
   },
+  "trial": {
+    "available": "Free Trial Available",
+    "freeToday": "Try {{feature}} once for free today!",
+    "unlimitedAccess": "Get Unlimited Access",
+    "completed": "Today's Trial Complete",
+    "nextTrialIn": "Next free trial in {{time}}",
+    "upgradePremium": "Upgrade to Premium"
+  },
   "pwaWelcome": {
     "installComplete": "Installation Complete!",
     "appAdded": "Game LUKATO has been added to your home screen.",
@@ -3256,5 +3264,62 @@
     "send": "Send",
     "scenarioSelect": "Select Scenario",
     "topikLevel": "TOPIK Level"
-  }
+  },
+  "stats": {
+    "progress": "Progress",
+    "completed": "{{completed}}/{{total}} completed",
+    "totalScore": "Total Score",
+    "points": "points",
+    "averageScore": "Average Score",
+    "scoreUnit": "",
+    "outOf100": "out of 100",
+    "studyTime": "Study Time",
+    "totalStudy": "total study",
+    "hoursMinutes": "{{hours}}h {{minutes}}m",
+    "minutes": "{{minutes}}m"
+  },
+  "category": {
+    "vocabulary": "Vocabulary",
+    "grammar": "Grammar",
+    "reading": "Reading",
+    "listening": "Listening",
+    "mockTest": "Mock Test"
+  },
+  "emotion": {
+    "fallenHard": "Totally fallen for you!",
+    "loveIt": "Love it!",
+    "excited": "Excited~",
+    "goodFeeling": "Good feeling",
+    "interested": "Interested",
+    "notSure": "Not sure yet",
+    "notGood": "Not great..."
+  },
+  "idiom": {
+    "loading": "Loading idioms...",
+    "title": "Idiom Master",
+    "subtitle": "Match literal ↔ actual meanings!",
+    "levelExpressions": "TOPIK Level {{level}} Expressions",
+    "previousScore": "Previous Score",
+    "scoreUnit": "pts",
+    "restart": "Restart",
+    "start": "Start",
+    "tapToFlip": "Tap to flip",
+    "literal": "Literal",
+    "actualMeaning": "Actual Meaning",
+    "situationExample": "Example Situation",
+    "similarExpressions": "Similar Expressions",
+    "showExample": "Show Example",
+    "confused": "Confused 😅",
+    "gotIt": "Got it!"
+  },
+  "vocab": {
+    "flash": { "title": "Flash Loop", "desc": "Quick memorization with 3-sec flashcards" },
+    "match": { "title": "Meaning Match", "desc": "Korean ↔ your language matching game" },
+    "cloze": { "title": "Mini Cloze", "desc": "Fill-in-the-blank in context" },
+    "mistake": { "title": "Mistake Review", "desc": "Focus on wrong words" },
+    "section": { "memorize": "Memorization", "memorizeDesc": "Memorize words quickly", "context": "Context", "contextDesc": "Learn vocabulary in sentences" },
+    "level": { "beginner": "Beginner", "intermediate": "Intermediate", "advanced": "Advanced" },
+    "category": { "memorize": "Memorize", "context": "Context" }
+  },
+  "roleplay": { "level": { "beginner": "Beginner", "intermediate": "Intermediate" } }
 }

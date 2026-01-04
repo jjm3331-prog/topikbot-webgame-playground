@@ -55,6 +55,14 @@
     "gameStartError": "O'yinni boshlash xatosi",
     "gameStartErrorDesc": "O'yinni boshlab bo'lmadi."
   },
+  "trial": {
+    "available": "Bepul sinov mavjud",
+    "freeToday": "Bugun {{feature}}ni 1 marta bepul sinab ko'rishingiz mumkin!",
+    "unlimitedAccess": "Cheksiz kirish olish",
+    "completed": "Bugungi sinov tugadi",
+    "nextTrialIn": "Keyingi bepul sinovga {{time}} qoldi",
+    "upgradePremium": "Premiumga yangilash"
+  },
   "pwaWelcome": {
     "installComplete": "O'rnatish tugallandi!",
     "appAdded": "Game LUKATO bosh ekranga qo'shildi.",
@@ -2989,5 +2997,62 @@
     "send": "Yuborish",
     "scenarioSelect": "Senariy tanlash",
     "topikLevel": "TOPIK darajasi"
-  }
+  },
+  "stats": {
+    "progress": "Rivojlanish",
+    "completed": "{{completed}}/{{total}} tugallandi",
+    "totalScore": "Umumiy ball",
+    "points": "ball",
+    "averageScore": "O'rtacha ball",
+    "scoreUnit": "b",
+    "outOf100": "100 dan",
+    "studyTime": "O'qish vaqti",
+    "totalStudy": "jami o'qish",
+    "hoursMinutes": "{{hours}}s {{minutes}}d",
+    "minutes": "{{minutes}}d"
+  },
+  "category": {
+    "vocabulary": "Lug'at",
+    "grammar": "Grammatika",
+    "reading": "O'qish",
+    "listening": "Tinglash",
+    "mockTest": "Sinov test"
+  },
+  "emotion": {
+    "fallenHard": "Butunlay oshiq bo'ldim!",
+    "loveIt": "Juda yoqdi!",
+    "excited": "Hayajonli~",
+    "goodFeeling": "Yaxshi his",
+    "interested": "Qiziq",
+    "notSure": "Hali aniq emas",
+    "notGood": "Unchalik emas..."
+  },
+  "idiom": {
+    "loading": "Idiomalar yuklanmoqda...",
+    "title": "Idioma Ustasi",
+    "subtitle": "To'g'ridan-to'g'ri ↔ haqiqiy ma'noni toping!",
+    "levelExpressions": "TOPIK {{level}} daraja ifodalari",
+    "previousScore": "Oldingi ball",
+    "scoreUnit": "b",
+    "restart": "Qayta boshlash",
+    "start": "Boshlash",
+    "tapToFlip": "Aylantirish uchun bosing",
+    "literal": "To'g'ridan-to'g'ri",
+    "actualMeaning": "Haqiqiy ma'no",
+    "situationExample": "Vaziyat misoli",
+    "similarExpressions": "O'xshash iboralar",
+    "showExample": "Misolni ko'rish",
+    "confused": "Chalkashib qoldim 😅",
+    "gotIt": "Tushundim!"
+  },
+  "vocab": {
+    "flash": { "title": "Flash Loop", "desc": "3 soniyalik tez yodlash" },
+    "match": { "title": "Maʼno moslashtirish", "desc": "Koreys↔tilingiz oʻyini" },
+    "cloze": { "title": "Boʻsh joy toʻldirish", "desc": "Kontekstda boʻsh joy" },
+    "mistake": { "title": "Xato tahlili", "desc": "Notoʻgʻri soʻzlarga eʻtibor" },
+    "section": { "memorize": "Yodlash", "memorizeDesc": "Soʻzlarni tez yodlang", "context": "Kontekst", "contextDesc": "Gaplarda soʻz oʻrganing" },
+    "level": { "beginner": "Boshlangʻich", "intermediate": "Oʻrta", "advanced": "Yuqori" },
+    "category": { "memorize": "Yodlash", "context": "Kontekst" }
+  },
+  "roleplay": { "level": { "beginner": "Boshlangʻich", "intermediate": "Oʻrta" } }
 }
