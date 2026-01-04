@@ -195,3 +195,6 @@ verify_jwt = false
 
 [functions.idiom-slang-quiz]
 verify_jwt = false
+
+[functions.translate-all-languages]
+verify_jwt = false
