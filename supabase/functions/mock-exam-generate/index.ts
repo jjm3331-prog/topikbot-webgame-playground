@@ -1072,11 +1072,11 @@ ${writingType !== 'mixed' ? `
   "question_text": "[문제 지시문 + 지문/주제]",
   "options": ["모범 답안 예시"],
   "correct_answer": 1,
-  "explanation_ko": "채점 기준 및 핵심 포인트 설명",
-  "explanation_en": "Scoring criteria and key points",
-  "explanation_vi": "Tiêu chí chấm điểm và điểm chính",
+  "explanation_ko": "채점 기준 및 핵심 포인트 설명 (200자 이상 상세히)",
+  "explanation_en": "Scoring criteria and key points (detailed)",
+  "explanation_vi": "Tiêu chí chấm điểm và điểm chính (chi tiết)",
   "part_number": 51-54 (문항 번호),
-  "question_number": 1-4 (순차),
+  "question_number": 51-54 (⚠️ part_number와 동일하게!),
   "difficulty": "${params.difficulty}",
   "topic": "주제",
   "writing_prompt": "작성해야 할 글의 구체적 지시사항",
@@ -1087,6 +1087,8 @@ ${writingType !== 'mixed' ? `
   "graph_data_description": "[53번 전용] AI 이미지 생성용 도표/그래프 데이터 상세 설명. 예: '2020-2023년 한국인 여가 활동 조사. 선 그래프: 운동(2020: 45%, 2023: 60%), 독서(2020: 30%, 2023: 25%). 원형 차트: 운동 이유 - 건강 50%, 스트레스 해소 30%, 다이어트 20%'"
 }
 \`\`\`
+
+⚠️ **중요**: question_number는 반드시 part_number와 같은 값(51, 52, 53, 54)을 사용하세요!
 
 ### ⚠️ 53번 그래프/도표 이미지 생성 필수 규칙
 
