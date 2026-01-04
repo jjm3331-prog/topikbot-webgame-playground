@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -129,7 +130,6 @@ interface ParsedReadingQuestion {
 }
 
 function parseReadingRawText(rawText: string): ParsedReadingQuestion | null {
-  // 지문과 문제 분리 (빈 줄 또는 [지문], [문제] 태그로)
   let passage = "";
   let questionText = "";
   const options: string[] = [];
@@ -138,7 +138,7 @@ function parseReadingRawText(rawText: string): ParsedReadingQuestion | null {
 
   // [지문], [문제], [해설] 태그 기반 파싱
   const passageMatch = rawText.match(/\[지문\]([\s\S]*?)(?=\[문제\]|\[선택지\]|①|❶|1\))/i);
-  const questionMatch = rawText.match(/\[문제\]([\s\S]*?)(?=①|❶|1\)|$)/i);
+  const questionMatch = rawText.match(/\[문제\]([\s\S]*?)(?=\[선택지\]|①|❶|1\)|$)/i);
   
   if (passageMatch) {
     const rawPassage = passageMatch[1].trim();
@@ -148,11 +148,12 @@ function parseReadingRawText(rawText: string): ParsedReadingQuestion | null {
   }
   
   if (questionMatch) {
+    // [문제] 태그 제거 후 순수 문제 텍스트만 추출
     questionText = questionMatch[1].trim();
   }
 
   // 태그 없으면 빈 줄로 분리
-  if (!passage && !questionText) {
+  if (!passageMatch && !questionMatch) {
     const sections = rawText.split(/\n{2,}/);
     if (sections.length >= 2) {
       passage = sections[0].trim();
@@ -162,7 +163,7 @@ function parseReadingRawText(rawText: string): ParsedReadingQuestion | null {
     }
   }
 
-  // 선택지 및 정답 추출
+  // 선택지 및 정답 추출 (번호 제거!)
   const lines = rawText.split('\n').map(l => l.trim());
   let explanationStartIdx = -1;
 
@@ -175,10 +176,12 @@ function parseReadingRawText(rawText: string): ParsedReadingQuestion | null {
         correctAnswer = options.length + 1;
       }
       
+      // 번호(①②③④) 및 정답 마커 완전 제거
       const cleanOption = line
-        .replace(/^[①②③④⑤1-5][.)]\s*/, '')
-        .replace(/[★✓●]/g, '')
-        .replace(/\(정답\)|\[정답\]/g, '')
+        .replace(/^[①②③④⑤]\s*/, '')      // ① 제거
+        .replace(/^[1-5][.)]\s*/, '')       // 1) 또는 1. 제거
+        .replace(/[★✓●]/g, '')              // 정답 마커 제거
+        .replace(/\(정답\)|\[정답\]/g, '')  // (정답) 제거
         .trim();
       options.push(cleanOption);
     }
@@ -198,12 +201,13 @@ function parseReadingRawText(rawText: string): ParsedReadingQuestion | null {
       .trim();
   }
 
-  // questionText 없으면 지문 다음 줄에서 추출
+  // questionText 없으면 기본값
   if (!questionText && passage) {
-    const passageEndIdx = rawText.indexOf(passage) + passage.length;
-    const afterPassage = rawText.slice(passageEndIdx).trim();
-    const firstLine = afterPassage.split('\n').find(l => l.trim() && !l.match(/^[①②③④⑤1-5]/));
-    questionText = firstLine?.replace(/^\[문제\]\s*/i, '').trim() || "다음 글을 읽고 물음에 답하십시오.";
+    questionText = "다음 글을 읽고 물음에 답하십시오.";
+  } else if (!questionText && !passage) {
+    // 첫 번째 줄을 문제로 사용
+    const firstNonOption = lines.find(l => l.trim() && !l.match(/^[①②③④⑤1-5]/) && !l.startsWith('['));
+    questionText = firstNonOption || "";
   }
 
   return {
@@ -560,7 +564,12 @@ const MockExamManualUpload = () => {
     const parsed = parseReadingRawText(readingRawText);
     
     if (!parsed || parsed.options.length < 4) {
-      toast.error("문제 형식을 확인해주세요. 지문, 문제, 4개 선택지가 필요합니다.");
+      toast.error("문제 형식을 확인해주세요. 4개 선택지가 필요합니다.");
+      return;
+    }
+
+    if (!parsed.questionText) {
+      toast.error("문제 텍스트가 필요합니다.");
       return;
     }
 
@@ -568,11 +577,6 @@ const MockExamManualUpload = () => {
     setTranslating(true);
 
     try {
-      // 지문 + 문제 합침 (중복 검사용)
-      const fullQuestion = parsed.passage 
-        ? `[지문]\n${parsed.passage}\n\n[문제]\n${parsed.questionText}`
-        : parsed.questionText;
-
       // ========== 중복 검사 (저장 전) ==========
       toast.info("중복 검사 중...");
       const { data: existingQuestions, error: fetchError } = await supabase
@@ -586,10 +590,10 @@ const MockExamManualUpload = () => {
         console.warn("기존 문제 조회 실패 (중복 검사 스킵):", fetchError.message);
       }
 
-      // 현재 문제의 정규화 키 생성
+      // 현재 문제의 정규화 키 생성 (지문 + 문제 + 옵션 + 정답)
       const newKey = [
-        '',
-        String(fullQuestion ?? '').replace(/\s+/g, ' ').trim().toLowerCase(),
+        String(parsed.passage ?? '').replace(/\s+/g, ' ').trim().toLowerCase(),
+        String(parsed.questionText ?? '').replace(/\s+/g, ' ').trim().toLowerCase(),
         JSON.stringify(parsed.options ?? []),
         String(parsed.correctAnswer ?? ''),
       ].join('|||');
@@ -617,12 +621,14 @@ const MockExamManualUpload = () => {
       const translations = await translateToAllLanguages(parsed.explanationKo);
       setTranslating(false);
 
+      // instruction_text = 지문 (없으면 null), question_text = 순수 문제만
       const { error } = await supabase.from("mock_question_bank").insert({
         exam_type: examType,
         section: "reading",
-        part_number: 1, // 읽기는 파트 구분 없이 랜덤 셔플로 제공
-        question_text: fullQuestion,
-        options: parsed.options,
+        part_number: 1,
+        instruction_text: parsed.passage || null,  // 지문은 instruction_text에 저장
+        question_text: parsed.questionText,         // 순수 문제만 저장
+        options: parsed.options,                    // 번호 없는 순수 옵션만
         correct_answer: parsed.correctAnswer,
         explanation_ko: translations.ko || null,
         explanation_vi: translations.vi || null,
@@ -901,40 +907,97 @@ const MockExamManualUpload = () => {
                   </Select>
                 </div>
 
-                {/* 통합 입력 */}
-                <div className="space-y-2">
-                  <Label>📝 지문 + 문제 + 선택지 + 해설 (한 번에 복붙)</Label>
-                  <Textarea
-                    placeholder={`예시 형식:
-
-[지문]
-한국어 수업이 끝난 후 친구들과 함께 학교 앞 식당에 갔습니다. 
-우리는 비빔밥과 된장찌개를 주문했습니다. 
-음식이 맛있어서 모두 기분이 좋았습니다.
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* 입력 영역 */}
+                  <div className="space-y-2">
+                    <Label>📝 복붙 입력</Label>
+                    <Textarea
+                      placeholder={`[지문]
+없음 (어휘/문법 문제면 이렇게)
 
 [문제]
-이 글의 내용과 같은 것을 고르십시오.
+저는 매일 아침 7시에 (    ).
 
-① 혼자서 식당에 갔습니다
-② 친구들과 함께 식당에 갔습니다 ★
-③ 학교에서 점심을 먹었습니다
-④ 음식이 맛이 없었습니다
+① 일어납니다 ★
+② 일어나습니다
+③ 일어났습니다
+④ 일어날 것입니다
 
 [해설]
-지문에서 "친구들과 함께 학교 앞 식당에 갔습니다"라고 했으므로 정답은 ②번입니다.
+'매일 아침'은 현재형을 사용합니다...
 
 ---
-지문과 문제 사이에 빈 줄 넣기. ★로 정답 표시.
-해설은 한국어 → 7개국어 자동 번역`}
-                    value={readingRawText}
-                    onChange={(e) => setReadingRawText(e.target.value)}
-                    className="min-h-[450px] font-mono text-sm"
-                  />
+★ = 정답 표시`}
+                      value={readingRawText}
+                      onChange={(e) => setReadingRawText(e.target.value)}
+                      className="min-h-[400px] font-mono text-sm"
+                    />
+                  </div>
+
+                  {/* 실시간 미리보기 */}
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      👁️ 저장될 데이터 미리보기
+                      {readingRawText.trim() && (() => {
+                        const p = parseReadingRawText(readingRawText);
+                        if (!p) return <Badge variant="destructive">파싱 실패</Badge>;
+                        if (p.options.length < 4) return <Badge variant="destructive">선택지 부족 ({p.options.length}/4)</Badge>;
+                        return <Badge variant="default" className="bg-green-600">✓ 저장 가능</Badge>;
+                      })()}
+                    </Label>
+                    <div className="border rounded-lg p-4 min-h-[400px] bg-muted/30 text-sm space-y-3 overflow-auto">
+                      {readingRawText.trim() ? (() => {
+                        const parsed = parseReadingRawText(readingRawText);
+                        if (!parsed) return <p className="text-destructive">파싱 실패</p>;
+                        return (
+                          <>
+                            <div>
+                              <strong className="text-primary">📖 지문 (instruction_text):</strong>
+                              <p className="mt-1 p-2 bg-background rounded border whitespace-pre-wrap">
+                                {parsed.passage || <span className="text-muted-foreground italic">없음</span>}
+                              </p>
+                            </div>
+                            <div>
+                              <strong className="text-primary">❓ 문제 (question_text):</strong>
+                              <p className="mt-1 p-2 bg-background rounded border whitespace-pre-wrap">
+                                {parsed.questionText || <span className="text-destructive">⚠️ 없음</span>}
+                              </p>
+                            </div>
+                            <div>
+                              <strong className="text-primary">🔢 선택지 (options):</strong>
+                              <div className="mt-1 p-2 bg-background rounded border space-y-1">
+                                {parsed.options.length > 0 ? parsed.options.map((opt, i) => (
+                                  <p key={i} className={i + 1 === parsed.correctAnswer ? "text-green-600 font-semibold" : ""}>
+                                    {i + 1 === parsed.correctAnswer ? "✓ " : ""}{"①②③④"[i]} {opt}
+                                  </p>
+                                )) : <span className="text-destructive">선택지 없음</span>}
+                              </div>
+                            </div>
+                            <div>
+                              <strong className="text-primary">🎯 정답:</strong>
+                              <span className="ml-2 text-green-600 font-bold">{parsed.correctAnswer}번</span>
+                            </div>
+                            <div>
+                              <strong className="text-primary">💡 해설 (explanation_ko):</strong>
+                              <p className="mt-1 p-2 bg-background rounded border whitespace-pre-wrap text-xs max-h-32 overflow-auto">
+                                {parsed.explanationKo || <span className="text-muted-foreground italic">없음</span>}
+                              </p>
+                            </div>
+                          </>
+                        );
+                      })() : (
+                        <p className="text-muted-foreground">왼쪽에 텍스트를 입력하면 여기에 미리보기가 표시됩니다.</p>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 <Button 
                   onClick={saveReadingQuestion} 
-                  disabled={saving || !readingRawText.trim()}
+                  disabled={saving || !readingRawText.trim() || (() => {
+                    const p = parseReadingRawText(readingRawText);
+                    return !p || p.options.length < 4;
+                  })()}
                   className="w-full"
                   size="lg"
                 >
