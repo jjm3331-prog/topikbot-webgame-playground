@@ -331,7 +331,11 @@
     "ai": {
       "badge": "RAG AI",
       "title": "LUKATO Q&A Agent",
-      "description": "最高性能のQ&Aエージェントでプレミアムモデルに直接質問！"
+      "description": "最高性能のQ&Aエージェントでプレミアムモデルに直接質問！",
+      "loginRequired": "ログインが必要です",
+      "login": "ログイン",
+      "dailyLimitReached": "今日の無料質問を使い切りました",
+      "upgradePremium": "プレミアムアップグレード"
     },
     "cache": {
       "cleared": "キャッシュ削除完了",
@@ -925,7 +929,15 @@
     "incorrect": "不正解 😅",
     "checkAnswer": "答えを確認",
     "nextQuestion": "次の問題",
-    "viewResults": "結果を見る"
+    "viewResults": "結果を見る",
+    "complete": "学習完了！",
+    "wellDone": "お疲れ様でした",
+    "scoreUnit": "点",
+    "score": "スコア",
+    "lessonComplete": "学習完了！",
+    "scoreSaved": "スコアが保存されました: {{score}}点",
+    "saveFailed": "保存失敗",
+    "progressSaveFailed": "進捗の保存に失敗しました。"
   },
   "writing": {
     "title": "作文添削", "subtitle": "TOPIK II 作文添削", "premiumFeature": "プレミアム機能",
@@ -2497,6 +2509,7 @@
     "modes": {
       "full": {
         "title": "本番模擬試験",
+        "shortTitle": "実戦模擬試験",
         "description": "本番と同じ環境で全問題を解く",
         "features": {
           "timeLimit": "時間制限",
@@ -2506,6 +2519,7 @@
       },
       "section": {
         "title": "セクション練習",
+        "shortTitle": "セクション練習",
         "description": "聞き取り/読解を選んで集中練習",
         "features": {
           "selectSection": "セクション選択",
@@ -2515,6 +2529,7 @@
       },
       "part": {
         "title": "パート練習",
+        "shortTitle": "パート訓練",
         "description": "特定の問題タイプに集中",
         "features": {
           "typePractice": "タイプ練習",
@@ -2524,6 +2539,7 @@
       },
       "weakness": {
         "title": "弱点集中",
+        "shortTitle": "弱点集中",
         "description": "AI分析による弱点問題",
         "features": {
           "aiAnalysis": "AI分析",
@@ -2531,6 +2547,29 @@
           "efficientLearning": "効率的学習"
         }
       }
+    },
+    "difficulty": {
+      "beginner": {
+        "label": "下",
+        "fullLabel": "Easy",
+        "description": "基礎文法と日常語彙"
+      },
+      "intermediate": {
+        "label": "中",
+        "fullLabel": "Normal",
+        "description": "実践レベルの中級問題"
+      },
+      "advanced": {
+        "label": "上",
+        "fullLabel": "Hard",
+        "description": "高級語彙と複雑な文法"
+      }
+    },
+    "stats": {
+      "questions": "問題数",
+      "analysis": "リアルタイム分析",
+      "languagesValue": "7か国語",
+      "languages": "対応"
     },
     "features": {
       "aiGeneration": {
@@ -2925,6 +2964,14 @@
         "tip2Vi": "韓国語が上手いともっと稼げる"
       }
     }
+  },
+  "gamePreview": {
+    "badge": "ゲームプレビュー",
+    "title": "ゲームプレビュー",
+    "aiTyping": "AIが応答中...",
+    "inputPlaceholder": "韓国語で答えてください...",
+    "send": "送信",
+    "scenarioSelect": "シナリオ選択",
+    "topikLevel": "TOPIKレベル"
   }
 }
-

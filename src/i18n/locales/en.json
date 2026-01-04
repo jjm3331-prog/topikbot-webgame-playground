@@ -346,7 +346,11 @@
     "ai": {
       "badge": "RAG AI",
       "title": "LUKATO Q&A Agent",
-      "description": "Ask premium models directly with the highest-performance Q&A Agent!"
+      "description": "Ask premium models directly with the highest-performance Q&A Agent!",
+      "loginRequired": "Login required",
+      "login": "Login",
+      "dailyLimitReached": "You've used all free questions today",
+      "upgradePremium": "Upgrade to Premium"
     },
     "cache": {
       "cleared": "Cache Cleared",
@@ -952,7 +956,15 @@
     "incorrect": "Incorrect 😅",
     "checkAnswer": "Check Answer",
     "nextQuestion": "Next Question",
-    "viewResults": "View Results"
+    "viewResults": "View Results",
+    "complete": "Lesson Complete!",
+    "wellDone": "Well done!",
+    "scoreUnit": " pts",
+    "score": "Score",
+    "lessonComplete": "Lesson Complete!",
+    "scoreSaved": "Score saved: {{score}} points",
+    "saveFailed": "Save Failed",
+    "progressSaveFailed": "Failed to save progress."
   },
 "grammar": {
     "title": "Grammar Learning",
@@ -2780,6 +2792,7 @@
     "modes": {
       "full": {
         "title": "Full Mock Exam",
+        "shortTitle": "Full Mock Exam",
         "description": "Complete all questions in a real exam environment",
         "features": {
           "timeLimit": "Time Limit",
@@ -2789,6 +2802,7 @@
       },
       "section": {
         "title": "Section Practice",
+        "shortTitle": "Section Practice",
         "description": "Focus on listening/reading sections",
         "features": {
           "selectSection": "Select Section",
@@ -2798,6 +2812,7 @@
       },
       "part": {
         "title": "Part Practice",
+        "shortTitle": "Part Training",
         "description": "Focus on specific question types",
         "features": {
           "typePractice": "Type Practice",
@@ -2807,6 +2822,7 @@
       },
       "weakness": {
         "title": "Weakness Focus",
+        "shortTitle": "Weakness Focus",
         "description": "AI-analyzed weak area questions",
         "features": {
           "aiAnalysis": "AI Analysis",
@@ -2814,6 +2830,29 @@
           "efficientLearning": "Efficient Learning"
         }
       }
+    },
+    "difficulty": {
+      "beginner": {
+        "label": "Low",
+        "fullLabel": "Easy",
+        "description": "Basic grammar and daily vocabulary"
+      },
+      "intermediate": {
+        "label": "Mid",
+        "fullLabel": "Normal",
+        "description": "Intermediate level practical questions"
+      },
+      "advanced": {
+        "label": "High",
+        "fullLabel": "Hard",
+        "description": "Advanced vocabulary and complex grammar"
+      }
+    },
+    "stats": {
+      "questions": "Questions",
+      "analysis": "Real-time Analysis",
+      "languagesValue": "7 Languages",
+      "languages": "Supported"
     },
     "features": {
       "aiGeneration": {
@@ -3208,6 +3247,14 @@
         "tip2Vi": "Speak Korean well to earn more"
       }
     }
+  },
+  "gamePreview": {
+    "badge": "Game Preview",
+    "title": "Game Preview",
+    "aiTyping": "AI is responding...",
+    "inputPlaceholder": "Answer in Korean...",
+    "send": "Send",
+    "scenarioSelect": "Select Scenario",
+    "topikLevel": "TOPIK Level"
   }
 }
-

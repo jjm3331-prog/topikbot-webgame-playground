@@ -556,21 +556,21 @@ const Lesson = () => {
                   <Trophy className="w-10 h-10 text-white" />
                 </div>
                 
-                <h2 className="text-2xl font-bold text-foreground mb-2">학습 완료!</h2>
-                <p className="text-muted-foreground mb-6">수고하셨습니다</p>
+                <h2 className="text-2xl font-bold text-foreground mb-2">{t("lesson.complete", "학습 완료!")}</h2>
+                <p className="text-muted-foreground mb-6">{t("lesson.wellDone", "수고하셨습니다")}</p>
                 
                 <div className="grid grid-cols-3 gap-4 mb-8">
                   <div className="p-4 rounded-xl bg-muted">
-                    <div className="text-3xl font-bold text-foreground">{score}점</div>
-                    <div className="text-sm text-muted-foreground">점수</div>
+                    <div className="text-3xl font-bold text-foreground">{score}{t("lesson.scoreUnit", "점")}</div>
+                    <div className="text-sm text-muted-foreground">{t("lesson.score", "점수")}</div>
                   </div>
                   <div className="p-4 rounded-xl bg-muted">
                     <div className="text-3xl font-bold text-korean-green">{correctCount}</div>
-                    <div className="text-sm text-muted-foreground">정답</div>
+                    <div className="text-sm text-muted-foreground">{t("lesson.correct", "정답")}</div>
                   </div>
                   <div className="p-4 rounded-xl bg-muted">
                     <div className="text-3xl font-bold text-korean-red">{totalQuestions - correctCount}</div>
-                    <div className="text-sm text-muted-foreground">오답</div>
+                    <div className="text-sm text-muted-foreground">{t("lesson.incorrect", "오답")}</div>
                   </div>
                 </div>
                 

@@ -167,7 +167,7 @@ const MockExamHub = () => {
       ],
       totalTime: 50,
       totalQuestions: 50,
-      level: "고용허가제",
+      level: t("mockExam.examTypes.eps.level", "고용허가제"),
       popular: false,
       comingSoon: true
     }
@@ -177,7 +177,7 @@ const MockExamHub = () => {
     {
       id: "full",
       titleKey: "mockExam.modes.full.title",
-      shortTitle: "실전 모의고사",
+      shortTitle: t("mockExam.modes.full.shortTitle", "실전 모의고사"),
       descriptionKey: "mockExam.modes.full.description",
       icon: Clock,
       gradient: "from-rose-500 to-pink-600",
@@ -186,7 +186,7 @@ const MockExamHub = () => {
     {
       id: "section",
       titleKey: "mockExam.modes.section.title",
-      shortTitle: "영역별 연습",
+      shortTitle: t("mockExam.modes.section.shortTitle", "영역별 연습"),
       descriptionKey: "mockExam.modes.section.description",
       icon: Target,
       gradient: "from-blue-500 to-cyan-600",
@@ -195,7 +195,7 @@ const MockExamHub = () => {
     {
       id: "part",
       titleKey: "mockExam.modes.part.title",
-      shortTitle: "파트별 훈련",
+      shortTitle: t("mockExam.modes.part.shortTitle", "파트별 훈련"),
       descriptionKey: "mockExam.modes.part.description",
       icon: Zap,
       gradient: "from-amber-500 to-orange-600",
@@ -204,7 +204,7 @@ const MockExamHub = () => {
     {
       id: "weakness",
       titleKey: "mockExam.modes.weakness.title",
-      shortTitle: "약점 집중",
+      shortTitle: t("mockExam.modes.weakness.shortTitle", "약점 집중"),
       descriptionKey: "mockExam.modes.weakness.description",
       icon: Brain,
       gradient: "from-purple-500 to-violet-600",
@@ -215,26 +215,26 @@ const MockExamHub = () => {
   const difficultyOptions = [
     {
       id: "beginner",
-      label: "하",
-      fullLabel: "Easy",
-      description: "기초 문법과 일상 어휘",
+      label: t("mockExam.difficulty.beginner.label", "하"),
+      fullLabel: t("mockExam.difficulty.beginner.fullLabel", "Easy"),
+      description: t("mockExam.difficulty.beginner.description", "기초 문법과 일상 어휘"),
       gradient: "from-green-400 to-emerald-500",
       icon: "🌱"
     },
     {
       id: "intermediate", 
-      label: "중",
-      fullLabel: "Normal",
-      description: "실전 수준의 중급 문제",
+      label: t("mockExam.difficulty.intermediate.label", "중"),
+      fullLabel: t("mockExam.difficulty.intermediate.fullLabel", "Normal"),
+      description: t("mockExam.difficulty.intermediate.description", "실전 수준의 중급 문제"),
       gradient: "from-blue-400 to-cyan-500",
       icon: "⚡",
       recommended: true
     },
     {
       id: "advanced",
-      label: "상",
-      fullLabel: "Hard",
-      description: "고급 어휘와 복잡한 문법",
+      label: t("mockExam.difficulty.advanced.label", "상"),
+      fullLabel: t("mockExam.difficulty.advanced.fullLabel", "Hard"),
+      description: t("mockExam.difficulty.advanced.description", "고급 어휘와 복잡한 문법"),
       gradient: "from-purple-400 to-pink-500",
       icon: "🔥"
     }
@@ -468,9 +468,9 @@ const MockExamHub = () => {
             transition={{ delay: 0.4 }}
           >
             {[
-              { value: "10,000+", label: "문제 보유" },
-              { value: "AI", label: "실시간 분석" },
-              { value: "7개국", label: "언어 지원" }
+              { value: "10,000+", label: t("mockExam.stats.questions", "문제 보유") },
+              { value: "AI", label: t("mockExam.stats.analysis", "실시간 분석") },
+              { value: t("mockExam.stats.languagesValue", "7개국"), label: t("mockExam.stats.languages", "언어 지원") }
             ].map((stat, i) => (
               <div key={i} className="text-center">
                 <div className="text-lg md:text-xl font-bold bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">

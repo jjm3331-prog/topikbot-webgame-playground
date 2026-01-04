@@ -329,7 +329,11 @@
     "ai": {
       "badge": "RAG AI",
       "title": "LUKATO Q&A Agent",
-      "description": "Eng yaxshi Q&A Agent bilan premium modellardan to'g'ridan-to'g'ri so'rang!"
+      "description": "Eng yaxshi Q&A Agent bilan premium modellardan to'g'ridan-to'g'ri so'rang!",
+      "loginRequired": "Kirish talab qilinadi",
+      "login": "Kirish",
+      "dailyLimitReached": "Bugungi bepul savollarni ishlatib bo'ldingiz",
+      "upgradePremium": "Premium ga yangilash"
     },
     "cache": {
       "cleared": "Kesh Tozalandi",
@@ -872,7 +876,15 @@
     "incorrect": "Noto'g'ri 😅",
     "checkAnswer": "Javobni tekshirish",
     "nextQuestion": "Keyingi savol",
-    "viewResults": "Natijalarni ko'rish"
+    "viewResults": "Natijalarni ko'rish",
+    "complete": "Dars tugadi!",
+    "wellDone": "Ajoyib ish!",
+    "scoreUnit": " ball",
+    "score": "Ball",
+    "lessonComplete": "Dars tugadi!",
+    "scoreSaved": "Ball saqlandi: {{score}} ball",
+    "saveFailed": "Saqlash muvaffaqiyatsiz",
+    "progressSaveFailed": "Rivojlanishni saqlashda xato."
   },
 "grammar": {
     "title": "Grammatika o'rganish",
@@ -2513,6 +2525,7 @@
     "modes": {
       "full": {
         "title": "To'liq sinov imtihoni",
+        "shortTitle": "Sinov imtihoni",
         "description": "Haqiqiy imtihon sharoitida barcha savollarni yechish",
         "features": {
           "timeLimit": "Vaqt chegarasi",
@@ -2522,6 +2535,7 @@
       },
       "section": {
         "title": "Bo'lim mashqi",
+        "shortTitle": "Bo'lim mashqi",
         "description": "Tinglash/O'qish bo'limlariga e'tibor",
         "features": {
           "selectSection": "Bo'lim tanlash",
@@ -2531,6 +2545,7 @@
       },
       "part": {
         "title": "Qism mashqi",
+        "shortTitle": "Qism mashqi",
         "description": "Muayyan savol turlariga e'tibor",
         "features": {
           "typePractice": "Tur mashqi",
@@ -2540,6 +2555,7 @@
       },
       "weakness": {
         "title": "Kamchilik e'tibori",
+        "shortTitle": "Kamchilik",
         "description": "AI tahlil qilgan zaif joylarga oid savollar",
         "features": {
           "aiAnalysis": "AI tahlili",
@@ -2547,6 +2563,29 @@
           "efficientLearning": "Samarali o'qish"
         }
       }
+    },
+    "difficulty": {
+      "beginner": {
+        "label": "Past",
+        "fullLabel": "Easy",
+        "description": "Asosiy grammatika va kundalik lug'at"
+      },
+      "intermediate": {
+        "label": "O'rta",
+        "fullLabel": "Normal",
+        "description": "Amaliy darajadagi o'rta savollar"
+      },
+      "advanced": {
+        "label": "Yuqori",
+        "fullLabel": "Hard",
+        "description": "Yuqori darajali lug'at va murakkab grammatika"
+      }
+    },
+    "stats": {
+      "questions": "Savollar",
+      "analysis": "Real vaqt tahlili",
+      "languagesValue": "7 til",
+      "languages": "Qo'llab-quvvatlanadi"
     },
     "features": {
       "aiGeneration": {
@@ -2941,6 +2980,14 @@
         "tip2Vi": "Yaxshi koreys tili = ko'proq daromad"
       }
     }
+  },
+  "gamePreview": {
+    "badge": "O'yin ko'rinishi",
+    "title": "O'yin ko'rinishi",
+    "aiTyping": "AI javob beryapti...",
+    "inputPlaceholder": "Koreys tilida javob bering...",
+    "send": "Yuborish",
+    "scenarioSelect": "Senariy tanlash",
+    "topikLevel": "TOPIK darajasi"
   }
 }
-

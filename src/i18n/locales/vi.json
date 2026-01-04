@@ -346,7 +346,11 @@
     "ai": {
       "badge": "RAG AI",
       "title": "LUKATO Q&A Agent",
-      "description": "Hỏi trực tiếp các mô hình Premium với Q&A Agent hiệu suất cao nhất!"
+      "description": "Hỏi trực tiếp các mô hình Premium với Q&A Agent hiệu suất cao nhất!",
+      "loginRequired": "Cần đăng nhập",
+      "login": "Đăng nhập",
+      "dailyLimitReached": "Bạn đã sử dụng hết câu hỏi miễn phí hôm nay",
+      "upgradePremium": "Nâng cấp Premium"
     },
     "cache": {
       "cleared": "Xóa Cache Thành Công",
@@ -1042,7 +1046,15 @@
     "incorrect": "Sai rồi 😅",
     "checkAnswer": "Kiểm tra đáp án",
     "nextQuestion": "Câu tiếp theo",
-    "viewResults": "Xem kết quả"
+    "viewResults": "Xem kết quả",
+    "complete": "Hoàn thành bài học!",
+    "wellDone": "Làm tốt lắm!",
+    "scoreUnit": " điểm",
+    "score": "Điểm",
+    "lessonComplete": "Hoàn thành bài học!",
+    "scoreSaved": "Điểm đã lưu: {{score}} điểm",
+    "saveFailed": "Lưu thất bại",
+    "progressSaveFailed": "Không thể lưu tiến trình."
   },
 "grammar": {
     "title": "Học ngữ pháp",
@@ -2828,6 +2840,7 @@
     "modes": {
       "full": {
         "title": "Thi thử thực tế",
+        "shortTitle": "Thi thử thực tế",
         "description": "Hoàn thành tất cả câu hỏi như thi thật",
         "features": {
           "timeLimit": "Giới hạn thời gian",
@@ -2837,6 +2850,7 @@
       },
       "section": {
         "title": "Luyện theo phần",
+        "shortTitle": "Luyện theo phần",
         "description": "Tập trung vào phần nghe/đọc",
         "features": {
           "selectSection": "Chọn phần",
@@ -2846,6 +2860,7 @@
       },
       "part": {
         "title": "Luyện theo Part",
+        "shortTitle": "Luyện Part",
         "description": "Tập trung vào loại câu hỏi cụ thể",
         "features": {
           "typePractice": "Luyện theo loại",
@@ -2855,6 +2870,7 @@
       },
       "weakness": {
         "title": "Tập trung điểm yếu",
+        "shortTitle": "Điểm yếu",
         "description": "Câu hỏi phân tích AI cho điểm yếu",
         "features": {
           "aiAnalysis": "Phân tích AI",
@@ -2862,6 +2878,29 @@
           "efficientLearning": "Học hiệu quả"
         }
       }
+    },
+    "difficulty": {
+      "beginner": {
+        "label": "Thấp",
+        "fullLabel": "Easy",
+        "description": "Ngữ pháp cơ bản và từ vựng hàng ngày"
+      },
+      "intermediate": {
+        "label": "Trung",
+        "fullLabel": "Normal",
+        "description": "Câu hỏi trung cấp thực tế"
+      },
+      "advanced": {
+        "label": "Cao",
+        "fullLabel": "Hard",
+        "description": "Từ vựng nâng cao và ngữ pháp phức tạp"
+      }
+    },
+    "stats": {
+      "questions": "Câu hỏi",
+      "analysis": "Phân tích thời gian thực",
+      "languagesValue": "7 ngôn ngữ",
+      "languages": "Hỗ trợ"
     },
     "features": {
       "aiGeneration": {
@@ -3256,6 +3295,14 @@
         "tip2Vi": "Nói tiếng Hàn tốt sẽ kiếm được nhiều hơn"
       }
     }
+  },
+  "gamePreview": {
+    "badge": "Xem trước Game",
+    "title": "Xem trước Game",
+    "aiTyping": "AI đang phản hồi...",
+    "inputPlaceholder": "Trả lời bằng tiếng Hàn...",
+    "send": "Gửi",
+    "scenarioSelect": "Chọn Kịch bản",
+    "topikLevel": "Cấp độ TOPIK"
   }
 }
-

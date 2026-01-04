@@ -999,7 +999,7 @@ const WritingCorrection = () => {
                             <span className="text-lg">{item.icon}</span>
                           </div>
                           <p className="text-2xl font-bold text-foreground mt-1">{item.score}<span className="text-sm font-normal text-muted-foreground">/25</span></p>
-                          <p className="text-[10px] text-muted-foreground mt-1">클릭하여 상세 보기</p>
+                          <p className="text-[10px] text-muted-foreground mt-1">{t("writing.clickToViewDetail", "클릭하여 상세 보기")}</p>
                         </div>
                       ))}
                     </div>

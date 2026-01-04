@@ -331,7 +331,11 @@
     "ai": {
       "badge": "RAG AI",
       "title": "LUKATO Q&A Agent",
-      "description": "使用最强Q&A Agent直接询问高级模型！"
+      "description": "使用最强Q&A Agent直接询问高级模型！",
+      "loginRequired": "需要登录",
+      "login": "登录",
+      "dailyLimitReached": "今日免费问题已用完",
+      "upgradePremium": "升级Premium"
     },
     "cache": {
       "cleared": "缓存已清除",
@@ -925,7 +929,15 @@
     "incorrect": "错误 😅",
     "checkAnswer": "检查答案",
     "nextQuestion": "下一题",
-    "viewResults": "查看结果"
+    "viewResults": "查看结果",
+    "complete": "学习完成！",
+    "wellDone": "辛苦了！",
+    "scoreUnit": "分",
+    "score": "得分",
+    "lessonComplete": "学习完成！",
+    "scoreSaved": "分数已保存: {{score}}分",
+    "saveFailed": "保存失败",
+    "progressSaveFailed": "无法保存进度。"
   },
   "writing": {
     "title": "写作批改", "subtitle": "TOPIK II 写作批改", "premiumFeature": "高级功能",
@@ -2512,6 +2524,7 @@
     "modes": {
       "full": {
         "title": "实战模拟考试",
+        "shortTitle": "实战模考",
         "description": "在真实考试环境中完成所有题目",
         "features": {
           "timeLimit": "限时",
@@ -2521,6 +2534,7 @@
       },
       "section": {
         "title": "分区练习",
+        "shortTitle": "分区练习",
         "description": "专注听力/阅读部分",
         "features": {
           "selectSection": "选择部分",
@@ -2530,6 +2544,7 @@
       },
       "part": {
         "title": "Part练习",
+        "shortTitle": "Part训练",
         "description": "专注特定题型",
         "features": {
           "typePractice": "题型练习",
@@ -2539,6 +2554,7 @@
       },
       "weakness": {
         "title": "弱点集中",
+        "shortTitle": "弱点集中",
         "description": "AI分析的弱点题目",
         "features": {
           "aiAnalysis": "AI分析",
@@ -2546,6 +2562,29 @@
           "efficientLearning": "高效学习"
         }
       }
+    },
+    "difficulty": {
+      "beginner": {
+        "label": "低",
+        "fullLabel": "Easy",
+        "description": "基础语法和日常词汇"
+      },
+      "intermediate": {
+        "label": "中",
+        "fullLabel": "Normal",
+        "description": "实战水平的中级题目"
+      },
+      "advanced": {
+        "label": "高",
+        "fullLabel": "Hard",
+        "description": "高级词汇和复杂语法"
+      }
+    },
+    "stats": {
+      "questions": "题目数",
+      "analysis": "实时分析",
+      "languagesValue": "7种语言",
+      "languages": "支持"
     },
     "features": {
       "aiGeneration": {
@@ -2940,6 +2979,14 @@
         "tip2Vi": "韩语好能赚更多"
       }
     }
+  },
+  "gamePreview": {
+    "badge": "游戏预览",
+    "title": "游戏预览",
+    "aiTyping": "AI正在响应...",
+    "inputPlaceholder": "用韩语回答...",
+    "send": "发送",
+    "scenarioSelect": "选择场景",
+    "topikLevel": "TOPIK等级"
   }
 }
-

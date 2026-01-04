@@ -838,19 +838,19 @@ const AIAgentChat = () => {
               {!isAuthenticated ? (
                 <div className="text-center py-6">
                   <AlertCircle className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground mb-3">로그인이 필요합니다</p>
+                  <p className="text-sm text-muted-foreground mb-3">{t("ai.loginRequired", "로그인이 필요합니다")}</p>
                   <Button onClick={() => navigate("/auth")} className="gap-2">
                     <Sparkles className="w-4 h-4" />
-                    로그인
+                    {t("ai.login", "로그인")}
                   </Button>
                 </div>
               ) : remainingQuestions === 0 && !isPremium ? (
                 <div className="text-center py-6">
                   <Crown className="w-8 h-8 text-korean-gold mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground mb-3">오늘 무료 질문을 모두 사용했습니다</p>
+                  <p className="text-sm text-muted-foreground mb-3">{t("ai.dailyLimitReached", "오늘 무료 질문을 모두 사용했습니다")}</p>
                   <Button onClick={() => navigate("/pricing")} className="gap-2 bg-korean-gold hover:bg-korean-gold/90 text-black">
                     <Crown className="w-4 h-4" />
-                    프리미엄 업그레이드
+                    {t("ai.upgradePremium", "프리미엄 업그레이드")}
                   </Button>
                 </div>
               ) : (
