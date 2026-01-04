@@ -1519,8 +1519,8 @@ async function handleStreamingGeneration(
 ): Promise<Response> {
   const encoder = new TextEncoder();
   
-  // 듣기 문제는 Claude 사용, 나머지는 Gemini 2.5 Pro
-  const useClaude = params.section === 'listening';
+  // 듣기/쓰기 문제는 Claude Sonnet 4.5 사용 (긴 해설/스크립트 안정적 생성), 읽기는 Gemini 2.5 Pro
+  const useClaude = params.section === 'listening' || params.section === 'writing';
   const modelName = useClaude ? 'claude-sonnet-4-5-20250929' : (Deno.env.get("GEMINI_MODEL") || "gemini-2.5-pro");
 
   // 🚀 듣기 문제 캐시 체크 (토큰 절감)
