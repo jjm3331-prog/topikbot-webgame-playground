@@ -12,7 +12,31 @@
       "next": "Keyingi",
       "startGame": "O'yinni boshlash!",
       "skip": "O'quv qo'llanmasini o'tkazib yuborish",
-      "showAgain": "O'quv qo'llanmasini qayta ko'rish"
+      "showAgain": "O'quv qo'llanmasini qayta ko'rish",
+      "step1": {
+        "title": "🏎️ 1-qadam: Harakat",
+        "titleKo": "1-qadam: Harakat",
+        "desc": "Mashinani yo'laklar o'rtasida harakatlantirish uchun pastdagi 1-5 tugmalarni bosing",
+        "descKo": "1-5 tugmalarini bosing"
+      },
+      "step2": {
+        "title": "✅ 2-qadam: Harflarni yig'ish",
+        "titleKo": "2-qadam: Yig'ish",
+        "desc": "So'zni yakunlash uchun YASHIL harflarni tartibda yig'ing",
+        "descKo": "Yashil harflarni tartibda yig'ing"
+      },
+      "step3": {
+        "title": "⚠️ 3-qadam: Xatolardan qoching",
+        "titleKo": "3-qadam: Qoching",
+        "desc": "QIZIL harflardan qoching! Urilsangiz sekinlashadi",
+        "descKo": "Qizil harflardan qoching"
+      },
+      "step4": {
+        "title": "🚀 4-qadam: BOOST!",
+        "titleKo": "4-qadam: Boost!",
+        "desc": "So'zni tugatish = BOOST tezligi + katta bonus!",
+        "descKo": "So'z tugatish = Boost + katta bonus!"
+      }
     },
     "wordTarget": "So'z maqsadi",
     "seconds": "s",
@@ -33,7 +57,10 @@
     "maxCombo": "Maks kombo",
     "missionsCompleted": "Vazifalar bajarildi",
     "playAgain": "Qayta o'ynash",
-    "finish": "Tugatish"
+    "finish": "Tugatish",
+    "missionComplete": "Vazifa bajarildi!",
+    "paused": "To'xtatildi",
+    "tapToContinue": "Davom etish uchun bosing"
   },
   "chainReaction": {
     "roomNotFound": "Xona topilmadi",
