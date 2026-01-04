@@ -617,7 +617,7 @@ const MockExamManualUpload = () => {
       const { error } = await supabase.from("mock_question_bank").insert({
         exam_type: examType,
         section: "reading",
-        part_number: partNumber,
+        part_number: 1, // 읽기는 파트 구분 없이 랜덤 셔플로 제공
         question_text: fullQuestion,
         options: parsed.options,
         correct_answer: parsed.correctAnswer,
@@ -887,28 +887,15 @@ const MockExamManualUpload = () => {
             {/* ===== 읽기 탭 ===== */}
             <TabsContent value="reading">
               <div className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>시험 유형</Label>
-                    <Select value={examType} onValueChange={setExamType}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="TOPIK_I">TOPIK I (1-2급)</SelectItem>
-                        <SelectItem value="TOPIK_II">TOPIK II (3-6급)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>파트 번호</Label>
-                    <Select value={partNumber.toString()} onValueChange={(v) => setPartNumber(parseInt(v))}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {Array.from({ length: 50 }, (_, i) => i + 1).map(n => (
-                          <SelectItem key={n} value={n.toString()}>파트 {n}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="space-y-2">
+                  <Label>시험 유형</Label>
+                  <Select value={examType} onValueChange={setExamType}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="TOPIK_I">TOPIK I (1-2급)</SelectItem>
+                      <SelectItem value="TOPIK_II">TOPIK II (3-6급)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* 통합 입력 */}
