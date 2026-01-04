@@ -193,15 +193,6 @@ const MockExamHub = () => {
       glowColor: "#3b82f6"
     },
     {
-      id: "part",
-      titleKey: "mockExam.modes.part.title",
-      shortTitle: t("mockExam.modes.part.shortTitle", "파트별 훈련"),
-      descriptionKey: "mockExam.modes.part.description",
-      icon: Zap,
-      gradient: "from-amber-500 to-orange-600",
-      glowColor: "#f59e0b"
-    },
-    {
       id: "weakness",
       titleKey: "mockExam.modes.weakness.title",
       shortTitle: t("mockExam.modes.weakness.shortTitle", "약점 집중"),

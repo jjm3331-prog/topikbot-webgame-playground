@@ -38,7 +38,7 @@ interface QuizQuestion {
 }
 
 const Quiz = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [question, setQuestion] = useState<QuizQuestion | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -53,6 +53,9 @@ const Quiz = () => {
   const [savedScore, setSavedScore] = useState(0);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // 현재 언어가 베트남어인지 확인
+  const isVietnamese = i18n.language === "vi";
 
   const saveScoreToProfile = async () => {
     if (score <= savedScore) return;
@@ -232,8 +235,9 @@ const Quiz = () => {
                       </Button>
                     ) : (
                       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-yellow-500/20 border border-yellow-500/30 p-2 rounded-lg">
-                        <p className="text-white/90 text-xs">{question.hint_ko || t("quiz.noHint")}</p>
-                        <p className="text-white/60 text-[10px] italic">{question.hint_vi || t("quiz.noHint")}</p>
+                        <p className="text-white/90 text-xs">
+                          {isVietnamese ? (question.hint_vi || t("quiz.noHint")) : (question.hint_ko || t("quiz.noHint"))}
+                        </p>
                       </motion.div>
                     )}
                   </div>
@@ -259,8 +263,9 @@ const Quiz = () => {
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <p className="text-white font-medium text-sm">{option.ko}</p>
-                          <p className="text-white/60 text-xs italic">{option.vi}</p>
+                          <p className="text-white font-medium text-sm">
+                            {isVietnamese ? option.vi : option.ko}
+                          </p>
                         </div>
                         {showCorrect && <CheckCircle className="w-4 h-4 text-green-400 shrink-0" />}
                         {showWrong && <XCircle className="w-4 h-4 text-red-400 shrink-0" />}
@@ -278,12 +283,15 @@ const Quiz = () => {
                       <Lightbulb className="w-4 h-4 text-yellow-400" />
                       <span className="text-white font-bold text-sm">{t("quiz.explanation")}</span>
                     </div>
-                    <p className="text-white/90 text-sm mb-1">{question.explanation_ko}</p>
-                    <p className="text-white/60 text-xs italic mb-3">{question.explanation_vi}</p>
+                    <p className="text-white/90 text-sm mb-3">
+                      {isVietnamese ? question.explanation_vi : question.explanation_ko}
+                    </p>
                     <div className="bg-white/5 p-2 rounded-lg">
                       <p className="text-white/50 text-[10px] mb-0.5">{t("quiz.example")}</p>
                       <p className="text-amber-300 text-sm">{question.example_sentence}</p>
-                      <p className="text-white/60 text-xs italic">{question.example_translation}</p>
+                      <p className="text-white/60 text-xs italic">
+                        {isVietnamese ? question.example_translation : ""}
+                      </p>
                     </div>
                   </motion.div>
                 )}
