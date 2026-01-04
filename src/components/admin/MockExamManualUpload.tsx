@@ -373,6 +373,46 @@ const MockExamManualUpload = () => {
     setTranslating(true);
 
     try {
+      // ========== 중복 검사 (저장 전) ==========
+      toast.info("중복 검사 중...");
+      const { data: existingQuestions, error: fetchError } = await supabase
+        .from("mock_question_bank")
+        .select("id, instruction_text, question_text, options, correct_answer")
+        .eq("section", "listening")
+        .eq("exam_type", examType)
+        .eq("is_active", true);
+
+      if (fetchError) {
+        console.warn("기존 문제 조회 실패 (중복 검사 스킵):", fetchError.message);
+      }
+
+      // 현재 문제의 정규화 키 생성
+      const newKey = [
+        '', // instruction_text (manual upload에서는 비어있음)
+        String(parsed.questionText ?? '').replace(/\s+/g, ' ').trim().toLowerCase(),
+        JSON.stringify(parsed.options ?? []),
+        String(parsed.correctAnswer ?? ''),
+      ].join('|||');
+
+      // 기존 문제와 비교
+      if (existingQuestions) {
+        for (const eq of existingQuestions) {
+          const existingKey = [
+            String(eq.instruction_text ?? '').replace(/\s+/g, ' ').trim().toLowerCase(),
+            String(eq.question_text ?? '').replace(/\s+/g, ' ').trim().toLowerCase(),
+            JSON.stringify(eq.options ?? []),
+            String(eq.correct_answer ?? ''),
+          ].join('|||');
+
+          if (existingKey === newKey) {
+            setSaving(false);
+            setTranslating(false);
+            toast.error("❌ 이미 동일한 문제가 DB에 존재합니다. 저장을 취소합니다.");
+            return;
+          }
+        }
+      }
+
       // 7개국어 번역
       toast.info("해설을 7개국어로 번역 중...");
       const translations = await translateToAllLanguages(parsed.explanationKo);
