@@ -395,24 +395,55 @@ const MockExamTest = () => {
         return;
       }
       
-      const shuffledQuestions = [...questionData].sort(() => Math.random() - 0.5);
+      // ========== 실전모드(full): TOPIK 시험 형식에 맞게 섹션별 문제 수 배분 ==========
+      let limitedQuestions: typeof questionData = [];
       
-      const getFullModeQuestionLimit = (): number => {
-        const dbType = dbExamType;
-        if (dbType === 'TOPIK_I') return 70;
-        if (dbType === 'TOPIK_II') return 104;
-        if (dbType === 'TOPIK_EPS') return 50;
-        return 70;
-      };
-      
-      const questionLimits: Record<string, number> = {
-        'full': getFullModeQuestionLimit(),
-        'section': section === 'listening' ? (dbExamType === 'TOPIK_II' ? 50 : dbExamType === 'TOPIK_I' ? 30 : 25) : 
-                   section === 'reading' ? (dbExamType === 'TOPIK_II' ? 50 : dbExamType === 'TOPIK_I' ? 40 : 25) : 30,
-        'part': 15,
-        'weakness': weaknessQuestionIds.length
-      };
-      const limitedQuestions = shuffledQuestions.slice(0, Math.min(questionLimits[mode] || 30, shuffledQuestions.length));
+      if (mode === 'full' && examPreset?.sections) {
+        // 실제 TOPIK 시험 형식에 맞게 섹션별로 정확한 문제 수 배분
+        const sectionOrder = ['listening', 'reading', 'writing'];
+        
+        for (const sec of sectionOrder) {
+          const sectionConfig = examPreset.sections[sec as keyof typeof examPreset.sections];
+          if (!sectionConfig) continue;
+          
+          const sectionQuestions = questionData
+            .filter(q => q.section === sec)
+            .sort((a, b) => (a.part_number || 0) - (b.part_number || 0) || (a.question_number || 0) - (b.question_number || 0));
+          
+          // 섹션별 필요 문제 수만큼 추출
+          const neededCount = sectionConfig.questionCount;
+          const selected = sectionQuestions.slice(0, Math.min(neededCount, sectionQuestions.length));
+          limitedQuestions = limitedQuestions.concat(selected);
+        }
+        
+        console.log('[MockExamTest] Full mode question distribution:', {
+          examType: dbExamType,
+          total: limitedQuestions.length,
+          listening: limitedQuestions.filter(q => q.section === 'listening').length,
+          reading: limitedQuestions.filter(q => q.section === 'reading').length,
+          writing: limitedQuestions.filter(q => q.section === 'writing').length,
+        });
+      } else {
+        // 연습 모드: 기존 로직
+        const shuffledQuestions = [...questionData].sort(() => Math.random() - 0.5);
+        
+        const getFullModeQuestionLimit = (): number => {
+          if (dbExamType === 'TOPIK_I') return 70;
+          if (dbExamType === 'TOPIK_II') return 104;
+          if (dbExamType === 'TOPIK_EPS') return 50;
+          return 70;
+        };
+        
+        const questionLimits: Record<string, number> = {
+          'full': getFullModeQuestionLimit(),
+          'section': section === 'listening' ? (dbExamType === 'TOPIK_II' ? 50 : dbExamType === 'TOPIK_I' ? 30 : 25) : 
+                     section === 'reading' ? (dbExamType === 'TOPIK_II' ? 50 : dbExamType === 'TOPIK_I' ? 40 : 25) : 
+                     section === 'writing' ? (dbExamType === 'TOPIK_II' ? 4 : 0) : 30,
+          'part': 15,
+          'weakness': weaknessQuestionIds.length
+        };
+        limitedQuestions = shuffledQuestions.slice(0, Math.min(questionLimits[mode] || 30, shuffledQuestions.length));
+      }
       
       // Parse option_images properly
       const parseOptionImages = (optImages: any): string[] | undefined => {
