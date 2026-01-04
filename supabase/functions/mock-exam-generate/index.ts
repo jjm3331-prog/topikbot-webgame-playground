@@ -895,6 +895,7 @@ async function generateWritingGraphImage(
       console.log(`[Writing Q53] Chart config generated: ${chartConfig.type}`);
 
       // 2. Generate chart image using QuickChart API
+      // QuickChart expects 'chart' as a JSON string for POST endpoint
       const quickChartUrl = "https://quickchart.io/chart";
       const chartPayload = {
         version: "2",
@@ -902,8 +903,10 @@ async function generateWritingGraphImage(
         height: 500,
         backgroundColor: "#ffffff",
         format: "png",
-        chart: chartConfig
+        chart: JSON.stringify(chartConfig) // MUST be JSON string, not object
       };
+
+      console.log(`[Writing Q53] Sending to QuickChart: type=${chartConfig.type}, labels=${chartConfig.data?.labels?.length || 0}`);
 
       const response = await fetch(quickChartUrl, {
         method: "POST",
