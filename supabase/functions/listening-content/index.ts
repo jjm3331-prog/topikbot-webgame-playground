@@ -118,10 +118,20 @@ const TOPIK_LEVEL_EXAMPLES: Record<string, string> = {
 const SYSTEM_PROMPT = `당신은 TOPIK(한국어능력시험) 듣기 문제 출제 전문가입니다.
 대상: 베트남인 학습자
 
-[🔥 다양성 최우선 규칙 - 반드시 준수!]
+[🚫 중복 절대 금지 (가장 중요)]
+- 동일/유사 문제를 만들면 실패입니다.
+- 아래 항목 중 하나라도 겹치면 ‘중복’으로 간주합니다:
+  1) 대화/발화(표현·문장) 핵심이 유사
+  2) 상황(장소·목적·갈등)이 유사
+  3) 질문 유형/문장 틀이 유사(예: “왜 ~했습니까?” 반복)
+  4) 보기(option) 구성과 정답 포인트가 유사
+- 최근 문제 목록이 제공되면, 그 목록과 ‘표현/내용/구성’이 겹치지 않도록 반드시 새로 만들 것.
+- 생성 후 스스로 점검: 서로 겹치는 문제(주제/장소/관계/직업/전개/질문틀/정답포인트)가 있으면 전부 폐기하고 새로 생성.
+
+[🔥 다양성 최우선 규칙 - 반드시 준수]
 1. 매 요청마다 완전히 새로운 주제, 상황, 등장인물을 사용할 것
-2. 절대 이전에 생성한 문제와 유사한 패턴 금지
-3. 아래 주제 풀에서 무작위로 선택하되, 매번 다른 조합 사용
+2. 각 문제는 서로 완전히 다른 주제/상황이어야 함
+3. 아래 풀에서 무작위로 선택하되, 매번 다른 조합 사용
 
 [주제 다양성 풀 - 필수 활용]
 - 일상: 카페 주문, 택배 수령, 헬스장 등록, 미용실 예약, 세탁소, 도서관, 우체국, 은행, 병원 접수, 약국
@@ -130,7 +140,7 @@ const SYSTEM_PROMPT = `당신은 TOPIK(한국어능력시험) 듣기 문제 출�
 - 학교: 수강신청, 동아리 가입, 기숙사 생활, 학식 메뉴, 과제 제출, 시험 일정, 학점 상담, 휴학 신청
 - 교통: 버스 노선 변경, 지하철 환승, 택시 호출, 주차장 이용, 기차 예매, 비행기 탑승
 - 문화: 영화 예매, 전시회 관람, 콘서트 티켓, 박물관 투어, 독서 모임, 요리 교실
-- 건강: 건강검진, 코로나 검사, 헌혈, 다이어트 상담, 운동 루틴, 수면 문제
+- 건강: 건강검진, 감기 증상, 헌혈, 다이어트 상담, 운동 루틴, 수면 문제
 - 뉴스: 날씨 예보, 교통 정보, 지역 행사, 환경 이슈, 경제 동향, 신기술 소개
 - 인터뷰: 직업인 인터뷰, 취미 소개, 성공 스토리, 실패 경험담, 조언
 - 사회: 봉사활동, 환경보호, 세대갈등, 워라밸, 1인가구, 반려동물, 결혼관
@@ -148,12 +158,11 @@ const SYSTEM_PROMPT = `당신은 TOPIK(한국어능력시험) 듣기 문제 출�
 - 추천 요청 → 장단점 비교
 - 경험 공유 → 조언/공감
 
-[핵심 규칙]
-1. 출력은 오직 JSON 배열만 (마크다운, 설명 금지)
+[출력 규칙]
+1. 출력은 오직 JSON 배열만 (마크다운/설명 금지)
 2. 베트남어는 번역투 금지, 현지인이 쓰는 자연스러운 표현
 3. 급수별 어휘/문법 수준을 엄격히 준수
 4. 대화형(dialogue)과 안내/발표형(single) 적절히 혼합
-5. 각 문제는 서로 완전히 다른 주제와 상황이어야 함
 
 [JSON 스키마]
 {
@@ -283,17 +292,22 @@ async function searchRAG(
 async function generateWithLLM(
   count: number,
   topikLevel: string,
-  ragContext: string[]
+  ragContext: string[],
+  recentQuestionsBlock: string
 ): Promise<Question[]> {
   const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
   if (!OPENAI_API_KEY) throw new Error("OPENAI_API_KEY not configured");
 
   const levelExamples = TOPIK_LEVEL_EXAMPLES[topikLevel] || TOPIK_LEVEL_EXAMPLES["1-2"];
-  
+
   let contextSection = "";
   if (ragContext.length > 0) {
     contextSection = `\n\n[참고 자료 - 이 내용을 바탕으로 문제 생성]\n${ragContext.join('\n\n')}`;
   }
+
+  const recentSection = recentQuestionsBlock
+    ? `\n\n[최근 출제된 문제 목록 - 절대 재사용/변형 금지]\n${recentQuestionsBlock}`
+    : "";
 
   // 다양성을 위한 랜덤 시드 생성
   const randomSeed = Date.now() % 10000;
@@ -305,15 +319,15 @@ async function generateWithLLM(
     "스터디카페", "코인세탁", "PC방", "노래방", "볼링장", "수족관", "동물병원", "어린이집"
   ];
   const selectedTopics = randomTopics.sort(() => Math.random() - 0.5).slice(0, 7);
-  
+
   // 다양한 상황 패턴
   const situationPatterns = [
     "약속 변경", "정보 문의", "불만 제기", "감사 표현", "조언 구하기", "계획 논의",
     "오해 해결", "추천 요청", "결정 내리기", "경험 공유", "문제 해결", "예약 변경"
   ];
   const selectedPatterns = situationPatterns.sort(() => Math.random() - 0.5).slice(0, 3);
-  
-  const userPrompt = `${levelExamples}${contextSection}
+
+  const userPrompt = `${levelExamples}${contextSection}${recentSection}
 
 [🎲 이번 생성 필수 조건]
 - 필수 포함 주제: ${selectedTopics.join(", ")}
@@ -322,12 +336,12 @@ async function generateWithLLM(
 
 위 예시와 동일한 품질과 난이도로 TOPIK ${topikLevel}급 듣기 문제 ${count}개를 JSON 배열로 생성하세요.
 
-⚠️ 다양성 규칙 (매우 중요!):
+⚠️ 중복/다양성 규칙 (매우 중요!):
 1. 각 문제의 주제, 장소, 등장인물이 모두 달라야 함
-2. 같은 질문 패턴 금지 (예: "왜 전화했습니까?" 반복 금지)
+2. 같은 질문 패턴/문장 틀 반복 금지
 3. 대화 시작 방식, 전개, 결론이 각각 다르게
-4. 등장인물 이름: 한국 이름 다양하게 (민수, 지영, 현우, 소희, 태민, 은지 등)
-5. 나이대/직업 다양하게: 학생, 직장인, 주부, 노인, 자영업자 등
+4. ‘최근 출제된 문제 목록’과 내용/표현/보기/정답 포인트가 겹치면 전부 폐기 후 다시 생성
+5. 등장인물 이름/나이/직업 다양하게
 6. 반드시 예시의 어휘/문법 수준을 정확히 따르세요
 
 출력: JSON 배열만 (설명, 마크다운 금지)`;
@@ -380,6 +394,7 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const count = Math.min(Math.max(body.count || 5, 1), 20);
     const topikLevel = body.level || "1-2";
+    const useCache = body.useCache === true; // 기본은 다양성 우선: 캐시 사용 안 함
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -388,30 +403,58 @@ serve(async (req) => {
     const openAIKey = Deno.env.get('OPENAI_API_KEY');
     const cohereKey = Deno.env.get('COHERE_API_KEY');
 
-    // 캐시 확인 (버전 포함 - v2)
-    const cacheKey = `listening_v2_${topikLevel}_${count}`;
-    const { data: cached } = await supabase
-      .from('ai_response_cache')
-      .select('*')
-      .eq('cache_key', cacheKey)
-      .eq('function_name', 'listening-content')
-      .gt('expires_at', new Date().toISOString())
-      .maybeSingle();
+    // 캐시 확인 (옵션)
+    const cacheKey = `listening_v3_${topikLevel}_${count}`;
+    if (useCache) {
+      const { data: cached } = await supabase
+        .from('ai_response_cache')
+        .select('*')
+        .eq('cache_key', cacheKey)
+        .eq('function_name', 'listening-content')
+        .gt('expires_at', new Date().toISOString())
+        .maybeSingle();
 
-    if (cached) {
-      console.log(`[Listening] Cache HIT: ${cacheKey}`);
-      await supabase.rpc('increment_cache_hit', { p_id: cached.id });
-      return new Response(JSON.stringify({
-        success: true,
-        questions: cached.response,
-        source: 'cache',
-        topikLevel,
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      if (cached) {
+        console.log(`[Listening] Cache HIT: ${cacheKey}`);
+        await supabase.rpc('increment_cache_hit', { p_id: cached.id });
+        return new Response(JSON.stringify({
+          success: true,
+          questions: cached.response,
+          source: 'cache',
+          topikLevel,
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
     }
 
     console.log(`[Listening] Generating ${count} questions for TOPIK ${topikLevel}`);
+
+    // 최근 출제(저장)된 문제를 제공해서 중복을 강제로 차단
+    const examType = topikLevel === '1-2' ? 'TOPIK_I' : 'TOPIK_II';
+    const { data: recentRows, error: recentErr } = await supabase
+      .from('mock_question_bank')
+      .select('instruction_text, question_text, options, correct_answer')
+      .eq('section', 'listening')
+      .eq('exam_type', examType)
+      .eq('is_active', true)
+      .order('updated_at', { ascending: false })
+      .order('id', { ascending: false })
+      .limit(60);
+
+    if (recentErr) {
+      console.warn('[Listening] Recent questions fetch failed:', recentErr);
+    }
+
+    const recentQuestionsBlock = (recentRows ?? [])
+      .map((r: any, idx: number) => {
+        const inst = String(r.instruction_text ?? '').replace(/\s+/g, ' ').trim().slice(0, 180);
+        const q = String(r.question_text ?? '').replace(/\s+/g, ' ').trim().slice(0, 180);
+        const opts = JSON.stringify(r.options ?? []).slice(0, 240);
+        const ans = r.correct_answer ?? null;
+        return `- (${idx + 1}) inst: ${inst} | q: ${q} | options: ${opts} | ans: ${ans}`;
+      })
+      .join('\n');
 
     // 1. RAG 검색 시도
     let ragContext: string[] = [];
@@ -422,19 +465,21 @@ serve(async (req) => {
     }
 
     // 2. LLM으로 문제 생성 (RAG 컨텍스트 활용 또는 순수 생성)
-    const questions = await generateWithLLM(count, topikLevel, ragContext);
+    const questions = await generateWithLLM(count, topikLevel, ragContext, recentQuestionsBlock);
     console.log(`[Listening] Generated ${questions.length} questions`);
 
-    // 캐시 저장 (4시간)
-    const expiresAt = new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString();
-    await supabase.from('ai_response_cache').upsert({
-      cache_key: cacheKey,
-      function_name: 'listening-content',
-      response: questions.slice(0, count),
-      request_params: { count, topikLevel },
-      expires_at: expiresAt,
-      hit_count: 0,
-    }, { onConflict: 'cache_key' });
+    // 캐시 저장 (옵션, 4시간)
+    if (useCache) {
+      const expiresAt = new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString();
+      await supabase.from('ai_response_cache').upsert({
+        cache_key: cacheKey,
+        function_name: 'listening-content',
+        response: questions.slice(0, count),
+        request_params: { count, topikLevel, useCache },
+        expires_at: expiresAt,
+        hit_count: 0,
+      }, { onConflict: 'cache_key' });
+    }
 
     return new Response(JSON.stringify({
       success: true,
