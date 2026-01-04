@@ -224,7 +224,7 @@ const MockExamReport = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">결과 로딩 중...</p>
+          <p className="text-muted-foreground">{t("mockExam.report.loading", "결과 로딩 중...")}</p>
         </div>
       </div>
     );
@@ -239,12 +239,12 @@ const MockExamReport = () => {
         <div className="flex items-center justify-between mb-8">
           <Button variant="ghost" onClick={() => navigate('/mock-exam')}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            모의고사 허브
+            {t("mockExam.report.backToHub", "모의고사 허브")}
           </Button>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => navigate(`/mock-exam/mistakes`)}>
               <BookOpen className="w-4 h-4 mr-2" />
-              오답노트
+              {t("mockExam.report.mistakeNote", "오답노트")}
             </Button>
           </div>
         </div>
@@ -257,9 +257,9 @@ const MockExamReport = () => {
         >
           <Badge className="mb-4 bg-gradient-to-r from-primary to-purple-600 text-white border-0">
             <Sparkles className="w-3 h-3 mr-1" />
-            AI 분석 리포트
+            {t("mockExam.report.aiAnalysis", "AI 분석 리포트")}
           </Badge>
-          <h1 className="text-3xl font-bold mb-2">{attempt?.exam_type?.replace('_', ' ')} 결과 분석</h1>
+          <h1 className="text-3xl font-bold mb-2">{attempt?.exam_type?.replace('_', ' ')} {t("mockExam.report.resultAnalysis", "결과 분석")}</h1>
           <p className="text-muted-foreground">
             {new Date(attempt?.finished_at || attempt?.created_at).toLocaleDateString('ko-KR', {
               year: 'numeric',
@@ -274,8 +274,8 @@ const MockExamReport = () => {
         {generating ? (
           <Card className="p-12 text-center">
             <Brain className="w-16 h-16 mx-auto mb-4 text-primary animate-pulse" />
-            <h3 className="text-xl font-bold mb-2">AI가 결과를 분석하고 있습니다...</h3>
-            <p className="text-muted-foreground">취약점과 학습 추천을 생성 중입니다</p>
+            <h3 className="text-xl font-bold mb-2">{t("mockExam.report.analyzing", "AI가 결과를 분석하고 있습니다...")}</h3>
+            <p className="text-muted-foreground">{t("mockExam.report.generating", "취약점과 학습 추천을 생성 중입니다")}</p>
           </Card>
         ) : report && (
           <>
@@ -295,9 +295,9 @@ const MockExamReport = () => {
                   )}>
                     <span className="text-4xl font-bold text-white">{report.predictedGrade}</span>
                   </div>
-                  <h3 className="font-bold text-lg">예상 등급</h3>
+                  <h3 className="font-bold text-lg">{t("mockExam.report.predictedGrade", "예상 등급")}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {report.predictedGrade >= 5 ? '고급' : report.predictedGrade >= 3 ? '중급' : '초급'}
+                    {report.predictedGrade >= 5 ? t("mockExam.report.advanced", "고급") : report.predictedGrade >= 3 ? t("mockExam.report.intermediate", "중급") : t("mockExam.report.beginner", "초급")}
                   </p>
                 </CardContent>
               </Card>
@@ -306,7 +306,7 @@ const MockExamReport = () => {
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-muted-foreground">총점</span>
+                    <span className="text-muted-foreground">{t("mockExam.report.totalScore", "총점")}</span>
                     <BarChart3 className="w-5 h-5 text-primary" />
                   </div>
                   <p className="text-3xl font-bold">{report.scores.total}%</p>
@@ -343,9 +343,9 @@ const MockExamReport = () => {
             {/* Detailed Analysis */}
             <Tabs defaultValue="analysis" className="mb-8">
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="analysis">종합 분석</TabsTrigger>
-                <TabsTrigger value="recommendations">학습 추천</TabsTrigger>
-                <TabsTrigger value="plan">학습 계획</TabsTrigger>
+                <TabsTrigger value="analysis">{t("mockExam.report.tabs.analysis", "종합 분석")}</TabsTrigger>
+                <TabsTrigger value="recommendations">{t("mockExam.report.tabs.recommendations", "학습 추천")}</TabsTrigger>
+                <TabsTrigger value="plan">{t("mockExam.report.tabs.plan", "학습 계획")}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="analysis" className="space-y-4 mt-4">
@@ -354,7 +354,7 @@ const MockExamReport = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Brain className="w-5 h-5 text-primary" />
-                      종합 분석
+                      {t("mockExam.report.overallAnalysis", "종합 분석")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -480,7 +480,7 @@ const MockExamReport = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Target className="w-5 h-5 text-primary" />
-                        주간 목표
+                        {t("mockExam.report.weeklyGoal", "주간 목표")}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -491,7 +491,7 @@ const MockExamReport = () => {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>집중 학습 영역</CardTitle>
+                    <CardTitle>{t("mockExam.report.focusAreas", "집중 학습 영역")}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-wrap gap-2">
@@ -518,14 +518,14 @@ const MockExamReport = () => {
             <div className="flex flex-wrap justify-center gap-4">
               <Button onClick={() => generateReport(attempt, answers, questions)}>
                 <RefreshCw className="w-4 h-4 mr-2" />
-                리포트 다시 생성
+                {t("mockExam.report.regenerate", "리포트 다시 생성")}
               </Button>
               <Button variant="outline" onClick={() => navigate('/mock-exam/mistakes')}>
                 <BookOpen className="w-4 h-4 mr-2" />
-                오답노트로 이동
+                {t("mockExam.report.goToMistakes", "오답노트로 이동")}
               </Button>
               <Button variant="outline" onClick={() => navigate('/mock-exam')}>
-                다시 도전하기
+                {t("mockExam.report.tryAgain", "다시 도전하기")}
               </Button>
             </div>
           </>

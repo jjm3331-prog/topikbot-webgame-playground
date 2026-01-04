@@ -2997,7 +2997,46 @@
       "reviewAgain": "Ôn lại",
       "deleteComplete": "Đã xóa lỗi",
       "reviewComplete": "Ôn tập hoàn tất!",
-      "goodJob": "Bạn làm tốt lắm!"
+      "goodJob": "Bạn làm tốt lắm!",
+      "loading": "Đang tải sổ lỗi...",
+      "endReview": "Kết thúc ôn tập",
+      "explanation": "Giải thích",
+      "title": "Sổ lỗi",
+      "subtitle": "Ôn tập và master các câu sai",
+      "totalMistakes": "Tổng lỗi",
+      "mastered": "Đã master",
+      "needsReview": "Cần ôn",
+      "masteryRate": "Tỷ lệ master",
+      "startReview": "Bắt đầu ôn tập",
+      "reviewCount": "Ôn {{count}} câu chưa master",
+      "delete": "Xóa",
+      "deleteTitle": "Xóa lỗi",
+      "deleteConfirm": "Bạn có chắc muốn xóa lỗi này? Không thể hoàn tác."
+    },
+    "report": {
+      "loading": "Đang tải kết quả...",
+      "backToHub": "Trang thi thử",
+      "mistakeNote": "Sổ lỗi",
+      "aiAnalysis": "Báo cáo phân tích AI",
+      "resultAnalysis": "Phân tích kết quả",
+      "analyzing": "AI đang phân tích kết quả...",
+      "generating": "Đang tạo điểm yếu và gợi ý học tập",
+      "predictedGrade": "Cấp độ dự đoán",
+      "advanced": "Cao cấp",
+      "intermediate": "Trung cấp",
+      "beginner": "Sơ cấp",
+      "totalScore": "Tổng điểm",
+      "tabs": {
+        "analysis": "Phân tích",
+        "recommendations": "Gợi ý",
+        "plan": "Kế hoạch học"
+      },
+      "overallAnalysis": "Phân tích tổng quan",
+      "weeklyGoal": "Mục tiêu tuần",
+      "focusAreas": "Lĩnh vực tập trung",
+      "regenerate": "Tạo lại báo cáo",
+      "goToMistakes": "Đi đến sổ lỗi",
+      "tryAgain": "Thử lại"
     },
     "error": {
       "notFound": "Không tìm thấy bản ghi thi"
@@ -3369,5 +3408,13 @@
     "level": { "beginner": "Sơ cấp", "intermediate": "Trung cấp", "advanced": "Cao cấp" },
     "category": { "memorize": "Ghi nhớ", "context": "Ngữ cảnh" }
   },
-  "roleplay": { "level": { "beginner": "Sơ cấp", "intermediate": "Trung cấp" } }
+  "roleplay": { "level": { "beginner": "Sơ cấp", "intermediate": "Trung cấp" } },
+  "lessonMenu": {
+    "handwriting": { "title": "Luyện viết tay", "description": "Luyện viết từ phụ âm/nguyên âm đến từ vựng và câu. AI cũng tạo quiz chính tả." },
+    "listening": { "title": "Luyện nghe", "description": "Giải bài 4 lựa chọn như thi TOPIK thật. Có cả hội thoại AI TTS với 2 người nói." },
+    "badge": { "recommended": "Đề xuất", "new": "MỚI", "aiLearning": "Học tiếng Hàn với AI" },
+    "title": { "lesson": "Bài học", "select": "Chọn" },
+    "subtitle1": "Chọn lĩnh vực học tập.",
+    "subtitle2": "AI cung cấp nội dung cá nhân hóa."
+  }
 }
