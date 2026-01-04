@@ -273,74 +273,94 @@ const MockExamHub = () => {
   };
 
   // 섹션별 문제 개수 로드 (DB에 없으면 버튼 비활성화)
+  // ✅ 섹션 카운트는 1000개 제한/정렬 영향 없이 "정확한 count"로 계산
   const loadAvailableSections = async (examId: string) => {
     const dbExamType = mapExamTypeToDb(examId);
-    const { data, error } = await supabase
-      .from('mock_question_bank')
-      .select('section')
-      .eq('exam_type', dbExamType)
-      .eq('is_active', true);
 
-    if (error) {
+    try {
+      const sections = ['listening', 'reading', 'writing'] as const;
+
+      const results = await Promise.all(
+        sections.map(async (sec) => {
+          const { count, error } = await supabase
+            .from('mock_question_bank')
+            .select('id', { count: 'exact', head: true })
+            .eq('exam_type', dbExamType)
+            .eq('section', sec)
+            .eq('is_active', true);
+
+          if (error) throw error;
+          return [sec, count ?? 0] as const;
+        })
+      );
+
+      const counts: Record<string, number> = {};
+      results.forEach(([sec, cnt]) => {
+        counts[sec] = cnt;
+      });
+
+      console.log('[MockExamHub] section counts', { exam: examId, dbExamType, counts });
+      setAvailableSectionCounts(counts);
+    } catch (error) {
       console.error('[MockExamHub] loadAvailableSections error', error);
       setAvailableSectionCounts({});
-      return;
     }
-
-    const counts: Record<string, number> = {};
-    (data || []).forEach((row: any) => {
-      const sec = String(row.section ?? '').toLowerCase();
-      if (!sec) return;
-      counts[sec] = (counts[sec] || 0) + 1;
-    });
-
-    setAvailableSectionCounts(counts);
   };
 
   // 파트별 문제 개수 로드
+  // ⚠️ 주의: 기본 쿼리는 1000개 제한이 있어 파트 데이터가 누락될 수 있으므로 페이지네이션으로 전부 집계
   const loadAvailableParts = async (examId: string) => {
     const dbExamType = mapExamTypeToDb(examId);
-    const { data, error } = await supabase
-      .from('mock_question_bank')
-      .select('part_number, section')
-      .eq('exam_type', dbExamType)
-      .eq('is_active', true);
 
-    if (error) {
-      console.error('[MockExamHub] loadAvailableParts error', error);
-      setAvailableParts([]);
-      return;
+    const pageSize = 1000;
+    let from = 0;
+    let allRows: Array<{ part_number: number | null; section: string | null }> = [];
+
+    while (true) {
+      const { data, error } = await supabase
+        .from('mock_question_bank')
+        .select('part_number, section')
+        .eq('exam_type', dbExamType)
+        .eq('is_active', true)
+        .range(from, from + pageSize - 1);
+
+      if (error) {
+        console.error('[MockExamHub] loadAvailableParts error', error);
+        setAvailableParts([]);
+        return;
+      }
+
+      const batch = (data || []) as Array<{ part_number: number | null; section: string | null }>;
+      allRows = allRows.concat(batch);
+
+      if (batch.length < pageSize) break;
+      from += pageSize;
     }
 
     const allowedSections = new Set(['listening', 'reading', 'writing']);
 
-    if (data) {
-      const partCounts = new Map<string, { partNumber: number; section: string; count: number }>();
-      data
-        .filter((q: any) => {
-          const sec = String(q.section ?? '').toLowerCase();
-          const pn = Number(q.part_number);
-          return allowedSections.has(sec) && Number.isFinite(pn) && pn > 0;
-        })
-        .forEach((q: any) => {
-          const sec = String(q.section).toLowerCase();
-          const pn = Number(q.part_number);
-          const key = `${sec}-${pn}`;
-          const existing = partCounts.get(key);
-          if (existing) {
-            existing.count++;
-          } else {
-            partCounts.set(key, { partNumber: pn, section: sec, count: 1 });
-          }
-        });
+    const partCounts = new Map<string, { partNumber: number; section: string; count: number }>();
+    allRows
+      .filter((q) => {
+        const sec = String(q.section ?? '').toLowerCase();
+        const pn = Number(q.part_number);
+        return allowedSections.has(sec) && Number.isFinite(pn) && pn > 0;
+      })
+      .forEach((q) => {
+        const sec = String(q.section).toLowerCase();
+        const pn = Number(q.part_number);
+        const key = `${sec}-${pn}`;
+        const existing = partCounts.get(key);
+        if (existing) existing.count++;
+        else partCounts.set(key, { partNumber: pn, section: sec, count: 1 });
+      });
 
-      setAvailableParts(
-        Array.from(partCounts.values()).sort((a, b) => {
-          if (a.section !== b.section) return a.section.localeCompare(b.section);
-          return a.partNumber - b.partNumber;
-        })
-      );
-    }
+    setAvailableParts(
+      Array.from(partCounts.values()).sort((a, b) => {
+        if (a.section !== b.section) return a.section.localeCompare(b.section);
+        return a.partNumber - b.partNumber;
+      })
+    );
   };
 
   // 약점 분석 로드
