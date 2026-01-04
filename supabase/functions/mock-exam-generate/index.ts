@@ -188,6 +188,8 @@ interface GenerateRequest {
   listeningQuestionType?: string;
   dialogueLength?: string;
   speakerCount?: string;
+  // 쓰기 세부 설정
+  writingQuestionType?: string;
 }
 
 interface GeneratedQuestion {
@@ -958,11 +960,19 @@ ${params.topic ? `- 주제/문법: ${params.topic}` : ''}
 각 문제에는 반드시 지문(읽기 텍스트)이 포함되어야 합니다.`;
   } else if (params.section === 'writing') {
     // ⚠️ TOPIK II 쓰기 51~54번 실제 기출 유형 (TOPIK I에는 쓰기 없음)
+    const writingType = params.writingQuestionType || 'mixed';
+    
     prompt += `
 ### ✍️ TOPIK II 쓰기 영역 문제 유형 (51~54번) - 실제 기출 형식 준수!
 
 ⚠️ **중요**: TOPIK II 쓰기는 객관식이 아닌 **주관식 작문 문제**입니다!
 선다형(4지선다) 형식이 아닙니다. 수험자가 직접 글을 작성해야 합니다.
+
+${writingType !== 'mixed' ? `
+### ⚠️ 지정된 문제 유형만 생성
+**${writingType}번 문제만 생성하세요!** 다른 유형(${['51', '52', '53', '54'].filter(t => t !== writingType).join(', ')}번)은 생성하지 마세요.
+모든 문제의 part_number를 ${writingType}으로 설정하세요.
+` : ''}
 
 ---
 
