@@ -797,14 +797,83 @@ const MockExamGenerator = () => {
           is_active: true,
         });
       }
+      // ========== 중복 검사 로직 (저장 전) ==========
+      setGenState({ step: "saving", progress: 78, message: "🔍 기존 DB 중복 검사 중..." });
+
+      // 해당 section + exam_type의 기존 문제들 가져오기 (instruction_text, question_text, options, correct_answer)
+      const dbExamType = mapExamTypeToDb(examType);
+      const { data: existingQuestions, error: fetchError } = await supabase
+        .from("mock_question_bank")
+        .select("id, instruction_text, question_text, options, correct_answer")
+        .eq("section", section)
+        .eq("exam_type", dbExamType)
+        .eq("is_active", true);
+
+      if (fetchError) {
+        console.warn("기존 문제 조회 실패 (중복 검사 스킵):", fetchError.message);
+      }
+
+      const existingSet = new Set<string>();
+      if (existingQuestions) {
+        for (const eq of existingQuestions) {
+          // 정규화: instruction_text + question_text + options + correct_answer
+          const key = [
+            String(eq.instruction_text ?? '').replace(/\s+/g, ' ').trim().toLowerCase(),
+            String(eq.question_text ?? '').replace(/\s+/g, ' ').trim().toLowerCase(),
+            JSON.stringify(eq.options ?? []),
+            String(eq.correct_answer ?? ''),
+          ].join('|||');
+          existingSet.add(key);
+        }
+      }
+
+      // 생성된 문제 중 중복 필터링
+      const nonDuplicateQuestions: typeof translatedQuestions = [];
+      const duplicateIndices: number[] = [];
+
+      for (let i = 0; i < translatedQuestions.length; i++) {
+        const q = translatedQuestions[i];
+        const key = [
+          String(q.instruction_text ?? '').replace(/\s+/g, ' ').trim().toLowerCase(),
+          String(q.question_text ?? '').replace(/\s+/g, ' ').trim().toLowerCase(),
+          JSON.stringify(q.options ?? []),
+          String(q.correct_answer ?? ''),
+        ].join('|||');
+
+        if (existingSet.has(key)) {
+          duplicateIndices.push(i + 1);
+        } else {
+          nonDuplicateQuestions.push(q);
+          existingSet.add(key); // 같은 배치 내 중복 방지
+        }
+      }
+
+      if (duplicateIndices.length > 0) {
+        toast({
+          title: `⚠️ ${duplicateIndices.length}개 중복 제외`,
+          description: `문제 번호 ${duplicateIndices.slice(0, 5).join(', ')}${duplicateIndices.length > 5 ? '...' : ''}은(는) DB에 이미 존재하여 저장하지 않습니다.`,
+          variant: "destructive",
+        });
+      }
+
+      if (nonDuplicateQuestions.length === 0) {
+        setGenState({ step: "idle", progress: 100, message: "" });
+        toast({
+          title: "❌ 저장할 문제 없음",
+          description: "모든 문제가 DB에 이미 존재합니다.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Save in chunks of 10 to avoid timeout
       const CHUNK_SIZE = 10;
       const chunks = [];
-      for (let i = 0; i < translatedQuestions.length; i += CHUNK_SIZE) {
-        chunks.push(translatedQuestions.slice(i, i + CHUNK_SIZE));
+      for (let i = 0; i < nonDuplicateQuestions.length; i += CHUNK_SIZE) {
+        chunks.push(nonDuplicateQuestions.slice(i, i + CHUNK_SIZE));
       }
 
-      setGenState({ step: "saving", progress: 80, message: `💾 ${chunks.length}개 청크로 분할 저장 중...` });
+      setGenState({ step: "saving", progress: 80, message: `💾 ${chunks.length}개 청크로 분할 저장 중... (중복 ${duplicateIndices.length}개 제외)` });
 
       let savedCount = 0;
       let failedChunks: number[] = [];
