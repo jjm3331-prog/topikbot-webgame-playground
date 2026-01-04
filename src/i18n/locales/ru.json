@@ -1,4 +1,56 @@
 {
+  "wordRacing": {
+    "title": "Гонка слов",
+    "subtitle": "Гонка слов",
+    "speed": {
+      "slow": "Медленно",
+      "normal": "Нормально",
+      "fast": "Быстро"
+    },
+    "tutorial": {
+      "prev": "Назад",
+      "next": "Далее",
+      "startGame": "Начать игру!",
+      "skip": "Пропустить обучение",
+      "showAgain": "Показать обучение снова"
+    },
+    "wordTarget": "Цель по словам",
+    "seconds": "с",
+    "timeLimit": "Ограничение времени",
+    "missions": {
+      "title": "Миссии",
+      "words5": "Завершить 5 слов",
+      "combo5": "Достичь 5 комбо",
+      "perfect": "3 слова без ошибок",
+      "score500": "Набрать 500 очков"
+    },
+    "speedLabel": "Скорость",
+    "start": "Старт",
+    "startGame": "Начать игру",
+    "complete": "Гонка завершена!",
+    "score": "Счёт",
+    "words": "Слова",
+    "maxCombo": "Макс. комбо",
+    "missionsCompleted": "Миссии выполнены",
+    "playAgain": "Играть снова",
+    "finish": "Завершить"
+  },
+  "chainReaction": {
+    "roomNotFound": "Комната не найдена",
+    "roomInProgress": "Игра уже идёт",
+    "roomFull": "Комната заполнена",
+    "autoJoinFailed": "Автоматическое присоединение не удалось",
+    "kickedGuest": "Гость исключён",
+    "enterName": "Введите ник",
+    "createFailed": "Не удалось создать комнату",
+    "enterNameAndCode": "Введите ник и код",
+    "errors": {
+      "duplicate": "Слово уже использовано!",
+      "invalidWord": "Недопустимое слово!"
+    },
+    "defeat": "Поражение!",
+    "warningOne": "Предупреждение 1!"
+  },
   "splash": {
     "tagline": "Игра для изучения корейского на основе ИИ",
     "loading": "Загрузка...",
@@ -3259,5 +3311,26 @@
   "sentenceBuilder": {
     "streak": " подряд!",
     "firstWord": "Первое слово"
+  },
+  "shadowing": {
+    "browserNotSupported": "Этот браузер не поддерживает распознавание речи",
+    "noSubtitles": "Нет субтитров для теневого повторения",
+    "completed": "Завершено",
+    "countUnit": "",
+    "noCaption": "Нет субтитров",
+    "listening": "Слушаю...",
+    "speakAfterListening": "Повторите услышанное предложение",
+    "startRecording": "Начать запись",
+    "listenAgain": "Слушать снова",
+    "recording": "Запись...",
+    "stopRecording": "Остановить запись",
+    "myPronunciation": "Моё произношение",
+    "recognitionFailed": "Ошибка распознавания",
+    "excellent": "Отлично!",
+    "good": "Хорошо!",
+    "tryAgain": "Ещё раз!",
+    "practiceAgain": "Повторить",
+    "nextSentence": "Следующее предложение",
+    "start": "Начать теневое повторение"
   }
 }

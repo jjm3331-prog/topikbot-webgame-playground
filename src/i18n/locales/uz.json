@@ -1,4 +1,56 @@
 {
+  "wordRacing": {
+    "title": "So'z Poygasi",
+    "subtitle": "So'z Poygasi",
+    "speed": {
+      "slow": "Sekin",
+      "normal": "O'rtacha",
+      "fast": "Tez"
+    },
+    "tutorial": {
+      "prev": "Oldingi",
+      "next": "Keyingi",
+      "startGame": "O'yinni boshlash!",
+      "skip": "O'quv qo'llanmasini o'tkazib yuborish",
+      "showAgain": "O'quv qo'llanmasini qayta ko'rish"
+    },
+    "wordTarget": "So'z maqsadi",
+    "seconds": "s",
+    "timeLimit": "Vaqt chegarasi",
+    "missions": {
+      "title": "Vazifalar",
+      "words5": "5 ta so'zni tugatish",
+      "combo5": "5 komboga erishish",
+      "perfect": "Xatosiz 3 so'z",
+      "score500": "500 ball to'plash"
+    },
+    "speedLabel": "Tezlik",
+    "start": "Boshlash",
+    "startGame": "O'yinni boshlash",
+    "complete": "Poyga tugadi!",
+    "score": "Ball",
+    "words": "So'zlar",
+    "maxCombo": "Maks kombo",
+    "missionsCompleted": "Vazifalar bajarildi",
+    "playAgain": "Qayta o'ynash",
+    "finish": "Tugatish"
+  },
+  "chainReaction": {
+    "roomNotFound": "Xona topilmadi",
+    "roomInProgress": "O'yin allaqachon davom etmoqda",
+    "roomFull": "Xona to'lgan",
+    "autoJoinFailed": "Avtomatik qo'shilish muvaffaqiyatsiz",
+    "kickedGuest": "Mehmon chiqarildi",
+    "enterName": "Taxallusni kiriting",
+    "createFailed": "Xona yaratib bo'lmadi",
+    "enterNameAndCode": "Taxallus va kodni kiriting",
+    "errors": {
+      "duplicate": "So'z allaqachon ishlatilgan!",
+      "invalidWord": "Noto'g'ri so'z!"
+    },
+    "defeat": "Mag'lubiyat!",
+    "warningOne": "1-ogohlantirish!"
+  },
   "splash": {
     "tagline": "AI asosidagi koreys tilini o'rganish o'yini",
     "loading": "Yuklanmoqda...",
@@ -3269,5 +3321,26 @@
   "sentenceBuilder": {
     "streak": " ketma-ket!",
     "firstWord": "Birinchi so'z"
+  },
+  "shadowing": {
+    "browserNotSupported": "Bu brauzer ovozni tanishni qo'llab-quvvatlamaydi",
+    "noSubtitles": "Soya takrorlash uchun subtitrlar yo'q",
+    "completed": "Bajarildi",
+    "countUnit": " ta",
+    "noCaption": "Subtitr yo'q",
+    "listening": "Tinglayapman...",
+    "speakAfterListening": "Eshitgan gapni takrorlang",
+    "startRecording": "Yozishni boshlash",
+    "listenAgain": "Qayta tinglash",
+    "recording": "Yozib olinmoqda...",
+    "stopRecording": "Yozishni to'xtatish",
+    "myPronunciation": "Mening talaffuzim",
+    "recognitionFailed": "Tanib bo'lmadi",
+    "excellent": "A'lo!",
+    "good": "Yaxshi!",
+    "tryAgain": "Qayta urinib ko'ring!",
+    "practiceAgain": "Qayta mashq qilish",
+    "nextSentence": "Keyingi gap",
+    "start": "Soya takrorlashni boshlash"
   }
 }

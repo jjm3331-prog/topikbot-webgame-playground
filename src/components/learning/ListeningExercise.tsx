@@ -96,8 +96,8 @@ const ListeningExercise = ({ questions, onComplete }: ListeningExerciseProps) =>
       audio.onerror = () => {
         setIsPlaying(false);
         toast({
-          title: "재생 오류",
-          description: "오디오를 재생할 수 없습니다.",
+          title: t("listening.playError", "재생 오류"),
+          description: t("listening.playErrorDesc", "오디오를 재생할 수 없습니다."),
           variant: "destructive",
         });
       };
@@ -106,8 +106,8 @@ const ListeningExercise = ({ questions, onComplete }: ListeningExerciseProps) =>
     } catch (error) {
       console.error("TTS error:", error);
       toast({
-        title: "오류 발생",
-        description: "음성을 생성할 수 없습니다.",
+        title: t("listening.error", "오류 발생"),
+        description: t("listening.ttsError", "음성을 생성할 수 없습니다."),
         variant: "destructive",
       });
     } finally {
@@ -171,8 +171,8 @@ const ListeningExercise = ({ questions, onComplete }: ListeningExerciseProps) =>
           } catch (error) {
             console.error("STT error:", error);
             toast({
-              title: "인식 오류",
-              description: "음성을 인식할 수 없습니다.",
+              title: t("listening.recognitionError", "인식 오류"),
+              description: t("listening.sttError", "음성을 인식할 수 없습니다."),
               variant: "destructive",
             });
           } finally {
@@ -196,8 +196,8 @@ const ListeningExercise = ({ questions, onComplete }: ListeningExerciseProps) =>
     } catch (error) {
       console.error("Recording error:", error);
       toast({
-        title: "마이크 오류",
-        description: "마이크를 사용할 수 없습니다.",
+        title: t("listening.micError", "마이크 오류"),
+        description: t("listening.micErrorDesc", "마이크를 사용할 수 없습니다."),
         variant: "destructive",
       });
     }
@@ -248,14 +248,14 @@ const ListeningExercise = ({ questions, onComplete }: ListeningExerciseProps) =>
     <div className="space-y-6">
       {/* Progress */}
       <div className="flex items-center justify-between text-sm text-muted-foreground">
-        <span>문제 {currentIndex + 1} / {questions.length}</span>
-        <span>정답 {correctCount}개</span>
+        <span>{t("listening.question", "문제")} {currentIndex + 1} / {questions.length}</span>
+        <span>{t("listening.correctCount", "정답")} {correctCount}{t("listening.countUnit", "개")}</span>
       </div>
       
       {/* Audio Player */}
       <div className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
         <div className="text-center mb-2">
-          <p className="text-sm text-muted-foreground mb-1">듣고 받아쓰기</p>
+          <p className="text-sm text-muted-foreground mb-1">{t("listening.listenAndWrite", "듣고 받아쓰기")}</p>
           <p className="text-xs text-muted-foreground">{currentQuestion.english}</p>
         </div>
         
@@ -293,7 +293,7 @@ const ListeningExercise = ({ questions, onComplete }: ListeningExerciseProps) =>
         
         {playCount > 0 && (
           <p className="text-xs text-muted-foreground">
-            {playCount}회 재생됨 {playCount > 1 && "(느린 속도)"}
+            {playCount}{t("listening.playCount", "회 재생됨")} {playCount > 1 && `(${t("listening.slowSpeed", "느린 속도")})`}
           </p>
         )}
       </div>
@@ -315,7 +315,7 @@ const ListeningExercise = ({ questions, onComplete }: ListeningExerciseProps) =>
         
         {currentQuestion.hint && !showResult && (
           <p className="text-xs text-muted-foreground text-center">
-            힌트: {currentQuestion.hint}
+            {t("listening.hint", "힌트")}: {currentQuestion.hint}
           </p>
         )}
       </div>
@@ -364,7 +364,7 @@ const ListeningExercise = ({ questions, onComplete }: ListeningExerciseProps) =>
             onClick={checkAnswer}
             disabled={!userAnswer.trim() || isLoading}
           >
-            정답 확인
+            {t("listening.checkAnswer", "정답 확인")}
           </Button>
         ) : (
           <>
@@ -377,13 +377,13 @@ const ListeningExercise = ({ questions, onComplete }: ListeningExerciseProps) =>
               }}
             >
               <RotateCcw className="w-4 h-4 mr-2" />
-              다시 듣기
+              {t("listening.listenAgain", "다시 듣기")}
             </Button>
             <Button
               className="flex-1"
               onClick={nextQuestion}
             >
-              {currentIndex + 1 >= questions.length ? "결과 보기" : "다음 문제"}
+              {currentIndex + 1 >= questions.length ? t("listening.viewResults", "결과 보기") : t("listening.nextQuestion", "다음 문제")}
             </Button>
           </>
         )}

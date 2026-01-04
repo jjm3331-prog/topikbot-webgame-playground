@@ -237,7 +237,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
   // Random nickname
   const generateRandomNickname = () => {
-    const adjectives = ["빠른", "용감한", "똑똒한", "귀여운", "멋진", "신나는", "활발한", "재미있는"];
+    const adjectives = ["빠른", "용감한", "똑똑한", "귀여운", "멋진", "신나는", "활발한", "재미있는"];
     const nouns = ["호랑이", "토끼", "용", "펭귄", "고양이", "강아지", "여우", "곰"];
     const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
     const noun = nouns[Math.floor(Math.random() * nouns.length)];
@@ -785,7 +785,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
     // Check duplicate
     if (chain.some((c) => c.word === newWord)) {
       // Duplicate = violation
-      await handleViolation("이미 사용한 단어예요!");
+      await handleViolation(t("chainReaction.errors.duplicate", "이미 사용한 단어예요!"));
       return;
     }
 
@@ -798,7 +798,7 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
 
       if (!result.valid) {
         // Use the reason from validation or fallback message
-        const message = result.reason || `유효하지 않은 단어예요!`;
+        const message = result.reason || t("chainReaction.errors.invalidWord", "유효하지 않은 단어예요!");
         await handleViolation(message);
         return;
       }
@@ -860,11 +860,11 @@ export default function ChainReactionMultiplayer({ words, onBack, initialRoomCod
         })
         .eq("id", room.id);
 
-      toast({ title: `❌ ${message} 패배!`, variant: "destructive" });
+      toast({ title: `❌ ${message} ${t("chainReaction.defeat", "패배!")}`, variant: "destructive" });
     } else {
       // Warning
       playWarnBeep();
-      setError(`⚠️ ${message} 경고 1회!`);
+      setError(`⚠️ ${message} ${t("chainReaction.warningOne", "경고 1회!")}`);
 
       const nextTurnPlayer = isHost ? room.guest_id : room.host_id;
 

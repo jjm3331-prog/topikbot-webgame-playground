@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -31,6 +32,7 @@ export default function ShadowingMode({
   onPlay,
   isPlaying,
 }: ShadowingModeProps) {
+  const { t } = useTranslation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [step, setStep] = useState<ShadowingStep>('listen');
   const [isRecording, setIsRecording] = useState(false);
@@ -63,7 +65,7 @@ export default function ShadowingMode({
 
   const startRecording = () => {
     if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      alert('이 브라우저는 음성인식을 지원하지 않습니다');
+      alert(t("shadowing.browserNotSupported", "이 브라우저는 음성인식을 지원하지 않습니다"));
       return;
     }
 
@@ -147,7 +149,7 @@ export default function ShadowingMode({
     return (
       <Card>
         <CardContent className="py-8 text-center text-muted-foreground">
-          자막이 없어서 섀도잉을 시작할 수 없습니다
+          {t("shadowing.noSubtitles", "자막이 없어서 섀도잉을 시작할 수 없습니다")}
         </CardContent>
       </Card>
     );
@@ -162,7 +164,7 @@ export default function ShadowingMode({
             {currentIndex + 1} / {subtitles.length}
           </span>
           <Badge variant="outline">
-            ✅ 완료: {completedCount}개
+            ✅ {t("shadowing.completed", "완료")}: {completedCount}{t("shadowing.countUnit", "개")}
           </Badge>
         </div>
         <Progress value={(currentIndex / subtitles.length) * 100} className="h-2" />
@@ -170,7 +172,7 @@ export default function ShadowingMode({
         {/* Current Sentence */}
         <div className="p-4 bg-muted/50 rounded-xl text-center">
           <p className="text-lg font-medium">
-            {currentSub?.text || '자막 없음'}
+            {currentSub?.text || t("shadowing.noCaption", "자막 없음")}
           </p>
         </div>
 
@@ -197,7 +199,7 @@ export default function ShadowingMode({
               className="text-center py-4"
             >
               <Badge className="bg-blue-500/20 text-blue-600">
-                🎧 듣는 중...
+                🎧 {t("shadowing.listening", "듣는 중...")}
               </Badge>
             </motion.div>
           )}
@@ -210,13 +212,13 @@ export default function ShadowingMode({
               exit={{ opacity: 0 }}
               className="flex flex-col items-center gap-3"
             >
-              <p className="text-sm text-muted-foreground">들은 문장을 따라 말해보세요</p>
+              <p className="text-sm text-muted-foreground">{t("shadowing.speakAfterListening", "들은 문장을 따라 말해보세요")}</p>
               <Button size="lg" onClick={startRecording} className="gap-2">
                 <Mic className="w-5 h-5" />
-                녹음 시작
+                {t("shadowing.startRecording", "녹음 시작")}
               </Button>
               <Button size="sm" variant="ghost" onClick={startShadowing}>
-                <Play className="w-4 h-4 mr-1" /> 다시 듣기
+                <Play className="w-4 h-4 mr-1" /> {t("shadowing.listenAgain", "다시 듣기")}
               </Button>
             </motion.div>
           )}
@@ -234,9 +236,9 @@ export default function ShadowingMode({
                   <Mic className="w-10 h-10 text-red-500" />
                 </div>
               </div>
-              <p className="text-sm font-medium text-red-500">녹음 중...</p>
+              <p className="text-sm font-medium text-red-500">{t("shadowing.recording", "녹음 중...")}</p>
               <Button size="sm" variant="destructive" onClick={stopRecording}>
-                <MicOff className="w-4 h-4 mr-1" /> 녹음 중지
+                <MicOff className="w-4 h-4 mr-1" /> {t("shadowing.stopRecording", "녹음 중지")}
               </Button>
             </motion.div>
           )}
@@ -251,8 +253,8 @@ export default function ShadowingMode({
             >
               {/* Your speech */}
               <div className="p-3 bg-muted rounded-lg">
-                <p className="text-xs text-muted-foreground mb-1">내 발음:</p>
-                <p className="font-medium">{transcript || '(인식 실패)'}</p>
+                <p className="text-xs text-muted-foreground mb-1">{t("shadowing.myPronunciation", "내 발음")}:</p>
+                <p className="font-medium">{transcript || `(${t("shadowing.recognitionFailed", "인식 실패")})`}</p>
               </div>
 
               {/* Score */}
@@ -268,7 +270,7 @@ export default function ShadowingMode({
                   <div>
                     <p className="text-3xl font-bold">{score}%</p>
                     <p className="text-sm text-muted-foreground">
-                      {score >= 80 ? '훌륭해요!' : score >= 50 ? '좋아요!' : '다시 도전!'}
+                      {score >= 80 ? t("shadowing.excellent", "훌륭해요!") : score >= 50 ? t("shadowing.good", "좋아요!") : t("shadowing.tryAgain", "다시 도전!")}
                     </p>
                   </div>
                 </div>
@@ -277,10 +279,10 @@ export default function ShadowingMode({
               {/* Actions */}
               <div className="flex justify-center gap-2">
                 <Button variant="outline" onClick={startShadowing}>
-                  <Play className="w-4 h-4 mr-1" /> 다시 연습
+                  <Play className="w-4 h-4 mr-1" /> {t("shadowing.practiceAgain", "다시 연습")}
                 </Button>
                 <Button onClick={nextSentence} disabled={currentIndex >= subtitles.length - 1}>
-                  <SkipForward className="w-4 h-4 mr-1" /> 다음 문장
+                  <SkipForward className="w-4 h-4 mr-1" /> {t("shadowing.nextSentence", "다음 문장")}
                 </Button>
               </div>
             </motion.div>
@@ -291,7 +293,7 @@ export default function ShadowingMode({
         {step !== 'listen' && step !== 'record' && currentIndex === 0 && score === null && (
           <div className="text-center pt-2">
             <Button onClick={startShadowing} className="gap-2">
-              <Play className="w-4 h-4" /> 섀도잉 시작
+              <Play className="w-4 h-4" /> {t("shadowing.start", "섀도잉 시작")}
             </Button>
           </div>
         )}

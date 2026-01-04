@@ -1,4 +1,56 @@
 {
+  "wordRacing": {
+    "title": "ワードレーシング",
+    "subtitle": "単語レース",
+    "speed": {
+      "slow": "遅い",
+      "normal": "普通",
+      "fast": "速い"
+    },
+    "tutorial": {
+      "prev": "前へ",
+      "next": "次へ",
+      "startGame": "ゲーム開始!",
+      "skip": "チュートリアルをスキップ",
+      "showAgain": "チュートリアルを再表示"
+    },
+    "wordTarget": "単語目標",
+    "seconds": "秒",
+    "timeLimit": "制限時間",
+    "missions": {
+      "title": "ミッション",
+      "words5": "5単語完成",
+      "combo5": "5コンボ達成",
+      "perfect": "ミスなし3単語",
+      "score500": "500点達成"
+    },
+    "speedLabel": "速度",
+    "start": "開始",
+    "startGame": "ゲーム開始",
+    "complete": "レース完了!",
+    "score": "スコア",
+    "words": "単語",
+    "maxCombo": "最大コンボ",
+    "missionsCompleted": "ミッション完了",
+    "playAgain": "もう一度",
+    "finish": "完了"
+  },
+  "chainReaction": {
+    "roomNotFound": "部屋が見つかりません",
+    "roomInProgress": "ゲームは既に進行中です",
+    "roomFull": "部屋が満員です",
+    "autoJoinFailed": "自動参加に失敗しました",
+    "kickedGuest": "ゲストを退出させました",
+    "enterName": "ニックネームを入力",
+    "createFailed": "部屋の作成に失敗しました",
+    "enterNameAndCode": "ニックネームとコードを入力",
+    "errors": {
+      "duplicate": "既に使用された単語です!",
+      "invalidWord": "無効な単語です!"
+    },
+    "defeat": "敗北!",
+    "warningOne": "警告1回!"
+  },
   "splash": {
     "tagline": "AIベースの韓国語学習ゲーム",
     "loading": "読み込み中...",
@@ -3253,5 +3305,26 @@
   "sentenceBuilder": {
     "streak": "連続!",
     "firstWord": "最初の単語"
+  },
+  "shadowing": {
+    "browserNotSupported": "このブラウザは音声認識に対応していません",
+    "noSubtitles": "字幕がないためシャドーイングを開始できません",
+    "completed": "完了",
+    "countUnit": "個",
+    "noCaption": "字幕なし",
+    "listening": "聞いています...",
+    "speakAfterListening": "聞いた文章を繰り返してください",
+    "startRecording": "録音開始",
+    "listenAgain": "もう一度聞く",
+    "recording": "録音中...",
+    "stopRecording": "録音停止",
+    "myPronunciation": "私の発音",
+    "recognitionFailed": "認識失敗",
+    "excellent": "素晴らしい!",
+    "good": "いいですね!",
+    "tryAgain": "もう一度!",
+    "practiceAgain": "もう一度練習",
+    "nextSentence": "次の文",
+    "start": "シャドーイング開始"
   }
 }

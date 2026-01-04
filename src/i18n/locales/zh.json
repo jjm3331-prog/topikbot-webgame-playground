@@ -1,4 +1,56 @@
 {
+  "wordRacing": {
+    "title": "单词赛车",
+    "subtitle": "单词赛车",
+    "speed": {
+      "slow": "慢",
+      "normal": "普通",
+      "fast": "快"
+    },
+    "tutorial": {
+      "prev": "上一步",
+      "next": "下一步",
+      "startGame": "开始游戏!",
+      "skip": "跳过教程",
+      "showAgain": "重看教程"
+    },
+    "wordTarget": "单词目标",
+    "seconds": "秒",
+    "timeLimit": "时间限制",
+    "missions": {
+      "title": "任务",
+      "words5": "完成5个单词",
+      "combo5": "达成5连击",
+      "perfect": "无失误3个单词",
+      "score500": "达成500分"
+    },
+    "speedLabel": "速度",
+    "start": "开始",
+    "startGame": "开始游戏",
+    "complete": "比赛完成!",
+    "score": "分数",
+    "words": "单词",
+    "maxCombo": "最大连击",
+    "missionsCompleted": "任务完成",
+    "playAgain": "再玩一次",
+    "finish": "完成"
+  },
+  "chainReaction": {
+    "roomNotFound": "找不到房间",
+    "roomInProgress": "游戏正在进行中",
+    "roomFull": "房间已满",
+    "autoJoinFailed": "自动加入失败",
+    "kickedGuest": "已踢出访客",
+    "enterName": "输入昵称",
+    "createFailed": "创建房间失败",
+    "enterNameAndCode": "输入昵称和代码",
+    "errors": {
+      "duplicate": "单词已使用!",
+      "invalidWord": "无效单词!"
+    },
+    "defeat": "失败!",
+    "warningOne": "警告1次!"
+  },
   "splash": {
     "tagline": "AI驱动的韩语学习游戏",
     "loading": "加载中...",
@@ -3268,5 +3320,26 @@
   "sentenceBuilder": {
     "streak": "连续!",
     "firstWord": "第一个词"
+  },
+  "shadowing": {
+    "browserNotSupported": "此浏览器不支持语音识别",
+    "noSubtitles": "没有字幕，无法开始跟读",
+    "completed": "完成",
+    "countUnit": "个",
+    "noCaption": "无字幕",
+    "listening": "正在听...",
+    "speakAfterListening": "请跟读刚才听到的句子",
+    "startRecording": "开始录音",
+    "listenAgain": "再听一次",
+    "recording": "录音中...",
+    "stopRecording": "停止录音",
+    "myPronunciation": "我的发音",
+    "recognitionFailed": "识别失败",
+    "excellent": "太棒了!",
+    "good": "不错!",
+    "tryAgain": "再试一次!",
+    "practiceAgain": "再练习",
+    "nextSentence": "下一句",
+    "start": "开始跟读"
   }
 }
