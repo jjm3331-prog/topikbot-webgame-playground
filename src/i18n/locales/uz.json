@@ -2790,6 +2790,124 @@
     "preparing": "Savollar tayyorlanmoqda",
     "noQuestions": "Bu bo'lim uchun hali savollar yo'q. Boshqasini tanlang.",
     "noQuestionsFilter": "Joriy mezonlarga mos savollar yo'q. Boshqa qiyinlikni sinab ko'ring."
+  },
+  "tutorial": {
+    "title": "O'yin qo'llanmasi",
+    "subtitle": "AI bilan qiziqarli koreys tilini o'rganing! Noyob til o'rganish o'yinlarini kashf qiling.",
+    "howToStart": "Qanday boshlash",
+    "tips": "Maslahatlar",
+    "playNow": "O'ynash!",
+    "startLearning": "Hozir o'rganishni boshlash!",
+    "quickStart": {
+      "title": "Tez boshlash",
+      "step1": { "title": "O'yin tanlash", "desc": "Menyudan o'yin tanlang" },
+      "step2": { "title": "Suhbat", "desc": "AI bilan koreys tilida muloqot qiling" },
+      "step3": { "title": "Ball olish", "desc": "Vazifalarni bajaring va bonus oling" }
+    },
+    "stats": {
+      "title": "Holatni tushunish",
+      "hp": { "title": "HP (Sog'liq)", "desc": "Xatolarda kamayadi. 0 = o'yin tugadi!" },
+      "money": { "title": "Pul (₩)", "desc": "Vazifalarni bajarib oling" },
+      "mission": { "title": "Vazifalar", "desc": "Bajarilgan vazifalar soni" },
+      "points": { "title": "Ballar", "desc": "Barcha o'yinlardan jami ball" }
+    },
+    "importantTips": {
+      "title": "Muhim maslahatlar",
+      "tip1": { "title": "Koreys tilida suhbatlashing!", "desc": "AI tushunadi va mos javob beradi" },
+      "tip2": { "title": "Tabiiyroq = yuqori ball", "desc": "Tabiiy ifodalarga e'tibor bering" },
+      "tip3": { "title": "Xato qilish yaxshi!", "desc": "Bu o'rganish jarayoni, sinab ko'ring" },
+      "tip4": { "title": "Ko'p tilli tushuntirishlar", "desc": "Barcha qo'llanmalarda tarjimalar bor" }
+    },
+    "gameGuides": {
+      "title": "Batafsil o'yin qo'llanmalari",
+      "subtitle": "Batafsil qo'llanma uchun har bir o'yinni bosing"
+    },
+    "games": {
+      "manager": {
+        "title": "LUKATO Manager",
+        "titleVi": "Guruh menejeri",
+        "summary": "Menejer simulyatori - stajyorlarni o'rgating va debyut qildiring!",
+        "summaryVi": "Menejer simulyatori - stajyorlarni o'rgating!",
+        "howToStart": "Menyu → 'LUKATO Manager' bosing",
+        "howToStartVi": "Menyu → 'LUKATO Manager' bosing",
+        "tip1": "Koreys tilida suhbatlashib statlarni oshiring",
+        "tip1Vi": "Koreys tilida suhbatlashib statlarni oshiring",
+        "tip2": "A'zolarning holatini boshqaring",
+        "tip2Vi": "A'zolarning holatini boshqaring"
+      },
+      "survival": {
+        "title": "Seulda yashash",
+        "titleVi": "Seulda yashash",
+        "summary": "AI bilan koreys tilida suhbatlashing va Seulda 10 tur yashang!",
+        "summaryVi": "AI bilan koreys tilida suhbatlashing va 10 tur yashang!",
+        "howToStart": "Menyu → 'AI Seul yashash' → Joy kiriting, 'Boshlash'",
+        "howToStartVi": "Menyu → 'AI Seul yashash' → Joy kiriting, 'Boshlash'",
+        "tip1": "Qisqa oddiy gaplardan boshlang",
+        "tip1Vi": "Qisqa oddiy gaplardan boshlang",
+        "tip2": "Hurmatli shakl (요/습니다) ishlatib yuqori ball oling",
+        "tip2Vi": "Hurmatli shakl (요/습니다) ishlatib yuqori ball oling"
+      },
+      "dating": {
+        "title": "Love Signal",
+        "titleVi": "Sevgi signali",
+        "summary": "Jozibali koreys personajlar bilan suhbatlashing va 100% simpati oling!",
+        "summaryVi": "Jozibali koreys personajlar bilan suhbatlashing!",
+        "howToStart": "Menyu → 'Koreys tanishuv' → Personaj tanlang",
+        "howToStartVi": "Menyu → 'Koreys tanishuv' → Personaj tanlang",
+        "tip1": "MZ sleng (ㅋㅋ, 갓생) ishlatib do'stona ko'rining",
+        "tip1Vi": "MZ sleng (ㅋㅋ, 갓생) ishlatib do'stona ko'rining",
+        "tip2": "Ularning MBTI ga mos suhbatlashib ko'ring",
+        "tip2Vi": "Ularning MBTI ga mos suhbatlashib ko'ring"
+      },
+      "wordchain": {
+        "title": "So'z zanjiri",
+        "titleVi": "So'z zanjiri",
+        "summary": "AI so'zining oxirgi harfi bilan boshlanadigan yangi so'z ayting!",
+        "summaryVi": "AI so'zining oxirgi harfi bilan boshlanadigan yangi so'z!",
+        "howToStart": "Menyu → 'Koreys so'z zanjiri'",
+        "howToStartVi": "Menyu → 'Koreys so'z zanjiri'",
+        "tip1": "Bosh tovush qoidasi: '녀→여', '률→율' qo'llaniladi",
+        "tip1Vi": "Bosh tovush qoidasi: '녀→여', '률→율' qo'llaniladi",
+        "tip2": "15 soniya ichida javob bering!",
+        "tip2Vi": "15 soniya ichida javob bering!"
+      },
+      "kpop": {
+        "title": "K-POP qo'shiq viktorinasi",
+        "titleVi": "K-POP qo'shiq viktorinasi",
+        "summary": "K-POP tinglab bo'sh joylarni to'ldiring!",
+        "summaryVi": "K-POP tinglab bo'sh joylarni to'ldiring!",
+        "howToStart": "Menyu → 'K-POP Quiz'",
+        "howToStartVi": "Menyu → 'K-POP Quiz'",
+        "tip1": "Tinglayotganda subtitrlarni diqqat bilan ko'ring",
+        "tip1Vi": "Tinglayotganda subtitrlarni diqqat bilan ko'ring",
+        "tip2": "Tez javob = bonus ball!",
+        "tip2Vi": "Tez javob = bonus ball!"
+      },
+      "kdrama": {
+        "title": "K-Drama dublyaj",
+        "titleVi": "K-Drama dublyaj",
+        "summary": "Mashhur drama replikalarini tinglab talaffuzni mashq qiling!",
+        "summaryVi": "Mashhur drama replikalarini tinglab talaffuzni mashq qiling!",
+        "howToStart": "Menyu → 'K-Drama Dublyaj'",
+        "howToStartVi": "Menyu → 'K-Drama Dublyaj'",
+        "tip1": "Sokin joyda yozing",
+        "tip1Vi": "Sokin joyda yozing",
+        "tip2": "Sekin va aniq o'qib yuqori ball oling",
+        "tip2Vi": "Sekin va aniq o'qib yuqori ball oling"
+      },
+      "parttime": {
+        "title": "Part-time ish",
+        "titleVi": "Koreys part-time",
+        "summary": "Koreys do'konlar va kafelarda ishlang va koreys tilini yaxshilang!",
+        "summaryVi": "Koreys do'konlar va kafelarda ishlang!",
+        "howToStart": "Menyu → 'Koreys part-time'",
+        "howToStartVi": "Menyu → 'Koreys part-time'",
+        "tip1": "Mijozlarga tabiiy xizmat qiling",
+        "tip1Vi": "Mijozlarga tabiiy xizmat qiling",
+        "tip2": "Yaxshi koreys tili = ko'proq daromad",
+        "tip2Vi": "Yaxshi koreys tili = ko'proq daromad"
+      }
+    }
   }
 }
 
