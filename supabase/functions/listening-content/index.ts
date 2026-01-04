@@ -279,14 +279,14 @@ async function searchRAG(
   }
 }
 
-// LLM Fallback - Gemini 2.5 Flash Lite (가장 빠름)
+// LLM - GPT-5 (OpenAI 최신 모델로 다양성 극대화)
 async function generateWithLLM(
   count: number,
   topikLevel: string,
   ragContext: string[]
 ): Promise<Question[]> {
-  const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-  if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not configured");
+  const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+  if (!OPENAI_API_KEY) throw new Error("OPENAI_API_KEY not configured");
 
   const levelExamples = TOPIK_LEVEL_EXAMPLES[topikLevel] || TOPIK_LEVEL_EXAMPLES["1-2"];
   
@@ -300,55 +300,69 @@ async function generateWithLLM(
   const randomTopics = [
     "카페", "병원", "학교", "회사", "공항", "호텔", "식당", "마트", "은행", "우체국",
     "도서관", "헬스장", "미용실", "영화관", "박물관", "지하철", "버스", "택시", "기차역",
-    "동아리", "회의", "면접", "여행", "쇼핑", "배달", "이사", "결혼", "생일", "졸업"
+    "동아리", "회의", "면접", "여행", "쇼핑", "배달", "이사", "결혼", "생일", "졸업",
+    "수영장", "치과", "안과", "약국", "편의점", "카센터", "부동산", "세탁소", "꽃집", "베이커리",
+    "스터디카페", "코인세탁", "PC방", "노래방", "볼링장", "수족관", "동물병원", "어린이집"
   ];
-  const selectedTopics = randomTopics.sort(() => Math.random() - 0.5).slice(0, 5);
+  const selectedTopics = randomTopics.sort(() => Math.random() - 0.5).slice(0, 7);
+  
+  // 다양한 상황 패턴
+  const situationPatterns = [
+    "약속 변경", "정보 문의", "불만 제기", "감사 표현", "조언 구하기", "계획 논의",
+    "오해 해결", "추천 요청", "결정 내리기", "경험 공유", "문제 해결", "예약 변경"
+  ];
+  const selectedPatterns = situationPatterns.sort(() => Math.random() - 0.5).slice(0, 3);
   
   const userPrompt = `${levelExamples}${contextSection}
 
-[이번 생성 시 필수 포함할 주제: ${selectedTopics.join(", ")}]
-[랜덤 시드: ${randomSeed} - 이 숫자를 참고하여 창의적이고 독특한 상황 설정]
+[🎲 이번 생성 필수 조건]
+- 필수 포함 주제: ${selectedTopics.join(", ")}
+- 필수 상황 패턴: ${selectedPatterns.join(", ")}
+- 랜덤 시드: ${randomSeed}
 
 위 예시와 동일한 품질과 난이도로 TOPIK ${topikLevel}급 듣기 문제 ${count}개를 JSON 배열로 생성하세요.
 
-⚠️ 중요: 
-- 각 문제는 완전히 다른 주제와 상황을 다뤄야 합니다
-- 비슷한 패턴의 대화나 질문 금지
-- 등장인물의 이름, 직업, 나이를 다양하게 설정
-- 창의적이고 현실적인 한국 생활 상황 반영
-- 반드시 예시의 어휘/문법 수준을 정확히 따르세요`;
+⚠️ 다양성 규칙 (매우 중요!):
+1. 각 문제의 주제, 장소, 등장인물이 모두 달라야 함
+2. 같은 질문 패턴 금지 (예: "왜 전화했습니까?" 반복 금지)
+3. 대화 시작 방식, 전개, 결론이 각각 다르게
+4. 등장인물 이름: 한국 이름 다양하게 (민수, 지영, 현우, 소희, 태민, 은지 등)
+5. 나이대/직업 다양하게: 학생, 직장인, 주부, 노인, 자영업자 등
+6. 반드시 예시의 어휘/문법 수준을 정확히 따르세요
 
-  console.log(`[Listening] LLM Fallback: Generating ${count} questions for TOPIK ${topikLevel}`);
+출력: JSON 배열만 (설명, 마크다운 금지)`;
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        generationConfig: {
-          temperature: 0.9,  // 높은 temperature로 다양성 극대화
-          topP: 0.95,        // 더 넓은 토큰 선택 범위
-          maxOutputTokens: 8192,
-          responseMimeType: "application/json",
-        },
-      }),
-    }
-  );
+  console.log(`[Listening] GPT-5: Generating ${count} questions for TOPIK ${topikLevel}`);
+
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${OPENAI_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'gpt-5-2025-08-07',
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: userPrompt }
+      ],
+      max_completion_tokens: 8192,
+      response_format: { type: "json_object" },
+    }),
+  });
 
   if (!response.ok) {
     const errText = await response.text();
-    console.error("[Listening] Gemini error:", response.status, errText);
-    throw new Error(`Gemini API error: ${response.status}`);
+    console.error("[Listening] GPT-5 error:", response.status, errText);
+    throw new Error(`OpenAI API error: ${response.status}`);
   }
 
   const data = await response.json();
-  const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  const content = data.choices?.[0]?.message?.content || '';
 
   try {
     const parsed = JSON.parse(content);
+    // GPT가 { "questions": [...] } 형태로 반환할 수 있음
     return Array.isArray(parsed) ? parsed : parsed.questions || [];
   } catch {
     const jsonMatch = content.match(/\[[\s\S]*\]/);
