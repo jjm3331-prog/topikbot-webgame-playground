@@ -542,8 +542,13 @@ const MockExamTest = () => {
         query = query.eq('part_number', existingAttempt.part_number);
       }
       
-      const { data: questionData } = await query.order('section').order('part_number').order('question_number');
+      const { data: questionData, error: questionError } = await query
+        .order('section')
+        .order('part_number')
+        .order('question_number');
       
+      if (questionError) throw questionError;
+
       if (!questionData?.length) {
         navigate('/mock-exam');
         return;
@@ -564,10 +569,46 @@ const MockExamTest = () => {
         return undefined;
       };
 
-      // Shuffle questions for random order
-      const shuffledQuestions = [...questionData].sort(() => Math.random() - 0.5);
-      
-      const formattedQuestions: Question[] = shuffledQuestions.map(q => ({
+      // ✅ 재개(resume) 시에도 "실전(full)"은 프리셋 기준 문항수/섹션 구성으로 강제 정규화
+      const preset = getPreset(existingAttempt.exam_type, existingAttempt.exam_mode);
+      let normalizedQuestions = [...questionData];
+
+      if (existingAttempt.exam_mode === 'full' && preset?.sections) {
+        const sectionOrder = ['listening', 'reading', 'writing'] as const;
+        const picked: typeof questionData = [];
+
+        for (const sec of sectionOrder) {
+          const cfg = preset.sections[sec];
+          if (!cfg) continue;
+
+          const secQuestions = normalizedQuestions
+            .filter((q) => q.section === sec)
+            .sort(
+              (a, b) =>
+                (a.part_number || 0) - (b.part_number || 0) ||
+                (a.question_number || 0) - (b.question_number || 0)
+            );
+
+          picked.push(...secQuestions.slice(0, Math.min(cfg.questionCount, secQuestions.length)));
+        }
+
+        normalizedQuestions = picked;
+
+        // 잘못 생성된 기존 attempt가 1000개로 저장되어 있어도 UI/저장은 실제 문항수로 맞춤
+        if (existingAttempt.total_questions !== normalizedQuestions.length) {
+          await supabase
+            .from('mock_exam_attempts')
+            .update({ total_questions: normalizedQuestions.length })
+            .eq('id', existingAttempt.id);
+          existingAttempt.total_questions = normalizedQuestions.length;
+        }
+      } else {
+        // 프리셋 설정에 따라 셔플 여부 결정 (기본: 셔플)
+        const shouldShuffle = preset?.settings.shuffleQuestions ?? true;
+        if (shouldShuffle) normalizedQuestions = [...normalizedQuestions].sort(() => Math.random() - 0.5);
+      }
+
+      const formattedQuestions: Question[] = normalizedQuestions.map(q => ({
         id: q.id,
         question_text: q.question_text,
         options: Array.isArray(q.options) ? q.options as string[] : [],
