@@ -15,7 +15,11 @@ import {
   ChevronDown,
   Eye,
   BookOpen,
-  Headphones
+  Headphones,
+  Image,
+  X,
+  Volume2,
+  PenTool
 } from "lucide-react";
 import CleanHeader from "@/components/CleanHeader";
 import { Button } from "@/components/ui/button";
@@ -25,6 +29,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -46,12 +52,16 @@ interface QuestionBankItem {
   exam_type: string;
   section: string;
   part_number: number;
+  question_number: number | null;
   question_text: string;
   options: string[];
   correct_answer: number;
   difficulty: string | null;
   usage_count: number;
   is_active: boolean;
+  question_image_url: string | null;
+  question_audio_url: string | null;
+  explanation_ko: string | null;
 }
 
 const AdminMockExam = () => {
@@ -65,6 +75,7 @@ const AdminMockExam = () => {
   const PAGE_SIZE = 100;
   const [jsonPreview, setJsonPreview] = useState<any>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [previewQuestion, setPreviewQuestion] = useState<QuestionBankItem | null>(null);
 
   // Fetch templates
   const { data: templates, isLoading: templatesLoading } = useQuery({
@@ -665,32 +676,71 @@ const AdminMockExam = () => {
                         <TableHead>시험</TableHead>
                         <TableHead>영역</TableHead>
                         <TableHead>Part</TableHead>
-                        <TableHead className="max-w-md">문제</TableHead>
+                        <TableHead>번호</TableHead>
+                        <TableHead className="max-w-xs">문제</TableHead>
+                        <TableHead>미디어</TableHead>
                         <TableHead>난이도</TableHead>
-                        <TableHead>사용횟수</TableHead>
+                        <TableHead>사용</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {questions.map((question) => (
                         <TableRow key={question.id}>
                           <TableCell>
-                            <Badge className={`${getExamTypeColor(question.exam_type)} text-white`}>
+                            <Badge className={`${getExamTypeColor(question.exam_type)} text-white text-[10px]`}>
                               {question.exam_type.replace('_', ' ')}
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            {question.section === 'listening' ? '듣기' : question.section === 'writing' ? '쓰기' : '읽기'}
+                            {question.section === 'listening' ? (
+                              <Headphones className="w-4 h-4 text-amber-500" />
+                            ) : question.section === 'writing' ? (
+                              <PenTool className="w-4 h-4 text-purple-500" />
+                            ) : (
+                              <BookOpen className="w-4 h-4 text-blue-500" />
+                            )}
                           </TableCell>
-                          <TableCell>Part {question.part_number}</TableCell>
-                          <TableCell className="max-w-md truncate">
-                            {question.question_text}
+                          <TableCell className="text-xs">{question.part_number}</TableCell>
+                          <TableCell className="text-xs">{question.question_number || '-'}</TableCell>
+                          <TableCell className="max-w-xs">
+                            <p className="truncate text-xs">{question.question_text.slice(0, 50)}...</p>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="outline">
-                              {question.difficulty || 'medium'}
+                            <div className="flex items-center gap-1">
+                              {question.question_image_url && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-7 w-7 p-0"
+                                  onClick={() => setPreviewQuestion(question)}
+                                >
+                                  <Image className="w-4 h-4 text-green-500" />
+                                </Button>
+                              )}
+                              {question.question_audio_url && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-7 w-7 p-0"
+                                  onClick={() => {
+                                    const audio = new Audio(question.question_audio_url!);
+                                    audio.play();
+                                  }}
+                                >
+                                  <Volume2 className="w-4 h-4 text-amber-500" />
+                                </Button>
+                              )}
+                              {!question.question_image_url && !question.question_audio_url && (
+                                <span className="text-muted-foreground text-xs">-</span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="text-[10px]">
+                              {question.difficulty || 'med'}
                             </Badge>
                           </TableCell>
-                          <TableCell>{question.usage_count}</TableCell>
+                          <TableCell className="text-xs">{question.usage_count}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -706,6 +756,117 @@ const AdminMockExam = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Image/Question Preview Dialog */}
+        <Dialog open={!!previewQuestion} onOpenChange={() => setPreviewQuestion(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Eye className="w-5 h-5" />
+                문제 상세 미리보기
+                {previewQuestion && (
+                  <Badge className="ml-2">
+                    Part {previewQuestion.part_number} - Q{previewQuestion.question_number || '?'}
+                  </Badge>
+                )}
+              </DialogTitle>
+            </DialogHeader>
+            
+            {previewQuestion && (
+              <ScrollArea className="max-h-[70vh]">
+                <div className="space-y-4 pr-4">
+                  {/* Image Preview */}
+                  {previewQuestion.question_image_url && (
+                    <div className="space-y-2">
+                      <h4 className="font-medium flex items-center gap-2">
+                        <Image className="w-4 h-4 text-green-500" />
+                        도표/이미지
+                      </h4>
+                      <div className="border rounded-lg overflow-hidden bg-white">
+                        <img 
+                          src={previewQuestion.question_image_url} 
+                          alt="Question image"
+                          className="w-full h-auto max-h-96 object-contain"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/placeholder.svg';
+                          }}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground break-all">
+                        URL: {previewQuestion.question_image_url}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Audio Preview */}
+                  {previewQuestion.question_audio_url && (
+                    <div className="space-y-2">
+                      <h4 className="font-medium flex items-center gap-2">
+                        <Volume2 className="w-4 h-4 text-amber-500" />
+                        오디오
+                      </h4>
+                      <audio 
+                        controls 
+                        className="w-full"
+                        src={previewQuestion.question_audio_url}
+                      />
+                    </div>
+                  )}
+
+                  {/* Question Text */}
+                  <div className="space-y-2">
+                    <h4 className="font-medium">문제</h4>
+                    <p className="text-sm bg-muted p-3 rounded-lg whitespace-pre-wrap">
+                      {previewQuestion.question_text}
+                    </p>
+                  </div>
+
+                  {/* Options */}
+                  {Array.isArray(previewQuestion.options) && previewQuestion.options.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="font-medium">선택지</h4>
+                      <div className="space-y-1">
+                        {previewQuestion.options.map((opt: string, idx: number) => (
+                          <div 
+                            key={idx}
+                            className={`text-sm p-2 rounded-lg border ${
+                              idx + 1 === previewQuestion.correct_answer 
+                                ? 'bg-green-500/10 border-green-500/30 text-green-600' 
+                                : 'bg-muted border-transparent'
+                            }`}
+                          >
+                            {idx + 1}. {opt}
+                            {idx + 1 === previewQuestion.correct_answer && (
+                              <CheckCircle2 className="w-4 h-4 inline ml-2" />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Explanation */}
+                  {previewQuestion.explanation_ko && (
+                    <div className="space-y-2">
+                      <h4 className="font-medium">해설</h4>
+                      <p className="text-sm bg-blue-500/10 p-3 rounded-lg border border-blue-500/20">
+                        {previewQuestion.explanation_ko}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Metadata */}
+                  <div className="flex flex-wrap gap-2 pt-2 border-t">
+                    <Badge variant="outline">{previewQuestion.exam_type}</Badge>
+                    <Badge variant="outline">{previewQuestion.section}</Badge>
+                    <Badge variant="outline">{previewQuestion.difficulty || 'medium'}</Badge>
+                    <Badge variant="secondary">사용 {previewQuestion.usage_count}회</Badge>
+                  </div>
+                </div>
+              </ScrollArea>
+            )}
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
