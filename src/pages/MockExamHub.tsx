@@ -363,16 +363,16 @@ const MockExamHub = () => {
   };
 
   // 시험 시작
-  const handleStartExam = () => {
+  const handleStartExam = async () => {
     if (!selectedExamForStart) return;
 
     setShowStartDialog(false);
 
     if (selectedMode === 'section') {
-      loadAvailableSections(selectedExamForStart);
+      await loadAvailableSections(selectedExamForStart);
       setShowModeDialog(true);
     } else if (selectedMode === 'part') {
-      loadAvailableParts(selectedExamForStart);
+      await loadAvailableParts(selectedExamForStart);
       setShowPartDialog(true);
     } else if (selectedMode === 'weakness') {
       loadWeaknessAnalysis(selectedExamForStart);
