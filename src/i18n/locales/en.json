@@ -553,7 +553,9 @@
     "topRankers": "Top Rankers",
     "rankingList": "Ranking List",
     "levelSystem": "TOPIK Level System",
-    "earnPointsToLevel": "Earn points to level up your TOPIK rank"
+    "earnPointsToLevel": "Earn points to level up your TOPIK rank",
+    "topikLevel": "TOPIK Level {{level}}",
+    "grade": ""
   },
   "pricing": {
     "title": "Choose the right plan",
@@ -3482,5 +3484,57 @@
     "title": { "lesson": "Lesson", "select": "Selection" },
     "subtitle1": "Choose your learning area.",
     "subtitle2": "AI provides personalized content."
+  },
+  "flashLoop": {
+    "loading": "Loading words...",
+    "noData": "No vocabulary data for this level.",
+    "retry": "Retry",
+    "complete": "Flash Loop Complete!",
+    "know": "Know",
+    "dontKnow": "Don't Know",
+    "accuracy": "Accuracy",
+    "restart": "Restart",
+    "meaning": "meaning",
+    "example": "e.g.",
+    "showMeaning": "Show Meaning",
+    "autoOn": "Auto-play ON",
+    "manualMode": "Manual Mode"
+  },
+  "meaningMatch": {
+    "loading": "Loading words...",
+    "noData": "No vocabulary data for this level.",
+    "retry": "Retry",
+    "complete": "Meaning Match Complete!",
+    "points": " pts",
+    "pairs": " pairs matched",
+    "accuracy": "Accuracy",
+    "restart": "Restart",
+    "round": "Round",
+    "streak": " streak!",
+    "koreanWord": "Korean Word",
+    "meaning": "meaning",
+    "correct": "Correct!",
+    "wrong": "Wrong! Try again",
+    "instruction": "Match Korean words on the left with {{lang}} meanings on the right"
+  },
+  "miniCloze": {
+    "loading": "Loading questions...",
+    "noData": "No cloze questions for this level.",
+    "retry": "Retry",
+    "complete": "Mini Cloze Complete!",
+    "points": " pts",
+    "questions": " questions",
+    "accuracy": "Accuracy",
+    "restart": "Restart",
+    "streak": " streak!",
+    "hint": "Hint",
+    "showHint": "Show Hint",
+    "correct": "Correct!",
+    "wrong": "Wrong! Answer is",
+    "nextQuestion": "Next Question"
+  },
+  "sentenceBuilder": {
+    "streak": " streak!",
+    "firstWord": "First word"
   }
 }

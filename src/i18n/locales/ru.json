@@ -515,7 +515,9 @@
     "topRankers": "Топ рейтинга",
     "rankingList": "Список рейтинга",
     "levelSystem": "Система уровней TOPIK",
-    "earnPointsToLevel": "Зарабатывайте баллы для повышения уровня TOPIK"
+    "earnPointsToLevel": "Зарабатывайте баллы для повышения уровня TOPIK",
+    "topikLevel": "TOPIK уровень {{level}}",
+    "grade": ""
   },
   "pricing": {
     "title": "Выберите подходящий план",
@@ -3205,5 +3207,57 @@
     "title": { "lesson": "Урок", "select": "Выбор" },
     "subtitle1": "Выберите область обучения.",
     "subtitle2": "AI предоставит персонализированный контент."
+  },
+  "flashLoop": {
+    "loading": "Загрузка слов...",
+    "noData": "Нет данных для этого уровня.",
+    "retry": "Повторить",
+    "complete": "Flash Loop завершён!",
+    "know": "Знаю",
+    "dontKnow": "Не знаю",
+    "accuracy": "Точность",
+    "restart": "Заново",
+    "meaning": "значение",
+    "example": "пр.",
+    "showMeaning": "Показать значение",
+    "autoOn": "Авто ВКЛ",
+    "manualMode": "Ручной режим"
+  },
+  "meaningMatch": {
+    "loading": "Загрузка слов...",
+    "noData": "Нет данных для этого уровня.",
+    "retry": "Повторить",
+    "complete": "Сопоставление завершено!",
+    "points": " очк.",
+    "pairs": " пар сопоставлено",
+    "accuracy": "Точность",
+    "restart": "Заново",
+    "round": "Раунд",
+    "streak": " подряд!",
+    "koreanWord": "Корейское слово",
+    "meaning": "значение",
+    "correct": "Правильно!",
+    "wrong": "Неправильно! Попробуйте снова",
+    "instruction": "Сопоставьте корейские слова слева со значениями на {{lang}} справа"
+  },
+  "miniCloze": {
+    "loading": "Загрузка вопросов...",
+    "noData": "Нет вопросов для этого уровня.",
+    "retry": "Повторить",
+    "complete": "Mini Cloze завершён!",
+    "points": " очк.",
+    "questions": " вопросов",
+    "accuracy": "Точность",
+    "restart": "Заново",
+    "streak": " подряд!",
+    "hint": "Подсказка",
+    "showHint": "Показать подсказку",
+    "correct": "Правильно!",
+    "wrong": "Неправильно! Ответ:",
+    "nextQuestion": "Следующий вопрос"
+  },
+  "sentenceBuilder": {
+    "streak": " подряд!",
+    "firstWord": "Первое слово"
   }
 }

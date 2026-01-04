@@ -517,7 +517,9 @@
     "topRankers": "トップランカー",
     "rankingList": "ランキングリスト",
     "levelSystem": "TOPIKレベルシステム",
-    "earnPointsToLevel": "ポイントを獲得してTOPIKレベルを上げよう"
+    "earnPointsToLevel": "ポイントを獲得してTOPIKレベルを上げよう",
+    "topikLevel": "TOPIK {{level}}級",
+    "grade": "級"
   },
   "pricing": {
     "title": "最適なプランを選択",
@@ -3199,5 +3201,57 @@
     "title": { "lesson": "レッスン", "select": "選択" },
     "subtitle1": "学習したい分野を選んでください。",
     "subtitle2": "AIがパーソナライズされたコンテンツを提供します。"
+  },
+  "flashLoop": {
+    "loading": "単語を読み込み中...",
+    "noData": "このレベルの語彙データがありません。",
+    "retry": "再試行",
+    "complete": "Flash Loop完了!",
+    "know": "知っている",
+    "dontKnow": "知らない",
+    "accuracy": "正答率",
+    "restart": "再開",
+    "meaning": "意味",
+    "example": "例",
+    "showMeaning": "意味を見る",
+    "autoOn": "自動進行ON",
+    "manualMode": "手動モード"
+  },
+  "meaningMatch": {
+    "loading": "単語を読み込み中...",
+    "noData": "このレベルの語彙データがありません。",
+    "retry": "再試行",
+    "complete": "意味マッチ完了!",
+    "points": "点",
+    "pairs": "ペアマッチ",
+    "accuracy": "正確度",
+    "restart": "再開",
+    "round": "ラウンド",
+    "streak": "連続!",
+    "koreanWord": "韓国語単語",
+    "meaning": "意味",
+    "correct": "正解!",
+    "wrong": "不正解!もう一度",
+    "instruction": "左の韓国語単語と右の{{lang}}の意味をマッチさせてください"
+  },
+  "miniCloze": {
+    "loading": "問題を読み込み中...",
+    "noData": "このレベルの穴埋め問題がありません。",
+    "retry": "再試行",
+    "complete": "Mini Cloze完了!",
+    "points": "点",
+    "questions": "問中",
+    "accuracy": "正答率",
+    "restart": "再開",
+    "streak": "連続!",
+    "hint": "ヒント",
+    "showHint": "ヒントを見る",
+    "correct": "正解です!",
+    "wrong": "不正解!正解は",
+    "nextQuestion": "次の問題"
+  },
+  "sentenceBuilder": {
+    "streak": "連続!",
+    "firstWord": "最初の単語"
   }
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { 
@@ -29,8 +30,8 @@ interface MiniClozeProps {
 }
 
 const MiniCloze = ({ level, onMistake }: MiniClozeProps) => {
+  const { t } = useTranslation();
   const { getMeaning, getCurrentLanguage, languageLabels } = useVocabulary();
-  
   const [questions, setQuestions] = useState<ClozeQuestion[]>([]);
   const [vocabQuestions, setVocabQuestions] = useState<VocabWord[]>([]);
   const [useVocabMode, setUseVocabMode] = useState(false);
@@ -246,7 +247,7 @@ const MiniCloze = ({ level, onMistake }: MiniClozeProps) => {
     return (
       <div className="text-center py-12">
         <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
-        <p className="text-muted-foreground">문제 로딩 중...</p>
+        <p className="text-muted-foreground">{t("miniCloze.loading")}</p>
       </div>
     );
   }
@@ -255,9 +256,9 @@ const MiniCloze = ({ level, onMistake }: MiniClozeProps) => {
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground mb-4">
-          이 레벨의 빈칸 문제가 없습니다.
+          {t("miniCloze.noData")}
         </p>
-        <Button onClick={fetchQuestions}>다시 시도</Button>
+        <Button onClick={fetchQuestions}>{t("miniCloze.retry")}</Button>
       </div>
     );
   }
@@ -272,14 +273,14 @@ const MiniCloze = ({ level, onMistake }: MiniClozeProps) => {
         <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center mx-auto mb-6">
           <CheckCircle2 className="w-12 h-12 text-white" />
         </div>
-        <h2 className="text-2xl font-bold mb-2">Mini Cloze 완료! 🎯</h2>
-        <p className="text-3xl font-bold text-primary mb-2">{score}점</p>
+        <h2 className="text-2xl font-bold mb-2">{t("miniCloze.complete")} 🎯</h2>
+        <p className="text-3xl font-bold text-primary mb-2">{score}{t("miniCloze.points")}</p>
         <p className="text-muted-foreground mb-6">
-          {totalQuestions}문제 중 정답률: {Math.round((score / (totalQuestions * 10)) * 100)}%
+          {totalQuestions}{t("miniCloze.questions")} {t("miniCloze.accuracy")}: {Math.round((score / (totalQuestions * 10)) * 100)}%
         </p>
         <Button onClick={handleRestart} size="lg">
           <RotateCcw className="w-4 h-4 mr-2" />
-          다시 시작
+          {t("miniCloze.restart")}
         </Button>
       </motion.div>
     );
@@ -328,17 +329,17 @@ const MiniCloze = ({ level, onMistake }: MiniClozeProps) => {
               animate={{ scale: 1 }}
               className="text-orange-500 font-bold"
             >
-              🔥 {streak} 연속!
+              🔥 {streak} {t("miniCloze.streak")}
             </motion.span>
           )}
-          <span className="text-lg font-bold text-primary">{score}점</span>
+          <span className="text-lg font-bold text-primary">{score}{t("miniCloze.points")}</span>
         </div>
       </div>
 
       {/* Language indicator */}
       <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
         <Globe className="w-4 h-4" />
-        <span>힌트: {languageLabels[currentLang]}</span>
+        <span>{t("miniCloze.hint")}: {languageLabels[currentLang]}</span>
       </div>
 
       {/* Question Card */}
@@ -365,7 +366,7 @@ const MiniCloze = ({ level, onMistake }: MiniClozeProps) => {
                 className="text-muted-foreground"
               >
                 <Lightbulb className="w-4 h-4 mr-2" />
-                {languageLabels[currentLang]} 힌트 보기
+                {languageLabels[currentLang]} {t("miniCloze.showHint")}
               </Button>
               <AnimatePresence>
                 {showHint && (
@@ -430,10 +431,10 @@ const MiniCloze = ({ level, onMistake }: MiniClozeProps) => {
                   ? (currentQuestion as VocabWord).word 
                   : (currentQuestion as ClozeQuestion).blank_word;
                 return selectedAnswer === correctAnswer ? (
-                  <p className="text-green-500 font-bold text-lg">정답입니다! ✨</p>
+                  <p className="text-green-500 font-bold text-lg">{t("miniCloze.correct")} ✨</p>
                 ) : (
                   <p className="text-red-500 font-bold text-lg">
-                    오답! 정답은 "{correctAnswer}" 입니다.
+                    {t("miniCloze.wrong")} "{correctAnswer}"
                   </p>
                 );
               })()}
@@ -450,7 +451,7 @@ const MiniCloze = ({ level, onMistake }: MiniClozeProps) => {
           className="flex justify-center"
         >
           <Button onClick={handleNext} size="lg">
-            다음 문제 <ChevronRight className="w-4 h-4 ml-1" />
+            {t("miniCloze.nextQuestion")} <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
         </motion.div>
       )}

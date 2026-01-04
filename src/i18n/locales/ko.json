@@ -553,7 +553,9 @@
     "topRankers": "상위 랭커",
     "rankingList": "랭킹 목록",
     "levelSystem": "TOPIK 레벨 시스템",
-    "earnPointsToLevel": "포인트를 모아 TOPIK 레벨을 올리세요"
+    "earnPointsToLevel": "포인트를 모아 TOPIK 레벨을 올리세요",
+    "topikLevel": "TOPIK {{level}}급",
+    "grade": "급"
   },
   "pricing": {
     "title": "적합한 플랜 선택",
@@ -3649,5 +3651,57 @@
     "title": { "lesson": "레슨", "select": "선택" },
     "subtitle1": "원하는 학습 영역을 선택하세요.",
     "subtitle2": "AI가 맞춤형 콘텐츠를 제공합니다."
+  },
+  "flashLoop": {
+    "loading": "단어 로딩 중...",
+    "noData": "이 레벨의 어휘 데이터가 없습니다.",
+    "retry": "다시 시도",
+    "complete": "Flash Loop 완료!",
+    "know": "알아요",
+    "dontKnow": "몰라요",
+    "accuracy": "정답률",
+    "restart": "다시 시작",
+    "meaning": "뜻",
+    "example": "예",
+    "showMeaning": "뜻 보기",
+    "autoOn": "자동 진행 ON",
+    "manualMode": "수동 모드"
+  },
+  "meaningMatch": {
+    "loading": "단어 로딩 중...",
+    "noData": "이 레벨의 어휘 데이터가 없습니다.",
+    "retry": "다시 시도",
+    "complete": "뜻 매칭 완료!",
+    "points": "점",
+    "pairs": "쌍 매칭",
+    "accuracy": "정확도",
+    "restart": "다시 시작",
+    "round": "라운드",
+    "streak": "연속!",
+    "koreanWord": "한국어 단어",
+    "meaning": "뜻",
+    "correct": "정답!",
+    "wrong": "오답! 다시 시도하세요",
+    "instruction": "왼쪽 한국어 단어와 오른쪽 {{lang}} 뜻을 매칭하세요"
+  },
+  "miniCloze": {
+    "loading": "문제 로딩 중...",
+    "noData": "이 레벨의 빈칸 문제가 없습니다.",
+    "retry": "다시 시도",
+    "complete": "Mini Cloze 완료!",
+    "points": "점",
+    "questions": "문제 중",
+    "accuracy": "정답률",
+    "restart": "다시 시작",
+    "streak": "연속!",
+    "hint": "힌트",
+    "showHint": "힌트 보기",
+    "correct": "정답입니다!",
+    "wrong": "오답! 정답은",
+    "nextQuestion": "다음 문제"
+  },
+  "sentenceBuilder": {
+    "streak": "연속!",
+    "firstWord": "첫 단어"
   }
 }

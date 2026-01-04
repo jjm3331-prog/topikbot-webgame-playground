@@ -553,7 +553,9 @@
     "topRankers": "Top Rankers",
     "rankingList": "Danh sách xếp hạng",
     "levelSystem": "Hệ thống cấp độ TOPIK",
-    "earnPointsToLevel": "Kiếm điểm để lên cấp TOPIK của bạn"
+    "earnPointsToLevel": "Kiếm điểm để lên cấp TOPIK của bạn",
+    "topikLevel": "TOPIK cấp {{level}}",
+    "grade": ""
   },
   "pricing": {
     "title": "Chọn gói phù hợp",
@@ -3530,5 +3532,57 @@
     "title": { "lesson": "Bài học", "select": "Chọn" },
     "subtitle1": "Chọn lĩnh vực học tập.",
     "subtitle2": "AI cung cấp nội dung cá nhân hóa."
+  },
+  "flashLoop": {
+    "loading": "Đang tải từ vựng...",
+    "noData": "Không có dữ liệu từ vựng cho cấp độ này.",
+    "retry": "Thử lại",
+    "complete": "Hoàn thành Flash Loop!",
+    "know": "Biết",
+    "dontKnow": "Không biết",
+    "accuracy": "Độ chính xác",
+    "restart": "Bắt đầu lại",
+    "meaning": "nghĩa",
+    "example": "ví dụ",
+    "showMeaning": "Xem nghĩa",
+    "autoOn": "Tự động BẬT",
+    "manualMode": "Chế độ thủ công"
+  },
+  "meaningMatch": {
+    "loading": "Đang tải từ vựng...",
+    "noData": "Không có dữ liệu từ vựng cho cấp độ này.",
+    "retry": "Thử lại",
+    "complete": "Hoàn thành ghép nghĩa!",
+    "points": " điểm",
+    "pairs": " cặp đã ghép",
+    "accuracy": "Độ chính xác",
+    "restart": "Bắt đầu lại",
+    "round": "Vòng",
+    "streak": " liên tiếp!",
+    "koreanWord": "Từ tiếng Hàn",
+    "meaning": "nghĩa",
+    "correct": "Đúng rồi!",
+    "wrong": "Sai! Thử lại nhé",
+    "instruction": "Ghép từ tiếng Hàn bên trái với nghĩa {{lang}} bên phải"
+  },
+  "miniCloze": {
+    "loading": "Đang tải câu hỏi...",
+    "noData": "Không có câu hỏi điền khuyết cho cấp độ này.",
+    "retry": "Thử lại",
+    "complete": "Hoàn thành Mini Cloze!",
+    "points": " điểm",
+    "questions": " câu hỏi",
+    "accuracy": "Tỷ lệ đúng",
+    "restart": "Bắt đầu lại",
+    "streak": " liên tiếp!",
+    "hint": "Gợi ý",
+    "showHint": "Xem gợi ý",
+    "correct": "Đúng rồi!",
+    "wrong": "Sai! Đáp án là",
+    "nextQuestion": "Câu tiếp theo"
+  },
+  "sentenceBuilder": {
+    "streak": " liên tiếp!",
+    "firstWord": "Từ đầu tiên"
   }
 }

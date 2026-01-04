@@ -517,7 +517,9 @@
     "topRankers": "顶级玩家",
     "rankingList": "排名列表",
     "levelSystem": "TOPIK等级系统",
-    "earnPointsToLevel": "获取积分提升你的TOPIK等级"
+    "earnPointsToLevel": "获取积分提升你的TOPIK等级",
+    "topikLevel": "TOPIK {{level}}级",
+    "grade": "级"
   },
   "pricing": {
     "title": "选择合适的套餐",
@@ -3214,5 +3216,57 @@
     "title": { "lesson": "课程", "select": "选择" },
     "subtitle1": "选择您想学习的领域。",
     "subtitle2": "AI提供个性化内容。"
+  },
+  "flashLoop": {
+    "loading": "加载单词中...",
+    "noData": "该级别没有词汇数据。",
+    "retry": "重试",
+    "complete": "Flash Loop完成!",
+    "know": "认识",
+    "dontKnow": "不认识",
+    "accuracy": "正确率",
+    "restart": "重新开始",
+    "meaning": "意思",
+    "example": "例",
+    "showMeaning": "查看意思",
+    "autoOn": "自动进行 ON",
+    "manualMode": "手动模式"
+  },
+  "meaningMatch": {
+    "loading": "加载单词中...",
+    "noData": "该级别没有词汇数据。",
+    "retry": "重试",
+    "complete": "意思匹配完成!",
+    "points": "分",
+    "pairs": "对匹配",
+    "accuracy": "准确度",
+    "restart": "重新开始",
+    "round": "回合",
+    "streak": "连续!",
+    "koreanWord": "韩语单词",
+    "meaning": "意思",
+    "correct": "正确!",
+    "wrong": "错误!再试一次",
+    "instruction": "将左边的韩语单词与右边的{{lang}}意思匹配"
+  },
+  "miniCloze": {
+    "loading": "加载问题中...",
+    "noData": "该级别没有填空题。",
+    "retry": "重试",
+    "complete": "Mini Cloze完成!",
+    "points": "分",
+    "questions": "题中",
+    "accuracy": "正确率",
+    "restart": "重新开始",
+    "streak": "连续!",
+    "hint": "提示",
+    "showHint": "查看提示",
+    "correct": "正确!",
+    "wrong": "错误!答案是",
+    "nextQuestion": "下一题"
+  },
+  "sentenceBuilder": {
+    "streak": "连续!",
+    "firstWord": "第一个词"
   }
 }
