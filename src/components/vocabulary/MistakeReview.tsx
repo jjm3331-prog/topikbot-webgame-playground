@@ -73,10 +73,10 @@ interface MistakeReviewProps {
 type ViewMode = 'review' | 'stats';
 type QuizType = 'synonym' | 'antonym' | 'similar';
 
-const QUIZ_TYPE_LABELS: Record<QuizType, { ko: string; color: string }> = {
-  synonym: { ko: '동의어', color: 'text-green-600' },
-  antonym: { ko: '반의어', color: 'text-red-600' },
-  similar: { ko: '유사어', color: 'text-blue-600' }
+const QUIZ_TYPE_LABELS: Record<QuizType, { key: string; color: string }> = {
+  synonym: { key: 'mistakeReview.quizType.synonym', color: 'text-green-600' },
+  antonym: { key: 'mistakeReview.quizType.antonym', color: 'text-red-600' },
+  similar: { key: 'mistakeReview.quizType.similar', color: 'text-blue-600' }
 };
 
 // In-memory cache for related words (persists across quiz sessions)
@@ -431,17 +431,17 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold flex items-center gap-2">
             <Target className="w-5 h-5 text-primary" />
-            오답 통계
+            {t('mistakeReview.stats.title')}
           </h3>
           <Button variant="outline" size="sm" onClick={() => setViewMode('review')}>
-            퀴즈 모드
+            {t('mistakeReview.quizMode')}
           </Button>
         </div>
 
         {stats.total === 0 ? (
           <Card className="p-8 text-center bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20">
             <Trophy className="w-12 h-12 mx-auto text-yellow-500 mb-3" />
-            <p className="text-muted-foreground">아직 오답 기록이 없습니다!</p>
+            <p className="text-muted-foreground">{t('mistakeReview.stats.noRecord')}</p>
           </Card>
         ) : (
           <>
@@ -449,19 +449,19 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
                   <div className="text-2xl font-bold text-primary">{stats.total}</div>
-                  <div className="text-xs text-muted-foreground">전체 오답</div>
+                  <div className="text-xs text-muted-foreground">{t('mistakeReview.stats.totalMistakes')}</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-orange-500">
                     {Object.keys(stats.levelCounts).length}
                   </div>
-                  <div className="text-xs text-muted-foreground">레벨</div>
+                  <div className="text-xs text-muted-foreground">{t('mistakeReview.stats.levels')}</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-red-500">
                     {stats.topMistakes[0]?.count || 0}
                   </div>
-                  <div className="text-xs text-muted-foreground">최다 오답</div>
+                  <div className="text-xs text-muted-foreground">{t('mistakeReview.stats.mostMistakes')}</div>
                 </div>
               </div>
             </Card>
@@ -469,7 +469,7 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
             <Card className="p-4">
               <h4 className="font-semibold mb-3 flex items-center gap-2">
                 <Flame className="w-4 h-4 text-orange-500" />
-                레벨별 오답 분포
+                {t('mistakeReview.stats.levelDistribution')}
               </h4>
               <div className="h-48">
                 <ResponsiveContainer width="100%" height="100%">
@@ -505,7 +505,7 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
             <Card className="p-4">
               <h4 className="font-semibold mb-3 flex items-center gap-2">
                 <Brain className="w-4 h-4 text-red-500" />
-                가장 많이 틀린 단어 TOP 5
+                {t('mistakeReview.stats.topMistakes')}
               </h4>
               <div className="h-48">
                 <ResponsiveContainer width="100%" height="100%">
@@ -518,7 +518,7 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
                       tick={{ fontSize: 12 }}
                     />
                     <Tooltip 
-                      formatter={(value: number) => [`${value}회`, '틀린 횟수']}
+                      formatter={(value: number) => [`${value}${t('mistakeReview.stats.times')}`, t('mistakeReview.stats.mistakeCount')]}
                       contentStyle={{ 
                         backgroundColor: 'hsl(var(--background))', 
                         border: '1px solid hsl(var(--border))',
@@ -551,11 +551,11 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
             size="sm"
             onClick={() => setShowAllLevels(!showAllLevels)}
           >
-            {showAllLevels ? "전체 레벨" : `${level}급만`}
+            {showAllLevels ? t('mistakeReview.allLevels') : t('mistakeReview.levelOnly', { level })}
           </Button>
           <Button variant="outline" size="sm" onClick={() => setViewMode('stats')}>
             <Target className="w-4 h-4 mr-1" />
-            통계
+            {t('mistakeReview.stats.button')}
           </Button>
         </div>
 
@@ -567,16 +567,16 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
           >
             <Trophy className="w-16 h-16 mx-auto text-yellow-500 mb-4" />
           </motion.div>
-          <h3 className="text-xl font-bold text-foreground mb-2">완벽해요! 🎉</h3>
+          <h3 className="text-xl font-bold text-foreground mb-2">{t('mistakeReview.perfect')} 🎉</h3>
           <p className="text-muted-foreground mb-4">
             {showAllLevels 
-              ? "복습할 오답이 없습니다. 다른 학습 모듈에서 더 연습해보세요!"
-              : `${level}급 복습할 오답이 없습니다. 전체 레벨을 확인해보세요!`
+              ? t('mistakeReview.noMistakes.all')
+              : t('mistakeReview.noMistakes.level', { level })
             }
           </p>
           {!showAllLevels && allMistakes.length > 0 && (
             <Button onClick={() => setShowAllLevels(true)} className="mb-2">
-              전체 레벨 보기 ({allMistakes.length}개)
+              {t('mistakeReview.viewAllLevels', { count: allMistakes.length })}
             </Button>
           )}
         </Card>
@@ -600,31 +600,31 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
           >
             <Sparkles className="w-12 h-12 mx-auto text-primary mb-3" />
           </motion.div>
-          <h3 className="text-xl font-bold text-foreground mb-4">관련어 퀴즈 완료!</h3>
+          <h3 className="text-xl font-bold text-foreground mb-4">{t('mistakeReview.quizComplete')}</h3>
           
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div className="bg-background/50 rounded-lg p-3">
               <div className="text-2xl font-bold text-primary">{correctCount}/{quizQuestions.length}</div>
-              <div className="text-xs text-muted-foreground">정답</div>
+              <div className="text-xs text-muted-foreground">{t('mistakeReview.correct')}</div>
             </div>
             <div className="bg-background/50 rounded-lg p-3">
               <div className="text-2xl font-bold text-green-500">{accuracy}%</div>
-              <div className="text-xs text-muted-foreground">정확도</div>
+              <div className="text-xs text-muted-foreground">{t('mistakeReview.accuracy')}</div>
             </div>
           </div>
           
           <p className="text-sm text-muted-foreground mb-4">
             {accuracy >= 80 
-              ? '훌륭해요! 관련어를 잘 이해하고 있습니다!' 
+              ? t('mistakeReview.result.excellent')
               : accuracy >= 50 
-                ? '좋아요! 조금 더 연습하면 완벽해질 거예요.' 
-                : '더 연습이 필요해요. 다시 도전해보세요!'}
+                ? t('mistakeReview.result.good')
+                : t('mistakeReview.result.needPractice')}
           </p>
         </Card>
 
         <Button onClick={handleRestart} className="w-full">
           <RotateCcw className="w-4 h-4 mr-2" />
-          다시 시작하기
+          {t('mistakeReview.restart')}
         </Button>
       </div>
     );
@@ -640,32 +640,32 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
             size="sm"
             onClick={() => setShowAllLevels(!showAllLevels)}
           >
-            {showAllLevels ? "전체 레벨" : `${level}급만`}
+            {showAllLevels ? t('mistakeReview.allLevels') : t('mistakeReview.levelOnly', { level })}
           </Button>
           <Button variant="outline" size="sm" onClick={() => setViewMode('stats')}>
             <Target className="w-4 h-4 mr-1" />
-            통계
+            {t('mistakeReview.stats.button')}
           </Button>
         </div>
 
         <Card className="p-6 bg-gradient-to-br from-primary/10 to-purple-500/10 border-primary/20">
           <div className="text-center space-y-4">
             <Brain className="w-12 h-12 mx-auto text-primary" />
-            <h3 className="text-xl font-bold">관련어 퀴즈</h3>
+            <h3 className="text-xl font-bold">{t('mistakeReview.relatedWordQuiz')}</h3>
             <p className="text-sm text-muted-foreground">
-              오답 단어의 동의어, 반의어, 유사어를 맞히는 퀴즈입니다.
+              {t('mistakeReview.quizDescription')}
               <br />
-              AI 검색 기반으로 정확한 관련어를 찾아드립니다.
+              {t('mistakeReview.aiSearchBased')}
             </p>
             
             <div className="flex flex-wrap justify-center gap-2">
-              <Badge className="bg-green-500/20 text-green-600">동의어</Badge>
-              <Badge className="bg-red-500/20 text-red-600">반의어</Badge>
-              <Badge className="bg-blue-500/20 text-blue-600">유사어</Badge>
+              <Badge className="bg-green-500/20 text-green-600">{t('mistakeReview.quizType.synonym')}</Badge>
+              <Badge className="bg-red-500/20 text-red-600">{t('mistakeReview.quizType.antonym')}</Badge>
+              <Badge className="bg-blue-500/20 text-blue-600">{t('mistakeReview.quizType.similar')}</Badge>
             </div>
             
             <div className="text-sm text-muted-foreground">
-              복습할 단어: <span className="font-bold text-foreground">{mistakes.length}개</span>
+              {t('mistakeReview.wordsToReview')}: <span className="font-bold text-foreground">{mistakes.length}{t('mistakeReview.countUnit')}</span>
             </div>
 
             <Button 
@@ -679,8 +679,8 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
                   <div className="flex items-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin" />
                     {preloadProgress.total > 0 
-                      ? `관련어 로딩 중... (${preloadProgress.current}/${preloadProgress.total})`
-                      : '준비 중...'
+                      ? t('mistakeReview.loadingProgress', { current: preloadProgress.current, total: preloadProgress.total })
+                      : t('mistakeReview.preparing')
                     }
                   </div>
                   {preloadProgress.total > 0 && (
@@ -695,7 +695,7 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
               ) : (
                 <>
                   <Sparkles className="w-4 h-4 mr-2" />
-                  퀴즈 시작하기
+                  {t('mistakeReview.startQuiz')}
                 </>
               )}
             </Button>
@@ -711,17 +711,18 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
   if (!currentQuestion) {
     return (
       <div className="text-center py-8">
-        <p className="text-muted-foreground">퀴즈를 생성할 수 없습니다. 다시 시도해주세요.</p>
+        <p className="text-muted-foreground">{t('mistakeReview.cannotGenerate')}</p>
         <Button onClick={handleRestart} className="mt-4">
           <RotateCcw className="w-4 h-4 mr-2" />
-          다시 시작
+          {t('mistakeReview.restart')}
         </Button>
       </div>
     );
   }
 
-  const progress = ((currentIndex + 1) / quizQuestions.length) * 100;
+  const progressPercent = ((currentIndex + 1) / quizQuestions.length) * 100;
   const quizTypeInfo = QUIZ_TYPE_LABELS[currentQuestion.questionType];
+  const quizTypeLabel = t(quizTypeInfo.key);
 
   return (
     <div className="space-y-4">
@@ -735,12 +736,12 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
           {streak > 0 && (
             <Badge className="bg-orange-500/20 text-orange-600 flex items-center gap-1">
               <Flame className="w-3 h-3" />
-              {streak} 연속
+              {streak} {t('mistakeReview.streak')}
             </Badge>
           )}
         </div>
         <Badge variant="secondary">
-          정답: {correctCount}
+          {t('mistakeReview.correct')}: {correctCount}
         </Badge>
       </div>
 
@@ -749,7 +750,7 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
         <motion.div 
           className="h-full bg-gradient-to-r from-primary to-purple-500"
           initial={{ width: 0 }}
-          animate={{ width: `${progress}%` }}
+          animate={{ width: `${progressPercent}%` }}
           transition={{ duration: 0.3 }}
         />
       </div>
@@ -767,7 +768,7 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
             {/* Question type badge */}
             <div className="text-center">
               <Badge className={`${quizTypeInfo.color} bg-opacity-20`}>
-                {quizTypeInfo.ko} 찾기
+                {t('mistakeReview.findType', { type: quizTypeLabel })}
               </Badge>
             </div>
 
@@ -779,7 +780,7 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
 
             {/* Question prompt */}
             <p className="text-center text-sm text-muted-foreground">
-              위 단어의 <span className={`font-bold ${quizTypeInfo.color}`}>{quizTypeInfo.ko}</span>를 고르세요
+              {t('mistakeReview.selectType', { type: quizTypeLabel })}
             </p>
 
             {/* Options */}
@@ -833,12 +834,12 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
                     : 'bg-red-500/20 text-red-700'
                 }`}>
                   {selectedAnswer === currentQuestion.correctAnswer ? (
-                    <span className="font-bold">정답입니다! ✓</span>
+                    <span className="font-bold">{t('mistakeReview.correctAnswer')} ✓</span>
                   ) : (
                     <div>
-                      <span className="font-bold">오답입니다 ✗</span>
+                      <span className="font-bold">{t('mistakeReview.wrongAnswer')} ✗</span>
                       <div className="text-sm mt-1">
-                        정답: <span className="font-bold">{currentQuestion.correctAnswer}</span>
+                        {t('mistakeReview.theAnswer')}: <span className="font-bold">{currentQuestion.correctAnswer}</span>
                         {currentQuestion.correctMeaning && (
                           <span className="opacity-70"> ({currentQuestion.correctMeaning})</span>
                         )}
@@ -855,12 +856,12 @@ const MistakeReview: React.FC<MistakeReviewProps> = ({ level, onMistake }) => {
                     className="flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-primary"
                   >
                     <ExternalLink className="w-3 h-3" />
-                    출처 확인
+                    {t('mistakeReview.checkSource')}
                   </a>
                 )}
 
                 <Button onClick={handleNext} className="w-full">
-                  {currentIndex < quizQuestions.length - 1 ? '다음' : '결과 보기'}
+                  {currentIndex < quizQuestions.length - 1 ? t('common.next') : t('mistakeReview.viewResult')}
                 </Button>
               </motion.div>
             )}

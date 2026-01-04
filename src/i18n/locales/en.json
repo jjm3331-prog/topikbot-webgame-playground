@@ -3330,7 +3330,93 @@
     "inputPlaceholder": "Answer in Korean...",
     "send": "Send",
     "scenarioSelect": "Select Scenario",
-    "topikLevel": "TOPIK Level"
+    "topikLevel": "TOPIK Level",
+    "player": {
+      "name": "Player",
+      "level": "Level 12"
+    },
+    "chat": {
+      "npc1": "Hello! How can I help you?",
+      "npc1En": "Hello! How can I help you?",
+      "user1": "One Americano, please.",
+      "user1En": "One Americano, please.",
+      "npc2": "Sure, what size would you like?",
+      "npc2En": "Sure, what size would you like?"
+    },
+    "scenarios": {
+      "cafeOrder": {
+        "title": "Ordering at a Cafe",
+        "titleEn": "Ordering at a Cafe",
+        "location": "Gangnam Cafe",
+        "difficulty": "Beginner"
+      },
+      "subway": {
+        "title": "Taking the Subway",
+        "titleEn": "Taking the Subway",
+        "location": "Seoul Subway",
+        "difficulty": "Beginner"
+      },
+      "restaurant": {
+        "title": "Dining at a Restaurant",
+        "titleEn": "Dining at a Restaurant",
+        "location": "Myeongdong Restaurant",
+        "difficulty": "Intermediate"
+      }
+    }
+  },
+  "mistakeReview": {
+    "quizType": {
+      "synonym": "Synonym",
+      "antonym": "Antonym",
+      "similar": "Similar"
+    },
+    "stats": {
+      "title": "Mistake Statistics",
+      "button": "Stats",
+      "noRecord": "No mistake records yet!",
+      "totalMistakes": "Total Mistakes",
+      "levels": "Levels",
+      "mostMistakes": "Most Mistakes",
+      "levelDistribution": "Mistakes by Level",
+      "topMistakes": "Top 5 Most Missed Words",
+      "times": " times",
+      "mistakeCount": "Times Wrong"
+    },
+    "quizMode": "Quiz Mode",
+    "allLevels": "All Levels",
+    "levelOnly": "Level {{level}} Only",
+    "perfect": "Perfect!",
+    "noMistakes": {
+      "all": "No mistakes to review. Practice more in other modules!",
+      "level": "No Level {{level}} mistakes. Check all levels!"
+    },
+    "viewAllLevels": "View All Levels ({{count}})",
+    "quizComplete": "Related Words Quiz Complete!",
+    "correct": "Correct",
+    "accuracy": "Accuracy",
+    "result": {
+      "excellent": "Excellent! You understand related words well!",
+      "good": "Good! A little more practice and you'll be perfect.",
+      "needPractice": "More practice needed. Try again!"
+    },
+    "restart": "Restart",
+    "relatedWordQuiz": "Related Words Quiz",
+    "quizDescription": "Match synonyms, antonyms, and similar words from your mistakes.",
+    "aiSearchBased": "AI-powered search finds accurate related words.",
+    "wordsToReview": "Words to review",
+    "countUnit": "",
+    "loadingProgress": "Loading related words... ({{current}}/{{total}})",
+    "preparing": "Preparing...",
+    "startQuiz": "Start Quiz",
+    "cannotGenerate": "Cannot generate quiz. Please try again.",
+    "streak": "streak",
+    "findType": "Find {{type}}",
+    "selectType": "Select the {{type}} of the word above",
+    "correctAnswer": "Correct!",
+    "wrongAnswer": "Wrong",
+    "theAnswer": "Answer",
+    "checkSource": "Check Source",
+    "viewResult": "View Result"
   },
   "stats": {
     "progress": "Progress",

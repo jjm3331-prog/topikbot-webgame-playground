@@ -6,35 +6,36 @@ import NeonText from "./NeonText";
 import LevelSelector from "./LevelSelector";
 import { ChevronRight, MessageSquare, User, Heart, Zap, Coins } from "lucide-react";
 
-const scenarios = [
+const getScenarios = (t: (key: string) => string) => [
   {
     id: 1,
-    title: "카페에서 주문하기",
-    titleEn: "Ordering at a Cafe",
-    location: "강남역 카페",
-    difficulty: "초급",
+    title: t("gamePreview.scenarios.cafeOrder.title"),
+    titleEn: t("gamePreview.scenarios.cafeOrder.titleEn"),
+    location: t("gamePreview.scenarios.cafeOrder.location"),
+    difficulty: t("gamePreview.scenarios.cafeOrder.difficulty"),
     xp: 50,
   },
   {
     id: 2,
-    title: "지하철 타기",
-    titleEn: "Taking the Subway",
-    location: "서울 지하철",
-    difficulty: "초급",
+    title: t("gamePreview.scenarios.subway.title"),
+    titleEn: t("gamePreview.scenarios.subway.titleEn"),
+    location: t("gamePreview.scenarios.subway.location"),
+    difficulty: t("gamePreview.scenarios.subway.difficulty"),
     xp: 75,
   },
   {
     id: 3,
-    title: "식당에서 식사하기",
-    titleEn: "Dining at a Restaurant",
-    location: "명동 식당",
-    difficulty: "중급",
+    title: t("gamePreview.scenarios.restaurant.title"),
+    titleEn: t("gamePreview.scenarios.restaurant.titleEn"),
+    location: t("gamePreview.scenarios.restaurant.location"),
+    difficulty: t("gamePreview.scenarios.restaurant.difficulty"),
     xp: 100,
   },
 ];
 
 const GamePreviewSection = () => {
   const { t } = useTranslation();
+  const scenarios = getScenarios(t);
   const [selectedScenario, setSelectedScenario] = useState(scenarios[0]);
 
   return (
@@ -68,8 +69,8 @@ const GamePreviewSection = () => {
                       <User className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-display text-sm">김민수</p>
-                      <p className="text-xs text-muted-foreground">Level 12</p>
+                      <p className="font-display text-sm">{t("gamePreview.player.name")}</p>
+                      <p className="text-xs text-muted-foreground">{t("gamePreview.player.level")}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
@@ -96,18 +97,18 @@ const GamePreviewSection = () => {
                     <MessageSquare className="w-4 h-4 text-secondary" />
                   </div>
                   <div className="glass-card p-3 max-w-[80%]">
-                    <p className="text-sm">안녕하세요! 무엇을 도와드릴까요?</p>
+                    <p className="text-sm">{t("gamePreview.chat.npc1")}</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Hello! How can I help you?
+                      {t("gamePreview.chat.npc1En")}
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 justify-end">
                   <div className="bg-primary/20 border border-primary/30 rounded-2xl p-3 max-w-[80%]">
-                    <p className="text-sm">아메리카노 한 잔 주세요.</p>
+                    <p className="text-sm">{t("gamePreview.chat.user1")}</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      One Americano, please.
+                      {t("gamePreview.chat.user1En")}
                     </p>
                   </div>
                 </div>
@@ -117,9 +118,9 @@ const GamePreviewSection = () => {
                     <MessageSquare className="w-4 h-4 text-secondary" />
                   </div>
                   <div className="glass-card p-3 max-w-[80%]">
-                    <p className="text-sm">네, 사이즈는 어떤 걸로 드릴까요?</p>
+                    <p className="text-sm">{t("gamePreview.chat.npc2")}</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Sure, what size would you like?
+                      {t("gamePreview.chat.npc2En")}
                     </p>
                   </div>
                 </div>

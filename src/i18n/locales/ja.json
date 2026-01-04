@@ -3047,7 +3047,93 @@
     "inputPlaceholder": "韓国語で答えてください...",
     "send": "送信",
     "scenarioSelect": "シナリオ選択",
-    "topikLevel": "TOPIKレベル"
+    "topikLevel": "TOPIKレベル",
+    "player": {
+      "name": "プレイヤー",
+      "level": "Level 12"
+    },
+    "chat": {
+      "npc1": "こんにちは！何かお手伝いしましょうか？",
+      "npc1En": "Hello! How can I help you?",
+      "user1": "アメリカーノを一杯ください。",
+      "user1En": "One Americano, please.",
+      "npc2": "はい、サイズはどうしますか？",
+      "npc2En": "Sure, what size would you like?"
+    },
+    "scenarios": {
+      "cafeOrder": {
+        "title": "カフェで注文",
+        "titleEn": "Ordering at a Cafe",
+        "location": "江南カフェ",
+        "difficulty": "初級"
+      },
+      "subway": {
+        "title": "地下鉄に乗る",
+        "titleEn": "Taking the Subway",
+        "location": "ソウル地下鉄",
+        "difficulty": "初級"
+      },
+      "restaurant": {
+        "title": "レストランで食事",
+        "titleEn": "Dining at a Restaurant",
+        "location": "明洞レストラン",
+        "difficulty": "中級"
+      }
+    }
+  },
+  "mistakeReview": {
+    "quizType": {
+      "synonym": "同義語",
+      "antonym": "反義語",
+      "similar": "類義語"
+    },
+    "stats": {
+      "title": "誤答統計",
+      "button": "統計",
+      "noRecord": "まだ誤答記録がありません！",
+      "totalMistakes": "総誤答数",
+      "levels": "レベル",
+      "mostMistakes": "最多誤答",
+      "levelDistribution": "レベル別誤答分布",
+      "topMistakes": "最も間違えた単語TOP5",
+      "times": "回",
+      "mistakeCount": "間違い回数"
+    },
+    "quizMode": "クイズモード",
+    "allLevels": "全レベル",
+    "levelOnly": "{{level}}級のみ",
+    "perfect": "完璧！",
+    "noMistakes": {
+      "all": "復習する誤答がありません。他のモジュールで練習しましょう！",
+      "level": "{{level}}級の誤答がありません。全レベルを確認してみてください！"
+    },
+    "viewAllLevels": "全レベルを見る（{{count}}個）",
+    "quizComplete": "関連語クイズ完了！",
+    "correct": "正解",
+    "accuracy": "正確度",
+    "result": {
+      "excellent": "素晴らしい！関連語をよく理解しています！",
+      "good": "いいですね！もう少し練習すれば完璧です。",
+      "needPractice": "もっと練習が必要です。再挑戦してみてください！"
+    },
+    "restart": "もう一度",
+    "relatedWordQuiz": "関連語クイズ",
+    "quizDescription": "誤答単語の同義語、反義語、類義語を当てるクイズです。",
+    "aiSearchBased": "AI検索で正確な関連語を見つけます。",
+    "wordsToReview": "復習する単語",
+    "countUnit": "個",
+    "loadingProgress": "関連語を読み込み中...（{{current}}/{{total}}）",
+    "preparing": "準備中...",
+    "startQuiz": "クイズ開始",
+    "cannotGenerate": "クイズを生成できません。もう一度お試しください。",
+    "streak": "連続",
+    "findType": "{{type}}を探す",
+    "selectType": "上の単語の{{type}}を選んでください",
+    "correctAnswer": "正解です！",
+    "wrongAnswer": "不正解",
+    "theAnswer": "答え",
+    "checkSource": "出典を確認",
+    "viewResult": "結果を見る"
   },
   "stats": {
     "progress": "進捗率",

@@ -3062,7 +3062,93 @@
     "inputPlaceholder": "用韩语回答...",
     "send": "发送",
     "scenarioSelect": "选择场景",
-    "topikLevel": "TOPIK等级"
+    "topikLevel": "TOPIK等级",
+    "player": {
+      "name": "玩家",
+      "level": "Level 12"
+    },
+    "chat": {
+      "npc1": "您好！需要什么帮助？",
+      "npc1En": "Hello! How can I help you?",
+      "user1": "请给我一杯美式咖啡。",
+      "user1En": "One Americano, please.",
+      "npc2": "好的，您要什么尺寸的？",
+      "npc2En": "Sure, what size would you like?"
+    },
+    "scenarios": {
+      "cafeOrder": {
+        "title": "在咖啡店点单",
+        "titleEn": "Ordering at a Cafe",
+        "location": "江南咖啡店",
+        "difficulty": "初级"
+      },
+      "subway": {
+        "title": "乘坐地铁",
+        "titleEn": "Taking the Subway",
+        "location": "首尔地铁",
+        "difficulty": "初级"
+      },
+      "restaurant": {
+        "title": "在餐厅用餐",
+        "titleEn": "Dining at a Restaurant",
+        "location": "明洞餐厅",
+        "difficulty": "中级"
+      }
+    }
+  },
+  "mistakeReview": {
+    "quizType": {
+      "synonym": "同义词",
+      "antonym": "反义词",
+      "similar": "近义词"
+    },
+    "stats": {
+      "title": "错题统计",
+      "button": "统计",
+      "noRecord": "还没有错题记录！",
+      "totalMistakes": "总错题",
+      "levels": "级别",
+      "mostMistakes": "最多错误",
+      "levelDistribution": "各级别错题分布",
+      "topMistakes": "错误最多的5个单词",
+      "times": "次",
+      "mistakeCount": "错误次数"
+    },
+    "quizMode": "测验模式",
+    "allLevels": "所有级别",
+    "levelOnly": "仅{{level}}级",
+    "perfect": "完美！",
+    "noMistakes": {
+      "all": "没有错题需要复习。在其他模块多练习吧！",
+      "level": "没有{{level}}级错题。查看所有级别！"
+    },
+    "viewAllLevels": "查看所有级别（{{count}}个）",
+    "quizComplete": "相关词测验完成！",
+    "correct": "正确",
+    "accuracy": "准确率",
+    "result": {
+      "excellent": "太棒了！你很了解相关词！",
+      "good": "不错！再练习一点就完美了。",
+      "needPractice": "需要更多练习。再试一次吧！"
+    },
+    "restart": "重新开始",
+    "relatedWordQuiz": "相关词测验",
+    "quizDescription": "匹配错题单词的同义词、反义词和近义词。",
+    "aiSearchBased": "AI搜索找到准确的相关词。",
+    "wordsToReview": "待复习单词",
+    "countUnit": "个",
+    "loadingProgress": "正在加载相关词...（{{current}}/{{total}}）",
+    "preparing": "准备中...",
+    "startQuiz": "开始测验",
+    "cannotGenerate": "无法生成测验。请重试。",
+    "streak": "连续",
+    "findType": "找{{type}}",
+    "selectType": "选择上面单词的{{type}}",
+    "correctAnswer": "正确！",
+    "wrongAnswer": "错误",
+    "theAnswer": "答案",
+    "checkSource": "查看来源",
+    "viewResult": "查看结果"
   },
   "stats": {
     "progress": "进度",

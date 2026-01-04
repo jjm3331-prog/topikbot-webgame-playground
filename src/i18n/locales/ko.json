@@ -3497,7 +3497,93 @@
     "inputPlaceholder": "한국어로 대답하세요...",
     "send": "전송",
     "scenarioSelect": "시나리오 선택",
-    "topikLevel": "TOPIK 레벨"
+    "topikLevel": "TOPIK 레벨",
+    "player": {
+      "name": "김민수",
+      "level": "Level 12"
+    },
+    "chat": {
+      "npc1": "안녕하세요! 무엇을 도와드릴까요?",
+      "npc1En": "Hello! How can I help you?",
+      "user1": "아메리카노 한 잔 주세요.",
+      "user1En": "One Americano, please.",
+      "npc2": "네, 사이즈는 어떤 걸로 드릴까요?",
+      "npc2En": "Sure, what size would you like?"
+    },
+    "scenarios": {
+      "cafeOrder": {
+        "title": "카페에서 주문하기",
+        "titleEn": "Ordering at a Cafe",
+        "location": "강남역 카페",
+        "difficulty": "초급"
+      },
+      "subway": {
+        "title": "지하철 타기",
+        "titleEn": "Taking the Subway",
+        "location": "서울 지하철",
+        "difficulty": "초급"
+      },
+      "restaurant": {
+        "title": "식당에서 식사하기",
+        "titleEn": "Dining at a Restaurant",
+        "location": "명동 식당",
+        "difficulty": "중급"
+      }
+    }
+  },
+  "mistakeReview": {
+    "quizType": {
+      "synonym": "동의어",
+      "antonym": "반의어",
+      "similar": "유사어"
+    },
+    "stats": {
+      "title": "오답 통계",
+      "button": "통계",
+      "noRecord": "아직 오답 기록이 없습니다!",
+      "totalMistakes": "전체 오답",
+      "levels": "레벨",
+      "mostMistakes": "최다 오답",
+      "levelDistribution": "레벨별 오답 분포",
+      "topMistakes": "가장 많이 틀린 단어 TOP 5",
+      "times": "회",
+      "mistakeCount": "틀린 횟수"
+    },
+    "quizMode": "퀴즈 모드",
+    "allLevels": "전체 레벨",
+    "levelOnly": "{{level}}급만",
+    "perfect": "완벽해요!",
+    "noMistakes": {
+      "all": "복습할 오답이 없습니다. 다른 학습 모듈에서 더 연습해보세요!",
+      "level": "{{level}}급 복습할 오답이 없습니다. 전체 레벨을 확인해보세요!"
+    },
+    "viewAllLevels": "전체 레벨 보기 ({{count}}개)",
+    "quizComplete": "관련어 퀴즈 완료!",
+    "correct": "정답",
+    "accuracy": "정확도",
+    "result": {
+      "excellent": "훌륭해요! 관련어를 잘 이해하고 있습니다!",
+      "good": "좋아요! 조금 더 연습하면 완벽해질 거예요.",
+      "needPractice": "더 연습이 필요해요. 다시 도전해보세요!"
+    },
+    "restart": "다시 시작하기",
+    "relatedWordQuiz": "관련어 퀴즈",
+    "quizDescription": "오답 단어의 동의어, 반의어, 유사어를 맞히는 퀴즈입니다.",
+    "aiSearchBased": "AI 검색 기반으로 정확한 관련어를 찾아드립니다.",
+    "wordsToReview": "복습할 단어",
+    "countUnit": "개",
+    "loadingProgress": "관련어 로딩 중... ({{current}}/{{total}})",
+    "preparing": "준비 중...",
+    "startQuiz": "퀴즈 시작하기",
+    "cannotGenerate": "퀴즈를 생성할 수 없습니다. 다시 시도해주세요.",
+    "streak": "연속",
+    "findType": "{{type}} 찾기",
+    "selectType": "위 단어의 {{type}}를 고르세요",
+    "correctAnswer": "정답입니다!",
+    "wrongAnswer": "오답입니다",
+    "theAnswer": "정답",
+    "checkSource": "출처 확인",
+    "viewResult": "결과 보기"
   },
   "stats": {
     "progress": "진도율",
