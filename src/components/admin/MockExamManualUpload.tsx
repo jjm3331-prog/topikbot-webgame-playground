@@ -141,7 +141,10 @@ function parseReadingRawText(rawText: string): ParsedReadingQuestion | null {
   const questionMatch = rawText.match(/\[문제\]([\s\S]*?)(?=①|❶|1\)|$)/i);
   
   if (passageMatch) {
-    passage = passageMatch[1].trim();
+    const rawPassage = passageMatch[1].trim();
+    // "없음", "없음 (어휘 문제)", "-", "N/A" 등은 빈 문자열로 처리
+    const noPassagePatterns = /^(없음|없음\s*\(.*\)|없음\(.*\)|-|n\/a|none|해당\s*없음|지문\s*없음)$/i;
+    passage = noPassagePatterns.test(rawPassage) ? "" : rawPassage;
   }
   
   if (questionMatch) {
