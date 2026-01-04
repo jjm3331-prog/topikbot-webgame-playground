@@ -1509,8 +1509,21 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
           throw new Error("Failed to parse AI response as JSON");
         }
 
+        // Normalize/validate questions
+        const rawQuestions = Array.isArray(parsed.questions) ? parsed.questions : [];
+
+        // Some models return correct_answer as 0-3 (0-index). Normalize to 1-4.
+        const normalizedQuestions = rawQuestions.map((q) => {
+          const ca = (q as any)?.correct_answer;
+          const normalizedCorrectAnswer = typeof ca === "number" && ca >= 0 && ca <= 3 ? ca + 1 : ca;
+          return {
+            ...q,
+            correct_answer: normalizedCorrectAnswer,
+          } as GeneratedQuestion;
+        });
+
         // Validate questions
-        let validQuestions = (parsed.questions || []).filter((q) => {
+        let validQuestions = normalizedQuestions.filter((q) => {
           return (
             q.question_text &&
             Array.isArray(q.options) &&
@@ -1521,6 +1534,8 @@ ${params.topic ? `주제/문법: ${params.topic}` : ''}
             q.explanation_ko
           );
         });
+
+        console.log(`✅ Valid questions after normalization: ${validQuestions.length}/${rawQuestions.length}`);
 
         sendProgress("audio", 88, `✅ ${validQuestions.length}개 문제 생성 완료`);
 
