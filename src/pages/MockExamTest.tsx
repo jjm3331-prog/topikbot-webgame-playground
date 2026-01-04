@@ -1202,13 +1202,13 @@ const MockExamTest = () => {
                             showResult && isSelected && !isCorrect && "border-destructive ring-2 ring-destructive/30"
                           )}
                         >
-                          <div className="relative">
+                          <div className="relative bg-white">
                             <img 
                               src={optionImage} 
                               alt={`선택지 ${idx + 1}`}
-                              className="w-full h-32 object-cover"
+                              className="w-full h-40 object-contain"
                               onError={(e) => {
-                                (e.target as HTMLImageElement).src = `https://placehold.co/200x120/1a1a2e/ffffff?text=${circledNumbers[idx]}`;
+                                (e.target as HTMLImageElement).src = `https://placehold.co/200x160/1a1a2e/ffffff?text=${circledNumbers[idx]}`;
                               }}
                             />
                             <div className={cn(
