@@ -3302,7 +3302,26 @@
     }
   },
   "listening": {
-    "inputPlaceholder": "들은 내용을 한국어로 입력하세요"
+    "inputPlaceholder": "들은 내용을 한국어로 입력하세요",
+    "playError": "재생 오류",
+    "playErrorDesc": "오디오를 재생할 수 없습니다.",
+    "error": "오류 발생",
+    "ttsError": "음성을 생성할 수 없습니다.",
+    "recognitionError": "인식 오류",
+    "sttError": "음성을 인식할 수 없습니다.",
+    "micError": "마이크 오류",
+    "micErrorDesc": "마이크를 사용할 수 없습니다.",
+    "question": "문제",
+    "correctCount": "정답",
+    "countUnit": "개",
+    "listenAndWrite": "듣고 받아쓰기",
+    "playCount": "회 재생됨",
+    "slowSpeed": "느린 속도",
+    "hint": "힌트",
+    "checkAnswer": "정답 확인",
+    "listenAgain": "다시 듣기",
+    "viewResults": "결과 보기",
+    "nextQuestion": "다음 문제"
   },
   "sentenceBuilder": {
     "aiLoading": "AI 교란 조각 생성 중...",
@@ -3703,5 +3722,78 @@
   "sentenceBuilder": {
     "streak": "연속!",
     "firstWord": "첫 단어"
+  },
+  "wordRacing": {
+    "title": "Word Racing",
+    "subtitle": "단어 레이싱",
+    "speed": {
+      "slow": "느림",
+      "normal": "보통",
+      "fast": "빠름"
+    },
+    "tutorial": {
+      "prev": "이전",
+      "next": "다음",
+      "startGame": "게임 시작!",
+      "skip": "튜토리얼 건너뛰기",
+      "showAgain": "튜토리얼 다시 보기"
+    },
+    "wordTarget": "단어 목표",
+    "seconds": "초",
+    "timeLimit": "제한 시간",
+    "missions": {
+      "title": "미션",
+      "words5": "5단어 완성",
+      "combo5": "5콤보 달성",
+      "perfect": "실수 없이 3단어",
+      "score500": "500점 달성"
+    },
+    "speedLabel": "속도",
+    "start": "시작",
+    "startGame": "시작하기",
+    "complete": "레이스 완료!",
+    "score": "점수",
+    "words": "단어",
+    "maxCombo": "최대 콤보",
+    "missionsCompleted": "미션 완료",
+    "playAgain": "다시하기",
+    "finish": "완료"
+  },
+  "chainReaction": {
+    "roomNotFound": "방을 찾을 수 없습니다",
+    "roomInProgress": "게임이 이미 진행 중입니다",
+    "roomFull": "방이 꽉 찼습니다",
+    "autoJoinFailed": "자동 참가 실패",
+    "kickedGuest": "게스트를 강퇴했습니다",
+    "enterName": "닉네임을 입력하세요",
+    "createFailed": "방 생성 실패",
+    "enterNameAndCode": "닉네임과 코드를 입력하세요",
+    "errors": {
+      "duplicate": "이미 사용한 단어예요!",
+      "invalidWord": "유효하지 않은 단어예요!"
+    },
+    "defeat": "패배!",
+    "warningOne": "경고 1회!"
+  },
+  "shadowing": {
+    "browserNotSupported": "이 브라우저는 음성인식을 지원하지 않습니다",
+    "noSubtitles": "자막이 없어서 섀도잉을 시작할 수 없습니다",
+    "completed": "완료",
+    "countUnit": "개",
+    "noCaption": "자막 없음",
+    "listening": "듣는 중...",
+    "speakAfterListening": "들은 문장을 따라 말해보세요",
+    "startRecording": "녹음 시작",
+    "listenAgain": "다시 듣기",
+    "recording": "녹음 중...",
+    "stopRecording": "녹음 중지",
+    "myPronunciation": "내 발음",
+    "recognitionFailed": "인식 실패",
+    "excellent": "훌륭해요!",
+    "good": "좋아요!",
+    "tryAgain": "다시 도전!",
+    "practiceAgain": "다시 연습",
+    "nextSentence": "다음 문장",
+    "start": "섀도잉 시작"
   }
 }

@@ -1,4 +1,56 @@
 {
+  "wordRacing": {
+    "title": "Word Racing",
+    "subtitle": "Word Racing",
+    "speed": {
+      "slow": "Slow",
+      "normal": "Normal",
+      "fast": "Fast"
+    },
+    "tutorial": {
+      "prev": "Previous",
+      "next": "Next",
+      "startGame": "Start Game!",
+      "skip": "Skip Tutorial",
+      "showAgain": "Show Tutorial Again"
+    },
+    "wordTarget": "Word Target",
+    "seconds": "s",
+    "timeLimit": "Time Limit",
+    "missions": {
+      "title": "Missions",
+      "words5": "Complete 5 words",
+      "combo5": "Reach 5 combo",
+      "perfect": "3 words without mistake",
+      "score500": "Reach 500 points"
+    },
+    "speedLabel": "Speed",
+    "start": "Start",
+    "startGame": "Start Game",
+    "complete": "Race Complete!",
+    "score": "Score",
+    "words": "Words",
+    "maxCombo": "Max Combo",
+    "missionsCompleted": "Missions Completed",
+    "playAgain": "Play Again",
+    "finish": "Finish"
+  },
+  "chainReaction": {
+    "roomNotFound": "Room not found",
+    "roomInProgress": "Game is already in progress",
+    "roomFull": "Room is full",
+    "autoJoinFailed": "Auto join failed",
+    "kickedGuest": "Guest kicked",
+    "enterName": "Enter nickname",
+    "createFailed": "Failed to create room",
+    "enterNameAndCode": "Enter nickname and code",
+    "errors": {
+      "duplicate": "Word already used!",
+      "invalidWord": "Invalid word!"
+    },
+    "defeat": "Defeat!",
+    "warningOne": "Warning 1!"
+  },
   "splash": {
     "tagline": "AI-Powered Korean Learning Game",
     "loading": "Loading...",
@@ -3135,7 +3187,26 @@
     }
   },
   "listening": {
-    "inputPlaceholder": "Type what you heard in Korean"
+    "inputPlaceholder": "Type what you heard in Korean",
+    "playError": "Playback Error",
+    "playErrorDesc": "Unable to play audio.",
+    "error": "Error Occurred",
+    "ttsError": "Unable to generate speech.",
+    "recognitionError": "Recognition Error",
+    "sttError": "Unable to recognize speech.",
+    "micError": "Microphone Error",
+    "micErrorDesc": "Cannot access microphone.",
+    "question": "Question",
+    "correctCount": "Correct",
+    "countUnit": "",
+    "listenAndWrite": "Listen & Write",
+    "playCount": "x played",
+    "slowSpeed": "slow speed",
+    "hint": "Hint",
+    "checkAnswer": "Check Answer",
+    "listenAgain": "Listen Again",
+    "viewResults": "View Results",
+    "nextQuestion": "Next Question"
   },
   "sentenceBuilder": {
     "aiLoading": "AI generating distractor pieces...",
@@ -3536,5 +3607,26 @@
   "sentenceBuilder": {
     "streak": " streak!",
     "firstWord": "First word"
+  },
+  "shadowing": {
+    "browserNotSupported": "This browser does not support speech recognition",
+    "noSubtitles": "No subtitles available for shadowing",
+    "completed": "Completed",
+    "countUnit": "",
+    "noCaption": "No caption",
+    "listening": "Listening...",
+    "speakAfterListening": "Repeat the sentence you heard",
+    "startRecording": "Start Recording",
+    "listenAgain": "Listen Again",
+    "recording": "Recording...",
+    "stopRecording": "Stop Recording",
+    "myPronunciation": "My pronunciation",
+    "recognitionFailed": "Recognition failed",
+    "excellent": "Excellent!",
+    "good": "Good!",
+    "tryAgain": "Try again!",
+    "practiceAgain": "Practice Again",
+    "nextSentence": "Next Sentence",
+    "start": "Start Shadowing"
   }
 }

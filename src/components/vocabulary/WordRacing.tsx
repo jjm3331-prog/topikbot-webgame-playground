@@ -92,10 +92,10 @@ const GAME_DURATION = 90; // 90 seconds
 const WORD_TARGET = 8; // Complete 8 words to win
 
 const MISSIONS: Mission[] = [
-  { id: "words5", title: "5단어 완성", titleVi: "Hoàn thành 5 từ", target: 5, type: "words", reward: 100 },
-  { id: "combo5", title: "5콤보 달성", titleVi: "Đạt 5 combo", target: 5, type: "combo", reward: 150 },
-  { id: "perfect", title: "실수 없이 3단어", titleVi: "3 từ không sai", target: 3, type: "perfect", reward: 200 },
-  { id: "score500", title: "500점 달성", titleVi: "Đạt 500 điểm", target: 500, type: "score", reward: 50 },
+  { id: "words5", title: "wordRacing.missions.words5", titleVi: "Hoàn thành 5 từ", target: 5, type: "words", reward: 100 },
+  { id: "combo5", title: "wordRacing.missions.combo5", titleVi: "Đạt 5 combo", target: 5, type: "combo", reward: 150 },
+  { id: "perfect", title: "wordRacing.missions.perfect", titleVi: "3 từ không sai", target: 3, type: "perfect", reward: 200 },
+  { id: "score500", title: "wordRacing.missions.score500", titleVi: "Đạt 500 điểm", target: 500, type: "score", reward: 50 },
 ];
 
 export default function WordRacing({ words, onComplete }: WordRacingProps) {
@@ -131,11 +131,13 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const wrongCountRef = useRef(0);
 
+  const { t } = useTranslation();
+  
   // Speed settings with difficulty curve
   const speedSettings = {
-    slow: { base: 1.5, spawnInterval: 2000, label: "느림 / Chậm", color: "from-green-500 to-emerald-500" },
-    normal: { base: 2.5, spawnInterval: 1500, label: "보통 / Bình thường", color: "from-blue-500 to-cyan-500" },
-    fast: { base: 4, spawnInterval: 1000, label: "빠름 / Nhanh", color: "from-orange-500 to-red-500" },
+    slow: { base: 1.5, spawnInterval: 2000, label: t("wordRacing.speed.slow", "느림 / Chậm"), color: "from-green-500 to-emerald-500" },
+    normal: { base: 2.5, spawnInterval: 1500, label: t("wordRacing.speed.normal", "보통 / Bình thường"), color: "from-blue-500 to-cyan-500" },
+    fast: { base: 4, spawnInterval: 1000, label: t("wordRacing.speed.fast", "빠름 / Nhanh"), color: "from-orange-500 to-red-500" },
   };
 
   // Tutorial steps
@@ -582,22 +584,22 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
           <div className="flex gap-2 justify-center">
             {tutorialStep > 0 && (
               <Button variant="outline" onClick={() => setTutorialStep(prev => prev - 1)}>
-                이전
+                {t("wordRacing.tutorial.prev", "이전")}
               </Button>
             )}
             {tutorialStep < tutorialSteps.length - 1 ? (
               <Button onClick={() => setTutorialStep(prev => prev + 1)} className="gap-2">
-                다음 <ChevronRight className="w-4 h-4" />
+                {t("wordRacing.tutorial.next", "다음")} <ChevronRight className="w-4 h-4" />
               </Button>
             ) : (
               <Button onClick={finishTutorial} className="gap-2 bg-gradient-to-r from-green-500 to-emerald-500">
-                <Play className="w-4 h-4" /> 게임 시작!
+                <Play className="w-4 h-4" /> {t("wordRacing.tutorial.startGame", "게임 시작!")}
               </Button>
             )}
           </div>
           
           <Button variant="ghost" size="sm" onClick={finishTutorial} className="mt-4 text-muted-foreground">
-            튜토리얼 건너뛰기
+            {t("wordRacing.tutorial.skip", "튜토리얼 건너뛰기")}
           </Button>
         </Card>
       </motion.div>
@@ -625,10 +627,10 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
           >
             <div className="text-5xl sm:text-6xl mb-3">🏎️</div>
             <h2 className="text-2xl sm:text-3xl font-black mb-1 bg-gradient-to-r from-blue-500 via-cyan-500 to-green-500 bg-clip-text text-transparent">
-              Word Racing
+              {t("wordRacing.title", "Word Racing")}
             </h2>
             <p className="text-muted-foreground mb-4 text-sm">
-              단어 레이싱 / Đua xe từ vựng
+              {t("wordRacing.subtitle", "단어 레이싱 / Đua xe từ vựng")}
             </p>
           </motion.div>
           
@@ -639,14 +641,14 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
                 <Target className="w-4 h-4" />
                 <span className="font-bold">{WORD_TARGET}</span>
               </div>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">단어 목표 / Mục tiêu</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">{t("wordRacing.wordTarget", "단어 목표")}</p>
             </div>
             <div className="bg-muted/50 rounded-lg p-2 sm:p-3">
               <div className="flex items-center justify-center gap-1 text-blue-400 mb-1">
                 <Clock className="w-4 h-4" />
-                <span className="font-bold">{GAME_DURATION}초</span>
+                <span className="font-bold">{GAME_DURATION}{t("wordRacing.seconds", "초")}</span>
               </div>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">제한 시간 / Thời gian</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">{t("wordRacing.timeLimit", "제한 시간")}</p>
             </div>
           </div>
 
@@ -654,7 +656,7 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
           <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-xl p-3 mb-4 border border-purple-500/20">
             <p className="font-bold text-sm mb-2 flex items-center gap-1 justify-center">
               <Star className="w-4 h-4 text-yellow-400" />
-              미션 / Nhiệm vụ
+              {t("wordRacing.missions.title", "미션")}
             </p>
             <div className="grid grid-cols-2 gap-1.5 text-[10px] sm:text-xs">
               {MISSIONS.slice(0, 4).map(mission => (
@@ -668,7 +670,7 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
 
           {/* Speed selector */}
           <div className="mb-4">
-            <p className="text-xs text-muted-foreground mb-2">🏎️ Tốc độ / 속도</p>
+            <p className="text-xs text-muted-foreground mb-2">🏎️ {t("wordRacing.speedLabel", "속도")}</p>
             <div className="grid grid-cols-3 gap-1.5">
               {(Object.keys(speedSettings) as Array<keyof typeof speedSettings>).map((key) => (
                 <Button
@@ -695,7 +697,7 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
               className={`gap-2 text-base w-full bg-gradient-to-r ${speedSettings[selectedSpeed].color} hover:opacity-90`}
             >
               <Play className="w-5 h-5" />
-              {hasSeenTutorial ? "Bắt đầu / 시작" : "시작하기"}
+              {hasSeenTutorial ? t("wordRacing.start", "시작") : t("wordRacing.startGame", "시작하기")}
             </Button>
           </motion.div>
           
@@ -706,7 +708,7 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
               onClick={() => { setHasSeenTutorial(false); setGameState("tutorial"); setTutorialStep(0); }}
               className="mt-2 text-xs text-muted-foreground"
             >
-              튜토리얼 다시 보기
+              {t("wordRacing.tutorial.showAgain", "튜토리얼 다시 보기")}
             </Button>
           )}
         </Card>
@@ -743,7 +745,7 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
           </motion.div>
           
           <h2 className="text-xl sm:text-2xl font-black mb-4 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-            레이스 완료! / Hoàn thành!
+            {t("wordRacing.complete", "레이스 완료!")}
           </h2>
           
           {/* Stats */}
@@ -751,17 +753,17 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
             <div className="bg-muted/50 rounded-lg p-2">
               <Trophy className="w-5 h-5 mx-auto mb-1 text-amber-400" />
               <div className="font-bold text-lg">{score}</div>
-              <div className="text-[10px] text-muted-foreground">점수</div>
+              <div className="text-[10px] text-muted-foreground">{t("wordRacing.score", "점수")}</div>
             </div>
             <div className="bg-muted/50 rounded-lg p-2">
               <Car className="w-5 h-5 mx-auto mb-1 text-blue-400" />
               <div className="font-bold text-lg">{wordsCompleted}/{WORD_TARGET}</div>
-              <div className="text-[10px] text-muted-foreground">단어</div>
+              <div className="text-[10px] text-muted-foreground">{t("wordRacing.words", "단어")}</div>
             </div>
             <div className="bg-muted/50 rounded-lg p-2">
               <Flame className="w-5 h-5 mx-auto mb-1 text-orange-400" />
               <div className="font-bold text-lg">{maxCombo}x</div>
-              <div className="text-[10px] text-muted-foreground">최대 콤보</div>
+              <div className="text-[10px] text-muted-foreground">{t("wordRacing.maxCombo", "최대 콤보")}</div>
             </div>
           </div>
 
@@ -770,7 +772,7 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
             <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-lg p-3 mb-4 border border-yellow-500/30">
               <p className="font-bold text-sm flex items-center gap-1 justify-center mb-2">
                 <Star className="w-4 h-4 text-yellow-400" />
-                미션 완료: {missionsCompleted}/{MISSIONS.length}
+                {t("wordRacing.missionsCompleted", "미션 완료")}: {missionsCompleted}/{MISSIONS.length}
               </p>
               <div className="flex flex-wrap gap-1 justify-center">
                 {completedMissions.map(id => {
@@ -791,13 +793,13 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
               className="gap-2 bg-gradient-to-r from-blue-500 to-cyan-500"
             >
               <RotateCcw className="w-4 h-4" />
-              다시하기 / Chơi lại
+              {t("wordRacing.playAgain", "다시하기")}
             </Button>
             <Button 
               variant="outline"
               onClick={() => onComplete(score, wordsCompleted)}
             >
-              완료 / Hoàn thành
+              {t("wordRacing.finish", "완료")}
             </Button>
           </div>
         </Card>

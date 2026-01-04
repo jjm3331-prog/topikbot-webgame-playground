@@ -1,4 +1,56 @@
 {
+  "wordRacing": {
+    "title": "Đua Xe Từ Vựng",
+    "subtitle": "Đua Xe Từ Vựng",
+    "speed": {
+      "slow": "Chậm",
+      "normal": "Bình thường",
+      "fast": "Nhanh"
+    },
+    "tutorial": {
+      "prev": "Trước",
+      "next": "Tiếp",
+      "startGame": "Bắt đầu!",
+      "skip": "Bỏ qua hướng dẫn",
+      "showAgain": "Xem lại hướng dẫn"
+    },
+    "wordTarget": "Mục tiêu từ",
+    "seconds": "s",
+    "timeLimit": "Giới hạn thời gian",
+    "missions": {
+      "title": "Nhiệm vụ",
+      "words5": "Hoàn thành 5 từ",
+      "combo5": "Đạt 5 combo",
+      "perfect": "3 từ không sai",
+      "score500": "Đạt 500 điểm"
+    },
+    "speedLabel": "Tốc độ",
+    "start": "Bắt đầu",
+    "startGame": "Bắt đầu chơi",
+    "complete": "Hoàn thành đua!",
+    "score": "Điểm",
+    "words": "Từ",
+    "maxCombo": "Combo tối đa",
+    "missionsCompleted": "Nhiệm vụ hoàn thành",
+    "playAgain": "Chơi lại",
+    "finish": "Hoàn thành"
+  },
+  "chainReaction": {
+    "roomNotFound": "Không tìm thấy phòng",
+    "roomInProgress": "Trò chơi đang diễn ra",
+    "roomFull": "Phòng đã đầy",
+    "autoJoinFailed": "Tham gia tự động thất bại",
+    "kickedGuest": "Đã đuổi khách",
+    "enterName": "Nhập biệt danh",
+    "createFailed": "Tạo phòng thất bại",
+    "enterNameAndCode": "Nhập biệt danh và mã",
+    "errors": {
+      "duplicate": "Từ đã được sử dụng!",
+      "invalidWord": "Từ không hợp lệ!"
+    },
+    "defeat": "Thua!",
+    "warningOne": "Cảnh cáo 1!"
+  },
   "splash": {
     "tagline": "Game học tiếng Hàn với AI",
     "loading": "Đang tải...",
@@ -3183,7 +3235,26 @@
     }
   },
   "listening": {
-    "inputPlaceholder": "Nhập nội dung bạn nghe được bằng tiếng Hàn"
+    "inputPlaceholder": "Nhập nội dung bạn nghe được bằng tiếng Hàn",
+    "playError": "Lỗi phát",
+    "playErrorDesc": "Không thể phát âm thanh.",
+    "error": "Lỗi xảy ra",
+    "ttsError": "Không thể tạo giọng nói.",
+    "recognitionError": "Lỗi nhận dạng",
+    "sttError": "Không thể nhận dạng giọng nói.",
+    "micError": "Lỗi micro",
+    "micErrorDesc": "Không thể sử dụng micro.",
+    "question": "Câu hỏi",
+    "correctCount": "Đúng",
+    "countUnit": "",
+    "listenAndWrite": "Nghe và viết",
+    "playCount": " lần phát",
+    "slowSpeed": "tốc độ chậm",
+    "hint": "Gợi ý",
+    "checkAnswer": "Kiểm tra đáp án",
+    "listenAgain": "Nghe lại",
+    "viewResults": "Xem kết quả",
+    "nextQuestion": "Câu tiếp theo"
   },
   "sentenceBuilder": {
     "aiLoading": "AI đang tạo mảnh ghép nhiễu...",
@@ -3584,5 +3655,26 @@
   "sentenceBuilder": {
     "streak": " liên tiếp!",
     "firstWord": "Từ đầu tiên"
+  },
+  "shadowing": {
+    "browserNotSupported": "Trình duyệt này không hỗ trợ nhận dạng giọng nói",
+    "noSubtitles": "Không có phụ đề để luyện shadowing",
+    "completed": "Hoàn thành",
+    "countUnit": "",
+    "noCaption": "Không có phụ đề",
+    "listening": "Đang nghe...",
+    "speakAfterListening": "Lặp lại câu bạn vừa nghe",
+    "startRecording": "Bắt đầu ghi âm",
+    "listenAgain": "Nghe lại",
+    "recording": "Đang ghi âm...",
+    "stopRecording": "Dừng ghi âm",
+    "myPronunciation": "Phát âm của tôi",
+    "recognitionFailed": "Nhận dạng thất bại",
+    "excellent": "Xuất sắc!",
+    "good": "Tốt!",
+    "tryAgain": "Thử lại!",
+    "practiceAgain": "Luyện lại",
+    "nextSentence": "Câu tiếp theo",
+    "start": "Bắt đầu Shadowing"
   }
 }
