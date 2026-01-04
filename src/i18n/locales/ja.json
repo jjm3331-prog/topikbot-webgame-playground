@@ -12,7 +12,31 @@
       "next": "次へ",
       "startGame": "ゲーム開始!",
       "skip": "チュートリアルをスキップ",
-      "showAgain": "チュートリアルを再表示"
+      "showAgain": "チュートリアルを再表示",
+      "step1": {
+        "title": "🏎️ ステップ1: 移動",
+        "titleKo": "ステップ1: 移動",
+        "desc": "下の1-5ボタンを押して車をレーン間で移動させてください",
+        "descKo": "1-5ボタンで車を移動"
+      },
+      "step2": {
+        "title": "✅ ステップ2: 文字収集",
+        "titleKo": "ステップ2: 収集",
+        "desc": "緑色の文字を順番に集めて単語を完成させてください",
+        "descKo": "緑の文字を順番に収集"
+      },
+      "step3": {
+        "title": "⚠️ ステップ3: 間違いを避ける",
+        "titleKo": "ステップ3: 回避",
+        "desc": "赤い文字を避けてください！当たると速度が落ちます",
+        "descKo": "赤い文字を避ける"
+      },
+      "step4": {
+        "title": "🚀 ステップ4: ブースト!",
+        "titleKo": "ステップ4: ブースト!",
+        "desc": "単語完成 = ブースト速度 + 大量ボーナス！",
+        "descKo": "単語完成 = ブースト + 大量ボーナス！"
+      }
     },
     "wordTarget": "単語目標",
     "seconds": "秒",
@@ -33,7 +57,10 @@
     "maxCombo": "最大コンボ",
     "missionsCompleted": "ミッション完了",
     "playAgain": "もう一度",
-    "finish": "完了"
+    "finish": "完了",
+    "missionComplete": "ミッション完了!",
+    "paused": "一時停止",
+    "tapToContinue": "タップして続行"
   },
   "chainReaction": {
     "roomNotFound": "部屋が見つかりません",

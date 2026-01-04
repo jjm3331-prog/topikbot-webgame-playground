@@ -2,13 +2,15 @@ import { Crown, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 interface PremiumPreviewBannerProps {
   featureName?: string;
 }
 
-export const PremiumPreviewBanner = ({ featureName = "tính năng này" }: PremiumPreviewBannerProps) => {
+export const PremiumPreviewBanner = ({ featureName }: PremiumPreviewBannerProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <motion.div 
@@ -23,10 +25,10 @@ export const PremiumPreviewBanner = ({ featureName = "tính năng này" }: Premi
           </div>
           <div>
             <h3 className="font-semibold text-foreground text-sm sm:text-base">
-              Chế độ xem trước
+              {t("premium.previewMode")}
             </h3>
             <p className="text-xs sm:text-sm text-muted-foreground">
-              Nâng cấp Premium để sử dụng đầy đủ {featureName}
+              {t("premium.upgradeToUse", { feature: featureName || t("premium.thisFeature") })}
             </p>
           </div>
         </div>
@@ -36,7 +38,7 @@ export const PremiumPreviewBanner = ({ featureName = "tính năng này" }: Premi
           className="bg-gradient-to-r from-korean-orange to-korean-pink hover:from-korean-orange/90 hover:to-korean-pink/90 text-white shrink-0"
         >
           <Crown className="w-4 h-4 mr-2" />
-          Nâng cấp
+          {t("premium.upgrade")}
         </Button>
       </div>
     </motion.div>

@@ -177,12 +177,19 @@
     "success": "성공",
     "or": "또는",
     "points": "점",
+    "pointsUnit": "점",
     "playNow": "지금 플레이",
     "learnNow": "지금 학습",
     "backToDashboard": "대시보드로 돌아가기",
     "locale": "ko-KR",
     "previous": "이전",
     "delete": "삭제"
+  },
+  "premium": {
+    "previewMode": "미리보기 모드",
+    "upgradeToUse": "{{feature}} 전체 기능을 사용하려면 Premium으로 업그레이드하세요",
+    "thisFeature": "이 기능",
+    "upgrade": "업그레이드"
   },
   "brand": {
     "name": "LUKATO AI",
@@ -1697,6 +1704,20 @@
     "submitted": "지원서가 제출되었습니다!",
     "updated": "지원서가 수정되었습니다!",
     "privacyNote": "귀하의 정보는 헤드헌팅 목적으로만 사용되며 안전하게 보호됩니다.",
+    "confirmDelete": "이 지원서를 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
+    "deleteSuccess": "지원서가 삭제되었습니다",
+    "deleteError": "지원서를 삭제할 수 없습니다",
+    "uploadSuccess": "{{type}}이(가) 업로드되었습니다!",
+    "coverLetter": "자기소개서",
+    "uploadFailed": "업로드 실패",
+    "uploadError": "파일을 업로드할 수 없습니다",
+    "fileSizeError": "파일 크기는 최대 10MB입니다",
+    "fileTypeError": "PDF 또는 Word 파일만 허용됩니다",
+    "updateSuccess": "지원서가 업데이트되었습니다!",
+    "notificationTitle": "🎉 헤드헌팅 등록 완료!",
+    "notificationMessage": "{{name}}님, 지원서가 제출되었습니다. 헤드헌터가 3-5일 이내에 연락드릴 예정입니다.",
+    "submitSuccess": "헤드헌팅 서비스 등록 완료!",
+    "submitError": "등록 중 오류가 발생했습니다",
     "featureName": "헤드헌팅 서비스"
   },
   "reading": {
@@ -3310,7 +3331,14 @@
       "clickToSave": "영상 학습 중 모르는 단어를 클릭하면 여기에 저장됩니다",
       "complete": "완료",
       "wrongCount": "{{count}}회 틀림",
-      "addNote": "메모 추가..."
+      "addNote": "메모 추가...",
+      "loadError": "오답노트를 불러오는데 실패했습니다",
+      "addedToReview": "다시 학습 목록에 추가되었습니다",
+      "markedComplete": "학습 완료 처리되었습니다",
+      "updateError": "업데이트에 실패했습니다",
+      "confirmDelete": "정말 삭제하시겠습니까?",
+      "deleted": "삭제되었습니다",
+      "deleteError": "삭제에 실패했습니다"
     }
   },
   "listening": {
@@ -3748,7 +3776,31 @@
       "next": "다음",
       "startGame": "게임 시작!",
       "skip": "튜토리얼 건너뛰기",
-      "showAgain": "튜토리얼 다시 보기"
+      "showAgain": "튜토리얼 다시 보기",
+      "step1": {
+        "title": "🏎️ 1단계: 이동",
+        "titleKo": "1단계: 이동",
+        "desc": "아래 1-5 버튼을 눌러 차량을 레인 간에 이동하세요",
+        "descKo": "아래 1-5 버튼을 눌러 차량을 이동하세요"
+      },
+      "step2": {
+        "title": "✅ 2단계: 글자 수집",
+        "titleKo": "2단계: 글자 수집",
+        "desc": "초록색 글자를 순서대로 수집하여 단어를 완성하세요",
+        "descKo": "초록색 글자를 순서대로 수집하여 단어를 완성하세요"
+      },
+      "step3": {
+        "title": "⚠️ 3단계: 오답 피하기",
+        "titleKo": "3단계: 오답 피하기",
+        "desc": "빨간 글자를 피하세요! 부딪히면 속도가 느려집니다",
+        "descKo": "빨간 글자를 피하세요! 부딪히면 속도가 느려집니다"
+      },
+      "step4": {
+        "title": "🚀 4단계: 부스트!",
+        "titleKo": "4단계: 부스트!",
+        "desc": "단어 완성 = 부스트 + 대량 보너스 점수!",
+        "descKo": "단어 완성 = 부스트 + 대량 보너스 점수!"
+      }
     },
     "wordTarget": "단어 목표",
     "seconds": "초",
@@ -3769,7 +3821,10 @@
     "maxCombo": "최대 콤보",
     "missionsCompleted": "미션 완료",
     "playAgain": "다시하기",
-    "finish": "완료"
+    "finish": "완료",
+    "missionComplete": "미션 완료!",
+    "paused": "일시정지",
+    "tapToContinue": "터치하여 계속"
   },
   "chainReaction": {
     "roomNotFound": "방을 찾을 수 없습니다",

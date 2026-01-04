@@ -201,7 +201,7 @@ const Headhunting = () => {
   };
 
   const handleDeleteApplication = async (appId: string) => {
-    if (!confirm("Bạn có chắc muốn xóa đơn đăng ký này? Hành động này không thể hoàn tác.")) {
+    if (!confirm(t("headhunting.confirmDelete"))) {
       return;
     }
 
@@ -214,11 +214,11 @@ const Headhunting = () => {
 
       if (error) throw error;
 
-      toast.success("Đã xóa đơn đăng ký thành công");
+      toast.success(t("headhunting.deleteSuccess"));
       await checkUser();
     } catch (error: any) {
       console.error("Delete error:", error);
-      toast.error("Không thể xóa đơn đăng ký");
+      toast.error(t("headhunting.deleteError"));
     } finally {
       setDeletingId(null);
     }
@@ -248,12 +248,12 @@ const Headhunting = () => {
         .getPublicUrl(fileName);
       
       setUploadState({ file, uploading: false, url: fileName, error: null });
-      toast.success(`${type === 'resume' ? 'CV' : type === 'cover_letter' ? 'Thư xin việc' : 'Portfolio'} đã tải lên thành công!`);
+      toast.success(t("headhunting.uploadSuccess", { type: type === 'resume' ? 'CV' : type === 'cover_letter' ? t("headhunting.coverLetter") : 'Portfolio' }));
       return fileName;
     } catch (error: any) {
       console.error('Upload error:', error);
-      setUploadState(prev => ({ ...prev, uploading: false, error: 'Tải lên thất bại' }));
-      toast.error('Không thể tải file lên');
+      setUploadState(prev => ({ ...prev, uploading: false, error: t("headhunting.uploadFailed") }));
+      toast.error(t("headhunting.uploadError"));
       return null;
     }
   };
@@ -268,14 +268,14 @@ const Headhunting = () => {
     
     // Validate file size (10MB max)
     if (file.size > 10 * 1024 * 1024) {
-      toast.error('Kích thước file tối đa là 10MB');
+      toast.error(t("headhunting.fileSizeError"));
       return;
     }
     
     // Validate file type
     const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     if (!allowedTypes.includes(file.type)) {
-      toast.error('Chỉ chấp nhận file PDF hoặc Word');
+      toast.error(t("headhunting.fileTypeError"));
       return;
     }
     
@@ -332,7 +332,7 @@ const Headhunting = () => {
           .eq("id", editingApplication.id);
 
         if (error) throw error;
-        toast.success("Đã cập nhật đơn đăng ký thành công!");
+        toast.success(t("headhunting.updateSuccess"));
       } else {
         // Create new application
         const { error } = await supabase.from("headhunting_applications").insert({
@@ -345,21 +345,21 @@ const Headhunting = () => {
 
         // Send notification to user
         await supabase.from("notifications").insert({
-          title: "🎉 Đăng ký Headhunting thành công!",
-          message: `${formData.full_name}, đơn đăng ký của bạn đã được gửi. Đội ngũ Headhunter sẽ liên hệ trong 3-5 ngày.`,
+          title: t("headhunting.notificationTitle"),
+          message: t("headhunting.notificationMessage", { name: formData.full_name }),
           type: "success",
           target_user_id: user.id,
           is_global: false,
         });
 
-        toast.success("Đăng ký dịch vụ Headhunting thành công!");
+        toast.success(t("headhunting.submitSuccess"));
       }
 
       setSubmitted(true);
       setEditingApplication(null);
     } catch (error: any) {
       console.error("Submit error:", error);
-      toast.error("Có lỗi xảy ra khi đăng ký");
+      toast.error(t("headhunting.submitError"));
     } finally {
       setLoading(false);
     }

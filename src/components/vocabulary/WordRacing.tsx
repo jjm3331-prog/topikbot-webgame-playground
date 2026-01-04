@@ -92,10 +92,10 @@ const GAME_DURATION = 90; // 90 seconds
 const WORD_TARGET = 8; // Complete 8 words to win
 
 const MISSIONS: Mission[] = [
-  { id: "words5", title: "wordRacing.missions.words5", titleVi: "Hoàn thành 5 từ", target: 5, type: "words", reward: 100 },
-  { id: "combo5", title: "wordRacing.missions.combo5", titleVi: "Đạt 5 combo", target: 5, type: "combo", reward: 150 },
-  { id: "perfect", title: "wordRacing.missions.perfect", titleVi: "3 từ không sai", target: 3, type: "perfect", reward: 200 },
-  { id: "score500", title: "wordRacing.missions.score500", titleVi: "Đạt 500 điểm", target: 500, type: "score", reward: 50 },
+  { id: "words5", title: "wordRacing.missions.words5", titleVi: "wordRacing.missions.words5", target: 5, type: "words", reward: 100 },
+  { id: "combo5", title: "wordRacing.missions.combo5", titleVi: "wordRacing.missions.combo5", target: 5, type: "combo", reward: 150 },
+  { id: "perfect", title: "wordRacing.missions.perfect", titleVi: "wordRacing.missions.perfect", target: 3, type: "perfect", reward: 200 },
+  { id: "score500", title: "wordRacing.missions.score500", titleVi: "wordRacing.missions.score500", target: 500, type: "score", reward: 50 },
 ];
 
 export default function WordRacing({ words, onComplete }: WordRacingProps) {
@@ -143,31 +143,31 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
   // Tutorial steps
   const tutorialSteps = [
     {
-      title: "🏎️ Bước 1: Di chuyển",
-      titleKo: "1단계: 이동",
-      description: "Nhấn các nút 1-5 bên dưới để di chuyển xe qua các làn đường",
-      descriptionKo: "아래 1-5 버튼을 눌러 차량을 이동하세요",
+      title: t("wordRacing.tutorial.step1.title", "🏎️ Bước 1: Di chuyển"),
+      titleKo: t("wordRacing.tutorial.step1.titleKo", "1단계: 이동"),
+      description: t("wordRacing.tutorial.step1.desc", "Nhấn các nút 1-5 bên dưới để di chuyển xe qua các làn đường"),
+      descriptionKo: t("wordRacing.tutorial.step1.descKo", "아래 1-5 버튼을 눌러 차량을 이동하세요"),
       highlight: "controls"
     },
     {
-      title: "✅ Bước 2: Thu thập chữ",
-      titleKo: "2단계: 글자 수집",
-      description: "Thu thập các chữ cái MÀU XANH theo đúng thứ tự để hoàn thành từ",
-      descriptionKo: "초록색 글자를 순서대로 수집하여 단어를 완성하세요",
+      title: t("wordRacing.tutorial.step2.title", "✅ Bước 2: Thu thập chữ"),
+      titleKo: t("wordRacing.tutorial.step2.titleKo", "2단계: 글자 수집"),
+      description: t("wordRacing.tutorial.step2.desc", "Thu thập các chữ cái MÀU XANH theo đúng thứ tự để hoàn thành từ"),
+      descriptionKo: t("wordRacing.tutorial.step2.descKo", "초록색 글자를 순서대로 수집하여 단어를 완성하세요"),
       highlight: "letters"
     },
     {
-      title: "⚠️ Bước 3: Tránh chữ sai",
-      titleKo: "3단계: 오답 피하기",
-      description: "Tránh các chữ MÀU ĐỎ! Đụng phải sẽ bị giảm tốc và mất combo",
-      descriptionKo: "빨간 글자를 피하세요! 부딪히면 속도가 느려집니다",
+      title: t("wordRacing.tutorial.step3.title", "⚠️ Bước 3: Tránh chữ sai"),
+      titleKo: t("wordRacing.tutorial.step3.titleKo", "3단계: 오답 피하기"),
+      description: t("wordRacing.tutorial.step3.desc", "Tránh các chữ MÀU ĐỎ! Đụng phải sẽ bị giảm tốc và mất combo"),
+      descriptionKo: t("wordRacing.tutorial.step3.descKo", "빨간 글자를 피하세요! 부딪히면 속도가 느려집니다"),
       highlight: "wrong"
     },
     {
-      title: "🚀 Bước 4: BOOST!",
-      titleKo: "4단계: 부스트!",
-      description: "Hoàn thành từ = BOOST tốc độ + điểm thưởng lớn!",
-      descriptionKo: "단어 완성 = 부스트 + 대량 보너스 점수!",
+      title: t("wordRacing.tutorial.step4.title", "🚀 Bước 4: BOOST!"),
+      titleKo: t("wordRacing.tutorial.step4.titleKo", "4단계: 부스트!"),
+      description: t("wordRacing.tutorial.step4.desc", "Hoàn thành từ = BOOST tốc độ + điểm thưởng lớn!"),
+      descriptionKo: t("wordRacing.tutorial.step4.descKo", "단어 완성 = 부스트 + 대량 보너스 점수!"),
       highlight: "boost"
     }
   ];
@@ -1093,8 +1093,8 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
             <div className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2">
               <Star className="w-5 h-5" />
               <div>
-                <p className="font-bold text-sm">미션 완료!</p>
-                <p className="text-xs">{showMissionComplete.titleVi} (+{showMissionComplete.reward}점)</p>
+                <p className="font-bold text-sm">{t("wordRacing.missionComplete", "미션 완료!")}</p>
+                <p className="text-xs">{t(showMissionComplete.titleVi)} (+{showMissionComplete.reward}{t("common.pointsUnit", "점")})</p>
               </div>
             </div>
           </motion.div>
@@ -1114,8 +1114,8 @@ export default function WordRacing({ words, onComplete }: WordRacingProps) {
             <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
               <Card className="p-8 text-center">
                 <Pause className="w-16 h-16 mx-auto mb-4 text-primary" />
-                <h2 className="text-2xl font-black mb-2">Tạm dừng / 일시정지</h2>
-                <p className="text-muted-foreground">Nhấn để tiếp tục / 터치하여 계속</p>
+                <h2 className="text-2xl font-black mb-2">{t("wordRacing.paused", "Tạm dừng / 일시정지")}</h2>
+                <p className="text-muted-foreground">{t("wordRacing.tapToContinue", "Nhấn để tiếp tục / 터치하여 계속")}</p>
               </Card>
             </motion.div>
           </motion.div>

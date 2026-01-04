@@ -12,7 +12,31 @@
       "next": "Next",
       "startGame": "Start Game!",
       "skip": "Skip Tutorial",
-      "showAgain": "Show Tutorial Again"
+      "showAgain": "Show Tutorial Again",
+      "step1": {
+        "title": "🏎️ Step 1: Move",
+        "titleKo": "Step 1: Move",
+        "desc": "Press buttons 1-5 below to move the car between lanes",
+        "descKo": "Press buttons 1-5 below to move the car"
+      },
+      "step2": {
+        "title": "✅ Step 2: Collect Letters",
+        "titleKo": "Step 2: Collect",
+        "desc": "Collect GREEN letters in order to complete the word",
+        "descKo": "Collect green letters in order to complete the word"
+      },
+      "step3": {
+        "title": "⚠️ Step 3: Avoid Wrong Letters",
+        "titleKo": "Step 3: Avoid",
+        "desc": "Avoid RED letters! Hitting them will slow you down",
+        "descKo": "Avoid red letters! Hitting them slows you down"
+      },
+      "step4": {
+        "title": "🚀 Step 4: BOOST!",
+        "titleKo": "Step 4: Boost!",
+        "desc": "Complete word = BOOST speed + big bonus points!",
+        "descKo": "Complete word = Boost + massive bonus points!"
+      }
     },
     "wordTarget": "Word Target",
     "seconds": "s",
@@ -33,7 +57,10 @@
     "maxCombo": "Max Combo",
     "missionsCompleted": "Missions Completed",
     "playAgain": "Play Again",
-    "finish": "Finish"
+    "finish": "Finish",
+    "missionComplete": "Mission Complete!",
+    "paused": "Paused",
+    "tapToContinue": "Tap to continue"
   },
   "chainReaction": {
     "roomNotFound": "Room not found",
@@ -229,12 +256,19 @@
     "success": "Success",
     "or": "or",
     "points": "points",
+    "pointsUnit": "pts",
     "playNow": "Play Now",
     "learnNow": "Learn Now",
     "backToDashboard": "Back to Dashboard",
     "locale": "en-US",
     "previous": "Previous",
     "delete": "Delete"
+  },
+  "premium": {
+    "previewMode": "Preview Mode",
+    "upgradeToUse": "Upgrade to Premium to fully use {{feature}}",
+    "thisFeature": "this feature",
+    "upgrade": "Upgrade"
   },
   "brand": {
     "name": "LUKATO AI",
@@ -1725,6 +1759,20 @@
     "submitted": "Application submitted successfully!",
     "updated": "Application updated successfully!",
     "privacyNote": "Your information is used only for headhunting purposes and is kept secure.",
+    "confirmDelete": "Are you sure you want to delete this application? This action cannot be undone.",
+    "deleteSuccess": "Application deleted successfully",
+    "deleteError": "Failed to delete application",
+    "uploadSuccess": "{{type}} uploaded successfully!",
+    "coverLetter": "Cover Letter",
+    "uploadFailed": "Upload failed",
+    "uploadError": "Failed to upload file",
+    "fileSizeError": "Maximum file size is 10MB",
+    "fileTypeError": "Only PDF or Word files accepted",
+    "updateSuccess": "Application updated successfully!",
+    "notificationTitle": "🎉 Headhunting Registration Complete!",
+    "notificationMessage": "{{name}}, your application has been submitted. The headhunter team will contact you within 3-5 days.",
+    "submitSuccess": "Headhunting service registration complete!",
+    "submitError": "An error occurred during registration",
     "featureName": "Headhunting Service"
   },
   "reading": {
@@ -3195,7 +3243,14 @@
       "clickToSave": "Click on unknown words while watching to save them here",
       "complete": "Complete",
       "wrongCount": "Wrong {{count}} times",
-      "addNote": "Add note..."
+      "addNote": "Add note...",
+      "loadError": "Failed to load mistake notes",
+      "addedToReview": "Added to review list",
+      "markedComplete": "Marked as complete",
+      "updateError": "Failed to update",
+      "confirmDelete": "Are you sure you want to delete?",
+      "deleted": "Deleted",
+      "deleteError": "Failed to delete"
     }
   },
   "listening": {

@@ -74,7 +74,7 @@ export default function VideoMistakeNote({ videoId, onSeekTo }: VideoMistakeNote
       setMistakes(data || []);
     } catch (error) {
       console.error('Error fetching mistakes:', error);
-      toast.error('오답노트를 불러오는데 실패했습니다');
+      toast.error(t("video.mistake.loadError"));
     } finally {
       setLoading(false);
     }
@@ -92,10 +92,10 @@ export default function VideoMistakeNote({ videoId, onSeekTo }: VideoMistakeNote
       setMistakes(prev => 
         prev.map(m => m.id === mistake.id ? { ...m, mastered: !m.mastered } : m)
       );
-      toast.success(mistake.mastered ? '다시 학습 목록에 추가되었습니다' : '학습 완료 처리되었습니다');
+      toast.success(mistake.mastered ? t("video.mistake.addedToReview") : t("video.mistake.markedComplete"));
     } catch (error) {
       console.error('Error updating mistake:', error);
-      toast.error('업데이트에 실패했습니다');
+      toast.error(t("video.mistake.updateError"));
     }
   };
 
@@ -117,7 +117,7 @@ export default function VideoMistakeNote({ videoId, onSeekTo }: VideoMistakeNote
   };
 
   const handleDelete = async (mistake: VideoMistake) => {
-    if (!confirm('정말 삭제하시겠습니까?')) return;
+    if (!confirm(t("video.mistake.confirmDelete"))) return;
 
     try {
       const { error } = await supabase
@@ -128,10 +128,10 @@ export default function VideoMistakeNote({ videoId, onSeekTo }: VideoMistakeNote
       if (error) throw error;
       
       setMistakes(prev => prev.filter(m => m.id !== mistake.id));
-      toast.success('삭제되었습니다');
+      toast.success(t("video.mistake.deleted"));
     } catch (error) {
       console.error('Error deleting mistake:', error);
-      toast.error('삭제에 실패했습니다');
+      toast.error(t("video.mistake.deleteError"));
     }
   };
 

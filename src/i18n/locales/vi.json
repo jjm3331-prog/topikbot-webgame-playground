@@ -12,7 +12,31 @@
       "next": "Tiếp",
       "startGame": "Bắt đầu!",
       "skip": "Bỏ qua hướng dẫn",
-      "showAgain": "Xem lại hướng dẫn"
+      "showAgain": "Xem lại hướng dẫn",
+      "step1": {
+        "title": "🏎️ Bước 1: Di chuyển",
+        "titleKo": "Bước 1: Di chuyển",
+        "desc": "Nhấn các nút 1-5 bên dưới để di chuyển xe qua các làn đường",
+        "descKo": "Nhấn nút 1-5 để di chuyển xe"
+      },
+      "step2": {
+        "title": "✅ Bước 2: Thu thập chữ",
+        "titleKo": "Bước 2: Thu thập",
+        "desc": "Thu thập các chữ cái MÀU XANH theo đúng thứ tự để hoàn thành từ",
+        "descKo": "Thu thập chữ xanh theo thứ tự"
+      },
+      "step3": {
+        "title": "⚠️ Bước 3: Tránh chữ sai",
+        "titleKo": "Bước 3: Tránh",
+        "desc": "Tránh các chữ MÀU ĐỎ! Đụng phải sẽ bị giảm tốc và mất combo",
+        "descKo": "Tránh chữ đỏ! Đụng phải sẽ giảm tốc"
+      },
+      "step4": {
+        "title": "🚀 Bước 4: BOOST!",
+        "titleKo": "Bước 4: Boost!",
+        "desc": "Hoàn thành từ = BOOST tốc độ + điểm thưởng lớn!",
+        "descKo": "Hoàn thành từ = Boost + thưởng lớn!"
+      }
     },
     "wordTarget": "Mục tiêu từ",
     "seconds": "s",
@@ -33,7 +57,10 @@
     "maxCombo": "Combo tối đa",
     "missionsCompleted": "Nhiệm vụ hoàn thành",
     "playAgain": "Chơi lại",
-    "finish": "Hoàn thành"
+    "finish": "Hoàn thành",
+    "missionComplete": "Nhiệm vụ hoàn thành!",
+    "paused": "Tạm dừng",
+    "tapToContinue": "Nhấn để tiếp tục"
   },
   "chainReaction": {
     "roomNotFound": "Không tìm thấy phòng",
@@ -229,12 +256,19 @@
     "success": "Thành công",
     "or": "hoặc",
     "points": "điểm",
+    "pointsUnit": "điểm",
     "playNow": "Chơi ngay",
     "learnNow": "Học ngay",
     "backToDashboard": "Quay lại Dashboard",
     "locale": "vi-VN",
     "previous": "Trước",
     "delete": "Xóa"
+  },
+  "premium": {
+    "previewMode": "Chế độ xem trước",
+    "upgradeToUse": "Nâng cấp Premium để sử dụng đầy đủ {{feature}}",
+    "thisFeature": "tính năng này",
+    "upgrade": "Nâng cấp"
   },
   "brand": {
     "name": "LUKATO AI",
@@ -1698,6 +1732,20 @@
     "submitted": "Đã gửi đơn thành công!",
     "updated": "Đã cập nhật đơn!",
     "privacyNote": "Thông tin của bạn chỉ được sử dụng cho mục đích headhunting và được bảo mật an toàn.",
+    "confirmDelete": "Bạn có chắc muốn xóa đơn đăng ký này? Hành động này không thể hoàn tác.",
+    "deleteSuccess": "Đã xóa đơn đăng ký thành công",
+    "deleteError": "Không thể xóa đơn đăng ký",
+    "uploadSuccess": "{{type}} đã tải lên thành công!",
+    "coverLetter": "Thư xin việc",
+    "uploadFailed": "Tải lên thất bại",
+    "uploadError": "Không thể tải file lên",
+    "fileSizeError": "Kích thước file tối đa là 10MB",
+    "fileTypeError": "Chỉ chấp nhận file PDF hoặc Word",
+    "updateSuccess": "Đã cập nhật đơn đăng ký thành công!",
+    "notificationTitle": "🎉 Đăng ký Headhunting thành công!",
+    "notificationMessage": "{{name}}, đơn đăng ký của bạn đã được gửi. Đội ngũ Headhunter sẽ liên hệ trong 3-5 ngày.",
+    "submitSuccess": "Đăng ký dịch vụ Headhunting thành công!",
+    "submitError": "Có lỗi xảy ra khi đăng ký",
     "featureName": "dịch vụ Headhunting"
   },
   "reading": {
@@ -3243,7 +3291,14 @@
       "clickToSave": "Nhấn vào từ không biết khi xem video để lưu ở đây",
       "complete": "Hoàn thành",
       "wrongCount": "Sai {{count}} lần",
-      "addNote": "Thêm ghi chú..."
+      "addNote": "Thêm ghi chú...",
+      "loadError": "Không thể tải danh sách lỗi",
+      "addedToReview": "Đã thêm vào danh sách học lại",
+      "markedComplete": "Đã đánh dấu hoàn thành",
+      "updateError": "Cập nhật thất bại",
+      "confirmDelete": "Bạn có chắc muốn xóa?",
+      "deleted": "Đã xóa",
+      "deleteError": "Xóa thất bại"
     }
   },
   "listening": {
