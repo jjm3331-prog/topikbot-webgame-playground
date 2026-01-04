@@ -587,6 +587,7 @@ const TOPIK2_PICTURE_QUESTION_TYPES: PictureQuestionConfig[] = [
 ];
 
 // Generate image for SCENE type picture questions (문항 1-2)
+// 🚀 프로덕션 레벨: google/gemini-3-pro-image-preview 모델 사용 + 재시도 로직
 async function generateSceneImage(
   sceneDescription: string,
   questionNumber: number,
@@ -597,11 +598,14 @@ async function generateSceneImage(
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY || !sceneDescription) return null;
 
-  try {
-    console.log(`🎨 [Scene Q${questionNumber}-${optionNumber}] ${sceneDescription.slice(0, 50)}...`);
+  const MAX_RETRIES = 2;
+  const RETRY_DELAY_MS = 1500;
 
-    // TOPIK 스타일 장면 그림 프롬프트
-    const imagePrompt = `Create a TOPIK Korean language test illustration.
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      console.log(`🎨 [Scene Q${questionNumber}-${optionNumber}] Attempt ${attempt}: ${sceneDescription.slice(0, 50)}...`);
+
+      const imagePrompt = `Create a TOPIK Korean language test illustration.
 
 Scene to illustrate: ${sceneDescription}
 
@@ -618,66 +622,95 @@ CRITICAL STYLE REQUIREMENTS:
 
 Reference style: Similar to TOPIK listening section picture dialogues - simple educational illustrations showing everyday situations.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image-preview",
-        messages: [{ role: "user", content: imagePrompt }],
-        modalities: ["image", "text"],
-      }),
-    });
-
-    if (!response.ok) {
-      console.error(`Scene image API error: ${response.status}`);
-      return null;
-    }
-
-    const data = await response.json();
-    const imageBase64 = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-
-    if (!imageBase64 || !imageBase64.startsWith("data:image/")) {
-      console.error("No valid scene image in response");
-      return null;
-    }
-
-    // Upload to storage
-    const base64Data = imageBase64.split(",")[1];
-    const binaryString = atob(base64Data);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-
-    const mimeMatch = imageBase64.match(/data:image\/(\w+);/);
-    const extension = mimeMatch ? mimeMatch[1] : "png";
-    const fileName = `mock-exam/${examType}/scene_q${questionNumber}_opt${optionNumber}_${Date.now()}.${extension}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("podcast-audio")
-      .upload(fileName, bytes.buffer, {
-        contentType: `image/${extension}`,
-        upsert: true,
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-pro-image-preview",
+          messages: [{ role: "user", content: imagePrompt }],
+          modalities: ["image", "text"],
+        }),
       });
 
-    if (uploadError) {
-      console.error("Scene image upload error:", uploadError);
+      if (!response.ok) {
+        console.error(`[Scene] API error: ${response.status}`);
+        if (attempt < MAX_RETRIES) {
+          await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+          continue;
+        }
+        return null;
+      }
+
+      const data = await response.json();
+      const imageBase64 = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+
+      if (!imageBase64 || !imageBase64.startsWith("data:image/")) {
+        console.error("[Scene] No valid image in response");
+        if (attempt < MAX_RETRIES) {
+          await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+          continue;
+        }
+        return null;
+      }
+
+      // Validate and decode
+      const base64Parts = imageBase64.split(",");
+      if (base64Parts.length !== 2 || !base64Parts[1] || base64Parts[1].length < 1000) {
+        console.error("[Scene] Invalid or empty base64 data");
+        if (attempt < MAX_RETRIES) continue;
+        return null;
+      }
+
+      const binaryString = atob(base64Parts[1]);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+
+      if (bytes.length < 3000) {
+        console.error(`[Scene] Image too small: ${bytes.length} bytes`);
+        if (attempt < MAX_RETRIES) continue;
+        return null;
+      }
+
+      const mimeMatch = imageBase64.match(/data:image\/(\w+);/);
+      const extension = mimeMatch ? mimeMatch[1] : "png";
+      const fileName = `mock-exam/${examType}/scene_q${questionNumber}_opt${optionNumber}_${Date.now()}.${extension}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("podcast-audio")
+        .upload(fileName, bytes, {
+          contentType: `image/${extension}`,
+          upsert: true,
+        });
+
+      if (uploadError) {
+        console.error("[Scene] Upload error:", uploadError);
+        if (attempt < MAX_RETRIES) continue;
+        return null;
+      }
+
+      const { data: urlData } = supabase.storage.from("podcast-audio").getPublicUrl(fileName);
+      console.log(`✅ Scene image Q${questionNumber}-${optionNumber} uploaded`);
+      return urlData.publicUrl;
+
+    } catch (error) {
+      console.error(`[Scene] Attempt ${attempt} error:`, error);
+      if (attempt < MAX_RETRIES) {
+        await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+        continue;
+      }
       return null;
     }
-
-    const { data: urlData } = supabase.storage.from("podcast-audio").getPublicUrl(fileName);
-    console.log(`✅ Scene image Q${questionNumber}-${optionNumber} uploaded`);
-    return urlData.publicUrl;
-  } catch (error) {
-    console.error("Scene image generation error:", error);
-    return null;
   }
+  return null;
 }
 
 // Generate image for GRAPH type picture questions (문항 3)
+// 🚀 프로덕션 레벨: google/gemini-3-pro-image-preview 모델 사용 + 재시도 로직
 async function generateGraphImage(
   graphDescription: string,
   questionNumber: number,
@@ -688,11 +721,14 @@ async function generateGraphImage(
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY || !graphDescription) return null;
 
-  try {
-    console.log(`📊 [Graph Q${questionNumber}-${optionNumber}] ${graphDescription.slice(0, 50)}...`);
+  const MAX_RETRIES = 2;
+  const RETRY_DELAY_MS = 1500;
 
-    // TOPIK 스타일 그래프/도표 프롬프트
-    const imagePrompt = `Create a TOPIK Korean language test GRAPH/CHART combination image.
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      console.log(`📊 [Graph Q${questionNumber}-${optionNumber}] Attempt ${attempt}: ${graphDescription.slice(0, 50)}...`);
+
+      const imagePrompt = `Create a TOPIK Korean language test GRAPH/CHART combination image.
 
 Chart data to visualize: ${graphDescription}
 
@@ -710,7 +746,7 @@ CRITICAL REQUIREMENTS:
 3. PIE/DONUT CHART specifications:
    - Show percentage breakdown for reasons
    - Labels should be in Korean with percentages
-   - Common reasons: 신선하고 품질이 좋아서 (Fresh/Good quality), 가격이 합리적이어서 (Reasonable price), 편리해서 (Convenient)
+   - Common reasons: 신선하고 품질이 좋아서, 가격이 합리적이어서, 편리해서
 
 4. STYLE:
    - Clean, professional business chart style
@@ -720,65 +756,93 @@ CRITICAL REQUIREMENTS:
 
 5. NO decorative elements, just clean data visualization
 
-The graphs must clearly match the data described. Different options should show different trends or percentage distributions.`;
+The graphs must clearly match the data described.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image-preview",
-        messages: [{ role: "user", content: imagePrompt }],
-        modalities: ["image", "text"],
-      }),
-    });
-
-    if (!response.ok) {
-      console.error(`Graph image API error: ${response.status}`);
-      return null;
-    }
-
-    const data = await response.json();
-    const imageBase64 = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-
-    if (!imageBase64 || !imageBase64.startsWith("data:image/")) {
-      console.error("No valid graph image in response");
-      return null;
-    }
-
-    // Upload to storage
-    const base64Data = imageBase64.split(",")[1];
-    const binaryString = atob(base64Data);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-
-    const mimeMatch = imageBase64.match(/data:image\/(\w+);/);
-    const extension = mimeMatch ? mimeMatch[1] : "png";
-    const fileName = `mock-exam/${examType}/graph_q${questionNumber}_opt${optionNumber}_${Date.now()}.${extension}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("podcast-audio")
-      .upload(fileName, bytes.buffer, {
-        contentType: `image/${extension}`,
-        upsert: true,
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-pro-image-preview",
+          messages: [{ role: "user", content: imagePrompt }],
+          modalities: ["image", "text"],
+        }),
       });
 
-    if (uploadError) {
-      console.error("Graph image upload error:", uploadError);
+      if (!response.ok) {
+        console.error(`[Graph] API error: ${response.status}`);
+        if (attempt < MAX_RETRIES) {
+          await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+          continue;
+        }
+        return null;
+      }
+
+      const data = await response.json();
+      const imageBase64 = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+
+      if (!imageBase64 || !imageBase64.startsWith("data:image/")) {
+        console.error("[Graph] No valid image in response");
+        if (attempt < MAX_RETRIES) {
+          await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+          continue;
+        }
+        return null;
+      }
+
+      // Validate and decode
+      const base64Parts = imageBase64.split(",");
+      if (base64Parts.length !== 2 || !base64Parts[1] || base64Parts[1].length < 1000) {
+        console.error("[Graph] Invalid or empty base64 data");
+        if (attempt < MAX_RETRIES) continue;
+        return null;
+      }
+
+      const binaryString = atob(base64Parts[1]);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+
+      if (bytes.length < 3000) {
+        console.error(`[Graph] Image too small: ${bytes.length} bytes`);
+        if (attempt < MAX_RETRIES) continue;
+        return null;
+      }
+
+      const mimeMatch = imageBase64.match(/data:image\/(\w+);/);
+      const extension = mimeMatch ? mimeMatch[1] : "png";
+      const fileName = `mock-exam/${examType}/graph_q${questionNumber}_opt${optionNumber}_${Date.now()}.${extension}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("podcast-audio")
+        .upload(fileName, bytes, {
+          contentType: `image/${extension}`,
+          upsert: true,
+        });
+
+      if (uploadError) {
+        console.error("[Graph] Upload error:", uploadError);
+        if (attempt < MAX_RETRIES) continue;
+        return null;
+      }
+
+      const { data: urlData } = supabase.storage.from("podcast-audio").getPublicUrl(fileName);
+      console.log(`✅ Graph image Q${questionNumber}-${optionNumber} uploaded`);
+      return urlData.publicUrl;
+
+    } catch (error) {
+      console.error(`[Graph] Attempt ${attempt} error:`, error);
+      if (attempt < MAX_RETRIES) {
+        await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+        continue;
+      }
       return null;
     }
-
-    const { data: urlData } = supabase.storage.from("podcast-audio").getPublicUrl(fileName);
-    console.log(`✅ Graph image Q${questionNumber}-${optionNumber} uploaded`);
-    return urlData.publicUrl;
-  } catch (error) {
-    console.error("Graph image generation error:", error);
-    return null;
   }
+  return null;
 }
 
 // Unified function to generate picture question images based on type
@@ -798,116 +862,222 @@ async function generatePictureQuestionImage(
 }
 
 // Generate graph/chart image for Writing Question 53 (도표 설명 문제)
+// 🚀 프로덕션 레벨: google/gemini-3-pro-image-preview 모델 사용 + 재시도 로직
 async function generateWritingGraphImage(
   graphDataDescription: string,
   examType: string,
   supabase: any,
 ): Promise<string | null> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  if (!LOVABLE_API_KEY || !graphDataDescription) return null;
-
-  try {
-    console.log(`📊 [Writing Q53] Generating graph: ${graphDataDescription.slice(0, 80)}...`);
-
-    // 쓰기 53번 전용 - 실제 TOPIK 스타일 도표 이미지
-    const imagePrompt = `Create a TOPIK Korean language test STATISTICAL GRAPH/CHART image for Writing Question 53.
-
-The image must visualize the following data:
-${graphDataDescription}
-
-CRITICAL REQUIREMENTS:
-
-1. **LAYOUT OPTIONS** (choose one based on data):
-   - Option A: LINE GRAPH (선 그래프) - for trends over time
-   - Option B: BAR CHART (막대 그래프) - for comparisons
-   - Option C: PIE/DONUT CHART (원형 차트) - for percentages/proportions
-   - Option D: COMBINED (선 그래프 + 원형 차트) - for complex data with multiple aspects
-
-2. **KOREAN LABELS** (필수):
-   - Title in Korean at the top (e.g., "한국인의 여가 활동 조사", "연도별 출생률 변화")
-   - X-axis and Y-axis labels in Korean
-   - Legend items in Korean if applicable
-   - Percentage numbers or numerical values clearly visible
-   - Unit labels like "(만명)", "(%)", "(년)" where appropriate
-
-3. **DATA VISUALIZATION**:
-   - Clear, accurate representation of the described data
-   - Each data point/segment should be distinguishable
-   - Use professional grayscale or minimal colors (black, gray tones)
-   - Numbers and percentages should be clearly readable
-
-4. **TOPIK EXAM STYLE**:
-   - Clean, professional business/academic chart style
-   - Simple white background
-   - No decorative elements, just pure data visualization
-   - The chart should be suitable for a Korean language proficiency exam
-
-5. **DIMENSIONS**: Suitable for display in an exam paper (approximately 16:9 or 4:3 ratio)
-
-The resulting image should look like a chart from an official TOPIK exam paper that students need to describe in 200-300 characters.`;
-
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image-preview",
-        messages: [{ role: "user", content: imagePrompt }],
-        modalities: ["image", "text"],
-      }),
-    });
-
-    if (!response.ok) {
-      console.error(`Writing graph image API error: ${response.status}`);
-      return null;
-    }
-
-    const data = await response.json();
-    const imageBase64 = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-
-    if (!imageBase64 || !imageBase64.startsWith("data:image/")) {
-      console.error("No valid writing graph image in response");
-      return null;
-    }
-
-    // Extract base64 and upload to storage
-    const base64Data = imageBase64.split(",")[1];
-    if (!base64Data) {
-      console.error("Invalid base64 format for writing graph image");
-      return null;
-    }
-
-    const binaryString = atob(base64Data);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let k = 0; k < binaryString.length; k++) {
-      bytes[k] = binaryString.charCodeAt(k);
-    }
-
-    const mimeMatch = imageBase64.match(/data:image\/(\w+);/);
-    const extension = mimeMatch ? mimeMatch[1] : "png";
-    const fileName = `mock-exam/${examType}/writing_q53_graph_${Date.now()}.${extension}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("podcast-audio")
-      .upload(fileName, bytes, {
-        contentType: `image/${extension}`,
-        upsert: true,
-      });
-
-    if (uploadError) {
-      console.error("Writing graph image upload error:", uploadError);
-      return null;
-    }
-
-    const { data: urlData } = supabase.storage.from("podcast-audio").getPublicUrl(fileName);
-    console.log(`✅ Writing Q53 graph image uploaded: ${urlData.publicUrl}`);
-    return urlData.publicUrl;
-  } catch (error) {
-    console.error("Writing graph image generation error:", error);
+  if (!LOVABLE_API_KEY) {
+    console.error("[Writing Q53] ❌ LOVABLE_API_KEY not configured");
     return null;
   }
+  if (!graphDataDescription || graphDataDescription.trim().length < 10) {
+    console.error("[Writing Q53] ❌ Invalid graph_data_description:", graphDataDescription);
+    return null;
+  }
+
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY_MS = 2000;
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      console.log(`📊 [Writing Q53] Attempt ${attempt}/${MAX_RETRIES}: ${graphDataDescription.slice(0, 80)}...`);
+
+      // 🎨 프로덕션 레벨 TOPIK 53번 그래프 프롬프트
+      const imagePrompt = `You are a professional chart designer. Create a HIGH-QUALITY KOREAN LANGUAGE TEST STATISTICAL CHART image.
+
+## DATA TO VISUALIZE:
+${graphDataDescription}
+
+## MANDATORY REQUIREMENTS:
+
+### 1. CHART TYPE (choose based on data):
+- LINE GRAPH (선 그래프): For trends over time (years, months)
+- BAR CHART (막대 그래프): For comparing quantities
+- PIE/DONUT CHART (원형 차트): For percentages/proportions
+- COMBINED LAYOUT: Use 2 charts side-by-side if data has multiple aspects
+
+### 2. KOREAN TEXT LABELS (매우 중요!):
+- Chart title in Korean at the top (e.g., "한국인의 독서 습관 조사 (2023)")
+- X-axis label in Korean (e.g., "(연도)", "(항목)")
+- Y-axis label in Korean with units (e.g., "(만명)", "(%)", "(권)")
+- Legend items in Korean
+- All data labels and percentages clearly visible
+
+### 3. VISUAL STYLE:
+- Clean, professional business/academic style
+- WHITE or very light gray background
+- Use distinguishable grayscale tones or minimal colors (black, dark gray, light gray)
+- Clear grid lines for line/bar charts
+- Anti-aliased, smooth rendering
+- High contrast between elements
+
+### 4. DATA ACCURACY:
+- Numbers and percentages must match the description exactly
+- Proportions must be visually accurate (50% should look like half)
+- Trends (increase/decrease) must be clearly visible
+
+### 5. DIMENSIONS:
+- Landscape orientation (16:9 or 4:3 ratio)
+- Suitable for exam paper display
+
+## OUTPUT:
+Generate a single, clean chart image that looks like it came from an official TOPIK exam paper. Students should be able to analyze this chart and write a 200-300 character description in Korean.
+
+DO NOT include any watermarks, decorative elements, or anything that distracts from the data.`;
+
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-pro-image-preview",
+          messages: [{ role: "user", content: imagePrompt }],
+          modalities: ["image", "text"],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => "");
+        console.error(`[Writing Q53] API error ${response.status}: ${errorText.slice(0, 200)}`);
+        
+        if (response.status === 429) {
+          console.log(`[Writing Q53] Rate limited, waiting ${RETRY_DELAY_MS * attempt}ms...`);
+          await new Promise(r => setTimeout(r, RETRY_DELAY_MS * attempt));
+          continue;
+        }
+        
+        if (attempt < MAX_RETRIES) {
+          await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+          continue;
+        }
+        return null;
+      }
+
+      const data = await response.json();
+      const imageData = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+
+      if (!imageData) {
+        console.error(`[Writing Q53] No image in response (attempt ${attempt})`);
+        console.log("[Writing Q53] Response structure:", JSON.stringify(data).slice(0, 500));
+        
+        if (attempt < MAX_RETRIES) {
+          await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+          continue;
+        }
+        return null;
+      }
+
+      // Validate base64 image data
+      if (!imageData.startsWith("data:image/")) {
+        console.error(`[Writing Q53] Invalid image format: ${imageData.slice(0, 50)}`);
+        if (attempt < MAX_RETRIES) {
+          await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+          continue;
+        }
+        return null;
+      }
+
+      // Extract and validate base64 data
+      const base64Parts = imageData.split(",");
+      if (base64Parts.length !== 2) {
+        console.error("[Writing Q53] Malformed base64 data URL");
+        if (attempt < MAX_RETRIES) continue;
+        return null;
+      }
+
+      const base64Data = base64Parts[1];
+      if (!base64Data || base64Data.length < 1000) {
+        console.error(`[Writing Q53] Base64 data too small (${base64Data?.length || 0} chars) - likely empty image`);
+        if (attempt < MAX_RETRIES) {
+          await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+          continue;
+        }
+        return null;
+      }
+
+      // Decode base64 to binary
+      let binaryData: Uint8Array;
+      try {
+        const binaryString = atob(base64Data);
+        binaryData = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          binaryData[i] = binaryString.charCodeAt(i);
+        }
+      } catch (decodeError) {
+        console.error("[Writing Q53] Failed to decode base64:", decodeError);
+        if (attempt < MAX_RETRIES) continue;
+        return null;
+      }
+
+      // Validate image size (minimum 5KB for a real chart)
+      if (binaryData.length < 5000) {
+        console.error(`[Writing Q53] Image too small (${binaryData.length} bytes) - likely corrupted or empty`);
+        if (attempt < MAX_RETRIES) {
+          await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+          continue;
+        }
+        return null;
+      }
+
+      // Validate PNG/JPEG header
+      const isPNG = binaryData[0] === 0x89 && binaryData[1] === 0x50 && binaryData[2] === 0x4E && binaryData[3] === 0x47;
+      const isJPEG = binaryData[0] === 0xFF && binaryData[1] === 0xD8 && binaryData[2] === 0xFF;
+      const isWEBP = binaryData[8] === 0x57 && binaryData[9] === 0x45 && binaryData[10] === 0x42 && binaryData[11] === 0x50;
+      
+      if (!isPNG && !isJPEG && !isWEBP) {
+        console.error(`[Writing Q53] Invalid image header: [${binaryData.slice(0, 12).join(', ')}]`);
+        if (attempt < MAX_RETRIES) {
+          await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+          continue;
+        }
+        return null;
+      }
+
+      const mimeMatch = imageData.match(/data:image\/(\w+);/);
+      const extension = mimeMatch ? mimeMatch[1] : (isPNG ? "png" : isJPEG ? "jpg" : "webp");
+      const contentType = isPNG ? "image/png" : isJPEG ? "image/jpeg" : "image/webp";
+      const fileName = `mock-exam/${examType}/writing_q53_graph_${Date.now()}.${extension}`;
+
+      console.log(`[Writing Q53] ✅ Valid image: ${binaryData.length} bytes, ${extension.toUpperCase()}`);
+
+      // Upload to storage
+      const { error: uploadError } = await supabase.storage
+        .from("podcast-audio")
+        .upload(fileName, binaryData, {
+          contentType: contentType,
+          upsert: true,
+        });
+
+      if (uploadError) {
+        console.error("[Writing Q53] Upload error:", uploadError);
+        if (attempt < MAX_RETRIES) {
+          await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+          continue;
+        }
+        return null;
+      }
+
+      const { data: urlData } = supabase.storage.from("podcast-audio").getPublicUrl(fileName);
+      console.log(`✅ [Writing Q53] Graph image uploaded successfully: ${urlData.publicUrl}`);
+      return urlData.publicUrl;
+
+    } catch (error) {
+      console.error(`[Writing Q53] Attempt ${attempt} error:`, error);
+      if (attempt < MAX_RETRIES) {
+        await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+        continue;
+      }
+      return null;
+    }
+  }
+
+  console.error("[Writing Q53] ❌ All retry attempts failed");
+  return null;
 }
 
 // Build system prompt for Gemini
