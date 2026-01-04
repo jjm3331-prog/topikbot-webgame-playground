@@ -191,11 +191,11 @@ const ReadingA = () => {
           return {
             id: q.id,
             passage: q.instruction_text || q.question_text,
-            question: q.instruction_text ? q.question_text : "다음 질문에 답하세요.",
+            question: q.instruction_text ? q.question_text : t("reading.defaultQuestion", "다음 질문에 답하세요."),
             options: opts.map((o: any) => typeof o === 'string' ? o : o.text || String(o)),
             answer: q.correct_answer - 1, // DB is 1-indexed, UI is 0-indexed
-            explanationKo: q.explanation_ko || "해설이 준비 중입니다.",
-            explanationVi: q.explanation_vi || "Giải thích đang được chuẩn bị.",
+            explanationKo: q.explanation_ko || t("reading.explanationPreparing", "해설이 준비 중입니다."),
+            explanationVi: q.explanation_vi || t("reading.explanationPreparingVi", "Giải thích đang được chuẩn bị."),
           };
         });
 
@@ -206,8 +206,8 @@ const ReadingA = () => {
         setDbQuestionCount(0);
         setQuestions(fallbackQuestions[tabType] || fallbackQuestions.grammar);
         toast({
-          title: "DB 문제 없음",
-          description: "해당 조건의 문제가 없어 샘플 문제를 사용합니다.",
+          title: t("reading.noDbQuestions", "DB 문제 없음"),
+          description: t("reading.usingSampleQuestions", "해당 조건의 문제가 없어 샘플 문제를 사용합니다."),
         });
       }
     } catch (error) {
@@ -419,8 +419,8 @@ const ReadingA = () => {
                 className="rounded-3xl bg-gradient-to-b from-card to-card/50 border border-border/50 shadow-2xl p-12 text-center"
               >
                 <Database className="w-16 h-16 animate-pulse text-primary mx-auto mb-6" />
-                <h3 className="text-xl font-bold text-foreground mb-2">문제 불러오는 중...</h3>
-                <p className="text-muted-foreground">DB에서 읽기 문제를 불러오고 있습니다</p>
+                <h3 className="text-xl font-bold text-foreground mb-2">{t("reading.loadingQuestions", "문제 불러오는 중...")}</h3>
+                <p className="text-muted-foreground">{t("reading.loadingFromDb", "DB에서 읽기 문제를 불러오고 있습니다")}</p>
               </motion.div>
             ) : !currentQuestion ? (
               <motion.div

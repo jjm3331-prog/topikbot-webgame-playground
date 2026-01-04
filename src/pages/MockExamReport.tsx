@@ -190,7 +190,7 @@ const MockExamReport = () => {
         predictedGrade: totalRate >= 80 ? 2 : 1,
         scores: { total: totalRate, listening: 0, reading: 0 },
         analysis: {
-          overallAnalysis: "리포트를 생성하는 중 오류가 발생했습니다. 다시 시도해주세요.",
+          overallAnalysis: t("mockExam.report.errorGenerating", "리포트를 생성하는 중 오류가 발생했습니다. 다시 시도해주세요."),
           strengths: [],
           weaknesses: [],
           listeningAnalysis: "",
@@ -442,9 +442,9 @@ const MockExamReport = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Lightbulb className="w-5 h-5 text-amber-500" />
-                      맞춤 학습 추천
+                      {t("mockExam.report.customRecommendation", "맞춤 학습 추천")}
                     </CardTitle>
-                    <CardDescription>AI가 분석한 취약점 기반 우선순위별 학습 가이드</CardDescription>
+                    <CardDescription>{t("mockExam.report.customRecommendationDesc", "AI가 분석한 취약점 기반 우선순위별 학습 가이드")}</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {report.analysis.recommendations.map((rec, i) => (

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, 
@@ -27,37 +28,38 @@ import AppFooter from "@/components/AppFooter";
 
 const PWAGuide = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("android");
 
   const benefits = [
-    { icon: Zap, label: "Khởi động nhanh", color: "text-korean-yellow" },
-    { icon: WifiOff, label: "Dùng offline", color: "text-korean-cyan" },
-    { icon: Bell, label: "Nhận thông báo", color: "text-korean-orange" },
+    { icon: Zap, label: t("pwaGuide.benefits.fastLaunch", "Khởi động nhanh"), color: "text-korean-yellow" },
+    { icon: WifiOff, label: t("pwaGuide.benefits.offline", "Dùng offline"), color: "text-korean-cyan" },
+    { icon: Bell, label: t("pwaGuide.benefits.notifications", "Nhận thông báo"), color: "text-korean-orange" },
   ];
 
   const androidSteps = [
     {
       step: 1,
-      title: "Mở Chrome",
-      desc: "Truy cập game.lukato.kr bằng Chrome",
+      title: t("pwaGuide.android.step1Title", "Mở Chrome"),
+      desc: t("pwaGuide.android.step1Desc", "Truy cập game.lukato.kr bằng Chrome"),
       icon: "🌐",
     },
     {
       step: 2,
-      title: "Nhấn menu ⋮",
-      desc: "Góc trên bên phải màn hình",
+      title: t("pwaGuide.android.step2Title", "Nhấn menu ⋮"),
+      desc: t("pwaGuide.android.step2Desc", "Góc trên bên phải màn hình"),
       icon: "⋮",
     },
     {
       step: 3,
-      title: "Cài đặt ứng dụng",
-      desc: "Chọn 'Add to Home screen'",
+      title: t("pwaGuide.android.step3Title", "Cài đặt ứng dụng"),
+      desc: t("pwaGuide.android.step3Desc", "Chọn 'Add to Home screen'"),
       icon: "📲",
     },
     {
       step: 4,
-      title: "Hoàn tất",
-      desc: "Nhấn 'Install' để xác nhận",
+      title: t("pwaGuide.android.step4Title", "Hoàn tất"),
+      desc: t("pwaGuide.android.step4Desc", "Nhấn 'Install' để xác nhận"),
       icon: "✅",
     },
   ];
@@ -65,38 +67,38 @@ const PWAGuide = () => {
   const iosSteps = [
     {
       step: 1,
-      title: "Mở Safari",
-      desc: "Bắt buộc dùng Safari trên iOS",
+      title: t("pwaGuide.ios.step1Title", "Mở Safari"),
+      desc: t("pwaGuide.ios.step1Desc", "Bắt buộc dùng Safari trên iOS"),
       icon: "🧭",
     },
     {
       step: 2,
-      title: "Nhấn Share",
-      desc: "Nút chia sẻ (□↑) ở dưới",
+      title: t("pwaGuide.ios.step2Title", "Nhấn Share"),
+      desc: t("pwaGuide.ios.step2Desc", "Nút chia sẻ (□↑) ở dưới"),
       icon: "📤",
     },
     {
       step: 3,
-      title: "Add to Home",
-      desc: "Cuộn và chọn 'Add to Home Screen'",
+      title: t("pwaGuide.ios.step3Title", "Add to Home"),
+      desc: t("pwaGuide.ios.step3Desc", "Cuộn và chọn 'Add to Home Screen'"),
       icon: "➕",
     },
     {
       step: 4,
-      title: "Hoàn tất",
-      desc: "Nhấn 'Add' góc trên phải",
+      title: t("pwaGuide.ios.step4Title", "Hoàn tất"),
+      desc: t("pwaGuide.ios.step4Desc", "Nhấn 'Add' góc trên phải"),
       icon: "✅",
     },
   ];
 
   const faqs = [
     {
-      question: "Không thấy nút cài đặt?",
-      answer: "Có thể ứng dụng đã được cài đặt hoặc trình duyệt không hỗ trợ. Vui lòng sử dụng Chrome (Android) hoặc Safari (iOS).",
+      question: t("pwaGuide.faq.q1", "Không thấy nút cài đặt?"),
+      answer: t("pwaGuide.faq.a1", "Có thể ứng dụng đã được cài đặt hoặc trình duyệt không hỗ trợ. Vui lòng sử dụng Chrome (Android) hoặc Safari (iOS)."),
     },
     {
-      question: "Muốn gỡ cài đặt?",
-      answer: "Nhấn giữ biểu tượng app trên màn hình chính và chọn xóa/gỡ cài đặt như ứng dụng thông thường.",
+      question: t("pwaGuide.faq.q2", "Muốn gỡ cài đặt?"),
+      answer: t("pwaGuide.faq.a2", "Nhấn giữ biểu tượng app trên màn hình chính và chọn xóa/gỡ cài đặt như ứng dụng thông thường."),
     },
   ];
 

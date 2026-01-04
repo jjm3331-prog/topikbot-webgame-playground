@@ -1381,7 +1381,14 @@
     "loading": "正在生成题目...",
     "loadingDesc": "AI正在生成TOPIK题目",
     "noQuestions": "没有题目",
-    "reload": "重新加载"
+    "reload": "重新加载",
+    "defaultQuestion": "请回答以下问题。",
+    "explanationPreparing": "解析正在准备中。",
+    "explanationPreparingVi": "解析正在准备中。",
+    "loadingQuestions": "正在加载题目...",
+    "loadingFromDb": "正在从数据库加载阅读题目",
+    "noDbQuestions": "数据库中没有题目",
+    "usingSampleQuestions": "没有符合条件的题目，正在使用示例题目。"
   },
   "topikPage": {
     "goBack": "返回",
@@ -2596,6 +2603,11 @@
     "upgradeToPremium": "升级高级版",
     "coreFeatures": "核心功能",
     "comingSoon": "准备中",
+    "preparing": "准备中",
+    "sectionPreparing": "题目准备中",
+    "sectionNoData": "听力题目尚未准备好，请选择其他部分。",
+    "sectionNoDataReading": "阅读题目尚未准备好，请选择其他部分。",
+    "examPreparing": "考试准备中...",
     "startExam": "开始考试",
     "units": {
       "questions": "道题",
@@ -2820,7 +2832,10 @@
       "focusAreas": "重点学习领域",
       "regenerate": "重新生成报告",
       "goToMistakes": "前往错题本",
-      "tryAgain": "再次挑战"
+      "tryAgain": "再次挑战",
+      "errorGenerating": "生成报告时出错，请重试。",
+      "customRecommendation": "个性化学习建议",
+      "customRecommendationDesc": "基于AI分析弱点的优先级学习指南"
     },
     "error": {
       "notFound": "未找到考试记录"
@@ -3504,5 +3519,38 @@
     "clear": "清除",
     "check": "检查",
     "hint": "用手指或鼠标按照字的形状写"
+  },
+  "pwaGuide": {
+    "benefits": {
+      "fastLaunch": "快速启动",
+      "offline": "离线使用",
+      "notifications": "接收通知"
+    },
+    "android": {
+      "step1Title": "打开Chrome",
+      "step1Desc": "用Chrome访问game.lukato.kr",
+      "step2Title": "点击菜单 ⋮",
+      "step2Desc": "屏幕右上角",
+      "step3Title": "安装应用",
+      "step3Desc": "选择'添加到主屏幕'",
+      "step4Title": "完成",
+      "step4Desc": "点击'安装'确认"
+    },
+    "ios": {
+      "step1Title": "打开Safari",
+      "step1Desc": "iOS必须使用Safari",
+      "step2Title": "点击分享",
+      "step2Desc": "底部分享按钮 (□↑)",
+      "step3Title": "添加到主屏幕",
+      "step3Desc": "滚动选择'添加到主屏幕'",
+      "step4Title": "完成",
+      "step4Desc": "点击右上角'添加'"
+    },
+    "faq": {
+      "q1": "看不到安装按钮?",
+      "a1": "应用可能已安装或浏览器不支持。请使用Chrome（Android）或Safari（iOS）。",
+      "q2": "想要卸载?",
+      "a2": "在主屏幕长按应用图标，像普通应用一样删除/卸载。"
+    }
   }
 }
