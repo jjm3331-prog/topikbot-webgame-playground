@@ -3057,6 +3057,124 @@
     "preparing": "Questions being prepared",
     "noQuestions": "No questions available for this section/part. Please select another.",
     "noQuestionsFilter": "No questions match current criteria. Try a different difficulty."
+  },
+  "tutorial": {
+    "title": "Game Guide",
+    "subtitle": "Learn Korean with AI! Explore unique language learning games.",
+    "howToStart": "How to Start",
+    "tips": "Tips",
+    "playNow": "Play Now!",
+    "startLearning": "Start Learning Now!",
+    "quickStart": {
+      "title": "Quick Start",
+      "step1": { "title": "Choose Game", "desc": "Select a game from the menu" },
+      "step2": { "title": "Chat", "desc": "Input Korean to interact with AI" },
+      "step3": { "title": "Earn Points", "desc": "Complete missions for bonus points" }
+    },
+    "stats": {
+      "title": "Understanding Stats",
+      "hp": { "title": "HP (Health)", "desc": "Decreases on mistakes. 0 = game over!" },
+      "money": { "title": "Money (₩)", "desc": "Earn by completing missions" },
+      "mission": { "title": "Missions", "desc": "Number of completed missions" },
+      "points": { "title": "Points", "desc": "Total points from all games" }
+    },
+    "importantTips": {
+      "title": "Important Tips",
+      "tip1": { "title": "Chat in Korean!", "desc": "AI will understand and respond appropriately" },
+      "tip2": { "title": "More natural = higher score", "desc": "Focus on natural expressions" },
+      "tip3": { "title": "It's okay to make mistakes!", "desc": "This is a learning process, don't be afraid to try" },
+      "tip4": { "title": "Multilingual explanations", "desc": "All guides have translations" }
+    },
+    "gameGuides": {
+      "title": "Detailed Game Guides",
+      "subtitle": "Tap each game to see detailed guide"
+    },
+    "games": {
+      "manager": {
+        "title": "LUKATO Manager",
+        "titleVi": "Group Manager",
+        "summary": "Manager simulation - train trainees and help them debut!",
+        "summaryVi": "Manager simulation - train trainees and debut!",
+        "howToStart": "Menu → Click 'LUKATO Manager'",
+        "howToStartVi": "Menu → Click 'LUKATO Manager'",
+        "tip1": "Chat in Korean to raise stats",
+        "tip1Vi": "Chat in Korean to raise stats",
+        "tip2": "Manage members' condition",
+        "tip2Vi": "Manage members' condition"
+      },
+      "survival": {
+        "title": "Seoul Survival",
+        "titleVi": "Survival in Seoul",
+        "summary": "Chat with AI in Korean and survive 10 turns in Seoul!",
+        "summaryVi": "Chat with AI in Korean and survive 10 turns in Seoul!",
+        "howToStart": "Menu → Click 'AI Seoul Survival' → Enter location, 'Start'",
+        "howToStartVi": "Menu → Click 'AI Seoul Survival' → Enter location, 'Start'",
+        "tip1": "Start with short, simple sentences",
+        "tip1Vi": "Start with short, simple sentences",
+        "tip2": "Use polite form (요/습니다) for higher scores",
+        "tip2Vi": "Use polite form (요/습니다) for higher scores"
+      },
+      "dating": {
+        "title": "Love Signal",
+        "titleVi": "Love Signal",
+        "summary": "Chat with attractive Korean characters and achieve 100% affinity!",
+        "summaryVi": "Chat with attractive Korean characters and achieve 100% affinity!",
+        "howToStart": "Menu → Click 'Korean Dating' → Choose character",
+        "howToStartVi": "Menu → Click 'Korean Dating' → Choose character",
+        "tip1": "Using MZ slang (ㅋㅋ, 갓생) makes you seem friendly",
+        "tip1Vi": "Using MZ slang (ㅋㅋ, 갓생) makes you seem friendly",
+        "tip2": "Try chatting matching their MBTI",
+        "tip2Vi": "Try chatting matching their MBTI"
+      },
+      "wordchain": {
+        "title": "Word Chain",
+        "titleVi": "Word Chain",
+        "summary": "Say a new word starting with the last letter of AI's word!",
+        "summaryVi": "Say a new word starting with the last letter of AI's word!",
+        "howToStart": "Menu → Click 'Korean Word Chain'",
+        "howToStartVi": "Menu → Click 'Korean Word Chain'",
+        "tip1": "Initial sound rule: '녀→여', '률→율' applied",
+        "tip1Vi": "Initial sound rule: '녀→여', '률→율' applied",
+        "tip2": "Answer within 15 seconds!",
+        "tip2Vi": "Answer within 15 seconds!"
+      },
+      "kpop": {
+        "title": "K-POP Lyrics Quiz",
+        "titleVi": "K-POP Lyrics Quiz",
+        "summary": "Listen to K-POP and fill in the missing lyrics!",
+        "summaryVi": "Listen to K-POP and fill in the missing lyrics!",
+        "howToStart": "Menu → Click 'K-POP Quiz'",
+        "howToStartVi": "Menu → Click 'K-POP Quiz'",
+        "tip1": "Watch subtitles carefully while listening",
+        "tip1Vi": "Watch subtitles carefully while listening",
+        "tip2": "Answer fast for bonus points!",
+        "tip2Vi": "Answer fast for bonus points!"
+      },
+      "kdrama": {
+        "title": "K-Drama Dubbing",
+        "titleVi": "K-Drama Dubbing",
+        "summary": "Listen to famous drama lines and practice pronunciation!",
+        "summaryVi": "Listen to famous drama lines and practice pronunciation!",
+        "howToStart": "Menu → Click 'K-Drama Dubbing'",
+        "howToStartVi": "Menu → Click 'K-Drama Dubbing'",
+        "tip1": "Record in a quiet place",
+        "tip1Vi": "Record in a quiet place",
+        "tip2": "Read slowly and clearly for higher scores",
+        "tip2Vi": "Read slowly and clearly for higher scores"
+      },
+      "parttime": {
+        "title": "Part-time Job",
+        "titleVi": "Korean Part-time",
+        "summary": "Work part-time at Korean convenience stores, cafes and improve Korean!",
+        "summaryVi": "Work part-time at Korean convenience stores, cafes and improve Korean!",
+        "howToStart": "Menu → Click 'Korean Part-time'",
+        "howToStartVi": "Menu → Click 'Korean Part-time'",
+        "tip1": "Serve customers naturally",
+        "tip1Vi": "Serve customers naturally",
+        "tip2": "Speak Korean well to earn more",
+        "tip2Vi": "Speak Korean well to earn more"
+      }
+    }
   }
 }
 

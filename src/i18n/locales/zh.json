@@ -2789,6 +2789,124 @@
     "preparing": "题目准备中",
     "noQuestions": "此部分暂无题目。请选择其他部分。",
     "noQuestionsFilter": "没有符合条件的题目。请尝试其他难度。"
+  },
+  "tutorial": {
+    "title": "游戏指南",
+    "subtitle": "和AI一起快乐学韩语！探索独特的语言学习游戏。",
+    "howToStart": "如何开始",
+    "tips": "提示",
+    "playNow": "开始玩！",
+    "startLearning": "立即开始学习！",
+    "quickStart": {
+      "title": "快速开始",
+      "step1": { "title": "选择游戏", "desc": "从菜单中选择游戏" },
+      "step2": { "title": "聊天", "desc": "用韩语与AI互动" },
+      "step3": { "title": "获得积分", "desc": "完成任务获得奖励积分" }
+    },
+    "stats": {
+      "title": "了解状态栏",
+      "hp": { "title": "HP（血量）", "desc": "失误时减少。归零=游戏结束！" },
+      "money": { "title": "金钱（₩）", "desc": "完成任务时获得" },
+      "mission": { "title": "任务", "desc": "已完成的任务数" },
+      "points": { "title": "积分", "desc": "所有游戏的总积分" }
+    },
+    "importantTips": {
+      "title": "重要提示",
+      "tip1": { "title": "用韩语聊天！", "desc": "AI会理解并适当回应" },
+      "tip2": { "title": "越自然分数越高", "desc": "专注于自然表达" },
+      "tip3": { "title": "犯错也没关系！", "desc": "这是学习过程，大胆尝试" },
+      "tip4": { "title": "多语言说明", "desc": "所有指南都有翻译" }
+    },
+    "gameGuides": {
+      "title": "详细游戏指南",
+      "subtitle": "点击每个游戏查看详细指南"
+    },
+    "games": {
+      "manager": {
+        "title": "LUKATO Manager",
+        "titleVi": "团队经理",
+        "summary": "培训练习生并帮助他们出道的经理模拟游戏！",
+        "summaryVi": "经理模拟 - 培训练习生并出道！",
+        "howToStart": "菜单 → 点击 'LUKATO Manager'",
+        "howToStartVi": "菜单 → 点击 'LUKATO Manager'",
+        "tip1": "用韩语聊天来提升属性",
+        "tip1Vi": "用韩语聊天来提升属性",
+        "tip2": "管理成员的状态",
+        "tip2Vi": "管理成员的状态"
+      },
+      "survival": {
+        "title": "首尔生存",
+        "titleVi": "首尔生存",
+        "summary": "用韩语与AI对话，在首尔生存10回合！",
+        "summaryVi": "用韩语与AI对话，在首尔生存10回合！",
+        "howToStart": "菜单 → 点击 'AI 首尔生存' → 输入地点后'开始'",
+        "howToStartVi": "菜单 → 点击 'AI 首尔生存' → 输入地点后'开始'",
+        "tip1": "从简短的句子开始",
+        "tip1Vi": "从简短的句子开始",
+        "tip2": "使用敬语（요/습니다）得分更高",
+        "tip2Vi": "使用敬语（요/습니다）得分更高"
+      },
+      "dating": {
+        "title": "Love Signal",
+        "titleVi": "爱情信号",
+        "summary": "与魅力韩国角色聊天，达成100%好感度！",
+        "summaryVi": "与魅力韩国角色聊天，达成100%好感度！",
+        "howToStart": "菜单 → 点击 '韩国约会' → 选择角色",
+        "howToStartVi": "菜单 → 点击 '韩国约会' → 选择角色",
+        "tip1": "使用MZ俚语（ㅋㅋ, 갓생）显得更亲近",
+        "tip1Vi": "使用MZ俚语（ㅋㅋ, 갓생）显得更亲近",
+        "tip2": "试着根据对方的MBTI来聊天",
+        "tip2Vi": "试着根据对方的MBTI来聊天"
+      },
+      "wordchain": {
+        "title": "接龙",
+        "titleVi": "接龙",
+        "summary": "说一个以AI单词最后一个字开头的新单词！",
+        "summaryVi": "说一个以AI单词最后一个字开头的新单词！",
+        "howToStart": "菜单 → 点击 '韩语接龙'",
+        "howToStartVi": "菜单 → 点击 '韩语接龙'",
+        "tip1": "头音规则：'녀→여', '률→율'等转换适用",
+        "tip1Vi": "头音规则：'녀→여', '률→율'等转换适用",
+        "tip2": "15秒内回答！",
+        "tip2Vi": "15秒内回答！"
+      },
+      "kpop": {
+        "title": "K-POP歌词问答",
+        "titleVi": "K-POP歌词问答",
+        "summary": "听K-POP填空歌词！",
+        "summaryVi": "听K-POP填空歌词！",
+        "howToStart": "菜单 → 点击 'K-POP Quiz'",
+        "howToStartVi": "菜单 → 点击 'K-POP Quiz'",
+        "tip1": "听歌时仔细看字幕",
+        "tip1Vi": "听歌时仔细看字幕",
+        "tip2": "答得快有奖励积分！",
+        "tip2Vi": "答得快有奖励积分！"
+      },
+      "kdrama": {
+        "title": "K-Drama配音",
+        "titleVi": "K-Drama配音",
+        "summary": "听著名韩剧台词并跟读练习发音！",
+        "summaryVi": "听著名韩剧台词并跟读练习发音！",
+        "howToStart": "菜单 → 点击 'K-Drama 配音'",
+        "howToStartVi": "菜单 → 点击 'K-Drama 配音'",
+        "tip1": "在安静的地方录音",
+        "tip1Vi": "在安静的地方录音",
+        "tip2": "慢慢清晰地读分数更高",
+        "tip2Vi": "慢慢清晰地读分数更高"
+      },
+      "parttime": {
+        "title": "兼职体验",
+        "titleVi": "韩国兼职",
+        "summary": "在韩国便利店、咖啡店打工提高韩语！",
+        "summaryVi": "在韩国便利店、咖啡店打工提高韩语！",
+        "howToStart": "菜单 → 点击 '韩国兼职'",
+        "howToStartVi": "菜单 → 点击 '韩国兼职'",
+        "tip1": "自然地接待顾客",
+        "tip1Vi": "自然地接待顾客",
+        "tip2": "韩语好能赚更多",
+        "tip2Vi": "韩语好能赚更多"
+      }
+    }
   }
 }
 
