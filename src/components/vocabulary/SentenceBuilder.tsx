@@ -390,7 +390,7 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
               animate={{ scale: 1 }}
               className="text-orange-500 font-bold text-sm"
             >
-              🔥 {streak}연속!
+              🔥 {streak}{t("sentenceBuilder.streak")}
             </motion.span>
           )}
           <span className="text-lg font-bold text-primary">{score}{t("sentenceBuilder.points")}</span>
@@ -426,14 +426,14 @@ const SentenceBuilder = ({ level, onMistake }: SentenceBuilderProps) => {
           <span>{languageLabels[currentLang]}: {getMeaning(currentPuzzle.word)}</span>
         </div>
         
-        {showHint && (
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-3 p-2 bg-amber-500/10 rounded-lg border border-amber-500/30"
-          >
-            <p className="text-sm text-amber-600 dark:text-amber-400">
-              💡 첫 단어: <strong>"{currentPuzzle.correctParts[0]}"</strong>
+          {showHint && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-3 p-2 bg-amber-500/10 rounded-lg border border-amber-500/30"
+            >
+              <p className="text-sm text-amber-600 dark:text-amber-400">
+                💡 {t("sentenceBuilder.firstWord")}: <strong>"{currentPuzzle.correctParts[0]}"</strong>
             </p>
           </motion.div>
         )}

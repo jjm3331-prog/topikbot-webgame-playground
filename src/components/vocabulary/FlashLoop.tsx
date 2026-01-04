@@ -151,7 +151,7 @@ const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
     return (
       <div className="text-center py-12">
         <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
-        <p className="text-muted-foreground">단어 로딩 중...</p>
+        <p className="text-muted-foreground">{t("flashLoop.loading")}</p>
       </div>
     );
   }
@@ -159,8 +159,8 @@ const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
   if (words.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground mb-4">이 레벨의 어휘 데이터가 없습니다.</p>
-        <Button onClick={fetchWords}>다시 시도</Button>
+        <p className="text-muted-foreground mb-4">{t("flashLoop.noData")}</p>
+        <Button onClick={fetchWords}>{t("flashLoop.retry")}</Button>
       </div>
     );
   }
@@ -180,16 +180,16 @@ const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
         <div className="w-24 h-24 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center mx-auto mb-6">
           <Zap className="w-12 h-12 text-white" />
         </div>
-        <h2 className="text-2xl font-bold mb-2">Flash Loop 완료! 🎉</h2>
+        <h2 className="text-2xl font-bold mb-2">{t("flashLoop.complete")} 🎉</h2>
         
         <div className="flex justify-center gap-8 my-6">
           <div className="text-center">
             <div className="text-3xl font-bold text-green-500">{knownCount}</div>
-            <div className="text-sm text-muted-foreground">알아요</div>
+            <div className="text-sm text-muted-foreground">{t("flashLoop.know")}</div>
           </div>
           <div className="text-center">
             <div className="text-3xl font-bold text-red-500">{unknownCount}</div>
-            <div className="text-sm text-muted-foreground">몰라요</div>
+            <div className="text-sm text-muted-foreground">{t("flashLoop.dontKnow")}</div>
           </div>
         </div>
 
@@ -199,11 +199,11 @@ const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
             style={{ width: `${percentage}%` }}
           />
         </div>
-        <p className="text-muted-foreground mb-6">정답률 {percentage}%</p>
+        <p className="text-muted-foreground mb-6">{t("flashLoop.accuracy")} {percentage}%</p>
 
         <Button onClick={handleRestart} size="lg">
           <RotateCcw className="w-4 h-4 mr-2" />
-          다시 시작
+          {t("flashLoop.restart")}
         </Button>
       </motion.div>
     );
@@ -294,14 +294,14 @@ const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
                   className="mt-4 p-4 bg-background/50 rounded-xl border border-border"
                 >
                   <p className="text-sm text-muted-foreground mb-1">
-                    {languageLabels[currentLang]} 뜻:
+                    {languageLabels[currentLang]} {t("flashLoop.meaning")}:
                   </p>
                   <p className="text-2xl font-semibold text-primary">
                     {getMeaning(currentWord)}
                   </p>
                   {currentWord.example_phrase && (
                     <p className="text-sm text-muted-foreground mt-3 italic">
-                      예) {currentWord.example_phrase}
+                      {t("flashLoop.example")}) {currentWord.example_phrase}
                     </p>
                   )}
                 </motion.div>
@@ -321,7 +321,7 @@ const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
               className="gap-2"
             >
               <Eye className="w-4 h-4" />
-              뜻 보기
+              {t("flashLoop.showMeaning")}
             </Button>
           </div>
         )}
@@ -339,7 +339,7 @@ const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
               className="h-16 text-lg border-red-500/50 hover:bg-red-500/10 hover:border-red-500"
             >
               <ThumbsDown className="w-5 h-5 mr-2 text-red-500" />
-              <span>몰라요</span>
+              <span>{t("flashLoop.dontKnow")}</span>
             </Button>
             <Button
               onClick={handleKnow}
@@ -347,7 +347,7 @@ const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
               className="h-16 text-lg bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
             >
               <ThumbsUp className="w-5 h-5 mr-2" />
-              <span>알아요</span>
+              <span>{t("flashLoop.know")}</span>
             </Button>
           </motion.div>
         )}
@@ -362,7 +362,7 @@ const FlashLoop = ({ level, onMistake }: FlashLoopProps) => {
           className="text-muted-foreground"
         >
           {autoPlay ? <Play className="w-4 h-4 mr-2" /> : <Zap className="w-4 h-4 mr-2" />}
-          {autoPlay ? '자동 진행 ON' : '수동 모드'}
+          {autoPlay ? t("flashLoop.autoOn") : t("flashLoop.manualMode")}
         </Button>
       </div>
     </div>

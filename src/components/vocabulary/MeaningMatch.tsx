@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { 
@@ -25,8 +26,8 @@ interface MatchPair {
 }
 
 const MeaningMatch = ({ level, onMistake }: MeaningMatchProps) => {
+  const { t } = useTranslation();
   const { getMeaning, getCurrentLanguage, languageLabels } = useVocabulary();
-  
   const [words, setWords] = useState<VocabWord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [round, setRound] = useState(0);
@@ -187,7 +188,7 @@ const MeaningMatch = ({ level, onMistake }: MeaningMatchProps) => {
     return (
       <div className="text-center py-12">
         <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
-        <p className="text-muted-foreground">단어 로딩 중...</p>
+        <p className="text-muted-foreground">{t("meaningMatch.loading")}</p>
       </div>
     );
   }
@@ -195,8 +196,8 @@ const MeaningMatch = ({ level, onMistake }: MeaningMatchProps) => {
   if (words.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground mb-4">이 레벨의 어휘 데이터가 없습니다.</p>
-        <Button onClick={fetchWords}>다시 시도</Button>
+        <p className="text-muted-foreground mb-4">{t("meaningMatch.noData")}</p>
+        <Button onClick={fetchWords}>{t("meaningMatch.retry")}</Button>
       </div>
     );
   }
@@ -214,14 +215,14 @@ const MeaningMatch = ({ level, onMistake }: MeaningMatchProps) => {
         <div className="w-24 h-24 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center mx-auto mb-6">
           <Shuffle className="w-12 h-12 text-white" />
         </div>
-        <h2 className="text-2xl font-bold mb-2">뜻 매칭 완료! 🎯</h2>
-        <p className="text-4xl font-bold text-primary mb-2">{score}점</p>
+        <h2 className="text-2xl font-bold mb-2">{t("meaningMatch.complete")} 🎯</h2>
+        <p className="text-4xl font-bold text-primary mb-2">{score}{t("meaningMatch.points")}</p>
         <p className="text-muted-foreground mb-6">
-          {words.length}쌍 매칭 • 정확도 {percentage}%
+          {words.length}{t("meaningMatch.pairs")} • {t("meaningMatch.accuracy")} {percentage}%
         </p>
         <Button onClick={handleRestart} size="lg">
           <RotateCcw className="w-4 h-4 mr-2" />
-          다시 시작
+          {t("meaningMatch.restart")}
         </Button>
       </motion.div>
     );
@@ -233,7 +234,7 @@ const MeaningMatch = ({ level, onMistake }: MeaningMatchProps) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-muted-foreground">
-            라운드 {round + 1} / {totalRounds}
+            {t("meaningMatch.round")} {round + 1} / {totalRounds}
           </span>
           <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
             <div 
@@ -249,16 +250,16 @@ const MeaningMatch = ({ level, onMistake }: MeaningMatchProps) => {
               animate={{ scale: 1 }}
               className="text-orange-500 font-bold text-sm"
             >
-              🔥 {streak}연속!
+              🔥 {streak}{t("meaningMatch.streak")}
             </motion.span>
           )}
-          <span className="text-lg font-bold text-primary">{score}점</span>
+          <span className="text-lg font-bold text-primary">{score}{t("meaningMatch.points")}</span>
         </div>
       </div>
 
       {/* Language indicator */}
       <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-        <span className="font-medium">한국어</span>
+        <span className="font-medium">{t("meaningMatch.koreanWord")}</span>
         <ArrowRight className="w-4 h-4" />
         <Globe className="w-4 h-4" />
         <span className="font-medium">{languageLabels[currentLang]}</span>
@@ -268,7 +269,7 @@ const MeaningMatch = ({ level, onMistake }: MeaningMatchProps) => {
       <div className="grid grid-cols-2 gap-4 md:gap-6">
         {/* Korean Words (Left) */}
         <div className="space-y-3">
-          <p className="text-xs text-center text-muted-foreground mb-2">한국어 단어</p>
+          <p className="text-xs text-center text-muted-foreground mb-2">{t("meaningMatch.koreanWord")}</p>
           {currentWords.map((word, idx) => {
             const isMatched = matchedPairs.has(word.id);
             const isWrong = wrongPairs.has(word.id);
@@ -302,7 +303,7 @@ const MeaningMatch = ({ level, onMistake }: MeaningMatchProps) => {
 
         {/* Meanings (Right) */}
         <div className="space-y-3">
-          <p className="text-xs text-center text-muted-foreground mb-2">{languageLabels[currentLang]} 뜻</p>
+          <p className="text-xs text-center text-muted-foreground mb-2">{languageLabels[currentLang]} {t("meaningMatch.meaning")}</p>
           {shuffledMeanings.map((pair, idx) => {
             const isMatched = matchedPairs.has(pair.word.id);
             const isSelected = selectedMeaning === pair.meaning && !isMatched;
@@ -348,12 +349,12 @@ const MeaningMatch = ({ level, onMistake }: MeaningMatchProps) => {
               {isCorrect ? (
                 <>
                   <Sparkles className="w-5 h-5 inline mr-2" />
-                  정답! +{10 + Math.min(streak - 1, 4) * 2}점
+                  {t("meaningMatch.correct")} +{10 + Math.min(streak - 1, 4) * 2}{t("meaningMatch.points")}
                 </>
               ) : (
                 <>
                   <XCircle className="w-5 h-5 inline mr-2" />
-                  오답! 다시 시도하세요
+                  {t("meaningMatch.wrong")}
                 </>
               )}
             </p>
@@ -363,7 +364,7 @@ const MeaningMatch = ({ level, onMistake }: MeaningMatchProps) => {
 
       {/* Instructions */}
       <p className="text-center text-sm text-muted-foreground">
-        왼쪽 한국어 단어와 오른쪽 {languageLabels[currentLang]} 뜻을 매칭하세요
+        {t("meaningMatch.instruction", { lang: languageLabels[currentLang] })}
       </p>
     </div>
   );

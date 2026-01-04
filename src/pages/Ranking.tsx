@@ -17,16 +17,16 @@ interface RankingUser {
 }
 
 // TOPIK 기반 레벨 시스템 (6급 = 100만점)
-const topikLevels = [
-  { level: 1, name: "TOPIK 1급", min: 0, max: 9999, color: "from-slate-400 to-slate-500", textColor: "text-slate-400", bgColor: "bg-slate-500/20", icon: "🌱" },
-  { level: 2, name: "TOPIK 2급", min: 10000, max: 49999, color: "from-emerald-400 to-emerald-600", textColor: "text-emerald-400", bgColor: "bg-emerald-500/20", icon: "📚" },
-  { level: 3, name: "TOPIK 3급", min: 50000, max: 149999, color: "from-blue-400 to-blue-600", textColor: "text-blue-400", bgColor: "bg-blue-500/20", icon: "✨" },
-  { level: 4, name: "TOPIK 4급", min: 150000, max: 349999, color: "from-purple-400 to-purple-600", textColor: "text-purple-400", bgColor: "bg-purple-500/20", icon: "🎯" },
-  { level: 5, name: "TOPIK 5급", min: 350000, max: 999999, color: "from-orange-400 to-orange-600", textColor: "text-orange-400", bgColor: "bg-orange-500/20", icon: "🔥" },
-  { level: 6, name: "TOPIK 6급", min: 1000000, max: Infinity, color: "from-red-400 to-rose-600", textColor: "text-red-400", bgColor: "bg-red-500/20", icon: "👑" },
+const getTopikLevels = (t: any) => [
+  { level: 1, name: t("ranking.topikLevel", { level: 1 }), min: 0, max: 9999, color: "from-slate-400 to-slate-500", textColor: "text-slate-400", bgColor: "bg-slate-500/20", icon: "🌱" },
+  { level: 2, name: t("ranking.topikLevel", { level: 2 }), min: 10000, max: 49999, color: "from-emerald-400 to-emerald-600", textColor: "text-emerald-400", bgColor: "bg-emerald-500/20", icon: "📚" },
+  { level: 3, name: t("ranking.topikLevel", { level: 3 }), min: 50000, max: 149999, color: "from-blue-400 to-blue-600", textColor: "text-blue-400", bgColor: "bg-blue-500/20", icon: "✨" },
+  { level: 4, name: t("ranking.topikLevel", { level: 4 }), min: 150000, max: 349999, color: "from-purple-400 to-purple-600", textColor: "text-purple-400", bgColor: "bg-purple-500/20", icon: "🎯" },
+  { level: 5, name: t("ranking.topikLevel", { level: 5 }), min: 350000, max: 999999, color: "from-orange-400 to-orange-600", textColor: "text-orange-400", bgColor: "bg-orange-500/20", icon: "🔥" },
+  { level: 6, name: t("ranking.topikLevel", { level: 6 }), min: 1000000, max: Infinity, color: "from-red-400 to-rose-600", textColor: "text-red-400", bgColor: "bg-red-500/20", icon: "👑" },
 ];
 
-const getUserTopikLevel = (points: number) => {
+const getUserTopikLevel = (points: number, topikLevels: any[]) => {
   for (let i = topikLevels.length - 1; i >= 0; i--) {
     if (points >= topikLevels[i].min) {
       return topikLevels[i];
@@ -48,11 +48,14 @@ const formatPoints = (points: number): string => {
 const Ranking = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const topikLevels = getTopikLevels(t);
   const [rankings, setRankings] = useState<RankingUser[]>([]);
   const [topThree, setTopThree] = useState<RankingUser[]>([]);
   const [currentUser, setCurrentUser] = useState<RankingUser | null>(null);
   const [currentUserRank, setCurrentUserRank] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  const getLevel = (points: number) => getUserTopikLevel(points, topikLevels);
 
   useEffect(() => {
     fetchRankings();
@@ -212,8 +215,8 @@ const Ranking = () => {
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getUserTopikLevel(currentUser.points).bgColor} ${getUserTopikLevel(currentUser.points).textColor}`}>
-                      {getUserTopikLevel(currentUser.points).icon} {getUserTopikLevel(currentUser.points).name}
+                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getLevel(currentUser.points).bgColor} ${getLevel(currentUser.points).textColor}`}>
+                      {getLevel(currentUser.points).icon} {getLevel(currentUser.points).name}
                     </span>
                   </div>
                   <p className="font-bold text-xl text-foreground truncate">{currentUser.username}</p>
@@ -269,7 +272,7 @@ const Ranking = () => {
                   <div className="flex items-center justify-center mb-1">
                     <Target className="w-5 h-5 text-green-500" />
                   </div>
-                  <p className="text-xl font-bold text-foreground">{getUserTopikLevel(currentUser.points).level}급</p>
+                  <p className="text-xl font-bold text-foreground">{getLevel(currentUser.points).level}{t('ranking.grade')}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">{t('ranking.topik')}</p>
                 </div>
               </div>
@@ -303,7 +306,7 @@ const Ranking = () => {
                 </div>
               </div>
               <p className="text-sm font-semibold text-foreground mt-4 truncate max-w-full text-center">{topThree[1].username}</p>
-              <p className={`text-xs ${getUserTopikLevel(topThree[1].points).textColor} font-medium`}>{getUserTopikLevel(topThree[1].points).name}</p>
+              <p className={`text-xs ${getLevel(topThree[1].points).textColor} font-medium`}>{getLevel(topThree[1].points).name}</p>
               <div className="mt-2 px-4 py-2 rounded-xl bg-gray-400/10 border border-gray-400/30">
                 <p className="text-base font-bold text-foreground">{formatPoints(topThree[1].points)}</p>
                 <p className="text-xs text-muted-foreground text-center">{t('ranking.points')}</p>
@@ -330,7 +333,7 @@ const Ranking = () => {
                 </div>
               </div>
               <p className="text-base font-bold text-foreground mt-4 truncate max-w-full text-center">{topThree[0].username}</p>
-              <p className={`text-xs ${getUserTopikLevel(topThree[0].points).textColor} font-medium`}>{getUserTopikLevel(topThree[0].points).name}</p>
+              <p className={`text-xs ${getLevel(topThree[0].points).textColor} font-medium`}>{getLevel(topThree[0].points).name}</p>
               <div className="mt-2 px-5 py-3 rounded-xl bg-yellow-400/10 border border-yellow-400/30">
                 <p className="text-xl font-bold text-foreground">{formatPoints(topThree[0].points)}</p>
                 <p className="text-xs text-muted-foreground text-center">{t('ranking.points')}</p>
@@ -356,7 +359,7 @@ const Ranking = () => {
                 </div>
               </div>
               <p className="text-sm font-semibold text-foreground mt-4 truncate max-w-full text-center">{topThree[2].username}</p>
-              <p className={`text-xs ${getUserTopikLevel(topThree[2].points).textColor} font-medium`}>{getUserTopikLevel(topThree[2].points).name}</p>
+              <p className={`text-xs ${getLevel(topThree[2].points).textColor} font-medium`}>{getLevel(topThree[2].points).name}</p>
               <div className="mt-2 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30">
                 <p className="text-sm font-bold text-foreground">{formatPoints(topThree[2].points)}</p>
                 <p className="text-xs text-muted-foreground text-center">{t('ranking.points')}</p>
@@ -377,7 +380,7 @@ const Ranking = () => {
           <div className="divide-y divide-border/50">
             {rankings.map((user, index) => {
               const rank = index + 4;
-              const topikLevel = getUserTopikLevel(user.points);
+              const topikLevel = getLevel(user.points);
               return (
                 <motion.div
                   key={user.id}
