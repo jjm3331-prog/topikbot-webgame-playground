@@ -1800,7 +1800,14 @@
     "loading": "Đang tạo câu hỏi...",
     "loadingDesc": "AI đang tạo câu hỏi TOPIK",
     "noQuestions": "Không có câu hỏi",
-    "reload": "Tải lại"
+    "reload": "Tải lại",
+    "defaultQuestion": "Hãy trả lời câu hỏi sau.",
+    "explanationPreparing": "Giải thích đang được chuẩn bị.",
+    "explanationPreparingVi": "Giải thích đang được chuẩn bị.",
+    "loadingQuestions": "Đang tải câu hỏi...",
+    "loadingFromDb": "Đang tải câu hỏi đọc từ cơ sở dữ liệu",
+    "noDbQuestions": "Không có câu hỏi trong DB",
+    "usingSampleQuestions": "Đang sử dụng câu hỏi mẫu vì không có câu hỏi phù hợp."
   },
   "topikPage": {
     "goBack": "Quay lại",
@@ -2935,6 +2942,11 @@
     "upgradeToPremium": "Nâng cấp Premium",
     "coreFeatures": "Tính năng chính",
     "comingSoon": "Đang chuẩn bị",
+    "preparing": "Đang chuẩn bị",
+    "sectionPreparing": "Đang chuẩn bị câu hỏi",
+    "sectionNoData": "Chưa có câu hỏi nghe. Vui lòng chọn phần khác.",
+    "sectionNoDataReading": "Chưa có câu hỏi đọc. Vui lòng chọn phần khác.",
+    "examPreparing": "Đang chuẩn bị thi...",
     "startExam": "Bắt đầu thi",
     "units": {
       "questions": " câu",
@@ -3159,7 +3171,10 @@
       "focusAreas": "Lĩnh vực tập trung",
       "regenerate": "Tạo lại báo cáo",
       "goToMistakes": "Đi đến sổ lỗi",
-      "tryAgain": "Thử lại"
+      "tryAgain": "Thử lại",
+      "errorGenerating": "Đã xảy ra lỗi khi tạo báo cáo. Vui lòng thử lại.",
+      "customRecommendation": "Gợi ý học tập phù hợp",
+      "customRecommendationDesc": "Hướng dẫn học ưu tiên dựa trên điểm yếu AI phân tích"
     },
     "error": {
       "notFound": "Không tìm thấy bản ghi thi"
@@ -3869,5 +3884,38 @@
     "clear": "Xóa",
     "check": "Kiểm tra",
     "hint": "Hãy dùng ngón tay hoặc chuột viết theo chữ mẫu"
+  },
+  "pwaGuide": {
+    "benefits": {
+      "fastLaunch": "Khởi động nhanh",
+      "offline": "Dùng offline",
+      "notifications": "Nhận thông báo"
+    },
+    "android": {
+      "step1Title": "Mở Chrome",
+      "step1Desc": "Truy cập game.lukato.kr bằng Chrome",
+      "step2Title": "Nhấn menu ⋮",
+      "step2Desc": "Góc trên bên phải màn hình",
+      "step3Title": "Cài đặt ứng dụng",
+      "step3Desc": "Chọn 'Add to Home screen'",
+      "step4Title": "Hoàn tất",
+      "step4Desc": "Nhấn 'Install' để xác nhận"
+    },
+    "ios": {
+      "step1Title": "Mở Safari",
+      "step1Desc": "Bắt buộc dùng Safari trên iOS",
+      "step2Title": "Nhấn Share",
+      "step2Desc": "Nút chia sẻ (□↑) ở dưới",
+      "step3Title": "Add to Home",
+      "step3Desc": "Cuộn và chọn 'Add to Home Screen'",
+      "step4Title": "Hoàn tất",
+      "step4Desc": "Nhấn 'Add' góc trên phải"
+    },
+    "faq": {
+      "q1": "Không thấy nút cài đặt?",
+      "a1": "Có thể ứng dụng đã được cài đặt hoặc trình duyệt không hỗ trợ. Vui lòng sử dụng Chrome (Android) hoặc Safari (iOS).",
+      "q2": "Muốn gỡ cài đặt?",
+      "a2": "Nhấn giữ biểu tượng app trên màn hình chính và chọn xóa/gỡ cài đặt như ứng dụng thông thường."
+    }
   }
 }

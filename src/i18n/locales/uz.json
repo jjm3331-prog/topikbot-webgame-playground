@@ -1389,7 +1389,14 @@
     "loading": "Savollar yaratilmoqda...",
     "loadingDesc": "AI TOPIK savollarini yaratmoqda",
     "noQuestions": "Savollar yo'q",
-    "reload": "Qayta yuklash"
+    "reload": "Qayta yuklash",
+    "defaultQuestion": "Quyidagi savolga javob bering.",
+    "explanationPreparing": "Tushuntirish tayyorlanmoqda.",
+    "explanationPreparingVi": "Tushuntirish tayyorlanmoqda.",
+    "loadingQuestions": "Savollar yuklanmoqda...",
+    "loadingFromDb": "Ma'lumotlar bazasidan o'qish savollari yuklanmoqda",
+    "noDbQuestions": "Bazada savollar yo'q",
+    "usingSampleQuestions": "Mezorlarga mos savollar yo'q, namuna savollar ishlatilmoqda."
   },
   "topikPage": {
     "goBack": "Orqaga",
@@ -2597,6 +2604,11 @@
     "upgradeToPremium": "Premium ga o'tish",
     "coreFeatures": "Asosiy xususiyatlar",
     "comingSoon": "Tayyorlanmoqda",
+    "preparing": "Tayyorlanmoqda",
+    "sectionPreparing": "Savollar tayyorlanmoqda",
+    "sectionNoData": "Tinglash savollari hali tayyor emas. Boshqa bo'limni tanlang.",
+    "sectionNoDataReading": "O'qish savollari hali tayyor emas. Boshqa bo'limni tanlang.",
+    "examPreparing": "Imtihon tayyorlanmoqda...",
     "startExam": "Imtihonni boshlash",
     "units": {
       "questions": " ta savol",
@@ -2821,7 +2833,10 @@
       "focusAreas": "Diqqat sohalar",
       "regenerate": "Hisobotni qayta yaratish",
       "goToMistakes": "Xatolarga o'tish",
-      "tryAgain": "Qayta urinish"
+      "tryAgain": "Qayta urinish",
+      "errorGenerating": "Hisobot yaratishda xatolik yuz berdi. Qaytadan urinib ko'ring.",
+      "customRecommendation": "Shaxsiy o'rganish tavsiyalari",
+      "customRecommendationDesc": "AI tahlil qilgan kamchiliklar asosida ustuvor o'qish qo'llanmasi"
     },
     "error": {
       "notFound": "Imtihon yozuvi topilmadi"
@@ -3505,5 +3520,38 @@
     "clear": "Tozalash",
     "check": "Tekshirish",
     "hint": "Barmoq yoki sichqoncha bilan belgi shaklini chizing"
+  },
+  "pwaGuide": {
+    "benefits": {
+      "fastLaunch": "Tez ishga tushirish",
+      "offline": "Oflayn ishlatish",
+      "notifications": "Bildirishnomalar olish"
+    },
+    "android": {
+      "step1Title": "Chrome ochish",
+      "step1Desc": "Chrome orqali game.lukato.kr ga kiring",
+      "step2Title": "Menyu ⋮ bosish",
+      "step2Desc": "Ekranning o'ng yuqori burchagi",
+      "step3Title": "Ilovani o'rnatish",
+      "step3Desc": "'Bosh ekranga qo'shish'ni tanlang",
+      "step4Title": "Tayyor",
+      "step4Desc": "Tasdiqlash uchun 'O'rnatish'ni bosing"
+    },
+    "ios": {
+      "step1Title": "Safari ochish",
+      "step1Desc": "iOS da Safari majburiy",
+      "step2Title": "Ulashish bosing",
+      "step2Desc": "Pastdagi ulashish tugmasi (□↑)",
+      "step3Title": "Boshga qo'shish",
+      "step3Desc": "Aylantiring va 'Bosh ekranga qo'shish'ni tanlang",
+      "step4Title": "Tayyor",
+      "step4Desc": "O'ng yuqoridagi 'Qo'shish'ni bosing"
+    },
+    "faq": {
+      "q1": "O'rnatish tugmasi ko'rinmayaptimi?",
+      "a1": "Ilova allaqachon o'rnatilgan yoki brauzer qo'llab-quvvatlamaydi. Chrome (Android) yoki Safari (iOS) foydalaning.",
+      "q2": "O'chirishni xohlaysizmi?",
+      "a2": "Bosh ekrandagi ilova belgisini bosib turing va oddiy ilova kabi o'chiring."
+    }
   }
 }

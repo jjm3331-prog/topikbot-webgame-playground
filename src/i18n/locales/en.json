@@ -1827,7 +1827,14 @@
     "loading": "Generating questions...",
     "loadingDesc": "AI is generating TOPIK questions",
     "noQuestions": "No questions available",
-    "reload": "Reload"
+    "reload": "Reload",
+    "defaultQuestion": "Please answer the following question.",
+    "explanationPreparing": "Explanation is being prepared.",
+    "explanationPreparingVi": "Explanation is being prepared.",
+    "loadingQuestions": "Loading questions...",
+    "loadingFromDb": "Loading reading questions from database",
+    "noDbQuestions": "No questions in database",
+    "usingSampleQuestions": "Using sample questions as no questions match the criteria."
   },
   "parttime": {
     "title": "Part-time Job",
@@ -2887,6 +2894,11 @@
     "upgradeToPremium": "Upgrade to Premium",
     "coreFeatures": "Core Features",
     "comingSoon": "Coming Soon",
+    "preparing": "Preparing",
+    "sectionPreparing": "Questions Preparing",
+    "sectionNoData": "No listening questions available yet. Please select another section.",
+    "sectionNoDataReading": "No reading questions available yet. Please select another section.",
+    "examPreparing": "Preparing exam...",
     "startExam": "Start Exam",
     "units": {
       "questions": " questions",
@@ -3111,7 +3123,10 @@
       "focusAreas": "Focus Areas",
       "regenerate": "Regenerate Report",
       "goToMistakes": "Go to Mistakes",
-      "tryAgain": "Try Again"
+      "tryAgain": "Try Again",
+      "errorGenerating": "An error occurred while generating the report. Please try again.",
+      "customRecommendation": "Personalized Study Recommendations",
+      "customRecommendationDesc": "Priority-based study guide based on AI-analyzed weaknesses"
     },
     "error": {
       "notFound": "Exam record not found"
@@ -3821,5 +3836,38 @@
     "clear": "Clear",
     "check": "Check",
     "hint": "Use your finger or mouse to trace the character"
+  },
+  "pwaGuide": {
+    "benefits": {
+      "fastLaunch": "Fast launch",
+      "offline": "Use offline",
+      "notifications": "Get notifications"
+    },
+    "android": {
+      "step1Title": "Open Chrome",
+      "step1Desc": "Access game.lukato.kr with Chrome",
+      "step2Title": "Tap menu ⋮",
+      "step2Desc": "Top right corner of screen",
+      "step3Title": "Install app",
+      "step3Desc": "Select 'Add to Home screen'",
+      "step4Title": "Done",
+      "step4Desc": "Tap 'Install' to confirm"
+    },
+    "ios": {
+      "step1Title": "Open Safari",
+      "step1Desc": "Safari is required on iOS",
+      "step2Title": "Tap Share",
+      "step2Desc": "Share button (□↑) at bottom",
+      "step3Title": "Add to Home",
+      "step3Desc": "Scroll and select 'Add to Home Screen'",
+      "step4Title": "Done",
+      "step4Desc": "Tap 'Add' at top right"
+    },
+    "faq": {
+      "q1": "Can't see install button?",
+      "a1": "The app may already be installed or your browser doesn't support it. Please use Chrome (Android) or Safari (iOS).",
+      "q2": "Want to uninstall?",
+      "a2": "Press and hold the app icon on home screen and delete/uninstall like a regular app."
+    }
   }
 }

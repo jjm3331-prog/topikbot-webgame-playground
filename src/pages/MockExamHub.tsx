@@ -819,8 +819,8 @@ const MockExamHub = () => {
                       onClick={() => {
                         if (listeningDisabled) {
                           toast({
-                            title: '문제 준비중',
-                            description: '듣기 영역 문제 데이터가 아직 없습니다. 다른 영역을 선택해주세요.',
+                            title: t('mockExam.sectionPreparing', '문제 준비중'),
+                            description: t('mockExam.sectionNoData', '듣기 영역 문제 데이터가 아직 없습니다. 다른 영역을 선택해주세요.'),
                           });
                           return;
                         }
@@ -839,7 +839,7 @@ const MockExamHub = () => {
                       <Headphones className="w-8 h-8 text-blue-500" />
                       <span className="font-medium">{t('mockExam.dialog.listening')}</span>
                       {listeningDisabled && (
-                        <span className="text-[11px] text-muted-foreground">준비중</span>
+                        <span className="text-[11px] text-muted-foreground">{t('mockExam.preparing', '준비중')}</span>
                       )}
                     </motion.button>
 
@@ -850,8 +850,8 @@ const MockExamHub = () => {
                       onClick={() => {
                         if (readingDisabled) {
                           toast({
-                            title: '문제 준비중',
-                            description: '읽기 영역 문제 데이터가 아직 없습니다. 다른 영역을 선택해주세요.',
+                            title: t('mockExam.sectionPreparing', '문제 준비중'),
+                            description: t('mockExam.sectionNoDataReading', '읽기 영역 문제 데이터가 아직 없습니다. 다른 영역을 선택해주세요.'),
                           });
                           return;
                         }
@@ -870,7 +870,7 @@ const MockExamHub = () => {
                       <BookOpen className="w-8 h-8 text-emerald-500" />
                       <span className="font-medium">{t('mockExam.dialog.reading')}</span>
                       {readingDisabled && (
-                        <span className="text-[11px] text-muted-foreground">준비중</span>
+                        <span className="text-[11px] text-muted-foreground">{t('mockExam.preparing', '준비중')}</span>
                       )}
                     </motion.button>
 

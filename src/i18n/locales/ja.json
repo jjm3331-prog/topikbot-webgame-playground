@@ -1542,7 +1542,14 @@
     "loading": "問題生成中...",
     "loadingDesc": "AIがTOPIK問題を生成中です",
     "noQuestions": "問題がありません",
-    "reload": "再読み込み"
+    "reload": "再読み込み",
+    "defaultQuestion": "次の質問に答えてください。",
+    "explanationPreparing": "解説準備中です。",
+    "explanationPreparingVi": "解説準備中です。",
+    "loadingQuestions": "問題を読み込み中...",
+    "loadingFromDb": "DBから読解問題を読み込んでいます",
+    "noDbQuestions": "DBに問題がありません",
+    "usingSampleQuestions": "条件に合う問題がないため、サンプル問題を使用しています。"
   },
   "topikPage": {
     "goBack": "戻る",
@@ -2581,6 +2588,11 @@
     "upgradeToPremium": "プレミアムにアップグレード",
     "coreFeatures": "主要機能",
     "comingSoon": "準備中",
+    "preparing": "準備中",
+    "sectionPreparing": "問題準備中",
+    "sectionNoData": "リスニング問題がまだありません。他のセクションを選択してください。",
+    "sectionNoDataReading": "読解問題がまだありません。他のセクションを選択してください。",
+    "examPreparing": "試験準備中...",
     "startExam": "試験開始",
     "units": {
       "questions": "問",
@@ -2805,7 +2817,10 @@
       "focusAreas": "集中学習領域",
       "regenerate": "レポート再生成",
       "goToMistakes": "誤答ノートへ",
-      "tryAgain": "もう一度挑戦"
+      "tryAgain": "もう一度挑戦",
+      "errorGenerating": "レポート生成中にエラーが発生しました。もう一度お試しください。",
+      "customRecommendation": "カスタム学習推薦",
+      "customRecommendationDesc": "AIが分析した弱点に基づく優先順位別学習ガイド"
     },
     "error": {
       "notFound": "試験記録が見つかりません"
@@ -3489,5 +3504,38 @@
     "clear": "消す",
     "check": "確認",
     "hint": "指やマウスで文字の形をなぞってください"
+  },
+  "pwaGuide": {
+    "benefits": {
+      "fastLaunch": "高速起動",
+      "offline": "オフライン使用",
+      "notifications": "通知を受け取る"
+    },
+    "android": {
+      "step1Title": "Chromeを開く",
+      "step1Desc": "Chromeでgame.lukato.krにアクセス",
+      "step2Title": "メニュー ⋮ をタップ",
+      "step2Desc": "画面右上",
+      "step3Title": "アプリをインストール",
+      "step3Desc": "'ホーム画面に追加'を選択",
+      "step4Title": "完了",
+      "step4Desc": "'インストール'をタップして確認"
+    },
+    "ios": {
+      "step1Title": "Safariを開く",
+      "step1Desc": "iOSではSafari必須",
+      "step2Title": "共有をタップ",
+      "step2Desc": "下部の共有ボタン (□↑)",
+      "step3Title": "ホームに追加",
+      "step3Desc": "スクロールして'ホーム画面に追加'を選択",
+      "step4Title": "完了",
+      "step4Desc": "右上の'追加'をタップ"
+    },
+    "faq": {
+      "q1": "インストールボタンが見えない?",
+      "a1": "アプリがすでにインストールされているか、ブラウザがサポートしていない可能性があります。Chrome（Android）またはSafari（iOS）をご使用ください。",
+      "q2": "アンインストールしたい?",
+      "a2": "ホーム画面でアプリアイコンを長押しして、通常のアプリと同様に削除/アンインストールしてください。"
+    }
   }
 }
