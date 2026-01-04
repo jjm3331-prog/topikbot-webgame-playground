@@ -339,7 +339,7 @@ const HandwritingPractice = () => {
                 </div>
                 <div className="flex items-center gap-2 text-white/90">
                   <Database className="w-5 h-5" />
-                  <span className="text-sm">10,000+ 어휘 DB</span>
+                  <span className="text-sm">{t("handwriting.dbVocabulary", "{{dbCount}} 어휘 DB", { dbCount: "10,000+" })}</span>
                 </div>
               </motion.div>
             </div>
