@@ -1121,19 +1121,7 @@
     },
     "testimonials": {
       "title": "Phản hồi thật từ người học"
-    }
-  },
-  "testimonials": {
-    "default": {
-      "1": { "text": "Từ zero tiếng Hàn, mình đậu TOPIK 6 trong 8 tháng! Game AI giúp học ngữ pháp tự nhiên.", "name": "TOPIK 6", "period": "8 tháng" },
-      "2": { "text": "AI chấm Writing chi tiết hơn giáo viên thật. Điểm Writing tăng từ 30 lên 70!", "name": "TOPIK 5", "period": "6 tháng" },
-      "3": { "text": "Luyện Speaking với AI mỗi ngày, phát âm chuẩn bản xứ. Phỏng vấn việc làm thành công!", "name": "Nhân viên Samsung", "period": "1 năm" },
-      "4": { "text": "K-Drama dubbing giúp học ngữ điệu tự nhiên. Nghe hiểu phim Hàn không cần phụ đề!", "name": "TOPIK 4", "period": "5 tháng" },
-      "5": { "text": "Headhunting service tuyệt vời! Được tư vấn CV miễn phí và có việc làm tại Hàn Quốc.", "name": "Kỹ sư IT Seoul", "period": "3 tháng" },
-      "6": { "text": "10,000+ tài liệu TOPIK thực sự khác biệt. Đề thi sát với đề thật nhất!", "name": "TOPIK 6", "period": "10 tháng" }
-    }
-  },
-  "landing": {
+    },
     "pricing": {
       "title1": "Giá hợp túi tiền,",
       "local": "chuẩn địa phương",
@@ -1150,6 +1138,16 @@
       "desc": "Giáo sư ra đề TOPIK + AI LUKATO =",
       "noRival": "cặp bài trùng không đối thủ",
       "cta": "Bắt đầu ngay"
+    }
+  },
+  "testimonials": {
+    "default": {
+      "1": { "text": "Từ zero tiếng Hàn, mình đậu TOPIK 6 trong 8 tháng! Game AI giúp học ngữ pháp tự nhiên.", "name": "TOPIK 6", "period": "8 tháng" },
+      "2": { "text": "AI chấm Writing chi tiết hơn giáo viên thật. Điểm Writing tăng từ 30 lên 70!", "name": "TOPIK 5", "period": "6 tháng" },
+      "3": { "text": "Luyện Speaking với AI mỗi ngày, phát âm chuẩn bản xứ. Phỏng vấn việc làm thành công!", "name": "Nhân viên Samsung", "period": "1 năm" },
+      "4": { "text": "K-Drama dubbing giúp học ngữ điệu tự nhiên. Nghe hiểu phim Hàn không cần phụ đề!", "name": "TOPIK 4", "period": "5 tháng" },
+      "5": { "text": "Headhunting service tuyệt vời! Được tư vấn CV miễn phí và có việc làm tại Hàn Quốc.", "name": "Kỹ sư IT Seoul", "period": "3 tháng" },
+      "6": { "text": "10,000+ tài liệu TOPIK thực sự khác biệt. Đề thi sát với đề thật nhất!", "name": "TOPIK 6", "period": "10 tháng" }
     }
   },
   "lesson": {
