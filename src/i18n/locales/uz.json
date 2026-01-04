@@ -190,7 +190,9 @@
     "playNow": "Hozir o'ynash",
     "learnNow": "Hozir o'rganish",
     "backToDashboard": "Dashboardga qaytish",
-    "locale": "uz-UZ"
+    "locale": "uz-UZ",
+    "previous": "Oldingi",
+    "delete": "O'chirish"
   },
   "brand": {
     "name": "LUKATO AI",
@@ -755,7 +757,8 @@
       "victory": "🎉 G'alaba!",
       "defeat": "😢 Mag'lubiyat",
       "victoryDesc": "+1,000 ball yutdingiz!",
-      "defeatDesc": "{{name}} g'alaba qozondi!"
+      "defeatDesc": "{{name}} g'alaba qozondi!",
+      "system": "Tizim"
     },
     "guide": {
       "title": "To'liq qo'llanma",
@@ -2696,8 +2699,14 @@
       "reviewCount": "{{count}} ta o'zlashtirilmagan savolni takrorlang",
       "delete": "O'chirish",
       "deleteTitle": "Xatoni o'chirish",
-      "deleteConfirm": "Bu xatoni o'chirishni xohlaysizmi? Buni qaytarib bo'lmaydi."
+      "deleteConfirm": "Bu xatoni o'chirishni xohlaysizmi? Buni qaytarib bo'lmaydi.",
+      "noExplanation": "Izoh yo'q.",
+      "showAnswer": "Javobni ko'rish",
+      "startReviewButton": "Takrorlashni boshlash",
+      "reviewTimes": "{{count}} marta takrorlash",
+      "reviewAgainButton": "Qayta takrorlash"
     },
+    "hub": "Sinov markazi",
     "report": {
       "loading": "Natijalar yuklanmoqda...",
       "backToHub": "Sinov imtihoni markazi",
@@ -2818,7 +2827,26 @@
     "noPhotos": "Hali juftlik surati yo'q",
     "noEndings": "Hali ochilgan yakun yo'q",
     "backToSwipe": "Orqaga",
-    "unlockedEndings": "Ochilgan yakunlar"
+    "unlockedEndings": "Ochilgan yakunlar",
+    "restart": "Qayta boshlash",
+    "miniGame": {
+      "title": "Mini o'yin",
+      "subtitle": "Mini Game - 미니게임",
+      "playWith": "{{name}} bilan o'ynang va yaqinlikni oshiring!",
+      "telepathy": "Telepatiya o'yini",
+      "telepathySub": "이심전심 게임",
+      "preference": "Did mosligi",
+      "preferenceSub": "취향 맞추기",
+      "perfectMatch": "Mukammal juftlik!",
+      "goodMatch": "Juda yaxshi!",
+      "tryAgain": "Keyingi safar yaxshiroq!",
+      "correct": "To'g'ri",
+      "affinity": "Yaqinlik",
+      "affinitySub": "호감도",
+      "guessNpc": "{{name}} nimani o'ylayotganini toping!",
+      "correctAnswer": "To'g'ri!",
+      "wrongAnswer": "Afsus... {{name}} boshqasini tanladi"
+    }
   },
   "video": {
     "mistake": {

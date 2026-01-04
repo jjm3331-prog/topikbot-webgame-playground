@@ -530,7 +530,7 @@ export default function SemanticBattle({ onBack, initialRoomCode, initialGuestNa
         room_id: room.id,
         // Use host id for the seed word to satisfy RLS (still displayed as system via player_name)
         player_id: room.host_id,
-        player_name: "시스템",
+        player_name: t("battle.semanticGame.system"),
         word: startWord,
         connection_mode: "semantic",
         chain_length: 1,

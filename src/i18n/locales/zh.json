@@ -165,7 +165,9 @@
     "playNow": "立即玩",
     "learnNow": "立即学习",
     "backToDashboard": "返回仪表盘",
-    "locale": "zh-CN"
+    "locale": "zh-CN",
+    "previous": "上一个",
+    "delete": "删除"
   },
   "brand": {
     "name": "LUKATO AI",
@@ -757,7 +759,8 @@
       "victory": "🎉 胜利！",
       "defeat": "😢 失败",
       "victoryDesc": "你赢得了+1,000分！",
-      "defeatDesc": "{{name}} 获胜了！"
+      "defeatDesc": "{{name}} 获胜了！",
+      "system": "系统"
     },
     "guide": {
       "title": "完整指南",
@@ -2695,8 +2698,14 @@
       "reviewCount": "复习{{count}}道未掌握题目",
       "delete": "删除",
       "deleteTitle": "删除错题",
-      "deleteConfirm": "确定要删除这道错题吗？无法恢复。"
+      "deleteConfirm": "确定要删除这道错题吗？无法恢复。",
+      "noExplanation": "暂无解释。",
+      "showAnswer": "查看答案",
+      "startReviewButton": "开始复习",
+      "reviewTimes": "{{count}}次复习",
+      "reviewAgainButton": "再次复习"
     },
+    "hub": "模拟考试中心",
     "report": {
       "loading": "加载结果中...",
       "backToHub": "模拟考试中心",
@@ -2817,7 +2826,26 @@
     "noPhotos": "还没有情侣照片",
     "noEndings": "还没有解锁的结局",
     "backToSwipe": "返回",
-    "unlockedEndings": "已解锁结局"
+    "unlockedEndings": "已解锁结局",
+    "restart": "重新开始",
+    "miniGame": {
+      "title": "小游戏",
+      "subtitle": "Mini Game - 미니게임",
+      "playWith": "和{{name}}一起玩，提升好感度！",
+      "telepathy": "心灵感应游戏",
+      "telepathySub": "이심전심 게임",
+      "preference": "喜好匹配",
+      "preferenceSub": "취향 맞추기",
+      "perfectMatch": "完美契合！",
+      "goodMatch": "很合拍！",
+      "tryAgain": "下次会更好！",
+      "correct": "正确",
+      "affinity": "好感度",
+      "affinitySub": "호감도",
+      "guessNpc": "猜猜{{name}}在想什么！",
+      "correctAnswer": "正确！",
+      "wrongAnswer": "好可惜...{{name}}选了别的"
+    }
   },
   "video": {
     "mistake": {

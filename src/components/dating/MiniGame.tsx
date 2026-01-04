@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Gamepad2, Heart, Check, X } from "lucide-react";
 
@@ -85,6 +86,7 @@ const PREFERENCE_QUESTIONS: GameQuestion[] = [
 ];
 
 const MiniGame = ({ npcName, onComplete, onClose }: MiniGameProps) => {
+  const { t, i18n } = useTranslation();
   const [gameType, setGameType] = useState<GameType | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
@@ -151,10 +153,10 @@ const MiniGame = ({ npcName, onComplete, onClose }: MiniGameProps) => {
         >
           <div className="text-center mb-6">
             <Gamepad2 className="w-12 h-12 text-green-400 mx-auto mb-2" />
-            <h2 className="text-2xl font-bold text-white">🎮 미니게임</h2>
-            <p className="text-white/60 text-sm mt-1">Mini Game - Trò chơi nhỏ</p>
+            <h2 className="text-2xl font-bold text-white">🎮 {t("dating.miniGame.title")}</h2>
+            <p className="text-white/60 text-sm mt-1">{t("dating.miniGame.subtitle")}</p>
             <p className="text-green-300 text-sm mt-2">
-              {npcName}와(과) 게임하고 호감도를 올려요!
+              {t("dating.miniGame.playWith", { name: npcName })}
             </p>
           </div>
 
@@ -164,8 +166,8 @@ const MiniGame = ({ npcName, onComplete, onClose }: MiniGameProps) => {
               className="w-full h-20 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 flex flex-col"
             >
               <span className="text-xl">🔮</span>
-              <span className="font-bold">이심전심 게임</span>
-              <span className="text-xs opacity-80">Telepathy Game</span>
+              <span className="font-bold">{t("dating.miniGame.telepathy")}</span>
+              <span className="text-xs opacity-80">{t("dating.miniGame.telepathySub")}</span>
             </Button>
 
             <Button
@@ -173,8 +175,8 @@ const MiniGame = ({ npcName, onComplete, onClose }: MiniGameProps) => {
               className="w-full h-20 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 flex flex-col"
             >
               <span className="text-xl">💕</span>
-              <span className="font-bold">취향 맞추기</span>
-              <span className="text-xs opacity-80">Preference Match</span>
+              <span className="font-bold">{t("dating.miniGame.preference")}</span>
+              <span className="text-xs opacity-80">{t("dating.miniGame.preferenceSub")}</span>
             </Button>
           </div>
 
@@ -183,7 +185,7 @@ const MiniGame = ({ npcName, onComplete, onClose }: MiniGameProps) => {
             onClick={onClose}
             className="w-full mt-4 text-white/60 hover:text-white"
           >
-            닫기 / Đóng
+            {t("common.close")}
           </Button>
         </motion.div>
       </motion.div>
@@ -217,24 +219,24 @@ const MiniGame = ({ npcName, onComplete, onClose }: MiniGameProps) => {
           </motion.div>
 
           <h2 className="text-2xl font-bold text-white mt-4 mb-2">
-            {score === questions.length ? "완벽한 궁합!" : score >= questions.length / 2 ? "잘 맞아요!" : "다음엔 더 잘해요!"}
+            {score === questions.length ? t("dating.miniGame.perfectMatch") : score >= questions.length / 2 ? t("dating.miniGame.goodMatch") : t("dating.miniGame.tryAgain")}
           </h2>
           
           <p className="text-pink-300 text-lg mb-4">
-            {score} / {questions.length} 정답
+            {score} / {questions.length} {t("dating.miniGame.correct")}
           </p>
 
           <div className="bg-white/10 rounded-2xl p-4 mb-6">
             <Heart className="w-8 h-8 text-pink-400 mx-auto mb-2" />
-            <p className="text-white font-bold">+{getBonusAffinity()} 호감도</p>
-            <p className="text-white/60 text-sm">+{getBonusAffinity()} điểm thân mật</p>
+            <p className="text-white font-bold">+{getBonusAffinity()} {t("dating.miniGame.affinity")}</p>
+            <p className="text-white/60 text-sm">+{getBonusAffinity()} {t("dating.miniGame.affinitySub")}</p>
           </div>
 
           <Button
             onClick={handleComplete}
             className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
           >
-            확인 / OK
+            {t("common.confirm")}
           </Button>
         </motion.div>
       </motion.div>
@@ -273,12 +275,12 @@ const MiniGame = ({ npcName, onComplete, onClose }: MiniGameProps) => {
 
         <div className="text-center mb-6">
           <p className="text-white/60 text-sm mb-1">
-            {gameType === 'telepathy' ? "🔮 이심전심" : "💕 취향 맞추기"}
+            {gameType === 'telepathy' ? `🔮 ${t("dating.miniGame.telepathy")}` : `💕 ${t("dating.miniGame.preference")}`}
           </p>
-          <h3 className="text-xl font-bold text-white">{question.question}</h3>
-          <p className="text-white/60 text-sm">{question.questionVi}</p>
+          <h3 className="text-xl font-bold text-white">{i18n.language === 'ko' ? question.question : question.questionVi}</h3>
+          <p className="text-white/60 text-sm">{i18n.language === 'ko' ? question.questionVi : question.question}</p>
           <p className="text-pink-300 text-sm mt-2">
-            {npcName}의 마음을 맞춰보세요!
+            {t("dating.miniGame.guessNpc", { name: npcName })}
           </p>
         </div>
 
@@ -300,8 +302,8 @@ const MiniGame = ({ npcName, onComplete, onClose }: MiniGameProps) => {
                   : "bg-white/10 text-white hover:bg-white/20"
               }`}
             >
-              <span className="text-2xl block mb-1">{option.label.split(" ")[0]}</span>
-              <span className="text-sm block">{option.label.split(" ").slice(1).join(" ")}</span>
+              <span className="text-2xl block mb-1">{(i18n.language === 'ko' ? option.label : option.labelVi).split(" ")[0]}</span>
+              <span className="text-sm block">{(i18n.language === 'ko' ? option.label : option.labelVi).split(" ").slice(1).join(" ")}</span>
               {showResult && idx === question.npcAnswer && (
                 <Check className="w-5 h-5 mx-auto mt-2" />
               )}
@@ -320,7 +322,7 @@ const MiniGame = ({ npcName, onComplete, onClose }: MiniGameProps) => {
               userAnswer === question.npcAnswer ? "text-green-400" : "text-red-400"
             }`}
           >
-            {userAnswer === question.npcAnswer ? "정답! 💕" : `아쉬워요... ${npcName}의 선택은 다른 거였어요`}
+            {userAnswer === question.npcAnswer ? `${t("dating.miniGame.correctAnswer")} 💕` : t("dating.miniGame.wrongAnswer", { name: npcName })}
           </motion.p>
         )}
       </motion.div>
