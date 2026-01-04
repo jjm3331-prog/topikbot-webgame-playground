@@ -3116,7 +3116,46 @@
       "reviewAgain": "다시 복습하세요",
       "deleteComplete": "오답 삭제 완료",
       "reviewComplete": "복습 완료!",
-      "goodJob": "수고하셨습니다"
+      "goodJob": "수고하셨습니다",
+      "loading": "오답노트 로딩 중...",
+      "endReview": "복습 종료",
+      "explanation": "해설",
+      "title": "오답노트",
+      "subtitle": "틀린 문제를 복습하고 마스터하세요",
+      "totalMistakes": "총 오답",
+      "mastered": "마스터",
+      "needsReview": "복습 필요",
+      "masteryRate": "마스터율",
+      "startReview": "복습 모드 시작",
+      "reviewCount": "{{count}}개의 미마스터 문제를 복습하세요",
+      "delete": "삭제",
+      "deleteTitle": "오답 삭제",
+      "deleteConfirm": "이 오답을 삭제하시겠습니까? 삭제 후 복구할 수 없습니다."
+    },
+    "report": {
+      "loading": "결과 로딩 중...",
+      "backToHub": "모의고사 허브",
+      "mistakeNote": "오답노트",
+      "aiAnalysis": "AI 분석 리포트",
+      "resultAnalysis": "결과 분석",
+      "analyzing": "AI가 결과를 분석하고 있습니다...",
+      "generating": "취약점과 학습 추천을 생성 중입니다",
+      "predictedGrade": "예상 등급",
+      "advanced": "고급",
+      "intermediate": "중급",
+      "beginner": "초급",
+      "totalScore": "총점",
+      "tabs": {
+        "analysis": "종합 분석",
+        "recommendations": "학습 추천",
+        "plan": "학습 계획"
+      },
+      "overallAnalysis": "종합 분석",
+      "weeklyGoal": "주간 목표",
+      "focusAreas": "집중 학습 영역",
+      "regenerate": "리포트 다시 생성",
+      "goToMistakes": "오답노트로 이동",
+      "tryAgain": "다시 도전하기"
     },
     "error": {
       "notFound": "시험 기록을 찾을 수 없습니다"
@@ -3488,5 +3527,13 @@
     "level": { "beginner": "초급", "intermediate": "중급", "advanced": "고급" },
     "category": { "memorize": "암기", "context": "맥락" }
   },
-  "roleplay": { "level": { "beginner": "초급", "intermediate": "중고급" } }
+  "roleplay": { "level": { "beginner": "초급", "intermediate": "중고급" } },
+  "lessonMenu": {
+    "handwriting": { "title": "손글씨 연습", "description": "자음·모음 기초부터 단어, 문장까지 손글씨로 직접 써보며 한글을 익히세요. AI가 맞춤법 퀴즈도 생성해드려요." },
+    "listening": { "title": "듣기 연습", "description": "실제 TOPIK 듣기 시험처럼 4지선다 문제를 풀어보세요. AI TTS로 2명의 화자가 대화하는 문제도 준비되어 있어요." },
+    "badge": { "recommended": "추천", "new": "NEW", "aiLearning": "AI 기반 한국어 학습" },
+    "title": { "lesson": "레슨", "select": "선택" },
+    "subtitle1": "원하는 학습 영역을 선택하세요.",
+    "subtitle2": "AI가 맞춤형 콘텐츠를 제공합니다."
+  }
 }

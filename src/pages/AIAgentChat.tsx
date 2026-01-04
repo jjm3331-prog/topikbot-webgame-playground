@@ -525,7 +525,7 @@ const AIAgentChat = () => {
                 {chatSessions.length === 0 ? (
                   <div className="text-center py-12 text-muted-foreground text-sm">
                     <MessageSquare className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                    <p>대화 기록이 없습니다</p>
+                    <p>{t("ai.noHistory", "대화 기록이 없습니다")}</p>
                   </div>
                 ) : (
                   chatSessions.map((session) => (

@@ -2681,7 +2681,46 @@
       "reviewAgain": "再复习一次",
       "deleteComplete": "错题已删除",
       "reviewComplete": "复习完成！",
-      "goodJob": "辛苦了！"
+      "goodJob": "辛苦了！",
+      "loading": "加载错题本中...",
+      "endReview": "结束复习",
+      "explanation": "解析",
+      "title": "错题本",
+      "subtitle": "复习并掌握错题",
+      "totalMistakes": "总错题",
+      "mastered": "已掌握",
+      "needsReview": "需复习",
+      "masteryRate": "掌握率",
+      "startReview": "开始复习模式",
+      "reviewCount": "复习{{count}}道未掌握题目",
+      "delete": "删除",
+      "deleteTitle": "删除错题",
+      "deleteConfirm": "确定要删除这道错题吗？无法恢复。"
+    },
+    "report": {
+      "loading": "加载结果中...",
+      "backToHub": "模拟考试中心",
+      "mistakeNote": "错题本",
+      "aiAnalysis": "AI分析报告",
+      "resultAnalysis": "结果分析",
+      "analyzing": "AI正在分析结果...",
+      "generating": "正在生成弱点和学习建议",
+      "predictedGrade": "预测等级",
+      "advanced": "高级",
+      "intermediate": "中级",
+      "beginner": "初级",
+      "totalScore": "总分",
+      "tabs": {
+        "analysis": "综合分析",
+        "recommendations": "学习建议",
+        "plan": "学习计划"
+      },
+      "overallAnalysis": "综合分析",
+      "weeklyGoal": "周目标",
+      "focusAreas": "重点学习领域",
+      "regenerate": "重新生成报告",
+      "goToMistakes": "前往错题本",
+      "tryAgain": "再次挑战"
     },
     "error": {
       "notFound": "未找到考试记录"
@@ -3053,5 +3092,13 @@
     "level": { "beginner": "初级", "intermediate": "中级", "advanced": "高级" },
     "category": { "memorize": "记忆", "context": "语境" }
   },
-  "roleplay": { "level": { "beginner": "初级", "intermediate": "中高级" } }
+  "roleplay": { "level": { "beginner": "初级", "intermediate": "中高级" } },
+  "lessonMenu": {
+    "handwriting": { "title": "手写练习", "description": "从辅音/元音到单词、句子手写练习韩语。AI还会生成拼写测验。" },
+    "listening": { "title": "听力练习", "description": "像真正的TOPIK听力考试一样做四选一题目。还有AI TTS两人对话题目。" },
+    "badge": { "recommended": "推荐", "new": "新", "aiLearning": "AI韩语学习" },
+    "title": { "lesson": "课程", "select": "选择" },
+    "subtitle1": "选择您想学习的领域。",
+    "subtitle2": "AI提供个性化内容。"
+  }
 }

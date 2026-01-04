@@ -2666,7 +2666,46 @@
       "reviewAgain": "もう一度復習しましょう",
       "deleteComplete": "誤答を削除しました",
       "reviewComplete": "復習完了！",
-      "goodJob": "お疲れ様でした"
+      "goodJob": "お疲れ様でした",
+      "loading": "誤答ノート読み込み中...",
+      "endReview": "復習終了",
+      "explanation": "解説",
+      "title": "誤答ノート",
+      "subtitle": "間違った問題を復習してマスターしましょう",
+      "totalMistakes": "総誤答数",
+      "mastered": "マスター",
+      "needsReview": "復習が必要",
+      "masteryRate": "マスター率",
+      "startReview": "復習モード開始",
+      "reviewCount": "{{count}}個の未マスター問題を復習",
+      "delete": "削除",
+      "deleteTitle": "誤答を削除",
+      "deleteConfirm": "この誤答を削除しますか？元に戻せません。"
+    },
+    "report": {
+      "loading": "結果読み込み中...",
+      "backToHub": "模擬試験ハブ",
+      "mistakeNote": "誤答ノート",
+      "aiAnalysis": "AI分析レポート",
+      "resultAnalysis": "結果分析",
+      "analyzing": "AIが結果を分析中...",
+      "generating": "弱点と学習推薦を生成中",
+      "predictedGrade": "予想等級",
+      "advanced": "上級",
+      "intermediate": "中級",
+      "beginner": "初級",
+      "totalScore": "総点",
+      "tabs": {
+        "analysis": "総合分析",
+        "recommendations": "学習推薦",
+        "plan": "学習計画"
+      },
+      "overallAnalysis": "総合分析",
+      "weeklyGoal": "週間目標",
+      "focusAreas": "集中学習領域",
+      "regenerate": "レポート再生成",
+      "goToMistakes": "誤答ノートへ",
+      "tryAgain": "もう一度挑戦"
     },
     "error": {
       "notFound": "試験記録が見つかりません"
@@ -3038,5 +3077,13 @@
     "level": { "beginner": "初級", "intermediate": "中級", "advanced": "上級" },
     "category": { "memorize": "暗記", "context": "文脈" }
   },
-  "roleplay": { "level": { "beginner": "初級", "intermediate": "中上級" } }
+  "roleplay": { "level": { "beginner": "初級", "intermediate": "中上級" } },
+  "lessonMenu": {
+    "handwriting": { "title": "手書き練習", "description": "子音・母音から単語、文章まで手書きで韓国語を学びましょう。AIがスペルクイズも作成します。" },
+    "listening": { "title": "リスニング練習", "description": "実際のTOPIKリスニング試験のような4択問題を解きましょう。AI TTSによる2人の会話問題も用意されています。" },
+    "badge": { "recommended": "おすすめ", "new": "NEW", "aiLearning": "AI韓国語学習" },
+    "title": { "lesson": "レッスン", "select": "選択" },
+    "subtitle1": "学習したい分野を選んでください。",
+    "subtitle2": "AIがパーソナライズされたコンテンツを提供します。"
+  }
 }

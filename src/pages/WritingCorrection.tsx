@@ -976,15 +976,15 @@ const WritingCorrection = () => {
                       <div className="text-7xl font-bold text-primary mb-2 drop-shadow-sm">
                         {result.overall_score}
                       </div>
-                      <p className="text-muted-foreground text-sm">/ 100 điểm</p>
+                      <p className="text-muted-foreground text-sm">/ 100 {t("writing.points", "điểm")}</p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
                       {[
-                        { key: "grammar" as const, label: "Ngữ pháp", labelKr: "문법", score: result.grammar_score, color: "from-red-500/20 to-red-500/5", activeColor: "ring-red-500", icon: "🔴" },
-                        { key: "vocabulary" as const, label: "Từ vựng", labelKr: "어휘", score: result.vocabulary_score, color: "from-yellow-500/20 to-yellow-500/5", activeColor: "ring-yellow-500", icon: "🟡" },
-                        { key: "structure" as const, label: "Cấu trúc", labelKr: "구조", score: result.structure_score, color: "from-green-500/20 to-green-500/5", activeColor: "ring-green-500", icon: "🟢" },
-                        { key: "content" as const, label: "Nội dung", labelKr: "내용", score: result.content_score, color: "from-blue-500/20 to-blue-500/5", activeColor: "ring-blue-500", icon: "🔵" },
+                        { key: "grammar" as const, label: t("writing.score.grammar", "Ngữ pháp"), labelKr: t("writing.score.grammarKr", "문법"), score: result.grammar_score, color: "from-red-500/20 to-red-500/5", activeColor: "ring-red-500", icon: "🔴" },
+                        { key: "vocabulary" as const, label: t("writing.score.vocabulary", "Từ vựng"), labelKr: t("writing.score.vocabularyKr", "어휘"), score: result.vocabulary_score, color: "from-yellow-500/20 to-yellow-500/5", activeColor: "ring-yellow-500", icon: "🟡" },
+                        { key: "structure" as const, label: t("writing.score.structure", "Cấu trúc"), labelKr: t("writing.score.structureKr", "구조"), score: result.structure_score, color: "from-green-500/20 to-green-500/5", activeColor: "ring-green-500", icon: "🟢" },
+                        { key: "content" as const, label: t("writing.score.content", "Nội dung"), labelKr: t("writing.score.contentKr", "내용"), score: result.content_score, color: "from-blue-500/20 to-blue-500/5", activeColor: "ring-blue-500", icon: "🔵" },
                       ].map((item) => (
                         <div 
                           key={item.key} 

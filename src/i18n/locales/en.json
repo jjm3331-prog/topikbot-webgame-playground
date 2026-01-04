@@ -2949,7 +2949,46 @@
       "reviewAgain": "Review again",
       "deleteComplete": "Mistake deleted",
       "reviewComplete": "Review complete!",
-      "goodJob": "Well done!"
+      "goodJob": "Well done!",
+      "loading": "Loading mistake notebook...",
+      "endReview": "End Review",
+      "explanation": "Explanation",
+      "title": "Mistake Notebook",
+      "subtitle": "Review and master your wrong answers",
+      "totalMistakes": "Total Mistakes",
+      "mastered": "Mastered",
+      "needsReview": "Needs Review",
+      "masteryRate": "Mastery Rate",
+      "startReview": "Start Review Mode",
+      "reviewCount": "Review {{count}} unmastered questions",
+      "delete": "Delete",
+      "deleteTitle": "Delete Mistake",
+      "deleteConfirm": "Are you sure you want to delete this mistake? This cannot be undone."
+    },
+    "report": {
+      "loading": "Loading results...",
+      "backToHub": "Mock Exam Hub",
+      "mistakeNote": "Mistake Notebook",
+      "aiAnalysis": "AI Analysis Report",
+      "resultAnalysis": "Result Analysis",
+      "analyzing": "AI is analyzing your results...",
+      "generating": "Generating weaknesses and study recommendations",
+      "predictedGrade": "Predicted Grade",
+      "advanced": "Advanced",
+      "intermediate": "Intermediate",
+      "beginner": "Beginner",
+      "totalScore": "Total Score",
+      "tabs": {
+        "analysis": "Analysis",
+        "recommendations": "Recommendations",
+        "plan": "Study Plan"
+      },
+      "overallAnalysis": "Overall Analysis",
+      "weeklyGoal": "Weekly Goal",
+      "focusAreas": "Focus Areas",
+      "regenerate": "Regenerate Report",
+      "goToMistakes": "Go to Mistakes",
+      "tryAgain": "Try Again"
     },
     "error": {
       "notFound": "Exam record not found"
@@ -3321,5 +3360,13 @@
     "level": { "beginner": "Beginner", "intermediate": "Intermediate", "advanced": "Advanced" },
     "category": { "memorize": "Memorize", "context": "Context" }
   },
-  "roleplay": { "level": { "beginner": "Beginner", "intermediate": "Intermediate" } }
+  "roleplay": { "level": { "beginner": "Beginner", "intermediate": "Intermediate" } },
+  "lessonMenu": {
+    "handwriting": { "title": "Handwriting Practice", "description": "Practice writing from consonants/vowels to words and sentences. AI generates spelling quizzes too." },
+    "listening": { "title": "Listening Practice", "description": "Solve 4-choice questions like the real TOPIK listening test. AI TTS dialogues with 2 speakers included." },
+    "badge": { "recommended": "Recommended", "new": "NEW", "aiLearning": "AI-based Korean Learning" },
+    "title": { "lesson": "Lesson", "select": "Selection" },
+    "subtitle1": "Choose your learning area.",
+    "subtitle2": "AI provides personalized content."
+  }
 }

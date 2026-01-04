@@ -247,7 +247,7 @@ const MockExamMistakes = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">오답노트 로딩 중...</p>
+          <p className="text-muted-foreground">{t("mockExam.mistakes.loading", "오답노트 로딩 중...")}</p>
         </div>
       </div>
     );
@@ -266,7 +266,7 @@ const MockExamMistakes = () => {
           <div className="flex items-center justify-between mb-6">
             <Button variant="ghost" onClick={() => setReviewMode(false)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              복습 종료
+              {t("mockExam.mistakes.endReview", "복습 종료")}
             </Button>
             <Badge variant="outline">
               {currentReviewIndex + 1} / {reviewMistakes.length}
@@ -334,7 +334,7 @@ const MockExamMistakes = () => {
                       <div className="flex items-start gap-2">
                         <Lightbulb className="w-5 h-5 text-amber-500 mt-0.5" />
                         <div>
-                          <p className="font-medium mb-2">해설</p>
+                          <p className="font-medium mb-2">{t("mockExam.mistakes.explanation", "해설")}</p>
                           <p className="text-sm text-muted-foreground">{getExplanation(question)}</p>
                         </div>
                       </div>
@@ -418,8 +418,8 @@ const MockExamMistakes = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <h1 className="text-3xl font-bold mb-2">오답노트</h1>
-          <p className="text-muted-foreground">틀린 문제를 복습하고 마스터하세요</p>
+          <h1 className="text-3xl font-bold mb-2">{t("mockExam.mistakes.title", "오답노트")}</h1>
+          <p className="text-muted-foreground">{t("mockExam.mistakes.subtitle", "틀린 문제를 복습하고 마스터하세요")}</p>
         </motion.div>
 
         {/* Stats */}
@@ -432,25 +432,25 @@ const MockExamMistakes = () => {
           <Card>
             <CardContent className="pt-4 text-center">
               <p className="text-3xl font-bold text-primary">{totalCount}</p>
-              <p className="text-sm text-muted-foreground">총 오답</p>
+              <p className="text-sm text-muted-foreground">{t("mockExam.mistakes.totalMistakes", "총 오답")}</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-4 text-center">
               <p className="text-3xl font-bold text-green-500">{masteredCount}</p>
-              <p className="text-sm text-muted-foreground">마스터</p>
+              <p className="text-sm text-muted-foreground">{t("mockExam.mistakes.mastered", "마스터")}</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-4 text-center">
               <p className="text-3xl font-bold text-amber-500">{totalCount - masteredCount}</p>
-              <p className="text-sm text-muted-foreground">복습 필요</p>
+              <p className="text-sm text-muted-foreground">{t("mockExam.mistakes.needsReview", "복습 필요")}</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-4 text-center">
               <p className="text-3xl font-bold">{masteredRate}%</p>
-              <p className="text-sm text-muted-foreground">마스터율</p>
+              <p className="text-sm text-muted-foreground">{t("mockExam.mistakes.masteryRate", "마스터율")}</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -467,9 +467,9 @@ const MockExamMistakes = () => {
               <CardContent className="pt-6">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                   <div className="text-center md:text-left">
-                    <h3 className="font-bold text-lg mb-1">복습 모드 시작</h3>
+                    <h3 className="font-bold text-lg mb-1">{t("mockExam.mistakes.startReview", "복습 모드 시작")}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {reviewMistakes.length}개의 미마스터 문제를 복습하세요
+                      {t("mockExam.mistakes.reviewCount", "{{count}}개의 미마스터 문제를 복습하세요", { count: reviewMistakes.length })}
                     </p>
                   </div>
                   <Button 
@@ -637,20 +637,20 @@ const MockExamMistakes = () => {
                               <AlertDialogTrigger asChild>
                                 <Button variant="ghost" size="sm">
                                   <Trash2 className="w-4 h-4 mr-1" />
-                                  삭제
+                                  {t("mockExam.mistakes.delete", "삭제")}
                                 </Button>
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle>오답 삭제</AlertDialogTitle>
+                                  <AlertDialogTitle>{t("mockExam.mistakes.deleteTitle", "오답 삭제")}</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    이 오답을 삭제하시겠습니까? 삭제 후 복구할 수 없습니다.
+                                    {t("mockExam.mistakes.deleteConfirm", "이 오답을 삭제하시겠습니까? 삭제 후 복구할 수 없습니다.")}
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel>취소</AlertDialogCancel>
+                                  <AlertDialogCancel>{t("common.cancel", "취소")}</AlertDialogCancel>
                                   <AlertDialogAction onClick={() => deleteMistake(mistake.id)}>
-                                    삭제
+                                    {t("common.delete", "삭제")}
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>

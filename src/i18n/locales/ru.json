@@ -2672,7 +2672,46 @@
       "reviewAgain": "Повторите ещё раз",
       "deleteComplete": "Ошибка удалена",
       "reviewComplete": "Повторение завершено!",
-      "goodJob": "Хорошая работа!"
+      "goodJob": "Хорошая работа!",
+      "loading": "Загрузка заметок об ошибках...",
+      "endReview": "Завершить повторение",
+      "explanation": "Объяснение",
+      "title": "Заметки об ошибках",
+      "subtitle": "Повторяйте и осваивайте ошибки",
+      "totalMistakes": "Всего ошибок",
+      "mastered": "Освоено",
+      "needsReview": "Нужно повторить",
+      "masteryRate": "Уровень освоения",
+      "startReview": "Начать режим повторения",
+      "reviewCount": "Повторить {{count}} неосвоенных вопросов",
+      "delete": "Удалить",
+      "deleteTitle": "Удалить ошибку",
+      "deleteConfirm": "Вы уверены, что хотите удалить эту ошибку? Это нельзя отменить."
+    },
+    "report": {
+      "loading": "Загрузка результатов...",
+      "backToHub": "Центр пробных экзаменов",
+      "mistakeNote": "Заметки об ошибках",
+      "aiAnalysis": "AI-отчёт",
+      "resultAnalysis": "Анализ результатов",
+      "analyzing": "AI анализирует результаты...",
+      "generating": "Генерация слабых мест и рекомендаций",
+      "predictedGrade": "Прогнозируемый уровень",
+      "advanced": "Продвинутый",
+      "intermediate": "Средний",
+      "beginner": "Начальный",
+      "totalScore": "Общий балл",
+      "tabs": {
+        "analysis": "Анализ",
+        "recommendations": "Рекомендации",
+        "plan": "План обучения"
+      },
+      "overallAnalysis": "Общий анализ",
+      "weeklyGoal": "Недельная цель",
+      "focusAreas": "Области для изучения",
+      "regenerate": "Перегенерировать отчёт",
+      "goToMistakes": "Перейти к ошибкам",
+      "tryAgain": "Попробовать снова"
     },
     "error": {
       "notFound": "Запись экзамена не найдена"
@@ -3044,5 +3083,13 @@
     "level": { "beginner": "Начальный", "intermediate": "Средний", "advanced": "Продвинутый" },
     "category": { "memorize": "Запоминание", "context": "Контекст" }
   },
-  "roleplay": { "level": { "beginner": "Начальный", "intermediate": "Средний" } }
+  "roleplay": { "level": { "beginner": "Начальный", "intermediate": "Средний" } },
+  "lessonMenu": {
+    "handwriting": { "title": "Рукописная практика", "description": "Практикуйте письмо от согласных/гласных до слов и предложений. AI также создаёт тесты на правописание." },
+    "listening": { "title": "Практика аудирования", "description": "Решайте вопросы с 4 вариантами как на настоящем экзамене TOPIK. Диалоги AI TTS с 2 собеседниками включены." },
+    "badge": { "recommended": "Рекомендуется", "new": "НОВОЕ", "aiLearning": "AI-обучение корейскому" },
+    "title": { "lesson": "Урок", "select": "Выбор" },
+    "subtitle1": "Выберите область обучения.",
+    "subtitle2": "AI предоставит персонализированный контент."
+  }
 }

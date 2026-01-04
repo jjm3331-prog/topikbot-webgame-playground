@@ -2682,7 +2682,46 @@
       "reviewAgain": "Yana takrorlang",
       "deleteComplete": "Xato o'chirildi",
       "reviewComplete": "Takrorlash tugadi!",
-      "goodJob": "Yaxshi ish!"
+      "goodJob": "Yaxshi ish!",
+      "loading": "Xato daftari yuklanmoqda...",
+      "endReview": "Takrorlashni tugatish",
+      "explanation": "Tushuntirish",
+      "title": "Xato daftari",
+      "subtitle": "Xatolarni takrorlang va o'zlashtiring",
+      "totalMistakes": "Jami xatolar",
+      "mastered": "O'zlashtirilgan",
+      "needsReview": "Takrorlash kerak",
+      "masteryRate": "O'zlashtirish darajasi",
+      "startReview": "Takrorlash rejimini boshlash",
+      "reviewCount": "{{count}} ta o'zlashtirilmagan savolni takrorlang",
+      "delete": "O'chirish",
+      "deleteTitle": "Xatoni o'chirish",
+      "deleteConfirm": "Bu xatoni o'chirishni xohlaysizmi? Buni qaytarib bo'lmaydi."
+    },
+    "report": {
+      "loading": "Natijalar yuklanmoqda...",
+      "backToHub": "Sinov imtihoni markazi",
+      "mistakeNote": "Xato daftari",
+      "aiAnalysis": "AI tahlil hisoboti",
+      "resultAnalysis": "Natija tahlili",
+      "analyzing": "AI natijalarni tahlil qilmoqda...",
+      "generating": "Kamchiliklar va tavsiyalar yaratilmoqda",
+      "predictedGrade": "Taxminiy daraja",
+      "advanced": "Yuqori",
+      "intermediate": "O'rta",
+      "beginner": "Boshlang'ich",
+      "totalScore": "Umumiy ball",
+      "tabs": {
+        "analysis": "Tahlil",
+        "recommendations": "Tavsiyalar",
+        "plan": "O'qish rejasi"
+      },
+      "overallAnalysis": "Umumiy tahlil",
+      "weeklyGoal": "Haftalik maqsad",
+      "focusAreas": "Diqqat sohalar",
+      "regenerate": "Hisobotni qayta yaratish",
+      "goToMistakes": "Xatolarga o'tish",
+      "tryAgain": "Qayta urinish"
     },
     "error": {
       "notFound": "Imtihon yozuvi topilmadi"
@@ -3054,5 +3093,13 @@
     "level": { "beginner": "Boshlangʻich", "intermediate": "Oʻrta", "advanced": "Yuqori" },
     "category": { "memorize": "Yodlash", "context": "Kontekst" }
   },
-  "roleplay": { "level": { "beginner": "Boshlangʻich", "intermediate": "Oʻrta" } }
+  "roleplay": { "level": { "beginner": "Boshlangʻich", "intermediate": "Oʻrta" } },
+  "lessonMenu": {
+    "handwriting": { "title": "Qo'l yozuvi mashqi", "description": "Undosh/unlidan so'zlar va gaplargacha yozing. AI imlo testlarini ham yaratadi." },
+    "listening": { "title": "Tinglash mashqi", "description": "Haqiqiy TOPIK tinglash imtihoni kabi 4 variantli savollarni yeching. AI TTS 2 kishilik muloqotlar ham mavjud." },
+    "badge": { "recommended": "Tavsiya etilgan", "new": "YANGI", "aiLearning": "AI bilan koreys tili" },
+    "title": { "lesson": "Dars", "select": "Tanlash" },
+    "subtitle1": "O'rganish sohasini tanlang.",
+    "subtitle2": "AI shaxsiylashtirilgan kontent taqdim etadi."
+  }
 }

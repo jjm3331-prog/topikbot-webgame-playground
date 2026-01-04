@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import CleanHeader from "@/components/CleanHeader";
 import AppFooter from "@/components/AppFooter";
 import { supabase } from "@/integrations/supabase/client";
@@ -129,24 +130,24 @@ const LessonMenu = () => {
     checkAuth();
   }, []);
 
+  const { t } = useTranslation();
+
   const lessonMenuItems = [
     {
       icon: PenTool,
       title: "Handwriting Practice",
-      titleKo: "손글씨 연습",
-      description:
-        "자음·모음 기초부터 단어, 문장까지 손글씨로 직접 써보며 한글을 익히세요. AI가 맞춤법 퀴즈도 생성해드려요.",
+      titleKo: t("lessonMenu.handwriting.title", "손글씨 연습"),
+      description: t("lessonMenu.handwriting.description", "자음·모음 기초부터 단어, 문장까지 손글씨로 직접 써보며 한글을 익히세요. AI가 맞춤법 퀴즈도 생성해드려요."),
       gradient: "from-korean-purple to-korean-pink",
-      badge: "추천",
+      badge: t("lessonMenu.badge.recommended", "추천"),
     },
     {
       icon: Headphones,
       title: "Listening Practice",
-      titleKo: "듣기 연습",
-      description:
-        "실제 TOPIK 듣기 시험처럼 4지선다 문제를 풀어보세요. AI TTS로 2명의 화자가 대화하는 문제도 준비되어 있어요.",
+      titleKo: t("lessonMenu.listening.title", "듣기 연습"),
+      description: t("lessonMenu.listening.description", "실제 TOPIK 듣기 시험처럼 4지선다 문제를 풀어보세요. AI TTS로 2명의 화자가 대화하는 문제도 준비되어 있어요."),
       gradient: "from-korean-blue to-korean-cyan",
-      badge: "NEW",
+      badge: t("lessonMenu.badge.new", "NEW"),
     },
   ];
 
@@ -173,7 +174,7 @@ const LessonMenu = () => {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-4"
               >
                 <Sparkles className="w-4 h-4" />
-                <span>AI 기반 한국어 학습</span>
+                <span>{t("lessonMenu.badge.aiLearning", "AI 기반 한국어 학습")}</span>
               </motion.div>
 
               <motion.h1
@@ -182,7 +183,7 @@ const LessonMenu = () => {
                 transition={{ delay: 0.3 }}
                 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl text-foreground mb-4"
               >
-                <span className="text-gradient-primary">레슨</span> 선택
+                <span className="text-gradient-primary">{t("lessonMenu.title.lesson", "레슨")}</span> {t("lessonMenu.title.select", "선택")}
               </motion.h1>
               
               <motion.p
@@ -191,9 +192,9 @@ const LessonMenu = () => {
                 transition={{ delay: 0.4 }}
                 className="text-muted-foreground text-sm sm:text-base max-w-md mx-auto"
               >
-                원하는 학습 영역을 선택하세요. 
+                {t("lessonMenu.subtitle1", "원하는 학습 영역을 선택하세요.")}
                 <br className="hidden sm:block" />
-                AI가 맞춤형 콘텐츠를 제공합니다.
+                {t("lessonMenu.subtitle2", "AI가 맞춤형 콘텐츠를 제공합니다.")}
               </motion.p>
             </div>
           </motion.div>
