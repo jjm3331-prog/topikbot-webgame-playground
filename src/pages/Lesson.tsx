@@ -363,14 +363,14 @@ const Lesson = () => {
       }
       
       toast({
-        title: "학습 완료!",
-        description: `점수가 저장되었습니다: ${score}점`,
+        title: t("lesson.lessonComplete", "학습 완료!"),
+        description: t("lesson.scoreSaved", "점수가 저장되었습니다: {{score}}점", { score }),
       });
     } catch (error) {
       console.error("Error saving progress:", error);
       toast({
-        title: "저장 실패",
-        description: "진도 저장에 실패했습니다.",
+        title: t("lesson.saveFailed", "저장 실패"),
+        description: t("lesson.progressSaveFailed", "진도 저장에 실패했습니다."),
         variant: "destructive",
       });
     } finally {
@@ -448,16 +448,16 @@ const Lesson = () => {
       }
       
       toast({
-        title: "학습 완료!",
-        description: `점수가 저장되었습니다: ${finalScore}점`,
+        title: t("lesson.lessonComplete", "학습 완료!"),
+        description: t("lesson.scoreSaved", "점수가 저장되었습니다: {{score}}점", { score: finalScore }),
       });
       
       setQuizComplete(true);
     } catch (error) {
       console.error("Error saving progress:", error);
       toast({
-        title: "저장 실패",
-        description: "진도 저장에 실패했습니다.",
+        title: t("lesson.saveFailed", "저장 실패"),
+        description: t("lesson.progressSaveFailed", "진도 저장에 실패했습니다."),
         variant: "destructive",
       });
     } finally {

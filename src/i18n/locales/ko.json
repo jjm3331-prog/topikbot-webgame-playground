@@ -608,7 +608,40 @@
     "helpItem3": "버그 신고 및 개선 제안",
     "helpItem4": "학습 콘텐츠 문의",
     "copyright": "© 2025 LUKATO AI. AI와 함께하는 스마트 시험 대비.",
-    "platform": "글로벌 TOPIK 시험 AI 학습 플랫폼"
+    "platform": "글로벌 TOPIK 시험 AI 학습 플랫폼",
+    "kakao": {
+      "platform": "카카오톡",
+      "buttonText": "카카오톡 오픈채팅 참여하기",
+      "description": "카카오톡 오픈채팅으로 실시간 상담을 받아보세요",
+      "scanText": "QR 코드를 스캔하거나 아래 버튼을 눌러 참여하세요",
+      "supportHours": "실시간 고객 지원",
+      "supportTime": "평일 09:00 - 18:00 (주말·공휴일 휴무)",
+      "helpTitle": "무엇을 도와드릴까요?",
+      "helpItem1": "앱 사용 방법 및 기능 안내",
+      "helpItem2": "결제 및 구독 관련 문의",
+      "helpItem3": "버그 신고 및 개선 제안",
+      "helpItem4": "학습 콘텐츠 관련 문의",
+      "feature1": {
+        "title": "빠른 응답",
+        "desc": "평균 30분 이내 답변"
+      },
+      "feature2": {
+        "title": "전문 상담",
+        "desc": "TOPIK 전문가 상담"
+      },
+      "feature3": {
+        "title": "맞춤 지원",
+        "desc": "1:1 맞춤형 솔루션"
+      },
+      "headerTitle": "고객 지원 센터",
+      "headerSubtitle": "LUKATO AI 공식 고객센터",
+      "heroTitle1": "카카오톡으로",
+      "heroTitle2": "빠른 상담",
+      "badge": "카카오톡 오픈채팅",
+      "onlineNow": "현재 운영 중",
+      "footerCopyright": "© 2025 LUKATO AI. AI와 함께하는 스마트 시험 대비.",
+      "footerPlatform": "글로벌 TOPIK 시험 AI 학습 플랫폼"
+    }
   },
   "battle": {
     "title": "1:1 실시간 배틀",

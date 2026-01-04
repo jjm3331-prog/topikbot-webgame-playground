@@ -168,11 +168,11 @@ const Pricing = () => {
         // Redirect to payment page
         window.location.href = data.paymentUrl;
       } else {
-        throw new Error(data.error || "결제 생성 실패");
+        throw new Error(data.error || t("pricing.paymentCreateFailed", "결제 생성 실패"));
       }
     } catch (error: unknown) {
       console.error("Payment error:", error);
-      const errorMessage = error instanceof Error ? error.message : "결제 처리 중 오류가 발생했습니다.";
+      const errorMessage = error instanceof Error ? error.message : t("pricing.paymentProcessError", "결제 처리 중 오류가 발생했습니다.");
       toast({
         title: t("pricing.paymentError.title", "결제 오류"),
         description: errorMessage,

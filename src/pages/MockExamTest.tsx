@@ -742,8 +742,8 @@ const MockExamTest = () => {
         });
         setIsPlaying(false);
         toast({
-          title: "오디오 재생 실패",
-          description: "음성 파일을 로드하지 못했습니다.",
+          title: t("mockExam.audioPlayFailed", "오디오 재생 실패"),
+          description: t("mockExam.audioLoadFailed", "음성 파일을 로드하지 못했습니다."),
           variant: "destructive",
         });
       };
@@ -758,8 +758,8 @@ const MockExamTest = () => {
       console.error("[MockExamTest] audio fetch/play failed", err, { url });
       setIsPlaying(false);
       toast({
-        title: "오디오 재생 실패",
-        description: "네트워크/포맷 문제로 재생할 수 없습니다.",
+        title: t("mockExam.audioPlayFailed", "오디오 재생 실패"),
+        description: t("mockExam.audioNetworkError", "네트워크/포맷 문제로 재생할 수 없습니다."),
         variant: "destructive",
       });
     }

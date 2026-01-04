@@ -547,7 +547,40 @@
     "helpItem3": "错误报告和改进建议",
     "helpItem4": "学习内容咨询",
     "copyright": "© 2025 LUKATO AI. AI智能备考。",
-    "platform": "面向全球学员的TOPIK AI学习平台"
+    "platform": "面向全球学员的TOPIK AI学习平台",
+    "kakao": {
+      "platform": "KakaoTalk",
+      "buttonText": "加入KakaoTalk开放聊天",
+      "description": "通过KakaoTalk获得实时支持",
+      "scanText": "扫描二维码或点击下方按钮加入",
+      "supportHours": "实时客户支持",
+      "supportTime": "工作日09:00-18:00（周末节假日休息）",
+      "helpTitle": "我们能帮您什么？",
+      "helpItem1": "应用使用方法及功能介绍",
+      "helpItem2": "支付及订阅相关咨询",
+      "helpItem3": "错误报告及改进建议",
+      "helpItem4": "学习内容相关咨询",
+      "feature1": {
+        "title": "快速响应",
+        "desc": "平均30分钟内回复"
+      },
+      "feature2": {
+        "title": "专业咨询",
+        "desc": "TOPIK专家咨询"
+      },
+      "feature3": {
+        "title": "个性化支持",
+        "desc": "1:1定制解决方案"
+      },
+      "headerTitle": "客户服务中心",
+      "headerSubtitle": "LUKATO AI官方客服",
+      "heroTitle1": "通过KakaoTalk",
+      "heroTitle2": "快速咨询",
+      "badge": "KakaoTalk开放聊天",
+      "onlineNow": "正在运营中",
+      "footerCopyright": "© 2025 LUKATO AI. AI智能备考。",
+      "footerPlatform": "面向全球学员的TOPIK AI学习平台"
+    }
   },
   "battle": {
     "title": "1:1实时对战场",

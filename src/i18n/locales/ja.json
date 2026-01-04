@@ -547,7 +547,40 @@
     "helpItem3": "バグ報告＆改善提案",
     "helpItem4": "学習コンテンツに関するお問い合わせ",
     "copyright": "© 2025 LUKATO AI. AIとスマート試験対策。",
-    "platform": "世界中の学習者向けTOPIK AI学習プラットフォーム"
+    "platform": "世界中の学習者向けTOPIK AI学習プラットフォーム",
+    "kakao": {
+      "platform": "カカオトーク",
+      "buttonText": "カカオトークオープンチャットに参加",
+      "description": "カカオトークでリアルタイムサポートを受けられます",
+      "scanText": "QRコードをスキャンするか、下のボタンを押して参加してください",
+      "supportHours": "リアルタイムサポート",
+      "supportTime": "平日09:00〜18:00（土日祝休み）",
+      "helpTitle": "何かお手伝いできますか？",
+      "helpItem1": "アプリ使用方法と機能案内",
+      "helpItem2": "決済・サブスクリプション関連",
+      "helpItem3": "バグ報告・改善提案",
+      "helpItem4": "学習コンテンツに関する質問",
+      "feature1": {
+        "title": "迅速な対応",
+        "desc": "平均30分以内に返信"
+      },
+      "feature2": {
+        "title": "専門相談",
+        "desc": "TOPIK専門家による相談"
+      },
+      "feature3": {
+        "title": "個別サポート",
+        "desc": "1:1カスタマイズソリューション"
+      },
+      "headerTitle": "カスタマーサポート",
+      "headerSubtitle": "LUKATO AI公式サポート",
+      "heroTitle1": "カカオトークで",
+      "heroTitle2": "迅速な相談",
+      "badge": "カカオトークオープンチャット",
+      "onlineNow": "現在営業中",
+      "footerCopyright": "© 2025 LUKATO AI. AIとスマート試験対策。",
+      "footerPlatform": "世界中の学習者向けTOPIK AI学習プラットフォーム"
+    }
   },
   "battle": {
     "title": "1:1リアルタイムバトル",

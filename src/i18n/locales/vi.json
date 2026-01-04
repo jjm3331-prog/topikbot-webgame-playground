@@ -608,7 +608,40 @@
     "helpItem3": "Báo lỗi & góp ý cải tiến",
     "helpItem4": "Giải đáp thắc mắc về nội dung học tập",
     "copyright": "© 2025 LUKATO AI. Ôn thi thông minh với AI.",
-    "platform": "Nền tảng AI học TOPIK cho người học toàn cầu"
+    "platform": "Nền tảng AI học TOPIK cho người học toàn cầu",
+    "kakao": {
+      "platform": "KakaoTalk",
+      "buttonText": "Tham gia KakaoTalk Open Chat",
+      "description": "Nhận hỗ trợ thời gian thực qua KakaoTalk",
+      "scanText": "Quét mã QR hoặc nhấn nút bên dưới để tham gia",
+      "supportHours": "Hỗ trợ khách hàng trực tiếp",
+      "supportTime": "Thứ 2-6: 09:00 - 18:00 (Nghỉ cuối tuần & lễ)",
+      "helpTitle": "Chúng tôi có thể giúp gì?",
+      "helpItem1": "Hướng dẫn sử dụng & tính năng",
+      "helpItem2": "Thanh toán & đăng ký gói",
+      "helpItem3": "Báo lỗi & góp ý cải tiến",
+      "helpItem4": "Thắc mắc về nội dung học tập",
+      "feature1": {
+        "title": "Phản hồi nhanh",
+        "desc": "Trung bình trong 30 phút"
+      },
+      "feature2": {
+        "title": "Tư vấn chuyên gia",
+        "desc": "Chuyên gia TOPIK hỗ trợ"
+      },
+      "feature3": {
+        "title": "Cá nhân hóa",
+        "desc": "Giải pháp 1:1 riêng biệt"
+      },
+      "headerTitle": "Trung tâm Hỗ trợ",
+      "headerSubtitle": "LUKATO AI Hỗ trợ chính thức",
+      "heroTitle1": "Tư vấn nhanh",
+      "heroTitle2": "qua KakaoTalk",
+      "badge": "KakaoTalk Open Chat",
+      "onlineNow": "Đang hoạt động",
+      "footerCopyright": "© 2025 LUKATO AI. Ôn thi thông minh với AI.",
+      "footerPlatform": "Nền tảng AI học TOPIK toàn cầu"
+    }
   },
   "battle": {
     "title": "1:1 Đấu trường Real-time",

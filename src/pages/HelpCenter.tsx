@@ -338,26 +338,26 @@ const HelpCenter = () => {
   // 한국어 전용 프리미엄 UI (카카오톡)
   if (isKorean) {
     const config = {
-      platform: "카카오톡",
+      platform: t("helpCenter.kakao.platform", "카카오톡"),
       link: "https://open.kakao.com/o/salnPB8h",
       qrImage: kakaoQr,
       logo: kakaoLogo,
-      buttonText: "카카오톡 오픈채팅 참여하기",
-      description: "카카오톡 오픈채팅으로 실시간 상담을 받아보세요",
-      scanText: "QR 코드를 스캔하거나 아래 버튼을 눌러 참여하세요",
-      supportHours: "실시간 고객 지원",
-      supportTime: "평일 09:00 - 18:00 (주말·공휴일 휴무)",
-      helpTitle: "무엇을 도와드릴까요?",
+      buttonText: t("helpCenter.kakao.buttonText", "카카오톡 오픈채팅 참여하기"),
+      description: t("helpCenter.kakao.description", "카카오톡 오픈채팅으로 실시간 상담을 받아보세요"),
+      scanText: t("helpCenter.kakao.scanText", "QR 코드를 스캔하거나 아래 버튼을 눌러 참여하세요"),
+      supportHours: t("helpCenter.kakao.supportHours", "실시간 고객 지원"),
+      supportTime: t("helpCenter.kakao.supportTime", "평일 09:00 - 18:00 (주말·공휴일 휴무)"),
+      helpTitle: t("helpCenter.kakao.helpTitle", "무엇을 도와드릴까요?"),
       helpItems: [
-        "앱 사용 방법 및 기능 안내",
-        "결제 및 구독 관련 문의",
-        "버그 신고 및 개선 제안",
-        "학습 콘텐츠 관련 문의",
+        t("helpCenter.kakao.helpItem1", "앱 사용 방법 및 기능 안내"),
+        t("helpCenter.kakao.helpItem2", "결제 및 구독 관련 문의"),
+        t("helpCenter.kakao.helpItem3", "버그 신고 및 개선 제안"),
+        t("helpCenter.kakao.helpItem4", "학습 콘텐츠 관련 문의"),
       ],
       features: [
-        { icon: Zap, title: "빠른 응답", desc: "평균 30분 이내 답변" },
-        { icon: Shield, title: "전문 상담", desc: "TOPIK 전문가 상담" },
-        { icon: Sparkles, title: "맞춤 지원", desc: "1:1 맞춤형 솔루션" },
+        { icon: Zap, title: t("helpCenter.kakao.feature1.title", "빠른 응답"), desc: t("helpCenter.kakao.feature1.desc", "평균 30분 이내 답변") },
+        { icon: Shield, title: t("helpCenter.kakao.feature2.title", "전문 상담"), desc: t("helpCenter.kakao.feature2.desc", "TOPIK 전문가 상담") },
+        { icon: Sparkles, title: t("helpCenter.kakao.feature3.title", "맞춤 지원"), desc: t("helpCenter.kakao.feature3.desc", "1:1 맞춤형 솔루션") },
       ],
     };
 
@@ -379,8 +379,8 @@ const HelpCenter = () => {
                 <Headphones className="w-5 h-5 text-[#3C1E1E]" />
               </div>
               <div>
-                <h1 className="font-heading font-bold text-lg">고객 지원 센터</h1>
-                <p className="text-xs text-muted-foreground">LUKATO AI 공식 고객센터</p>
+                <h1 className="font-heading font-bold text-lg">{t("helpCenter.kakao.headerTitle", "고객 지원 센터")}</h1>
+                <p className="text-xs text-muted-foreground">{t("helpCenter.kakao.headerSubtitle", "LUKATO AI 공식 고객센터")}</p>
               </div>
             </div>
           </div>
@@ -402,7 +402,7 @@ const HelpCenter = () => {
               <img src={kakaoLogo} alt="KakaoTalk" className="w-16 h-16 rounded-xl" />
             </motion.div>
             <h2 className="text-3xl font-bold text-foreground">
-              카카오톡으로 <span className="text-[#FEE500]">빠른 상담</span>
+              {t("helpCenter.kakao.heroTitle1", "카카오톡으로")} <span className="text-[#FEE500]">{t("helpCenter.kakao.heroTitle2", "빠른 상담")}</span>
             </h2>
             <p className="text-muted-foreground max-w-md mx-auto">
               {config.description}
@@ -453,7 +453,7 @@ const HelpCenter = () => {
                 </div>
                 {/* Kakao Badge */}
                 <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-[#FEE500] rounded-full shadow-lg">
-                  <span className="text-xs font-bold text-[#3C1E1E]">카카오톡 오픈채팅</span>
+                  <span className="text-xs font-bold text-[#3C1E1E]">{t("helpCenter.kakao.badge", "카카오톡 오픈채팅")}</span>
                 </div>
               </div>
 
@@ -493,7 +493,7 @@ const HelpCenter = () => {
                   <p className="text-sm text-muted-foreground">{config.supportTime}</p>
                   <div className="mt-3 flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                    <span className="text-xs text-green-500 font-medium">현재 운영 중</span>
+                    <span className="text-xs text-green-500 font-medium">{t("helpCenter.kakao.onlineNow", "현재 운영 중")}</span>
                   </div>
                 </div>
               </div>
@@ -530,10 +530,10 @@ const HelpCenter = () => {
           {/* Footer */}
           <footer className="text-center pt-8 border-t border-border/50">
             <p className="text-sm text-muted-foreground">
-              © 2025 LUKATO AI. AI와 함께하는 스마트 시험 대비.
+              {t("helpCenter.kakao.footerCopyright", "© 2025 LUKATO AI. AI와 함께하는 스마트 시험 대비.")}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              글로벌 TOPIK 시험 AI 학습 플랫폼
+              {t("helpCenter.kakao.footerPlatform", "글로벌 TOPIK 시험 AI 학습 플랫폼")}
             </p>
           </footer>
         </main>

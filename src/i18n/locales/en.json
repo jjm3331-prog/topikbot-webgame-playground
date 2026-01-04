@@ -608,7 +608,40 @@
     "helpItem3": "Bug reports & improvement suggestions",
     "helpItem4": "Learning content inquiries",
     "copyright": "© 2025 LUKATO AI. Smart exam prep with AI.",
-    "platform": "AI learning platform for TOPIK exam worldwide"
+    "platform": "AI learning platform for TOPIK exam worldwide",
+    "kakao": {
+      "platform": "KakaoTalk",
+      "buttonText": "Join KakaoTalk Open Chat",
+      "description": "Get real-time support via KakaoTalk open chat",
+      "scanText": "Scan QR code or click button below to join",
+      "supportHours": "Live Customer Support",
+      "supportTime": "Weekdays 09:00 - 18:00 (Closed on weekends & holidays)",
+      "helpTitle": "How can we help you?",
+      "helpItem1": "App usage guide & feature info",
+      "helpItem2": "Payment & subscription inquiries",
+      "helpItem3": "Bug reports & improvement suggestions",
+      "helpItem4": "Learning content inquiries",
+      "feature1": {
+        "title": "Fast Response",
+        "desc": "Average reply within 30 min"
+      },
+      "feature2": {
+        "title": "Expert Support",
+        "desc": "TOPIK specialist consultation"
+      },
+      "feature3": {
+        "title": "Personalized",
+        "desc": "1:1 tailored solutions"
+      },
+      "headerTitle": "Customer Support Center",
+      "headerSubtitle": "LUKATO AI Official Support",
+      "heroTitle1": "Fast Consultation",
+      "heroTitle2": "via KakaoTalk",
+      "badge": "KakaoTalk Open Chat",
+      "onlineNow": "Currently Online",
+      "footerCopyright": "© 2025 LUKATO AI. Smart exam prep with AI.",
+      "footerPlatform": "Global TOPIK Exam AI Learning Platform"
+    }
   },
   "battle": {
     "title": "1:1 Real-time Battle Arena",
