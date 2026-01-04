@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Trophy, Target, Clock, Star, TrendingUp } from "lucide-react";
 
@@ -19,42 +20,43 @@ const ProgressStats = ({
   totalTimeSpent,
   className,
 }: ProgressStatsProps) => {
+  const { t } = useTranslation();
   const completionRate = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
   
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    if (hours > 0) return `${hours}시간 ${minutes}분`;
-    return `${minutes}분`;
+    if (hours > 0) return t("stats.hoursMinutes", "{{hours}}시간 {{minutes}}분", { hours, minutes });
+    return t("stats.minutes", "{{minutes}}분", { minutes });
   };
 
   const stats = [
     {
       icon: Target,
-      label: "진도율",
+      label: t("stats.progress", "진도율"),
       value: `${completionRate}%`,
-      subtext: `${completedLessons}/${totalLessons} 완료`,
+      subtext: t("stats.completed", "{{completed}}/{{total}} 완료", { completed: completedLessons, total: totalLessons }),
       color: "from-korean-blue to-korean-cyan",
     },
     {
       icon: Trophy,
-      label: "총 점수",
+      label: t("stats.totalScore", "총 점수"),
       value: totalScore.toLocaleString(),
-      subtext: "포인트",
+      subtext: t("stats.points", "포인트"),
       color: "from-korean-yellow to-korean-orange",
     },
     {
       icon: Star,
-      label: "평균 점수",
-      value: `${averageScore}점`,
-      subtext: "100점 만점",
+      label: t("stats.averageScore", "평균 점수"),
+      value: `${averageScore}${t("stats.scoreUnit", "점")}`,
+      subtext: t("stats.outOf100", "100점 만점"),
       color: "from-korean-pink to-korean-purple",
     },
     {
       icon: Clock,
-      label: "학습 시간",
+      label: t("stats.studyTime", "학습 시간"),
       value: formatTime(totalTimeSpent),
-      subtext: "총 학습량",
+      subtext: t("stats.totalStudy", "총 학습량"),
       color: "from-korean-green to-korean-teal",
     },
   ];

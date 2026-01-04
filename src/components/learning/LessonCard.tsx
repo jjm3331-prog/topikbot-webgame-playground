@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Check, Lock, Play, Star, Clock, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,12 +19,6 @@ interface LessonCardProps {
   index?: number;
 }
 
-const difficultyConfig = {
-  easy: { label: "쉬움", color: "bg-korean-green/20 text-korean-green" },
-  medium: { label: "보통", color: "bg-korean-yellow/20 text-korean-yellow" },
-  hard: { label: "어려움", color: "bg-korean-red/20 text-korean-red" },
-};
-
 const LessonCard = ({
   id,
   title,
@@ -38,6 +33,14 @@ const LessonCard = ({
   onClick,
   index = 0,
 }: LessonCardProps) => {
+  const { t } = useTranslation();
+  
+  const difficultyConfig = {
+    easy: { label: t("difficulty.easy", "쉬움"), color: "bg-korean-green/20 text-korean-green" },
+    medium: { label: t("difficulty.medium", "보통"), color: "bg-korean-yellow/20 text-korean-yellow" },
+    hard: { label: t("difficulty.hard", "어려움"), color: "bg-korean-red/20 text-korean-red" },
+  };
+  
   const diffConfig = difficultyConfig[difficulty];
 
   return (
@@ -97,11 +100,11 @@ const LessonCard = ({
           <div className="flex items-center gap-3 mb-3 p-2 rounded-lg bg-muted/50">
             <div className="flex items-center gap-1">
               <Star className="w-4 h-4 text-korean-yellow fill-korean-yellow" />
-              <span className="text-sm font-medium">{score}점</span>
+              <span className="text-sm font-medium">{score}{t("lesson.scoreUnit", "점")}</span>
             </div>
             {correctRate !== undefined && (
               <div className="text-sm text-muted-foreground">
-                정답률 {correctRate}%
+                {t("lesson.correctRate", "정답률")} {correctRate}%
               </div>
             )}
           </div>
@@ -117,17 +120,17 @@ const LessonCard = ({
           {locked ? (
             <>
               <Lock className="w-4 h-4 mr-2" />
-              잠김
+              {t("lesson.locked", "잠김")}
             </>
           ) : completed ? (
             <>
-              다시 학습
+              {t("lesson.reviewAgain", "다시 학습")}
               <ChevronRight className="w-4 h-4 ml-2" />
             </>
           ) : (
             <>
               <Play className="w-4 h-4 mr-2" />
-              시작하기
+              {t("lesson.start", "시작하기")}
             </>
           )}
         </Button>

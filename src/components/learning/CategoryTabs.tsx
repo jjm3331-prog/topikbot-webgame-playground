@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Book, FileText, Headphones, ClipboardCheck, LucideIcon } from "lucide-react";
 
@@ -12,48 +13,17 @@ interface CategoryTabsProps {
 
 interface CategoryConfig {
   id: LearningCategory;
-  label: string;
-  labelKo: string;
+  labelKey: string;
   icon: LucideIcon;
   color: string;
 }
 
-const categories: CategoryConfig[] = [
-  {
-    id: "vocabulary",
-    label: "Vocabulary",
-    labelKo: "어휘",
-    icon: Book,
-    color: "from-korean-blue to-korean-cyan",
-  },
-  {
-    id: "grammar",
-    label: "Grammar",
-    labelKo: "문법",
-    icon: FileText,
-    color: "from-korean-purple to-korean-pink",
-  },
-  {
-    id: "reading",
-    label: "Reading",
-    labelKo: "읽기",
-    icon: FileText,
-    color: "from-korean-green to-korean-teal",
-  },
-  {
-    id: "listening",
-    label: "Listening",
-    labelKo: "듣기",
-    icon: Headphones,
-    color: "from-korean-orange to-korean-yellow",
-  },
-  {
-    id: "mock_test",
-    label: "Mock Test",
-    labelKo: "모의고사",
-    icon: ClipboardCheck,
-    color: "from-korean-red to-korean-pink",
-  },
+const categoryConfigs: CategoryConfig[] = [
+  { id: "vocabulary", labelKey: "category.vocabulary", icon: Book, color: "from-korean-blue to-korean-cyan" },
+  { id: "grammar", labelKey: "category.grammar", icon: FileText, color: "from-korean-purple to-korean-pink" },
+  { id: "reading", labelKey: "category.reading", icon: FileText, color: "from-korean-green to-korean-teal" },
+  { id: "listening", labelKey: "category.listening", icon: Headphones, color: "from-korean-orange to-korean-yellow" },
+  { id: "mock_test", labelKey: "category.mockTest", icon: ClipboardCheck, color: "from-korean-red to-korean-pink" },
 ];
 
 const CategoryTabs = ({
@@ -61,9 +31,11 @@ const CategoryTabs = ({
   onCategoryChange,
   className,
 }: CategoryTabsProps) => {
+  const { t } = useTranslation();
+  
   return (
     <div className={cn("flex flex-wrap gap-2", className)}>
-      {categories.map((category) => {
+      {categoryConfigs.map((category) => {
         const isActive = activeCategory === category.id;
         const Icon = category.icon;
 
@@ -89,7 +61,7 @@ const CategoryTabs = ({
             )}
             <span className="relative z-10 flex items-center gap-2">
               <Icon className="w-4 h-4" />
-              <span className="font-medium">{category.labelKo}</span>
+              <span className="font-medium">{t(category.labelKey)}</span>
             </span>
           </motion.button>
         );

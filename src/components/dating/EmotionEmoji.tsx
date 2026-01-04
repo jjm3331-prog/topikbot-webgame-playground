@@ -1,20 +1,23 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 interface EmotionEmojiProps {
   affinity: number;
 }
 
-const getEmoji = (affinity: number) => {
-  if (affinity >= 90) return { emoji: "💘", label: "완전 반했어!" };
-  if (affinity >= 75) return { emoji: "🥰", label: "너무 좋아!" };
-  if (affinity >= 60) return { emoji: "😍", label: "설레어~" };
-  if (affinity >= 45) return { emoji: "😊", label: "좋은 느낌" };
-  if (affinity >= 30) return { emoji: "🙂", label: "관심있어" };
-  if (affinity >= 15) return { emoji: "😐", label: "아직 모르겠어" };
-  return { emoji: "😒", label: "별로야..." };
-};
-
 const EmotionEmoji = ({ affinity }: EmotionEmojiProps) => {
+  const { t } = useTranslation();
+  
+  const getEmoji = (aff: number) => {
+    if (aff >= 90) return { emoji: "💘", label: t("emotion.fallenHard", "완전 반했어!") };
+    if (aff >= 75) return { emoji: "🥰", label: t("emotion.loveIt", "너무 좋아!") };
+    if (aff >= 60) return { emoji: "😍", label: t("emotion.excited", "설레어~") };
+    if (aff >= 45) return { emoji: "😊", label: t("emotion.goodFeeling", "좋은 느낌") };
+    if (aff >= 30) return { emoji: "🙂", label: t("emotion.interested", "관심있어") };
+    if (aff >= 15) return { emoji: "😐", label: t("emotion.notSure", "아직 모르겠어") };
+    return { emoji: "😒", label: t("emotion.notGood", "별로야...") };
+  };
+
   const { emoji, label } = getEmoji(affinity);
 
   return (

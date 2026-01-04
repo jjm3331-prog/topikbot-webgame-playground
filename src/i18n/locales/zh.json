@@ -55,6 +55,14 @@
     "gameStartError": "游戏启动错误",
     "gameStartErrorDesc": "无法启动游戏。"
   },
+  "trial": {
+    "available": "免费试用可用",
+    "freeToday": "今天可以免费体验{{feature}}一次！",
+    "unlimitedAccess": "获取无限访问",
+    "completed": "今日试用已完成",
+    "nextTrialIn": "下次免费试用还需{{time}}",
+    "upgradePremium": "升级到Premium"
+  },
   "pwaWelcome": {
     "installComplete": "安装完成！",
     "appAdded": "Game LUKATO已添加到主屏幕。",
@@ -2988,5 +2996,62 @@
     "send": "发送",
     "scenarioSelect": "选择场景",
     "topikLevel": "TOPIK等级"
-  }
+  },
+  "stats": {
+    "progress": "进度",
+    "completed": "{{completed}}/{{total}} 完成",
+    "totalScore": "总分",
+    "points": "积分",
+    "averageScore": "平均分",
+    "scoreUnit": "分",
+    "outOf100": "满分100",
+    "studyTime": "学习时间",
+    "totalStudy": "总学习量",
+    "hoursMinutes": "{{hours}}小时{{minutes}}分",
+    "minutes": "{{minutes}}分钟"
+  },
+  "category": {
+    "vocabulary": "词汇",
+    "grammar": "语法",
+    "reading": "阅读",
+    "listening": "听力",
+    "mockTest": "模拟考试"
+  },
+  "emotion": {
+    "fallenHard": "完全沦陷了！",
+    "loveIt": "太喜欢了！",
+    "excited": "心动~",
+    "goodFeeling": "感觉不错",
+    "interested": "有兴趣",
+    "notSure": "还不确定",
+    "notGood": "不太行..."
+  },
+  "idiom": {
+    "loading": "正在加载惯用语...",
+    "title": "惯用语大师",
+    "subtitle": "匹配字面 ↔ 实际含义!",
+    "levelExpressions": "TOPIK {{level}}级表达",
+    "previousScore": "之前得分",
+    "scoreUnit": "分",
+    "restart": "重新开始",
+    "start": "开始",
+    "tapToFlip": "点击翻转",
+    "literal": "字面意思",
+    "actualMeaning": "实际含义",
+    "situationExample": "情景示例",
+    "similarExpressions": "类似表达",
+    "showExample": "查看示例",
+    "confused": "有点迷糊 😅",
+    "gotIt": "明白了！"
+  },
+  "vocab": {
+    "flash": { "title": "闪卡记忆", "desc": "3秒闪卡快速记忆" },
+    "match": { "title": "意思匹配", "desc": "韩语↔母语匹配游戏" },
+    "cloze": { "title": "填空", "desc": "语境填空测验" },
+    "mistake": { "title": "错题复习", "desc": "专注错误单词" },
+    "section": { "memorize": "记忆区", "memorizeDesc": "快速记忆单词", "context": "语境区", "contextDesc": "在句子中学习词汇" },
+    "level": { "beginner": "初级", "intermediate": "中级", "advanced": "高级" },
+    "category": { "memorize": "记忆", "context": "语境" }
+  },
+  "roleplay": { "level": { "beginner": "初级", "intermediate": "中高级" } }
 }

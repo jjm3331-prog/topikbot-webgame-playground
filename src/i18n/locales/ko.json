@@ -55,6 +55,14 @@
     "gameStartError": "게임 시작 오류",
     "gameStartErrorDesc": "게임을 시작하는데 실패했습니다."
   },
+  "trial": {
+    "available": "무료 체험 가능",
+    "freeToday": "오늘 1회 무료로 {{feature}}을 체험할 수 있습니다!",
+    "unlimitedAccess": "무제한 이용하기",
+    "completed": "오늘 체험 완료",
+    "nextTrialIn": "다음 무료 체험까지 {{time}} 남았습니다",
+    "upgradePremium": "Premium 업그레이드"
+  },
   "pwaWelcome": {
     "installComplete": "설치 완료!",
     "appAdded": "Game LUKATO가 홈 화면에 추가되었습니다.",
@@ -3423,5 +3431,62 @@
     "send": "전송",
     "scenarioSelect": "시나리오 선택",
     "topikLevel": "TOPIK 레벨"
-  }
+  },
+  "stats": {
+    "progress": "진도율",
+    "completed": "{{completed}}/{{total}} 완료",
+    "totalScore": "총 점수",
+    "points": "포인트",
+    "averageScore": "평균 점수",
+    "scoreUnit": "점",
+    "outOf100": "100점 만점",
+    "studyTime": "학습 시간",
+    "totalStudy": "총 학습량",
+    "hoursMinutes": "{{hours}}시간 {{minutes}}분",
+    "minutes": "{{minutes}}분"
+  },
+  "category": {
+    "vocabulary": "어휘",
+    "grammar": "문법",
+    "reading": "읽기",
+    "listening": "듣기",
+    "mockTest": "모의고사"
+  },
+  "emotion": {
+    "fallenHard": "완전 반했어!",
+    "loveIt": "너무 좋아!",
+    "excited": "설레어~",
+    "goodFeeling": "좋은 느낌",
+    "interested": "관심있어",
+    "notSure": "아직 모르겠어",
+    "notGood": "별로야..."
+  },
+  "idiom": {
+    "loading": "관용표현 로딩 중...",
+    "title": "관용표현 마스터",
+    "subtitle": "직역 ↔ 실제 의미를 맞춰보세요!",
+    "levelExpressions": "TOPIK {{level}}급 표현",
+    "previousScore": "이전 점수",
+    "scoreUnit": "점",
+    "restart": "다시 시작",
+    "start": "시작하기",
+    "tapToFlip": "탭하여 뒤집기",
+    "literal": "직역",
+    "actualMeaning": "실제 의미",
+    "situationExample": "상황 예시",
+    "similarExpressions": "비슷한 표현",
+    "showExample": "상황 예시 보기",
+    "confused": "헷갈려요 😅",
+    "gotIt": "알겠어요!"
+  },
+  "vocab": {
+    "flash": { "title": "플래시 암기", "desc": "3초 플래시카드로 빠른 암기" },
+    "match": { "title": "뜻 매칭", "desc": "한국어 ↔ 내 언어 매칭 게임" },
+    "cloze": { "title": "빈칸 채우기", "desc": "문맥 속 빈칸 퀴즈" },
+    "mistake": { "title": "오답 복습", "desc": "틀린 단어 집중 학습" },
+    "section": { "memorize": "암기 영역", "memorizeDesc": "단어를 빠르게 암기하세요", "context": "맥락 영역", "contextDesc": "문장 속에서 어휘를 학습하세요" },
+    "level": { "beginner": "초급", "intermediate": "중급", "advanced": "고급" },
+    "category": { "memorize": "암기", "context": "맥락" }
+  },
+  "roleplay": { "level": { "beginner": "초급", "intermediate": "중고급" } }
 }
