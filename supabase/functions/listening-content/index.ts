@@ -32,9 +32,9 @@ const TOPIK_LEVEL_EXAMPLES: Record<string, string> = {
   "speaker2Text": "아니요, 지금 밖에 나갔어요. 메시지 남기실래요?",
   "question": "남자는 왜 전화했습니까?",
   "options": ["김민수 씨를 만나려고", "메시지를 남기려고", "전화번호를 물으려고", "집에 가려고"],
-  "answer": 0,
-  "explanation": "'김민수 씨 있어요?'라고 물었으므로 김민수 씨를 찾기 위해 전화한 것입니다.",
-  "explanationVi": "Người đàn ông hỏi 'Kim Minsu có ở đó không?' nên anh ấy gọi để tìm Kim Minsu."
+  "answer": 1,
+  "explanation": "정답은 ①번입니다. '김민수 씨 있어요?'라고 물었으므로 김민수 씨를 찾기 위해 전화한 것입니다.\n\n오답 분석:\n② 메시지를 남기려고 한 것은 여자의 제안이지 남자의 목적이 아닙니다.\n③ 전화번호를 물어본 내용은 없습니다.\n④ 집에 가려고 전화한 것이 아닙니다.",
+  "explanationVi": "Đáp án đúng là số ①. Người đàn ông hỏi 'Kim Minsu có ở đó không?' nên anh ấy gọi để tìm Kim Minsu.\n\nPhân tích đáp án sai:\n② Việc nhắn tin là đề xuất của người phụ nữ, không phải mục đích của người đàn ông.\n③ Không có nội dung hỏi số điện thoại.\n④ Không phải gọi để về nhà."
 }
 
 <예시2 - 안내형>
@@ -43,9 +43,9 @@ const TOPIK_LEVEL_EXAMPLES: Record<string, string> = {
   "speaker1Text": "지금부터 3번 출구는 공사 중입니다. 4번 출구를 이용해 주세요.",
   "question": "이 안내를 듣고 어디로 가야 합니까?",
   "options": ["1번 출구", "2번 출구", "3번 출구", "4번 출구"],
-  "answer": 3,
-  "explanation": "3번 출구가 공사 중이어서 4번 출구를 이용하라고 안내했습니다.",
-  "explanationVi": "Vì cửa số 3 đang thi công nên được hướng dẫn sử dụng cửa số 4."
+  "answer": 4,
+  "explanation": "정답은 ④번입니다. 3번 출구가 공사 중이어서 4번 출구를 이용하라고 안내했습니다.\n\n오답 분석:\n① 1번 출구는 언급되지 않았습니다.\n② 2번 출구도 언급되지 않았습니다.\n③ 3번 출구는 공사 중이므로 이용할 수 없습니다.",
+  "explanationVi": "Đáp án đúng là số ④. Vì cửa số 3 đang thi công nên được hướng dẫn sử dụng cửa số 4.\n\nPhân tích đáp án sai:\n① Cửa số 1 không được đề cập.\n② Cửa số 2 cũng không được đề cập.\n③ Cửa số 3 đang thi công nên không thể sử dụng."
 }
 
 [필수 어휘/문법]
@@ -62,9 +62,9 @@ const TOPIK_LEVEL_EXAMPLES: Record<string, string> = {
   "speaker2Text": "저도 그래요. 그래서 출퇴근할 때 한 정거장 먼저 내려서 걸어요.",
   "question": "여자가 운동하는 방법은 무엇입니까?",
   "options": ["헬스장에 다닌다", "주말에 등산을 한다", "출퇴근 시 걸어 다닌다", "점심시간에 수영한다"],
-  "answer": 2,
-  "explanation": "한 정거장 먼저 내려서 걷는다고 했으므로 출퇴근 시 걷는 것이 운동 방법입니다.",
-  "explanationVi": "Cô ấy nói xuống trước một trạm và đi bộ, nên cách tập thể dục là đi bộ khi đi làm."
+  "answer": 3,
+  "explanation": "정답은 ③번입니다. 한 정거장 먼저 내려서 걷는다고 했으므로 출퇴근 시 걷는 것이 운동 방법입니다.\n\n오답 분석:\n① 헬스장에 대한 언급이 없습니다.\n② 등산에 대한 언급이 없습니다.\n④ 수영에 대한 언급이 없습니다.",
+  "explanationVi": "Đáp án đúng là số ③. Cô ấy nói xuống trước một trạm và đi bộ, nên cách tập thể dục là đi bộ khi đi làm.\n\nPhân tích đáp án sai:\n① Không đề cập đến phòng gym.\n② Không đề cập đến leo núi.\n④ Không đề cập đến bơi lội."
 }
 
 <예시2 - 뉴스형>
@@ -73,9 +73,9 @@ const TOPIK_LEVEL_EXAMPLES: Record<string, string> = {
   "speaker1Text": "최근 조사에 따르면 20대의 70%가 결혼보다 자기 계발을 더 중요하게 생각한다고 합니다. 전문가들은 경제적 불안과 개인주의 확산이 원인이라고 분석했습니다.",
   "question": "20대가 결혼을 미루는 이유는 무엇입니까?",
   "options": ["부모님 반대", "건강 문제", "경제적 불안과 개인주의", "주거 문제"],
-  "answer": 2,
-  "explanation": "전문가들이 경제적 불안과 개인주의 확산이 원인이라고 분석했습니다.",
-  "explanationVi": "Các chuyên gia phân tích nguyên nhân là sự bất ổn kinh tế và sự lan rộng của chủ nghĩa cá nhân."
+  "answer": 3,
+  "explanation": "정답은 ③번입니다. 전문가들이 경제적 불안과 개인주의 확산이 원인이라고 분석했습니다.\n\n오답 분석:\n① 부모님 반대는 언급되지 않았습니다.\n② 건강 문제는 언급되지 않았습니다.\n④ 주거 문제는 언급되지 않았습니다.",
+  "explanationVi": "Đáp án đúng là số ③. Các chuyên gia phân tích nguyên nhân là sự bất ổn kinh tế và sự lan rộng của chủ nghĩa cá nhân.\n\nPhân tích đáp án sai:\n① Sự phản đối của cha mẹ không được đề cập.\n② Vấn đề sức khỏe không được đề cập.\n④ Vấn đề nhà ở không được đề cập."
 }
 
 [필수 어휘/문법]
@@ -92,9 +92,9 @@ const TOPIK_LEVEL_EXAMPLES: Record<string, string> = {
   "speaker2Text": "단기적으로는 일부 직종의 대체가 불가피하겠지만, 역사적으로 기술 혁신은 새로운 산업과 일자리를 창출해 왔습니다. 중요한 건 이 전환기에 적절한 재교육 시스템을 갖추는 것입니다.",
   "question": "남자의 주장으로 가장 적절한 것은 무엇입니까?",
   "options": ["AI 개발을 중단해야 한다", "재교육 시스템 구축이 중요하다", "모든 직종이 AI로 대체될 것이다", "기술 혁신은 항상 해롭다"],
-  "answer": 1,
-  "explanation": "전환기에 적절한 재교육 시스템을 갖추는 것이 중요하다고 강조했습니다.",
-  "explanationVi": "Ông ấy nhấn mạnh việc xây dựng hệ thống đào tạo lại phù hợp trong giai đoạn chuyển đổi là quan trọng."
+  "answer": 2,
+  "explanation": "정답은 ②번입니다. 전환기에 적절한 재교육 시스템을 갖추는 것이 중요하다고 강조했습니다.\n\n오답 분석:\n① AI 개발 중단을 주장한 적이 없습니다.\n③ 모든 직종이 대체된다고 하지 않았습니다.\n④ 기술 혁신이 해롭다고 하지 않았습니다.",
+  "explanationVi": "Đáp án đúng là số ②. Ông ấy nhấn mạnh việc xây dựng hệ thống đào tạo lại phù hợp trong giai đoạn chuyển đổi là quan trọng.\n\nPhân tích đáp án sai:\n① Không hề chủ trương dừng phát triển AI.\n③ Không nói tất cả các ngành nghề sẽ bị thay thế.\n④ Không nói đổi mới công nghệ luôn có hại."
 }
 
 <예시2 - 강연형>
@@ -103,9 +103,9 @@ const TOPIK_LEVEL_EXAMPLES: Record<string, string> = {
   "speaker1Text": "지속가능한 발전이라는 개념은 1987년 브룬트란트 보고서에서 처음 공식화되었습니다. 이는 미래 세대의 필요를 충족시킬 능력을 저해하지 않으면서 현재 세대의 필요를 충족시키는 발전을 의미합니다. 오늘날 이 개념은 환경, 경제, 사회의 세 축을 아우르는 통합적 접근으로 확장되었습니다.",
   "question": "강연의 중심 내용으로 가장 적절한 것은 무엇입니까?",
   "options": ["브룬트란트 보고서의 역사", "지속가능한 발전의 정의와 확장", "환경 문제의 심각성", "경제 발전의 필요성"],
-  "answer": 1,
-  "explanation": "지속가능한 발전의 정의(1987년)와 오늘날의 통합적 접근으로의 확장을 설명하고 있습니다.",
-  "explanationVi": "Bài giảng giải thích định nghĩa phát triển bền vững (1987) và sự mở rộng thành cách tiếp cận tích hợp ngày nay."
+  "answer": 2,
+  "explanation": "정답은 ②번입니다. 지속가능한 발전의 정의(1987년)와 오늘날의 통합적 접근으로의 확장을 설명하고 있습니다.\n\n오답 분석:\n① 보고서의 역사가 아니라 개념의 정의와 확장이 중심입니다.\n③ 환경 문제의 심각성은 직접 다루지 않았습니다.\n④ 경제 발전의 필요성만 강조한 것이 아닙니다.",
+  "explanationVi": "Đáp án đúng là số ②. Bài giảng giải thích định nghĩa phát triển bền vững (1987) và sự mở rộng thành cách tiếp cận tích hợp ngày nay.\n\nPhân tích đáp án sai:\n① Trọng tâm là định nghĩa và mở rộng khái niệm, không phải lịch sử báo cáo.\n③ Mức độ nghiêm trọng của vấn đề môi trường không được đề cập trực tiếp.\n④ Không chỉ nhấn mạnh sự cần thiết của phát triển kinh tế."
 }
 
 [필수 어휘/문법]
@@ -120,12 +120,12 @@ const SYSTEM_PROMPT = `당신은 TOPIK(한국어능력시험) 듣기 문제 출�
 
 [🚫 중복 절대 금지 (가장 중요)]
 - 동일/유사 문제를 만들면 실패입니다.
-- 아래 항목 중 하나라도 겹치면 ‘중복’으로 간주합니다:
+- 아래 항목 중 하나라도 겹치면 '중복'으로 간주합니다:
   1) 대화/발화(표현·문장) 핵심이 유사
   2) 상황(장소·목적·갈등)이 유사
-  3) 질문 유형/문장 틀이 유사(예: “왜 ~했습니까?” 반복)
+  3) 질문 유형/문장 틀이 유사(예: "왜 ~했습니까?" 반복)
   4) 보기(option) 구성과 정답 포인트가 유사
-- 최근 문제 목록이 제공되면, 그 목록과 ‘표현/내용/구성’이 겹치지 않도록 반드시 새로 만들 것.
+- 최근 문제 목록이 제공되면, 그 목록과 '표현/내용/구성'이 겹치지 않도록 반드시 새로 만들 것.
 - 생성 후 스스로 점검: 서로 겹치는 문제(주제/장소/관계/직업/전개/질문틀/정답포인트)가 있으면 전부 폐기하고 새로 생성.
 
 [🔥 다양성 최우선 규칙 - 반드시 준수]
@@ -164,6 +164,15 @@ const SYSTEM_PROMPT = `당신은 TOPIK(한국어능력시험) 듣기 문제 출�
 3. 급수별 어휘/문법 수준을 엄격히 준수
 4. 대화형(dialogue)과 안내/발표형(single) 적절히 혼합
 
+[🚨 정답-해설 일치 필수 규칙 (가장 중요!)]
+- answer 필드는 반드시 1, 2, 3, 4 중 하나 (1-based 인덱스)
+- answer=1 이면 해설에서 반드시 "정답은 ①번" 또는 "정답은 1번"으로 시작
+- answer=2 이면 해설에서 반드시 "정답은 ②번" 또는 "정답은 2번"으로 시작
+- answer=3 이면 해설에서 반드시 "정답은 ③번" 또는 "정답은 3번"으로 시작
+- answer=4 이면 해설에서 반드시 "정답은 ④번" 또는 "정답은 4번"으로 시작
+- 해설에서 언급하는 정답 번호와 answer 값이 반드시 일치해야 함
+- 오답 분석에서는 다른 번호(①②③④)를 설명할 것
+
 [JSON 스키마]
 {
   "type": "dialogue" | "single",
@@ -171,9 +180,9 @@ const SYSTEM_PROMPT = `당신은 TOPIK(한국어능력시험) 듣기 문제 출�
   "speaker2Text": "두 번째 화자 (dialogue만, 한국어)",
   "question": "질문 (한국어)",
   "options": ["①", "②", "③", "④"],
-  "answer": 0-3,
-  "explanation": "해설 (한국어)",
-  "explanationVi": "Giải thích (tiếng Việt tự nhiên)"
+  "answer": 1-4 (1-based 인덱스, 해설과 반드시 일치),
+  "explanation": "정답은 X번입니다. (해설 - answer와 일치하는 번호로 시작)",
+  "explanationVi": "Đáp án đúng là số X. (Giải thích tiếng Việt tự nhiên)"
 }`;
 
 interface Question {
@@ -182,9 +191,77 @@ interface Question {
   speaker2Text?: string;
   question: string;
   options: string[];
-  answer: number;
+  answer: number; // 1-4 (1-based index)
   explanation: string;
   explanationVi: string;
+}
+
+// 정답-해설 일치 검증 및 수정 함수
+function validateAndFixAnswerConsistency(questions: Question[]): Question[] {
+  const answerSymbols = ['①', '②', '③', '④'];
+  const answerNumbers = ['1번', '2번', '3번', '4번'];
+  
+  return questions.map((q, idx) => {
+    // 해설에서 정답 번호 추출
+    let explanationAnswer: number | null = null;
+    
+    for (let i = 0; i < 4; i++) {
+      const symbol = answerSymbols[i];
+      const number = answerNumbers[i];
+      if (q.explanation.includes(`정답은 ${symbol}`) || q.explanation.includes(`정답은 ${number}`)) {
+        explanationAnswer = i + 1; // 1-based
+        break;
+      }
+    }
+    
+    // 베트남어 해설에서도 확인
+    if (explanationAnswer === null && q.explanationVi) {
+      for (let i = 0; i < 4; i++) {
+        if (q.explanationVi.includes(`số ${answerSymbols[i]}`) || 
+            q.explanationVi.includes(`là ${i + 1}`) ||
+            q.explanationVi.includes(`Đáp án đúng là ①②③④`[i])) {
+          explanationAnswer = i + 1;
+          break;
+        }
+      }
+    }
+    
+    // answer 값 검증 및 수정
+    let correctedAnswer = q.answer;
+    
+    // 0-based로 들어온 경우 1-based로 변환
+    if (correctedAnswer >= 0 && correctedAnswer <= 3) {
+      correctedAnswer = correctedAnswer + 1;
+      console.log(`[Listening] Q${idx + 1}: Converting 0-based (${q.answer}) to 1-based (${correctedAnswer})`);
+    }
+    
+    // 범위 검증 (1-4)
+    if (correctedAnswer < 1 || correctedAnswer > 4) {
+      console.warn(`[Listening] Q${idx + 1}: Invalid answer ${correctedAnswer}, defaulting to explanation answer or 1`);
+      correctedAnswer = explanationAnswer || 1;
+    }
+    
+    // 해설과 answer가 불일치하면 해설 기준으로 수정
+    if (explanationAnswer !== null && explanationAnswer !== correctedAnswer) {
+      console.log(`[Listening] Q${idx + 1}: Answer mismatch! DB answer=${correctedAnswer}, explanation says=${explanationAnswer}. Using explanation.`);
+      correctedAnswer = explanationAnswer;
+    }
+    
+    // 해설이 정답 번호로 시작하지 않으면 수정
+    let correctedExplanation = q.explanation;
+    const expectedSymbol = answerSymbols[correctedAnswer - 1];
+    if (!q.explanation.includes(`정답은 ${expectedSymbol}`) && !q.explanation.includes(`정답은 ${correctedAnswer}번`)) {
+      // 해설 앞에 정답 번호 추가
+      correctedExplanation = `정답은 ${expectedSymbol}번입니다. ${q.explanation.replace(/^정답은\s*[①②③④1-4]번?[입니다\.\s]*/i, '')}`;
+      console.log(`[Listening] Q${idx + 1}: Fixed explanation to start with correct answer symbol`);
+    }
+    
+    return {
+      ...q,
+      answer: correctedAnswer,
+      explanation: correctedExplanation,
+    };
+  });
 }
 
 // OpenAI 임베딩 생성
@@ -465,8 +542,12 @@ serve(async (req) => {
     }
 
     // 2. LLM으로 문제 생성 (RAG 컨텍스트 활용 또는 순수 생성)
-    const questions = await generateWithLLM(count, topikLevel, ragContext, recentQuestionsBlock);
-    console.log(`[Listening] Generated ${questions.length} questions`);
+    const rawQuestions = await generateWithLLM(count, topikLevel, ragContext, recentQuestionsBlock);
+    console.log(`[Listening] Generated ${rawQuestions.length} raw questions`);
+
+    // 3. 정답-해설 일치 검증 및 수정 (필수!)
+    const questions = validateAndFixAnswerConsistency(rawQuestions);
+    console.log(`[Listening] Validated and fixed ${questions.length} questions for answer-explanation consistency`);
 
     // 캐시 저장 (옵션, 4시간)
     if (useCache) {
