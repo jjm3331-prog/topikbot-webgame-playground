@@ -31,9 +31,9 @@ const TOPIK_READING_EXAMPLES: Record<string, string> = {
   "passage": "저는 매일 아침 7시___ 일어납니다.",
   "question": "빈칸에 알맞은 것을 고르십시오.",
   "options": ["①에", "②를", "③이", "④은"],
-  "answer": 0,
-  "explanationKo": "'7시'는 시간이므로 시간을 나타내는 조사 '에'가 필요합니다.",
-  "explanationVi": "'7시' là thời gian nên cần trợ từ '에' chỉ thời gian."
+  "answer": 1,
+  "explanationKo": "정답은 ①번입니다. '7시'는 시간이므로 시간을 나타내는 조사 '에'가 필요합니다.",
+  "explanationVi": "Đáp án đúng là số ①. '7시' là thời gian nên cần trợ từ '에' chỉ thời gian."
 }
 
 <주제 파악 예시>
@@ -42,9 +42,9 @@ const TOPIK_READING_EXAMPLES: Record<string, string> = {
   "passage": "저는 한국 음식을 좋아합니다. 특히 김치찌개와 비빔밥을 자주 먹습니다. 한국 음식은 맛있고 건강에도 좋습니다.",
   "question": "이 글의 중심 생각은 무엇입니까?",
   "options": ["①한국 음식 만드는 법", "②한국 음식이 좋은 이유", "③김치찌개 재료", "④건강한 생활"],
-  "answer": 1,
-  "explanationKo": "필자가 한국 음식을 좋아하는 이유(맛있고 건강에 좋음)를 설명하고 있습니다.",
-  "explanationVi": "Tác giả giải thích lý do thích đồ ăn Hàn (ngon và tốt cho sức khỏe)."
+  "answer": 2,
+  "explanationKo": "정답은 ②번입니다. 필자가 한국 음식을 좋아하는 이유(맛있고 건강에 좋음)를 설명하고 있습니다.",
+  "explanationVi": "Đáp án đúng là số ②. Tác giả giải thích lý do thích đồ ăn Hàn (ngon và tốt cho sức khỏe)."
 }
 
 [필수 어휘/문법]
@@ -59,9 +59,9 @@ const TOPIK_READING_EXAMPLES: Record<string, string> = {
   "passage": "최근 재택근무가 늘어나면서 직장인들의 생활 패턴이 크게 변했다. 출퇴근 시간이 줄어들어 (        ) 반면, 일과 생활의 경계가 모호해지는 문제도 생겼다.",
   "question": "빈칸에 들어갈 내용으로 가장 알맞은 것은?",
   "options": ["①스트레스가 증가한", "②개인 시간이 늘어난", "③업무 효율이 떨어진", "④회의 시간이 길어진"],
-  "answer": 1,
-  "explanationKo": "출퇴근 시간이 줄면 그만큼 개인 시간이 늘어나므로 긍정적 결과를 나타내는 ②가 적절합니다.",
-  "explanationVi": "Khi thời gian đi làm giảm thì thời gian cá nhân tăng lên, nên ② là phù hợp."
+  "answer": 2,
+  "explanationKo": "정답은 ②번입니다. 출퇴근 시간이 줄면 그만큼 개인 시간이 늘어나므로 긍정적 결과를 나타내는 ②가 적절합니다.",
+  "explanationVi": "Đáp án đúng là số ②. Khi thời gian đi làm giảm thì thời gian cá nhân tăng lên, nên ② là phù hợp."
 }
 
 <내용 일치 예시>
@@ -70,9 +70,9 @@ const TOPIK_READING_EXAMPLES: Record<string, string> = {
   "passage": "한국의 사계절 중 가을은 단풍으로 유명합니다. 특히 설악산과 내장산은 단풍 명소로 많은 관광객이 찾습니다. 가을 단풍은 보통 9월 말부터 시작해서 11월 초까지 볼 수 있습니다.",
   "question": "이 글의 내용과 같은 것을 고르십시오.",
   "options": ["①한국에는 사계절이 없다", "②단풍은 여름에 볼 수 있다", "③설악산은 단풍 명소이다", "④관광객은 단풍을 싫어한다"],
-  "answer": 2,
-  "explanationKo": "지문에서 '설악산과 내장산은 단풍 명소'라고 명시되어 있습니다.",
-  "explanationVi": "Bài đọc nói rõ 'Núi Seorak và Naejang là điểm ngắm lá đỏ nổi tiếng'."
+  "answer": 3,
+  "explanationKo": "정답은 ③번입니다. 지문에서 '설악산과 내장산은 단풍 명소'라고 명시되어 있습니다.",
+  "explanationVi": "Đáp án đúng là số ③. Bài đọc nói rõ 'Núi Seorak và Naejang là điểm ngắm lá đỏ nổi tiếng'."
 }
 
 [필수 어휘/문법]
@@ -87,9 +87,9 @@ const TOPIK_READING_EXAMPLES: Record<string, string> = {
   "passage": "(가) 이러한 변화는 전통적 가치관과 충돌을 일으키기도 한다.\n(나) 현대 사회에서 가족의 형태는 다양해지고 있다.\n(다) 1인 가구, 비혼 가정, 다문화 가정 등 새로운 가족 유형이 증가하고 있다.\n(라) 그러나 다양성을 인정하는 것이 사회 통합에 중요하다는 인식이 확산되고 있다.",
   "question": "글의 순서로 가장 알맞은 것은?",
   "options": ["①(나)-(다)-(가)-(라)", "②(다)-(나)-(라)-(가)", "③(가)-(라)-(나)-(다)", "④(나)-(가)-(다)-(라)"],
-  "answer": 0,
-  "explanationKo": "(나) 주제 제시 → (다) 구체적 예시 → (가) 문제점 지적 → (라) 해결 방향 제시의 논리적 흐름입니다.",
-  "explanationVi": "(나) Đề xuất chủ đề → (다) Ví dụ cụ thể → (가) Chỉ ra vấn đề → (라) Đề xuất hướng giải quyết."
+  "answer": 1,
+  "explanationKo": "정답은 ①번입니다. (나) 주제 제시 → (다) 구체적 예시 → (가) 문제점 지적 → (라) 해결 방향 제시의 논리적 흐름입니다.",
+  "explanationVi": "Đáp án đúng là số ①. (나) Đề xuất chủ đề → (다) Ví dụ cụ thể → (가) Chỉ ra vấn đề → (라) Đề xuất hướng giải quyết."
 }
 
 <종합 독해 예시>
@@ -98,9 +98,9 @@ const TOPIK_READING_EXAMPLES: Record<string, string> = {
   "passage": "인공지능의 발전은 노동 시장에 근본적인 변화를 가져올 것으로 예측된다. 단순 반복 업무는 자동화되는 반면, 창의성과 감성 지능이 요구되는 직종은 오히려 중요성이 커질 전망이다. 이에 따라 교육 시스템도 암기 중심에서 문제 해결 능력 중심으로 전환해야 한다는 주장이 제기되고 있다.",
   "question": "이 글의 중심 내용으로 가장 적절한 것은?",
   "options": ["①AI가 모든 일자리를 대체할 것이다", "②AI 시대에 맞는 교육 변화가 필요하다", "③암기 교육이 가장 효과적이다", "④단순 업무가 더 중요해질 것이다"],
-  "answer": 1,
-  "explanationKo": "AI로 인한 노동 시장 변화와 이에 따른 교육 시스템 전환 필요성을 주장하고 있습니다.",
-  "explanationVi": "Bài viết nêu sự thay đổi thị trường lao động do AI và sự cần thiết phải chuyển đổi hệ thống giáo dục."
+  "answer": 2,
+  "explanationKo": "정답은 ②번입니다. AI로 인한 노동 시장 변화와 이에 따른 교육 시스템 전환 필요성을 주장하고 있습니다.",
+  "explanationVi": "Đáp án đúng là số ②. Bài viết nêu sự thay đổi thị trường lao động do AI và sự cần thiết phải chuyển đổi hệ thống giáo dục."
 }
 
 [필수 어휘/문법]
@@ -116,6 +116,8 @@ const SYSTEM_PROMPT = `당신은 TOPIK 읽기 시험 전문가입니다.
 2. 베트남어는 번역투 금지, 현지인이 쓰는 자연스러운 표현
 3. 급수별 어휘/문법 수준을 엄격히 준수
 4. 해설은 왜 정답인지 + 오답 분석 포함
+5. **정답-해설 불일치 금지**: answer 번호(1~4)와 해설에서 언급하는 정답 번호가 반드시 같아야 함
+   - 해설은 "정답은 ①번입니다."처럼 정답 번호로 시작할 것
 
 [JSON 스키마]
 {
@@ -123,9 +125,9 @@ const SYSTEM_PROMPT = `당신은 TOPIK 읽기 시험 전문가입니다.
   "passage": "지문 (한국어)",
   "question": "질문 (한국어)",
   "options": ["①", "②", "③", "④"],
-  "answer": 0-3,
-  "explanationKo": "해설 (한국어)",
-  "explanationVi": "Giải thích (tiếng Việt)"
+  "answer": 1-4 (1-based 인덱스),
+  "explanationKo": "정답은 X번입니다. (해설 - answer와 반드시 일치)",
+  "explanationVi": "Đáp án đúng là số X. (Giải thích tiếng Việt tự nhiên)"
 }`;
 
 const TAB_PROMPTS: Record<string, Record<string, string>> = {
@@ -284,6 +286,74 @@ async function generateWithLLM(
   }
 }
 
+type ReadingQuestion = {
+  id?: number;
+  passage: string;
+  question: string;
+  options: string[];
+  answer: number; // 1-4 (1-based)
+  explanationKo: string;
+  explanationVi: string;
+};
+
+function normalizeReadingQuestions(raw: any[]): ReadingQuestion[] {
+  const answerSymbols = ['①', '②', '③', '④'];
+
+  // raw answer가 0을 포함하면(명확히 0-based) → 전체를 0-based로 간주
+  const treatAsZeroBased = raw.some((q) => typeof q?.answer === 'number' && q.answer === 0);
+
+  return raw.map((q, idx) => {
+    const options = Array.isArray(q?.options) ? q.options.map(String) : [];
+
+    // 해설에서 정답 번호 추출 (가능하면)
+    const koToken = String(q?.explanationKo ?? '').match(/정답\s*(?:은|는|:)\s*([①②③④1-4])/);
+    const koAnswer = koToken?.[1]
+      ? (koToken[1] === '①' || koToken[1] === '1') ? 1
+        : (koToken[1] === '②' || koToken[1] === '2') ? 2
+        : (koToken[1] === '③' || koToken[1] === '3') ? 3
+        : (koToken[1] === '④' || koToken[1] === '4') ? 4
+        : null
+      : null;
+
+    let ans = Number(q?.answer);
+    if (!Number.isFinite(ans)) ans = koAnswer ?? 1;
+
+    // 0-based → 1-based 보정
+    if (treatAsZeroBased && ans >= 0 && ans <= 3) ans = ans + 1;
+    // 범위 보정
+    if (ans < 1 || ans > 4) ans = koAnswer ?? 1;
+
+    // 해설이 명시한 정답이 있으면 그걸 최우선으로 맞춤
+    if (koAnswer !== null && koAnswer !== ans) {
+      console.log(`[Reading] Q${idx + 1}: Answer mismatch (answer=${ans}, explanation=${koAnswer}) → using explanation`);
+      ans = koAnswer;
+    }
+
+    const expectedSymbol = answerSymbols[ans - 1];
+    const explanationKoRaw = String(q?.explanationKo ?? '').trim();
+    const explanationKo = explanationKoRaw
+      ? (/^정답\s*(?:은|는|:)\s*[①②③④1-4]/.test(explanationKoRaw)
+           ? explanationKoRaw
+          : `정답은 ${expectedSymbol}번입니다. ${explanationKoRaw}`)
+      : `정답은 ${expectedSymbol}번입니다.`;
+
+    const explanationViRaw = String(q?.explanationVi ?? '').trim();
+    const explanationVi = explanationViRaw
+      ? (/^Đáp\s*án/i.test(explanationViRaw) ? explanationViRaw : `Đáp án đúng là số ${expectedSymbol}. ${explanationViRaw}`)
+      : `Đáp án đúng là số ${expectedSymbol}.`;
+
+    return {
+      id: Number.isFinite(Number(q?.id)) ? Number(q.id) : idx + 1,
+      passage: String(q?.passage ?? ''),
+      question: String(q?.question ?? ''),
+      options,
+      answer: ans,
+      explanationKo,
+      explanationVi,
+    };
+  });
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -338,7 +408,8 @@ serve(async (req) => {
     }
 
     // 2. LLM 생성
-    const questions = await generateWithLLM(count, topikLevel, tab, subTab, ragContext);
+    const rawQuestions = await generateWithLLM(count, topikLevel, tab, subTab, ragContext);
+    const questions = normalizeReadingQuestions(rawQuestions);
 
     // 캐시 저장
     const expiresAt = new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString();
