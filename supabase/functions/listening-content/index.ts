@@ -229,10 +229,22 @@ function validateAndFixAnswerConsistency(questions: Question[]): Question[] {
     // answer 값 검증 및 수정
     let correctedAnswer = q.answer;
     
-    // 0-based로 들어온 경우 1-based로 변환
-    if (correctedAnswer >= 0 && correctedAnswer <= 3) {
+    // 0-based로 들어온 경우만 1-based로 변환 (⚠️ 1~3은 1-based일 수도 있으므로 절대 무조건 변환 금지)
+    // - answer가 0이면 확실히 0-based → 1로 변환
+    // - answer가 1~4면 이미 1-based로 간주
+    // - answer가 1~3인데 해설이 (answer+1)로 명시되어 있으면 그때만 0-based로 판단
+    if (correctedAnswer === 0) {
+      correctedAnswer = 1;
+      console.log(`[Listening] Q${idx + 1}: Converting 0-based (0) to 1-based (1)`);
+    } else if (
+      correctedAnswer >= 1 &&
+      correctedAnswer <= 3 &&
+      explanationAnswer !== null &&
+      explanationAnswer === correctedAnswer + 1
+    ) {
+      const from = correctedAnswer;
       correctedAnswer = correctedAnswer + 1;
-      console.log(`[Listening] Q${idx + 1}: Converting 0-based (${q.answer}) to 1-based (${correctedAnswer})`);
+      console.log(`[Listening] Q${idx + 1}: Converting 0-based (${from}) to 1-based (${correctedAnswer}) based on explanation`);
     }
     
     // 범위 검증 (1-4)
