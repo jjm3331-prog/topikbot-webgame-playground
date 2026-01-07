@@ -3715,7 +3715,7 @@
     "level": { "beginner": "초급", "intermediate": "중급", "advanced": "고급" },
     "category": { "memorize": "암기", "context": "맥락" }
   },
-  "roleplay": { "level": { "beginner": "초급", "intermediate": "중고급" } },
+  
   "lessonMenu": {
     "handwriting": { "title": "손글씨 연습", "description": "자음·모음 기초부터 단어, 문장까지 손글씨로 직접 써보며 한글을 익히세요. AI가 맞춤법 퀴즈도 생성해드려요." },
     "listening": { "title": "듣기 연습", "description": "실제 TOPIK 듣기 시험처럼 4지선다 문제를 풀어보세요. AI TTS로 2명의 화자가 대화하는 문제도 준비되어 있어요." },
